@@ -1,4 +1,3 @@
-// Twitch Emotes
 import 'package:json_annotation/json_annotation.dart';
 
 part 'emotes.g.dart';
