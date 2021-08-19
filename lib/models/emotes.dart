@@ -9,12 +9,12 @@ class ImagesTwitch {
   final String url2x;
   final String url4x;
 
-  ImagesTwitch(this.url1x, this.url2x, this.url4x);
+  const ImagesTwitch(this.url1x, this.url2x, this.url4x);
 
   factory ImagesTwitch.fromJson(Map<String, dynamic> json) => _$ImagesTwitchFromJson(json);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class EmoteTwitch {
   final String id;
   final String name;
@@ -22,8 +22,11 @@ class EmoteTwitch {
   final String? tier;
   final String? emoteType;
   final String? emoteSetId;
+  final List<String> format;
+  final List<String> scale;
+  final List<String> themeMode;
 
-  EmoteTwitch(this.id, this.name, this.images, this.tier, this.emoteType, this.emoteSetId);
+  const EmoteTwitch(this.id, this.name, this.images, this.tier, this.emoteType, this.emoteSetId, this.format, this.scale, this.themeMode);
 
   factory EmoteTwitch.fromJson(Map<String, dynamic> json) => _$EmoteTwitchFromJson(json);
 }
@@ -36,7 +39,7 @@ class EmoteBTTVGlobal {
   final String imageType;
   final String userId;
 
-  EmoteBTTVGlobal(this.id, this.code, this.imageType, this.userId);
+  const EmoteBTTVGlobal(this.id, this.code, this.imageType, this.userId);
 
   factory EmoteBTTVGlobal.fromJson(Map<String, dynamic> json) => _$EmoteBTTVGlobalFromJson(json);
 }
@@ -48,7 +51,7 @@ class UserBTTV {
   final String displayName;
   final String providerId;
 
-  UserBTTV(this.id, this.name, this.displayName, this.providerId);
+  const UserBTTV(this.id, this.name, this.displayName, this.providerId);
 
   factory UserBTTV.fromJson(Map<String, dynamic> json) => _$UserBTTVFromJson(json);
 }
@@ -60,7 +63,7 @@ class EmoteBTTVShared {
   final String imageType;
   final UserBTTV user;
 
-  EmoteBTTVShared(this.id, this.code, this.imageType, this.user);
+  const EmoteBTTVShared(this.id, this.code, this.imageType, this.user);
 
   factory EmoteBTTVShared.fromJson(Map<String, dynamic> json) => _$EmoteBTTVSharedFromJson(json);
 }
@@ -72,7 +75,7 @@ class EmoteBTTVChannel {
   final List<EmoteBTTVGlobal> channelEmotes;
   final List<EmoteBTTVShared> sharedEmotes;
 
-  EmoteBTTVChannel(this.id, this.bots, this.channelEmotes, this.sharedEmotes);
+  const EmoteBTTVChannel(this.id, this.bots, this.channelEmotes, this.sharedEmotes);
 
   factory EmoteBTTVChannel.fromJson(Map<String, dynamic> json) => _$EmoteBTTVChannelFromJson(json);
 }
@@ -84,7 +87,7 @@ class UserFFZ {
   final String name;
   final String displayName;
 
-  UserFFZ(this.id, this.name, this.displayName);
+  const UserFFZ(this.id, this.name, this.displayName);
 
   factory UserFFZ.fromJson(Map<String, dynamic> json) => _$UserFFZFromJson(json);
 }
@@ -98,7 +101,7 @@ class ImagesFFZ {
   @JsonKey(name: '4x')
   final String? url4x;
 
-  ImagesFFZ(this.url1x, this.url2x, this.url4x);
+  const ImagesFFZ(this.url1x, this.url2x, this.url4x);
 
   factory ImagesFFZ.fromJson(Map<String, dynamic> json) => _$ImagesFFZFromJson(json);
 }
@@ -111,7 +114,7 @@ class EmoteFFZ {
   final ImagesFFZ images;
   final String imageType;
 
-  EmoteFFZ(this.id, this.user, this.code, this.images, this.imageType);
+  const EmoteFFZ(this.id, this.user, this.code, this.images, this.imageType);
 
   factory EmoteFFZ.fromJson(Map<String, dynamic> json) => _$EmoteFFZFromJson(json);
 }

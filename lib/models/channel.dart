@@ -20,7 +20,7 @@ class Channel {
   final List<String> tagIds;
   final bool isMature;
 
-  Channel(this.id, this.userId, this.userLogin, this.userName, this.gameId, this.gameName, this.type, this.title, this.viewerCount, this.startedAt,
+  const Channel(this.id, this.userId, this.userLogin, this.userName, this.gameId, this.gameName, this.type, this.title, this.viewerCount, this.startedAt,
       this.language, this.thumbnailUrl, this.tagIds, this.isMature);
 
   factory Channel.fromJson(Map<String, dynamic> json) => _$ChannelFromJson(json);

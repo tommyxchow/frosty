@@ -16,7 +16,7 @@ class UserTwitch {
   final String viewCount;
   final String createdAt;
 
-  UserTwitch(this.id, this.login, this.displayName, this.type, this.broadcasterType, this.description, this.profileImageUrl, this.offlineImageUrl,
+  const UserTwitch(this.id, this.login, this.displayName, this.type, this.broadcasterType, this.description, this.profileImageUrl, this.offlineImageUrl,
       this.viewCount, this.createdAt);
 
   factory UserTwitch.fromJson(Map<String, dynamic> json) => _$UserTwitchFromJson(json);
