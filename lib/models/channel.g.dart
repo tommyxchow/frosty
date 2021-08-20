@@ -8,19 +8,19 @@ part of 'channel.dart';
 
 Channel _$ChannelFromJson(Map<String, dynamic> json) {
   return Channel(
-    json['id'] as String,
-    json['user_id'] as String,
-    json['user_login'] as String,
-    json['user_name'] as String,
-    json['game_id'] as String,
-    json['game_name'] as String,
-    json['type'] as String,
-    json['title'] as String,
-    json['viewer_count'] as int,
-    json['started_at'] as String,
-    json['language'] as String,
-    json['thumbnail_url'] as String,
-    (json['tag_ids'] as List<dynamic>).map((e) => e as String).toList(),
-    json['is_mature'] as bool,
+    id: json['id'] as String,
+    userId: json['user_id'] as String,
+    userLogin: json['user_login'] as String,
+    userName: json['user_name'] as String,
+    gameId: json['game_id'] as String,
+    gameName: json['game_name'] as String,
+    type: json['type'] as String,
+    title: json['title'] as String,
+    viewerCount: json['viewer_count'] as int,
+    startedAt: json['started_at'] as String,
+    language: json['language'] as String,
+    thumbnailUrl: json['thumbnail_url'] as String,
+    tagIds: (json['tag_ids'] as List<dynamic>).map((e) => e as String).toList(),
+    isMature: json['is_mature'] as bool,
   );
 }
