@@ -16,6 +16,7 @@ class ChannelCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
+              flex: 1,
               child: Padding(
                 padding: EdgeInsets.all(10.0),
                 child: Image.network(
@@ -24,6 +25,7 @@ class ChannelCard extends StatelessWidget {
               ),
             ),
             Flexible(
+              flex: 2,
               child: Padding(
                 padding: EdgeInsets.all(5.0),
                 child: Column(
