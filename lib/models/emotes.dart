@@ -3,10 +3,13 @@ import 'package:json_annotation/json_annotation.dart';
 part 'emotes.g.dart';
 
 // Twitch Emotes
-@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+@JsonSerializable(createToJson: false)
 class ImagesTwitch {
+  @JsonKey(name: 'url_1x')
   final String url1x;
+  @JsonKey(name: 'url_2x')
   final String url2x;
+  @JsonKey(name: 'url_4x')
   final String url4x;
 
   const ImagesTwitch(this.url1x, this.url2x, this.url4x);

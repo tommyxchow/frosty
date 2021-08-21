@@ -8,9 +8,9 @@ part of 'emotes.dart';
 
 ImagesTwitch _$ImagesTwitchFromJson(Map<String, dynamic> json) {
   return ImagesTwitch(
-    json['url1x'] as String,
-    json['url2x'] as String,
-    json['url4x'] as String,
+    json['url_1x'] as String,
+    json['url_2x'] as String,
+    json['url_4x'] as String,
   );
 }
 
@@ -59,12 +59,8 @@ EmoteBTTVChannel _$EmoteBTTVChannelFromJson(Map<String, dynamic> json) {
   return EmoteBTTVChannel(
     json['id'] as String,
     (json['bots'] as List<dynamic>).map((e) => e as String).toList(),
-    (json['channelEmotes'] as List<dynamic>)
-        .map((e) => EmoteBTTVGlobal.fromJson(e as Map<String, dynamic>))
-        .toList(),
-    (json['sharedEmotes'] as List<dynamic>)
-        .map((e) => EmoteBTTVShared.fromJson(e as Map<String, dynamic>))
-        .toList(),
+    (json['channelEmotes'] as List<dynamic>).map((e) => EmoteBTTVGlobal.fromJson(e as Map<String, dynamic>)).toList(),
+    (json['sharedEmotes'] as List<dynamic>).map((e) => EmoteBTTVShared.fromJson(e as Map<String, dynamic>)).toList(),
   );
 }
 
