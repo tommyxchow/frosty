@@ -1,111 +1,45 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/channel.dart';
+import 'package:frosty/utility/request.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:http/http.dart' as http;
 
 class Chat extends StatefulWidget {
-  const Chat({Key? key}) : super(key: key);
+  final Channel channelInfo;
+
+  const Chat({Key? key, required this.channelInfo}) : super(key: key);
 
   @override
   _ChatState createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  final _channel = WebSocketChannel.connect(Uri.parse(twitchIrc));
+  final _channel = WebSocketChannel.connect(Uri.parse(twitchIrcUrl));
   final _messages = <String>[];
   final _emoteToURL = <String, String>{};
 
-  final _id = '207813352';
-  final _channelName = 'hasanabi';
   final _token = const String.fromEnvironment('TEST_TOKEN');
 
-  Future<void> getEmotesBTTVGlobal() async {
-    final url = Uri.parse('https://api.betterttv.net/3/cached/emotes/global');
-    final response = await http.get(url);
-    final decoded = jsonDecode(response.body) as List;
-    final List<EmoteBTTVGlobal> emotes = decoded.map((emote) => EmoteBTTVGlobal.fromJson(emote)).toList();
-
-    for (var emote in emotes) {
-      _emoteToURL[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
-    }
-  }
-
-  Future<void> getEmotesBTTVChannel({required String id}) async {
-    final url = Uri.parse('https://api.betterttv.net/3/cached/users/twitch/$id');
-    final response = await http.get(url);
-    final decoded = jsonDecode(response.body);
-    final result = EmoteBTTVChannel.fromJson(decoded);
-
-    for (final emote in result.channelEmotes) {
-      _emoteToURL[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
-    }
-    for (final emote in result.sharedEmotes) {
-      _emoteToURL[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
-    }
-  }
-
-  Future<void> getEmotesFFZGlobal() async {
-    final url = Uri.parse('https://api.betterttv.net/3/cached/frankerfacez/emotes/global');
-    final response = await http.get(url);
-    final decoded = jsonDecode(response.body) as List;
-    final List<EmoteFFZ> emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
-
-    for (var emote in emotes) {
-      _emoteToURL[emote.code] = emote.images.url4x ?? emote.images.url1x;
-    }
-  }
-
-  Future<void> getEmotesFFZChannel({required String id}) async {
-    final url = Uri.parse('https://api.betterttv.net/3/cached/frankerfacez/users/twitch/$id');
-    final response = await http.get(url);
-    final decoded = jsonDecode(response.body) as List;
-    final List<EmoteFFZ> emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
-
-    for (var emote in emotes) {
-      _emoteToURL[emote.code] = emote.images.url4x ?? emote.images.url1x;
-    }
-  }
-
-  Future<void> getEmotesTwitchGlobal({required String token}) async {
-    final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
-    final response = await http.get(url, headers: headers);
-    final decoded = jsonDecode(response.body)['data'] as List;
-    final List<EmoteTwitch> emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
-
-    for (var emote in emotes) {
-      _emoteToURL[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0';
-    }
-  }
-
-  Future<void> getEmotesTwitchChannel({required String token}) async {
-    final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=$_id');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
-    final response = await http.get(url, headers: headers);
-    final decoded = jsonDecode(response.body)['data'] as List;
-    final List<EmoteTwitch> emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
-
-    for (var emote in emotes) {
-      _emoteToURL[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0';
-    }
-  }
-
   Future<void> getEmotes() async {
-    await getEmotesBTTVGlobal();
-    await getEmotesBTTVChannel(id: _id);
-    await getEmotesFFZGlobal();
-    await getEmotesFFZChannel(id: _id);
-    await getEmotesTwitchGlobal(token: _token);
-    await getEmotesTwitchChannel(token: _token);
+    final response = [
+      await Request.getEmotesBTTVGlobal(),
+      await Request.getEmotesBTTVChannel(id: widget.channelInfo.userId),
+      await Request.getEmotesFFZGlobal(),
+      await Request.getEmotesFFZChannel(id: widget.channelInfo.userId),
+      await Request.getEmotesTwitchGlobal(token: _token),
+      await Request.getEmotesTwitchChannel(token: _token, id: widget.channelInfo.userId)
+    ];
+
+    for (final map in response) {
+      _emoteToURL.addAll(map);
+    }
   }
 
   @override
   void initState() {
     super.initState();
     _channel.sink.add('NICK justinfan888');
-    _channel.sink.add('JOIN #$_channelName');
+    _channel.sink.add('JOIN #${widget.channelInfo.userLogin}');
   }
 
   // Here, we have a FutureBuilder that will wait for the emotes to be fetched.

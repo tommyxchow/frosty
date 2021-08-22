@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/views/chat_view.dart';
+import 'package:frosty/providers/authentication_provider.dart';
+import 'package:frosty/providers/channel_list_provider.dart';
+import 'package:frosty/widgets/channel_list.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,11 +17,17 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         brightness: Brightness.dark,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Frosty'),
+      home: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<Authentication>(create: (context) => Authentication()),
+          ChangeNotifierProvider<ChannelListProvider>(create: (context) => ChannelListProvider()),
+        ],
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Frosty'),
+          ),
+          body: ChannelList(),
         ),
-        body: Chat(),
       ),
     );
   }
