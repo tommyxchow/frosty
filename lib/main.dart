@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/providers/authentication_provider.dart';
-import 'package:frosty/providers/channel_list_provider.dart';
 import 'package:frosty/widgets/channel_list.dart';
 import 'package:provider/provider.dart';
 
@@ -20,11 +19,10 @@ class MyApp extends StatelessWidget {
       home: MultiProvider(
         providers: [
           ChangeNotifierProvider<Authentication>(create: (context) => Authentication()),
-          ChangeNotifierProvider<ChannelListProvider>(create: (context) => ChannelListProvider()),
         ],
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Frosty'),
+            title: Text('Top Channels'),
           ),
           body: ChannelList(),
         ),
