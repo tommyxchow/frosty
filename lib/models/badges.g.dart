@@ -9,15 +9,15 @@ part of 'badges.dart';
 BadgeImagesTwitch _$BadgeImagesTwitchFromJson(Map<String, dynamic> json) {
   return BadgeImagesTwitch(
     json['id'] as String,
-    json['image_url1x'] as String,
-    json['image_url2x'] as String,
-    json['image_url4x'] as String,
+    json['image_url_1x'] as String,
+    json['image_url_2x'] as String,
+    json['image_url_4x'] as String,
   );
 }
 
 BadgesTwitch _$BadgesTwitchFromJson(Map<String, dynamic> json) {
   return BadgesTwitch(
-    json['setId'] as String,
+    json['set_id'] as String,
     (json['versions'] as List<dynamic>)
         .map((e) => BadgeImagesTwitch.fromJson(e as Map<String, dynamic>))
         .toList(),
