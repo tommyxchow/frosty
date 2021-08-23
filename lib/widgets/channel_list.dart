@@ -56,7 +56,9 @@ class _ChannelListState extends State<ChannelList> {
                 // TODO: Handle this case.
                 break;
               case ConnectionState.waiting:
-                return CircularProgressIndicator();
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
               case ConnectionState.active:
                 // TODO: Handle this case.
                 break;
