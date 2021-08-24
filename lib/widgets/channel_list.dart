@@ -51,31 +51,23 @@ class _ChannelListState extends State<ChannelList> {
         return FutureBuilder(
           future: getTopChannels(token: auth.token!, cursor: currentCursor),
           builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.none:
-                // TODO: Handle this case.
-                break;
-              case ConnectionState.waiting:
-                return Center(
-                  child: CircularProgressIndicator(),
-                );
-              case ConnectionState.active:
-                // TODO: Handle this case.
-                break;
-              case ConnectionState.done:
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    if (index >= channels.length / 2) {
-                      if (!_isLoading) {
-                        print('fetching more channels...');
-                        getTopChannels(token: auth.token!, cursor: currentCursor);
-                      }
+            if (snapshot.connectionState == ConnectionState.done) {
+              return ListView.builder(
+                padding: EdgeInsets.all(5.0),
+                itemBuilder: (context, index) {
+                  if (index >= channels.length / 2) {
+                    if (!_isLoading) {
+                      print('fetching more channels...');
+                      getTopChannels(token: auth.token!, cursor: currentCursor);
                     }
-                    return ChannelCard(channelInfo: channels[index]);
-                  },
-                );
+                  }
+                  return ChannelCard(channelInfo: channels[index]);
+                },
+              );
             }
-            return Text('loading');
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           },
         );
       },
