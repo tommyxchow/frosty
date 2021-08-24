@@ -37,7 +37,7 @@ class ChannelCard extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: Padding(
-                  padding: EdgeInsets.all(5.0),
+                  padding: EdgeInsets.only(left: 10.0),
                   child: Image.network(
                     channelInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-1024x576'),
                   ),
@@ -46,7 +46,7 @@ class ChannelCard extends StatelessWidget {
               Flexible(
                 flex: 2,
                 child: Padding(
-                  padding: EdgeInsets.all(5.0),
+                  padding: EdgeInsets.all(10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
