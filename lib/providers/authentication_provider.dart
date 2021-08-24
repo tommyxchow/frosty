@@ -17,20 +17,14 @@ class Authentication extends ChangeNotifier {
   Map<String, String>? authHeaders;
   UserTwitch? user;
 
-  Authentication() {
-    print('test');
-    initAuth();
-  }
-
   /// Initialize by retrieving a token if it does not already exist.
-  void initAuth() async {
+  Future<void> init() async {
     debugPrint('Creating auth provider');
     token = await _storage.read(key: 'USER_TOKEN') ?? await getDefaultToken();
     authHeaders = {'Authorization': 'Bearer $token', 'Client-Id': _clientId};
 
-    if (isLoggedIn) {
-      await getUserInfo();
-    }
+    if (isLoggedIn) await getUserInfo();
+
     notifyListeners();
   }
 
@@ -50,6 +44,7 @@ class Authentication extends ChangeNotifier {
     final response = await http.post(url);
     final token = jsonDecode(response.body)['access_token'];
     _storage.write(key: 'USER_TOKEN', value: token);
+
     return token;
   }
 
@@ -57,18 +52,22 @@ class Authentication extends ChangeNotifier {
     final response = await http.get(Uri.parse(twitchValidateUrl), headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       tokenIsValid = true;
+
       notifyListeners();
+
       return;
     }
 
     print('Token invalidated');
     tokenIsValid = false;
+
     notifyListeners();
   }
 
   Future<UserTwitch> getUserInfo() async {
     final response = await http.get(Uri.parse(twitchUsersUrl), headers: authHeaders);
     final userData = jsonDecode(response.body)['data'];
+
     return UserTwitch.fromJson(userData);
   }
 }
