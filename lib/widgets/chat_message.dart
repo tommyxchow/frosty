@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 class ChatMessage extends StatelessWidget {
-  List<InlineSpan> children;
+  final List<InlineSpan> children;
 
   ChatMessage({Key? key, required this.children}) : super(key: key);
 

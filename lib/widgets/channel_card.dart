@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/views/chat_view.dart';
+import 'package:frosty/screens/chat.dart';
 
 /// A card widget that displays a live channel's thumbnail and details.
 class ChannelCard extends StatelessWidget {

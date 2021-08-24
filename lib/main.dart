@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/providers/authentication_provider.dart';
-import 'package:frosty/widgets/channel_list.dart';
+import 'package:frosty/screens/channel_list.dart';
 import 'package:provider/provider.dart';
 
 void main() {
