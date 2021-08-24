@@ -21,7 +21,6 @@ class _ChatState extends State<Chat> {
   final _assetToUrl = <String, String>{};
   final _emoteIdToWord = <String, String>{};
   final _scrollController = ScrollController();
-
   final _token = const String.fromEnvironment('TEST_TOKEN');
 
   Future<void> getEmotes() async {
@@ -45,13 +44,13 @@ class _ChatState extends State<Chat> {
   void initState() {
     super.initState();
     final commands = [
-      'CAP LS 302',
       'PASS oauth:$_token',
       'NICK justinfan888',
-      'JOIN #${widget.channelInfo.userLogin}',
-      'CAP REQ :twitch.tv/commands',
       'CAP REQ :twitch.tv/tags',
+      'CAP REQ :twitch.tv/commands',
+      // 'CAP REQ :twitch.tv/membership',
       'CAP END',
+      'JOIN #${widget.channelInfo.userLogin}',
     ];
 
     for (final command in commands) {
@@ -72,13 +71,13 @@ class _ChatState extends State<Chat> {
         mappedTags[tagSplit[0]] = tagSplit[1];
       }
     }
-    final ircAndMessageDivider = ircMessage.indexOf(':');
 
-    final ircInfo = ircMessage.substring(0, ircAndMessageDivider);
-    final message = ircMessage.substring(ircAndMessageDivider + 1);
+    final splitMessage = ircMessage.split(' ');
 
-    final ircInfoSplit = ircInfo.split(' ');
-    final command = ircInfoSplit[1];
+    // final user = splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
+    // print(user);
+
+    final command = splitMessage[1];
 
     switch (command) {
       case 'CLEARCHAT':
@@ -88,6 +87,8 @@ class _ChatState extends State<Chat> {
       case 'GLOBALUSERSTATE':
         break;
       case 'PRIVMSG':
+        final message = splitMessage.sublist(3).join(' ').substring(1);
+        if (message.contains('\r\n')) print(message);
         return privateMessage(tags: mappedTags, chatMessage: message);
       case 'ROOMSTATE':
         break;
@@ -180,9 +181,7 @@ class _ChatState extends State<Chat> {
   }
 
   // Here, we have a FutureBuilder that will wait for the emotes to be fetched.
-  // Once the emotes are acquired, the chat builder will start.
-
-  // TODO: Maybe StreamBuilder first, then FutureBuilder?
+  // Once the emotes are acquired, the chat (stream) builder will start.
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -194,7 +193,7 @@ class _ChatState extends State<Chat> {
               stream: _channel.stream,
               builder: (context, snapshot) {
                 for (final message in snapshot.data.toString().split('\r\n')) {
-                  print(message);
+                  // print(message);
                   if (message.startsWith('@')) {
                     _messages.add(const SizedBox(height: 10));
                     _messages.add(ChatMessage(
@@ -208,16 +207,18 @@ class _ChatState extends State<Chat> {
                 return ListView.builder(
                   itemCount: _messages.length,
                   controller: _scrollController,
+                  padding: EdgeInsets.all(5.0),
                   itemBuilder: (context, index) {
                     return _messages[index];
                   },
                 );
               },
             );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           }
-          return Center(
-            child: CircularProgressIndicator(),
-          );
         },
       ),
     );
