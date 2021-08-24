@@ -10,22 +10,35 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.dark,
-      ),
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider<Authentication>(create: (context) => Authentication()),
-        ],
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Top Channels'),
-          ),
-          body: ChannelList(),
-        ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<Authentication>(create: (_) => Authentication()),
+      ],
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            title: 'Frosty',
+            theme: ThemeData(
+              primaryColor: Colors.purple.shade900,
+              primarySwatch: Colors.blue,
+              brightness: Brightness.dark,
+            ),
+            home: Scaffold(
+              appBar: AppBar(
+                title: Text('Top Channels'),
+              ),
+              body: FutureBuilder(
+                future: context.read<Authentication>().init(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return ChannelList();
+                  }
+                  return CircularProgressIndicator();
+                },
+              ),
+            ),
+          );
+        },
       ),
     );
   }
