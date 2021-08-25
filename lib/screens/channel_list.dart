@@ -15,7 +15,7 @@ class ChannelList extends StatefulWidget {
   _ChannelListState createState() => _ChannelListState();
 }
 
-class _ChannelListState extends State<ChannelList> {
+class _ChannelListState extends State<ChannelList> with AutomaticKeepAliveClientMixin<ChannelList> {
   final channels = <Channel>[];
 
   var _isLoading = false;
@@ -46,7 +46,8 @@ class _ChannelListState extends State<ChannelList> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Authentication>(
+    super.build(context);
+    return Consumer<AuthenticationProvider>(
       builder: (context, auth, child) {
         return FutureBuilder(
           future: getTopChannels(token: auth.token!, cursor: currentCursor),
@@ -73,4 +74,7 @@ class _ChannelListState extends State<ChannelList> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

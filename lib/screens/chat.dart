@@ -40,24 +40,6 @@ class _ChatState extends State<Chat> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    final commands = [
-      'PASS oauth:$_token',
-      'NICK justinfan888',
-      'CAP REQ :twitch.tv/tags',
-      'CAP REQ :twitch.tv/commands',
-      // 'CAP REQ :twitch.tv/membership',
-      'CAP END',
-      'JOIN #${widget.channelInfo.userLogin}',
-    ];
-
-    for (final command in commands) {
-      _channel.sink.add(command);
-    }
-  }
-
   List<InlineSpan> parseIrcMessage(String whole) {
     var mappedTags = <String, String>{};
 
@@ -178,6 +160,24 @@ class _ChatState extends State<Chat> {
       }
     }
     return result;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final commands = [
+      'PASS oauth:$_token',
+      'NICK justinfan888',
+      'CAP REQ :twitch.tv/tags',
+      'CAP REQ :twitch.tv/commands',
+      // 'CAP REQ :twitch.tv/membership',
+      'CAP END',
+      'JOIN #${widget.channelInfo.userLogin}',
+    ];
+
+    for (final command in commands) {
+      _channel.sink.add(command);
+    }
   }
 
   // Here, we have a FutureBuilder that will wait for the emotes to be fetched.
