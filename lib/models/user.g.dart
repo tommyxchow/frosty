@@ -16,7 +16,7 @@ UserTwitch _$UserTwitchFromJson(Map<String, dynamic> json) {
     json['description'] as String,
     json['profile_image_url'] as String,
     json['offline_image_url'] as String,
-    json['view_count'] as String,
+    json['view_count'] as int,
     json['created_at'] as String,
   );
 }

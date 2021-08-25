@@ -13,7 +13,7 @@ class UserTwitch {
   final String description;
   final String profileImageUrl;
   final String offlineImageUrl;
-  final String viewCount;
+  final int viewCount;
   final String createdAt;
 
   const UserTwitch(this.id, this.login, this.displayName, this.type, this.broadcasterType, this.description, this.profileImageUrl, this.offlineImageUrl,
