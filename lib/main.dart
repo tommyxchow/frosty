@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/providers/authentication_provider.dart';
-import 'package:frosty/screens/channel_list.dart';
+import 'package:frosty/providers/settings_provider.dart';
+import 'package:frosty/screens/home.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -12,33 +13,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<Authentication>(create: (_) => Authentication()),
+        ChangeNotifierProvider<AuthenticationProvider>(create: (_) => AuthenticationProvider()),
+        ChangeNotifierProvider<SettingsProvider>(create: (_) => SettingsProvider()),
       ],
-      child: Builder(
-        builder: (context) {
-          return MaterialApp(
-            title: 'Frosty',
-            theme: ThemeData(
-              primaryColor: Colors.purple.shade900,
-              primarySwatch: Colors.blue,
-              brightness: Brightness.dark,
-            ),
-            home: Scaffold(
-              appBar: AppBar(
-                title: Text('Top Channels'),
-              ),
-              body: FutureBuilder(
-                future: context.read<Authentication>().init(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return ChannelList();
-                  }
-                  return CircularProgressIndicator();
-                },
-              ),
-            ),
-          );
-        },
+      child: MaterialApp(
+        title: 'Frosty',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.dark,
+        ),
+        home: Home(),
       ),
     );
   }
