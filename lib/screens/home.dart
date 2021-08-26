@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/providers/authentication_provider.dart';
 import 'package:frosty/screens/settings.dart';
+import 'package:frosty/providers/channel_list_provider.dart';
 import 'package:provider/provider.dart';
-
 import 'channel_list.dart';
 
 class Home extends StatelessWidget {
@@ -14,12 +14,12 @@ class Home extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Top Channels'),
+          title: Text('Frosty for Twitch'),
           bottom: TabBar(
             tabs: [
               Tab(text: 'Top'),
               Tab(text: 'Followed'),
-              Tab(text: 'Games'),
+              Tab(text: 'Categories'),
             ],
           ),
           actions: [
@@ -44,9 +44,11 @@ class Home extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.done) {
               return TabBarView(
                 children: [
-                  ChannelList(),
-                  Center(
-                    child: Text('Followed'),
+                  ChannelList(
+                    category: Category.top,
+                  ),
+                  ChannelList(
+                    category: Category.followed,
                   ),
                   Center(
                     child: Text('Games'),
