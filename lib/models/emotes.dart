@@ -2,7 +2,9 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'emotes.g.dart';
 
-// Twitch Emotes
+// TODO: Add 7TV emotes: https://github.com/SevenTV/ServerGo/blob/master/docs/rest-api.md
+
+// * Twitch Emotes *
 @JsonSerializable(createToJson: false)
 class ImagesTwitch {
   @JsonKey(name: 'url_1x')
@@ -34,7 +36,7 @@ class EmoteTwitch {
   factory EmoteTwitch.fromJson(Map<String, dynamic> json) => _$EmoteTwitchFromJson(json);
 }
 
-// BTTV Emotes
+// * BTTV Emotes *
 @JsonSerializable(createToJson: false)
 class EmoteBTTVGlobal {
   final String id;
@@ -83,7 +85,7 @@ class EmoteBTTVChannel {
   factory EmoteBTTVChannel.fromJson(Map<String, dynamic> json) => _$EmoteBTTVChannelFromJson(json);
 }
 
-// FFZ Emotes
+// * FFZ Emotes *
 @JsonSerializable(createToJson: false)
 class UserFFZ {
   final int id;
@@ -120,4 +122,54 @@ class EmoteFFZ {
   const EmoteFFZ(this.id, this.user, this.code, this.images, this.imageType);
 
   factory EmoteFFZ.fromJson(Map<String, dynamic> json) => _$EmoteFFZFromJson(json);
+}
+
+// * 7TV Emotes *
+
+@JsonSerializable(createToJson: false)
+class Role7TV {
+  final String id;
+  final String name;
+  final int position;
+  final int color;
+  final int allowed;
+  final int denied;
+  @JsonKey(name: 'default')
+  final bool defaults;
+
+  Role7TV(this.id, this.name, this.position, this.color, this.allowed, this.denied, this.defaults);
+
+  factory Role7TV.fromJson(Map<String, dynamic> json) => _$Role7TVFromJson(json);
+}
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class Owner7TV {
+  final String id;
+  final String twitchId;
+  final String login;
+  final String displayName;
+  final Role7TV role;
+
+  Owner7TV(this.id, this.twitchId, this.login, this.displayName, this.role);
+
+  factory Owner7TV.fromJson(Map<String, dynamic> json) => _$Owner7TVFromJson(json);
+}
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class Emote7TV {
+  final String id;
+  final String name;
+  final Owner7TV? owner;
+  final int visibility;
+  final List<String> visibilitySimple;
+  final String mime;
+  final int status;
+  final List<String> tags;
+  final List<int> width;
+  final List<int> height;
+  final List<List<String>> urls;
+
+  Emote7TV(this.id, this.name, this.owner, this.visibility, this.visibilitySimple, this.mime, this.status, this.tags, this.width, this.height, this.urls);
+
+  factory Emote7TV.fromJson(Map<String, dynamic> json) => _$Emote7TVFromJson(json);
 }

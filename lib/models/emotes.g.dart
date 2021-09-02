@@ -93,3 +93,47 @@ EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) {
     json['imageType'] as String,
   );
 }
+
+Role7TV _$Role7TVFromJson(Map<String, dynamic> json) {
+  return Role7TV(
+    json['id'] as String,
+    json['name'] as String,
+    json['position'] as int,
+    json['color'] as int,
+    json['allowed'] as int,
+    json['denied'] as int,
+    json['default'] as bool,
+  );
+}
+
+Owner7TV _$Owner7TVFromJson(Map<String, dynamic> json) {
+  return Owner7TV(
+    json['id'] as String,
+    json['twitch_id'] as String,
+    json['login'] as String,
+    json['display_name'] as String,
+    Role7TV.fromJson(json['role'] as Map<String, dynamic>),
+  );
+}
+
+Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) {
+  return Emote7TV(
+    json['id'] as String,
+    json['name'] as String,
+    json['owner'] == null
+        ? null
+        : Owner7TV.fromJson(json['owner'] as Map<String, dynamic>),
+    json['visibility'] as int,
+    (json['visibility_simple'] as List<dynamic>)
+        .map((e) => e as String)
+        .toList(),
+    json['mime'] as String,
+    json['status'] as int,
+    (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
+    (json['width'] as List<dynamic>).map((e) => e as int).toList(),
+    (json['height'] as List<dynamic>).map((e) => e as int).toList(),
+    (json['urls'] as List<dynamic>)
+        .map((e) => (e as List<dynamic>).map((e) => e as String).toList())
+        .toList(),
+  );
+}
