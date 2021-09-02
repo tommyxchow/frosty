@@ -20,7 +20,8 @@ Channel _$ChannelFromJson(Map<String, dynamic> json) {
     startedAt: json['started_at'] as String,
     language: json['language'] as String,
     thumbnailUrl: json['thumbnail_url'] as String,
-    tagIds: (json['tag_ids'] as List<dynamic>).map((e) => e as String).toList(),
+    tagIds:
+        (json['tag_ids'] as List<dynamic>?)?.map((e) => e as String).toList(),
     isMature: json['is_mature'] as bool,
   );
 }
