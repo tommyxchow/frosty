@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/providers/chat_provider.dart';
 import 'package:frosty/screens/chat.dart';
+import 'package:provider/provider.dart';
 
 /// A card widget that displays a live channel's thumbnail and details.
 class ChannelCard extends StatelessWidget {
@@ -22,8 +24,11 @@ class ChannelCard extends StatelessWidget {
                     appBar: AppBar(
                       title: Text(channelInfo.userName),
                     ),
-                    body: Chat(
-                      channelInfo: channelInfo,
+                    body: ChangeNotifierProvider<ChatProvider>(
+                      create: (context) => ChatProvider(channelInfo: channelInfo),
+                      child: Chat(
+                        channelInfo: channelInfo,
+                      ),
                     ),
                   );
                 },
