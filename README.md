@@ -1,4 +1,4 @@
-# Frosty
+# Frosty ![CI](https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg)
 
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/) and [originally with SwiftUI](https://github.com/tommyxchow/frosty-swiftui).
 
@@ -10,12 +10,12 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 
 ## Motivation
 
-Currently, the only available Twitch client on iOS is the official Twitch app. I wanted to make a Twitch client that provides some important missing features in the official app. I also saw this as an opportunity to learn and become familiar with mobile development.
+Currently, the only available Twitch client on iOS is the official Twitch app. I wanted to make a Twitch client that provides some important missing features in the official app. I also saw this as an opportunity to learn and become familiar with the mobile development ecosystem.
 
 ## The Problem
 
-A major problem with the official Twitch app is that emotes from third-party services such as [BetterTTV (FFZ)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb), and [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh) are not officially supported. Twitch is unaffiliated with these services, hence why they haven't been integrated officially.
+A major problem with the official Twitch app is that emotes from services such as [BetterTTV (FFZ)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb), and [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh) are not officially supported. Twitch is unaffiliated with these services, hence why they haven't been integrated officially.
 
-As a result, the millions of users of these services have an unideal viewing experience on the official Twitch app. In the stream chat, only text is positioned where emotes should be (similar to only being able to see :emoji: rather than the emojis themselves).
+As a result, the millions of users of these services have an unideal viewing experience on the official Twitch app. In the stream chat, only text is positioned where emotes should be (imagine only being able to see :emoji: rather than the emojis themselves).
 
 This app aims to bring these emotes and other general quality of life features to both iOS and Android.
