@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 // A class for general requests.
 class Request {
   /// Returns a map of global BTTV emotes to their URL.
-  static Future<Map<String, String>> getEmotesBTTVGlobal() async {
+  static Future<Map<String, String>?> getEmotesBTTVGlobal() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/emotes/global');
     final response = await http.get(url);
 
@@ -21,12 +21,12 @@ class Request {
 
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get global BTTV emotes', 'Error code: ${response.statusCode}']);
+      print('Failed to get global BTTV emotes. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of a channel's BTTV emotes to their URL.
-  static Future<Map<String, String>> getEmotesBTTVChannel({required String id}) async {
+  static Future<Map<String, String>?> getEmotesBTTVChannel({required String id}) async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/users/twitch/$id');
     final response = await http.get(url);
 
@@ -40,12 +40,12 @@ class Request {
 
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get BTTV emotes for id: $id', 'Error code: ${response.statusCode}']);
+      print('Failed to get BTTV emotes for id: $id. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of global FFZ emotes to their URL.
-  static Future<Map<String, String>> getEmotesFFZGlobal() async {
+  static Future<Map<String, String>?> getEmotesFFZGlobal() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/frankerfacez/emotes/global');
     final response = await http.get(url);
 
@@ -58,12 +58,12 @@ class Request {
 
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get global FFZ emotes', 'Error code: ${response.statusCode}']);
+      print('Failed to get global FFZ emotes. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of a channel's FFZ emotes to their URL.
-  static Future<Map<String, String>> getEmotesFFZChannel({required String id}) async {
+  static Future<Map<String, String>?> getEmotesFFZChannel({required String id}) async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/frankerfacez/users/twitch/$id');
     final response = await http.get(url);
 
@@ -76,12 +76,12 @@ class Request {
 
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get FFZ emotes for id: $id', 'Error code: ${response.statusCode}']);
+      print('Failed to get FFZ emotes for id: $id. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of global Twitch emotes to their URL.
-  static Future<Map<String, String>> getEmotesTwitchGlobal({required String token}) async {
+  static Future<Map<String, String>?> getEmotesTwitchGlobal({required String token}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
     final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
     final response = await http.get(url, headers: headers);
@@ -95,12 +95,12 @@ class Request {
 
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get global Twitch emotes', 'Error code: ${response.statusCode}']);
+      print('Failed to get global Twitch emotes. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of a channel's Twitch emotes to their URL.
-  static Future<Map<String, String>> getEmotesTwitchChannel({required String token, required String id}) async {
+  static Future<Map<String, String>?> getEmotesTwitchChannel({required String token, required String id}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=$id');
     final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
     final response = await http.get(url, headers: headers);
@@ -114,12 +114,12 @@ class Request {
 
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get Twitch emotes for id: $id', 'Error code: ${response.statusCode}']);
+      print('Failed to get Twitch emotes for id: $id. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of global Twitch badges to their URL.
-  static Future<Map<String, String>> getBadgesTwitchGlobal({required String token}) async {
+  static Future<Map<String, String>?> getBadgesTwitchGlobal({required String token}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/badges/global');
     final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
     final response = await http.get(url, headers: headers);
@@ -137,12 +137,12 @@ class Request {
 
       return badgeToUrl;
     } else {
-      throw Exception(['Failed to get global Twitch badges', 'Error code: ${response.statusCode}']);
+      print('Failed to get global Twitch badges. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of a channel's Twitch badges to their URL.
-  static Future<Map<String, String>> getBadgesTwitchChannel({required String token, required String id}) async {
+  static Future<Map<String, String>?> getBadgesTwitchChannel({required String token, required String id}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/badges?broadcaster_id=$id');
     final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
     final response = await http.get(url, headers: headers);
@@ -160,12 +160,12 @@ class Request {
 
       return badgeToUrl;
     } else {
-      throw Exception(['Failed to get Twitch badges for id: $id', 'Error code: ${response.statusCode}']);
+      print('Failed to get Twitch badges for id: $id. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of global 7TV emotes to their URL.
-  static Future<Map<String, String>> getEmotes7TVGlobal() async {
+  static Future<Map<String, String>?> getEmotes7TVGlobal() async {
     final url = Uri.parse('https://api.7tv.app/v2/emotes/global');
     final response = await http.get(url);
 
@@ -175,15 +175,14 @@ class Request {
 
       final emoteToUrl = <String, String>{};
       emotes.forEach((emote) => emoteToUrl[emote.name] = emote.urls[3][1]);
-
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get global 7TV emotes', 'Error code: ${response.statusCode}']);
+      print('Failed to get global 7TV emotes. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of a channel's 7TV emotes to their URL.
-  static Future<Map<String, String>> getEmotes7TVChannel({required String user}) async {
+  static Future<Map<String, String>?> getEmotes7TVChannel({required String user}) async {
     final url = Uri.parse('https://api.7tv.app/v2/users/$user/emotes');
     final response = await http.get(url);
 
@@ -193,10 +192,9 @@ class Request {
 
       final emoteToUrl = <String, String>{};
       emotes.forEach((emote) => emoteToUrl[emote.name] = emote.urls[3][1]);
-
       return emoteToUrl;
     } else {
-      throw Exception(['Failed to get channel 7TV emotes', 'Error code: ${response.statusCode}']);
+      print('Failed to get channel 7TV emotes. Error code: ${response.statusCode}');
     }
   }
 }
