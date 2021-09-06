@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:frosty/providers/authentication_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:frosty/models/channel.dart';
 
@@ -10,11 +11,11 @@ class ChannelListProvider extends ChangeNotifier {
 
   String? topChannelsCurrentCursor;
   String? followedChannelsCurrentCursor;
-  String? token;
-  String? id;
 
-  ChannelListProvider({required this.token, this.id}) {
-    print('start');
+  final token = AuthenticationProvider.token;
+  final String? id;
+
+  ChannelListProvider({this.id}) {
     if (token != null) {
       updateTopChannels();
     }

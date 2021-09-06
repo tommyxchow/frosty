@@ -22,10 +22,9 @@ class MyApp extends StatelessWidget {
           },
         ),
         ChangeNotifierProxyProvider<AuthenticationProvider, ChannelListProvider>(
-          create: (_) => ChannelListProvider(token: null),
+          create: (_) => ChannelListProvider(),
           update: (context, auth, channelListProvider) {
-            print(auth.token);
-            return ChannelListProvider(token: auth.token, id: auth.user?.id);
+            return ChannelListProvider(id: auth.user?.id);
           },
         ),
       ],
