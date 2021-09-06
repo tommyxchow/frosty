@@ -33,6 +33,7 @@ dependencies:
   provider: ^6.0.0
   flutter_secure_storage: ^4.2.1
   flutter_web_auth: ^0.3.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
