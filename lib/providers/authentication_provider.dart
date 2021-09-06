@@ -9,42 +9,50 @@ import 'package:flutter_web_auth/flutter_web_auth.dart';
 // TODO: Fix up notifyListeners() placements.
 
 class AuthenticationProvider extends ChangeNotifier {
+  static String? _token;
+  static String? get token => _token;
+
+  static Map<String, String>? authHeaders;
+
   final _storage = new FlutterSecureStorage();
-  final _secret = const String.fromEnvironment('SECRET');
-  final _clientId = const String.fromEnvironment('CLIENT_ID');
+  final _secret = secret;
+  final _clientId = clientId;
 
-  var isLoggedIn = false;
-  var tokenIsValid = false;
+  var _isLoggedIn = false;
+  bool get isLoggedIn => _isLoggedIn;
 
-  String? token;
-  Map<String, String>? authHeaders;
+  var _tokenIsValid = false;
+
   UserTwitch? user;
 
   /// Initialize by retrieving a token if it does not already exist.
   Future<void> init() async {
     // Read and set the currently stored user token, if any.
-    token = await _storage.read(key: 'USER_TOKEN');
+    _token = await _storage.read(key: 'USER_TOKEN');
 
     // If the token does not exist, get the default token.
     // Otherwise, log in and get the user info.
     if (token != null) {
-      isLoggedIn = true;
+      _isLoggedIn = true;
       authHeaders = {'Authorization': 'Bearer $token', 'Client-Id': _clientId};
-      await getUserInfo();
+      await _getUserInfo();
     } else {
-      await getDefaultToken();
+      await _getDefaultToken();
     }
 
     // Set the auth headers for future requests and validate the token.
     authHeaders = {'Authorization': 'Bearer $token', 'Client-Id': _clientId};
-    await validateToken();
+    await _validateToken();
+
+    debugPrint('Token is valid: $_tokenIsValid');
+
     debugPrint('Created auth provider');
   }
 
   /// Returns a token for an anonymous user.
-  Future<void> getDefaultToken() async {
+  Future<void> _getDefaultToken() async {
     debugPrint('Getting default token...');
-    token = await _storage.read(key: 'DEFAULT_TOKEN');
+    _token = await _storage.read(key: 'DEFAULT_TOKEN');
 
     if (token != null) return;
 
@@ -64,26 +72,26 @@ class AuthenticationProvider extends ChangeNotifier {
 
     await _storage.write(key: 'DEFAULT_TOKEN', value: defaultToken);
 
-    token = defaultToken;
+    _token = defaultToken;
   }
 
-  Future<void> validateToken() async {
+  Future<void> _validateToken() async {
     debugPrint('Validating token...');
-    final response = await http.get(Uri.parse(twitchValidateUrl), headers: {'Authorization': 'Bearer $token'});
+    final response = await http.get(Uri.parse('https://id.twitch.tv/oauth2/validate'), headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       debugPrint('Token validated!');
-      tokenIsValid = true;
+      _tokenIsValid = true;
       return;
     }
 
     debugPrint('Token invalidated :(');
-    tokenIsValid = false;
+    _tokenIsValid = false;
 
     notifyListeners();
   }
 
-  Future<void> getUserInfo() async {
-    final response = await http.get(Uri.parse(twitchUsersUrl), headers: authHeaders);
+  Future<void> _getUserInfo() async {
+    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users'), headers: authHeaders);
     final userData = jsonDecode(response.body)['data'] as List;
 
     user = UserTwitch.fromJson(userData.first);
@@ -107,13 +115,13 @@ class AuthenticationProvider extends ChangeNotifier {
 
       final fragment = Uri.parse(result).fragment;
 
-      token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
+      _token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
       await _storage.write(key: 'USER_TOKEN', value: token);
 
-      isLoggedIn = true;
+      _isLoggedIn = true;
       authHeaders = {'Authorization': 'Bearer $token', 'Client-Id': _clientId};
 
-      await getUserInfo();
+      await _getUserInfo();
 
       notifyListeners();
     } catch (error) {
@@ -122,8 +130,8 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   void logout() async {
-    await getDefaultToken();
-    isLoggedIn = false;
+    await _getDefaultToken();
+    _isLoggedIn = false;
 
     await _storage.delete(key: 'USER_TOKEN');
     debugPrint('Succesfully logged out');
