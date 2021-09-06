@@ -1,24 +1,25 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/providers/authentication_provider.dart';
 import 'package:frosty/utility/request.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatProvider extends ChangeNotifier {
   final Channel channelInfo;
 
-  final channel = WebSocketChannel.connect(Uri.parse(twitchIrcUrl));
+  final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
   final messages = <Widget>[];
   final scrollController = ScrollController();
 
   final _assetToUrl = <String, String>{};
   final _emoteIdToWord = <String, String>{};
-  final _token = const String.fromEnvironment('TEST_TOKEN');
+
+  var autoScroll = true;
 
   ChatProvider({required this.channelInfo}) {
     final commands = [
-      'PASS oauth:$_token',
+      'PASS oauth:${AuthenticationProvider.token}',
       'NICK justinfan888',
       'CAP REQ :twitch.tv/tags',
       'CAP REQ :twitch.tv/commands',
@@ -30,6 +31,16 @@ class ChatProvider extends ChangeNotifier {
     for (final command in commands) {
       channel.sink.add(command);
     }
+
+    scrollController.addListener(() {
+      if (!scrollController.position.atEdge) {
+        autoScroll = false;
+        notifyListeners();
+      } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
+        autoScroll = true;
+        notifyListeners();
+      }
+    });
   }
 
   Future<void> getEmotes() async {
@@ -38,10 +49,10 @@ class ChatProvider extends ChangeNotifier {
       await Request.getEmotesBTTVChannel(id: channelInfo.userId),
       await Request.getEmotesFFZGlobal(),
       await Request.getEmotesFFZChannel(id: channelInfo.userId),
-      await Request.getEmotesTwitchGlobal(token: _token),
-      await Request.getEmotesTwitchChannel(token: _token, id: channelInfo.userId),
-      await Request.getBadgesTwitchGlobal(token: _token),
-      await Request.getBadgesTwitchChannel(token: _token, id: channelInfo.userId),
+      await Request.getEmotesTwitchGlobal(),
+      await Request.getEmotesTwitchChannel(id: channelInfo.userId),
+      await Request.getBadgesTwitchGlobal(),
+      await Request.getBadgesTwitchChannel(id: channelInfo.userId),
       await Request.getEmotes7TVGlobal(),
       await Request.getEmotes7TVChannel(user: channelInfo.userLogin)
     ];
