@@ -1,13 +1,8 @@
 import 'package:frosty/models/channel.dart';
 
-/// The twitch IRC websocket channel.
-const twitchIrcUrl = 'wss://irc-ws.chat.twitch.tv:443';
+const clientId = const String.fromEnvironment('CLIENT_ID');
 
-/// The URL for getting Twitch user information.
-const twitchUsersUrl = 'https://api.twitch.tv/helix/users';
-
-/// The URL for validating Twitch OAuth tokens.
-const twitchValidateUrl = 'https://id.twitch.tv/oauth2/validate';
+const secret = const String.fromEnvironment('SECRET');
 
 /// Sample channel objects for testing/preview purposes.
 const SampleChannels = [
