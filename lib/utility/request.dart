@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/providers/authentication_provider.dart';
 import 'package:http/http.dart' as http;
 
 // TODO: Notify user when a request for an asset has failed (and possibly an option to retry).
@@ -81,10 +82,9 @@ class Request {
   }
 
   /// Returns a map of global Twitch emotes to their URL.
-  static Future<Map<String, String>?> getEmotesTwitchGlobal({required String token}) async {
+  static Future<Map<String, String>?> getEmotesTwitchGlobal() async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
-    final response = await http.get(url, headers: headers);
+    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
@@ -100,10 +100,9 @@ class Request {
   }
 
   /// Returns a map of a channel's Twitch emotes to their URL.
-  static Future<Map<String, String>?> getEmotesTwitchChannel({required String token, required String id}) async {
+  static Future<Map<String, String>?> getEmotesTwitchChannel({required String id}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=$id');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
-    final response = await http.get(url, headers: headers);
+    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
@@ -119,10 +118,9 @@ class Request {
   }
 
   /// Returns a map of global Twitch badges to their URL.
-  static Future<Map<String, String>?> getBadgesTwitchGlobal({required String token}) async {
+  static Future<Map<String, String>?> getBadgesTwitchGlobal() async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/badges/global');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
-    final response = await http.get(url, headers: headers);
+    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
@@ -142,10 +140,9 @@ class Request {
   }
 
   /// Returns a map of a channel's Twitch badges to their URL.
-  static Future<Map<String, String>?> getBadgesTwitchChannel({required String token, required String id}) async {
+  static Future<Map<String, String>?> getBadgesTwitchChannel({required String id}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/badges?broadcaster_id=$id');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
-    final response = await http.get(url, headers: headers);
+    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
