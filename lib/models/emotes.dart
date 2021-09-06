@@ -135,7 +135,7 @@ class Role7TV {
   final int allowed;
   final int denied;
   @JsonKey(name: 'default')
-  final bool defaults;
+  final bool? defaults;
 
   Role7TV(this.id, this.name, this.position, this.color, this.allowed, this.denied, this.defaults);
 

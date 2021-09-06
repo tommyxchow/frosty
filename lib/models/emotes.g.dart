@@ -102,7 +102,7 @@ Role7TV _$Role7TVFromJson(Map<String, dynamic> json) {
     json['color'] as int,
     json['allowed'] as int,
     json['denied'] as int,
-    json['default'] as bool,
+    json['default'] as bool?,
   );
 }
 
