@@ -3,6 +3,7 @@ import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/chat_provider.dart';
 import 'package:frosty/screens/chat.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 /// A card widget that displays a live channel's thumbnail and details.
 class ChannelCard extends StatelessWidget {
@@ -72,7 +73,7 @@ class ChannelCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        '${channelInfo.viewerCount} viewers',
+                        '${NumberFormat().format(channelInfo.viewerCount)} viewers',
                         style: const TextStyle(fontSize: 12),
                       ),
                     ],
