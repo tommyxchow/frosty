@@ -6,13 +6,15 @@ import 'package:frosty/utility/request.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatProvider extends ChangeNotifier {
+  final Channel channelInfo;
+
   final channel = WebSocketChannel.connect(Uri.parse(twitchIrcUrl));
   final messages = <Widget>[];
+  final scrollController = ScrollController();
+
   final _assetToUrl = <String, String>{};
   final _emoteIdToWord = <String, String>{};
-  final scrollController = ScrollController();
   final _token = const String.fromEnvironment('TEST_TOKEN');
-  final Channel channelInfo;
 
   ChatProvider({required this.channelInfo}) {
     final commands = [
@@ -31,7 +33,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   Future<void> getEmotes() async {
-    final response = [
+    final assets = [
       await Request.getEmotesBTTVGlobal(),
       await Request.getEmotesBTTVChannel(id: channelInfo.userId),
       await Request.getEmotesFFZGlobal(),
@@ -40,17 +42,18 @@ class ChatProvider extends ChangeNotifier {
       await Request.getEmotesTwitchChannel(token: _token, id: channelInfo.userId),
       await Request.getBadgesTwitchGlobal(token: _token),
       await Request.getBadgesTwitchChannel(token: _token, id: channelInfo.userId),
-      // await Request.getEmotes7TVGlobal(),
-      // await Request.getEmotes7TVChannel(user: channelInfo.userLogin)
+      await Request.getEmotes7TVGlobal(),
+      await Request.getEmotes7TVChannel(user: channelInfo.userLogin)
     ];
 
-    for (final map in response) {
-      _assetToUrl.addAll(map);
+    for (final map in assets) {
+      if (map != null) {
+        _assetToUrl.addAll(map);
+      }
     }
   }
 
   List<InlineSpan> parseIrcMessage(String whole) {
-    print(whole);
     var mappedTags = <String, String>{};
 
     final tagAndIrcMessageDivider = whole.indexOf(' ');
@@ -80,7 +83,6 @@ class ChatProvider extends ChangeNotifier {
         break;
       case 'PRIVMSG':
         final message = splitMessage.sublist(3).join(' ').substring(1);
-        if (message.contains('\r\n')) print(message);
         return privateMessage(tags: mappedTags, chatMessage: message);
       case 'ROOMSTATE':
         break;
