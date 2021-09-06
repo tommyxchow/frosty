@@ -10,56 +10,63 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Frosty for Twitch'),
-          bottom: TabBar(
-            tabs: [
-              Tab(text: 'Top'),
-              Tab(text: 'Followed'),
-              Tab(text: 'Categories'),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.settings),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return Settings();
+    final auth = context.watch<AuthenticationProvider>();
+    print('build home');
+
+    return FutureBuilder(
+      future: auth.init(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return DefaultTabController(
+            length: auth.isLoggedIn ? 3 : 2,
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text('Frosty for Twitch'),
+                bottom: TabBar(
+                  tabs: [
+                    Tab(text: 'Top'),
+                    if (auth.isLoggedIn) Tab(text: 'Followed'),
+                    Tab(text: 'Categories'),
+                  ],
+                ),
+                actions: [
+                  IconButton(
+                    icon: Icon(Icons.settings),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return Settings();
+                          },
+                        ),
+                      );
                     },
-                  ),
-                );
-              },
-            )
-          ],
-        ),
-        body: FutureBuilder(
-          future: context.read<AuthenticationProvider>().init(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return TabBarView(
+                  )
+                ],
+              ),
+              body: TabBarView(
                 children: [
                   ChannelList(
                     category: Category.top,
                   ),
-                  ChannelList(
-                    category: Category.followed,
-                  ),
+                  if (auth.isLoggedIn)
+                    ChannelList(
+                      category: Category.followed,
+                    ),
                   Center(
                     child: Text('Games'),
                   ),
                 ],
-              );
-            }
-            return Center(child: CircularProgressIndicator());
-          },
-        ),
-      ),
+              ),
+            ),
+          );
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 }
