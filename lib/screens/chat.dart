@@ -17,7 +17,7 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     print('build');
     final viewModel = context.read<ChatProvider>();
-    return Container(
+    return SafeArea(
       child: FutureBuilder(
         future: viewModel.getEmotes(),
         builder: (context, snapshot) {

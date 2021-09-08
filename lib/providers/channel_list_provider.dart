@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/providers/authentication_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:frosty/models/channel.dart';
@@ -56,7 +57,7 @@ class ChannelListProvider extends ChangeNotifier {
   /// Returns the top 10 streamers and a cursor for further requests.
   Future<void> updateTopChannels() async {
     final url = Uri.parse('https://api.twitch.tv/helix/streams?first=10');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
+    final headers = {'Authorization': 'Bearer $token', 'Client-Id': clientId};
 
     final response = await http.get(url, headers: headers);
 
@@ -87,7 +88,7 @@ class ChannelListProvider extends ChangeNotifier {
         break;
     }
 
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
+    final headers = {'Authorization': 'Bearer $token', 'Client-Id': clientId};
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
@@ -116,7 +117,7 @@ class ChannelListProvider extends ChangeNotifier {
 
   Future<void> updateFollowedChannels() async {
     final url = Uri.parse('https://api.twitch.tv/helix/streams/followed?first=10&user_id=$id');
-    final headers = {'Authorization': 'Bearer $token', 'Client-Id': const String.fromEnvironment('CLIENT_ID')};
+    final headers = {'Authorization': 'Bearer $token', 'Client-Id': clientId};
 
     final response = await http.get(url, headers: headers);
 

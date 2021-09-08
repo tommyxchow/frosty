@@ -15,11 +15,9 @@ class Settings extends StatelessWidget {
             title: Text('Settings'),
           ),
           body: Center(
-            child: TextButton(
+            child: ElevatedButton(
               child: auth.isLoggedIn ? Text(auth.user!.displayName) : Text('Login'),
-              onPressed: () {
-                auth.isLoggedIn ? auth.logout() : auth.login();
-              },
+              onPressed: () => auth.isLoggedIn ? auth.logout() : auth.login(),
             ),
           ),
         );
