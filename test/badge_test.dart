@@ -5,7 +5,7 @@ import 'package:frosty/models/badges.dart';
 void main() {
   group('Twitch', () {
     test('badge should parse correctly', () {
-      final sampleJson = '''{
+      const sampleJson = '''{
         "set_id": "vip",
         "versions": [
           {

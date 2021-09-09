@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/providers/authentication_provider.dart';
@@ -18,11 +19,13 @@ class Request {
       final List<EmoteBTTVGlobal> emotes = decoded.map((emote) => EmoteBTTVGlobal.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
-      emotes.forEach((emote) => emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x');
+      for (final emote in emotes) {
+        emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
+      }
 
       return emoteToUrl;
     } else {
-      print('Failed to get global BTTV emotes. Error code: ${response.statusCode}');
+      debugPrint('Failed to get global BTTV emotes. Error code: ${response.statusCode}');
     }
   }
 
@@ -36,12 +39,16 @@ class Request {
       final result = EmoteBTTVChannel.fromJson(decoded);
 
       final emoteToUrl = <String, String>{};
-      result.channelEmotes.forEach((emote) => emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x');
-      result.sharedEmotes.forEach((emote) => emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x');
+      for (final emote in result.channelEmotes) {
+        emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
+      }
+      for (final emote in result.sharedEmotes) {
+        emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
+      }
 
       return emoteToUrl;
     } else {
-      print('Failed to get BTTV emotes for id: $id. Error code: ${response.statusCode}');
+      debugPrint('Failed to get BTTV emotes for id: $id. Error code: ${response.statusCode}');
     }
   }
 
@@ -55,11 +62,13 @@ class Request {
       final List<EmoteFFZ> emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
-      emotes.forEach((emote) => emoteToUrl[emote.code] = emote.images.url4x ?? emote.images.url1x);
+      for (final emote in emotes) {
+        emoteToUrl[emote.code] = emote.images.url4x ?? emote.images.url1x;
+      }
 
       return emoteToUrl;
     } else {
-      print('Failed to get global FFZ emotes. Error code: ${response.statusCode}');
+      debugPrint('Failed to get global FFZ emotes. Error code: ${response.statusCode}');
     }
   }
 
@@ -73,11 +82,13 @@ class Request {
       final List<EmoteFFZ> emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
-      emotes.forEach((emote) => emoteToUrl[emote.code] = emote.images.url4x ?? emote.images.url1x);
+      for (final emote in emotes) {
+        emoteToUrl[emote.code] = emote.images.url4x ?? emote.images.url1x;
+      }
 
       return emoteToUrl;
     } else {
-      print('Failed to get FFZ emotes for id: $id. Error code: ${response.statusCode}');
+      debugPrint('Failed to get FFZ emotes for id: $id. Error code: ${response.statusCode}');
     }
   }
 
@@ -91,11 +102,13 @@ class Request {
       final List<EmoteTwitch> emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
-      emotes.forEach((emote) => emoteToUrl[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0');
+      for (final emote in emotes) {
+        emoteToUrl[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0';
+      }
 
       return emoteToUrl;
     } else {
-      print('Failed to get global Twitch emotes. Error code: ${response.statusCode}');
+      debugPrint('Failed to get global Twitch emotes. Error code: ${response.statusCode}');
     }
   }
 
@@ -109,11 +122,13 @@ class Request {
       final List<EmoteTwitch> emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
-      emotes.forEach((emote) => emoteToUrl[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0');
+      for (final emote in emotes) {
+        emoteToUrl[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0';
+      }
 
       return emoteToUrl;
     } else {
-      print('Failed to get Twitch emotes for id: $id. Error code: ${response.statusCode}');
+      debugPrint('Failed to get Twitch emotes for id: $id. Error code: ${response.statusCode}');
     }
   }
 
@@ -135,7 +150,7 @@ class Request {
 
       return badgeToUrl;
     } else {
-      print('Failed to get global Twitch badges. Error code: ${response.statusCode}');
+      debugPrint('Failed to get global Twitch badges. Error code: ${response.statusCode}');
     }
   }
 
@@ -157,7 +172,7 @@ class Request {
 
       return badgeToUrl;
     } else {
-      print('Failed to get Twitch badges for id: $id. Error code: ${response.statusCode}');
+      debugPrint('Failed to get Twitch badges for id: $id. Error code: ${response.statusCode}');
     }
   }
 
@@ -171,10 +186,12 @@ class Request {
       final List<Emote7TV> emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
-      emotes.forEach((emote) => emoteToUrl[emote.name] = emote.urls[3][1]);
+      for (final emote in emotes) {
+        emoteToUrl[emote.name] = emote.urls[3][1];
+      }
       return emoteToUrl;
     } else {
-      print('Failed to get global 7TV emotes. Error code: ${response.statusCode}');
+      debugPrint('Failed to get global 7TV emotes. Error code: ${response.statusCode}');
     }
   }
 
@@ -188,10 +205,12 @@ class Request {
       final List<Emote7TV> emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
-      emotes.forEach((emote) => emoteToUrl[emote.name] = emote.urls[3][1]);
+      for (final emote in emotes) {
+        emoteToUrl[emote.name] = emote.urls[3][1];
+      }
       return emoteToUrl;
     } else {
-      print('Failed to get channel 7TV emotes. Error code: ${response.statusCode}');
+      debugPrint('Failed to get channel 7TV emotes. Error code: ${response.statusCode}');
     }
   }
 }

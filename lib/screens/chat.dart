@@ -15,7 +15,7 @@ class Chat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('build');
+    debugPrint('build');
     final viewModel = context.read<ChatProvider>();
     return SafeArea(
       child: FutureBuilder(
@@ -45,14 +45,14 @@ class Chat extends StatelessWidget {
                     ListView.builder(
                       itemCount: viewModel.messages.length,
                       controller: viewModel.scrollController,
-                      padding: EdgeInsets.all(5.0),
+                      padding: const EdgeInsets.all(5.0),
                       itemBuilder: (context, index) {
                         return viewModel.messages[index];
                       },
                     ),
                     Consumer<ChatProvider>(
                       builder: (context, viewModel, child) {
-                        if (!viewModel.autoScroll)
+                        if (!viewModel.autoScroll) {
                           return ElevatedButton(
                             onPressed: () {
                               viewModel.autoScroll = true;
@@ -61,8 +61,9 @@ class Chat extends StatelessWidget {
                                 viewModel.scrollController.jumpTo(viewModel.scrollController.position.maxScrollExtent);
                               });
                             },
-                            child: Text('Resume Scroll'),
+                            child: const Text('Resume Scroll'),
                           );
+                        }
                         return const Text('');
                       },
                     ),
@@ -71,7 +72,7 @@ class Chat extends StatelessWidget {
               },
             );
           } else {
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           }

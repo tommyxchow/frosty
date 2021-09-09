@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 class ChannelList extends StatefulWidget {
   final Category category;
 
-  ChannelList({Key? key, required this.category}) : super(key: key);
+  const ChannelList({Key? key, required this.category}) : super(key: key);
 
   @override
   _ChannelListState createState() => _ChannelListState();
@@ -22,7 +22,7 @@ class _ChannelListState extends State<ChannelList> with AutomaticKeepAliveClient
         final channels = viewModel.channels(category: widget.category);
         return ListView.builder(
           itemCount: channels.length,
-          padding: EdgeInsets.all(5.0),
+          padding: const EdgeInsets.all(5.0),
           itemBuilder: (context, index) {
             if (index > channels.length / 2 && viewModel.isLoading == false && viewModel.currentCursor(category: widget.category) != null) {
               viewModel.getMoreChannels(category: widget.category);

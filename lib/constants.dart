@@ -1,11 +1,11 @@
 import 'package:frosty/models/channel.dart';
 
-const clientId = const String.fromEnvironment('CLIENT_ID');
+const clientId = String.fromEnvironment('CLIENT_ID');
 
-const secret = const String.fromEnvironment('SECRET');
+const secret = String.fromEnvironment('SECRET');
 
 /// Sample channel objects for testing/preview purposes.
-const SampleChannels = [
+const sampleChannels = [
   Channel(
       id: '',
       userId: '',

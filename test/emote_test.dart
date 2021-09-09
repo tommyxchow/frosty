@@ -5,7 +5,7 @@ import "package:frosty/models/emotes.dart";
 void main() {
   group('Twitch', () {
     test("emote should parse correctly", () {
-      final sampleJson = '''{
+      const sampleJson = '''{
         "id": "304456832",
         "name": "twitchdevPitchfork",
         "images": {
@@ -46,7 +46,7 @@ void main() {
   });
   group("BTTV", () {
     test("emote should parse correctly", () {
-      final emoteTrollFace = """{
+      const emoteTrollFace = """{
         "id":"54fa8f1401e468494b85b537",
         "code":":tf:",
         "imageType":"png",
@@ -63,7 +63,7 @@ void main() {
     });
 
     test("shared emote should parse correctly", () {
-      final emoteEZ = """{
+      const emoteEZ = """{
         "id": "5590b223b344e2c42a9e28e3",
         "code": "EZ",
         "imageType": "png",
@@ -88,7 +88,7 @@ void main() {
     });
 
     test("global emotes should parse correctly", () {
-      final sampleJson = """[
+      const sampleJson = """[
         {"id":"54fa903b01e468494b85b53f","code":"DatSauce","imageType":"png","userId":"5561169bd6b9d206222a8c19"},
         {"id":"54fa909b01e468494b85b542","code":"ForeverAlone","imageType":"png","userId":"5561169bd6b9d206222a8c19"},
         {"id":"54fa90ba01e468494b85b543","code":"GabeN","imageType":"png","userId":"5561169bd6b9d206222a8c19"},
@@ -109,7 +109,7 @@ void main() {
     });
 
     test("channel emotes should parse correctly", () {
-      final sampleJson = """{"id":"5509bd19a607044d1a3dd1bb",
+      const sampleJson = """{"id":"5509bd19a607044d1a3dd1bb",
         "bots":[
           "emotestats",
           "hnlbot"
@@ -164,7 +164,7 @@ void main() {
 
   group('FFZ', () {
     test("emote should parse correctly", () {
-      final sampleJson = """{
+      const sampleJson = """{
         "id": 317897,
         "user": {
           "id": 84534,

@@ -20,6 +20,12 @@ version: 1.0.0+1
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
 dependencies:
   flutter:
     sdk: flutter
@@ -31,13 +37,20 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^0.13.3
   provider: ^6.0.0
-  flutter_secure_storage: ^4.2.1
-  flutter_web_auth: ^0.3.0
+  flutter_secure_storage: ^5.0.0-beta.5
+  flutter_web_auth: ^0.3.1
   intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^1.0.0
   build_runner: ^2.1.1
   json_serializable: ^4.1.4
 

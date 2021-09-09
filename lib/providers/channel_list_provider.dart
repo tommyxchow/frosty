@@ -70,14 +70,14 @@ class ChannelListProvider extends ChangeNotifier {
       topChannels = result['channels'];
       topChannelsCurrentCursor = result['cursor'];
     } else {
-      print('Failed to update top channels');
+      debugPrint('Failed to update top channels');
     }
     notifyListeners();
   }
 
   Future<void> getMoreChannels({required Category category}) async {
     isLoading = true;
-    final url;
+    Uri url;
 
     switch (category) {
       case Category.top:
@@ -105,11 +105,11 @@ class ChannelListProvider extends ChangeNotifier {
         case Category.followed:
           followedChannels.addAll(result['channels']);
           followedChannelsCurrentCursor = result['cursor'];
-          print(followedChannelsCurrentCursor);
+          debugPrint(followedChannelsCurrentCursor);
           break;
       }
     } else {
-      print('Failed to get more channels');
+      debugPrint('Failed to get more channels');
     }
     isLoading = false;
     notifyListeners();
@@ -130,7 +130,7 @@ class ChannelListProvider extends ChangeNotifier {
       followedChannels = result['channels'];
       followedChannelsCurrentCursor = result['cursor'];
     } else {
-      print('Failed to update followed channls');
+      debugPrint('Failed to update followed channels');
     }
     notifyListeners();
   }

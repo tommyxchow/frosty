@@ -14,7 +14,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   static Map<String, String>? authHeaders;
 
-  final _storage = new FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage();
   final _secret = secret;
   final _clientId = clientId;
 

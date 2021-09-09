@@ -11,7 +11,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthenticationProvider>();
-    print('build home');
+    debugPrint('build home');
 
     return FutureBuilder(
       future: auth.init(),
@@ -21,23 +21,23 @@ class Home extends StatelessWidget {
             length: auth.isLoggedIn ? 3 : 2,
             child: Scaffold(
               appBar: AppBar(
-                title: Text('Frosty for Twitch'),
+                title: const Text('Frosty for Twitch'),
                 bottom: TabBar(
                   tabs: [
-                    Tab(text: 'Top'),
-                    if (auth.isLoggedIn) Tab(text: 'Followed'),
-                    Tab(text: 'Categories'),
+                    const Tab(text: 'Top'),
+                    if (auth.isLoggedIn) const Tab(text: 'Followed'),
+                    const Tab(text: 'Categories'),
                   ],
                 ),
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.settings),
+                    icon: const Icon(Icons.settings),
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return Settings();
+                            return const Settings();
                           },
                         ),
                       );
@@ -47,14 +47,14 @@ class Home extends StatelessWidget {
               ),
               body: TabBarView(
                 children: [
-                  ChannelList(
+                  const ChannelList(
                     category: Category.top,
                   ),
                   if (auth.isLoggedIn)
-                    ChannelList(
+                    const ChannelList(
                       category: Category.followed,
                     ),
-                  Center(
+                  const Center(
                     child: Text('Games'),
                   ),
                 ],
@@ -62,7 +62,7 @@ class Home extends StatelessWidget {
             ),
           );
         } else {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }

@@ -12,11 +12,11 @@ class Settings extends StatelessWidget {
       builder: (context, settings, auth, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Settings'),
+            title: const Text('Settings'),
           ),
           body: Center(
             child: ElevatedButton(
-              child: auth.isLoggedIn ? Text(auth.user!.displayName) : Text('Login'),
+              child: auth.isLoggedIn ? Text(auth.user!.displayName) : const Text('Login'),
               onPressed: () => auth.isLoggedIn ? auth.logout() : auth.login(),
             ),
           ),
