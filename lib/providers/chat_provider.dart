@@ -1,8 +1,9 @@
-import 'package:flutter/foundation.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/authentication_provider.dart';
 import 'package:frosty/utility/request.dart';
+import 'package:frosty/widgets/chat_message.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatProvider extends ChangeNotifier {
@@ -64,7 +65,7 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  List<InlineSpan> parseIrcMessage(String whole) {
+  void parseIrcMessage(String whole) {
     var mappedTags = <String, String>{};
 
     final tagAndIrcMessageDivider = whole.indexOf(' ');
@@ -94,7 +95,11 @@ class ChatProvider extends ChangeNotifier {
         break;
       case 'PRIVMSG':
         final message = splitMessage.sublist(3).join(' ').substring(1);
-        return privateMessage(tags: mappedTags, chatMessage: message);
+        messages.add(const SizedBox(height: 10));
+        messages.add(ChatMessage(
+          children: privateMessage(tags: mappedTags, chatMessage: message),
+        ));
+        break;
       case 'ROOMSTATE':
         break;
       case 'USERNOTICE':
@@ -102,10 +107,10 @@ class ChatProvider extends ChangeNotifier {
       case 'USERSTATE':
         break;
     }
-    return [];
   }
 
   List<InlineSpan> privateMessage({required Map<String, String> tags, required String chatMessage}) {
+    debugPrint(chatMessage);
     var result = <InlineSpan>[];
 
     final emoteTags = tags['emotes'];
@@ -147,8 +152,10 @@ class ChatProvider extends ChangeNotifier {
           result.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
-              child: Image.network(
-                badgeUrl,
+              child: CachedNetworkImage(
+                imageUrl: badgeUrl,
+                placeholder: (context, url) => const SizedBox(),
+                fadeInDuration: const Duration(seconds: 0),
                 height: 20,
               ),
             ),
@@ -179,8 +186,10 @@ class ChatProvider extends ChangeNotifier {
         result.add(
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
-            child: Image.network(
-              emoteUrl,
+            child: CachedNetworkImage(
+              imageUrl: emoteUrl,
+              placeholder: (context, url) => const SizedBox(),
+              fadeInDuration: const Duration(seconds: 0),
               height: 25,
             ),
           ),

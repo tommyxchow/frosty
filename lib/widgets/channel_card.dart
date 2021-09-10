@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/chat_provider.dart';
@@ -43,8 +44,8 @@ class ChannelCard extends StatelessWidget {
               flex: 1,
               child: Padding(
                 padding: const EdgeInsets.only(left: 10.0),
-                child: Image.network(
-                  channelInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-1024x576'),
+                child: CachedNetworkImage(
+                  imageUrl: channelInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-1024x576'),
                 ),
               ),
             ),

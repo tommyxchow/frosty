@@ -5,7 +5,6 @@ import 'package:frosty/providers/chat_provider.dart';
 import 'package:frosty/widgets/chat_message.dart';
 import 'package:provider/provider.dart';
 
-// TODO: Remove test token dependency.
 // TODO: Use padding/margin for badge spacing.
 
 class Chat extends StatelessWidget {
@@ -28,10 +27,7 @@ class Chat extends StatelessWidget {
                 for (final message in snapshot.data.toString().split('\r\n')) {
                   // print(message);
                   if (message.startsWith('@')) {
-                    viewModel.messages.add(const SizedBox(height: 10));
-                    viewModel.messages.add(ChatMessage(
-                      children: viewModel.parseIrcMessage(message),
-                    ));
+                    viewModel.parseIrcMessage(message);
                   }
                   if (viewModel.autoScroll) {
                     SchedulerBinding.instance?.addPostFrameCallback((_) {
