@@ -6,8 +6,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
-// TODO: Fix up notifyListeners() placements.
-
 class AuthenticationProvider extends ChangeNotifier {
   static String? _token;
   static String? get token => _token;

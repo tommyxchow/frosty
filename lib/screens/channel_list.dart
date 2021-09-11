@@ -20,15 +20,18 @@ class _ChannelListState extends State<ChannelList> with AutomaticKeepAliveClient
     return Consumer2<AuthenticationProvider, ChannelListProvider>(
       builder: (context, auth, viewModel, child) {
         final channels = viewModel.channels(category: widget.category);
-        return ListView.builder(
-          itemCount: channels.length,
-          padding: const EdgeInsets.all(5.0),
-          itemBuilder: (context, index) {
-            if (index > channels.length / 2 && viewModel.isLoading == false && viewModel.currentCursor(category: widget.category) != null) {
-              viewModel.getMoreChannels(category: widget.category);
-            }
-            return ChannelCard(channelInfo: channels[index]);
-          },
+        return RefreshIndicator(
+          child: ListView.builder(
+            itemCount: channels.length,
+            padding: const EdgeInsets.all(5.0),
+            itemBuilder: (context, index) {
+              if (index > channels.length / 2 && viewModel.isLoading == false && viewModel.currentCursor(category: widget.category) != null) {
+                viewModel.getMoreChannels(category: widget.category);
+              }
+              return ChannelCard(channelInfo: channels[index]);
+            },
+          ),
+          onRefresh: () => viewModel.update(category: widget.category),
         );
       },
     );

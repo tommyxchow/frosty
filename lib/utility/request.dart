@@ -5,8 +5,6 @@ import 'package:frosty/models/emotes.dart';
 import 'package:frosty/providers/authentication_provider.dart';
 import 'package:http/http.dart' as http;
 
-// TODO: Notify user when a request for an asset has failed (and possibly an option to retry).
-
 // A class for general requests.
 class Request {
   /// Returns a map of global BTTV emotes to their URL.
