@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/chat_provider.dart';
-import 'package:frosty/widgets/chat_message.dart';
 import 'package:provider/provider.dart';
-
-// TODO: Use padding/margin for badge spacing.
 
 class Chat extends StatelessWidget {
   final Channel channelInfo;
@@ -48,8 +45,9 @@ class Chat extends StatelessWidget {
                     ),
                     Consumer<ChatProvider>(
                       builder: (context, viewModel, child) {
-                        if (!viewModel.autoScroll) {
-                          return ElevatedButton(
+                        return Visibility(
+                          visible: !viewModel.autoScroll,
+                          child: ElevatedButton(
                             onPressed: () {
                               viewModel.autoScroll = true;
                               viewModel.scrollController.jumpTo(viewModel.scrollController.position.maxScrollExtent);
@@ -58,9 +56,8 @@ class Chat extends StatelessWidget {
                               });
                             },
                             child: const Text('Resume Scroll'),
-                          );
-                        }
-                        return const Text('');
+                          ),
+                        );
                       },
                     ),
                   ],
