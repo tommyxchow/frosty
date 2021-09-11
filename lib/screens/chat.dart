@@ -22,15 +22,7 @@ class Chat extends StatelessWidget {
               stream: viewModel.channel.stream,
               builder: (context, snapshot) {
                 for (final message in snapshot.data.toString().split('\r\n')) {
-                  // print(message);
-                  if (message.startsWith('@')) {
-                    viewModel.parseIrcMessage(message);
-                  }
-                  if (viewModel.autoScroll) {
-                    SchedulerBinding.instance?.addPostFrameCallback((_) {
-                      viewModel.scrollController.jumpTo(viewModel.scrollController.position.maxScrollExtent);
-                    });
-                  }
+                  viewModel.parseIrcMessage(message);
                 }
                 return Stack(
                   alignment: AlignmentDirectional.bottomCenter,

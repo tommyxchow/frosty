@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/authentication_provider.dart';
@@ -66,6 +67,14 @@ class ChatProvider extends ChangeNotifier {
   }
 
   void parseIrcMessage(String whole) {
+    if (whole.startsWith('P')) {
+      channel.sink.add('PONG :tmi.twitch.tv');
+      return;
+    }
+    if (!whole.startsWith('@')) {
+      return;
+    }
+
     var mappedTags = <String, String>{};
 
     final tagAndIrcMessageDivider = whole.indexOf(' ');
@@ -99,6 +108,11 @@ class ChatProvider extends ChangeNotifier {
         messages.add(ChatMessage(
           children: privateMessage(tags: mappedTags, chatMessage: message),
         ));
+        if (autoScroll) {
+          SchedulerBinding.instance?.addPostFrameCallback((_) {
+            scrollController.jumpTo(scrollController.position.maxScrollExtent);
+          });
+        }
         break;
       case 'ROOMSTATE':
         break;
@@ -110,7 +124,7 @@ class ChatProvider extends ChangeNotifier {
   }
 
   List<InlineSpan> privateMessage({required Map<String, String> tags, required String chatMessage}) {
-    debugPrint(chatMessage);
+    // debugPrint(chatMessage);
     var result = <InlineSpan>[];
 
     final emoteTags = tags['emotes'];
