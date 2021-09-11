@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/chat_provider.dart';
 import 'package:provider/provider.dart';
@@ -21,9 +20,7 @@ class Chat extends StatelessWidget {
             return StreamBuilder(
               stream: viewModel.channel.stream,
               builder: (context, snapshot) {
-                for (final message in snapshot.data.toString().split('\r\n')) {
-                  viewModel.parseIrcMessage(message);
-                }
+                viewModel.handleWebsocketData(snapshot.data);
                 return Stack(
                   alignment: AlignmentDirectional.bottomCenter,
                   children: [
@@ -40,13 +37,7 @@ class Chat extends StatelessWidget {
                         return Visibility(
                           visible: !viewModel.autoScroll,
                           child: ElevatedButton(
-                            onPressed: () {
-                              viewModel.autoScroll = true;
-                              viewModel.scrollController.jumpTo(viewModel.scrollController.position.maxScrollExtent);
-                              SchedulerBinding.instance?.addPostFrameCallback((_) {
-                                viewModel.scrollController.jumpTo(viewModel.scrollController.position.maxScrollExtent);
-                              });
-                            },
+                            onPressed: () => viewModel.resumeScroll(),
                             child: const Text('Resume Scroll'),
                           ),
                         );
@@ -56,11 +47,10 @@ class Chat extends StatelessWidget {
                 );
               },
             );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
           }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );

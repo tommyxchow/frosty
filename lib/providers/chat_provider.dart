@@ -66,15 +66,20 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  void parseIrcMessage(String whole) {
-    if (whole.startsWith('P')) {
-      channel.sink.add('PONG :tmi.twitch.tv');
-      return;
+  void handleWebsocketData(Object? data) {
+    for (final message in data.toString().split('\r\n')) {
+      if (message.startsWith('@')) {
+        parseIrcMessage(message);
+        continue;
+      }
+      if (message.startsWith('P')) {
+        channel.sink.add('PONG :tmi.twitch.tv');
+        continue;
+      }
     }
-    if (!whole.startsWith('@')) {
-      return;
-    }
+  }
 
+  void parseIrcMessage(String whole) {
     var mappedTags = <String, String>{};
 
     final tagAndIrcMessageDivider = whole.indexOf(' ');
@@ -214,6 +219,14 @@ class ChatProvider extends ChangeNotifier {
       }
     }
     return result;
+  }
+
+  void resumeScroll() {
+    autoScroll = true;
+    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
   }
 
   @override
