@@ -45,7 +45,7 @@ class ChannelCard extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10.0),
                 child: CachedNetworkImage(
-                  imageUrl: channelInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-1024x576'),
+                  imageUrl: channelInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248'),
                 ),
               ),
             ),
