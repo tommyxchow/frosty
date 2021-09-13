@@ -41,6 +41,7 @@ dependencies:
   flutter_web_auth: ^0.3.1
   intl: ^0.17.0
   cached_network_image: ^3.1.0
+  webview_flutter: ^2.0.13
 
 dev_dependencies:
   flutter_test:
