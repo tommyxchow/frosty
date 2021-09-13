@@ -25,6 +25,9 @@ class Chat extends StatelessWidget {
                   alignment: AlignmentDirectional.bottomCenter,
                   children: [
                     ListView.builder(
+                      addAutomaticKeepAlives: false,
+                      addRepaintBoundaries: false,
+                      physics: const ClampingScrollPhysics(),
                       itemCount: viewModel.messages.length,
                       controller: viewModel.scrollController,
                       padding: const EdgeInsets.all(5.0),
