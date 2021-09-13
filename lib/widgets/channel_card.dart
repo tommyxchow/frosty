@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/chat_provider.dart';
-import 'package:frosty/screens/chat.dart';
+import 'package:frosty/screens/video_chat.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
@@ -27,9 +27,7 @@ class ChannelCard extends StatelessWidget {
                   ),
                   body: ChangeNotifierProvider<ChatProvider>(
                     create: (context) => ChatProvider(channelInfo: channelInfo),
-                    child: Chat(
-                      channelInfo: channelInfo,
-                    ),
+                    child: VideoChat(channelInfo: channelInfo),
                   ),
                 );
               },
