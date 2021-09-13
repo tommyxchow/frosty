@@ -11,6 +11,8 @@ class Video extends StatelessWidget {
     return WebView(
       initialUrl: 'https://player.twitch.tv/?channel=$channelName&muted=false&parent=localhost.com',
       javascriptMode: JavascriptMode.unrestricted,
+      allowsInlineMediaPlayback: true,
+      initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
     );
   }
 }
