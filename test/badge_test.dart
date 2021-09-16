@@ -22,6 +22,10 @@ void main() {
 
       expect(badge.setId, "vip");
       expect(badge.versions.first.id, "1");
+      expect(badge.versions.length, 1);
+      expect(badge.versions.first.id, "1");
+      expect(badge.versions.first.imageUrl1x, "https://static-cdn.jtvnw.net/badges/v1/b817aba4-fad8-49e2-b88a-7cc744dfa6ec/1");
+      expect(badge.versions.first.imageUrl2x, "https://static-cdn.jtvnw.net/badges/v1/b817aba4-fad8-49e2-b88a-7cc744dfa6ec/2");
       expect(badge.versions.first.imageUrl4x, "https://static-cdn.jtvnw.net/badges/v1/b817aba4-fad8-49e2-b88a-7cc744dfa6ec/3");
     });
   });

@@ -35,6 +35,8 @@ void main() {
 
       expect(emote.id, "304456832");
       expect(emote.name, "twitchdevPitchfork");
+      expect(emote.images.url1x, "https://static-cdn.jtvnw.net/emoticons/v2/304456832/static/light/1.0");
+      expect(emote.images.url2x, "https://static-cdn.jtvnw.net/emoticons/v2/304456832/static/light/2.0");
       expect(emote.images.url4x, "https://static-cdn.jtvnw.net/emoticons/v2/304456832/static/light/3.0");
       expect(emote.tier, "1000");
       expect(emote.emoteType, "subscriptions");
@@ -188,6 +190,7 @@ void main() {
       expect(emote.user.name, "vulpeshd");
       expect(emote.user.displayName, "VulpesHD");
       expect(emote.code, "peepoPog");
+      expect(emote.images.url1x, "https://cdn.betterttv.net/frankerfacez_emote/317897/1");
       expect(emote.images.url2x, "https://cdn.betterttv.net/frankerfacez_emote/317897/2");
       expect(emote.images.url4x, null);
       expect(emote.imageType, "png");
