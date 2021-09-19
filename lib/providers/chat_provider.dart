@@ -100,6 +100,7 @@ class ChatProvider extends ChangeNotifier {
         final message = splitMessage.sublist(3).join(' ').substring(1);
         messages.add(const SizedBox(height: 10));
         messages.add(ChatMessage(
+          key: Key(mappedTags['id']!),
           children: privateMessage(tags: mappedTags, chatMessage: message),
         ));
         break;
