@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/authentication_provider.dart';
@@ -12,7 +11,6 @@ class ChatProvider extends ChangeNotifier {
 
   final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
   final messages = <Widget>[];
-  final scrollController = ScrollController();
 
   final _assetToUrl = <String, String>{};
   final _emoteIdToWord = <String, String>{};
@@ -33,16 +31,6 @@ class ChatProvider extends ChangeNotifier {
     for (final command in commands) {
       channel.sink.add(command);
     }
-
-    scrollController.addListener(() {
-      if (!scrollController.position.atEdge) {
-        autoScroll = false;
-        notifyListeners();
-      } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
-        autoScroll = true;
-        notifyListeners();
-      }
-    });
   }
 
   Future<void> getEmotes() async {
@@ -108,16 +96,17 @@ class ChatProvider extends ChangeNotifier {
       case 'GLOBALUSERSTATE':
         break;
       case 'PRIVMSG':
-        final message = splitMessage.sublist(3).join(' ').substring(1);
-        messages.add(const SizedBox(height: 10));
-        messages.add(ChatMessage(
-          children: privateMessage(tags: mappedTags, chatMessage: message),
-        ));
-        if (autoScroll) {
-          SchedulerBinding.instance?.addPostFrameCallback((_) {
-            scrollController.jumpTo(scrollController.position.maxScrollExtent);
-          });
+        if (messages.length >= 200) {
+          debugPrint('remove');
+          messages.removeRange(0, 20);
         }
+        final message = splitMessage.sublist(3).join(' ').substring(1);
+        messages
+          ..add(const SizedBox(height: 10))
+          ..add(ChatMessage(
+            key: Key(mappedTags['id']!),
+            children: privateMessage(tags: mappedTags, chatMessage: message),
+          ));
         break;
       case 'ROOMSTATE':
         break;
@@ -219,14 +208,6 @@ class ChatProvider extends ChangeNotifier {
       }
     }
     return result;
-  }
-
-  void resumeScroll() {
-    autoScroll = true;
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
   }
 
   @override
