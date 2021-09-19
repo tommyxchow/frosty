@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/authentication_provider.dart';
@@ -97,12 +96,17 @@ class ChatProvider extends ChangeNotifier {
       case 'GLOBALUSERSTATE':
         break;
       case 'PRIVMSG':
+        if (messages.length >= 200) {
+          debugPrint('remove');
+          messages.removeRange(0, 20);
+        }
         final message = splitMessage.sublist(3).join(' ').substring(1);
-        messages.add(const SizedBox(height: 10));
-        messages.add(ChatMessage(
-          key: Key(mappedTags['id']!),
-          children: privateMessage(tags: mappedTags, chatMessage: message),
-        ));
+        messages
+          ..add(const SizedBox(height: 10))
+          ..add(ChatMessage(
+            key: Key(mappedTags['id']!),
+            children: privateMessage(tags: mappedTags, chatMessage: message),
+          ));
         break;
       case 'ROOMSTATE':
         break;

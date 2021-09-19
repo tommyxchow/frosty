@@ -20,11 +20,10 @@ class Chat extends StatelessWidget {
             stream: viewModel.channel.stream,
             builder: (context, snapshot) {
               viewModel.handleWebsocketData(snapshot.data);
-              debugPrint('update');
-              print(viewModel.messages);
               if (viewModel.messages.isNotEmpty) {
                 return ListView(
                   reverse: true,
+                  padding: const EdgeInsets.all(5.0),
                   children: viewModel.messages.reversed.toList(),
                 );
               }

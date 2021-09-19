@@ -6,8 +6,6 @@ import 'package:frosty/screens/video_chat.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-import 'chat.dart';
-
 /// A card widget that displays a live channel's thumbnail and details.
 class ChannelCard extends StatelessWidget {
   final Channel channelInfo;
@@ -29,7 +27,7 @@ class ChannelCard extends StatelessWidget {
                   ),
                   body: ChangeNotifierProvider<ChatProvider>(
                     create: (context) => ChatProvider(channelInfo: channelInfo),
-                    child: Chat(channelInfo: channelInfo),
+                    child: VideoChat(channelInfo: channelInfo),
                   ),
                 );
               },
