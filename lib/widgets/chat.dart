@@ -12,29 +12,50 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint('build');
     final viewModel = context.read<ChatProvider>();
-    return FutureBuilder(
-      future: viewModel.getEmotes(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return StreamBuilder(
-            stream: viewModel.channel.stream,
-            builder: (context, snapshot) {
-              viewModel.handleWebsocketData(snapshot.data);
-              if (viewModel.messages.isNotEmpty) {
-                return ListView(
-                  reverse: true,
-                  padding: const EdgeInsets.all(5.0),
-                  children: viewModel.messages.reversed.toList(),
+    return SafeArea(
+      child: FutureBuilder(
+        future: viewModel.getEmotes(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return StreamBuilder(
+              stream: viewModel.channel.stream,
+              builder: (context, snapshot) {
+                viewModel.handleWebsocketData(snapshot.data);
+                return Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    ListView.builder(
+                      addAutomaticKeepAlives: false,
+                      addRepaintBoundaries: false,
+                      physics: const ClampingScrollPhysics(),
+                      itemCount: viewModel.messages.length,
+                      controller: viewModel.scrollController,
+                      padding: const EdgeInsets.all(5.0),
+                      itemBuilder: (context, index) {
+                        return viewModel.messages[index];
+                      },
+                    ),
+                    Consumer<ChatProvider>(
+                      builder: (context, viewModel, child) {
+                        return Visibility(
+                          visible: !viewModel.autoScroll,
+                          child: ElevatedButton(
+                            onPressed: () => viewModel.resumeScroll(),
+                            child: const Text('Resume Scroll'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 );
-              }
-              return const SizedBox();
-            },
+              },
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
           );
-        }
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+        },
+      ),
     );
   }
 }

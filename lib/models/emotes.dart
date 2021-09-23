@@ -2,6 +2,8 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'emotes.g.dart';
 
+// TODO: Add 7TV emotes: https://github.com/SevenTV/ServerGo/blob/master/docs/rest-api.md
+
 // * Twitch Emotes *
 @JsonSerializable(createToJson: false)
 class ImagesTwitch {

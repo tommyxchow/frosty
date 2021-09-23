@@ -9,7 +9,7 @@ class Video extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WebView(
-      initialUrl: 'https://player.twitch.tv/?channel=$channelName&muted=false&parent=frosty',
+      initialUrl: 'https://player.twitch.tv/?channel=$channelName&muted=false&parent=localhost.com',
       javascriptMode: JavascriptMode.unrestricted,
       allowsInlineMediaPlayback: true,
       initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
