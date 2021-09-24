@@ -7,9 +7,12 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        children: children,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: RichText(
+        text: TextSpan(
+          children: children,
+        ),
       ),
     );
   }

@@ -32,7 +32,7 @@ class Chat extends StatelessWidget {
                       controller: viewModel.scrollController,
                       padding: const EdgeInsets.all(5.0),
                       itemBuilder: (context, index) {
-                        return viewModel.messages[index];
+                        return viewModel.parseIrcMessage(viewModel.messages[index]);
                       },
                     ),
                     Consumer<ChatProvider>(

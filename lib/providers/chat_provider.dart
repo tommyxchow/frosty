@@ -11,7 +11,7 @@ class ChatProvider extends ChangeNotifier {
   final Channel channelInfo;
 
   final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
-  final messages = <Widget>[];
+  final messages = <String>[];
   final scrollController = ScrollController();
 
   final _assetToUrl = <String, String>{};
@@ -69,7 +69,7 @@ class ChatProvider extends ChangeNotifier {
   void handleWebsocketData(Object? data) {
     for (final message in data.toString().split('\r\n')) {
       if (message.startsWith('@')) {
-        parseIrcMessage(message);
+        messages.add(message);
         continue;
       }
       if (message.startsWith('P')) {
@@ -79,7 +79,7 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
-  void parseIrcMessage(String whole) {
+  Widget parseIrcMessage(String whole) {
     var mappedTags = <String, String>{};
 
     final tagAndIrcMessageDivider = whole.indexOf(' ');
@@ -109,16 +109,16 @@ class ChatProvider extends ChangeNotifier {
         break;
       case 'PRIVMSG':
         final message = splitMessage.sublist(3).join(' ').substring(1);
-        messages.add(const SizedBox(height: 10));
-        messages.add(ChatMessage(
-          children: privateMessage(tags: mappedTags, chatMessage: message),
-        ));
+
         if (autoScroll) {
           SchedulerBinding.instance?.addPostFrameCallback((_) {
             scrollController.jumpTo(scrollController.position.maxScrollExtent);
           });
         }
-        break;
+        return ChatMessage(
+          children: privateMessage(tags: mappedTags, chatMessage: message),
+        );
+
       case 'ROOMSTATE':
         break;
       case 'USERNOTICE':
@@ -126,6 +126,7 @@ class ChatProvider extends ChangeNotifier {
       case 'USERSTATE':
         break;
     }
+    return const SizedBox();
   }
 
   List<InlineSpan> privateMessage({required Map<String, String> tags, required String chatMessage}) {
