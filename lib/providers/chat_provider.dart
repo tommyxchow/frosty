@@ -115,16 +115,8 @@ class ChatProvider extends ChangeNotifier {
             scrollController.jumpTo(scrollController.position.maxScrollExtent);
           });
         }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 10,
-            ),
-            ChatMessage(
-              children: privateMessage(tags: mappedTags, chatMessage: message),
-            ),
-          ],
+        return ChatMessage(
+          children: privateMessage(tags: mappedTags, chatMessage: message),
         );
 
       case 'ROOMSTATE':
