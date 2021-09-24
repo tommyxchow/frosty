@@ -38,9 +38,13 @@ class Chat extends StatelessWidget {
                     builder: (context, viewModel, child) {
                       return Visibility(
                         visible: !viewModel.autoScroll,
-                        child: ElevatedButton(
-                          onPressed: () => viewModel.resumeScroll(),
-                          child: const Text('Resume Scroll'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => viewModel.resumeScroll(),
+                            child: const Text('Resume Scroll'),
+                          ),
                         ),
                       );
                     },
