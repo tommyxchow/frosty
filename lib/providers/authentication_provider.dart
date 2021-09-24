@@ -109,7 +109,7 @@ class AuthenticationProvider extends ChangeNotifier {
     );
 
     try {
-      final result = await FlutterWebAuth.authenticate(url: loginUrl.toString(), callbackUrlScheme: 'auth');
+      final result = await FlutterWebAuth.authenticate(url: loginUrl.toString(), callbackUrlScheme: 'auth', preferEphemeral: true);
 
       final fragment = Uri.parse(result).fragment;
 
