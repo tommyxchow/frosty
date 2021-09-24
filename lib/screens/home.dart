@@ -46,6 +46,7 @@ class Home extends StatelessWidget {
                 ],
               ),
               body: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
                   const ChannelList(
                     category: Category.top,
