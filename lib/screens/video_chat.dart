@@ -10,16 +10,18 @@ class VideoChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AspectRatio(
-          aspectRatio: 16 / 9,
-          child: Video(channelName: channelInfo.userLogin),
-        ),
-        Expanded(
-          child: Chat(channelInfo: channelInfo),
-        )
-      ],
+    return SafeArea(
+      child: Column(
+        children: [
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Video(channelName: channelInfo.userLogin),
+          ),
+          Expanded(
+            child: Chat(channelInfo: channelInfo),
+          )
+        ],
+      ),
     );
   }
 }

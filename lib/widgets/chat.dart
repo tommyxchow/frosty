@@ -12,50 +12,48 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint('build');
     final viewModel = context.read<ChatProvider>();
-    return SafeArea(
-      child: FutureBuilder(
-        future: viewModel.getEmotes(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return StreamBuilder(
-              stream: viewModel.channel.stream,
-              builder: (context, snapshot) {
-                viewModel.handleWebsocketData(snapshot.data);
-                return Stack(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  children: [
-                    ListView.builder(
-                      addAutomaticKeepAlives: false,
-                      addRepaintBoundaries: false,
-                      physics: const ClampingScrollPhysics(),
-                      itemCount: viewModel.messages.length,
-                      controller: viewModel.scrollController,
-                      padding: const EdgeInsets.all(5.0),
-                      itemBuilder: (context, index) {
-                        return viewModel.parseIrcMessage(viewModel.messages[index]);
-                      },
-                    ),
-                    Consumer<ChatProvider>(
-                      builder: (context, viewModel, child) {
-                        return Visibility(
-                          visible: !viewModel.autoScroll,
-                          child: ElevatedButton(
-                            onPressed: () => viewModel.resumeScroll(),
-                            child: const Text('Resume Scroll'),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          }
-          return const Center(
-            child: CircularProgressIndicator(),
+    return FutureBuilder(
+      future: viewModel.getEmotes(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return StreamBuilder(
+            stream: viewModel.channel.stream,
+            builder: (context, snapshot) {
+              viewModel.handleWebsocketData(snapshot.data);
+              return Stack(
+                alignment: AlignmentDirectional.bottomCenter,
+                children: [
+                  ListView.builder(
+                    addAutomaticKeepAlives: false,
+                    addRepaintBoundaries: false,
+                    physics: const ClampingScrollPhysics(),
+                    itemCount: viewModel.messages.length,
+                    controller: viewModel.scrollController,
+                    padding: const EdgeInsets.all(5.0),
+                    itemBuilder: (context, index) {
+                      return viewModel.parseIrcMessage(viewModel.messages[index]);
+                    },
+                  ),
+                  Consumer<ChatProvider>(
+                    builder: (context, viewModel, child) {
+                      return Visibility(
+                        visible: !viewModel.autoScroll,
+                        child: ElevatedButton(
+                          onPressed: () => viewModel.resumeScroll(),
+                          child: const Text('Resume Scroll'),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              );
+            },
           );
-        },
-      ),
+        }
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
   }
 }

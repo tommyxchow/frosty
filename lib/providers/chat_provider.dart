@@ -116,6 +116,7 @@ class ChatProvider extends ChangeNotifier {
           });
         }
         return ChatMessage(
+          key: Key(mappedTags['id']!),
           children: privateMessage(tags: mappedTags, chatMessage: message),
         );
 

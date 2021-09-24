@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/providers/chat_provider.dart';
@@ -19,12 +20,9 @@ class ChannelCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
+            CupertinoPageRoute(
               builder: (context) {
                 return Scaffold(
-                  appBar: AppBar(
-                    title: Text(channelInfo.userName),
-                  ),
                   body: ChangeNotifierProvider<ChatProvider>(
                     create: (context) => ChatProvider(channelInfo: channelInfo),
                     child: VideoChat(channelInfo: channelInfo),
