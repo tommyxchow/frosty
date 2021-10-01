@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         Provider<AuthStore>(create: (_) => AuthStore()),
         ProxyProvider<AuthStore, ChannelListStore>(
           create: (_) => ChannelListStore(),
-          update: (context, auth, channelListProvider) {
+          update: (context, auth, channelListStore) {
             return ChannelListStore(id: auth.user?.id);
           },
         ),
