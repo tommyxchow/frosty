@@ -11,7 +11,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthStore>();
+    final auth = context.read<AuthStore>();
     debugPrint('build home');
 
     return Observer(

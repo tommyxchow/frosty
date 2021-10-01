@@ -17,22 +17,22 @@ class _ChannelListState extends State<ChannelList> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final viewModel = context.watch<ChannelListStore>();
+    final channelListStore = context.read<ChannelListStore>();
     return Observer(
       builder: (_) {
-        final channels = viewModel.channels(category: widget.category);
+        final channels = channelListStore.channels(category: widget.category);
         return RefreshIndicator(
           child: ListView.builder(
             itemCount: channels.length,
             padding: const EdgeInsets.all(5.0),
             itemBuilder: (context, index) {
-              if (index > channels.length / 2 && viewModel.isLoading == false && viewModel.currentCursor(category: widget.category) != null) {
-                viewModel.getMoreChannels(category: widget.category);
+              if (index > channels.length / 2 && channelListStore.isLoading == false && channelListStore.currentCursor(category: widget.category) != null) {
+                channelListStore.getMoreChannels(category: widget.category);
               }
               return ChannelCard(channelInfo: channels[index]);
             },
           ),
-          onRefresh: () => viewModel.update(category: widget.category),
+          onRefresh: () => channelListStore.update(category: widget.category),
         );
       },
     );

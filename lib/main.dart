@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       ],
       child: Builder(
         builder: (context) {
-          final auth = context.watch<AuthStore>();
+          final auth = context.read<AuthStore>();
           return MaterialApp(
             title: 'Frosty',
             theme: ThemeData(

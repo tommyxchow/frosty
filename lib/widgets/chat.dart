@@ -13,18 +13,18 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  final viewModel = ChatStore();
+  late ChatStore chatStore = ChatStore(channelInfo: widget.channelInfo);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: viewModel.start(widget.channelInfo),
+      future: chatStore.getEmotes(),
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return StreamBuilder(
-            stream: viewModel.channel.stream,
+            stream: chatStore.channel.stream,
             builder: (context, snapshot) {
-              viewModel.handleWebsocketData(snapshot.data);
+              chatStore.handleWebsocketData(snapshot.data);
               return Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
@@ -32,22 +32,22 @@ class _ChatState extends State<Chat> {
                     addAutomaticKeepAlives: false,
                     addRepaintBoundaries: false,
                     physics: const ClampingScrollPhysics(),
-                    itemCount: viewModel.messages.length,
-                    controller: viewModel.scrollController,
+                    itemCount: chatStore.messages.length,
+                    controller: chatStore.scrollController,
                     padding: const EdgeInsets.all(5.0),
                     itemBuilder: (context, index) {
-                      return viewModel.parseIrcMessage(viewModel.messages[index]);
+                      return chatStore.parseIrcMessage(chatStore.messages[index]);
                     },
                   ),
                   Observer(
                     builder: (_) {
                       return Visibility(
-                        visible: !viewModel.autoScroll,
+                        visible: !chatStore.autoScroll,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () => viewModel.resumeScroll(),
+                            onPressed: () => chatStore.resumeScroll(),
                             child: const Text('Resume Scroll'),
                           ),
                         ),
@@ -68,7 +68,7 @@ class _ChatState extends State<Chat> {
 
   @override
   void dispose() {
-    viewModel.channel.sink.close();
+    chatStore.channel.sink.close();
     super.dispose();
   }
 }

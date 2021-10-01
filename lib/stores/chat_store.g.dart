@@ -24,6 +24,13 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
+  final _$getEmotesAsyncAction = AsyncAction('_ChatStoreBase.getEmotes');
+
+  @override
+  Future<void> getEmotes() {
+    return _$getEmotesAsyncAction.run(() => super.getEmotes());
+  }
+
   final _$_ChatStoreBaseActionController =
       ActionController(name: '_ChatStoreBase');
 

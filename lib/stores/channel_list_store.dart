@@ -47,7 +47,7 @@ abstract class _ChannelListBase with Store {
     }
   }
 
-  List<Channel> channels({required Category category}) {
+  ObservableList<Channel> channels({required Category category}) {
     switch (category) {
       case Category.top:
         return topChannels;
@@ -80,10 +80,7 @@ abstract class _ChannelListBase with Store {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      final result = {
-        'channels': data.map((channel) => Channel.fromJson(channel)).toList(),
-        'cursor': decoded['pagination']['cursor']
-      };
+      final result = {'channels': data.map((channel) => Channel.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
 
       topChannels = ObservableList.of(result['channels']);
       topChannelsCurrentCursor = result['cursor'];
@@ -100,12 +97,10 @@ abstract class _ChannelListBase with Store {
 
     switch (category) {
       case Category.top:
-        url = Uri.parse(
-            'https://api.twitch.tv/helix/streams?first=10&after=$topChannelsCurrentCursor');
+        url = Uri.parse('https://api.twitch.tv/helix/streams?first=10&after=$topChannelsCurrentCursor');
         break;
       case Category.followed:
-        url = Uri.parse(
-            'https://api.twitch.tv/helix/streams/followed?user_id=$id&first=10&after=$followedChannelsCurrentCursor');
+        url = Uri.parse('https://api.twitch.tv/helix/streams/followed?user_id=$id&first=10&after=$followedChannelsCurrentCursor');
         break;
     }
 
@@ -116,10 +111,7 @@ abstract class _ChannelListBase with Store {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      final result = {
-        'channels': data.map((channel) => Channel.fromJson(channel)).toList(),
-        'cursor': decoded['pagination']['cursor']
-      };
+      final result = {'channels': data.map((channel) => Channel.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
 
       switch (category) {
         case Category.top:
@@ -141,8 +133,7 @@ abstract class _ChannelListBase with Store {
 
   @action
   Future<void> updateFollowedChannels() async {
-    final url = Uri.parse(
-        'https://api.twitch.tv/helix/streams/followed?first=10&user_id=$id');
+    final url = Uri.parse('https://api.twitch.tv/helix/streams/followed?first=10&user_id=$id');
     final headers = {'Authorization': 'Bearer $token', 'Client-Id': clientId};
 
     final response = await http.get(url, headers: headers);
@@ -151,10 +142,7 @@ abstract class _ChannelListBase with Store {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      final result = {
-        'channels': data.map((channel) => Channel.fromJson(channel)).toList(),
-        'cursor': decoded['pagination']['cursor']
-      };
+      final result = {'channels': data.map((channel) => Channel.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
 
       followedChannels = ObservableList.of(result['channels']);
       followedChannelsCurrentCursor = result['cursor'];
