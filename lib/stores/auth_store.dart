@@ -1,3 +1,4 @@
+import 'package:mobx/mobx.dart';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:frosty/constants.dart';
@@ -6,7 +7,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
-class AuthenticationProvider extends ChangeNotifier {
+part 'auth_store.g.dart';
+
+class AuthStore = AuthBase with _$AuthStore;
+
+abstract class AuthBase with Store {
   static String? _token;
   static String? get token => _token;
 
@@ -16,7 +21,9 @@ class AuthenticationProvider extends ChangeNotifier {
   final _secret = secret;
   final _clientId = clientId;
 
+  @observable
   var _isLoggedIn = false;
+
   bool get isLoggedIn => _isLoggedIn;
 
   var _tokenIsValid = false;
@@ -85,7 +92,7 @@ class AuthenticationProvider extends ChangeNotifier {
     debugPrint('Token invalidated :(');
     _tokenIsValid = false;
 
-    notifyListeners();
+    // notifyListeners();
   }
 
   Future<void> _getUserInfo() async {
@@ -121,7 +128,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
       await _getUserInfo();
 
-      notifyListeners();
+      // notifyListeners();
     } catch (error) {
       debugPrint('Login failed due to $error');
     }
@@ -133,6 +140,6 @@ class AuthenticationProvider extends ChangeNotifier {
 
     await _storage.delete(key: 'USER_TOKEN');
     debugPrint('Succesfully logged out');
-    notifyListeners();
+    // notifyListeners();
   }
 }

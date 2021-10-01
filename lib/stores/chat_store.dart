@@ -2,50 +2,30 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/providers/authentication_provider.dart';
+import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/utility/request.dart';
 import 'package:frosty/widgets/chat_message.dart';
+import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class ChatProvider extends ChangeNotifier {
-  final Channel channelInfo;
+part 'chat_store.g.dart';
+
+class ChatStore = _ChatStoreBase with _$ChatStore;
+
+abstract class _ChatStoreBase with Store {
+  @observable
+  bool autoScroll = true;
+
+  List<String> messages = [];
 
   final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
-  final messages = <String>[];
-  final scrollController = ScrollController();
 
   final _assetToUrl = <String, String>{};
   final _emoteIdToWord = <String, String>{};
 
-  var autoScroll = true;
+  final scrollController = ScrollController();
 
-  ChatProvider({required this.channelInfo}) {
-    final commands = [
-      'PASS oauth:${AuthenticationProvider.token}',
-      'NICK justinfan888',
-      'CAP REQ :twitch.tv/tags',
-      'CAP REQ :twitch.tv/commands',
-      // 'CAP REQ :twitch.tv/membership',
-      'CAP END',
-      'JOIN #${channelInfo.userLogin}',
-    ];
-
-    for (final command in commands) {
-      channel.sink.add(command);
-    }
-
-    scrollController.addListener(() {
-      if (!scrollController.position.atEdge) {
-        autoScroll = false;
-        notifyListeners();
-      } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
-        autoScroll = true;
-        notifyListeners();
-      }
-    });
-  }
-
-  Future<void> getEmotes() async {
+  Future<void> start(Channel channelInfo) async {
     final assets = [
       await Request.getEmotesBTTVGlobal(),
       await Request.getEmotesBTTVChannel(id: channelInfo.userId),
@@ -64,8 +44,30 @@ class ChatProvider extends ChangeNotifier {
         _assetToUrl.addAll(map);
       }
     }
+    final commands = [
+      'PASS oauth:${AuthBase.token}',
+      'NICK justinfan888',
+      'CAP REQ :twitch.tv/tags',
+      'CAP REQ :twitch.tv/commands',
+      // 'CAP REQ :twitch.tv/membership',
+      'CAP END',
+      'JOIN #${channelInfo.userLogin}',
+    ];
+
+    for (final command in commands) {
+      channel.sink.add(command);
+    }
+
+    scrollController.addListener(() {
+      if (!scrollController.position.atEdge) {
+        autoScroll = false;
+      } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
+        autoScroll = true;
+      }
+    });
   }
 
+  @action
   void handleWebsocketData(Object? data) {
     for (final message in data.toString().split('\r\n')) {
       if (message.startsWith('@')) {
@@ -223,18 +225,13 @@ class ChatProvider extends ChangeNotifier {
     return result;
   }
 
+  @action
   void resumeScroll() {
     autoScroll = true;
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
-  }
-
-  @override
-  void dispose() {
-    channel.sink.close();
-    super.dispose();
   }
 }
 
