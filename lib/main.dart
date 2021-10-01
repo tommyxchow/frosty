@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/providers/authentication_provider.dart';
-import 'package:frosty/providers/settings_provider.dart';
 import 'package:frosty/screens/home.dart';
-import 'package:frosty/providers/channel_list_provider.dart';
+import 'package:frosty/stores/auth_store.dart';
+import 'package:frosty/stores/channel_list_store.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -16,27 +15,36 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthenticationProvider>(create: (_) => AuthenticationProvider()),
-        ChangeNotifierProxyProvider<AuthenticationProvider, SettingsProvider>(
-          create: (_) => SettingsProvider(),
-          update: (context, auth, settingsProvider) {
-            return SettingsProvider();
-          },
-        ),
-        ChangeNotifierProxyProvider<AuthenticationProvider, ChannelListProvider>(
-          create: (_) => ChannelListProvider(),
+        Provider<AuthStore>(create: (_) => AuthStore()),
+        ProxyProvider<AuthStore, ChannelListStore>(
+          create: (_) => ChannelListStore(),
           update: (context, auth, channelListProvider) {
-            return ChannelListProvider(id: auth.user?.id);
+            return ChannelListStore(id: auth.user?.id);
           },
         ),
       ],
-      child: MaterialApp(
-        title: 'Frosty',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          brightness: Brightness.dark,
-        ),
-        home: const Home(),
+      child: Builder(
+        builder: (context) {
+          final auth = context.watch<AuthStore>();
+          return MaterialApp(
+            title: 'Frosty',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              brightness: Brightness.dark,
+            ),
+            home: Scaffold(
+              body: FutureBuilder(
+                future: auth.init(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return const Home();
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+          );
+        },
       ),
     );
   }
