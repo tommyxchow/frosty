@@ -18,6 +18,7 @@ abstract class _ChatStoreBase with Store {
 
   List<String> messages = [];
 
+  final Channel channelInfo;
   final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
   final _assetToUrl = <String, String>{};
@@ -25,25 +26,7 @@ abstract class _ChatStoreBase with Store {
 
   final scrollController = ScrollController();
 
-  Future<void> start(Channel channelInfo) async {
-    final assets = [
-      await Request.getEmotesBTTVGlobal(),
-      await Request.getEmotesBTTVChannel(id: channelInfo.userId),
-      await Request.getEmotesFFZGlobal(),
-      await Request.getEmotesFFZChannel(id: channelInfo.userId),
-      await Request.getEmotesTwitchGlobal(),
-      await Request.getEmotesTwitchChannel(id: channelInfo.userId),
-      await Request.getBadgesTwitchGlobal(),
-      await Request.getBadgesTwitchChannel(id: channelInfo.userId),
-      await Request.getEmotes7TVGlobal(),
-      await Request.getEmotes7TVChannel(user: channelInfo.userLogin)
-    ];
-
-    for (final map in assets) {
-      if (map != null) {
-        _assetToUrl.addAll(map);
-      }
-    }
+  _ChatStoreBase({required this.channelInfo}) {
     final commands = [
       'PASS oauth:${AuthBase.token}',
       'NICK justinfan888',
@@ -65,6 +48,28 @@ abstract class _ChatStoreBase with Store {
         autoScroll = true;
       }
     });
+  }
+
+  @action
+  Future<void> getEmotes() async {
+    final assets = [
+      await Request.getEmotesBTTVGlobal(),
+      await Request.getEmotesBTTVChannel(id: channelInfo.userId),
+      await Request.getEmotesFFZGlobal(),
+      await Request.getEmotesFFZChannel(id: channelInfo.userId),
+      await Request.getEmotesTwitchGlobal(),
+      await Request.getEmotesTwitchChannel(id: channelInfo.userId),
+      await Request.getBadgesTwitchGlobal(),
+      await Request.getBadgesTwitchChannel(id: channelInfo.userId),
+      await Request.getEmotes7TVGlobal(),
+      await Request.getEmotes7TVChannel(user: channelInfo.userLogin)
+    ];
+
+    for (final map in assets) {
+      if (map != null) {
+        _assetToUrl.addAll(map);
+      }
+    }
   }
 
   @action
