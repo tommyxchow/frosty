@@ -2,9 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/providers/chat_provider.dart';
 import 'package:frosty/screens/video_chat.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 /// A card widget that displays a live channel's thumbnail and details.
@@ -23,10 +21,7 @@ class ChannelCard extends StatelessWidget {
             CupertinoPageRoute(
               builder: (context) {
                 return Scaffold(
-                  body: ChangeNotifierProvider<ChatProvider>(
-                    create: (context) => ChatProvider(channelInfo: channelInfo),
-                    child: VideoChat(channelInfo: channelInfo),
-                  ),
+                  body: VideoChat(channelInfo: channelInfo),
                 );
               },
             ),

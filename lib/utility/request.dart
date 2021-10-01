@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
-import 'package:frosty/providers/authentication_provider.dart';
+import 'package:frosty/stores/auth_store.dart';
 import 'package:http/http.dart' as http;
 
 // A class for general requests.
@@ -93,7 +93,7 @@ class Request {
   /// Returns a map of global Twitch emotes to their URL.
   static Future<Map<String, String>?> getEmotesTwitchGlobal() async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
-    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
+    final response = await http.get(url, headers: AuthBase.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
@@ -113,7 +113,7 @@ class Request {
   /// Returns a map of a channel's Twitch emotes to their URL.
   static Future<Map<String, String>?> getEmotesTwitchChannel({required String id}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=$id');
-    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
+    final response = await http.get(url, headers: AuthBase.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
@@ -133,7 +133,7 @@ class Request {
   /// Returns a map of global Twitch badges to their URL.
   static Future<Map<String, String>?> getBadgesTwitchGlobal() async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/badges/global');
-    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
+    final response = await http.get(url, headers: AuthBase.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
@@ -155,7 +155,7 @@ class Request {
   /// Returns a map of a channel's Twitch badges to their URL.
   static Future<Map<String, String>?> getBadgesTwitchChannel({required String id}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/badges?broadcaster_id=$id');
-    final response = await http.get(url, headers: AuthenticationProvider.authHeaders);
+    final response = await http.get(url, headers: AuthBase.authHeaders);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;

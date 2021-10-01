@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/providers/authentication_provider.dart';
-import 'package:frosty/providers/channel_list_provider.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/stores/channel_list_store.dart';
 import 'package:frosty/widgets/channel_card.dart';
 import 'package:provider/provider.dart';
 
@@ -17,8 +17,9 @@ class _ChannelListState extends State<ChannelList> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Consumer2<AuthenticationProvider, ChannelListProvider>(
-      builder: (context, auth, viewModel, child) {
+    final viewModel = context.watch<ChannelListStore>();
+    return Observer(
+      builder: (_) {
         final channels = viewModel.channels(category: widget.category);
         return RefreshIndicator(
           child: ListView.builder(

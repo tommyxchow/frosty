@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/providers/chat_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:frosty/stores/chat_store.dart';
 
-class Chat extends StatelessWidget {
+class Chat extends StatefulWidget {
   final Channel channelInfo;
 
   const Chat({Key? key, required this.channelInfo}) : super(key: key);
 
   @override
+  _ChatState createState() => _ChatState();
+}
+
+class _ChatState extends State<Chat> {
+  final viewModel = ChatStore();
+
+  @override
   Widget build(BuildContext context) {
-    debugPrint('build');
-    final viewModel = context.read<ChatProvider>();
     return FutureBuilder(
-      future: viewModel.getEmotes(),
-      builder: (context, snapshot) {
+      future: viewModel.start(widget.channelInfo),
+      builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return StreamBuilder(
             stream: viewModel.channel.stream,
@@ -34,8 +39,8 @@ class Chat extends StatelessWidget {
                       return viewModel.parseIrcMessage(viewModel.messages[index]);
                     },
                   ),
-                  Consumer<ChatProvider>(
-                    builder: (context, viewModel, child) {
+                  Observer(
+                    builder: (_) {
                       return Visibility(
                         visible: !viewModel.autoScroll,
                         child: Container(
@@ -59,5 +64,11 @@ class Chat extends StatelessWidget {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    viewModel.channel.sink.close();
+    super.dispose();
   }
 }
