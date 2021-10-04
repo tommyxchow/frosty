@@ -1,114 +1,86 @@
+import 'package:frosty/api/twitch_api.dart';
 import 'package:mobx/mobx.dart';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/user.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 
 part 'auth_store.g.dart';
 
-class AuthStore = AuthBase with _$AuthStore;
+class AuthStore = _AuthBase with _$AuthStore;
 
-abstract class AuthBase with Store {
-  static String? _token;
-  static String? get token => _token;
-
-  static Map<String, String>? authHeaders;
-
+abstract class _AuthBase with Store {
+  // Secure storage to store tokens
   final _storage = const FlutterSecureStorage();
-  final _secret = secret;
-  final _clientId = clientId;
 
+  // The current token
+  @observable
+  String? _token;
+  String? get token => _token;
+
+  // Whether the user is logged in or not
   @observable
   var _isLoggedIn = false;
-
   bool get isLoggedIn => _isLoggedIn;
 
+  // Whether the token is valid or not
+  @observable
   var _tokenIsValid = false;
 
-  UserTwitch? user;
+  // The current user's info
+  @observable
+  UserTwitch? _user;
+  UserTwitch? get user => _user;
+
+  // Authentication headers for Twitch API requests
+  @computed
+  Map<String, String> get headersTwitch => {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
 
   /// Initialize by retrieving a token if it does not already exist.
+  @action
   Future<void> init() async {
     // Read and set the currently stored user token, if any.
     _token = await _storage.read(key: 'USER_TOKEN');
 
     // If the token does not exist, get the default token.
     // Otherwise, log in and get the user info.
-    if (token != null) {
-      _isLoggedIn = true;
-      authHeaders = {'Authorization': 'Bearer $token', 'Client-Id': _clientId};
-      await _getUserInfo();
+    if (_token == null) {
+      // Retrieve the currently stored default token if it exists
+      _token = await _storage.read(key: 'DEFAULT_TOKEN');
+      // If the token does not exist, get a new token and store it
+      if (_token == null) {
+        _token = await Twitch.getDefaultToken();
+        await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
+      }
     } else {
-      await _getDefaultToken();
+      _isLoggedIn = true;
+      _user = await Twitch.getUserInfo(headers: headersTwitch);
     }
 
-    // Set the auth headers for future requests and validate the token.
-    authHeaders = {'Authorization': 'Bearer $token', 'Client-Id': _clientId};
-    await _validateToken();
+    // Validate the token
+    _tokenIsValid = await Twitch.validateToken(token: _token!);
 
-    debugPrint('Token is valid: $_tokenIsValid');
-
-    debugPrint('Created auth provider');
-  }
-
-  /// Returns a token for an anonymous user.
-  Future<void> _getDefaultToken() async {
-    debugPrint('Getting default token...');
-    _token = await _storage.read(key: 'DEFAULT_TOKEN');
-
-    if (token != null) return;
-
-    final url = Uri(
-      scheme: 'https',
-      host: 'id.twitch.tv',
-      path: '/oauth2/token',
-      queryParameters: {
-        'client_id': _clientId,
-        'client_secret': _secret,
-        'grant_type': 'client_credentials',
-      },
-    );
-
-    final response = await http.post(url);
-    final defaultToken = jsonDecode(response.body)['access_token'];
-
-    await _storage.write(key: 'DEFAULT_TOKEN', value: defaultToken);
-
-    _token = defaultToken;
-  }
-
-  Future<void> _validateToken() async {
-    debugPrint('Validating token...');
-    final response = await http.get(Uri.parse('https://id.twitch.tv/oauth2/validate'), headers: {'Authorization': 'Bearer $token'});
-    if (response.statusCode == 200) {
-      debugPrint('Token validated!');
-      _tokenIsValid = true;
+    // If the token is invalid, logout
+    if (!_tokenIsValid) {
+      logout();
       return;
     }
 
-    debugPrint('Token invalidated :(');
-    _tokenIsValid = false;
-
-    // notifyListeners();
+    debugPrint('Token is valid: $_tokenIsValid');
+    debugPrint('Created auth provider');
   }
 
-  Future<void> _getUserInfo() async {
-    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users'), headers: authHeaders);
-    final userData = jsonDecode(response.body)['data'] as List;
-
-    user = UserTwitch.fromJson(userData.first);
-  }
-
+  /// Initiates the OAuth sign-in process and updates fields accordingly upon successful login
+  @action
   Future<void> login() async {
+    // Create the OAuth sign-in URI
     final loginUrl = Uri(
       scheme: 'https',
       host: 'id.twitch.tv',
       path: '/oauth2/authorize',
       queryParameters: {
-        'client_id': _clientId,
+        'client_id': clientId,
         'redirect_uri': 'auth://',
         'response_type': 'token',
         'scope': 'chat:read chat:edit user:read:follows',
@@ -116,30 +88,37 @@ abstract class AuthBase with Store {
     );
 
     try {
+      // Retrieve the OAuth redirect URI
       final result = await FlutterWebAuth.authenticate(url: loginUrl.toString(), callbackUrlScheme: 'auth', preferEphemeral: true);
 
+      // Parse the user token from the redirect URI fragment
       final fragment = Uri.parse(result).fragment;
-
       _token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
-      await _storage.write(key: 'USER_TOKEN', value: token);
 
+      // Store the user token
+      await _storage.write(key: 'USER_TOKEN', value: _token);
+
+      // Retrieve the user info and set it
+      _user = await Twitch.getUserInfo(headers: headersTwitch);
+
+      // Set the login status to logged in
       _isLoggedIn = true;
-      authHeaders = {'Authorization': 'Bearer $token', 'Client-Id': _clientId};
-
-      await _getUserInfo();
-
-      // notifyListeners();
     } catch (error) {
       debugPrint('Login failed due to $error');
     }
   }
 
-  void logout() async {
-    await _getDefaultToken();
-    _isLoggedIn = false;
+  // Logs out the current user and updates fields accordingly
+  @action
+  Future<void> logout() async {
+    // If the default token already exists, set it. Otherwise, get a new default token.
+    _token = await _storage.read(key: 'DEFAULT_TOKEN') ?? await Twitch.getDefaultToken();
 
-    await _storage.delete(key: 'USER_TOKEN');
-    debugPrint('Succesfully logged out');
-    // notifyListeners();
+    // Clear the user info
+    _user = null;
+
+    // Set the login status to logged out
+    _isLoggedIn = false;
+    debugPrint('Successfully logged out');
   }
 }
