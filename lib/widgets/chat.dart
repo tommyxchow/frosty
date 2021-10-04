@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/chat_store.dart';
+import 'package:get_it/get_it.dart';
 
 class Chat extends StatefulWidget {
   final Channel channelInfo;
@@ -13,12 +15,12 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
-  late ChatStore chatStore = ChatStore(channelInfo: widget.channelInfo);
+  late final ChatStore chatStore = ChatStore(auth: GetIt.I<AuthStore>(), channelInfo: widget.channelInfo);
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: chatStore.getEmotes(),
+      future: chatStore.getAssets(),
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return StreamBuilder(

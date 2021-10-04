@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home.dart';
 import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/stores/channel_list_store.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 
 void main() {
+  GetIt.I.registerSingleton<AuthStore>(AuthStore());
+
   runApp(const MyApp());
 }
 
@@ -13,38 +14,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider<AuthStore>(create: (_) => AuthStore()),
-        ProxyProvider<AuthStore, ChannelListStore>(
-          create: (_) => ChannelListStore(),
-          update: (context, auth, channelListStore) {
-            return ChannelListStore(id: auth.user?.id);
+    final auth = GetIt.I<AuthStore>();
+    return MaterialApp(
+      title: 'Frosty',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      home: Scaffold(
+        body: FutureBuilder(
+          future: auth.init(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return const Home();
+            }
+            return const Center(child: CircularProgressIndicator());
           },
         ),
-      ],
-      child: Builder(
-        builder: (context) {
-          final auth = context.read<AuthStore>();
-          return MaterialApp(
-            title: 'Frosty',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-              brightness: Brightness.dark,
-            ),
-            home: Scaffold(
-              body: FutureBuilder(
-                future: auth.init(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return const Home();
-                  }
-                  return const Center(child: CircularProgressIndicator());
-                },
-              ),
-            ),
-          );
-        },
       ),
     );
   }

@@ -3,7 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/channel_list_store.dart';
-import 'package:provider/provider.dart';
+import 'package:get_it/get_it.dart';
 import 'channel_list.dart';
 
 class Home extends StatelessWidget {
@@ -11,11 +11,13 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.read<AuthStore>();
+    final auth = GetIt.I<AuthStore>();
     debugPrint('build home');
 
     return Observer(
       builder: (_) {
+        final channelListStore = ChannelListStore(auth: auth);
+        debugPrint('rebuild tab controller');
         return DefaultTabController(
           length: auth.isLoggedIn ? 3 : 2,
           child: Scaffold(
@@ -46,12 +48,14 @@ class Home extends StatelessWidget {
             ),
             body: TabBarView(
               children: [
-                const ChannelList(
-                  category: Category.top,
+                ChannelList(
+                  category: ChannelCategory.top,
+                  channelListStore: channelListStore,
                 ),
                 if (auth.isLoggedIn)
-                  const ChannelList(
-                    category: Category.followed,
+                  ChannelList(
+                    category: ChannelCategory.followed,
+                    channelListStore: channelListStore,
                   ),
                 const Center(
                   child: Text('Games'),
