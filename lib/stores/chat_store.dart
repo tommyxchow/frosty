@@ -1,9 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frosty/api/bttv_api.dart';
+import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/seventv_api.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/utility/request.dart';
 import 'package:frosty/widgets/chat_message.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -26,9 +29,11 @@ abstract class _ChatStoreBase with Store {
 
   final scrollController = ScrollController();
 
-  _ChatStoreBase({required this.channelInfo}) {
+  final AuthStore auth;
+
+  _ChatStoreBase({required this.auth, required this.channelInfo}) {
     final commands = [
-      'PASS oauth:${AuthBase.token}',
+      'PASS oauth:${auth.token}',
       'NICK justinfan888',
       'CAP REQ :twitch.tv/tags',
       'CAP REQ :twitch.tv/commands',
@@ -51,18 +56,18 @@ abstract class _ChatStoreBase with Store {
   }
 
   @action
-  Future<void> getEmotes() async {
+  Future<void> getAssets() async {
     final assets = [
-      await Request.getEmotesBTTVGlobal(),
-      await Request.getEmotesBTTVChannel(id: channelInfo.userId),
-      await Request.getEmotesFFZGlobal(),
-      await Request.getEmotesFFZChannel(id: channelInfo.userId),
-      await Request.getEmotesTwitchGlobal(),
-      await Request.getEmotesTwitchChannel(id: channelInfo.userId),
-      await Request.getBadgesTwitchGlobal(),
-      await Request.getBadgesTwitchChannel(id: channelInfo.userId),
-      await Request.getEmotes7TVGlobal(),
-      await Request.getEmotes7TVChannel(user: channelInfo.userLogin)
+      await FFZ.getEmotesGlobal(),
+      await FFZ.getEmotesChannel(id: channelInfo.userId),
+      await BTTV.getEmotesGlobal(),
+      await BTTV.getEmotesChannel(id: channelInfo.userId),
+      await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
+      await Twitch.getEmotesChannel(id: channelInfo.userId, headers: auth.headersTwitch),
+      await Twitch.getBadgesGlobal(headers: auth.headersTwitch),
+      await Twitch.getBadgesChannel(id: channelInfo.userId, headers: auth.headersTwitch),
+      await SevenTV.getEmotesGlobal(),
+      await SevenTV.getEmotesChannel(user: channelInfo.userLogin)
     ];
 
     for (final map in assets) {
