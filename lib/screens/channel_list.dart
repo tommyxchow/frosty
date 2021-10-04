@@ -19,11 +19,11 @@ class _ChannelListState extends State<ChannelList> with AutomaticKeepAliveClient
     debugPrint('build channel list');
     super.build(context);
 
-    return Observer(
-      builder: (_) {
-        final channels = widget.channelListStore.channels(category: widget.category);
-        return RefreshIndicator(
-          child: ListView.builder(
+    return RefreshIndicator(
+      child: Observer(
+        builder: (_) {
+          final channels = widget.channelListStore.channels(category: widget.category);
+          return ListView.builder(
             itemCount: channels.length,
             padding: const EdgeInsets.all(5.0),
             itemBuilder: (context, index) {
@@ -32,10 +32,10 @@ class _ChannelListState extends State<ChannelList> with AutomaticKeepAliveClient
               }
               return ChannelCard(channelInfo: channels.elementAt(index));
             },
-          ),
-          onRefresh: () => widget.channelListStore.refresh(category: widget.category),
-        );
-      },
+          );
+        },
+      ),
+      onRefresh: () => widget.channelListStore.refresh(category: widget.category),
     );
   }
 

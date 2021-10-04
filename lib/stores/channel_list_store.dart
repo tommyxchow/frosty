@@ -53,11 +53,9 @@ abstract class _ChannelListBase with Store {
     switch (category) {
       case ChannelCategory.top:
         topChannelsCurrentCursor = null;
-        topChannels.clear();
         break;
       case ChannelCategory.followed:
         followedChannelsCurrentCursor = null;
-        followedChannels.clear();
         break;
     }
 
@@ -73,7 +71,11 @@ abstract class _ChannelListBase with Store {
         final newTopChannels = await Twitch.getTopChannels(headers: auth.headersTwitch, cursor: topChannelsCurrentCursor);
 
         if (newTopChannels != null) {
-          topChannels.addAll(newTopChannels['channels']);
+          if (topChannelsCurrentCursor == null) {
+            topChannels = ObservableList.of(newTopChannels['channels']);
+          } else {
+            topChannels.addAll(newTopChannels['channels']);
+          }
           topChannelsCurrentCursor = newTopChannels['cursor'];
         }
         break;
@@ -81,7 +83,11 @@ abstract class _ChannelListBase with Store {
         final newFollowedChannels = await Twitch.getFollowedChannels(id: auth.user!.id, headers: auth.headersTwitch, cursor: followedChannelsCurrentCursor);
 
         if (newFollowedChannels != null) {
-          followedChannels.addAll(newFollowedChannels['channels']);
+          if (followedChannelsCurrentCursor == null) {
+            followedChannels = ObservableList.of(newFollowedChannels['channels']);
+          } else {
+            followedChannels.addAll(newFollowedChannels['channels']);
+          }
           followedChannelsCurrentCursor = newFollowedChannels['cursor'];
         }
         break;
