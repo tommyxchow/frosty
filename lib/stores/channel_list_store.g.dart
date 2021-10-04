@@ -40,96 +40,26 @@ mixin _$ChannelListStore on _ChannelListBase, Store {
     });
   }
 
-  final _$isLoadingAtom = Atom(name: '_ChannelListBase.isLoading');
+  final _$refreshAsyncAction = AsyncAction('_ChannelListBase.refresh');
 
   @override
-  bool get isLoading {
-    _$isLoadingAtom.reportRead();
-    return super.isLoading;
+  Future<void> refresh({required ChannelCategory category}) {
+    return _$refreshAsyncAction.run(() => super.refresh(category: category));
   }
 
-  @override
-  set isLoading(bool value) {
-    _$isLoadingAtom.reportWrite(value, super.isLoading, () {
-      super.isLoading = value;
-    });
-  }
-
-  final _$topChannelsCurrentCursorAtom =
-      Atom(name: '_ChannelListBase.topChannelsCurrentCursor');
+  final _$getChannelsAsyncAction = AsyncAction('_ChannelListBase.getChannels');
 
   @override
-  String? get topChannelsCurrentCursor {
-    _$topChannelsCurrentCursorAtom.reportRead();
-    return super.topChannelsCurrentCursor;
-  }
-
-  @override
-  set topChannelsCurrentCursor(String? value) {
-    _$topChannelsCurrentCursorAtom
-        .reportWrite(value, super.topChannelsCurrentCursor, () {
-      super.topChannelsCurrentCursor = value;
-    });
-  }
-
-  final _$followedChannelsCurrentCursorAtom =
-      Atom(name: '_ChannelListBase.followedChannelsCurrentCursor');
-
-  @override
-  String? get followedChannelsCurrentCursor {
-    _$followedChannelsCurrentCursorAtom.reportRead();
-    return super.followedChannelsCurrentCursor;
-  }
-
-  @override
-  set followedChannelsCurrentCursor(String? value) {
-    _$followedChannelsCurrentCursorAtom
-        .reportWrite(value, super.followedChannelsCurrentCursor, () {
-      super.followedChannelsCurrentCursor = value;
-    });
-  }
-
-  final _$updateAsyncAction = AsyncAction('_ChannelListBase.update');
-
-  @override
-  Future<void> update({required Category category}) {
-    return _$updateAsyncAction.run(() => super.update(category: category));
-  }
-
-  final _$updateTopChannelsAsyncAction =
-      AsyncAction('_ChannelListBase.updateTopChannels');
-
-  @override
-  Future<void> updateTopChannels() {
-    return _$updateTopChannelsAsyncAction.run(() => super.updateTopChannels());
-  }
-
-  final _$getMoreChannelsAsyncAction =
-      AsyncAction('_ChannelListBase.getMoreChannels');
-
-  @override
-  Future<void> getMoreChannels({required Category category}) {
-    return _$getMoreChannelsAsyncAction
-        .run(() => super.getMoreChannels(category: category));
-  }
-
-  final _$updateFollowedChannelsAsyncAction =
-      AsyncAction('_ChannelListBase.updateFollowedChannels');
-
-  @override
-  Future<void> updateFollowedChannels() {
-    return _$updateFollowedChannelsAsyncAction
-        .run(() => super.updateFollowedChannels());
+  Future<void> getChannels({required ChannelCategory category}) {
+    return _$getChannelsAsyncAction
+        .run(() => super.getChannels(category: category));
   }
 
   @override
   String toString() {
     return '''
 topChannels: ${topChannels},
-followedChannels: ${followedChannels},
-isLoading: ${isLoading},
-topChannelsCurrentCursor: ${topChannelsCurrentCursor},
-followedChannelsCurrentCursor: ${followedChannelsCurrentCursor}
+followedChannels: ${followedChannels}
     ''';
   }
 }
