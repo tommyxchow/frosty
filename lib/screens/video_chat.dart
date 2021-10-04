@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/widgets/chat.dart';
@@ -10,17 +11,19 @@ class VideoChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Video(channelName: channelInfo.userLogin),
-          ),
-          Expanded(
-            child: Chat(channelInfo: channelInfo),
-          )
-        ],
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Video(channelName: channelInfo.userLogin),
+            ),
+            Expanded(
+              child: Chat(channelInfo: channelInfo),
+            )
+          ],
+        ),
       ),
     );
   }

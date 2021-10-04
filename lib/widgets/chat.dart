@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/providers/chat_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:frosty/stores/auth_store.dart';
+import 'package:frosty/stores/chat_store.dart';
+import 'package:get_it/get_it.dart';
 
-class Chat extends StatelessWidget {
+class Chat extends StatefulWidget {
   final Channel channelInfo;
 
   const Chat({Key? key, required this.channelInfo}) : super(key: key);
 
   @override
+  _ChatState createState() => _ChatState();
+}
+
+class _ChatState extends State<Chat> {
+  late final ChatStore chatStore = ChatStore(auth: GetIt.I<AuthStore>(), channelInfo: widget.channelInfo);
+
+  @override
   Widget build(BuildContext context) {
-    debugPrint('build');
-    final viewModel = context.read<ChatProvider>();
     return FutureBuilder(
-      future: viewModel.getEmotes(),
-      builder: (context, snapshot) {
+      future: chatStore.getAssets(),
+      builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return StreamBuilder(
-            stream: viewModel.channel.stream,
+            stream: chatStore.channel.stream,
             builder: (context, snapshot) {
-              viewModel.handleWebsocketData(snapshot.data);
+              chatStore.handleWebsocketData(snapshot.data);
               return Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
@@ -27,22 +34,22 @@ class Chat extends StatelessWidget {
                     addAutomaticKeepAlives: false,
                     addRepaintBoundaries: false,
                     physics: const ClampingScrollPhysics(),
-                    itemCount: viewModel.messages.length,
-                    controller: viewModel.scrollController,
+                    itemCount: chatStore.messages.length,
+                    controller: chatStore.scrollController,
                     padding: const EdgeInsets.all(5.0),
                     itemBuilder: (context, index) {
-                      return viewModel.parseIrcMessage(viewModel.messages[index]);
+                      return chatStore.parseIrcMessage(chatStore.messages[index]);
                     },
                   ),
-                  Consumer<ChatProvider>(
-                    builder: (context, viewModel, child) {
+                  Observer(
+                    builder: (_) {
                       return Visibility(
-                        visible: !viewModel.autoScroll,
+                        visible: !chatStore.autoScroll,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () => viewModel.resumeScroll(),
+                            onPressed: () => chatStore.resumeScroll(),
                             child: const Text('Resume Scroll'),
                           ),
                         ),
@@ -59,5 +66,11 @@ class Chat extends StatelessWidget {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    chatStore.channel.sink.close();
+    super.dispose();
   }
 }

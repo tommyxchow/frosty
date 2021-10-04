@@ -1,27 +1,39 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frosty/api/bttv_api.dart';
+import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/seventv_api.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/providers/authentication_provider.dart';
-import 'package:frosty/utility/request.dart';
+import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/widgets/chat_message.dart';
+import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class ChatProvider extends ChangeNotifier {
-  final Channel channelInfo;
+part 'chat_store.g.dart';
 
+class ChatStore = _ChatStoreBase with _$ChatStore;
+
+abstract class _ChatStoreBase with Store {
+  @observable
+  bool autoScroll = true;
+
+  List<String> messages = [];
+
+  final Channel channelInfo;
   final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
-  final messages = <String>[];
-  final scrollController = ScrollController();
 
   final _assetToUrl = <String, String>{};
   final _emoteIdToWord = <String, String>{};
 
-  var autoScroll = true;
+  final scrollController = ScrollController();
 
-  ChatProvider({required this.channelInfo}) {
+  final AuthStore auth;
+
+  _ChatStoreBase({required this.auth, required this.channelInfo}) {
     final commands = [
-      'PASS oauth:${AuthenticationProvider.token}',
+      'PASS oauth:${auth.token}',
       'NICK justinfan888',
       'CAP REQ :twitch.tv/tags',
       'CAP REQ :twitch.tv/commands',
@@ -37,26 +49,25 @@ class ChatProvider extends ChangeNotifier {
     scrollController.addListener(() {
       if (!scrollController.position.atEdge) {
         autoScroll = false;
-        notifyListeners();
       } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
         autoScroll = true;
-        notifyListeners();
       }
     });
   }
 
-  Future<void> getEmotes() async {
+  @action
+  Future<void> getAssets() async {
     final assets = [
-      await Request.getEmotesBTTVGlobal(),
-      await Request.getEmotesBTTVChannel(id: channelInfo.userId),
-      await Request.getEmotesFFZGlobal(),
-      await Request.getEmotesFFZChannel(id: channelInfo.userId),
-      await Request.getEmotesTwitchGlobal(),
-      await Request.getEmotesTwitchChannel(id: channelInfo.userId),
-      await Request.getBadgesTwitchGlobal(),
-      await Request.getBadgesTwitchChannel(id: channelInfo.userId),
-      await Request.getEmotes7TVGlobal(),
-      await Request.getEmotes7TVChannel(user: channelInfo.userLogin)
+      await FFZ.getEmotesGlobal(),
+      await FFZ.getEmotesChannel(id: channelInfo.userId),
+      await BTTV.getEmotesGlobal(),
+      await BTTV.getEmotesChannel(id: channelInfo.userId),
+      await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
+      await Twitch.getEmotesChannel(id: channelInfo.userId, headers: auth.headersTwitch),
+      await Twitch.getBadgesGlobal(headers: auth.headersTwitch),
+      await Twitch.getBadgesChannel(id: channelInfo.userId, headers: auth.headersTwitch),
+      await SevenTV.getEmotesGlobal(),
+      await SevenTV.getEmotesChannel(user: channelInfo.userLogin)
     ];
 
     for (final map in assets) {
@@ -66,6 +77,7 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
+  @action
   void handleWebsocketData(Object? data) {
     for (final message in data.toString().split('\r\n')) {
       if (message.startsWith('@')) {
@@ -223,18 +235,13 @@ class ChatProvider extends ChangeNotifier {
     return result;
   }
 
+  @action
   void resumeScroll() {
     autoScroll = true;
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
-  }
-
-  @override
-  void dispose() {
-    channel.sink.close();
-    super.dispose();
   }
 }
 
