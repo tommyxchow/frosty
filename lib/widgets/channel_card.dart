@@ -20,9 +20,7 @@ class ChannelCard extends StatelessWidget {
             context,
             CupertinoPageRoute(
               builder: (context) {
-                return Scaffold(
-                  body: VideoChat(channelInfo: channelInfo),
-                );
+                return VideoChat(channelInfo: channelInfo);
               },
             ),
           );
