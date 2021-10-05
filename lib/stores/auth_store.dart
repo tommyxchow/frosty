@@ -11,29 +11,29 @@ part 'auth_store.g.dart';
 class AuthStore = _AuthBase with _$AuthStore;
 
 abstract class _AuthBase with Store {
-  // Secure storage to store tokens
+  /// Secure storage to store tokens.
   final _storage = const FlutterSecureStorage();
 
-  // The current token
+  /// The current token.
   @observable
   String? _token;
   String? get token => _token;
 
-  // Whether the user is logged in or not
+  /// Whether the user is logged in or not.
   @observable
   var _isLoggedIn = false;
   bool get isLoggedIn => _isLoggedIn;
 
-  // Whether the token is valid or not
+  /// Whether the token is valid or not.
   @observable
   var _tokenIsValid = false;
 
-  // The current user's info
+  /// The current user's info.
   @observable
   UserTwitch? _user;
   UserTwitch? get user => _user;
 
-  // Authentication headers for Twitch API requests
+  /// Authentication headers for Twitch API requests.
   @computed
   Map<String, String> get headersTwitch => {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
 
@@ -46,9 +46,9 @@ abstract class _AuthBase with Store {
     // If the token does not exist, get the default token.
     // Otherwise, log in and get the user info.
     if (_token == null) {
-      // Retrieve the currently stored default token if it exists
+      // Retrieve the currently stored default token if it exists.
       _token = await _storage.read(key: 'DEFAULT_TOKEN');
-      // If the token does not exist, get a new token and store it
+      // If the token does not exist, get a new token and store it.
       if (_token == null) {
         _token = await Twitch.getDefaultToken();
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
@@ -58,10 +58,10 @@ abstract class _AuthBase with Store {
       _isLoggedIn = true;
     }
 
-    // Validate the token
+    // Validate the token.
     _tokenIsValid = await Twitch.validateToken(token: _token!);
 
-    // If the token is invalid, logout
+    // If the token is invalid, logout.
     if (!_tokenIsValid) {
       logout();
       return;
@@ -71,10 +71,10 @@ abstract class _AuthBase with Store {
     debugPrint('Created auth provider');
   }
 
-  /// Initiates the OAuth sign-in process and updates fields accordingly upon successful login
+  /// Initiates the OAuth sign-in process and updates fields accordingly upon successful login.
   @action
   Future<void> login() async {
-    // Create the OAuth sign-in URI
+    // Create the OAuth sign-in URI.
     final loginUrl = Uri(
       scheme: 'https',
       host: 'id.twitch.tv',
@@ -88,37 +88,37 @@ abstract class _AuthBase with Store {
     );
 
     try {
-      // Retrieve the OAuth redirect URI
+      // Retrieve the OAuth redirect URI.
       final result = await FlutterWebAuth.authenticate(url: loginUrl.toString(), callbackUrlScheme: 'auth', preferEphemeral: true);
 
-      // Parse the user token from the redirect URI fragment
+      // Parse the user token from the redirect URI fragment.
       final fragment = Uri.parse(result).fragment;
       _token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
 
-      // Store the user token
+      // Store the user token.
       await _storage.write(key: 'USER_TOKEN', value: _token);
 
       // Retrieve the user info and set it
       _user = await Twitch.getUserInfo(headers: headersTwitch);
 
-      // Set the login status to logged in
+      // Set the login status to logged in.
       _isLoggedIn = true;
     } catch (error) {
       debugPrint('Login failed due to $error');
     }
   }
 
-  // Logs out the current user and updates fields accordingly
+  /// Logs out the current user and updates fields accordingly.
   @action
   Future<void> logout() async {
-    // Delete the existing user token
+    // Delete the existing user token.
     await _storage.delete(key: 'USER_TOKEN');
     _token = null;
 
-    // Clear the user info
+    // Clear the user info.
     _user = null;
 
-    // Set the login status to logged out
+    // Set the login status to logged out.
     _isLoggedIn = false;
 
     // If the default token already exists, set it. Otherwise, get a new default token.
