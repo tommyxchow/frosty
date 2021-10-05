@@ -9,34 +9,34 @@ part of 'channel_list_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ChannelListStore on _ChannelListBase, Store {
-  final _$topChannelsAtom = Atom(name: '_ChannelListBase.topChannels');
+  final _$_topChannelsAtom = Atom(name: '_ChannelListBase._topChannels');
 
   @override
-  ObservableList<Channel> get topChannels {
-    _$topChannelsAtom.reportRead();
-    return super.topChannels;
+  ObservableList<Channel> get _topChannels {
+    _$_topChannelsAtom.reportRead();
+    return super._topChannels;
   }
 
   @override
-  set topChannels(ObservableList<Channel> value) {
-    _$topChannelsAtom.reportWrite(value, super.topChannels, () {
-      super.topChannels = value;
+  set _topChannels(ObservableList<Channel> value) {
+    _$_topChannelsAtom.reportWrite(value, super._topChannels, () {
+      super._topChannels = value;
     });
   }
 
-  final _$followedChannelsAtom =
-      Atom(name: '_ChannelListBase.followedChannels');
+  final _$_followedChannelsAtom =
+      Atom(name: '_ChannelListBase._followedChannels');
 
   @override
-  ObservableList<Channel> get followedChannels {
-    _$followedChannelsAtom.reportRead();
-    return super.followedChannels;
+  ObservableList<Channel> get _followedChannels {
+    _$_followedChannelsAtom.reportRead();
+    return super._followedChannels;
   }
 
   @override
-  set followedChannels(ObservableList<Channel> value) {
-    _$followedChannelsAtom.reportWrite(value, super.followedChannels, () {
-      super.followedChannels = value;
+  set _followedChannels(ObservableList<Channel> value) {
+    _$_followedChannelsAtom.reportWrite(value, super._followedChannels, () {
+      super._followedChannels = value;
     });
   }
 
@@ -58,8 +58,7 @@ mixin _$ChannelListStore on _ChannelListBase, Store {
   @override
   String toString() {
     return '''
-topChannels: ${topChannels},
-followedChannels: ${followedChannels}
+
     ''';
   }
 }

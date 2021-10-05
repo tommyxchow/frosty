@@ -8,27 +8,24 @@ part 'channel_list_store.g.dart';
 class ChannelListStore = _ChannelListBase with _$ChannelListStore;
 
 abstract class _ChannelListBase with Store {
+  /// The list of the fetched top channels
   @observable
-  ObservableList<Channel> topChannels = ObservableList<Channel>();
+  ObservableList<Channel> _topChannels = ObservableList<Channel>();
 
+  /// The list of the fetched followed channels
   @observable
-  ObservableList<Channel> followedChannels = ObservableList<Channel>();
+  ObservableList<Channel> _followedChannels = ObservableList<Channel>();
 
-  bool isLoading = false;
+  /// The loading status for pagination.
+  bool _isLoading = false;
 
-  String? topChannelsCurrentCursor;
+  /// The pagination cursor for top channels.
+  String? _topChannelsCurrentCursor;
 
-  String? followedChannelsCurrentCursor;
+  /// The pagination cursor for followed channels.
+  String? _followedChannelsCurrentCursor;
 
-  ObservableList<Channel> channels({required ChannelCategory category}) {
-    switch (category) {
-      case ChannelCategory.top:
-        return topChannels;
-      case ChannelCategory.followed:
-        return followedChannels;
-    }
-  }
-
+  /// The authentication store.
   final AuthStore auth;
 
   _ChannelListBase({required this.auth}) {
@@ -39,62 +36,76 @@ abstract class _ChannelListBase with Store {
     }
   }
 
-  bool hasMore({required ChannelCategory category}) {
+  /// Returns the appropriate channels the [category].
+  ObservableList<Channel> channels({required ChannelCategory category}) {
     switch (category) {
       case ChannelCategory.top:
-        return isLoading == false && topChannelsCurrentCursor != null;
+        return _topChannels;
       case ChannelCategory.followed:
-        return isLoading == false && followedChannelsCurrentCursor != null;
+        return _followedChannels;
     }
   }
 
+  /// Returns whether or not there are more channels for the [category].
+  bool hasMore({required ChannelCategory category}) {
+    switch (category) {
+      case ChannelCategory.top:
+        return _isLoading == false && _topChannelsCurrentCursor != null;
+      case ChannelCategory.followed:
+        return _isLoading == false && _followedChannelsCurrentCursor != null;
+    }
+  }
+
+  /// Resets the cursor and then fetches the channels for the [category].
   @action
   Future<void> refresh({required ChannelCategory category}) async {
     switch (category) {
       case ChannelCategory.top:
-        topChannelsCurrentCursor = null;
+        _topChannelsCurrentCursor = null;
         break;
       case ChannelCategory.followed:
-        followedChannelsCurrentCursor = null;
+        _followedChannelsCurrentCursor = null;
         break;
     }
 
     await getChannels(category: category);
   }
 
+  /// Fetches the channels for the [category] based on the current cursor.
   @action
   Future<void> getChannels({required ChannelCategory category}) async {
-    isLoading = true;
+    _isLoading = true;
 
     switch (category) {
       case ChannelCategory.top:
-        final newTopChannels = await Twitch.getTopChannels(headers: auth.headersTwitch, cursor: topChannelsCurrentCursor);
+        final newTopChannels = await Twitch.getTopChannels(headers: auth.headersTwitch, cursor: _topChannelsCurrentCursor);
 
         if (newTopChannels != null) {
-          if (topChannelsCurrentCursor == null) {
-            topChannels = ObservableList.of(newTopChannels['channels']);
+          if (_topChannelsCurrentCursor == null) {
+            _topChannels = ObservableList.of(newTopChannels['channels']);
           } else {
-            topChannels.addAll(newTopChannels['channels']);
+            _topChannels.addAll(newTopChannels['channels']);
           }
-          topChannelsCurrentCursor = newTopChannels['cursor'];
+          _topChannelsCurrentCursor = newTopChannels['cursor'];
         }
         break;
       case ChannelCategory.followed:
-        final newFollowedChannels = await Twitch.getFollowedChannels(id: auth.user!.id, headers: auth.headersTwitch, cursor: followedChannelsCurrentCursor);
+        final newFollowedChannels = await Twitch.getFollowedChannels(id: auth.user!.id, headers: auth.headersTwitch, cursor: _followedChannelsCurrentCursor);
 
         if (newFollowedChannels != null) {
-          if (followedChannelsCurrentCursor == null) {
-            followedChannels = ObservableList.of(newFollowedChannels['channels']);
+          if (_followedChannelsCurrentCursor == null) {
+            _followedChannels = ObservableList.of(newFollowedChannels['channels']);
           } else {
-            followedChannels.addAll(newFollowedChannels['channels']);
+            _followedChannels.addAll(newFollowedChannels['channels']);
           }
-          followedChannelsCurrentCursor = newFollowedChannels['cursor'];
+          _followedChannelsCurrentCursor = newFollowedChannels['cursor'];
         }
         break;
     }
 
-    isLoading = false;
+    _isLoading = false;
   }
 }
 
+/// The type of category for channels.
 enum ChannelCategory { top, followed }
