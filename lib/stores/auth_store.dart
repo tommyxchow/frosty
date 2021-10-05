@@ -54,8 +54,8 @@ abstract class _AuthBase with Store {
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
       }
     } else {
-      _isLoggedIn = true;
       _user = await Twitch.getUserInfo(headers: headersTwitch);
+      _isLoggedIn = true;
     }
 
     // Validate the token
@@ -111,14 +111,19 @@ abstract class _AuthBase with Store {
   // Logs out the current user and updates fields accordingly
   @action
   Future<void> logout() async {
-    // If the default token already exists, set it. Otherwise, get a new default token.
-    _token = await _storage.read(key: 'DEFAULT_TOKEN') ?? await Twitch.getDefaultToken();
+    // Delete the existing user token
+    await _storage.delete(key: 'USER_TOKEN');
+    _token = null;
 
     // Clear the user info
     _user = null;
 
     // Set the login status to logged out
     _isLoggedIn = false;
+
+    // If the default token already exists, set it. Otherwise, get a new default token.
+    _token = await _storage.read(key: 'DEFAULT_TOKEN') ?? await Twitch.getDefaultToken();
+
     debugPrint('Successfully logged out');
   }
 }
