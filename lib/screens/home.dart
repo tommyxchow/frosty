@@ -3,7 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/channel_list_store.dart';
-import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 import 'channel_list.dart';
 
 class Home extends StatelessWidget {
@@ -11,7 +11,7 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = GetIt.I<AuthStore>();
+    final auth = context.watch<AuthStore>();
     debugPrint('build home');
 
     return Observer(
@@ -21,45 +21,60 @@ class Home extends StatelessWidget {
         return DefaultTabController(
           length: auth.isLoggedIn ? 3 : 2,
           child: Scaffold(
-            appBar: AppBar(
-              title: const Text('Frosty for Twitch'),
-              bottom: TabBar(
-                tabs: [
-                  const Tab(text: 'Top'),
-                  if (auth.isLoggedIn) const Tab(text: 'Followed'),
-                  const Tab(text: 'Categories'),
+            drawer: Drawer(
+              child: ListView(
+                children: [
+                  DrawerHeader(
+                    child: Center(
+                      child: Text('Logged in as ${auth.user?.displayName}'),
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Settings'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return const Settings();
+                          },
+                        ),
+                      );
+                    },
+                  )
                 ],
               ),
+            ),
+            appBar: AppBar(
+              title: const Text('Frosty for Twitch'),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return const Settings();
-                        },
-                      ),
-                    );
-                  },
+                  icon: const Icon(Icons.search),
+                  onPressed: () {},
                 )
               ],
             ),
             body: TabBarView(
               children: [
-                ChannelList(
-                  category: ChannelCategory.top,
-                  channelListStore: channelListStore,
-                ),
                 if (auth.isLoggedIn)
                   ChannelList(
                     category: ChannelCategory.followed,
                     channelListStore: channelListStore,
                   ),
+                ChannelList(
+                  category: ChannelCategory.top,
+                  channelListStore: channelListStore,
+                ),
                 const Center(
                   child: Text('Games'),
                 ),
+              ],
+            ),
+            bottomNavigationBar: TabBar(
+              tabs: [
+                if (auth.isLoggedIn) const Tab(text: 'Followed'),
+                const Tab(text: 'Top'),
+                const Tab(text: 'Categories'),
               ],
             ),
           ),

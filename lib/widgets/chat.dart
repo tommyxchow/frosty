@@ -31,8 +31,6 @@ class _ChatState extends State<Chat> {
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
                   ListView.builder(
-                    addAutomaticKeepAlives: false,
-                    addRepaintBoundaries: false,
                     physics: const ClampingScrollPhysics(),
                     itemCount: chatStore.messages.length,
                     controller: chatStore.scrollController,
