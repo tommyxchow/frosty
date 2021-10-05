@@ -70,12 +70,14 @@ class Home extends StatelessWidget {
                 ),
               ],
             ),
-            bottomNavigationBar: TabBar(
-              tabs: [
-                if (auth.isLoggedIn) const Tab(text: 'Followed'),
-                const Tab(text: 'Top'),
-                const Tab(text: 'Categories'),
-              ],
+            bottomNavigationBar: SafeArea(
+              child: TabBar(
+                tabs: [
+                  if (auth.isLoggedIn) const Tab(text: 'Followed'),
+                  const Tab(text: 'Top'),
+                  const Tab(text: 'Categories'),
+                ],
+              ),
             ),
           ),
         );
