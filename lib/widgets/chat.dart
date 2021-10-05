@@ -3,19 +3,19 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/chat_store.dart';
-import 'package:get_it/get_it.dart';
 
 class Chat extends StatefulWidget {
+  final AuthStore auth;
   final Channel channelInfo;
 
-  const Chat({Key? key, required this.channelInfo}) : super(key: key);
+  const Chat({Key? key, required this.auth, required this.channelInfo}) : super(key: key);
 
   @override
   _ChatState createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  late final ChatStore chatStore = ChatStore(auth: GetIt.I<AuthStore>(), channelInfo: widget.channelInfo);
+  late final ChatStore chatStore = ChatStore(auth: widget.auth, channelInfo: widget.channelInfo);
 
   @override
   Widget build(BuildContext context) {

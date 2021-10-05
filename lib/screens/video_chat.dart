@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/widgets/chat.dart';
 import 'package:frosty/widgets/video.dart';
+import 'package:provider/provider.dart';
 
 class VideoChat extends StatelessWidget {
   final Channel channelInfo;
@@ -20,7 +22,7 @@ class VideoChat extends StatelessWidget {
               child: Video(channelName: channelInfo.userLogin),
             ),
             Expanded(
-              child: Chat(channelInfo: channelInfo),
+              child: Chat(auth: context.read<AuthStore>(), channelInfo: channelInfo),
             )
           ],
         ),
