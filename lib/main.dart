@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home.dart';
 import 'package:frosty/stores/auth_store.dart';
+import 'package:frosty/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<AuthStore>(create: (_) => AuthStore()),
+        Provider<SettingsStore>(create: (_) => SettingsStore()),
       ],
       child: Builder(
         builder: (context) {
@@ -22,6 +24,8 @@ class MyApp extends StatelessWidget {
             title: 'Frosty',
             theme: ThemeData(
               primarySwatch: Colors.blue,
+              canvasColor: Colors.black,
+              cardColor: Colors.black,
               brightness: Brightness.dark,
             ),
             home: Scaffold(
