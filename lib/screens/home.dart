@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/channel_list_store.dart';
+import 'package:frosty/stores/home_store.dart';
 import 'package:provider/provider.dart';
 import 'channel_list.dart';
 
@@ -11,73 +12,86 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthStore>();
-    debugPrint('build home');
+    final homeStore = HomeStore();
+    final auth = context.read<AuthStore>();
+    final channelListStore = ChannelListStore(auth: auth);
+    final titles = [if (auth.isLoggedIn) 'Followed Channels', 'Top Channels', 'Categories'];
 
+    debugPrint('build home');
     return Observer(
       builder: (_) {
-        final channelListStore = ChannelListStore(auth: auth);
         debugPrint('rebuild tab controller');
-        return DefaultTabController(
-          length: auth.isLoggedIn ? 3 : 2,
-          child: Scaffold(
-            drawer: Drawer(
-              child: ListView(
-                children: [
-                  DrawerHeader(
-                    child: Center(
-                      child: Text('Logged in as ${auth.user?.displayName}'),
-                    ),
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(titles[homeStore.selectedIndex]),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () {},
+              )
+            ],
+          ),
+          drawer: Drawer(
+            child: ListView(
+              children: [
+                const DrawerHeader(
+                  child: Center(
+                    child: Text('Frosty for Twitch'),
                   ),
-                  ListTile(
-                    title: const Text('Settings'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return const Settings();
-                          },
-                        ),
-                      );
-                    },
-                  )
-                ],
-              ),
-            ),
-            appBar: AppBar(
-              title: const Text('Frosty for Twitch'),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.settings),
+                  title: const Text('Settings'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const Settings();
+                        },
+                      ),
+                    );
+                  },
                 )
               ],
             ),
-            body: TabBarView(
-              children: [
-                if (auth.isLoggedIn)
-                  ChannelList(
-                    category: ChannelCategory.followed,
-                    channelListStore: channelListStore,
-                  ),
+          ),
+          body: IndexedStack(
+            index: homeStore.selectedIndex,
+            children: [
+              if (auth.isLoggedIn)
                 ChannelList(
-                  category: ChannelCategory.top,
+                  category: ChannelCategory.followed,
                   channelListStore: channelListStore,
                 ),
-                const Center(
-                  child: Text('Games'),
+              ChannelList(
+                category: ChannelCategory.top,
+                channelListStore: channelListStore,
+              ),
+              const Center(
+                child: Text('Games'),
+              ),
+            ],
+          ),
+          bottomNavigationBar: SafeArea(
+            child: BottomNavigationBar(
+              items: [
+                if (auth.isLoggedIn)
+                  const BottomNavigationBarItem(
+                    icon: Icon(Icons.favorite),
+                    label: 'Followed',
+                  ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.arrow_upward),
+                  label: 'Top',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.gamepad),
+                  label: 'Categories',
                 ),
               ],
-            ),
-            bottomNavigationBar: SafeArea(
-              child: TabBar(
-                tabs: [
-                  if (auth.isLoggedIn) const Tab(text: 'Followed'),
-                  const Tab(text: 'Top'),
-                  const Tab(text: 'Categories'),
-                ],
-              ),
+              currentIndex: homeStore.selectedIndex,
+              onTap: homeStore.handleTap,
             ),
           ),
         );

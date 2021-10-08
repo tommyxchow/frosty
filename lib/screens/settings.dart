@@ -11,7 +11,7 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint('settings');
     final auth = context.read<AuthStore>();
-    final settings = context.watch<SettingsStore>();
+    final settings = context.read<SettingsStore>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
