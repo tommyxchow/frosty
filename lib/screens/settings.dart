@@ -9,9 +9,9 @@ class Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('settings');
-    final auth = context.read<AuthStore>();
-    final settings = context.read<SettingsStore>();
+    final authStore = context.read<AuthStore>();
+    final settingsStore = context.read<SettingsStore>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -21,13 +21,13 @@ class Settings extends StatelessWidget {
           return ListView(
             children: [
               ElevatedButton(
-                child: auth.isLoggedIn ? Text(auth.user!.displayName) : const Text('Login'),
-                onPressed: () => auth.isLoggedIn ? auth.logout() : auth.login(),
+                child: authStore.isLoggedIn ? Text(authStore.user!.displayName) : const Text('Login'),
+                onPressed: () => authStore.isLoggedIn ? authStore.logout() : authStore.login(),
               ),
               SwitchListTile(
                 title: const Text('Enable Video'),
-                value: settings.videoEnabled,
-                onChanged: (newValue) => settings.videoEnabled = newValue,
+                value: settingsStore.videoEnabled,
+                onChanged: (newValue) => settingsStore.videoEnabled = newValue,
               ),
             ],
           );

@@ -26,12 +26,12 @@ abstract class _ChannelListBase with Store {
   String? _followedChannelsCurrentCursor;
 
   /// The authentication store.
-  final AuthStore auth;
+  final AuthStore authStore;
 
-  _ChannelListBase({required this.auth}) {
+  _ChannelListBase({required this.authStore}) {
     getChannels(category: ChannelCategory.top);
 
-    if (auth.user?.id != null) {
+    if (authStore.user?.id != null) {
       getChannels(category: ChannelCategory.followed);
     }
   }
@@ -78,7 +78,7 @@ abstract class _ChannelListBase with Store {
 
     switch (category) {
       case ChannelCategory.top:
-        final newTopChannels = await Twitch.getTopChannels(headers: auth.headersTwitch, cursor: _topChannelsCurrentCursor);
+        final newTopChannels = await Twitch.getTopChannels(headers: authStore.headersTwitch, cursor: _topChannelsCurrentCursor);
 
         if (newTopChannels != null) {
           if (_topChannelsCurrentCursor == null) {
@@ -90,7 +90,8 @@ abstract class _ChannelListBase with Store {
         }
         break;
       case ChannelCategory.followed:
-        final newFollowedChannels = await Twitch.getFollowedChannels(id: auth.user!.id, headers: auth.headersTwitch, cursor: _followedChannelsCurrentCursor);
+        final newFollowedChannels =
+            await Twitch.getFollowedChannels(id: authStore.user!.id, headers: authStore.headersTwitch, cursor: _followedChannelsCurrentCursor);
 
         if (newFollowedChannels != null) {
           if (_followedChannelsCurrentCursor == null) {
