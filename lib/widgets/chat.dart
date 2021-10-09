@@ -1,53 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/chat_store.dart';
 
 class Chat extends StatefulWidget {
-  final AuthStore auth;
+  final ChatStore chatStore;
   final Channel channelInfo;
 
-  const Chat({Key? key, required this.auth, required this.channelInfo}) : super(key: key);
+  const Chat({Key? key, required this.chatStore, required this.channelInfo}) : super(key: key);
 
   @override
   _ChatState createState() => _ChatState();
 }
 
 class _ChatState extends State<Chat> {
-  late final ChatStore chatStore = ChatStore(auth: widget.auth, channelInfo: widget.channelInfo);
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: chatStore.getAssets(),
+      future: widget.chatStore.getAssets(),
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return StreamBuilder(
-            stream: chatStore.channel.stream,
+            stream: widget.chatStore.channel.stream,
             builder: (context, snapshot) {
-              chatStore.handleWebsocketData(snapshot.data);
+              widget.chatStore.handleWebsocketData(snapshot.data);
               return Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
                   ListView.builder(
-                    physics: const ClampingScrollPhysics(),
-                    itemCount: chatStore.messages.length,
-                    controller: chatStore.scrollController,
+                    itemCount: widget.chatStore.messages.length,
+                    controller: widget.chatStore.scrollController,
                     padding: const EdgeInsets.all(5.0),
                     itemBuilder: (context, index) {
-                      return chatStore.parseIrcMessage(chatStore.messages[index]);
+                      return widget.chatStore.parseIrcMessage(widget.chatStore.messages[index]);
                     },
                   ),
                   Observer(
                     builder: (_) {
                       return Visibility(
-                        visible: !chatStore.autoScroll,
+                        visible: !widget.chatStore.autoScroll,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 4.0),
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () => chatStore.resumeScroll(),
+                            onPressed: () => widget.chatStore.resumeScroll(),
                             child: const Text('Resume Scroll'),
                           ),
                         ),
@@ -68,7 +64,7 @@ class _ChatState extends State<Chat> {
 
   @override
   void dispose() {
-    chatStore.channel.sink.close();
+    widget.chatStore.channel.sink.close();
     super.dispose();
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/stores/auth_store.dart';
+import 'package:frosty/stores/chat_store.dart';
 import 'package:frosty/stores/settings_store.dart';
 import 'package:frosty/widgets/chat.dart';
 import 'package:frosty/widgets/video.dart';
@@ -26,7 +27,7 @@ class VideoChat extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Chat(auth: context.read<AuthStore>(), channelInfo: channelInfo),
+              child: Chat(chatStore: ChatStore(auth: context.read<AuthStore>(), channelInfo: channelInfo), channelInfo: channelInfo),
             ),
             const TextField(),
           ],
