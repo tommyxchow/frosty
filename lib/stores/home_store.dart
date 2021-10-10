@@ -13,6 +13,8 @@ abstract class _HomeStoreBase with Store {
 
   @action
   void handleTap(int index) {
-    selectedIndex = index;
+    if (index != selectedIndex) {
+      selectedIndex = index;
+    }
   }
 }
