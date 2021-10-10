@@ -44,7 +44,7 @@ abstract class _AuthBase with Store {
     _token = await _storage.read(key: 'USER_TOKEN');
 
     // If the token does not exist, get the default token.
-    // Otherwise, log in and get the user info.
+    // Otherwise, get the user info and log in.
     if (_token == null) {
       // Retrieve the currently stored default token if it exists.
       _token = await _storage.read(key: 'DEFAULT_TOKEN');
@@ -66,8 +66,6 @@ abstract class _AuthBase with Store {
       logout();
       return;
     }
-
-    debugPrint('Token is valid: $_tokenIsValid');
     debugPrint('Created auth provider');
   }
 

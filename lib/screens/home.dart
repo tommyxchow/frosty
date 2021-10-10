@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/screens/video_chat.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/channel_list_store.dart';
@@ -42,16 +43,23 @@ class _HomeState extends State<Home> {
                     autocorrect: false,
                     autofocus: true,
                     onSubmitted: (string) async {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (_) {
-                            return VideoChat(
-                              userLogin: string,
-                            );
-                          },
-                        ),
-                      );
+                      if (await Twitch.getUser(userLogin: string, headers: context.read<AuthStore>().headersTwitch) != null) {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (_) {
+                              return VideoChat(
+                                userLogin: string,
+                              );
+                            },
+                          ),
+                        );
+                      } else {
+                        const snackBar = SnackBar(content: Text('User does not exist :('));
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      }
+                      widget.homeStore.search = false;
+                      _textController.clear();
                     },
                   )
                 : Text(titles[widget.homeStore.selectedIndex]),

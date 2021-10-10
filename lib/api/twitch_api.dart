@@ -92,11 +92,15 @@ class Twitch {
   }
 
   /// Returns the user's info given their token (headers)
-  static Future<UserTwitch> getUserInfo({required Map<String, String>? headers}) async {
+  static Future<UserTwitch?> getUserInfo({required Map<String, String>? headers}) async {
     final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users'), headers: headers);
-    final userData = jsonDecode(response.body)['data'] as List;
+    if (response.statusCode == 200) {
+      final userData = jsonDecode(response.body)['data'] as List;
 
-    return UserTwitch.fromJson(userData.first);
+      return UserTwitch.fromJson(userData.first);
+    } else {
+      debugPrint('Failed to get user info');
+    }
   }
 
   /// Returns a token for an anonymous user.
@@ -180,10 +184,12 @@ class Twitch {
   /// Returns a user's info given their login name.
   static Future<UserTwitch?> getUser({required String userLogin, required Map<String, String>? headers}) async {
     final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users?login=$userLogin'), headers: headers);
-    final userData = jsonDecode(response.body)['data'] as List;
+    if (response.statusCode == 200) {
+      final userData = jsonDecode(response.body)['data'] as List;
 
-    if (userData.isNotEmpty) {
-      return UserTwitch.fromJson(userData.first);
+      if (userData.isNotEmpty) {
+        return UserTwitch.fromJson(userData.first);
+      }
     } else {
       debugPrint('User does not exist');
     }
