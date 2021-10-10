@@ -5,7 +5,6 @@ import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/models/channel.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/widgets/chat_message.dart';
 import 'package:mobx/mobx.dart';
@@ -21,7 +20,6 @@ abstract class _ChatStoreBase with Store {
 
   List<String> messages = [];
 
-  final Channel channelInfo;
   final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
   final _assetToUrl = <String, String>{};
@@ -29,9 +27,10 @@ abstract class _ChatStoreBase with Store {
 
   final scrollController = ScrollController();
 
+  final String channelName;
   final AuthStore auth;
 
-  _ChatStoreBase({required this.auth, required this.channelInfo}) {
+  _ChatStoreBase({required this.auth, required this.channelName}) {
     final commands = [
       'PASS oauth:${auth.token}',
       'NICK justinfan888',
@@ -39,7 +38,7 @@ abstract class _ChatStoreBase with Store {
       'CAP REQ :twitch.tv/commands',
       // 'CAP REQ :twitch.tv/membership',
       'CAP END',
-      'JOIN #${channelInfo.userLogin}',
+      'JOIN #$channelName',
     ];
 
     for (final command in commands) {
@@ -47,7 +46,7 @@ abstract class _ChatStoreBase with Store {
     }
 
     scrollController.addListener(() {
-      if (!scrollController.position.atEdge) {
+      if (!scrollController.position.atEdge && scrollController.position.pixels < scrollController.position.maxScrollExtent) {
         autoScroll = false;
       } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
         autoScroll = true;
@@ -57,22 +56,26 @@ abstract class _ChatStoreBase with Store {
 
   @action
   Future<void> getAssets() async {
-    final assets = [
-      await FFZ.getEmotesGlobal(),
-      await FFZ.getEmotesChannel(id: channelInfo.userId),
-      await BTTV.getEmotesGlobal(),
-      await BTTV.getEmotesChannel(id: channelInfo.userId),
-      await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
-      await Twitch.getEmotesChannel(id: channelInfo.userId, headers: auth.headersTwitch),
-      await Twitch.getBadgesGlobal(headers: auth.headersTwitch),
-      await Twitch.getBadgesChannel(id: channelInfo.userId, headers: auth.headersTwitch),
-      await SevenTV.getEmotesGlobal(),
-      await SevenTV.getEmotesChannel(user: channelInfo.userLogin)
-    ];
+    final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
 
-    for (final map in assets) {
-      if (map != null) {
-        _assetToUrl.addAll(map);
+    if (channelInfo != null) {
+      final assets = [
+        await FFZ.getEmotesGlobal(),
+        await FFZ.getEmotesChannel(id: channelInfo.id),
+        await BTTV.getEmotesGlobal(),
+        await BTTV.getEmotesChannel(id: channelInfo.id),
+        await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
+        await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
+        await Twitch.getBadgesGlobal(headers: auth.headersTwitch),
+        await Twitch.getBadgesChannel(id: channelInfo.id, headers: auth.headersTwitch),
+        await SevenTV.getEmotesGlobal(),
+        await SevenTV.getEmotesChannel(user: channelInfo.login)
+      ];
+
+      for (final map in assets) {
+        if (map != null) {
+          _assetToUrl.addAll(map);
+        }
       }
     }
   }

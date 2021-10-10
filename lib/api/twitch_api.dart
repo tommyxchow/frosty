@@ -176,4 +176,16 @@ class Twitch {
       debugPrint('Failed to update followed channels');
     }
   }
+
+  /// Returns a user's info given their login name.
+  static Future<UserTwitch?> getUser({required String userLogin, required Map<String, String>? headers}) async {
+    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users?login=$userLogin'), headers: headers);
+    final userData = jsonDecode(response.body)['data'] as List;
+
+    if (userData.isNotEmpty) {
+      return UserTwitch.fromJson(userData.first);
+    } else {
+      debugPrint('User does not exist');
+    }
+  }
 }

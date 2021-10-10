@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/screens/video_chat.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/channel_list_store.dart';
 import 'package:frosty/stores/home_store.dart';
@@ -22,6 +24,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final _textController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final titles = [if (context.read<AuthStore>().isLoggedIn) 'Followed Channels', 'Top Channels', 'Categories'];
@@ -32,12 +36,31 @@ class _HomeState extends State<Home> {
         debugPrint('rebuild tab controller');
         return Scaffold(
           appBar: AppBar(
-            title: widget.homeStore.search ? const TextField() : Text(titles[widget.homeStore.selectedIndex]),
+            title: widget.homeStore.search
+                ? TextField(
+                    controller: _textController,
+                    autocorrect: false,
+                    autofocus: true,
+                    onSubmitted: (string) async {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (_) {
+                            return VideoChat(
+                              userLogin: string,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  )
+                : Text(titles[widget.homeStore.selectedIndex]),
             actions: [
               IconButton(
-                icon: const Icon(Icons.search),
+                icon: widget.homeStore.search ? const Icon(Icons.cancel) : const Icon(Icons.search),
                 onPressed: () {
                   widget.homeStore.search = !widget.homeStore.search;
+                  _textController.clear();
                 },
               )
             ],
@@ -84,5 +107,11 @@ class _HomeState extends State<Home> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
   }
 }

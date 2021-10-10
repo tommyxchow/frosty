@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/models/channel.dart';
 import 'package:frosty/stores/chat_store.dart';
 
 class Chat extends StatefulWidget {
   final ChatStore chatStore;
-  final Channel channelInfo;
 
-  const Chat({Key? key, required this.chatStore, required this.channelInfo}) : super(key: key);
+  const Chat({Key? key, required this.chatStore}) : super(key: key);
 
   @override
   _ChatState createState() => _ChatState();
