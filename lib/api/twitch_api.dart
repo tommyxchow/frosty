@@ -104,7 +104,7 @@ class Twitch {
   }
 
   /// Returns a token for an anonymous user.
-  static Future<String> getDefaultToken() async {
+  static Future<String?> getDefaultToken() async {
     debugPrint('Getting default token...');
 
     final url = Uri(
@@ -119,9 +119,12 @@ class Twitch {
     );
 
     final response = await http.post(url);
-    final defaultToken = jsonDecode(response.body)['access_token'];
 
-    return defaultToken;
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['access_token'];
+    } else {
+      debugPrint('Failed to get default token.');
+    }
   }
 
   /// Returns the validity of the given token
@@ -189,6 +192,8 @@ class Twitch {
 
       if (userData.isNotEmpty) {
         return UserTwitch.fromJson(userData.first);
+      } else {
+        debugPrint('User does not exist');
       }
     } else {
       debugPrint('User does not exist');
