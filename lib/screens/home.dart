@@ -32,12 +32,11 @@ class _HomeState extends State<Home> {
     final titles = [if (context.read<AuthStore>().isLoggedIn) 'Followed Channels', 'Top Channels', 'Categories'];
 
     debugPrint('build home');
-    return Observer(
-      builder: (_) {
-        debugPrint('rebuild tab controller');
-        return Scaffold(
-          appBar: AppBar(
-            title: widget.homeStore.search
+    return Scaffold(
+      appBar: AppBar(
+        title: Observer(
+          builder: (_) {
+            return widget.homeStore.search
                 ? TextField(
                     controller: _textController,
                     autocorrect: false,
@@ -62,19 +61,23 @@ class _HomeState extends State<Home> {
                       _textController.clear();
                     },
                   )
-                : Text(titles[widget.homeStore.selectedIndex]),
-            actions: [
-              IconButton(
-                icon: widget.homeStore.search ? const Icon(Icons.cancel) : const Icon(Icons.search),
-                onPressed: () {
-                  widget.homeStore.search = !widget.homeStore.search;
-                  _textController.clear();
-                },
-              )
-            ],
-          ),
-          drawer: const DrawerMenu(),
-          body: IndexedStack(
+                : Text(titles[widget.homeStore.selectedIndex]);
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Observer(builder: (_) => widget.homeStore.search ? const Icon(Icons.cancel) : const Icon(Icons.search)),
+            onPressed: () {
+              widget.homeStore.search = !widget.homeStore.search;
+              _textController.clear();
+            },
+          )
+        ],
+      ),
+      drawer: const DrawerMenu(),
+      body: Observer(
+        builder: (_) {
+          return IndexedStack(
             index: widget.homeStore.selectedIndex,
             children: [
               if (context.read<AuthStore>().isLoggedIn)
@@ -90,9 +93,13 @@ class _HomeState extends State<Home> {
                 child: Text('Games'),
               ),
             ],
-          ),
-          bottomNavigationBar: SafeArea(
-            child: BottomNavigationBar(
+          );
+        },
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Observer(
+          builder: (_) {
+            return BottomNavigationBar(
               items: [
                 if (context.read<AuthStore>().isLoggedIn)
                   const BottomNavigationBarItem(
@@ -110,10 +117,10 @@ class _HomeState extends State<Home> {
               ],
               currentIndex: widget.homeStore.selectedIndex,
               onTap: widget.homeStore.handleTap,
-            ),
-          ),
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 
