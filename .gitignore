@@ -45,5 +45,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Testing file
-lib/test.dart
+# Folder containing random testing files
+random/
