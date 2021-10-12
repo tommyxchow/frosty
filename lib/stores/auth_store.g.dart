@@ -17,13 +17,32 @@ mixin _$AuthStore on _AuthBase, Store {
               name: '_AuthBase.headersTwitch'))
       .value;
 
-  final _$_tokenAtom = Atom(name: '_AuthBase._token');
+  final _$_userAtom = Atom(name: '_AuthBase._user');
+
+  UserTwitch? get user {
+    _$_userAtom.reportRead();
+    return super._user;
+  }
 
   @override
-  String? get _token {
+  UserTwitch? get _user => user;
+
+  @override
+  set _user(UserTwitch? value) {
+    _$_userAtom.reportWrite(value, super._user, () {
+      super._user = value;
+    });
+  }
+
+  final _$_tokenAtom = Atom(name: '_AuthBase._token');
+
+  String? get token {
     _$_tokenAtom.reportRead();
     return super._token;
   }
+
+  @override
+  String? get _token => token;
 
   @override
   set _token(String? value) {
@@ -34,11 +53,13 @@ mixin _$AuthStore on _AuthBase, Store {
 
   final _$_isLoggedInAtom = Atom(name: '_AuthBase._isLoggedIn');
 
-  @override
-  bool get _isLoggedIn {
+  bool get isLoggedIn {
     _$_isLoggedInAtom.reportRead();
     return super._isLoggedIn;
   }
+
+  @override
+  bool get _isLoggedIn => isLoggedIn;
 
   @override
   set _isLoggedIn(bool value) {
@@ -59,21 +80,6 @@ mixin _$AuthStore on _AuthBase, Store {
   set _tokenIsValid(bool value) {
     _$_tokenIsValidAtom.reportWrite(value, super._tokenIsValid, () {
       super._tokenIsValid = value;
-    });
-  }
-
-  final _$_userAtom = Atom(name: '_AuthBase._user');
-
-  @override
-  UserTwitch? get _user {
-    _$_userAtom.reportRead();
-    return super._user;
-  }
-
-  @override
-  set _user(UserTwitch? value) {
-    _$_userAtom.reportWrite(value, super._user, () {
-      super._user = value;
     });
   }
 
