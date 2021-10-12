@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/screens/settings.dart';
+import 'package:frosty/widgets/profile_card.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({Key? key}) : super(key: key);
@@ -10,11 +11,7 @@ class DrawerMenu extends StatelessWidget {
     return Drawer(
       child: ListView(
         children: [
-          const DrawerHeader(
-            child: Center(
-              child: Text('Frosty for Twitch'),
-            ),
-          ),
+          const ProfileCard(),
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
