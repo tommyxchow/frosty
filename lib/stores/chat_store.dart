@@ -3,8 +3,10 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/irc_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/models/irc_message.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/widgets/chat_message.dart';
 import 'package:mobx/mobx.dart';
@@ -15,25 +17,27 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
-  @observable
-  bool autoScroll = true;
-
-  List<String> messages = [];
+  final messages = <IrcMessage>[];
 
   final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
   final _assetToUrl = <String, String>{};
+
   final _emoteIdToWord = <String, String>{};
+
+  final String channelName;
+
+  final AuthStore auth;
 
   final scrollController = ScrollController();
 
-  final String channelName;
-  final AuthStore auth;
+  @readonly
+  var _autoScroll = true;
 
   _ChatStoreBase({required this.auth, required this.channelName}) {
     final commands = [
       'PASS oauth:${auth.token}',
-      'NICK justinfan888',
+      'NICK ${auth.isLoggedIn ? auth.user!.login : 'justinfan888'}',
       'CAP REQ :twitch.tv/tags',
       'CAP REQ :twitch.tv/commands',
       // 'CAP REQ :twitch.tv/membership',
@@ -47,9 +51,9 @@ abstract class _ChatStoreBase with Store {
 
     scrollController.addListener(() {
       if (!scrollController.position.atEdge && scrollController.position.pixels < scrollController.position.maxScrollExtent) {
-        autoScroll = false;
+        _autoScroll = false;
       } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
-        autoScroll = true;
+        _autoScroll = true;
       }
     });
   }
@@ -80,76 +84,72 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
-  @action
   void handleWebsocketData(Object? data) {
-    for (final message in data.toString().split('\r\n')) {
+    final ircMessages = data.toString();
+    for (final message in ircMessages.substring(0, ircMessages.length - 2).split('\r\n')) {
       if (message.startsWith('@')) {
-        messages.add(message);
-        continue;
-      }
-      if (message.startsWith('P')) {
-        channel.sink.add('PONG :tmi.twitch.tv');
-        continue;
-      }
-    }
-  }
+        final parsed = Irc.parse(message);
 
-  Widget parseIrcMessage(String whole) {
-    var mappedTags = <String, String>{};
-
-    final tagAndIrcMessageDivider = whole.indexOf(' ');
-    final tags = whole.substring(1, tagAndIrcMessageDivider).replaceAll('\\s', ' ');
-    final ircMessage = whole.substring(tagAndIrcMessageDivider + 2);
-
-    for (final tag in tags.split(';')) {
-      if (!tag.endsWith('=')) {
-        final tagSplit = tag.split('=');
-        mappedTags[tagSplit[0]] = tagSplit[1];
-      }
-    }
-
-    final splitMessage = ircMessage.split(' ');
-
-    // final user = splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
-    // print(user);
-
-    final command = splitMessage[1];
-
-    switch (command) {
-      case 'CLEARCHAT':
-        break;
-      case 'CLEARMSG':
-        break;
-      case 'GLOBALUSERSTATE':
-        break;
-      case 'PRIVMSG':
-        final message = splitMessage.sublist(3).join(' ').substring(1);
-
-        if (autoScroll) {
-          SchedulerBinding.instance?.addPostFrameCallback((_) {
-            scrollController.jumpTo(scrollController.position.maxScrollExtent);
-          });
+        switch (parsed.command) {
+          case 'CLEARCHAT':
+            clearChat(ircMessage: parsed);
+            break;
+          case 'CLEARMSG':
+            break;
+          case 'GLOBALUSERSTATE':
+            break;
+          case 'PRIVMSG':
+            if (_autoScroll) {
+              if (messages.length > 100) {
+                messages.removeRange(0, messages.length - 100);
+              }
+              SchedulerBinding.instance?.addPostFrameCallback((_) {
+                scrollController.jumpTo(scrollController.position.maxScrollExtent);
+              });
+            }
+            messages.add(parsed);
+            break;
+          case 'ROOMSTATE':
+            break;
+          case 'USERNOTICE':
+            break;
+          case 'USERSTATE':
+            break;
         }
-        return ChatMessage(
-          key: Key(mappedTags['id']!),
-          children: privateMessage(tags: mappedTags, chatMessage: message),
-        );
-
-      case 'ROOMSTATE':
-        break;
-      case 'USERNOTICE':
-        break;
-      case 'USERSTATE':
-        break;
+      } else if (message.startsWith('P')) {
+        channel.sink.add('PONG :tmi.twitch.tv');
+      }
     }
-    return const SizedBox();
   }
 
-  List<InlineSpan> privateMessage({required Map<String, String> tags, required String chatMessage}) {
-    // debugPrint(chatMessage);
-    var result = <InlineSpan>[];
+  void clearChat({required IrcMessage ircMessage}) {
+    // If there is no message, it means that entire chat was cleared.
+    if (ircMessage.message == null) {
+      // messages.clear();
+      messages[0].message = 'User was permabanned!';
+      return;
+    }
 
-    final emoteTags = tags['emotes'];
+    final bannedUser = ircMessage.message;
+    final banDuration = ircMessage.tags['ban-duration'];
+
+    debugPrint('$bannedUser was banned');
+
+    messages.asMap().forEach((i, message) {
+      if (message.user! == bannedUser) {
+        if (banDuration == null) {
+          messages[i].message = 'User was permabanned!';
+        } else {
+          messages[i].message = 'User was timed out for $banDuration seconds!';
+        }
+      }
+    });
+  }
+
+  ChatMessage renderChatMessage({required IrcMessage ircMessage}) {
+    final result = <InlineSpan>[];
+
+    final emoteTags = ircMessage.tags['emotes'];
     if (emoteTags != null) {
       final emotes = emoteTags.split('/');
 
@@ -172,15 +172,15 @@ abstract class _ChatStoreBase with Store {
         final startIndex = int.parse(indexSplit[0]);
         final endIndex = int.parse(indexSplit[1]);
 
-        final emoteWord = chatMessage.substring(startIndex, endIndex + 1);
+        final emoteWord = ircMessage.message!.substring(startIndex, endIndex + 1);
 
         _emoteIdToWord[emoteId] = emoteWord;
         _assetToUrl[emoteWord] = 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0';
       }
     }
 
-    final words = chatMessage.split(' ');
-    final badges = tags['badges'];
+    final words = ircMessage.message!.split(' ');
+    final badges = ircMessage.tags['badges'];
     if (badges != null) {
       for (final badge in badges.split(',')) {
         final badgeUrl = _assetToUrl[badge];
@@ -203,9 +203,9 @@ abstract class _ChatStoreBase with Store {
 
     result.add(
       TextSpan(
-        text: tags['display-name']!,
+        text: ircMessage.tags['display-name']!,
         style: TextStyle(
-          color: HexColor.fromHex(tags['color'] ?? '#868686'),
+          color: HexColor.fromHex(ircMessage.tags['color'] ?? '#868686'),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -235,12 +235,16 @@ abstract class _ChatStoreBase with Store {
         result.add(TextSpan(text: word));
       }
     }
-    return result;
+
+    return ChatMessage(
+      key: Key(ircMessage.tags['id']!),
+      children: result,
+    );
   }
 
   @action
   void resumeScroll() {
-    autoScroll = true;
+    _autoScroll = true;
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       scrollController.jumpTo(scrollController.position.maxScrollExtent);

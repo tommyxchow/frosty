@@ -30,7 +30,7 @@ class _ChatState extends State<Chat> {
                     controller: widget.chatStore.scrollController,
                     padding: const EdgeInsets.all(5.0),
                     itemBuilder: (context, index) {
-                      return widget.chatStore.messages[index];
+                      return widget.chatStore.renderChatMessage(ircMessage: widget.chatStore.messages[index]);
                     },
                   );
                 },
@@ -63,6 +63,7 @@ class _ChatState extends State<Chat> {
   @override
   void dispose() {
     widget.chatStore.channel.sink.close();
+    widget.chatStore.scrollController.dispose();
     super.dispose();
   }
 }
