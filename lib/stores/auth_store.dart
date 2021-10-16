@@ -14,21 +14,20 @@ abstract class _AuthBase with Store {
   /// Secure storage to store tokens.
   final _storage = const FlutterSecureStorage();
 
+  /// The current token.
+  String? _token;
+  String? get token => _token;
+
+  /// Whether the token is valid or not.
+  var _tokenIsValid = false;
+
   /// The current user's info.
   @readonly
   UserTwitch? _user;
 
-  /// The current token.
-  @readonly
-  String? _token;
-
   /// Whether the user is logged in or not.
   @readonly
   var _isLoggedIn = false;
-
-  /// Whether the token is valid or not.
-  @observable
-  var _tokenIsValid = false;
 
   /// Authentication headers for Twitch API requests.
   @computed

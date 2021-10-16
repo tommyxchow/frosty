@@ -34,23 +34,6 @@ mixin _$AuthStore on _AuthBase, Store {
     });
   }
 
-  final _$_tokenAtom = Atom(name: '_AuthBase._token');
-
-  String? get token {
-    _$_tokenAtom.reportRead();
-    return super._token;
-  }
-
-  @override
-  String? get _token => token;
-
-  @override
-  set _token(String? value) {
-    _$_tokenAtom.reportWrite(value, super._token, () {
-      super._token = value;
-    });
-  }
-
   final _$_isLoggedInAtom = Atom(name: '_AuthBase._isLoggedIn');
 
   bool get isLoggedIn {
@@ -65,21 +48,6 @@ mixin _$AuthStore on _AuthBase, Store {
   set _isLoggedIn(bool value) {
     _$_isLoggedInAtom.reportWrite(value, super._isLoggedIn, () {
       super._isLoggedIn = value;
-    });
-  }
-
-  final _$_tokenIsValidAtom = Atom(name: '_AuthBase._tokenIsValid');
-
-  @override
-  bool get _tokenIsValid {
-    _$_tokenIsValidAtom.reportRead();
-    return super._tokenIsValid;
-  }
-
-  @override
-  set _tokenIsValid(bool value) {
-    _$_tokenIsValidAtom.reportWrite(value, super._tokenIsValid, () {
-      super._tokenIsValid = value;
     });
   }
 
