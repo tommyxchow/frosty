@@ -18,39 +18,39 @@ class _ChatState extends State<Chat> {
       future: widget.chatStore.getAssets(),
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return StreamBuilder(
-            stream: widget.chatStore.channel.stream,
-            builder: (context, snapshot) {
-              widget.chatStore.handleWebsocketData(snapshot.data);
-              return Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                children: [
-                  ListView.builder(
+          return Stack(
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+              StreamBuilder(
+                stream: widget.chatStore.channel.stream,
+                builder: (context, snapshot) {
+                  widget.chatStore.handleWebsocketData(snapshot.data);
+                  return ListView.builder(
                     itemCount: widget.chatStore.messages.length,
                     controller: widget.chatStore.scrollController,
                     padding: const EdgeInsets.all(5.0),
                     itemBuilder: (context, index) {
-                      return widget.chatStore.parseIrcMessage(widget.chatStore.messages[index]);
+                      return widget.chatStore.messages[index];
                     },
-                  ),
-                  Observer(
-                    builder: (_) {
-                      return Visibility(
-                        visible: !widget.chatStore.autoScroll,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => widget.chatStore.resumeScroll(),
-                            child: const Text('Resume Scroll'),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              );
-            },
+                  );
+                },
+              ),
+              Observer(
+                builder: (_) {
+                  return Visibility(
+                    visible: !widget.chatStore.autoScroll,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => widget.chatStore.resumeScroll(),
+                        child: const Text('Resume Scroll'),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           );
         }
         return const Center(
