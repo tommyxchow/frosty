@@ -55,7 +55,7 @@ class ChannelCard extends StatelessWidget {
                     const SizedBox(height: 5),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Text(channelInfo.title),
+                      child: Text(channelInfo.title.replaceAll('\n', '')),
                     ),
                     const SizedBox(height: 5),
                     Text(
