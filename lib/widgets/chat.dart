@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/stores/chat_store.dart';
 
@@ -21,16 +22,19 @@ class _ChatState extends State<Chat> {
           return Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: [
-              StreamBuilder(
-                stream: widget.chatStore.channel.stream,
-                builder: (context, snapshot) {
-                  widget.chatStore.handleWebsocketData(snapshot.data);
+              Observer(
+                builder: (_) {
+                  if (widget.chatStore.autoScroll) {
+                    SchedulerBinding.instance?.addPostFrameCallback((_) {
+                      widget.chatStore.scrollController.jumpTo(widget.chatStore.scrollController.position.maxScrollExtent);
+                    });
+                  }
                   return ListView.builder(
                     itemCount: widget.chatStore.messages.length,
                     controller: widget.chatStore.scrollController,
                     padding: const EdgeInsets.all(5.0),
                     itemBuilder: (context, index) {
-                      return widget.chatStore.renderChatMessage(ircMessage: widget.chatStore.messages[index]);
+                      return widget.chatStore.renderChatMessage(widget.chatStore.messages[index]);
                     },
                   );
                 },
