@@ -1,7 +1,10 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'package:flutter/foundation.dart';
 import 'package:frosty/models/irc_message.dart';
 
-class Irc {
-  static IrcMessage parse(String whole) {
+class IRC {
+  static IRCMessage parse(String whole) {
     // We have three parts:
     // 1. The tags of the IRC message
     // 2. The metadata (user, command, and channel)
@@ -46,20 +49,70 @@ class Irc {
     // If there is a message, set it.
     final String? message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1) : null;
 
-    return IrcMessage(tags: mappedTags, command: splitMessage[1], user: user, message: message);
+    return IRCMessage(tags: mappedTags, command: splitMessage[1], user: user, message: message);
   }
 
-  static clearChat() {}
+  // Applies the given CLEARCHAT message to a list and returns the result.
+  static List<IRCMessage> CLEARCHAT({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+    debugPrint('CLEARCHAT');
 
-  static clearMsg() {}
+    // If there is no message, it means that entire chat was cleared.
+    if (ircMessage.message == null) {
+      // messages.clear();
+      return messages;
+    }
 
-  static globalUserState() {}
+    final bannedUser = ircMessage.message;
+    final banDuration = ircMessage.tags['ban-duration'];
 
-  static privmsg() {}
+    // For each message of the user, indicate that they were either permanently banned or timed out.
+    messages.asMap().forEach((i, message) {
+      if (message.user! == bannedUser) {
+        if (banDuration == null) {
+          messages[i].message = '<user permabanned>';
+        } else {
+          messages[i].message = '<user timed out for $banDuration seconds>';
+        }
+      }
+    });
 
-  static roomState() {}
+    return messages;
+  }
 
-  static userNotice() {}
+  // Applies the given CLEARMSG message to a list and returns the result.
+  static List<IRCMessage> CLEARMSG({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+    // final targetUser = ircMessage.tags['login'];
+    final targetId = ircMessage.tags['target-msg-id'];
 
-  static userState() {}
+    // Search for the message associated with the ID and indicate the the message was deleted.
+    for (var i = 0; i < messages.length; i++) {
+      if (messages[i].tags['id'] == targetId) {
+        messages[i].message = '<message deleted>';
+        break;
+      }
+    }
+
+    return messages;
+  }
+
+  static GLOBALUSERSTATE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+    debugPrint('GLOBALUSERSTATE');
+  }
+
+  static List<IRCMessage> PRIVMSG({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+    messages.add(ircMessage);
+    return messages;
+  }
+
+  static ROOMSTATE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+    debugPrint('ROOMSTATE');
+  }
+
+  static USERNOTICE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+    debugPrint('USERNOTICE');
+  }
+
+  static USERSTATE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+    debugPrint('USERSTATE');
+  }
 }
