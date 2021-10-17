@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:frosty/models/irc_message.dart';
 
 class IRC {
+  /// Parses an IRC string and returns its corresponding [IRCMessage] object.
   static IRCMessage parse(String whole) {
     // We have three parts:
     // 1. The tags of the IRC message
@@ -95,10 +96,6 @@ class IRC {
     return messages;
   }
 
-  static GLOBALUSERSTATE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
-    debugPrint('GLOBALUSERSTATE');
-  }
-
   static List<IRCMessage> PRIVMSG({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     messages.add(ircMessage);
     return messages;
@@ -112,7 +109,12 @@ class IRC {
     debugPrint('USERNOTICE');
   }
 
-  static USERSTATE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+  static List<IRCMessage> addMessage({required List<IRCMessage> messages, required String userState, required String sentMessage}) {
     debugPrint('USERSTATE');
+
+    final userChatMessage = parse(userState);
+    userChatMessage.message = sentMessage;
+    messages.add(userChatMessage);
+    return messages;
   }
 }
