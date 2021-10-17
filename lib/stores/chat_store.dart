@@ -18,24 +18,30 @@ class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
   @readonly
-  var _messages = <IRCMessage>[];
+  var _autoScroll = true;
 
-  final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
-  get channel => _channel;
+  @readonly
+  var _messages = <IRCMessage>[];
 
   final _assetToUrl = <String, String>{};
 
   final _emoteIdToWord = <String, String>{};
 
+  final _scrollController = ScrollController();
+  ScrollController get scrollController => _scrollController;
+
+  final _textController = TextEditingController();
+  TextEditingController get textController => _textController;
+
+  final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+  WebSocketChannel get channel => _channel;
+
+  String? userState;
+  String? globalUserState;
+
   final String channelName;
 
   final AuthStore auth;
-
-  final _scrollController = ScrollController();
-  get scrollController => _scrollController;
-
-  @readonly
-  var _autoScroll = true;
 
   _ChatStoreBase({required this.auth, required this.channelName}) {
     channel.stream.listen(
@@ -43,10 +49,10 @@ abstract class _ChatStoreBase with Store {
       onDone: () => debugPrint("DONE"),
     );
     final commands = [
+      'CAP REQ :twitch.tv/tags twitch.tv/commands',
+      'CAP END',
       'PASS oauth:${auth.token}',
       'NICK ${auth.isLoggedIn ? auth.user!.login : 'justinfan888'}',
-      'CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership',
-      'CAP END',
       'JOIN #$channelName',
     ];
 
@@ -96,37 +102,41 @@ abstract class _ChatStoreBase with Store {
         switch (parsedIRCMessage.command) {
           case 'CLEARCHAT':
             _messages = IRC.CLEARCHAT(messages: _messages, ircMessage: parsedIRCMessage);
-            break;
+            return;
           case 'CLEARMSG':
-            break;
+            _messages = IRC.CLEARMSG(messages: _messages, ircMessage: parsedIRCMessage);
+            return;
           case 'GLOBALUSERSTATE':
-            break;
+            // Updates the current global user state data (it includes user-id)
+            globalUserState = message;
+            return;
           case 'PRIVMSG':
-            if (_autoScroll) {
-              if (_messages.length > 100) {
-                _messages.removeRange(0, _messages.length - 100);
-              }
-              if (_scrollController.hasClients) {
-                SchedulerBinding.instance?.addPostFrameCallback((_) {
-                  _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-                });
-              }
-            }
-
             _messages = IRC.PRIVMSG(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'ROOMSTATE':
-            IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
-            break;
+            IRC.ROOMSTATE(messages: _messages, ircMessage: parsedIRCMessage);
+            return;
           case 'USERNOTICE':
             IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'USERSTATE':
-            IRC.USERSTATE(messages: _messages, ircMessage: parsedIRCMessage);
-            break;
+            // Updates the current user-state data
+            userState = message;
+            return;
         }
       } else if (message.startsWith('P')) {
         channel.sink.add('PONG :tmi.twitch.tv');
+        return;
+      }
+    }
+    if (_autoScroll) {
+      if (_messages.length > 100) {
+        _messages.removeRange(0, _messages.length - 80);
+      }
+      if (_scrollController.hasClients) {
+        SchedulerBinding.instance?.addPostFrameCallback((_) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        });
       }
     }
   }
@@ -222,9 +232,21 @@ abstract class _ChatStoreBase with Store {
     }
 
     return ChatMessage(
-      key: Key(ircMessage.tags['id']!),
+      // key: Key(ircMessage.tags['id']!),
       children: result,
     );
+  }
+
+  void sendMessage(String message) {
+    if (message.isEmpty) {
+      return;
+    }
+
+    _channel.sink.add('PRIVMSG #$channelName :$message');
+
+    _messages = IRC.addMessage(messages: _messages, userState: userState!, sentMessage: message);
+
+    _textController.clear();
   }
 
   @action
@@ -234,6 +256,12 @@ abstract class _ChatStoreBase with Store {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
+  }
+
+  void dispose() {
+    _channel.sink.close();
+    _textController.dispose();
+    _scrollController.dispose();
   }
 }
 
