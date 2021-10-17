@@ -14,12 +14,12 @@ abstract class _AuthBase with Store {
   /// Secure storage to store tokens.
   final _storage = const FlutterSecureStorage();
 
-  /// The current token.
-  String? _token;
-  String? get token => _token;
-
   /// Whether the token is valid or not.
   var _tokenIsValid = false;
+
+  /// The current token.
+  @readonly
+  String? _token;
 
   /// The current user's info.
   @readonly
@@ -115,8 +115,24 @@ abstract class _AuthBase with Store {
     // Set the login status to logged out.
     _isLoggedIn = false;
 
-    // If the default token already exists, set it. Otherwise, get a new default token.
-    _token = await _storage.read(key: 'DEFAULT_TOKEN') ?? await Twitch.getDefaultToken();
+    // If the default token already exists, set it.
+    _token = await _storage.read(key: 'DEFAULT_TOKEN');
+
+    // If the default token does not already exist, get the new default token and store it.
+    // Else, validate the existing token.
+    if (_token == null) {
+      await Twitch.getDefaultToken();
+      await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
+    } else {
+      // Validate the stored token.
+      _tokenIsValid = await Twitch.validateToken(token: _token!);
+
+      // If the stored token is invalid, get a new default token and store it.
+      if (!_tokenIsValid) {
+        await Twitch.getDefaultToken();
+        await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
+      }
+    }
 
     debugPrint('Successfully logged out');
   }

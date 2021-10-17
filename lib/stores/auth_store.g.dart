@@ -17,6 +17,23 @@ mixin _$AuthStore on _AuthBase, Store {
               name: '_AuthBase.headersTwitch'))
       .value;
 
+  final _$_tokenAtom = Atom(name: '_AuthBase._token');
+
+  String? get token {
+    _$_tokenAtom.reportRead();
+    return super._token;
+  }
+
+  @override
+  String? get _token => token;
+
+  @override
+  set _token(String? value) {
+    _$_tokenAtom.reportWrite(value, super._token, () {
+      super._token = value;
+    });
+  }
+
   final _$_userAtom = Atom(name: '_AuthBase._user');
 
   UserTwitch? get user {
