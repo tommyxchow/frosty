@@ -38,6 +38,10 @@ abstract class _ChatStoreBase with Store {
   var _autoScroll = true;
 
   _ChatStoreBase({required this.auth, required this.channelName}) {
+    channel.stream.listen(
+      (event) => handleWebsocketData(event.toString()),
+      onDone: () => debugPrint("DONE"),
+    );
     final commands = [
       'PASS oauth:${auth.token}',
       'NICK ${auth.isLoggedIn ? auth.user!.login : 'justinfan888'}',
@@ -102,7 +106,13 @@ abstract class _ChatStoreBase with Store {
               if (_messages.length > 100) {
                 _messages.removeRange(0, _messages.length - 100);
               }
+              if (_scrollController.hasClients) {
+                SchedulerBinding.instance?.addPostFrameCallback((_) {
+                  _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+                });
+              }
             }
+
             _messages = IRC.PRIVMSG(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'ROOMSTATE':

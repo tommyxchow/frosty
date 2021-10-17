@@ -24,11 +24,6 @@ class _ChatState extends State<Chat> {
             children: [
               Observer(
                 builder: (_) {
-                  if (widget.chatStore.autoScroll) {
-                    SchedulerBinding.instance?.addPostFrameCallback((_) {
-                      widget.chatStore.scrollController.jumpTo(widget.chatStore.scrollController.position.maxScrollExtent);
-                    });
-                  }
                   return ListView.builder(
                     itemCount: widget.chatStore.messages.length,
                     controller: widget.chatStore.scrollController,
