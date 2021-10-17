@@ -17,9 +17,11 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
-  final messages = <IrcMessage>[];
+  @readonly
+  var _messages = <IRCMessage>[];
 
-  final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+  final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+  get channel => _channel;
 
   final _assetToUrl = <String, String>{};
 
@@ -29,7 +31,8 @@ abstract class _ChatStoreBase with Store {
 
   final AuthStore auth;
 
-  final scrollController = ScrollController();
+  final _scrollController = ScrollController();
+  get scrollController => _scrollController;
 
   @readonly
   var _autoScroll = true;
@@ -38,9 +41,7 @@ abstract class _ChatStoreBase with Store {
     final commands = [
       'PASS oauth:${auth.token}',
       'NICK ${auth.isLoggedIn ? auth.user!.login : 'justinfan888'}',
-      'CAP REQ :twitch.tv/tags',
-      'CAP REQ :twitch.tv/commands',
-      // 'CAP REQ :twitch.tv/membership',
+      'CAP REQ :twitch.tv/tags twitch.tv/commands twitch.tv/membership',
       'CAP END',
       'JOIN #$channelName',
     ];
@@ -48,17 +49,15 @@ abstract class _ChatStoreBase with Store {
     for (final command in commands) {
       channel.sink.add(command);
     }
-
-    scrollController.addListener(() {
-      if (!scrollController.position.atEdge && scrollController.position.pixels < scrollController.position.maxScrollExtent) {
+    _scrollController.addListener(() {
+      if (!_scrollController.position.atEdge && _scrollController.position.pixels < _scrollController.position.maxScrollExtent) {
         _autoScroll = false;
-      } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
+      } else if (_scrollController.position.atEdge && _scrollController.position.pixels != _scrollController.position.minScrollExtent) {
         _autoScroll = true;
       }
     });
   }
 
-  @action
   Future<void> getAssets() async {
     final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
 
@@ -84,15 +83,15 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
-  void handleWebsocketData(Object? data) {
-    final ircMessages = data.toString();
+  void handleWebsocketData(String ircMessages) {
     for (final message in ircMessages.substring(0, ircMessages.length - 2).split('\r\n')) {
+      debugPrint(message);
       if (message.startsWith('@')) {
-        final parsed = Irc.parse(message);
+        final parsedIRCMessage = IRC.parse(message);
 
-        switch (parsed.command) {
+        switch (parsedIRCMessage.command) {
           case 'CLEARCHAT':
-            clearChat(ircMessage: parsed);
+            _messages = IRC.CLEARCHAT(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'CLEARMSG':
             break;
@@ -100,20 +99,20 @@ abstract class _ChatStoreBase with Store {
             break;
           case 'PRIVMSG':
             if (_autoScroll) {
-              if (messages.length > 100) {
-                messages.removeRange(0, messages.length - 100);
+              if (_messages.length > 100) {
+                _messages.removeRange(0, _messages.length - 100);
               }
-              SchedulerBinding.instance?.addPostFrameCallback((_) {
-                scrollController.jumpTo(scrollController.position.maxScrollExtent);
-              });
             }
-            messages.add(parsed);
+            _messages = IRC.PRIVMSG(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'ROOMSTATE':
+            IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'USERNOTICE':
+            IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'USERSTATE':
+            IRC.USERSTATE(messages: _messages, ircMessage: parsedIRCMessage);
             break;
         }
       } else if (message.startsWith('P')) {
@@ -122,31 +121,7 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
-  void clearChat({required IrcMessage ircMessage}) {
-    // If there is no message, it means that entire chat was cleared.
-    if (ircMessage.message == null) {
-      // messages.clear();
-      messages[0].message = 'User was permabanned!';
-      return;
-    }
-
-    final bannedUser = ircMessage.message;
-    final banDuration = ircMessage.tags['ban-duration'];
-
-    debugPrint('$bannedUser was banned');
-
-    messages.asMap().forEach((i, message) {
-      if (message.user! == bannedUser) {
-        if (banDuration == null) {
-          messages[i].message = 'User was permabanned!';
-        } else {
-          messages[i].message = 'User was timed out for $banDuration seconds!';
-        }
-      }
-    });
-  }
-
-  ChatMessage renderChatMessage({required IrcMessage ircMessage}) {
+  ChatMessage renderChatMessage(IRCMessage ircMessage) {
     final result = <InlineSpan>[];
 
     final emoteTags = ircMessage.tags['emotes'];
@@ -245,9 +220,9 @@ abstract class _ChatStoreBase with Store {
   @action
   void resumeScroll() {
     _autoScroll = true;
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     SchedulerBinding.instance?.addPostFrameCallback((_) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
 }
