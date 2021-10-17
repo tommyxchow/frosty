@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/chat_store.dart';
+import 'package:provider/provider.dart';
 
 class Chat extends StatefulWidget {
   final ChatStore chatStore;
@@ -19,36 +20,47 @@ class _ChatState extends State<Chat> {
       future: widget.chatStore.getAssets(),
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
-          return Stack(
-            alignment: AlignmentDirectional.bottomCenter,
+          return Column(
             children: [
-              Observer(
-                builder: (_) {
-                  return ListView.builder(
-                    itemCount: widget.chatStore.messages.length,
-                    controller: widget.chatStore.scrollController,
-                    padding: const EdgeInsets.all(5.0),
-                    itemBuilder: (context, index) {
-                      return widget.chatStore.renderChatMessage(widget.chatStore.messages[index]);
-                    },
-                  );
-                },
-              ),
-              Observer(
-                builder: (_) {
-                  return Visibility(
-                    visible: !widget.chatStore.autoScroll,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => widget.chatStore.resumeScroll(),
-                        child: const Text('Resume Scroll'),
-                      ),
+              Expanded(
+                child: Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    Observer(
+                      builder: (_) {
+                        return ListView.builder(
+                          itemCount: widget.chatStore.messages.length,
+                          controller: widget.chatStore.scrollController,
+                          padding: const EdgeInsets.all(5.0),
+                          itemBuilder: (context, index) {
+                            return widget.chatStore.renderChatMessage(widget.chatStore.messages[index]);
+                          },
+                        );
+                      },
                     ),
-                  );
-                },
+                    Observer(
+                      builder: (_) {
+                        return Visibility(
+                          visible: !widget.chatStore.autoScroll,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => widget.chatStore.resumeScroll(),
+                              child: const Text('Resume Scroll'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
+              if (context.read<AuthStore>().isLoggedIn)
+                TextField(
+                  controller: widget.chatStore.textController,
+                  onSubmitted: (string) => widget.chatStore.sendMessage(string),
+                ),
             ],
           );
         }
@@ -61,8 +73,7 @@ class _ChatState extends State<Chat> {
 
   @override
   void dispose() {
-    widget.chatStore.channel.sink.close();
-    widget.chatStore.scrollController.dispose();
+    widget.chatStore.dispose();
     super.dispose();
   }
 }
