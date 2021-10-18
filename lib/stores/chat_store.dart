@@ -38,6 +38,7 @@ abstract class _ChatStoreBase with Store {
 
   String? userState;
   String? globalUserState;
+  String? roomState;
 
   final String channelName;
 
@@ -95,7 +96,7 @@ abstract class _ChatStoreBase with Store {
 
   void handleWebsocketData(String ircMessages) {
     for (final message in ircMessages.substring(0, ircMessages.length - 2).split('\r\n')) {
-      debugPrint(message);
+      // debugPrint(message);
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRC.parse(message);
 
@@ -114,10 +115,11 @@ abstract class _ChatStoreBase with Store {
             _messages = IRC.PRIVMSG(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'ROOMSTATE':
-            IRC.ROOMSTATE(messages: _messages, ircMessage: parsedIRCMessage);
+            roomState = message;
             return;
           case 'USERNOTICE':
-            IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
+            debugPrint(message);
+            // _messages = IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'USERSTATE':
             // Updates the current user-state data
@@ -130,18 +132,18 @@ abstract class _ChatStoreBase with Store {
       }
     }
     if (_autoScroll) {
-      if (_messages.length > 100) {
-        _messages.removeRange(0, _messages.length - 80);
+      if (_messages.length > 200) {
+        _messages.removeRange(0, _messages.length - 180);
       }
-      if (_scrollController.hasClients) {
-        SchedulerBinding.instance?.addPostFrameCallback((_) {
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
           _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-        });
-      }
+        }
+      });
     }
   }
 
-  ChatMessage renderChatMessage(IRCMessage ircMessage) {
+  Widget renderChatMessage(IRCMessage ircMessage) {
     final result = <InlineSpan>[];
 
     final emoteTags = ircMessage.tags['emotes'];
@@ -231,10 +233,34 @@ abstract class _ChatStoreBase with Store {
       }
     }
 
-    return ChatMessage(
-      // key: Key(ircMessage.tags['id']!),
-      children: result,
-    );
+    if (ircMessage.command == 'CLEARCHAT' || ircMessage.command == 'CLEARMSG') {
+      final banDuration = ircMessage.tags['ban-duration'];
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        child: Opacity(
+          opacity: 0.50,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ChatMessage(
+                key: Key(ircMessage.tags['id']!),
+                children: result,
+              ),
+              banDuration == null
+                  ? (ircMessage.command == 'CLEARMSG')
+                      ? const Text('Message deleted.')
+                      : const Text('Permanently Banned.')
+                  : Text('Timed out for $banDuration seconds.')
+            ],
+          ),
+        ),
+      );
+    } else {
+      return ChatMessage(
+        key: ircMessage.tags['id'] == null ? null : Key(ircMessage.tags['id']!),
+        children: result,
+      );
+    }
   }
 
   void sendMessage(String message) {

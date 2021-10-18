@@ -66,13 +66,12 @@ class IRC {
     final bannedUser = ircMessage.message;
     final banDuration = ircMessage.tags['ban-duration'];
 
-    // For each message of the user, indicate that they were either permanently banned or timed out.
     messages.asMap().forEach((i, message) {
       if (message.user! == bannedUser) {
-        if (banDuration == null) {
-          messages[i].message = '<user permabanned>';
-        } else {
-          messages[i].message = '<user timed out for $banDuration seconds>';
+        messages[i].command = 'CLEARCHAT';
+
+        if (banDuration != null) {
+          messages[i].tags['ban-duration'] = banDuration;
         }
       }
     });
@@ -88,7 +87,7 @@ class IRC {
     // Search for the message associated with the ID and indicate the the message was deleted.
     for (var i = 0; i < messages.length; i++) {
       if (messages[i].tags['id'] == targetId) {
-        messages[i].message = '<message deleted>';
+        messages[i].command = 'CLEARMSG';
         break;
       }
     }
@@ -99,10 +98,6 @@ class IRC {
   static List<IRCMessage> PRIVMSG({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     messages.add(ircMessage);
     return messages;
-  }
-
-  static ROOMSTATE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
-    debugPrint('ROOMSTATE');
   }
 
   static USERNOTICE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {

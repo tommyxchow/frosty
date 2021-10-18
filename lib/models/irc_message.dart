@@ -1,6 +1,6 @@
 class IRCMessage {
   final Map<String, String> tags;
-  final String command;
+  String command;
   final String? user;
   String? message;
 
