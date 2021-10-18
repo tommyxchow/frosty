@@ -57,9 +57,20 @@ class _ChatState extends State<Chat> {
                 ),
               ),
               if (context.read<AuthStore>().isLoggedIn)
-                TextField(
-                  controller: widget.chatStore.textController,
-                  onSubmitted: (string) => widget.chatStore.sendMessage(string),
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: TextField(
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.all(8.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                      ),
+                      hintText: 'Send a message',
+                    ),
+                    controller: widget.chatStore.textController,
+                    onSubmitted: (string) => widget.chatStore.sendMessage(string),
+                  ),
                 ),
             ],
           );

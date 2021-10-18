@@ -250,7 +250,10 @@ abstract class _ChatStoreBase with Store {
                   ? (ircMessage.command == 'CLEARMSG')
                       ? const Text('Message deleted.')
                       : const Text('Permanently Banned.')
-                  : Text('Timed out for $banDuration seconds.')
+                  : Text(
+                      'Timed out for $banDuration seconds.',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    )
             ],
           ),
         ),

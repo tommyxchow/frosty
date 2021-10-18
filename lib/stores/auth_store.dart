@@ -123,6 +123,7 @@ abstract class _AuthBase with Store {
     if (_token == null) {
       await Twitch.getDefaultToken();
       await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
+      _tokenIsValid = await Twitch.validateToken(token: _token!);
     } else {
       // Validate the stored token.
       _tokenIsValid = await Twitch.validateToken(token: _token!);
@@ -131,6 +132,7 @@ abstract class _AuthBase with Store {
       if (!_tokenIsValid) {
         await Twitch.getDefaultToken();
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
+        _tokenIsValid = await Twitch.validateToken(token: _token!);
       }
     }
 

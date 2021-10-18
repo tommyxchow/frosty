@@ -19,6 +19,7 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
+                  fullscreenDialog: true,
                   builder: (_) {
                     return const Settings();
                   },
