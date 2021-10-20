@@ -26,23 +26,6 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_messagesAtom = Atom(name: '_ChatStoreBase._messages');
-
-  List<IRCMessage> get messages {
-    _$_messagesAtom.reportRead();
-    return super._messages;
-  }
-
-  @override
-  List<IRCMessage> get _messages => messages;
-
-  @override
-  set _messages(List<IRCMessage> value) {
-    _$_messagesAtom.reportWrite(value, super._messages, () {
-      super._messages = value;
-    });
-  }
-
   final _$_ChatStoreBaseActionController =
       ActionController(name: '_ChatStoreBase');
 

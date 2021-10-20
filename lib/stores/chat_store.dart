@@ -20,8 +20,7 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _autoScroll = true;
 
-  @readonly
-  var _messages = <IRCMessage>[];
+  final messages = ObservableList<IRCMessage>();
 
   final _assetToUrl = <String, String>{};
 
@@ -46,9 +45,10 @@ abstract class _ChatStoreBase with Store {
 
   _ChatStoreBase({required this.auth, required this.channelName}) {
     channel.stream.listen(
-      (event) => handleWebsocketData(event.toString()),
+      (data) => _handleWebsocketData(data.toString()),
       onDone: () => debugPrint("DONE"),
     );
+
     final commands = [
       'CAP REQ :twitch.tv/tags twitch.tv/commands',
       'CAP END',
@@ -60,6 +60,7 @@ abstract class _ChatStoreBase with Store {
     for (final command in commands) {
       channel.sink.add(command);
     }
+
     _scrollController.addListener(() {
       if (!_scrollController.position.atEdge && _scrollController.position.pixels < _scrollController.position.maxScrollExtent) {
         _autoScroll = false;
@@ -94,25 +95,25 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
-  void handleWebsocketData(String ircMessages) {
-    for (final message in ircMessages.substring(0, ircMessages.length - 2).split('\r\n')) {
+  void _handleWebsocketData(String data) {
+    for (final message in data.substring(0, data.length - 2).split('\r\n')) {
       // debugPrint(message);
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRC.parse(message);
 
         switch (parsedIRCMessage.command) {
           case 'CLEARCHAT':
-            _messages = IRC.CLEARCHAT(messages: _messages, ircMessage: parsedIRCMessage);
-            return;
+            IRC.clearChat(messages: messages, ircMessage: parsedIRCMessage);
+            break;
           case 'CLEARMSG':
-            _messages = IRC.CLEARMSG(messages: _messages, ircMessage: parsedIRCMessage);
-            return;
+            IRC.clearMsg(messages: messages, ircMessage: parsedIRCMessage);
+            break;
           case 'GLOBALUSERSTATE':
             // Updates the current global user state data (it includes user-id)
             globalUserState = message;
             return;
           case 'PRIVMSG':
-            _messages = IRC.PRIVMSG(messages: _messages, ircMessage: parsedIRCMessage);
+            messages.add(parsedIRCMessage);
             break;
           case 'ROOMSTATE':
             roomState = message;
@@ -132,9 +133,10 @@ abstract class _ChatStoreBase with Store {
       }
     }
     if (_autoScroll) {
-      if (_messages.length > 200) {
-        _messages.removeRange(0, _messages.length - 180);
+      if (messages.length > 200) {
+        messages.removeRange(0, messages.length - 180);
       }
+
       SchedulerBinding.instance?.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
@@ -146,6 +148,7 @@ abstract class _ChatStoreBase with Store {
   Widget renderChatMessage(IRCMessage ircMessage) {
     final result = <InlineSpan>[];
 
+    // TODO: These shouldn't be added to the global dict. Make it local (only this user/message will have the emotes)
     final emoteTags = ircMessage.tags['emotes'];
     if (emoteTags != null) {
       final emotes = emoteTags.split('/');
@@ -236,7 +239,7 @@ abstract class _ChatStoreBase with Store {
     if (ircMessage.command == 'CLEARCHAT' || ircMessage.command == 'CLEARMSG') {
       final banDuration = ircMessage.tags['ban-duration'];
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Opacity(
           opacity: 0.50,
           child: Column(
@@ -251,7 +254,7 @@ abstract class _ChatStoreBase with Store {
                       ? const Text('Message deleted.')
                       : const Text('Permanently Banned.')
                   : Text(
-                      'Timed out for $banDuration seconds.',
+                      'Timed out for $banDuration second(s).',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     )
             ],
@@ -273,7 +276,7 @@ abstract class _ChatStoreBase with Store {
 
     _channel.sink.add('PRIVMSG #$channelName :$message');
 
-    _messages = IRC.addMessage(messages: _messages, userState: userState!, sentMessage: message);
+    IRC.addMessage(messages: messages, userState: userState!, sentMessage: message);
 
     _textController.clear();
   }

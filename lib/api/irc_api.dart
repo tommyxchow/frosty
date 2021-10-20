@@ -1,5 +1,3 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'package:flutter/foundation.dart';
 import 'package:frosty/models/irc_message.dart';
 
@@ -54,13 +52,13 @@ class IRC {
   }
 
   // Applies the given CLEARCHAT message to a list and returns the result.
-  static List<IRCMessage> CLEARCHAT({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+  static void clearChat({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     debugPrint('CLEARCHAT');
 
     // If there is no message, it means that entire chat was cleared.
     if (ircMessage.message == null) {
       // messages.clear();
-      return messages;
+      return;
     }
 
     final bannedUser = ircMessage.message;
@@ -75,12 +73,10 @@ class IRC {
         }
       }
     });
-
-    return messages;
   }
 
   // Applies the given CLEARMSG message to a list and returns the result.
-  static List<IRCMessage> CLEARMSG({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+  static void clearMsg({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     // final targetUser = ircMessage.tags['login'];
     final targetId = ircMessage.tags['target-msg-id'];
 
@@ -91,25 +87,17 @@ class IRC {
         break;
       }
     }
-
-    return messages;
   }
 
-  static List<IRCMessage> PRIVMSG({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
-    messages.add(ircMessage);
-    return messages;
-  }
-
-  static USERNOTICE({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+  static void userNotice({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     debugPrint('USERNOTICE');
   }
 
-  static List<IRCMessage> addMessage({required List<IRCMessage> messages, required String userState, required String sentMessage}) {
+  static void addMessage({required List<IRCMessage> messages, required String userState, required String sentMessage}) {
     debugPrint('USERSTATE');
 
     final userChatMessage = parse(userState);
     userChatMessage.message = sentMessage;
     messages.add(userChatMessage);
-    return messages;
   }
 }
