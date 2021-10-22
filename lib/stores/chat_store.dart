@@ -6,7 +6,7 @@ import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/irc_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/models/irc_message.dart';
+import 'package:frosty/models/irc.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/widgets/chat_message.dart';
 import 'package:mobx/mobx.dart';
@@ -19,6 +19,13 @@ class ChatStore = _ChatStoreBase with _$ChatStore;
 abstract class _ChatStoreBase with Store {
   @readonly
   var _autoScroll = true;
+
+  @readonly
+  ROOMSTATE? _roomState;
+
+  String? _userState;
+
+  // String? _globalUserState;
 
   final messages = ObservableList<IRCMessage>();
 
@@ -35,10 +42,6 @@ abstract class _ChatStoreBase with Store {
   final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
   WebSocketChannel get channel => _channel;
 
-  String? userState;
-  String? globalUserState;
-  String? roomState;
-
   final String channelName;
 
   final AuthStore auth;
@@ -51,7 +54,6 @@ abstract class _ChatStoreBase with Store {
 
     final commands = [
       'CAP REQ :twitch.tv/tags twitch.tv/commands',
-      'CAP END',
       'PASS oauth:${auth.token}',
       'NICK ${auth.isLoggedIn ? auth.user!.login : 'justinfan888'}',
       'JOIN #$channelName',
@@ -95,11 +97,12 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
+  @action
   void _handleWebsocketData(String data) {
     for (final message in data.substring(0, data.length - 2).split('\r\n')) {
       // debugPrint(message);
       if (message.startsWith('@')) {
-        final parsedIRCMessage = IRC.parse(message);
+        final parsedIRCMessage = IRCMessage.fromString(message);
 
         switch (parsedIRCMessage.command) {
           case 'CLEARCHAT':
@@ -110,24 +113,24 @@ abstract class _ChatStoreBase with Store {
             break;
           case 'GLOBALUSERSTATE':
             // Updates the current global user state data (it includes user-id)
-            globalUserState = message;
-            return;
+            // _globalUserState = message;
+            break;
           case 'PRIVMSG':
             messages.add(parsedIRCMessage);
             break;
           case 'ROOMSTATE':
-            roomState = message;
-            return;
+            _roomState = ROOMSTATE.fromMessage(parsedIRCMessage);
+            break;
           case 'USERNOTICE':
             debugPrint(message);
             // _messages = IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
             break;
           case 'USERSTATE':
             // Updates the current user-state data
-            userState = message;
-            return;
+            _userState = message;
+            break;
         }
-      } else if (message.startsWith('P')) {
+      } else if (message == 'PING :tmi.twitch.tv') {
         channel.sink.add('PONG :tmi.twitch.tv');
         return;
       }
@@ -276,7 +279,9 @@ abstract class _ChatStoreBase with Store {
 
     _channel.sink.add('PRIVMSG #$channelName :$message');
 
-    IRC.addMessage(messages: messages, userState: userState!, sentMessage: message);
+    final userChatMessage = IRCMessage.fromString(_userState!);
+    userChatMessage.message = message;
+    messages.add(userChatMessage);
 
     _textController.clear();
   }
