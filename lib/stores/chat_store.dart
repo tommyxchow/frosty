@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/api/bttv_api.dart';
@@ -112,7 +113,8 @@ abstract class _ChatStoreBase with Store {
             IRC.clearMsg(messages: messages, ircMessage: parsedIRCMessage);
             break;
           case 'GLOBALUSERSTATE':
-            // Updates the current global user state data (it includes user-id)
+            // Updates the current global user state data (it includes user-id),
+            // Don't really see a use for it when USERSTATE exists, so leaving it unimplemented for now.
             // _globalUserState = message;
             break;
           case 'PRIVMSG':
@@ -123,7 +125,7 @@ abstract class _ChatStoreBase with Store {
             break;
           case 'USERNOTICE':
             debugPrint(message);
-            // _messages = IRC.USERNOTICE(messages: _messages, ircMessage: parsedIRCMessage);
+            messages.add(parsedIRCMessage);
             break;
           case 'USERSTATE':
             // Updates the current user-state data
@@ -182,7 +184,6 @@ abstract class _ChatStoreBase with Store {
       }
     }
 
-    final words = ircMessage.message!.split(' ');
     final badges = ircMessage.tags['badges'];
     if (badges != null) {
       for (final badge in badges.split(',')) {
@@ -218,31 +219,35 @@ abstract class _ChatStoreBase with Store {
       const TextSpan(text: ':'),
     );
 
-    for (final word in words) {
-      final emoteUrl = _assetToUrl[word];
-      if (emoteUrl != null) {
-        result.add(const TextSpan(text: ' '));
-        result.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: CachedNetworkImage(
-              imageUrl: emoteUrl,
-              placeholder: (context, url) => const SizedBox(),
-              fadeInDuration: const Duration(seconds: 0),
-              height: 25,
+    final message = ircMessage.message;
+    if (message != null) {
+      final words = message.split(' ');
+      for (final word in words) {
+        final emoteUrl = _assetToUrl[word];
+        if (emoteUrl != null) {
+          result.add(const TextSpan(text: ' '));
+          result.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: CachedNetworkImage(
+                imageUrl: emoteUrl,
+                placeholder: (context, url) => const SizedBox(),
+                fadeInDuration: const Duration(seconds: 0),
+                height: 25,
+              ),
             ),
-          ),
-        );
-      } else {
-        result.add(const TextSpan(text: ' '));
-        result.add(TextSpan(text: word));
+          );
+        } else {
+          result.add(const TextSpan(text: ' '));
+          result.add(TextSpan(text: word));
+        }
       }
     }
 
     if (ircMessage.command == 'CLEARCHAT' || ircMessage.command == 'CLEARMSG') {
       final banDuration = ircMessage.tags['ban-duration'];
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Opacity(
           opacity: 0.50,
           child: Column(
@@ -259,15 +264,34 @@ abstract class _ChatStoreBase with Store {
                   : Text(
                       'Timed out for $banDuration second(s).',
                       style: const TextStyle(fontWeight: FontWeight.bold),
-                    )
+                    ),
             ],
           ),
         ),
       );
+    } else if (ircMessage.command == 'USERNOTICE') {
+      return Container(
+        color: Colors.purple.withOpacity(0.25),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (ircMessage.message != null)
+              ChatMessage(
+                key: Key(ircMessage.tags['id']!),
+                children: result,
+              ),
+            Text(ircMessage.tags['system-msg']!),
+          ],
+        ),
+      );
     } else {
-      return ChatMessage(
-        key: ircMessage.tags['id'] == null ? null : Key(ircMessage.tags['id']!),
-        children: result,
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        child: ChatMessage(
+          key: ircMessage.tags['id'] == null ? null : Key(ircMessage.tags['id']!),
+          children: result,
+        ),
       );
     }
   }

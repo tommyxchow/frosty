@@ -16,7 +16,7 @@ class IRC {
     final banDuration = ircMessage.tags['ban-duration'];
 
     messages.asMap().forEach((i, message) {
-      if (message.user! == bannedUser) {
+      if (message.user == bannedUser) {
         messages[i].command = 'CLEARCHAT';
 
         if (banDuration != null) {

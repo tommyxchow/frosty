@@ -5,6 +5,7 @@ import 'package:frosty/models/channel.dart';
 
 part 'channel_list_store.g.dart';
 
+// TODO: Fix followed list refresh when log in.
 class ChannelListStore = _ChannelListBase with _$ChannelListStore;
 
 abstract class _ChannelListBase with Store {
