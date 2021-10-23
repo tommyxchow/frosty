@@ -41,6 +41,9 @@ class _HomeState extends State<Home> {
                     controller: _textController,
                     autocorrect: false,
                     autofocus: true,
+                    decoration: const InputDecoration(
+                      hintText: 'Search for a channel',
+                    ),
                     onSubmitted: (string) async {
                       if (await Twitch.getUser(userLogin: string, headers: context.read<AuthStore>().headersTwitch) != null) {
                         Navigator.push(

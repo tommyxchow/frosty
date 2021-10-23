@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/chat_store.dart';
+import 'package:frosty/widgets/chat_stats.dart';
 import 'package:provider/provider.dart';
 
 class Chat extends StatefulWidget {
@@ -56,22 +58,52 @@ class _ChatState extends State<Chat> {
                   ],
                 ),
               ),
-              if (context.read<AuthStore>().isLoggedIn)
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.all(8.0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                      ),
-                      hintText: 'Send a message',
-                    ),
-                    controller: widget.chatStore.textController,
-                    onSubmitted: (string) => widget.chatStore.sendMessage(string),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.settings),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return const Settings();
+                        },
+                      );
+                    },
                   ),
-                ),
+                  IconButton(
+                    icon: const Icon(Icons.stacked_bar_chart),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return ChatStats(
+                            chatStore: widget.chatStore,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  if (context.read<AuthStore>().isLoggedIn)
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextField(
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            contentPadding: EdgeInsets.all(8.0),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                            ),
+                            hintText: 'Send a message',
+                          ),
+                          controller: widget.chatStore.textController,
+                          onSubmitted: (string) => widget.chatStore.sendMessage(string),
+                        ),
+                      ),
+                    ),
+                ],
+              )
             ],
           );
         }
