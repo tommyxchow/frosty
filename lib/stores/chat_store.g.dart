@@ -28,16 +28,16 @@ mixin _$ChatStore on _ChatStoreBase, Store {
 
   final _$_roomStateAtom = Atom(name: '_ChatStoreBase._roomState');
 
-  ROOMSTATE? get roomState {
+  ROOMSTATE get roomState {
     _$_roomStateAtom.reportRead();
     return super._roomState;
   }
 
   @override
-  ROOMSTATE? get _roomState => roomState;
+  ROOMSTATE get _roomState => roomState;
 
   @override
-  set _roomState(ROOMSTATE? value) {
+  set _roomState(ROOMSTATE value) {
     _$_roomStateAtom.reportWrite(value, super._roomState, () {
       super._roomState = value;
     });

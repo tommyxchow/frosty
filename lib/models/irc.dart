@@ -63,21 +63,28 @@ class IRCMessage {
 }
 
 class ROOMSTATE {
-  final bool emoteOnly;
-  final bool followersOnly;
-  final bool r9k;
-  final bool slow;
-  final bool subMode;
+  final String emoteOnly;
+  final String followersOnly;
+  final String r9k;
+  final String slowMode;
+  final String subMode;
 
-  const ROOMSTATE(this.emoteOnly, this.followersOnly, this.r9k, this.slow, this.subMode);
+  ROOMSTATE({
+    this.emoteOnly = "0",
+    this.followersOnly = "0",
+    this.r9k = "0",
+    this.slowMode = "0",
+    this.subMode = "0",
+  });
 
-  factory ROOMSTATE.fromMessage(IRCMessage ircMessage) {
+  // Create a new copy with the paremeters from the provided [IRCMessage]
+  ROOMSTATE copyWith(IRCMessage ircMessage) {
     return ROOMSTATE(
-      (ircMessage.tags['emote-only'] == '0') ? false : true,
-      (ircMessage.tags['followers-only'] == '0') ? false : true,
-      (ircMessage.tags['r9k'] == '0') ? false : true,
-      (ircMessage.tags['slow'] == '0') ? false : true,
-      (ircMessage.tags['subs-only'] == '0') ? false : true,
+      emoteOnly: ircMessage.tags['emote-only'] ?? emoteOnly,
+      followersOnly: ircMessage.tags['followers-only'] ?? followersOnly,
+      r9k: ircMessage.tags['r9k'] ?? r9k,
+      slowMode: ircMessage.tags['slow'] ?? slowMode,
+      subMode: ircMessage.tags['subs-only'] ?? subMode,
     );
   }
 }

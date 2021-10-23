@@ -21,7 +21,7 @@ abstract class _ChatStoreBase with Store {
   var _autoScroll = true;
 
   @readonly
-  ROOMSTATE? _roomState;
+  var _roomState = ROOMSTATE();
 
   String? _userState;
 
@@ -119,7 +119,7 @@ abstract class _ChatStoreBase with Store {
             messages.add(parsedIRCMessage);
             break;
           case 'ROOMSTATE':
-            _roomState = ROOMSTATE.fromMessage(parsedIRCMessage);
+            _roomState = _roomState.copyWith(parsedIRCMessage);
             break;
           case 'USERNOTICE':
             debugPrint(message);
