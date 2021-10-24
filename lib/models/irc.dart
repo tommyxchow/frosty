@@ -1,7 +1,10 @@
+import 'package:flutter/foundation.dart';
+import 'package:frosty/api/irc_api.dart';
+
 class IRCMessage {
   final Map<String, String> tags;
   final String? user;
-  String command;
+  Command command;
   String? message;
 
   IRCMessage({required this.tags, required this.command, required this.user, required this.message});
@@ -53,9 +56,40 @@ class IRCMessage {
     // If there is an associated message, set it.
     final String? message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1) : null;
 
+    // Parse the command.
+    // The majority of messages will be PRIVMSG, so check that first.
+    // Else, loop each possible command and match the correct one.
+    final Command messageCommand;
+    switch (splitMessage[1]) {
+      case 'PRIVMSG':
+        messageCommand = Command.privateMessage;
+        break;
+      case 'CLEARCHAT':
+        messageCommand = Command.clearChat;
+        break;
+      case 'CLEARMSG':
+        messageCommand = Command.clearMessage;
+        break;
+      case 'USERNOTICE':
+        messageCommand = Command.userNotice;
+        break;
+      case 'ROOMSTATE':
+        messageCommand = Command.roomState;
+        break;
+      case 'USERSTATE':
+        messageCommand = Command.userState;
+        break;
+      case 'GLOBALUSERSTATE':
+        messageCommand = Command.globalUserState;
+        break;
+      default:
+        debugPrint('Unknown command: $splitMessage[1]');
+        messageCommand = Command.none;
+    }
+
     return IRCMessage(
       tags: mappedTags,
-      command: splitMessage[1],
+      command: messageCommand,
       user: user,
       message: message,
     );

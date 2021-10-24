@@ -58,6 +58,17 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   }
 
   @override
+  void _scrollToEnd() {
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
+        name: '_ChatStoreBase._scrollToEnd');
+    try {
+      return super._scrollToEnd();
+    } finally {
+      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void resumeScroll() {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
         name: '_ChatStoreBase.resumeScroll');

@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
@@ -31,8 +30,6 @@ abstract class _ChatStoreBase with Store {
   final messages = ObservableList<IRCMessage>();
 
   final _assetToUrl = <String, String>{};
-
-  final _emoteIdToWord = <String, String>{};
 
   final _scrollController = ScrollController();
   ScrollController get scrollController => _scrollController;
@@ -106,37 +103,46 @@ abstract class _ChatStoreBase with Store {
         final parsedIRCMessage = IRCMessage.fromString(message);
 
         switch (parsedIRCMessage.command) {
-          case 'CLEARCHAT':
+          case Command.privateMessage:
+            messages.add(parsedIRCMessage);
+            _scrollToEnd();
+            break;
+          case Command.clearChat:
             IRC.clearChat(messages: messages, ircMessage: parsedIRCMessage);
+            _scrollToEnd();
             break;
-          case 'CLEARMSG':
-            IRC.clearMsg(messages: messages, ircMessage: parsedIRCMessage);
+          case Command.clearMessage:
+            IRC.clearMessage(messages: messages, ircMessage: parsedIRCMessage);
+            _scrollToEnd();
             break;
-          case 'GLOBALUSERSTATE':
+          case Command.userNotice:
+            messages.add(parsedIRCMessage);
+            _scrollToEnd();
+            break;
+          case Command.roomState:
+            _roomState = _roomState.copyWith(parsedIRCMessage);
+            break;
+          case Command.userState:
+            // Updates the current user-state data
+            _userState = message;
+            break;
+          case Command.globalUserState:
             // Updates the current global user state data (it includes user-id),
             // Don't really see a use for it when USERSTATE exists, so leaving it unimplemented for now.
             // _globalUserState = message;
             break;
-          case 'PRIVMSG':
-            messages.add(parsedIRCMessage);
-            break;
-          case 'ROOMSTATE':
-            _roomState = _roomState.copyWith(parsedIRCMessage);
-            break;
-          case 'USERNOTICE':
-            debugPrint(message);
-            messages.add(parsedIRCMessage);
-            break;
-          case 'USERSTATE':
-            // Updates the current user-state data
-            _userState = message;
-            break;
+          default:
+            debugPrint('Unknown command: ${parsedIRCMessage.command}');
         }
       } else if (message == 'PING :tmi.twitch.tv') {
         channel.sink.add('PONG :tmi.twitch.tv');
         return;
       }
     }
+  }
+
+  @action
+  void _scrollToEnd() {
     if (_autoScroll) {
       if (messages.length > 200) {
         messages.removeRange(0, messages.length - 180);
@@ -151,100 +157,9 @@ abstract class _ChatStoreBase with Store {
   }
 
   Widget renderChatMessage(IRCMessage ircMessage) {
-    final result = <InlineSpan>[];
+    final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
 
-    // TODO: These shouldn't be added to the global dict. Make it local (only this user/message will have the emotes)
-    final emoteTags = ircMessage.tags['emotes'];
-    if (emoteTags != null) {
-      final emotes = emoteTags.split('/');
-
-      for (final emoteIdAndPosition in emotes) {
-        final indexBetweenIdAndPositions = emoteIdAndPosition.indexOf(':');
-        final emoteId = emoteIdAndPosition.substring(0, indexBetweenIdAndPositions);
-
-        if (_emoteIdToWord[emoteId] != null) {
-          continue;
-        }
-
-        final String range;
-        if (emoteIdAndPosition.contains(',')) {
-          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1, emoteIdAndPosition.indexOf(','));
-        } else {
-          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1);
-        }
-
-        final indexSplit = range.split('-');
-        final startIndex = int.parse(indexSplit[0]);
-        final endIndex = int.parse(indexSplit[1]);
-
-        final emoteWord = ircMessage.message!.substring(startIndex, endIndex + 1);
-
-        _emoteIdToWord[emoteId] = emoteWord;
-        _assetToUrl[emoteWord] = 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0';
-      }
-    }
-
-    final badges = ircMessage.tags['badges'];
-    if (badges != null) {
-      for (final badge in badges.split(',')) {
-        final badgeUrl = _assetToUrl[badge];
-        if (badgeUrl != null) {
-          result.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: CachedNetworkImage(
-                imageUrl: badgeUrl,
-                placeholder: (context, url) => const SizedBox(),
-                fadeInDuration: const Duration(seconds: 0),
-                height: 20,
-              ),
-            ),
-          );
-          result.add(const TextSpan(text: ' '));
-        }
-      }
-    }
-
-    result.add(
-      TextSpan(
-        text: ircMessage.tags['display-name']!,
-        style: TextStyle(
-          color: HexColor.fromHex(ircMessage.tags['color'] ?? '#868686'),
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-
-    result.add(
-      const TextSpan(text: ':'),
-    );
-
-    final message = ircMessage.message;
-    if (message != null) {
-      final words = message.split(' ');
-      for (final word in words) {
-        final emoteUrl = _assetToUrl[word];
-        if (emoteUrl != null) {
-          result.add(const TextSpan(text: ' '));
-          result.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: CachedNetworkImage(
-                imageUrl: emoteUrl,
-                placeholder: (context, url) => const SizedBox(),
-                fadeInDuration: const Duration(seconds: 0),
-                height: 25,
-              ),
-            ),
-          );
-        } else {
-          result.add(const TextSpan(text: ' '));
-          result.add(TextSpan(text: word));
-        }
-      }
-    }
-
-    if (ircMessage.command == 'CLEARCHAT' || ircMessage.command == 'CLEARMSG') {
+    if (ircMessage.command == Command.clearChat || ircMessage.command == Command.clearMessage) {
       final banDuration = ircMessage.tags['ban-duration'];
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -255,10 +170,10 @@ abstract class _ChatStoreBase with Store {
             children: [
               ChatMessage(
                 key: Key(ircMessage.tags['id']!),
-                children: result,
+                children: span,
               ),
               banDuration == null
-                  ? (ircMessage.command == 'CLEARMSG')
+                  ? (ircMessage.command == Command.clearMessage)
                       ? const Text('Message deleted.')
                       : const Text('Permanently Banned.')
                   : Text(
@@ -269,19 +184,22 @@ abstract class _ChatStoreBase with Store {
           ),
         ),
       );
-    } else if (ircMessage.command == 'USERNOTICE') {
+    } else if (ircMessage.command == Command.userNotice) {
       return Container(
         color: Colors.purple.withOpacity(0.25),
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              ircMessage.tags['system-msg']!,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             if (ircMessage.message != null)
               ChatMessage(
                 key: Key(ircMessage.tags['id']!),
-                children: result,
+                children: span,
               ),
-            Text(ircMessage.tags['system-msg']!),
           ],
         ),
       );
@@ -290,7 +208,7 @@ abstract class _ChatStoreBase with Store {
         padding: const EdgeInsets.symmetric(vertical: 5.0),
         child: ChatMessage(
           key: ircMessage.tags['id'] == null ? null : Key(ircMessage.tags['id']!),
-          children: result,
+          children: span,
         ),
       );
     }
@@ -324,22 +242,4 @@ abstract class _ChatStoreBase with Store {
     _textController.dispose();
     _scrollController.dispose();
   }
-}
-
-// https://stackoverflow.com/questions/50081213/how-do-i-use-hexadecimal-color-strings-in-flutter
-extension HexColor on Color {
-  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
-  static Color fromHex(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
-  }
-
-  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
-      '${alpha.toRadixString(16).padLeft(2, '0')}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
 }
