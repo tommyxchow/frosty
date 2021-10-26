@@ -47,22 +47,33 @@ mixin _$ChatStore on _ChatStoreBase, Store {
       ActionController(name: '_ChatStoreBase');
 
   @override
-  void _handleWebsocketData(String data) {
+  void _handleIRCData(String data) {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase._handleWebsocketData');
+        name: '_ChatStoreBase._handleIRCData');
     try {
-      return super._handleWebsocketData(data);
+      return super._handleIRCData(data);
     } finally {
       _$_ChatStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void _scrollToEnd() {
+  void sendMessage(String message) {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase._scrollToEnd');
+        name: '_ChatStoreBase.sendMessage');
     try {
-      return super._scrollToEnd();
+      return super.sendMessage(message);
+    } finally {
+      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _deleteAndScrollToEnd() {
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
+        name: '_ChatStoreBase._deleteAndScrollToEnd');
+    try {
+      return super._deleteAndScrollToEnd();
     } finally {
       _$_ChatStoreBaseActionController.endAction(_$actionInfo);
     }
