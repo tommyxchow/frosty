@@ -49,7 +49,7 @@ class IRC {
   }
 
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
-  static List<InlineSpan> generateSpan({required IRCMessage ircMessage, required assetToUrl}) {
+  static List<InlineSpan> generateSpan({required IRCMessage ircMessage, required Map<String, String> assetToUrl}) {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
