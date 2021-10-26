@@ -209,8 +209,6 @@ abstract class _ChatStoreBase with Store {
         await FFZ.getEmotesChannel(id: channelInfo.id),
         await BTTV.getEmotesGlobal(),
         await BTTV.getEmotesChannel(id: channelInfo.id),
-        await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
-        await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
         await Twitch.getBadgesGlobal(headers: auth.headersTwitch),
         await Twitch.getBadgesChannel(id: channelInfo.id, headers: auth.headersTwitch),
         await SevenTV.getEmotesGlobal(),

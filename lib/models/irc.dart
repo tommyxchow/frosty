@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:frosty/api/irc_api.dart';
 
+/// The object representation of a Twitch IRC message.
 class IRCMessage {
   final Map<String, String> tags;
   final String? user;
@@ -56,9 +57,8 @@ class IRCMessage {
     // If there is an associated message, set it.
     final String? message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1) : null;
 
-    // Parse the command.
+    // Check and parse the command.
     // The majority of messages will be PRIVMSG, so check that first.
-    // Else, loop each possible command and match the correct one.
     final Command messageCommand;
     switch (splitMessage[1]) {
       case 'PRIVMSG':
@@ -96,6 +96,7 @@ class IRCMessage {
   }
 }
 
+/// The object representation of the IRC ROOMSTATE message.
 class ROOMSTATE {
   final String emoteOnly;
   final String followersOnly;
@@ -111,7 +112,7 @@ class ROOMSTATE {
     this.subMode = "0",
   });
 
-  // Create a new copy with the paremeters from the provided [IRCMessage]
+  /// Create a new copy with the paremeters from the provided [IRCMessage]
   ROOMSTATE copyWith(IRCMessage ircMessage) {
     return ROOMSTATE(
       emoteOnly: ircMessage.tags['emote-only'] ?? emoteOnly,

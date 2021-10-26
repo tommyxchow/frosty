@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:frosty/models/irc.dart';
 
 class IRC {
-  // Applies the given CLEARCHAT message to a list and returns the result.
+  /// Applies the given CLEARCHAT message to the given list of messages.
   static void clearChat({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     // If there is no message, it means that entire chat was cleared.
     if (ircMessage.message == null) {
@@ -20,10 +20,13 @@ class IRC {
     final bannedUser = ircMessage.message;
     final banDuration = ircMessage.tags['ban-duration'];
 
+    // Search the messages for the banned/timed-out user.
     messages.asMap().forEach((i, message) {
       if (message.user == bannedUser) {
+        // Mark the message for removal.
         messages[i].command = Command.clearChat;
 
+        // If timed-out, indicate the duration.
         if (banDuration != null) {
           messages[i].tags['ban-duration'] = banDuration;
         }
@@ -31,7 +34,7 @@ class IRC {
     });
   }
 
-  // Applies the given CLEARMSG message to a list and returns the result.
+  /// Applies the given CLEARMSG message to the given list of messages.
   static void clearMessage({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     // final targetUser = ircMessage.tags['login'];
     final targetId = ircMessage.tags['target-msg-id'];
@@ -45,13 +48,15 @@ class IRC {
     }
   }
 
+  /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
   static List<InlineSpan> generateSpan({required IRCMessage ircMessage, required assetToUrl}) {
-    // Initialize the span list that will be used to render the chat message
+    // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
-    final localAssetToUrl = <String, String>{};
+    // The map containing emotes from the user's tags to their URL.
+    // This may include sub emotes that they can access but other users cannot.
+    final localEmoteToUrl = <String, String>{};
 
-    // Parse the message's 'emotes' tag if they exist and store them for later use.
     final emoteTags = ircMessage.tags['emotes'];
     if (emoteTags != null) {
       // Emotes and their indices are separated by '/' so split them there.
@@ -79,7 +84,7 @@ class IRC {
         final emoteWord = ircMessage.message!.substring(startIndex, endIndex + 1);
 
         // Store the emote word and its associated URL for later use.
-        localAssetToUrl[emoteWord] = 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0';
+        localEmoteToUrl[emoteWord] = 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0';
       }
     }
 
@@ -128,7 +133,7 @@ class IRC {
       for (final word in words) {
         span.add(const TextSpan(text: ' '));
 
-        final emoteUrl = assetToUrl[word] ?? localAssetToUrl[word];
+        final emoteUrl = assetToUrl[word] ?? localEmoteToUrl[word];
         if (emoteUrl != null) {
           span.add(
             WidgetSpan(
@@ -151,6 +156,7 @@ class IRC {
   }
 }
 
+/// The possible types of Twitch IRC commands.
 enum Command {
   privateMessage,
   clearChat,
