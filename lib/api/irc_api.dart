@@ -130,11 +130,23 @@ class IRC {
     final message = ircMessage.message;
     if (message != null) {
       final words = message.split(' ');
+
+      // Discard the last word if it is only the INVALID/UNDEFINED Unicode character.
+      // Rendering this character on iOS shows a question mark inside inside square.
+      // This character is used by some clients to bypass restrictions on repeating message.
+      if (words.last.contains('\u{E0000}')) words.removeLast();
+
+      final buffer = StringBuffer();
+
       for (final word in words) {
-        span.add(const TextSpan(text: ' '));
+        buffer.write(' ');
 
         final emoteUrl = assetToUrl[word] ?? localEmoteToUrl[word];
         if (emoteUrl != null) {
+          span.add(TextSpan(text: buffer.toString()));
+
+          buffer.clear();
+
           span.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
@@ -147,8 +159,12 @@ class IRC {
             ),
           );
         } else {
-          span.add(TextSpan(text: word));
+          buffer.write(word);
         }
+      }
+
+      if (buffer.isNotEmpty) {
+        span.add(TextSpan(text: buffer.toString()));
       }
     }
 
