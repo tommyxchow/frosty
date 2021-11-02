@@ -24,7 +24,7 @@ abstract class _ChatStoreBase with Store {
   /// The list of chat messages to render and display.
   final messages = ObservableList<IRCMessage>();
 
-  /// The map of badges and emote words to their image/gif URL.
+  /// The map of badges and emote words to their image or GIF URL.
   final _assetToUrl = <String, String>{};
 
   /// The scroll controller that controls auto-scroll and resume-scroll behavior.
@@ -50,7 +50,7 @@ abstract class _ChatStoreBase with Store {
 
   /// The rules and modes being used in the chat.
   @readonly
-  var _roomState = ROOMSTATE();
+  var _roomState = const ROOMSTATE();
 
   _ChatStoreBase({required this.auth, required this.channelName}) {
     // Listen for new messages and forward them to the handler.
@@ -75,7 +75,7 @@ abstract class _ChatStoreBase with Store {
       'JOIN #$channelName',
     ];
 
-    // Send each command in-order.
+    // Send each command in order.
     for (final command in commands) {
       _channel.sink.add(command);
     }
@@ -99,9 +99,8 @@ abstract class _ChatStoreBase with Store {
   @action
   void _handleIRCData(String data) {
     // The IRC data can contain more than one message separated by CRLF.
-    // To account for this, split by CRLF. Then loop and process each message.
-    for (final message in data.substring(0, data.length - 2).split('\r\n')) {
-      // debugPrint(message);
+    // To account for this, split by CRLF, then loop and process each message.
+    for (final message in data.trimRight().split('\r\n')) {
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message);
 
@@ -131,7 +130,6 @@ abstract class _ChatStoreBase with Store {
           case Command.globalUserState:
             // Updates the current global user state data (it includes user-id),
             // Don't really see a use for it when USERSTATE exists, so leaving it unimplemented for now.
-            // _globalUserState = message;
             break;
           default:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
@@ -209,6 +207,8 @@ abstract class _ChatStoreBase with Store {
         await FFZ.getEmotesChannel(id: channelInfo.id),
         await BTTV.getEmotesGlobal(),
         await BTTV.getEmotesChannel(id: channelInfo.id),
+        await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
+        await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
         await Twitch.getBadgesGlobal(headers: auth.headersTwitch),
         await Twitch.getBadgesChannel(id: channelInfo.id, headers: auth.headersTwitch),
         await SevenTV.getEmotesGlobal(),
@@ -230,6 +230,7 @@ abstract class _ChatStoreBase with Store {
     final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
 
     if (ircMessage.command == Command.clearChat || ircMessage.command == Command.clearMessage) {
+      // Render timeouts and bans
       final banDuration = ircMessage.tags['ban-duration'];
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
@@ -256,15 +257,14 @@ abstract class _ChatStoreBase with Store {
         ),
       );
     } else if (ircMessage.command == Command.userNotice) {
+      // Render sub alerts
       return Container(
         color: Colors.purple.withOpacity(0.3),
         padding: const EdgeInsets.all(5.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              ircMessage.tags['system-msg']!,
-            ),
+            Text(ircMessage.tags['system-msg']!),
             const SizedBox(height: 5),
             if (ircMessage.message != null)
               ChatMessage(
@@ -275,6 +275,7 @@ abstract class _ChatStoreBase with Store {
         ),
       );
     } else {
+      // Render normal chat message (PRIVMSG).
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0),
         child: ChatMessage(

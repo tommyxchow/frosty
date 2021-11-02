@@ -31,6 +31,8 @@ class _ChatState extends State<Chat> {
                     Observer(
                       builder: (_) {
                         return ListView.builder(
+                          addAutomaticKeepAlives: false,
+                          addRepaintBoundaries: false,
                           itemCount: widget.chatStore.messages.length,
                           controller: widget.chatStore.scrollController,
                           padding: const EdgeInsets.all(5.0),

@@ -13,9 +13,9 @@ class IRCMessage {
   /// Parses an IRC string and returns its corresponding [IRCMessage] object.
   factory IRCMessage.fromString(String whole) {
     // We have three parts:
-    // 1. The tags of the IRC message
-    // 2. The metadata (user, command, and channel)
-    // 3. The message itself
+    // 1. The tags of the IRC message.
+    // 2. The metadata (user, command, and channel).
+    // 3. The message itself.
 
     // First, slice the message tags (1) and set aside the rest for later.
     // Each part is separated by a space, so we'll start off by breaking off the tags and parsing them.
@@ -104,7 +104,7 @@ class ROOMSTATE {
   final String slowMode;
   final String subMode;
 
-  ROOMSTATE({
+  const ROOMSTATE({
     this.emoteOnly = "0",
     this.followersOnly = "0",
     this.r9k = "0",
@@ -112,7 +112,7 @@ class ROOMSTATE {
     this.subMode = "0",
   });
 
-  /// Create a new copy with the paremeters from the provided [IRCMessage]
+  /// Create a new copy with the parameters from the provided [IRCMessage]
   ROOMSTATE copyWith(IRCMessage ircMessage) {
     return ROOMSTATE(
       emoteOnly: ircMessage.tags['emote-only'] ?? emoteOnly,
