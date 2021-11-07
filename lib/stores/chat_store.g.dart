@@ -9,37 +9,71 @@ part of 'chat_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ChatStore on _ChatStoreBase, Store {
-  final _$autoScrollAtom = Atom(name: '_ChatStoreBase.autoScroll');
+  final _$_autoScrollAtom = Atom(name: '_ChatStoreBase._autoScroll');
 
-  @override
   bool get autoScroll {
-    _$autoScrollAtom.reportRead();
-    return super.autoScroll;
+    _$_autoScrollAtom.reportRead();
+    return super._autoScroll;
   }
 
   @override
-  set autoScroll(bool value) {
-    _$autoScrollAtom.reportWrite(value, super.autoScroll, () {
-      super.autoScroll = value;
+  bool get _autoScroll => autoScroll;
+
+  @override
+  set _autoScroll(bool value) {
+    _$_autoScrollAtom.reportWrite(value, super._autoScroll, () {
+      super._autoScroll = value;
     });
   }
 
-  final _$getAssetsAsyncAction = AsyncAction('_ChatStoreBase.getAssets');
+  final _$_roomStateAtom = Atom(name: '_ChatStoreBase._roomState');
+
+  ROOMSTATE get roomState {
+    _$_roomStateAtom.reportRead();
+    return super._roomState;
+  }
 
   @override
-  Future<void> getAssets() {
-    return _$getAssetsAsyncAction.run(() => super.getAssets());
+  ROOMSTATE get _roomState => roomState;
+
+  @override
+  set _roomState(ROOMSTATE value) {
+    _$_roomStateAtom.reportWrite(value, super._roomState, () {
+      super._roomState = value;
+    });
   }
 
   final _$_ChatStoreBaseActionController =
       ActionController(name: '_ChatStoreBase');
 
   @override
-  void handleWebsocketData(Object? data) {
+  void _handleIRCData(String data) {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.handleWebsocketData');
+        name: '_ChatStoreBase._handleIRCData');
     try {
-      return super.handleWebsocketData(data);
+      return super._handleIRCData(data);
+    } finally {
+      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void sendMessage(String message) {
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
+        name: '_ChatStoreBase.sendMessage');
+    try {
+      return super.sendMessage(message);
+    } finally {
+      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _deleteAndScrollToEnd() {
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
+        name: '_ChatStoreBase._deleteAndScrollToEnd');
+    try {
+      return super._deleteAndScrollToEnd();
     } finally {
       _$_ChatStoreBaseActionController.endAction(_$actionInfo);
     }
@@ -59,7 +93,7 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   @override
   String toString() {
     return '''
-autoScroll: ${autoScroll}
+
     ''';
   }
 }

@@ -5,16 +5,17 @@ import 'package:frosty/models/channel.dart';
 
 part 'channel_list_store.g.dart';
 
+// TODO: Fix followed list refresh when log in.
 class ChannelListStore = _ChannelListBase with _$ChannelListStore;
 
 abstract class _ChannelListBase with Store {
   /// The list of the fetched top channels
   @observable
-  ObservableList<Channel> _topChannels = ObservableList<Channel>();
+  var _topChannels = ObservableList<Channel>();
 
   /// The list of the fetched followed channels
   @observable
-  ObservableList<Channel> _followedChannels = ObservableList<Channel>();
+  var _followedChannels = ObservableList<Channel>();
 
   /// The loading status for pagination.
   bool _isLoading = false;

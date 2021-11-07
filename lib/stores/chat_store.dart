@@ -1,10 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/irc_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/models/irc.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/widgets/chat_message.dart';
 import 'package:mobx/mobx.dart';
@@ -12,53 +14,194 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'chat_store.g.dart';
 
+/// The store and view-model for chat-related activities.
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
-  @observable
-  bool autoScroll = true;
+  /// The Twitch IRC WebSocket channel.
+  final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
-  List<String> messages = [];
+  /// The list of chat messages to render and display.
+  final messages = ObservableList<IRCMessage>();
 
-  final channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
-
+  /// The map of badges and emote words to their image or GIF URL.
   final _assetToUrl = <String, String>{};
-  final _emoteIdToWord = <String, String>{};
 
-  final scrollController = ScrollController();
+  /// The scroll controller that controls auto-scroll and resume-scroll behavior.
+  final _scrollController = ScrollController();
+  ScrollController get scrollController => _scrollController;
 
+  /// The text controller that handles the TextField inputs and sending of messages.
+  final _textController = TextEditingController();
+  TextEditingController get textController => _textController;
+
+  /// The name of the channel to connect to.
   final String channelName;
+
+  /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
 
+  /// The logged-in user's appearance in chat.
+  String? _userState;
+
+  /// If the chat should automatically scroll/jump to the latest message.
+  @readonly
+  var _autoScroll = true;
+
+  /// The rules and modes being used in the chat.
+  @readonly
+  var _roomState = const ROOMSTATE();
+
   _ChatStoreBase({required this.auth, required this.channelName}) {
+    // Listen for new messages and forward them to the handler.
+    _channel.stream.listen(
+      (data) => _handleIRCData(data.toString()),
+      onDone: () => debugPrint("Disconnected from $channelName's chat."),
+    );
+
+    // The list of messages sent to the IRC WebSocket channel to connect and join.
     final commands = [
+      // Request the tags and commands capabilities.
+      // This will display tags containing metadata along with each IRC message.
+      'CAP REQ :twitch.tv/tags twitch.tv/commands',
+
+      // The OAuth token in order to connect, default or user token.
       'PASS oauth:${auth.token}',
-      'NICK justinfan888',
-      'CAP REQ :twitch.tv/tags',
-      'CAP REQ :twitch.tv/commands',
-      // 'CAP REQ :twitch.tv/membership',
-      'CAP END',
+
+      // The nickname for the connecting user. 'justinfan888' is the Twitch default if not logged in.
+      'NICK ${auth.isLoggedIn ? auth.user!.login : 'justinfan888'}',
+
+      // Join the desired channel's room.
       'JOIN #$channelName',
     ];
 
+    // Send each command in order.
     for (final command in commands) {
-      channel.sink.add(command);
+      _channel.sink.add(command);
     }
 
-    scrollController.addListener(() {
-      if (!scrollController.position.atEdge && scrollController.position.pixels < scrollController.position.maxScrollExtent) {
-        autoScroll = false;
-      } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
-        autoScroll = true;
+    // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
+    _scrollController.addListener(() {
+      // If the user scrolls up, auto-scroll will stop, allowing them to freely scroll back to previous messages.
+      // Else if the user scrolls back to the bottom edge (latest message), auto-scroll will resume.
+      if (!_scrollController.position.atEdge && _scrollController.position.pixels < _scrollController.position.maxScrollExtent) {
+        _autoScroll = false;
+      } else if (_scrollController.position.atEdge && _scrollController.position.pixels != _scrollController.position.minScrollExtent) {
+        _autoScroll = true;
       }
     });
   }
 
+  /// Handle and process the provided string-representation of the IRC data.
+  ///
+  /// If a message, parses the IRC data into an [IRCMessage] and handles it based on the [Command].
+  /// Else if a PING request, sends back the PONG to keep the connection alive.
   @action
+  void _handleIRCData(String data) {
+    // The IRC data can contain more than one message separated by CRLF.
+    // To account for this, split by CRLF, then loop and process each message.
+    for (final message in data.trimRight().split('\r\n')) {
+      if (message.startsWith('@')) {
+        final parsedIRCMessage = IRCMessage.fromString(message);
+
+        switch (parsedIRCMessage.command) {
+          case Command.privateMessage:
+            messages.add(parsedIRCMessage);
+            _deleteAndScrollToEnd();
+            break;
+          case Command.clearChat:
+            IRC.clearChat(messages: messages, ircMessage: parsedIRCMessage);
+            _deleteAndScrollToEnd();
+            break;
+          case Command.clearMessage:
+            IRC.clearMessage(messages: messages, ircMessage: parsedIRCMessage);
+            _deleteAndScrollToEnd();
+            break;
+          case Command.userNotice:
+            messages.add(parsedIRCMessage);
+            _deleteAndScrollToEnd();
+            break;
+          case Command.roomState:
+            _roomState = _roomState.copyWith(parsedIRCMessage);
+            break;
+          case Command.userState:
+            _userState = message;
+            break;
+          case Command.globalUserState:
+            // Updates the current global user state data (it includes user-id),
+            // Don't really see a use for it when USERSTATE exists, so leaving it unimplemented for now.
+            break;
+          default:
+            debugPrint('Unknown command: ${parsedIRCMessage.command}');
+        }
+      } else if (message == 'PING :tmi.twitch.tv') {
+        _channel.sink.add('PONG :tmi.twitch.tv');
+        return;
+      }
+    }
+  }
+
+  /// Sends the given string message by the logged-in user and adds it to [messages].
+  @action
+  void sendMessage(String message) {
+    // Do not send if the message is blank/empty.
+    if (message.isEmpty) {
+      return;
+    }
+
+    // Send the message to the IRC chat room.
+    _channel.sink.add('PRIVMSG #$channelName :$message');
+
+    // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
+    final userChatMessage = IRCMessage.fromString(_userState!);
+    userChatMessage.message = message;
+    messages.add(userChatMessage);
+
+    // Clear the previous input in the TextField.
+    _textController.clear();
+  }
+
+  /// If [_autoScroll] is enabled, removes messages if [messages] is too large and scrolls to the latest message.
+  @action
+  void _deleteAndScrollToEnd() {
+    if (_autoScroll) {
+      // If there are over 200 messages, remove at least 20.
+      if (messages.length > 200) {
+        messages.removeRange(0, messages.length - 180);
+      }
+
+      // After the end of the frame, scroll to the bottom of the chat.
+      // This is a postFrameCallback because the chat should scroll after the widget is built and rendered.
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      });
+    }
+  }
+
+  /// Re-enables [_autoScroll] and jumps to the latest message.
+  @action
+  void resumeScroll() {
+    _autoScroll = true;
+
+    // Jump to the latest message (bottom of the list/chat).
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+
+    // Schedule a postFrameCallback in the event a new message is added at the same time.
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+  }
+
+  /// Fetches global and channel assets (badges and emotes) and stores them in [_assetToUrl]
   Future<void> getAssets() async {
+    // Fetch the desired channel/user's information.
     final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
 
     if (channelInfo != null) {
+      // Fetch the global and channel's assets (emotes & badges).
+      // Async awaits are placed in a list so they are performed in parallel.
       final assets = [
         await FFZ.getEmotesGlobal(),
         await FFZ.getEmotesChannel(id: channelInfo.id),
@@ -72,6 +215,8 @@ abstract class _ChatStoreBase with Store {
         await SevenTV.getEmotesChannel(user: channelInfo.login)
       ];
 
+      // Add all the assets to the global word-to-asset map.
+      // 'Global' meaning these assets can be used by any message when rendering.
       for (final map in assets) {
         if (map != null) {
           _assetToUrl.addAll(map);
@@ -80,188 +225,71 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
-  @action
-  void handleWebsocketData(Object? data) {
-    for (final message in data.toString().split('\r\n')) {
-      if (message.startsWith('@')) {
-        messages.add(message);
-        continue;
-      }
-      if (message.startsWith('P')) {
-        channel.sink.add('PONG :tmi.twitch.tv');
-        continue;
-      }
-    }
-  }
+  /// Returns a chat message widget for the given [IRCMessage].
+  Widget renderChatMessage(IRCMessage ircMessage) {
+    final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
 
-  Widget parseIrcMessage(String whole) {
-    var mappedTags = <String, String>{};
-
-    final tagAndIrcMessageDivider = whole.indexOf(' ');
-    final tags = whole.substring(1, tagAndIrcMessageDivider).replaceAll('\\s', ' ');
-    final ircMessage = whole.substring(tagAndIrcMessageDivider + 2);
-
-    for (final tag in tags.split(';')) {
-      if (!tag.endsWith('=')) {
-        final tagSplit = tag.split('=');
-        mappedTags[tagSplit[0]] = tagSplit[1];
-      }
-    }
-
-    final splitMessage = ircMessage.split(' ');
-
-    // final user = splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
-    // print(user);
-
-    final command = splitMessage[1];
-
-    switch (command) {
-      case 'CLEARCHAT':
-        break;
-      case 'CLEARMSG':
-        break;
-      case 'GLOBALUSERSTATE':
-        break;
-      case 'PRIVMSG':
-        final message = splitMessage.sublist(3).join(' ').substring(1);
-
-        if (autoScroll) {
-          SchedulerBinding.instance?.addPostFrameCallback((_) {
-            scrollController.jumpTo(scrollController.position.maxScrollExtent);
-          });
-        }
-        return ChatMessage(
-          key: Key(mappedTags['id']!),
-          children: privateMessage(tags: mappedTags, chatMessage: message),
-        );
-
-      case 'ROOMSTATE':
-        break;
-      case 'USERNOTICE':
-        break;
-      case 'USERSTATE':
-        break;
-    }
-    return const SizedBox();
-  }
-
-  List<InlineSpan> privateMessage({required Map<String, String> tags, required String chatMessage}) {
-    // debugPrint(chatMessage);
-    var result = <InlineSpan>[];
-
-    final emoteTags = tags['emotes'];
-    if (emoteTags != null) {
-      final emotes = emoteTags.split('/');
-
-      for (final emoteIdAndPosition in emotes) {
-        final indexBetweenIdAndPositions = emoteIdAndPosition.indexOf(':');
-        final emoteId = emoteIdAndPosition.substring(0, indexBetweenIdAndPositions);
-
-        if (_emoteIdToWord[emoteId] != null) {
-          continue;
-        }
-
-        final String range;
-        if (emoteIdAndPosition.contains(',')) {
-          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1, emoteIdAndPosition.indexOf(','));
-        } else {
-          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1);
-        }
-
-        final indexSplit = range.split('-');
-        final startIndex = int.parse(indexSplit[0]);
-        final endIndex = int.parse(indexSplit[1]);
-
-        final emoteWord = chatMessage.substring(startIndex, endIndex + 1);
-
-        _emoteIdToWord[emoteId] = emoteWord;
-        _assetToUrl[emoteWord] = 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0';
-      }
-    }
-
-    final words = chatMessage.split(' ');
-    final badges = tags['badges'];
-    if (badges != null) {
-      for (final badge in badges.split(',')) {
-        final badgeUrl = _assetToUrl[badge];
-        if (badgeUrl != null) {
-          result.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: CachedNetworkImage(
-                imageUrl: badgeUrl,
-                placeholder: (context, url) => const SizedBox(),
-                fadeInDuration: const Duration(seconds: 0),
-                height: 20,
+    if (ircMessage.command == Command.clearChat || ircMessage.command == Command.clearMessage) {
+      // Render timeouts and bans
+      final banDuration = ircMessage.tags['ban-duration'];
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: Opacity(
+          opacity: 0.50,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ChatMessage(
+                key: Key(ircMessage.tags['id']!),
+                children: span,
               ),
-            ),
-          );
-          result.add(const TextSpan(text: ' '));
-        }
-      }
-    }
-
-    result.add(
-      TextSpan(
-        text: tags['display-name']!,
-        style: TextStyle(
-          color: HexColor.fromHex(tags['color'] ?? '#868686'),
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-
-    result.add(
-      const TextSpan(text: ':'),
-    );
-
-    for (final word in words) {
-      final emoteUrl = _assetToUrl[word];
-      if (emoteUrl != null) {
-        result.add(const TextSpan(text: ' '));
-        result.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: CachedNetworkImage(
-              imageUrl: emoteUrl,
-              placeholder: (context, url) => const SizedBox(),
-              fadeInDuration: const Duration(seconds: 0),
-              height: 25,
-            ),
+              const SizedBox(height: 5),
+              banDuration == null
+                  ? (ircMessage.command == Command.clearMessage)
+                      ? const Text('Message deleted.')
+                      : const Text('Permanently Banned.')
+                  : Text(
+                      'Timed out for $banDuration second(s).',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+            ],
           ),
-        );
-      } else {
-        result.add(const TextSpan(text: ' '));
-        result.add(TextSpan(text: word));
-      }
+        ),
+      );
+    } else if (ircMessage.command == Command.userNotice) {
+      // Render sub alerts
+      return Container(
+        color: Colors.purple.withOpacity(0.3),
+        padding: const EdgeInsets.all(5.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(ircMessage.tags['system-msg']!),
+            const SizedBox(height: 5),
+            if (ircMessage.message != null)
+              ChatMessage(
+                key: Key(ircMessage.tags['id']!),
+                children: span,
+              ),
+          ],
+        ),
+      );
+    } else {
+      // Render normal chat message (PRIVMSG).
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        child: ChatMessage(
+          key: ircMessage.tags['id'] == null ? null : Key(ircMessage.tags['id']!),
+          children: span,
+        ),
+      );
     }
-    return result;
   }
 
-  @action
-  void resumeScroll() {
-    autoScroll = true;
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
+  /// Closes and disposes all the channels and controllers used by the store.
+  void dispose() {
+    _channel.sink.close();
+    _textController.dispose();
+    _scrollController.dispose();
   }
-}
-
-// https://stackoverflow.com/questions/50081213/how-do-i-use-hexadecimal-color-strings-in-flutter
-extension HexColor on Color {
-  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
-  static Color fromHex(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
-  }
-
-  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
-      '${alpha.toRadixString(16).padLeft(2, '0')}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
 }
