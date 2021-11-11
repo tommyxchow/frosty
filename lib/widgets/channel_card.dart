@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/video_chat.dart';
@@ -18,7 +17,7 @@ class ChannelCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            CupertinoPageRoute(
+            MaterialPageRoute(
               builder: (context) {
                 return VideoChat(
                   userLogin: channelInfo.userLogin,

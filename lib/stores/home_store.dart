@@ -13,6 +13,9 @@ abstract class _HomeStoreBase with Store {
 
   @action
   void handleTap(int index) {
+    if (index == 3) {
+      search = !search;
+    }
     if (index != selectedIndex) {
       selectedIndex = index;
     }

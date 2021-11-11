@@ -11,7 +11,7 @@ class ChannelList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build channel list');
+    debugPrint('Build channel list!');
 
     return RefreshIndicator(
       child: Observer(

@@ -32,7 +32,10 @@ class MyApp extends StatelessWidget {
             ),
             home: Scaffold(
               body: FutureBuilder(
-                future: context.read<AuthStore>().init(),
+                future: Future.wait([
+                  context.read<AuthStore>().init(),
+                  context.read<SettingsStore>().init(),
+                ]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     return Home(

@@ -1,14 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/screens/video_chat.dart';
+import 'package:frosty/screens/search.dart';
+import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/channel_list_store.dart';
 import 'package:frosty/stores/home_store.dart';
-import 'package:frosty/widgets/drawer_menu.dart';
+import 'package:frosty/stores/settings_store.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'channel_list.dart';
+import '../widgets/channel_list.dart';
 
 class Home extends StatefulWidget {
   final HomeStore homeStore;
@@ -29,55 +29,49 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final titles = [if (context.read<AuthStore>().isLoggedIn) 'Followed Channels', 'Top Channels', 'Categories'];
+    final titles = [
+      if (context.read<AuthStore>().isLoggedIn) 'Followed Channels',
+      'Top Channels',
+      'Categories',
+      'Search',
+    ];
 
     debugPrint('build home');
     return Scaffold(
       appBar: AppBar(
         title: Observer(
           builder: (_) {
-            return widget.homeStore.search
-                ? TextField(
-                    controller: _textController,
-                    autocorrect: false,
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: 'Search for a channel',
-                    ),
-                    onSubmitted: (string) async {
-                      if (await Twitch.getUser(userLogin: string, headers: context.read<AuthStore>().headersTwitch) != null) {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (_) {
-                              return VideoChat(
-                                userLogin: string,
-                              );
-                            },
-                          ),
-                        );
-                      } else {
-                        const snackBar = SnackBar(content: Text('User does not exist :('));
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                      widget.homeStore.search = false;
-                      _textController.clear();
-                    },
-                  )
-                : Text(titles[widget.homeStore.selectedIndex]);
+            return Text(
+              titles[widget.homeStore.selectedIndex],
+              style: GoogleFonts.daysOne(),
+            );
           },
         ),
         actions: [
           IconButton(
-            icon: Observer(builder: (_) => widget.homeStore.search ? const Icon(Icons.cancel) : const Icon(Icons.search)),
+            icon: const Icon(Icons.settings),
             onPressed: () {
-              widget.homeStore.search = !widget.homeStore.search;
-              _textController.clear();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  fullscreenDialog: true,
+                  builder: (context) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: Text(
+                          'Settings',
+                          style: GoogleFonts.daysOne(),
+                        ),
+                      ),
+                      body: Settings(settingsStore: context.read<SettingsStore>()),
+                    );
+                  },
+                ),
+              );
             },
           )
         ],
       ),
-      drawer: const DrawerMenu(),
       body: Observer(
         builder: (_) {
           return IndexedStack(
@@ -95,6 +89,7 @@ class _HomeState extends State<Home> {
               const Center(
                 child: Text('Games'),
               ),
+              const Search(),
             ],
           );
         },
@@ -103,6 +98,7 @@ class _HomeState extends State<Home> {
         child: Observer(
           builder: (_) {
             return BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
               items: [
                 if (context.read<AuthStore>().isLoggedIn)
                   const BottomNavigationBarItem(
@@ -116,6 +112,10 @@ class _HomeState extends State<Home> {
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.gamepad),
                   label: 'Categories',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.search),
+                  label: 'Search',
                 ),
               ],
               currentIndex: widget.homeStore.selectedIndex,
