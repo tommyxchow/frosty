@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/user.dart';
 import 'package:http/http.dart' as http;
@@ -156,7 +157,7 @@ class Twitch {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      return {'channels': data.map((channel) => Channel.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return {'channels': data.map((channel) => Stream.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
     } else {
       debugPrint('Failed to update top channels');
     }
@@ -178,7 +179,7 @@ class Twitch {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      return {'channels': data.map((channel) => Channel.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return {'channels': data.map((channel) => Stream.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
     } else {
       debugPrint('Failed to update followed channels');
     }
@@ -197,6 +198,22 @@ class Twitch {
       }
     } else {
       debugPrint('User does not exist');
+    }
+  }
+
+  /// Returns a channels's info associated with the given ID.
+  static Future<Channel?> getChannel({required String userId, required Map<String, String>? headers}) async {
+    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/channels?broadcaster_id=$userId'), headers: headers);
+    if (response.statusCode == 200) {
+      final channelData = jsonDecode(response.body)['data'] as List;
+
+      if (channelData.isNotEmpty) {
+        return Channel.fromJson(channelData.first);
+      } else {
+        debugPrint('Channel does not exist');
+      }
+    } else {
+      debugPrint('Channel does not exist');
     }
   }
 }

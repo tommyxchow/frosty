@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:frosty/models/channel.dart';
+import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/video_chat.dart';
 import 'package:intl/intl.dart';
 
 /// A card widget that displays a live channel's thumbnail and details.
 class ChannelCard extends StatelessWidget {
-  final Channel channelInfo;
+  final Stream channelInfo;
 
   const ChannelCard({Key? key, required this.channelInfo}) : super(key: key);
 
@@ -21,6 +21,7 @@ class ChannelCard extends StatelessWidget {
               builder: (context) {
                 return VideoChat(
                   userLogin: channelInfo.userLogin,
+                  userName: channelInfo.userName,
                 );
               },
             ),
