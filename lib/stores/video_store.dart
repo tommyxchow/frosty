@@ -33,12 +33,19 @@ abstract class _VideoStoreBase with Store {
   }
 
   void handleVideoTap() async {
-    menuVisible = true;
-    timer.cancel();
-    timer = Timer(const Duration(seconds: 5), () {
-      debugPrint('timer thing');
+    if (menuVisible) {
+      timer.cancel();
+
       menuVisible = false;
-    });
+    } else {
+      timer.cancel();
+      timer = Timer(const Duration(seconds: 5), () {
+        debugPrint('timer thing');
+        menuVisible = false;
+      });
+
+      menuVisible = true;
+    }
   }
 
   void removeOverlay() {
