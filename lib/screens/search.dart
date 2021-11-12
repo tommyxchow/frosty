@@ -16,43 +16,46 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _textController,
-      autocorrect: false,
-      decoration: const InputDecoration(
-        isDense: true,
-        contentPadding: EdgeInsets.all(8.0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: TextField(
+        controller: _textController,
+        autocorrect: false,
+        decoration: const InputDecoration(
+          isDense: true,
+          contentPadding: EdgeInsets.all(8.0),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15.0)),
+          ),
+          hintText: 'Search for a channel',
         ),
-        hintText: 'Search',
-      ),
-      onSubmitted: (string) async {
-        final user = await Twitch.getUser(userLogin: string, headers: context.read<AuthStore>().headersTwitch);
-        if (user != null) {
-          final channelInfo = await Twitch.getChannel(userId: user.id, headers: context.read<AuthStore>().headersTwitch);
-          if (channelInfo != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) {
-                  return VideoChat(
-                    userLogin: channelInfo.broadcasterLogin,
-                    userName: channelInfo.broadcasterName,
-                  );
-                },
-              ),
-            );
+        onSubmitted: (string) async {
+          final user = await Twitch.getUser(userLogin: string, headers: context.read<AuthStore>().headersTwitch);
+          if (user != null) {
+            final channelInfo = await Twitch.getChannel(userId: user.id, headers: context.read<AuthStore>().headersTwitch);
+            if (channelInfo != null) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) {
+                    return VideoChat(
+                      userLogin: channelInfo.broadcasterLogin,
+                      userName: channelInfo.broadcasterName,
+                    );
+                  },
+                ),
+              );
+            } else {
+              const snackBar = SnackBar(content: Text('Failed to get channel info :('));
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
           } else {
-            const snackBar = SnackBar(content: Text('Failed to get channel info :('));
+            const snackBar = SnackBar(content: Text('User does not exist :('));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
-        } else {
-          const snackBar = SnackBar(content: Text('User does not exist :('));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-        _textController.clear();
-      },
+          _textController.clear();
+        },
+      ),
     );
   }
 }

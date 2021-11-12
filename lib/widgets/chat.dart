@@ -77,13 +77,13 @@ class _ChatState extends State<Chat> {
                   if (context.read<AuthStore>().isLoggedIn)
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: TextField(
                           decoration: const InputDecoration(
                             isDense: true,
                             contentPadding: EdgeInsets.all(8.0),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                              borderRadius: BorderRadius.all(Radius.circular(15.0)),
                             ),
                             hintText: 'Send a message',
                           ),

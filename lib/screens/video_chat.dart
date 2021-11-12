@@ -20,47 +20,50 @@ class VideoChat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Observer(
-              builder: (_) {
-                if (context.read<SettingsStore>().videoEnabled) {
-                  return AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Video(
-                      channelName: userLogin,
-                      videoStore: VideoStore(),
-                      settingsStore: context.read<SettingsStore>(),
-                    ),
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Column(
+            children: [
+              Observer(
+                builder: (_) {
+                  if (context.read<SettingsStore>().videoEnabled) {
+                    return AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Video(
+                        channelName: userLogin,
+                        videoStore: VideoStore(),
+                        settingsStore: context.read<SettingsStore>(),
+                      ),
+                    );
+                  }
+                  return AppBar(
+                    title: Text(userName),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.settings),
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Settings(settingsStore: context.read<SettingsStore>());
+                            },
+                          );
+                        },
+                      ),
+                    ],
                   );
-                }
-                return AppBar(
-                  title: Text(userName),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Settings(settingsStore: context.read<SettingsStore>());
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-            Expanded(
-              child: Chat(
-                chatStore: ChatStore(
-                  auth: context.read<AuthStore>(),
-                  channelName: userLogin,
+                },
+              ),
+              Expanded(
+                child: Chat(
+                  chatStore: ChatStore(
+                    auth: context.read<AuthStore>(),
+                    channelName: userLogin,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
