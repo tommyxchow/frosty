@@ -28,17 +28,25 @@ class _SearchState extends State<Search> {
         hintText: 'Search',
       ),
       onSubmitted: (string) async {
-        if (await Twitch.getUser(userLogin: string, headers: context.read<AuthStore>().headersTwitch) != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) {
-                return VideoChat(
-                  userLogin: string,
-                );
-              },
-            ),
-          );
+        final user = await Twitch.getUser(userLogin: string, headers: context.read<AuthStore>().headersTwitch);
+        if (user != null) {
+          final channelInfo = await Twitch.getChannel(userId: user.id, headers: context.read<AuthStore>().headersTwitch);
+          if (channelInfo != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) {
+                  return VideoChat(
+                    userLogin: channelInfo.broadcasterLogin,
+                    userName: channelInfo.broadcasterName,
+                  );
+                },
+              ),
+            );
+          } else {
+            const snackBar = SnackBar(content: Text('Failed to get channel info :('));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
         } else {
           const snackBar = SnackBar(content: Text('User does not exist :('));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
