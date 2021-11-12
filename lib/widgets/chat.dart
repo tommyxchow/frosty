@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/chat_store.dart';
-import 'package:frosty/stores/settings_store.dart';
 import 'package:frosty/widgets/chat_stats.dart';
 import 'package:provider/provider.dart';
 
@@ -63,21 +61,6 @@ class _ChatState extends State<Chat> {
               ),
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return Settings(settingsStore: context.read<SettingsStore>());
-                        },
-                      );
-                    },
-                  ),
                   IconButton(
                     icon: const Icon(Icons.stacked_bar_chart),
                     onPressed: () {
