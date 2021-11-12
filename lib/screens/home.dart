@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
           builder: (_) {
             return Text(
               titles[widget.homeStore.selectedIndex],
-              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold),
             );
           },
         ),

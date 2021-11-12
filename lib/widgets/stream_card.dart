@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/video_chat.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
@@ -50,7 +51,7 @@ class StreamCard extends StatelessWidget {
                   children: [
                     Text(
                       streamInfo.userName,
-                      style: const TextStyle(fontSize: 16),
+                      style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     SingleChildScrollView(

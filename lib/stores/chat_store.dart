@@ -9,6 +9,7 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/widgets/chat_message.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -250,7 +251,7 @@ abstract class _ChatStoreBase with Store {
                       : const Text('Permanently Banned.')
                   : Text(
                       'Timed out for $banDuration second(s).',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: GoogleFonts.inter(fontWeight: FontWeight.bold),
                     ),
             ],
           ),
