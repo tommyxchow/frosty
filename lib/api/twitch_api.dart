@@ -141,14 +141,14 @@ class Twitch {
     return false;
   }
 
-  /// Returns a map with top 10 streamers and a cursor for further requests.
-  static Future<Map<String, dynamic>?> getTopChannels({required Map<String, String>? headers, required String? cursor}) async {
+  /// Returns a map containing top 20 streams and a cursor for further requests.
+  static Future<Map<String, dynamic>?> getTopStreams({required Map<String, String>? headers, required String? cursor}) async {
     final Uri uri;
 
     if (cursor == null) {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams?first=10');
+      uri = Uri.parse('https://api.twitch.tv/helix/streams');
     } else {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams?first=10&after=$cursor');
+      uri = Uri.parse('https://api.twitch.tv/helix/streams?after=$cursor');
     }
 
     final response = await http.get(uri, headers: headers);
@@ -157,20 +157,20 @@ class Twitch {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      return {'channels': data.map((channel) => Stream.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return {'streams': data.map((stream) => Stream.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
     } else {
-      debugPrint('Failed to update top channels');
+      debugPrint('Failed to update top streams');
     }
   }
 
-  /// Returns a map with the given user's top 10 followed streamers and a cursor for further requests.
-  static Future<Map<String, dynamic>?> getFollowedChannels({required String id, required Map<String, String>? headers, required String? cursor}) async {
+  /// Returns a map with the given user's top 20 followed streams and a cursor for further requests.
+  static Future<Map<String, dynamic>?> getFollowedStreams({required String id, required Map<String, String>? headers, required String? cursor}) async {
     final Uri uri;
 
     if (cursor == null) {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams/followed?first=10&user_id=$id');
+      uri = Uri.parse('https://api.twitch.tv/helix/streams/followed?user_id=$id');
     } else {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams/followed?user_id=$id&first=10&after=$cursor');
+      uri = Uri.parse('https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
     }
 
     final response = await http.get(uri, headers: headers);
@@ -179,9 +179,9 @@ class Twitch {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      return {'channels': data.map((channel) => Stream.fromJson(channel)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return {'streams': data.map((stream) => Stream.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
     } else {
-      debugPrint('Failed to update followed channels');
+      debugPrint('Failed to update followed streams');
     }
   }
 

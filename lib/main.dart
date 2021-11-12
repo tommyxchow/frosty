@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home.dart';
 import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/stores/channel_list_store.dart';
+import 'package:frosty/stores/stream_list_store.dart';
 import 'package:frosty/stores/home_store.dart';
 import 'package:frosty/stores/settings_store.dart';
 import 'package:provider/provider.dart';
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     return Home(
-                      channelListStore: ChannelListStore(authStore: context.read<AuthStore>()),
+                      streamListStore: StreamListStore(authStore: context.read<AuthStore>()),
                       homeStore: HomeStore(),
                     );
                   }

@@ -4,7 +4,7 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 
 ## Features
 
-- Browse top and followed channels on Twitch
+- Browse top and followed streams on Twitch
 - Watch live streams with live chat
 - Support for BTTV, FFZ, and 7TV emotes, including GIFs
 

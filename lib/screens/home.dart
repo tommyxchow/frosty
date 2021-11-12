@@ -3,21 +3,21 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/search.dart';
 import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/stores/channel_list_store.dart';
+import 'package:frosty/stores/stream_list_store.dart';
 import 'package:frosty/stores/home_store.dart';
 import 'package:frosty/stores/settings_store.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../widgets/channel_list.dart';
+import '../widgets/stream_list.dart';
 
 class Home extends StatefulWidget {
   final HomeStore homeStore;
-  final ChannelListStore channelListStore;
+  final StreamListStore streamListStore;
 
   const Home({
     Key? key,
     required this.homeStore,
-    required this.channelListStore,
+    required this.streamListStore,
   }) : super(key: key);
 
   @override
@@ -30,8 +30,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final titles = [
-      if (context.read<AuthStore>().isLoggedIn) 'Followed Channels',
-      'Top Channels',
+      if (context.read<AuthStore>().isLoggedIn) 'Followed Streams',
+      'Top Streams',
       'Categories',
       'Search',
     ];
@@ -78,13 +78,13 @@ class _HomeState extends State<Home> {
             index: widget.homeStore.selectedIndex,
             children: [
               if (context.read<AuthStore>().isLoggedIn)
-                ChannelList(
-                  category: ChannelCategory.followed,
-                  channelListStore: widget.channelListStore,
+                StreamList(
+                  category: StreamCategory.followed,
+                  streamListStore: widget.streamListStore,
                 ),
-              ChannelList(
-                category: ChannelCategory.top,
-                channelListStore: widget.channelListStore,
+              StreamList(
+                category: StreamCategory.top,
+                streamListStore: widget.streamListStore,
               ),
               const Center(
                 child: Text('Games'),

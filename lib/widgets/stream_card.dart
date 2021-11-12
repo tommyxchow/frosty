@@ -4,11 +4,11 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/video_chat.dart';
 import 'package:intl/intl.dart';
 
-/// A card widget that displays a live channel's thumbnail and details.
-class ChannelCard extends StatelessWidget {
-  final Stream channelInfo;
+/// A tappable card widget that displays a stream's thumbnail and details.
+class StreamCard extends StatelessWidget {
+  final Stream streamInfo;
 
-  const ChannelCard({Key? key, required this.channelInfo}) : super(key: key);
+  const StreamCard({Key? key, required this.streamInfo}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,8 @@ class ChannelCard extends StatelessWidget {
             MaterialPageRoute(
               builder: (context) {
                 return VideoChat(
-                  userLogin: channelInfo.userLogin,
-                  userName: channelInfo.userName,
+                  userLogin: streamInfo.userLogin,
+                  userName: streamInfo.userName,
                 );
               },
             ),
@@ -36,7 +36,7 @@ class ChannelCard extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10.0),
                 child: CachedNetworkImage(
-                  imageUrl: channelInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248'),
+                  imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248'),
                 ),
               ),
             ),
@@ -49,22 +49,22 @@ class ChannelCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      channelInfo.userName,
+                      streamInfo.userName,
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 5),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Text(channelInfo.title.replaceAll('\n', '')),
+                      child: Text(streamInfo.title.replaceAll('\n', '')),
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      channelInfo.gameName,
+                      streamInfo.gameName,
                       style: const TextStyle(fontSize: 12),
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      '${NumberFormat().format(channelInfo.viewerCount)} viewers',
+                      '${NumberFormat().format(streamInfo.viewerCount)} viewers',
                       style: const TextStyle(fontSize: 12),
                     ),
                   ],
