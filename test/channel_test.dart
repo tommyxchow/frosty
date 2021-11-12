@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frosty/models/channel.dart';
+import 'package:frosty/models/stream.dart';
 
 void main() {
   test('Twitch channel should parse', () {
@@ -28,7 +28,7 @@ void main() {
     ''';
 
     final decoded = jsonDecode(sampleChannel);
-    final channel = Channel.fromJson(decoded);
+    final channel = Stream.fromJson(decoded);
 
     expect(channel.id, '43809710301');
     expect(channel.userId, '71092938');

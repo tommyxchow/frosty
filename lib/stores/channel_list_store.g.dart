@@ -12,13 +12,13 @@ mixin _$ChannelListStore on _ChannelListBase, Store {
   final _$_topChannelsAtom = Atom(name: '_ChannelListBase._topChannels');
 
   @override
-  ObservableList<Channel> get _topChannels {
+  ObservableList<Stream> get _topChannels {
     _$_topChannelsAtom.reportRead();
     return super._topChannels;
   }
 
   @override
-  set _topChannels(ObservableList<Channel> value) {
+  set _topChannels(ObservableList<Stream> value) {
     _$_topChannelsAtom.reportWrite(value, super._topChannels, () {
       super._topChannels = value;
     });
@@ -28,13 +28,13 @@ mixin _$ChannelListStore on _ChannelListBase, Store {
       Atom(name: '_ChannelListBase._followedChannels');
 
   @override
-  ObservableList<Channel> get _followedChannels {
+  ObservableList<Stream> get _followedChannels {
     _$_followedChannelsAtom.reportRead();
     return super._followedChannels;
   }
 
   @override
-  set _followedChannels(ObservableList<Channel> value) {
+  set _followedChannels(ObservableList<Stream> value) {
     _$_followedChannelsAtom.reportWrite(value, super._followedChannels, () {
       super._followedChannels = value;
     });

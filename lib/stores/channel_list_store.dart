@@ -1,7 +1,7 @@
 import 'package:frosty/api/twitch_api.dart';
 import 'package:mobx/mobx.dart';
 import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/models/channel.dart';
+import 'package:frosty/models/stream.dart';
 
 part 'channel_list_store.g.dart';
 
@@ -11,11 +11,11 @@ class ChannelListStore = _ChannelListBase with _$ChannelListStore;
 abstract class _ChannelListBase with Store {
   /// The list of the fetched top channels
   @observable
-  var _topChannels = ObservableList<Channel>();
+  var _topChannels = ObservableList<Stream>();
 
   /// The list of the fetched followed channels
   @observable
-  var _followedChannels = ObservableList<Channel>();
+  var _followedChannels = ObservableList<Stream>();
 
   /// The loading status for pagination.
   bool _isLoading = false;
@@ -38,7 +38,7 @@ abstract class _ChannelListBase with Store {
   }
 
   /// Returns the appropriate channels the [category].
-  ObservableList<Channel> channels({required ChannelCategory category}) {
+  ObservableList<Stream> channels({required ChannelCategory category}) {
     switch (category) {
       case ChannelCategory.top:
         return _topChannels;

@@ -1,4 +1,4 @@
-import 'package:frosty/models/channel.dart';
+import 'package:frosty/models/stream.dart';
 
 const clientId = String.fromEnvironment('CLIENT_ID');
 
@@ -6,7 +6,7 @@ const secret = String.fromEnvironment('SECRET');
 
 /// Sample channel objects for testing/preview purposes.
 const sampleChannels = [
-  Channel(
+  Stream(
       id: '',
       userId: '',
       userLogin: 'xqcow',
@@ -21,7 +21,7 @@ const sampleChannels = [
       thumbnailUrl: 'https://static-cdn.jtvnw.net/previews-ttv/live_user_xqcow-{width}x{height}.jpg',
       tagIds: [],
       isMature: false),
-  Channel(
+  Stream(
       id: '',
       userId: '',
       userLogin: 'lirik',
@@ -36,7 +36,7 @@ const sampleChannels = [
       thumbnailUrl: 'https://static-cdn.jtvnw.net/previews-ttv/live_user_lirik-{width}x{height}.jpg',
       tagIds: [],
       isMature: false),
-  Channel(
+  Stream(
       id: '',
       userId: '',
       userLogin: 'mizkif',
