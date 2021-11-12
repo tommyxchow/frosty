@@ -13,7 +13,7 @@ abstract class _VideoStoreBase with Store {
   late Timer timer;
 
   _VideoStoreBase() {
-    timer = Timer(const Duration(seconds: 5), () => menuVisible = false);
+    timer = Timer(const Duration(seconds: 3), () => menuVisible = false);
   }
 
   @observable

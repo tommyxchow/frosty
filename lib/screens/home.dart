@@ -29,22 +29,21 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final titles = [
-      if (context.read<AuthStore>().isLoggedIn) 'Followed Streams',
-      'Top Streams',
-      'Categories',
-      'Search',
-    ];
-
     debugPrint('build home');
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
         title: Observer(
           builder: (_) {
+            final titles = [
+              if (context.read<AuthStore>().isLoggedIn) 'Followed Streams',
+              'Top Streams',
+              'Categories',
+              'Search',
+            ];
             return Text(
               titles[widget.homeStore.selectedIndex],
-              style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold),
+              style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.bold),
             );
           },
         ),
@@ -55,7 +54,6 @@ class _HomeState extends State<Home> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  fullscreenDialog: true,
                   builder: (context) {
                     return Settings(settingsStore: context.read<SettingsStore>());
                   },
