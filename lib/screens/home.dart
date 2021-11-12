@@ -39,11 +39,12 @@ class _HomeState extends State<Home> {
     debugPrint('build home');
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
         title: Observer(
           builder: (_) {
             return Text(
               titles[widget.homeStore.selectedIndex],
-              style: GoogleFonts.daysOne(),
+              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
             );
           },
         ),
@@ -56,15 +57,7 @@ class _HomeState extends State<Home> {
                 MaterialPageRoute(
                   fullscreenDialog: true,
                   builder: (context) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        title: Text(
-                          'Settings',
-                          style: GoogleFonts.daysOne(),
-                        ),
-                      ),
-                      body: Settings(settingsStore: context.read<SettingsStore>()),
-                    );
+                    return Settings(settingsStore: context.read<SettingsStore>());
                   },
                 ),
               );

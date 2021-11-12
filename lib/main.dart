@@ -4,6 +4,7 @@ import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/stream_list_store.dart';
 import 'package:frosty/stores/home_store.dart';
 import 'package:frosty/stores/settings_store.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
               canvasColor: Colors.black,
               cardColor: Colors.black,
               brightness: Brightness.dark,
+              fontFamily: GoogleFonts.inter().fontFamily,
             ),
             home: Scaffold(
               body: FutureBuilder(
