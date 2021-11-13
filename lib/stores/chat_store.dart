@@ -8,7 +8,6 @@ import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/widgets/chat_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -240,9 +239,10 @@ abstract class _ChatStoreBase with Store {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ChatMessage(
-                key: Key(ircMessage.tags['id']!),
-                children: span,
+              Text.rich(
+                TextSpan(
+                  children: span,
+                ),
               ),
               const SizedBox(height: 5),
               banDuration == null
@@ -268,9 +268,10 @@ abstract class _ChatStoreBase with Store {
             Text(ircMessage.tags['system-msg']!),
             const SizedBox(height: 5),
             if (ircMessage.message != null)
-              ChatMessage(
-                key: Key(ircMessage.tags['id']!),
-                children: span,
+              Text.rich(
+                TextSpan(
+                  children: span,
+                ),
               ),
           ],
         ),
@@ -279,9 +280,10 @@ abstract class _ChatStoreBase with Store {
       // Render normal chat message (PRIVMSG).
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0),
-        child: ChatMessage(
-          key: ircMessage.tags['id'] == null ? null : Key(ircMessage.tags['id']!),
-          children: span,
+        child: Text.rich(
+          TextSpan(
+            children: span,
+          ),
         ),
       );
     }
