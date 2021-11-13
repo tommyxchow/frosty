@@ -40,7 +40,7 @@ class VideoChat extends StatelessWidget {
                   return AppBar(
                     title: Text(
                       userName,
-                      style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                      style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     actions: [
                       IconButton(

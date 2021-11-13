@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home.dart';
 import 'package:frosty/stores/auth_store.dart';
@@ -26,12 +28,27 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Frosty',
             theme: ThemeData(
-              primarySwatch: Colors.blue,
-              canvasColor: Colors.black,
-              cardColor: Colors.black,
-              brightness: Brightness.dark,
+              primarySwatch: Colors.deepPurple,
               fontFamily: GoogleFonts.inter().fontFamily,
+              splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+              appBarTheme: AppBarTheme(
+                titleTextStyle: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
+            darkTheme: ThemeData.dark().copyWith(
+                scaffoldBackgroundColor: Colors.black,
+                splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+                textTheme: ThemeData.dark().textTheme.apply(fontFamily: GoogleFonts.inter().fontFamily),
+                colorScheme: ColorScheme.fromSwatch(
+                  primarySwatch: Colors.deepPurple,
+                ),
+                appBarTheme: AppBarTheme(
+                  color: Colors.black,
+                  titleTextStyle: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.bold),
+                ),
+                bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                  backgroundColor: Colors.black,
+                )),
             home: Scaffold(
               body: FutureBuilder(
                 future: Future.wait([
