@@ -42,10 +42,10 @@ class Video extends StatelessWidget {
                 return AnimatedOpacity(
                   opacity: videoStore.menuVisible ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 100),
-                  child: Visibility(
-                    visible: videoStore.menuVisible,
-                    child: ColoredBox(
-                      color: Colors.black.withOpacity(0.5),
+                  child: ColoredBox(
+                    color: Colors.black.withOpacity(0.5),
+                    child: Visibility(
+                      visible: videoStore.menuVisible,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
