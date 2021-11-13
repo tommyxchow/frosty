@@ -38,12 +38,10 @@ class _HomeState extends State<Home> {
             final titles = [
               if (context.read<AuthStore>().isLoggedIn) 'Followed Streams',
               'Top Streams',
-              'Categories',
               'Search',
             ];
             return Text(
               titles[widget.homeStore.selectedIndex],
-              style: GoogleFonts.inter(fontSize: 30, fontWeight: FontWeight.bold),
             );
           },
         ),
@@ -77,9 +75,6 @@ class _HomeState extends State<Home> {
                 category: StreamCategory.top,
                 streamListStore: widget.streamListStore,
               ),
-              const Center(
-                child: Text('Games'),
-              ),
               const Search(),
             ],
           );
@@ -99,10 +94,6 @@ class _HomeState extends State<Home> {
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.arrow_upward),
                   label: 'Top',
-                ),
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.gamepad),
-                  label: 'Categories',
                 ),
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.search),
