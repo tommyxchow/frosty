@@ -37,7 +37,7 @@ class StreamCard extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 10.0),
                 child: CachedNetworkImage(
-                  imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248'),
+                  imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
                 ),
               ),
             ),
