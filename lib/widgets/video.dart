@@ -54,7 +54,9 @@ class Video extends StatelessWidget {
                                 Icons.arrow_back,
                                 color: Colors.white,
                               ),
-                              onPressed: () => Navigator.of(context).pop(),
+                              onPressed: () {
+                                if (videoStore.menuVisible) Navigator.of(context).pop();
+                              },
                             ),
                             const Spacer(),
                             IconButton(
@@ -63,12 +65,14 @@ class Video extends StatelessWidget {
                                 color: Colors.white,
                               ),
                               onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) {
-                                    return Settings(settingsStore: settingsStore);
-                                  },
-                                );
+                                if (videoStore.menuVisible) {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (context) {
+                                      return Settings(settingsStore: settingsStore);
+                                    },
+                                  );
+                                }
                               },
                             ),
                           ],
