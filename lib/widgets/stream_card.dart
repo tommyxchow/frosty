@@ -13,39 +13,37 @@ class StreamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return VideoChat(
-                  userLogin: streamInfo.userLogin,
-                  userName: streamInfo.userName,
-                );
-              },
-            ),
-          );
-        },
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return VideoChat(
+                userLogin: streamInfo.userLogin,
+                userName: streamInfo.userName,
+              );
+            },
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
               flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: CachedNetworkImage(
-                  imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
-                  useOldImageOnUrlChange: true,
-                ),
+              child: CachedNetworkImage(
+                imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
+                useOldImageOnUrlChange: true,
               ),
             ),
             Flexible(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.only(left: 10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
