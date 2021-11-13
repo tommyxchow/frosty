@@ -50,12 +50,18 @@ class Video extends StatelessWidget {
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.arrow_back),
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                             const Spacer(),
                             IconButton(
-                              icon: const Icon(Icons.settings),
+                              icon: const Icon(
+                                Icons.settings,
+                                color: Colors.white,
+                              ),
                               onPressed: () {
                                 showModalBottomSheet(
                                   context: context,
@@ -68,18 +74,32 @@ class Video extends StatelessWidget {
                           ],
                         ),
                         IconButton(
-                          icon: videoStore.paused ? const Icon(Icons.play_arrow) : const Icon(Icons.pause),
+                          icon: videoStore.paused
+                              ? const Icon(
+                                  Icons.play_arrow,
+                                  color: Colors.white,
+                                )
+                              : const Icon(
+                                  Icons.pause,
+                                  color: Colors.white,
+                                ),
                           onPressed: videoStore.handlePausePlay,
                         ),
                         Row(
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.refresh),
+                              icon: const Icon(
+                                Icons.refresh,
+                                color: Colors.white,
+                              ),
                               onPressed: () {},
                             ),
                             const Spacer(),
                             IconButton(
-                              icon: const Icon(Icons.fullscreen),
+                              icon: const Icon(
+                                Icons.fullscreen,
+                                color: Colors.white,
+                              ),
                               onPressed: videoStore.requestFullscreen,
                             )
                           ],
