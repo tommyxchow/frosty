@@ -23,15 +23,13 @@ abstract class _VideoStoreBase with Store {
   var paused = false;
 
   void handlePausePlay() {
-    if (menuVisible) {
-      if (paused) {
-        controller.runJavascript('document.getElementsByTagName("video")[0].play();');
-      } else {
-        controller.runJavascript('document.getElementsByTagName("video")[0].pause();');
-      }
-
-      paused = !paused;
+    if (paused) {
+      controller.runJavascript('document.getElementsByTagName("video")[0].play();');
+    } else {
+      controller.runJavascript('document.getElementsByTagName("video")[0].pause();');
     }
+
+    paused = !paused;
   }
 
   void handleVideoTap() async {

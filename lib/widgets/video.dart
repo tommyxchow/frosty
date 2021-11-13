@@ -42,73 +42,72 @@ class Video extends StatelessWidget {
                 return AnimatedOpacity(
                   opacity: videoStore.menuVisible ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 100),
-                  child: ColoredBox(
-                    color: Colors.black.withOpacity(0.5),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.arrow_back,
-                                color: Colors.white,
+                  child: Visibility(
+                    visible: videoStore.menuVisible,
+                    child: ColoredBox(
+                      color: Colors.black.withOpacity(0.5),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () => Navigator.of(context).pop(),
                               ),
-                              onPressed: () {
-                                if (videoStore.menuVisible) Navigator.of(context).pop();
-                              },
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.settings,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {
-                                if (videoStore.menuVisible) {
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.settings,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
                                   showModalBottomSheet(
                                     context: context,
                                     builder: (context) {
                                       return Settings(settingsStore: settingsStore);
                                     },
                                   );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: videoStore.paused
-                              ? const Icon(
-                                  Icons.play_arrow,
-                                  color: Colors.white,
-                                )
-                              : const Icon(
-                                  Icons.pause,
+                                },
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: videoStore.paused
+                                ? const Icon(
+                                    Icons.play_arrow,
+                                    color: Colors.white,
+                                  )
+                                : const Icon(
+                                    Icons.pause,
+                                    color: Colors.white,
+                                  ),
+                            onPressed: videoStore.handlePausePlay,
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.refresh,
                                   color: Colors.white,
                                 ),
-                          onPressed: videoStore.handlePausePlay,
-                        ),
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.refresh,
-                                color: Colors.white,
+                                onPressed: () {},
                               ),
-                              onPressed: () {},
-                            ),
-                            const Spacer(),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.fullscreen,
-                                color: Colors.white,
-                              ),
-                              onPressed: videoStore.requestFullscreen,
-                            )
-                          ],
-                        )
-                      ],
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.fullscreen,
+                                  color: Colors.white,
+                                ),
+                                onPressed: videoStore.requestFullscreen,
+                              )
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 );
