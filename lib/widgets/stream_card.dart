@@ -41,8 +41,9 @@ class StreamCard extends StatelessWidget {
                     imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
                     useOldImageOnUrlChange: true,
                   ),
-                  ColoredBox(
+                  Container(
                     color: Colors.black.withOpacity(0.5),
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
                     child: Text(
                       DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
                       style: const TextStyle(fontSize: 12),
