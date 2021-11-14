@@ -34,9 +34,21 @@ class StreamCard extends StatelessWidget {
           children: [
             Flexible(
               flex: 1,
-              child: CachedNetworkImage(
-                imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
-                useOldImageOnUrlChange: true,
+              child: Stack(
+                alignment: AlignmentDirectional.bottomEnd,
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
+                    useOldImageOnUrlChange: true,
+                  ),
+                  ColoredBox(
+                    color: Colors.black.withOpacity(0.5),
+                    child: Text(
+                      DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  )
+                ],
               ),
             ),
             Flexible(
