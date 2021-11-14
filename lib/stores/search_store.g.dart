@@ -24,6 +24,13 @@ mixin _$SearchStore on _SearchStoreBase, Store {
     });
   }
 
+  final _$handleQueryAsyncAction = AsyncAction('_SearchStoreBase.handleQuery');
+
+  @override
+  Future<void> handleQuery(String query) {
+    return _$handleQueryAsyncAction.run(() => super.handleQuery(query));
+  }
+
   @override
   String toString() {
     return '''

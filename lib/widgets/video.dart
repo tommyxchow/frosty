@@ -25,7 +25,7 @@ class Video extends StatelessWidget {
     return Stack(
       children: [
         WebView(
-          initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
+          initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
           javascriptMode: JavascriptMode.unrestricted,
           allowsInlineMediaPlayback: true,
           initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
@@ -37,7 +37,7 @@ class Video extends StatelessWidget {
           },
         ),
         GestureDetector(
-          behavior: HitTestBehavior.opaque,
+          onTap: videoStore.handleVideoTap,
           child: SizedBox.expand(
             child: Observer(
               builder: (_) {
@@ -123,7 +123,6 @@ class Video extends StatelessWidget {
               },
             ),
           ),
-          onTap: videoStore.handleVideoTap,
         ),
       ],
     );
