@@ -7,13 +7,15 @@ import 'package:frosty/stores/video_store.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class Video extends StatelessWidget {
-  final String channelName;
+  final String userLogin;
+  final String userName;
   final VideoStore videoStore;
   final SettingsStore settingsStore;
 
   const Video({
     Key? key,
-    required this.channelName,
+    required this.userLogin,
+    required this.userName,
     required this.videoStore,
     required this.settingsStore,
   }) : super(key: key);
@@ -23,7 +25,7 @@ class Video extends StatelessWidget {
     return Stack(
       children: [
         WebView(
-          initialUrl: 'https://player.twitch.tv/?channel=$channelName&muted=false&parent=frosty',
+          initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
           javascriptMode: JavascriptMode.unrestricted,
           allowsInlineMediaPlayback: true,
           initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
@@ -57,6 +59,13 @@ class Video extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                                 onPressed: () => Navigator.of(context).pop(),
+                              ),
+                              Text(
+                                userName,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               const Spacer(),
                               IconButton(
