@@ -6,7 +6,6 @@ import 'package:frosty/stores/auth_store.dart';
 import 'package:frosty/stores/stream_list_store.dart';
 import 'package:frosty/stores/home_store.dart';
 import 'package:frosty/stores/settings_store.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -29,26 +28,28 @@ class MyApp extends StatelessWidget {
             title: 'Frosty',
             theme: ThemeData(
               primarySwatch: Colors.deepPurple,
-              fontFamily: GoogleFonts.inter().fontFamily,
+              fontFamily: 'Inter',
               splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-              appBarTheme: AppBarTheme(
-                titleTextStyle: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold),
+              appBarTheme: const AppBarTheme(
+                titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             darkTheme: ThemeData.dark().copyWith(
-                scaffoldBackgroundColor: Colors.black,
-                splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-                textTheme: ThemeData.dark().textTheme.apply(fontFamily: GoogleFonts.inter().fontFamily),
-                colorScheme: ColorScheme.fromSwatch(
-                  primarySwatch: Colors.deepPurple,
+              scaffoldBackgroundColor: Colors.black,
+              splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+              textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'Inter'),
+              appBarTheme: const AppBarTheme(
+                color: Colors.black,
+                titleTextStyle: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                 ),
-                appBarTheme: AppBarTheme(
-                  color: Colors.black,
-                  titleTextStyle: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                  backgroundColor: Colors.black,
-                )),
+              ),
+              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                backgroundColor: Colors.black,
+              ),
+            ),
             home: Scaffold(
               body: FutureBuilder(
                 future: Future.wait([

@@ -46,7 +46,6 @@ dependencies:
   mobx: ^2.0.0
   flutter_mobx: ^2.0.0
   shared_preferences: ^2.0.8
-  google_fonts: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +71,19 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: fonts/Inter-Thin.ttf
+        - asset: fonts/Inter-ExtraLight.ttf
+        - asset: fonts/Inter-Light.ttf
+        - asset: fonts/Inter-Regular.ttf
+        - asset: fonts/Inter-Medium.ttf
+        - asset: fonts/Inter-SemiBold.ttf
+        - asset: fonts/Inter-Bold.ttf
+        - asset: fonts/Inter-ExtraBold.ttf
+        - asset: fonts/Inter-Black.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

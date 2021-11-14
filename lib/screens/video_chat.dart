@@ -8,7 +8,6 @@ import 'package:frosty/stores/settings_store.dart';
 import 'package:frosty/stores/video_store.dart';
 import 'package:frosty/widgets/chat.dart';
 import 'package:frosty/widgets/video.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 class VideoChat extends StatelessWidget {
@@ -31,7 +30,8 @@ class VideoChat extends StatelessWidget {
                     return AspectRatio(
                       aspectRatio: 16 / 9,
                       child: Video(
-                        channelName: userLogin,
+                        userLogin: userLogin,
+                        userName: userName,
                         videoStore: VideoStore(),
                         settingsStore: context.read<SettingsStore>(),
                       ),
@@ -40,7 +40,7 @@ class VideoChat extends StatelessWidget {
                   return AppBar(
                     title: Text(
                       userName,
-                      style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     actions: [
                       IconButton(

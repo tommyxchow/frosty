@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/models/irc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class IRC {
   /// Applies the given CLEARCHAT message to the given list of messages.
@@ -115,7 +114,7 @@ class IRC {
     span.add(
       TextSpan(
         text: ircMessage.tags['display-name']!,
-        style: GoogleFonts.inter(
+        style: TextStyle(
           color: HexColor.fromHex(ircMessage.tags['color'] ?? '#868686'),
           fontWeight: FontWeight.bold,
         ),
