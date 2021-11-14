@@ -216,4 +216,16 @@ class Twitch {
       debugPrint('Channel does not exist');
     }
   }
+
+  /// Returns a list of channel query objects closest matching the given query string.
+  static Future<List<ChannelQuery>> searchChannels({required String query, required Map<String, String>? headers}) async {
+    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/search/channels?first=8&query=$query'), headers: headers);
+    if (response.statusCode == 200) {
+      final channelData = jsonDecode(response.body)['data'] as List;
+
+      return channelData.map((e) => ChannelQuery.fromJson(e)).toList();
+    } else {
+      return [];
+    }
+  }
 }
