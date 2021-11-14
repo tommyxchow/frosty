@@ -121,7 +121,7 @@ abstract class _AuthBase with Store {
     // If the default token does not already exist, get the new default token and store it.
     // Else, validate the existing token.
     if (_token == null) {
-      await Twitch.getDefaultToken();
+      _token = await Twitch.getDefaultToken();
       await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
       _tokenIsValid = await Twitch.validateToken(token: _token!);
     } else {
@@ -130,7 +130,7 @@ abstract class _AuthBase with Store {
 
       // If the stored token is invalid, get a new default token and store it.
       if (!_tokenIsValid) {
-        await Twitch.getDefaultToken();
+        _token = await Twitch.getDefaultToken();
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
         _tokenIsValid = await Twitch.validateToken(token: _token!);
       }
