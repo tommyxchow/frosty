@@ -48,7 +48,7 @@ abstract class _VideoStoreBase with Store {
     }
   }
 
-  void removeOverlay() {
+  void initVideo() {
     controller.runJavascript('document.getElementsByClassName("video-player__overlay")[0].innerHTML = "";');
   }
 

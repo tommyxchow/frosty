@@ -37,7 +37,7 @@ abstract class _StreamListBase with Store {
     }
   }
 
-  /// Returns the appropriate streams the [category].
+  /// Returns the appropriate streams given the [category].
   ObservableList<Stream> streams({required StreamCategory category}) {
     switch (category) {
       case StreamCategory.top:

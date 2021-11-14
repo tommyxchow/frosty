@@ -33,7 +33,7 @@ class Video extends StatelessWidget {
             videoStore.controller = controller;
           },
           onPageFinished: (string) {
-            videoStore.removeOverlay();
+            videoStore.initVideo();
           },
         ),
         GestureDetector(
