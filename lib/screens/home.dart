@@ -79,31 +79,29 @@ class _HomeState extends State<Home> {
           );
         },
       ),
-      bottomNavigationBar: SafeArea(
-        child: Observer(
-          builder: (_) {
-            return BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              items: [
-                if (context.read<AuthStore>().isLoggedIn)
-                  const BottomNavigationBarItem(
-                    icon: Icon(Icons.favorite),
-                    label: 'Followed',
-                  ),
+      bottomNavigationBar: Observer(
+        builder: (_) {
+          return BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            items: [
+              if (context.read<AuthStore>().isLoggedIn)
                 const BottomNavigationBarItem(
-                  icon: Icon(Icons.arrow_upward),
-                  label: 'Top',
+                  icon: Icon(Icons.favorite),
+                  label: 'Followed',
                 ),
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: 'Search',
-                ),
-              ],
-              currentIndex: widget.homeStore.selectedIndex,
-              onTap: widget.homeStore.handleTap,
-            );
-          },
-        ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.arrow_upward),
+                label: 'Top',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.search),
+                label: 'Search',
+              ),
+            ],
+            currentIndex: widget.homeStore.selectedIndex,
+            onTap: widget.homeStore.handleTap,
+          );
+        },
       ),
     );
   }
