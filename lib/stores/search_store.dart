@@ -39,8 +39,9 @@ abstract class _SearchStoreBase with Store {
           MaterialPageRoute(
             builder: (_) {
               return VideoChat(
-                userLogin: channelInfo.broadcasterLogin,
+                title: channelInfo.title,
                 userName: channelInfo.broadcasterName,
+                userLogin: channelInfo.broadcasterLogin,
               );
             },
           ),

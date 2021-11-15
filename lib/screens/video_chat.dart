@@ -11,10 +11,16 @@ import 'package:frosty/widgets/video.dart';
 import 'package:provider/provider.dart';
 
 class VideoChat extends StatelessWidget {
-  final String userLogin;
+  final String title;
   final String userName;
+  final String userLogin;
 
-  const VideoChat({Key? key, required this.userLogin, required this.userName}) : super(key: key);
+  const VideoChat({
+    Key? key,
+    required this.title,
+    required this.userName,
+    required this.userLogin,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,10 +36,10 @@ class VideoChat extends StatelessWidget {
                     return AspectRatio(
                       aspectRatio: 16 / 9,
                       child: Video(
-                        userLogin: userLogin,
+                        title: title,
                         userName: userName,
+                        userLogin: userLogin,
                         videoStore: VideoStore(),
-                        settingsStore: context.read<SettingsStore>(),
                       ),
                     );
                   }

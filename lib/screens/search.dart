@@ -80,8 +80,9 @@ class _SearchState extends State<Search> {
                         MaterialPageRoute(
                           builder: (_) {
                             return VideoChat(
-                              userLogin: channel.broadcasterLogin,
+                              title: channel.title,
                               userName: channel.displayName,
+                              userLogin: channel.broadcasterLogin,
                             );
                           },
                         ),

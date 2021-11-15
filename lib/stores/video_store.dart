@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'dart:io';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -40,7 +40,6 @@ abstract class _VideoStoreBase with Store {
     } else {
       timer.cancel();
       timer = Timer(const Duration(seconds: 5), () {
-        debugPrint('timer thing');
         menuVisible = false;
       });
 
@@ -59,7 +58,8 @@ abstract class _VideoStoreBase with Store {
   }
 
   void requestFullscreen() {
-    controller.runJavascript('document.getElementsByTagName("video")[0].requestFullscreen();');
-    controller.runJavascript('document.getElementsByTagName("video")[0].webkitEnterFullscreen();');
+    Platform.isIOS
+        ? controller.runJavascript('document.getElementsByTagName("video")[0].webkitEnterFullscreen();')
+        : controller.runJavascript('document.getElementsByTagName("video")[0].requestFullscreen();');
   }
 }
