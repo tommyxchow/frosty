@@ -3,10 +3,11 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/search.dart';
 import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/stores/stream_list_store.dart';
 import 'package:frosty/stores/home_store.dart';
 import 'package:frosty/stores/settings_store.dart';
+import 'package:frosty/stores/stream_list_store.dart';
 import 'package:provider/provider.dart';
+
 import '../widgets/stream_list.dart';
 
 class Home extends StatefulWidget {

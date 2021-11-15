@@ -1,10 +1,11 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/user.dart';
 import 'package:http/http.dart' as http;
 
