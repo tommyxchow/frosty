@@ -230,7 +230,7 @@ abstract class _ChatStoreBase with Store {
       // Render timeouts and bans
       final banDuration = ircMessage.tags['ban-duration'];
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        padding: const EdgeInsets.all(10.0),
         child: Opacity(
           opacity: 0.50,
           child: Column(
@@ -258,7 +258,7 @@ abstract class _ChatStoreBase with Store {
       // Render sub alerts
       return Container(
         color: Colors.purple.withOpacity(0.3),
-        padding: const EdgeInsets.all(5.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -276,7 +276,7 @@ abstract class _ChatStoreBase with Store {
     } else {
       // Render normal chat message (PRIVMSG).
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0),
+        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
         child: Text.rich(
           TextSpan(
             children: span,

@@ -12,11 +12,11 @@ class StreamList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
+      onRefresh: () => streamListStore.refresh(category: category),
       child: Observer(
         builder: (_) {
           return ListView.builder(
             itemCount: streamListStore.streams(category: category).length,
-            padding: const EdgeInsets.all(5.0),
             itemBuilder: (context, index) {
               if (index > streamListStore.streams(category: category).length / 2 && streamListStore.hasMore(category: category)) {
                 streamListStore.getStreams(category: category);
@@ -26,7 +26,6 @@ class StreamList extends StatelessWidget {
           );
         },
       ),
-      onRefresh: () => streamListStore.refresh(category: category),
     );
   }
 }

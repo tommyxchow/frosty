@@ -34,7 +34,6 @@ class _ChatState extends State<Chat> {
                           addRepaintBoundaries: false,
                           itemCount: widget.chatStore.messages.length,
                           controller: widget.chatStore.scrollController,
-                          padding: const EdgeInsets.all(5.0),
                           itemBuilder: (context, index) {
                             return widget.chatStore.renderChatMessage(widget.chatStore.messages[index]);
                           },
@@ -81,9 +80,9 @@ class _ChatState extends State<Chat> {
                         child: TextField(
                           decoration: const InputDecoration(
                             isDense: true,
-                            contentPadding: EdgeInsets.all(8.0),
+                            contentPadding: EdgeInsets.all(10.0),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
                             ),
                             hintText: 'Send a message',
                           ),

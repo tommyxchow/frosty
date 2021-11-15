@@ -26,15 +26,15 @@ class _SearchState extends State<Search> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(15.0),
+          padding: const EdgeInsets.all(10.0),
           child: TextField(
             controller: searchStore.textController,
             autocorrect: false,
             decoration: const InputDecoration(
               isDense: true,
-              contentPadding: EdgeInsets.all(8.0),
+              contentPadding: EdgeInsets.all(10.0),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
               hintText: 'Search for a channel',
             ),
