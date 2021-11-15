@@ -53,7 +53,13 @@ abstract class _VideoStoreBase with Store {
     controller.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
   }
 
+  void enterPictureInPicture() {
+    controller.runJavascript('document.getElementsByTagName("video")[0].disablePictureInPicture = false;');
+    controller.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+  }
+
   void requestFullscreen() {
-    controller.runJavascript('document.getElementsByTagName("video")[0].requestFullscreen()');
+    controller.runJavascript('document.getElementsByTagName("video")[0].requestFullscreen();');
+    controller.runJavascript('document.getElementsByTagName("video")[0].webkitEnterFullscreen();');
   }
 }

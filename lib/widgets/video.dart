@@ -103,7 +103,7 @@ class Video extends StatelessWidget {
                                   Icons.refresh,
                                   color: Colors.white,
                                 ),
-                                onPressed: () {},
+                                onPressed: videoStore.enterPictureInPicture,
                               ),
                               const Spacer(),
                               IconButton(
