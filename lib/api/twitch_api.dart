@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
+import 'package:frosty/models/category.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/stream.dart';
@@ -227,6 +228,28 @@ class Twitch {
       return channelData.map((e) => ChannelQuery.fromJson(e)).toList();
     } else {
       return [];
+    }
+  }
+
+  /// Returns a map containing top 20 categories/games and a cursor for further requests.
+  static Future<CategoriesTwitch?> getTopGames({required Map<String, String>? headers, required String? cursor}) async {
+    final Uri uri;
+
+    if (cursor == null) {
+      uri = Uri.parse('https://api.twitch.tv/helix/games/top');
+    } else {
+      uri = Uri.parse('https://api.twitch.tv/helix/games/top?after=$cursor');
+    }
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      final data = decoded['data'] as List;
+
+      return CategoriesTwitch(data.map((category) => CategoryTwitch.fromJson(category)).toList(), decoded['pagination']['cursor']);
+    } else {
+      debugPrint('Failed to update top games');
     }
   }
 }

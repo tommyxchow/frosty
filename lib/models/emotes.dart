@@ -12,7 +12,11 @@ class ImagesTwitch {
   @JsonKey(name: 'url_4x')
   final String url4x;
 
-  const ImagesTwitch(this.url1x, this.url2x, this.url4x);
+  const ImagesTwitch(
+    this.url1x,
+    this.url2x,
+    this.url4x,
+  );
 
   factory ImagesTwitch.fromJson(Map<String, dynamic> json) => _$ImagesTwitchFromJson(json);
 }
@@ -29,7 +33,17 @@ class EmoteTwitch {
   final List<String> scale;
   final List<String> themeMode;
 
-  const EmoteTwitch(this.id, this.name, this.images, this.tier, this.emoteType, this.emoteSetId, this.format, this.scale, this.themeMode);
+  const EmoteTwitch(
+    this.id,
+    this.name,
+    this.images,
+    this.tier,
+    this.emoteType,
+    this.emoteSetId,
+    this.format,
+    this.scale,
+    this.themeMode,
+  );
 
   factory EmoteTwitch.fromJson(Map<String, dynamic> json) => _$EmoteTwitchFromJson(json);
 }
@@ -42,7 +56,12 @@ class EmoteBTTVGlobal {
   final String imageType;
   final String userId;
 
-  const EmoteBTTVGlobal(this.id, this.code, this.imageType, this.userId);
+  const EmoteBTTVGlobal(
+    this.id,
+    this.code,
+    this.imageType,
+    this.userId,
+  );
 
   factory EmoteBTTVGlobal.fromJson(Map<String, dynamic> json) => _$EmoteBTTVGlobalFromJson(json);
 }
@@ -54,7 +73,12 @@ class UserBTTV {
   final String displayName;
   final String providerId;
 
-  const UserBTTV(this.id, this.name, this.displayName, this.providerId);
+  const UserBTTV(
+    this.id,
+    this.name,
+    this.displayName,
+    this.providerId,
+  );
 
   factory UserBTTV.fromJson(Map<String, dynamic> json) => _$UserBTTVFromJson(json);
 }
@@ -66,7 +90,12 @@ class EmoteBTTVShared {
   final String imageType;
   final UserBTTV user;
 
-  const EmoteBTTVShared(this.id, this.code, this.imageType, this.user);
+  const EmoteBTTVShared(
+    this.id,
+    this.code,
+    this.imageType,
+    this.user,
+  );
 
   factory EmoteBTTVShared.fromJson(Map<String, dynamic> json) => _$EmoteBTTVSharedFromJson(json);
 }
@@ -78,7 +107,12 @@ class EmoteBTTVChannel {
   final List<EmoteBTTVGlobal> channelEmotes;
   final List<EmoteBTTVShared> sharedEmotes;
 
-  const EmoteBTTVChannel(this.id, this.bots, this.channelEmotes, this.sharedEmotes);
+  const EmoteBTTVChannel(
+    this.id,
+    this.bots,
+    this.channelEmotes,
+    this.sharedEmotes,
+  );
 
   factory EmoteBTTVChannel.fromJson(Map<String, dynamic> json) => _$EmoteBTTVChannelFromJson(json);
 }
@@ -90,7 +124,11 @@ class UserFFZ {
   final String name;
   final String displayName;
 
-  const UserFFZ(this.id, this.name, this.displayName);
+  const UserFFZ(
+    this.id,
+    this.name,
+    this.displayName,
+  );
 
   factory UserFFZ.fromJson(Map<String, dynamic> json) => _$UserFFZFromJson(json);
 }
@@ -104,7 +142,11 @@ class ImagesFFZ {
   @JsonKey(name: '4x')
   final String? url4x;
 
-  const ImagesFFZ(this.url1x, this.url2x, this.url4x);
+  const ImagesFFZ(
+    this.url1x,
+    this.url2x,
+    this.url4x,
+  );
 
   factory ImagesFFZ.fromJson(Map<String, dynamic> json) => _$ImagesFFZFromJson(json);
 }
@@ -117,7 +159,13 @@ class EmoteFFZ {
   final ImagesFFZ images;
   final String imageType;
 
-  const EmoteFFZ(this.id, this.user, this.code, this.images, this.imageType);
+  const EmoteFFZ(
+    this.id,
+    this.user,
+    this.code,
+    this.images,
+    this.imageType,
+  );
 
   factory EmoteFFZ.fromJson(Map<String, dynamic> json) => _$EmoteFFZFromJson(json);
 }
@@ -135,7 +183,15 @@ class Role7TV {
   @JsonKey(name: 'default')
   final bool? defaults;
 
-  Role7TV(this.id, this.name, this.position, this.color, this.allowed, this.denied, this.defaults);
+  const Role7TV(
+    this.id,
+    this.name,
+    this.position,
+    this.color,
+    this.allowed,
+    this.denied,
+    this.defaults,
+  );
 
   factory Role7TV.fromJson(Map<String, dynamic> json) => _$Role7TVFromJson(json);
 }
@@ -148,7 +204,13 @@ class Owner7TV {
   final String displayName;
   final Role7TV role;
 
-  Owner7TV(this.id, this.twitchId, this.login, this.displayName, this.role);
+  const Owner7TV(
+    this.id,
+    this.twitchId,
+    this.login,
+    this.displayName,
+    this.role,
+  );
 
   factory Owner7TV.fromJson(Map<String, dynamic> json) => _$Owner7TVFromJson(json);
 }
@@ -167,7 +229,19 @@ class Emote7TV {
   final List<int> height;
   final List<List<String>> urls;
 
-  Emote7TV(this.id, this.name, this.owner, this.visibility, this.visibilitySimple, this.mime, this.status, this.tags, this.width, this.height, this.urls);
+  const Emote7TV(
+    this.id,
+    this.name,
+    this.owner,
+    this.visibility,
+    this.visibilitySimple,
+    this.mime,
+    this.status,
+    this.tags,
+    this.width,
+    this.height,
+    this.urls,
+  );
 
   factory Emote7TV.fromJson(Map<String, dynamic> json) => _$Emote7TVFromJson(json);
 }
