@@ -76,7 +76,7 @@ class _ChatState extends State<Chat> {
                   if (context.read<AuthStore>().isLoggedIn)
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(5.0),
+                        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
                         child: TextField(
                           decoration: const InputDecoration(
                             isDense: true,

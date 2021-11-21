@@ -30,8 +30,6 @@ class StreamCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
               flex: 1,
@@ -73,7 +71,6 @@ class StreamCard extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text(
                       streamInfo.gameName,
-                      style: const TextStyle(fontSize: 12),
                     ),
                     const SizedBox(height: 5),
                     Text(

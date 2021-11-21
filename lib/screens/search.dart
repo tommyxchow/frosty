@@ -26,7 +26,7 @@ class _SearchState extends State<Search> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
           child: TextField(
             controller: searchStore.textController,
             autocorrect: false,
@@ -42,56 +42,60 @@ class _SearchState extends State<Search> {
           ),
         ),
         Expanded(
-          child: Observer(
-            builder: (_) {
-              return ListView.builder(
-                itemCount: searchStore.searchResults.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == searchStore.searchResults.length) {
-                    if (searchStore.textController.text.isEmpty) {
-                      return const SizedBox();
-                    }
-                    return ListTile(
-                      title: Text('Go to ${searchStore.textController.text}'),
-                      onTap: () => searchStore.handleSearch(searchStore.textController.text, context),
-                    );
-                  }
-
-                  final channel = searchStore.searchResults[index];
-                  return ListTile(
-                    title: Text(channel.displayName),
-                    trailing: channel.isLive
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(5.0),
-                            child: Container(
-                              color: Colors.red,
-                              padding: const EdgeInsets.all(8.0),
-                              child: const Text(
-                                'LIVE',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          )
-                        : null,
-                    subtitle: channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) {
-                            return VideoChat(
-                              title: channel.title,
-                              userName: channel.displayName,
-                              userLogin: channel.broadcasterLogin,
-                            );
-                          },
-                        ),
+          child: RefreshIndicator(
+            onRefresh: () => searchStore.handleQuery(searchStore.textController.text),
+            child: Observer(
+              builder: (_) {
+                return ListView.builder(
+                  itemCount: searchStore.searchResults.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == searchStore.searchResults.length) {
+                      if (searchStore.textController.text.isEmpty) {
+                        return const SizedBox();
+                      }
+                      return ListTile(
+                        title: Text('Go to ${searchStore.textController.text}'),
+                        onTap: () => searchStore.handleSearch(searchStore.textController.text, context),
                       );
-                    },
-                  );
-                },
-              );
-            },
+                    }
+
+                    final channel = searchStore.searchResults[index];
+                    return ListTile(
+                      title: Text(channel.displayName),
+                      trailing: channel.isLive
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(5.0),
+                              child: Container(
+                                color: Colors.red,
+                                padding: const EdgeInsets.all(8.0),
+                                child: const Text(
+                                  'LIVE',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            )
+                          : null,
+                      subtitle:
+                          channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) {
+                              return VideoChat(
+                                title: channel.title,
+                                userName: channel.displayName,
+                                userLogin: channel.broadcasterLogin,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
       ],

@@ -21,7 +21,7 @@ class StreamList extends StatelessWidget {
               if (index > streamListStore.streams(category: category).length / 2 && streamListStore.hasMore(category: category)) {
                 streamListStore.getStreams(category: category);
               }
-              return StreamCard(streamInfo: streamListStore.streams(category: category).elementAt(index));
+              return StreamCard(streamInfo: streamListStore.streams(category: category)[index]);
             },
           );
         },
