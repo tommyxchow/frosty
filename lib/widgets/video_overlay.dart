@@ -29,8 +29,8 @@ class VideoOverlay extends StatelessWidget {
               duration: const Duration(milliseconds: 100),
               child: ColoredBox(
                 color: Colors.black.withOpacity(0.5),
-                child: Visibility(
-                  visible: videoStore.menuVisible,
+                child: IgnorePointer(
+                  ignoring: !videoStore.menuVisible,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -42,13 +42,6 @@ class VideoOverlay extends StatelessWidget {
                               color: Colors.white,
                             ),
                             onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          Text(
-                            userName,
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
                           ),
                           const Spacer(),
                           IconButton(
@@ -81,6 +74,14 @@ class VideoOverlay extends StatelessWidget {
                       ),
                       Row(
                         children: [
+                          const SizedBox(width: 10),
+                          Text(
+                            userName,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const Spacer(),
                           IconButton(
                             icon: const Icon(
