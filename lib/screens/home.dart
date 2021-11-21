@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/screens/categories.dart';
 import 'package:frosty/screens/search.dart';
 import 'package:frosty/screens/settings.dart';
 import 'package:frosty/stores/auth_store.dart';
@@ -38,6 +39,7 @@ class _HomeState extends State<Home> {
             final titles = [
               if (context.read<AuthStore>().isLoggedIn) 'Followed Streams',
               'Top Streams',
+              'Categories',
               'Search',
             ];
             return Text(
@@ -75,6 +77,7 @@ class _HomeState extends State<Home> {
                 category: StreamCategory.top,
                 streamListStore: widget.streamListStore,
               ),
+              const Categories(),
               const Search(),
             ],
           );
@@ -93,6 +96,10 @@ class _HomeState extends State<Home> {
               const BottomNavigationBarItem(
                 icon: Icon(Icons.arrow_upward),
                 label: 'Top',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.games),
+                label: 'Categories',
               ),
               const BottomNavigationBarItem(
                 icon: Icon(Icons.search),
