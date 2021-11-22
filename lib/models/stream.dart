@@ -4,7 +4,7 @@ part 'stream.g.dart';
 
 // Object for live Twitch streams.
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
-class Stream {
+class StreamTwitch {
   final String id;
   final String userId;
   final String userLogin;
@@ -20,7 +20,7 @@ class Stream {
   final List<String>? tagIds;
   final bool isMature;
 
-  const Stream(
+  const StreamTwitch(
     this.id,
     this.userId,
     this.userLogin,
@@ -37,5 +37,5 @@ class Stream {
     this.isMature,
   );
 
-  factory Stream.fromJson(Map<String, dynamic> json) => _$StreamFromJson(json);
+  factory StreamTwitch.fromJson(Map<String, dynamic> json) => _$StreamTwitchFromJson(json);
 }

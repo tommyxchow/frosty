@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
-  final Stream streamInfo;
+  final StreamTwitch streamInfo;
 
   const StreamCard({Key? key, required this.streamInfo}) : super(key: key);
 

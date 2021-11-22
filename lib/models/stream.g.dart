@@ -6,7 +6,7 @@ part of 'stream.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Stream _$StreamFromJson(Map<String, dynamic> json) => Stream(
+StreamTwitch _$StreamTwitchFromJson(Map<String, dynamic> json) => StreamTwitch(
       json['id'] as String,
       json['user_id'] as String,
       json['user_login'] as String,

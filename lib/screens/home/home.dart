@@ -4,29 +4,31 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings.dart';
 import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/screens/categories/categories.dart';
+import 'package:frosty/screens/categories/categories_store.dart';
 import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/search/search.dart';
-import 'package:frosty/screens/stream_list/stream_list_store.dart';
+import 'package:frosty/screens/search/search_store.dart';
+import 'package:frosty/screens/stream_list/streams_followed/followed_streams.dart';
+import 'package:frosty/screens/stream_list/streams_followed/followed_streams_store.dart';
+import 'package:frosty/screens/stream_list/streams_top/top_streams.dart';
+import 'package:frosty/screens/stream_list/streams_top/top_streams_store.dart';
 import 'package:provider/provider.dart';
 
-import '../stream_list/stream_list.dart';
-
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   final HomeStore homeStore;
-  final StreamListStore streamListStore;
+  final TopStreamsStore topStreamsStore;
+  final FollowedStreamsStore followedStreamsStore;
+  final CategoriesStore categoriesStore;
+  final SearchStore searchStore;
 
   const Home({
     Key? key,
     required this.homeStore,
-    required this.streamListStore,
+    required this.topStreamsStore,
+    required this.followedStreamsStore,
+    required this.categoriesStore,
+    required this.searchStore,
   }) : super(key: key);
-
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  final _textController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +45,7 @@ class _HomeState extends State<Home> {
               'Search',
             ];
             return Text(
-              titles[widget.homeStore.selectedIndex],
+              titles[homeStore.selectedIndex],
             );
           },
         ),
@@ -66,19 +68,12 @@ class _HomeState extends State<Home> {
       body: Observer(
         builder: (_) {
           return IndexedStack(
-            index: widget.homeStore.selectedIndex,
+            index: homeStore.selectedIndex,
             children: [
-              if (context.read<AuthStore>().isLoggedIn)
-                StreamList(
-                  category: StreamCategory.followed,
-                  streamListStore: widget.streamListStore,
-                ),
-              StreamList(
-                category: StreamCategory.top,
-                streamListStore: widget.streamListStore,
-              ),
-              const Categories(),
-              const Search(),
+              if (context.read<AuthStore>().isLoggedIn) FollowedStreams(store: followedStreamsStore),
+              TopStreams(store: topStreamsStore),
+              Categories(store: categoriesStore),
+              Search(store: searchStore),
             ],
           );
         },
@@ -106,17 +101,11 @@ class _HomeState extends State<Home> {
                 label: 'Search',
               ),
             ],
-            currentIndex: widget.homeStore.selectedIndex,
-            onTap: widget.homeStore.handleTap,
+            currentIndex: homeStore.selectedIndex,
+            onTap: homeStore.handleTap,
           );
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
   }
 }

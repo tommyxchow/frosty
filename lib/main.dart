@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
+import 'package:frosty/screens/categories/categories_store.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/home/home_store.dart';
-import 'package:frosty/screens/stream_list/stream_list_store.dart';
+import 'package:frosty/screens/search/search_store.dart';
+import 'package:frosty/screens/stream_list/streams_followed/followed_streams_store.dart';
+import 'package:frosty/screens/stream_list/streams_top/top_streams_store.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -58,9 +61,14 @@ class MyApp extends StatelessWidget {
                 ]),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
+                    final authStore = context.read<AuthStore>();
+
                     return Home(
-                      streamListStore: StreamListStore(authStore: context.read<AuthStore>()),
                       homeStore: HomeStore(),
+                      topStreamsStore: TopStreamsStore(authStore: authStore),
+                      followedStreamsStore: FollowedStreamsStore(authStore: authStore),
+                      categoriesStore: CategoriesStore(authStore: authStore),
+                      searchStore: SearchStore(authStore: authStore),
                     );
                   }
                   return const Center(child: CircularProgressIndicator());

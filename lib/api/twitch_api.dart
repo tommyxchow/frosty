@@ -159,7 +159,7 @@ class Twitch {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      return {'streams': data.map((stream) => Stream.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return {'streams': data.map((stream) => StreamTwitch.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
     } else {
       debugPrint('Failed to update top streams');
     }
@@ -181,7 +181,7 @@ class Twitch {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      return {'streams': data.map((stream) => Stream.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return {'streams': data.map((stream) => StreamTwitch.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
     } else {
       debugPrint('Failed to update followed streams');
     }

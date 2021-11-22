@@ -28,7 +28,7 @@ void main() {
     ''';
 
     final decoded = jsonDecode(sampleStream);
-    final stream = Stream.fromJson(decoded);
+    final stream = StreamTwitch.fromJson(decoded);
 
     expect(stream.id, '43809710301');
     expect(stream.userId, '71092938');
