@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/categories.dart';
-import 'package:frosty/screens/search.dart';
-import 'package:frosty/screens/settings.dart';
-import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/stores/home_store.dart';
-import 'package:frosty/stores/settings_store.dart';
-import 'package:frosty/stores/stream_list_store.dart';
+import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/core/settings/settings.dart';
+import 'package:frosty/core/settings/settings_store.dart';
+import 'package:frosty/screens/categories/categories.dart';
+import 'package:frosty/screens/home/home_store.dart';
+import 'package:frosty/screens/search/search.dart';
+import 'package:frosty/screens/stream_list/stream_list_store.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/stream_list.dart';
+import '../stream_list/stream_list.dart';
 
 class Home extends StatefulWidget {
   final HomeStore homeStore;

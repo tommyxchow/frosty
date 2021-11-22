@@ -6,8 +6,8 @@ import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/irc_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/irc.dart';
-import 'package:frosty/stores/auth_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 

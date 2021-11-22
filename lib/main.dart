@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:frosty/screens/home.dart';
-import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/stores/home_store.dart';
-import 'package:frosty/stores/settings_store.dart';
-import 'package:frosty/stores/stream_list_store.dart';
+import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/core/settings/settings_store.dart';
+import 'package:frosty/screens/home/home.dart';
+import 'package:frosty/screens/home/home_store.dart';
+import 'package:frosty/screens/stream_list/stream_list_store.dart';
 import 'package:provider/provider.dart';
 
 void main() {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/video_chat.dart';
-import 'package:frosty/stores/auth_store.dart';
-import 'package:frosty/stores/search_store.dart';
+import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/screens/channel/video_chat.dart';
+import 'package:frosty/screens/search/search_store.dart';
 import 'package:provider/provider.dart';
 
 class Search extends StatefulWidget {

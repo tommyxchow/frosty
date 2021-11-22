@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/screens/video_chat.dart';
-import 'package:frosty/stores/auth_store.dart';
+import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 

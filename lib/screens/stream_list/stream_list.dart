@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/stores/stream_list_store.dart';
-import 'package:frosty/widgets/stream_card.dart';
+import 'package:frosty/screens/stream_list/stream_card.dart';
+import 'package:frosty/screens/stream_list/stream_list_store.dart';
 
 class StreamList extends StatelessWidget {
   final StreamCategory category;

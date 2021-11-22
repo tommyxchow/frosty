@@ -1,6 +1,6 @@
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
-import 'package:frosty/stores/auth_store.dart';
 import 'package:mobx/mobx.dart';
 
 part 'categories_store.g.dart';

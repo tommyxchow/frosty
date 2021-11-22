@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/stores/auth_store.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 
 class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
