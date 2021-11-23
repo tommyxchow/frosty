@@ -35,7 +35,7 @@ class _ChatState extends State<Chat> {
                           itemCount: widget.chatStore.messages.length,
                           controller: widget.chatStore.scrollController,
                           itemBuilder: (context, index) {
-                            return widget.chatStore.renderChatMessage(widget.chatStore.messages[index]);
+                            return widget.chatStore.renderChatMessage(widget.chatStore.messages[index], context);
                           },
                         );
                       },

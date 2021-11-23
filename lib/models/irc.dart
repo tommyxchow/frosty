@@ -70,6 +70,9 @@ class IRCMessage {
       case 'CLEARMSG':
         messageCommand = Command.clearMessage;
         break;
+      case 'NOTICE':
+        messageCommand = Command.notice;
+        break;
       case 'USERNOTICE':
         messageCommand = Command.userNotice;
         break;

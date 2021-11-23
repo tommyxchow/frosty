@@ -41,6 +41,9 @@ abstract class _ChatStoreBase with Store {
   /// The logged-in user's appearance in chat.
   String? _userState;
 
+  /// Requested message to be sent by the user. Will only be sent on receival of a USERNOTICE command.
+  IRCMessage? toSend;
+
   /// If the chat should automatically scroll/jump to the latest message.
   @readonly
   var _autoScroll = true;
@@ -104,33 +107,36 @@ abstract class _ChatStoreBase with Store {
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
             messages.add(parsedIRCMessage);
-            _deleteAndScrollToEnd();
             break;
           case Command.clearChat:
             IRC.clearChat(messages: messages, ircMessage: parsedIRCMessage);
-            _deleteAndScrollToEnd();
             break;
           case Command.clearMessage:
             IRC.clearMessage(messages: messages, ircMessage: parsedIRCMessage);
-            _deleteAndScrollToEnd();
             break;
+          case Command.notice:
           case Command.userNotice:
             messages.add(parsedIRCMessage);
-            _deleteAndScrollToEnd();
             break;
           case Command.roomState:
             _roomState = _roomState.copyWith(parsedIRCMessage);
-            break;
+            continue;
           case Command.userState:
             _userState = message;
+            if (toSend != null) {
+              messages.add(toSend!);
+              toSend = null;
+            }
             break;
           case Command.globalUserState:
             // Updates the current global user state data (it includes user-id),
             // Don't really see a use for it when USERSTATE exists, so leaving it unimplemented for now.
-            break;
-          default:
+            continue;
+          case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
+            continue;
         }
+        _deleteAndScrollToEnd();
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel.sink.add('PONG :tmi.twitch.tv');
         return;
@@ -150,9 +156,11 @@ abstract class _ChatStoreBase with Store {
     _channel.sink.add('PRIVMSG #$channelName :$message');
 
     // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
-    final userChatMessage = IRCMessage.fromString(_userState!);
-    userChatMessage.message = message;
-    messages.add(userChatMessage);
+    if (_userState != null) {
+      final userChatMessage = IRCMessage.fromString(_userState!);
+      userChatMessage.message = message;
+      toSend = userChatMessage;
+    }
 
     // Clear the previous input in the TextField.
     textController.clear();
@@ -222,11 +230,12 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
+  // TODO: Split render functions and use switch statment.
   /// Returns a chat message widget for the given [IRCMessage].
-  Widget renderChatMessage(IRCMessage ircMessage) {
-    final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
-
+  Widget renderChatMessage(IRCMessage ircMessage, BuildContext context) {
     if (ircMessage.command == Command.clearChat || ircMessage.command == Command.clearMessage) {
+      final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+
       // Render timeouts and bans
       final banDuration = ircMessage.tags['ban-duration'];
       return Padding(
@@ -254,7 +263,21 @@ abstract class _ChatStoreBase with Store {
           ),
         ),
       );
+    } else if (ircMessage.command == Command.notice) {
+      return Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Text.rich(
+          TextSpan(
+            text: ircMessage.message,
+          ),
+          style: TextStyle(
+            color: Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.5),
+          ),
+        ),
+      );
     } else if (ircMessage.command == Command.userNotice) {
+      final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+
       // Render sub alerts
       return Container(
         color: Colors.purple.withOpacity(0.3),
@@ -274,6 +297,8 @@ abstract class _ChatStoreBase with Store {
         ),
       );
     } else {
+      final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+
       // Render normal chat message (PRIVMSG).
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),

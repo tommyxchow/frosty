@@ -177,6 +177,7 @@ enum Command {
   privateMessage,
   clearChat,
   clearMessage,
+  notice,
   userNotice,
   roomState,
   userState,
