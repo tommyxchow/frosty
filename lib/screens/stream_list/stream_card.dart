@@ -45,7 +45,7 @@ class StreamCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 2.0),
                     child: Text(
                       DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
-                      style: const TextStyle(fontSize: 12),
+                      style: const TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   )
                 ],

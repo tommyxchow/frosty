@@ -78,6 +78,7 @@ class VideoOverlay extends StatelessWidget {
                           Text(
                             userName,
                             style: const TextStyle(
+                              color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
