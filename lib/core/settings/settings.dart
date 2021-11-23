@@ -31,9 +31,9 @@ class Settings extends StatelessWidget {
                 subtitle: Slider(
                   value: settingsStore.messageLimit,
                   onChanged: (newValue) => settingsStore.messageLimit = newValue,
-                  min: 0,
+                  min: 200,
                   max: 1000,
-                  divisions: 10,
+                  divisions: 4,
                   label: settingsStore.messageLimit == 1000 ? 'Unlimited' : '${settingsStore.messageLimit}',
                 ),
               )
