@@ -68,6 +68,7 @@ class VideoChat extends StatelessWidget {
                 child: Chat(
                   chatStore: ChatStore(
                     auth: context.read<AuthStore>(),
+                    settings: context.read<SettingsStore>(),
                     channelName: userLogin,
                   ),
                 ),

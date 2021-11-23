@@ -7,6 +7,7 @@ import 'package:frosty/api/irc_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -38,6 +39,9 @@ abstract class _ChatStoreBase with Store {
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
 
+  /// The provided setting store to account for any user-defined behaviors.
+  final SettingsStore settings;
+
   /// The logged-in user's appearance in chat.
   String? _userState;
 
@@ -52,7 +56,11 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _roomState = const ROOMSTATE();
 
-  _ChatStoreBase({required this.auth, required this.channelName}) {
+  _ChatStoreBase({
+    required this.auth,
+    required this.settings,
+    required this.channelName,
+  }) {
     // Listen for new messages and forward them to the handler.
     _channel.stream.listen(
       (data) => _handleIRCData(data.toString()),
@@ -170,9 +178,9 @@ abstract class _ChatStoreBase with Store {
   @action
   void _deleteAndScrollToEnd() {
     if (_autoScroll) {
-      // If there are over 200 messages, remove at least 20.
-      if (messages.length > 200) {
-        messages.removeRange(0, messages.length - 180);
+      // If there are more messages than the limit, remove around 10% of them from the oldest.
+      if (messages.length > settings.messageLimit && settings.messageLimit != 1000) {
+        messages.removeRange(0, (messages.length - settings.messageLimit * 0.1).ceil());
       }
 
       // After the end of the frame, scroll to the bottom of the chat.

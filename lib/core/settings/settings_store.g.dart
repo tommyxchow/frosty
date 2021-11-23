@@ -24,10 +24,26 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$messageLimitAtom = Atom(name: '_SettingsStoreBase.messageLimit');
+
+  @override
+  double get messageLimit {
+    _$messageLimitAtom.reportRead();
+    return super.messageLimit;
+  }
+
+  @override
+  set messageLimit(double value) {
+    _$messageLimitAtom.reportWrite(value, super.messageLimit, () {
+      super.messageLimit = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
-videoEnabled: ${videoEnabled}
+videoEnabled: ${videoEnabled},
+messageLimit: ${messageLimit}
     ''';
   }
 }
