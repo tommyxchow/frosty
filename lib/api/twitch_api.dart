@@ -187,6 +187,24 @@ class Twitch {
     }
   }
 
+  /// Returns the stream info given the user login.
+  static Future<StreamTwitch?> getStream({required String userLogin, required Map<String, String>? headers}) async {
+    final uri = Uri.parse('https://api.twitch.tv/helix/streams?user_login=$userLogin');
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      final data = decoded['data'] as List;
+
+      if (data.isEmpty) return null;
+
+      return StreamTwitch.fromJson(data.first);
+    } else {
+      debugPrint('Failed to update top streams');
+    }
+  }
+
   /// Returns a user's info given their login name.
   static Future<UserTwitch?> getUser({required String userLogin, required Map<String, String>? headers}) async {
     final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users?login=$userLogin'), headers: headers);

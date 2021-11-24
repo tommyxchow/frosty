@@ -39,11 +39,60 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
+  final _$streamInfoAtom = Atom(name: '_VideoStoreBase.streamInfo');
+
+  @override
+  StreamTwitch? get streamInfo {
+    _$streamInfoAtom.reportRead();
+    return super.streamInfo;
+  }
+
+  @override
+  set streamInfo(StreamTwitch? value) {
+    _$streamInfoAtom.reportWrite(value, super.streamInfo, () {
+      super.streamInfo = value;
+    });
+  }
+
+  final _$updateStreamInfoAsyncAction =
+      AsyncAction('_VideoStoreBase.updateStreamInfo');
+
+  @override
+  Future<void> updateStreamInfo() {
+    return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
+  }
+
+  final _$_VideoStoreBaseActionController =
+      ActionController(name: '_VideoStoreBase');
+
+  @override
+  void handlePausePlay() {
+    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
+        name: '_VideoStoreBase.handlePausePlay');
+    try {
+      return super.handlePausePlay();
+    } finally {
+      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void handleVideoTap() {
+    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
+        name: '_VideoStoreBase.handleVideoTap');
+    try {
+      return super.handleVideoTap();
+    } finally {
+      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
 menuVisible: ${menuVisible},
-paused: ${paused}
+paused: ${paused},
+streamInfo: ${streamInfo}
     ''';
   }
 }

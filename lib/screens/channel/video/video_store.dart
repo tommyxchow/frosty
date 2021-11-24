@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/models/stream.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -12,16 +15,25 @@ abstract class _VideoStoreBase with Store {
 
   late Timer timer;
 
-  _VideoStoreBase() {
-    timer = Timer(const Duration(seconds: 3), () => menuVisible = false);
-  }
-
   @observable
   var menuVisible = true;
 
   @observable
   var paused = false;
 
+  @observable
+  StreamTwitch? streamInfo;
+
+  final String userLogin;
+
+  final AuthStore authStore;
+
+  _VideoStoreBase({required this.userLogin, required this.authStore}) {
+    timer = Timer(const Duration(seconds: 3), () => menuVisible = false);
+    updateStreamInfo();
+  }
+
+  @action
   void handlePausePlay() {
     if (paused) {
       controller.runJavascript('document.getElementsByTagName("video")[0].play();');
@@ -32,7 +44,8 @@ abstract class _VideoStoreBase with Store {
     paused = !paused;
   }
 
-  void handleVideoTap() async {
+  @action
+  void handleVideoTap() {
     if (menuVisible) {
       timer.cancel();
 
@@ -44,6 +57,15 @@ abstract class _VideoStoreBase with Store {
       });
 
       menuVisible = true;
+      updateStreamInfo();
+    }
+  }
+
+  @action
+  Future<void> updateStreamInfo() async {
+    final updatedStreamInfo = await Twitch.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
+    if (updatedStreamInfo != null) {
+      streamInfo = updatedStreamInfo;
     }
   }
 
