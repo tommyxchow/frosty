@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
                       searchStore: SearchStore(authStore: authStore),
                     );
                   }
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator.adaptive());
                 },
               ),
             ),

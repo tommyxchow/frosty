@@ -73,7 +73,7 @@ class Home extends StatelessWidget {
               if (context.read<AuthStore>().isLoggedIn) FollowedStreams(store: followedStreamsStore),
               TopStreams(store: topStreamsStore),
               Categories(store: categoriesStore),
-              Search(store: searchStore),
+              Search(searchStore: searchStore),
             ],
           );
         },

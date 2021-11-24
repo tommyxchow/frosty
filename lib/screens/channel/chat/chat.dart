@@ -63,7 +63,7 @@ class _ChatState extends State<Chat> {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.stacked_bar_chart),
+                      icon: Icon(Icons.adaptive.more),
                       onPressed: () {
                         showModalBottomSheet(
                           context: context,
@@ -100,7 +100,7 @@ class _ChatState extends State<Chat> {
           );
         }
         return const Center(
-          child: CircularProgressIndicator(),
+          child: CircularProgressIndicator.adaptive(),
         );
       },
     );

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/search/search_store.dart';
+import 'package:mobx/mobx.dart';
 
 class Search extends StatefulWidget {
-  final SearchStore store;
+  final SearchStore searchStore;
 
   const Search({
     Key? key,
-    required this.store,
+    required this.searchStore,
   }) : super(key: key);
 
   @override
@@ -18,12 +20,13 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   @override
   Widget build(BuildContext context) {
+    final searchStore = widget.searchStore;
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
           child: TextField(
-            controller: widget.store.textController,
+            controller: searchStore.textController,
             autocorrect: false,
             decoration: const InputDecoration(
               isDense: true,
@@ -33,28 +36,28 @@ class _SearchState extends State<Search> {
               ),
               hintText: 'Search for a channel',
             ),
-            onSubmitted: widget.store.handleQuery,
+            onSubmitted: searchStore.handleQuery,
           ),
         ),
         Expanded(
           child: RefreshIndicator(
-            onRefresh: () => widget.store.handleQuery(widget.store.textController.text),
+            onRefresh: () => searchStore.handleQuery(searchStore.textController.text),
             child: Observer(
               builder: (_) {
                 return ListView.builder(
-                  itemCount: widget.store.searchResults.length + 1,
+                  itemCount: searchStore.searchResults.length + 1,
                   itemBuilder: (context, index) {
-                    if (index == widget.store.searchResults.length) {
-                      if (widget.store.textController.text.isEmpty) {
+                    if (index == searchStore.searchResults.length) {
+                      if (searchStore.textController.text.isEmpty) {
                         return const SizedBox();
                       }
                       return ListTile(
-                        title: Text('Go to ${widget.store.textController.text}'),
-                        onTap: () => widget.store.handleSearch(widget.store.textController.text, context),
+                        title: Text('Go to ${searchStore.textController.text}'),
+                        onTap: () => searchStore.handleSearch(searchStore.textController.text, context),
                       );
                     }
 
-                    final channel = widget.store.searchResults[index];
+                    final channel = searchStore.searchResults[index];
                     return ListTile(
                       title: Text(channel.displayName),
                       trailing: channel.isLive
@@ -99,7 +102,7 @@ class _SearchState extends State<Search> {
 
   @override
   void dispose() {
-    widget.store.dispose();
+    widget.searchStore.dispose();
     super.dispose();
   }
 }
