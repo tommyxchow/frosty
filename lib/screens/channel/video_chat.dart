@@ -26,55 +26,52 @@ class VideoChat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          child: Column(
-            children: [
-              Observer(
-                builder: (_) {
-                  if (context.read<SettingsStore>().videoEnabled) {
-                    return AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Video(
-                        title: title,
-                        userName: userName,
-                        userLogin: userLogin,
-                        videoStore: VideoStore(),
-                      ),
-                    );
-                  }
-                  return AppBar(
-                    title: Text(
-                      userName,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        child: Column(
+          children: [
+            Observer(
+              builder: (_) {
+                if (context.read<SettingsStore>().videoEnabled) {
+                  return AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Video(
+                      title: title,
+                      userName: userName,
+                      userLogin: userLogin,
+                      videoStore: VideoStore(),
                     ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.settings),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return Settings(settingsStore: context.read<SettingsStore>());
-                            },
-                          );
-                        },
-                      ),
-                    ],
                   );
-                },
-              ),
-              Expanded(
-                child: Chat(
-                  chatStore: ChatStore(
-                    auth: context.read<AuthStore>(),
-                    settings: context.read<SettingsStore>(),
-                    channelName: userLogin,
+                }
+                return AppBar(
+                  title: Text(
+                    userName,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return Settings(settingsStore: context.read<SettingsStore>());
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+            Expanded(
+              child: Chat(
+                chatStore: ChatStore(
+                  auth: context.read<AuthStore>(),
+                  settings: context.read<SettingsStore>(),
+                  channelName: userLogin,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
