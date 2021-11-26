@@ -13,7 +13,7 @@ class CategoryStreams extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('test'),
+        title: Text(store.categoryInfo.name),
       ),
       body: RefreshIndicator(
         onRefresh: store.refresh,

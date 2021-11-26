@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -37,9 +38,10 @@ class ProfileCard extends StatelessWidget {
           if (authStore.isLoggedIn) {
             return ListTile(
               leading: CircleAvatar(
-                foregroundImage: NetworkImage(
+                foregroundImage: CachedNetworkImageProvider(
                   authStore.user!.profileImageUrl,
                 ),
+                backgroundColor: Colors.deepPurple,
               ),
               title: Text(authStore.user!.displayName),
               onTap: () => _showDialog(context),

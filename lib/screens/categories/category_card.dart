@@ -32,27 +32,17 @@ class CategoryCard extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-        child: Row(
+        child: Column(
           children: [
-            Flexible(
-              flex: 1,
+            Expanded(
               child: CachedNetworkImage(
                 imageUrl: category.boxArtUrl.replaceFirst('-{width}x{height}', '-138x184'),
               ),
             ),
-            const SizedBox(width: 10),
-            Flexible(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    category.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const Text('0 Viewers')
-                ],
-              ),
+            const SizedBox(height: 5),
+            Text(
+              category.name,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),

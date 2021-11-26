@@ -15,7 +15,10 @@ class Categories extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        return ListView.builder(
+        return GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+          ),
           itemCount: store.categories.length,
           itemBuilder: (context, index) {
             if (index > store.categories.length / 2 && store.hasMore) {
