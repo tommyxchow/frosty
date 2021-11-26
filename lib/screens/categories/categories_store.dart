@@ -8,6 +8,8 @@ part 'categories_store.g.dart';
 class CategoriesStore = _CategoriesStoreBase with _$CategoriesStore;
 
 abstract class _CategoriesStoreBase with Store {
+  final AuthStore authStore;
+
   final categories = ObservableList<CategoryTwitch>();
 
   String? currentCursor;
@@ -15,8 +17,6 @@ abstract class _CategoriesStoreBase with Store {
   var _isLoading = false;
 
   bool get hasMore => _isLoading == false && currentCursor != null;
-
-  final AuthStore authStore;
 
   _CategoriesStoreBase({required this.authStore}) {
     getGames();
@@ -29,7 +29,7 @@ abstract class _CategoriesStoreBase with Store {
     final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: currentCursor);
     if (result != null) {
       categories.addAll(result.data);
-      currentCursor = result.cursor;
+      currentCursor = result.pagination['cursor'];
     }
 
     _isLoading = false;
