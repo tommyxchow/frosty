@@ -160,7 +160,7 @@ abstract class _ChatStoreBase with Store {
     if (_autoScroll) {
       // If there are more messages than the limit, remove around 10% of them from the oldest.
       if (messages.length > settings.messageLimit && settings.messageLimit != 1000) {
-        messages.removeRange(0, (settings.messageLimit - settings.messageLimit * 0.1).ceil());
+        messages.removeRange(0, (settings.messageLimit / 5).ceil());
       }
 
       // After the end of the frame, scroll to the bottom of the chat.
