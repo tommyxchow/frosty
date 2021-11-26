@@ -78,6 +78,7 @@ abstract class _AuthBase with Store {
         'redirect_uri': 'auth://',
         'response_type': 'token',
         'scope': 'chat:read chat:edit user:read:follows',
+        'force_verify': 'true',
       },
     );
 

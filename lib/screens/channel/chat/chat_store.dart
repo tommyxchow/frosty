@@ -64,6 +64,7 @@ abstract class _ChatStoreBase with Store {
     // Listen for new messages and forward them to the handler.
     _channel.stream.listen(
       (data) => _handleIRCData(data.toString()),
+      onError: (error) => debugPrint('Failed to connect to chat: ${error.toString()}'),
       onDone: () => debugPrint("Disconnected from $channelName's chat."),
     );
 
@@ -144,34 +145,13 @@ abstract class _ChatStoreBase with Store {
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
             continue;
         }
+
         _deleteAndScrollToEnd();
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel.sink.add('PONG :tmi.twitch.tv');
         return;
       }
     }
-  }
-
-  /// Sends the given string message by the logged-in user and adds it to [messages].
-  @action
-  void sendMessage(String message) {
-    // Do not send if the message is blank/empty.
-    if (message.isEmpty) {
-      return;
-    }
-
-    // Send the message to the IRC chat room.
-    _channel.sink.add('PRIVMSG #$channelName :$message');
-
-    // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
-    if (_userState != null) {
-      final userChatMessage = IRCMessage.fromString(_userState!);
-      userChatMessage.message = message;
-      toSend = userChatMessage;
-    }
-
-    // Clear the previous input in the TextField.
-    textController.clear();
   }
 
   /// If [_autoScroll] is enabled, removes messages if [messages] is too large and scrolls to the latest message.
@@ -205,6 +185,28 @@ abstract class _ChatStoreBase with Store {
     SchedulerBinding.instance?.addPostFrameCallback((_) {
       scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
+  }
+
+  /// Sends the given string message by the logged-in user and adds it to [messages].
+  @action
+  void sendMessage(String message) {
+    // Do not send if the message is blank/empty.
+    if (message.isEmpty) {
+      return;
+    }
+
+    // Send the message to the IRC chat room.
+    _channel.sink.add('PRIVMSG #$channelName :$message');
+
+    // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
+    if (_userState != null) {
+      final userChatMessage = IRCMessage.fromString(_userState!);
+      userChatMessage.message = message;
+      toSend = userChatMessage;
+    }
+
+    // Clear the previous input in the TextField.
+    textController.clear();
   }
 
   /// Fetches global and channel assets (badges and emotes) and stores them in [_assetToUrl]

@@ -26,7 +26,7 @@ abstract class _FollowedStreamsStoreBase with Store {
   bool get hasMore => _isLoading == false && _followedStreamsCurrentCursor != null;
 
   _FollowedStreamsStoreBase({required this.authStore}) {
-    getFollowedStreams();
+    if (authStore.isLoggedIn) getFollowedStreams();
   }
 
   /// Fetches the followed streams based on the current cursor.

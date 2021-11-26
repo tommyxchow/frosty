@@ -58,17 +58,6 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   }
 
   @override
-  void sendMessage(String message) {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.sendMessage');
-    try {
-      return super.sendMessage(message);
-    } finally {
-      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void _deleteAndScrollToEnd() {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
         name: '_ChatStoreBase._deleteAndScrollToEnd');
@@ -85,6 +74,17 @@ mixin _$ChatStore on _ChatStoreBase, Store {
         name: '_ChatStoreBase.resumeScroll');
     try {
       return super.resumeScroll();
+    } finally {
+      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void sendMessage(String message) {
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
+        name: '_ChatStoreBase.sendMessage');
+    try {
+      return super.sendMessage(message);
     } finally {
       _$_ChatStoreBaseActionController.endAction(_$actionInfo);
     }
