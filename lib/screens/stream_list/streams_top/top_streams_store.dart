@@ -38,11 +38,11 @@ abstract class _TopStreamsStoreBase with Store {
 
     if (newTopStreams != null) {
       if (_topStreamsCurrentCursor == null) {
-        _topStreams = ObservableList.of(newTopStreams['streams']);
+        _topStreams = ObservableList.of(newTopStreams.data);
       } else {
-        _topStreams.addAll(newTopStreams['streams']);
+        _topStreams.addAll(newTopStreams.data);
       }
-      _topStreamsCurrentCursor = newTopStreams['cursor'];
+      _topStreamsCurrentCursor = newTopStreams.pagination['cursor'];
     }
 
     _isLoading = false;

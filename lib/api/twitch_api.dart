@@ -97,6 +97,7 @@ class Twitch {
   /// Returns the user's info given their token (headers)
   static Future<UserTwitch?> getUserInfo({required Map<String, String>? headers}) async {
     final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users'), headers: headers);
+
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body)['data'] as List;
 
@@ -133,7 +134,11 @@ class Twitch {
   /// Returns the validity of the given token
   static Future<bool> validateToken({required String token}) async {
     debugPrint('Validating token...');
-    final response = await http.get(Uri.parse('https://id.twitch.tv/oauth2/validate'), headers: {'Authorization': 'Bearer $token'});
+    final response = await http.get(
+      Uri.parse('https://id.twitch.tv/oauth2/validate'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
     if (response.statusCode == 200) {
       debugPrint('Token validated!');
       return true;
@@ -144,7 +149,7 @@ class Twitch {
   }
 
   /// Returns a map containing top 20 streams and a cursor for further requests.
-  static Future<Map<String, dynamic>?> getTopStreams({required Map<String, String>? headers, required String? cursor}) async {
+  static Future<StreamsTwitch?> getTopStreams({required Map<String, String>? headers, required String? cursor}) async {
     final Uri uri;
 
     if (cursor == null) {
@@ -157,16 +162,19 @@ class Twitch {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      final data = decoded['data'] as List;
 
-      return {'streams': data.map((stream) => StreamTwitch.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return StreamsTwitch.fromJson(decoded);
     } else {
       debugPrint('Failed to update top streams');
     }
   }
 
   /// Returns a map with the given user's top 20 followed streams and a cursor for further requests.
-  static Future<Map<String, dynamic>?> getFollowedStreams({required String id, required Map<String, String>? headers, required String? cursor}) async {
+  static Future<StreamsTwitch?> getFollowedStreams({
+    required String id,
+    required Map<String, String>? headers,
+    required String? cursor,
+  }) async {
     final Uri uri;
 
     if (cursor == null) {
@@ -179,11 +187,35 @@ class Twitch {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      final data = decoded['data'] as List;
 
-      return {'streams': data.map((stream) => StreamTwitch.fromJson(stream)).toList(), 'cursor': decoded['pagination']['cursor']};
+      return StreamsTwitch.fromJson(decoded);
     } else {
       debugPrint('Failed to update followed streams');
+    }
+  }
+
+  /// Returns the list of streams under the given game/category ID.
+  static Future<StreamsTwitch?> getStreamsUnderGame({
+    required String gameId,
+    required Map<String, String>? headers,
+    required String? cursor,
+  }) async {
+    final Uri uri;
+
+    if (cursor == null) {
+      uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId');
+    } else {
+      uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
+    }
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+
+      return StreamsTwitch.fromJson(decoded);
+    } else {
+      debugPrint('Failed to update game streams');
     }
   }
 
@@ -263,9 +295,8 @@ class Twitch {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      final data = decoded['data'] as List;
 
-      return CategoriesTwitch(data.map((category) => CategoryTwitch.fromJson(category)).toList(), decoded['pagination']['cursor']);
+      return CategoriesTwitch.fromJson(decoded);
     } else {
       debugPrint('Failed to update top games');
     }

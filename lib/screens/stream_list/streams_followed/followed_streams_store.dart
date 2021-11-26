@@ -38,11 +38,11 @@ abstract class _FollowedStreamsStoreBase with Store {
 
     if (newFollowedStreams != null) {
       if (_followedStreamsCurrentCursor == null) {
-        _followedStreams = ObservableList.of(newFollowedStreams['streams']);
+        _followedStreams = ObservableList.of(newFollowedStreams.data);
       } else {
-        _followedStreams.addAll(newFollowedStreams['streams']);
+        _followedStreams.addAll(newFollowedStreams.data);
       }
-      _followedStreamsCurrentCursor = newFollowedStreams['cursor'];
+      _followedStreamsCurrentCursor = newFollowedStreams.pagination['cursor'];
     }
 
     _isLoading = false;

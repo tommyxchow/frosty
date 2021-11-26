@@ -22,3 +22,11 @@ StreamTwitch _$StreamTwitchFromJson(Map<String, dynamic> json) => StreamTwitch(
       (json['tag_ids'] as List<dynamic>?)?.map((e) => e as String).toList(),
       json['is_mature'] as bool,
     );
+
+StreamsTwitch _$StreamsTwitchFromJson(Map<String, dynamic> json) =>
+    StreamsTwitch(
+      (json['data'] as List<dynamic>)
+          .map((e) => StreamTwitch.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      Map<String, String>.from(json['pagination'] as Map),
+    );

@@ -12,3 +12,11 @@ CategoryTwitch _$CategoryTwitchFromJson(Map<String, dynamic> json) =>
       json['id'] as String,
       json['name'] as String,
     );
+
+CategoriesTwitch _$CategoriesTwitchFromJson(Map<String, dynamic> json) =>
+    CategoriesTwitch(
+      (json['data'] as List<dynamic>)
+          .map((e) => CategoryTwitch.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      Map<String, String>.from(json['pagination'] as Map),
+    );
