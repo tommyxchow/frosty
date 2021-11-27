@@ -32,11 +32,18 @@ mixin _$CategoryStreamsStore on _CategoryStreamsStoreBase, Store {
     return _$getStreamsAsyncAction.run(() => super.getStreams());
   }
 
-  final _$refreshAsyncAction = AsyncAction('_CategoryStreamsStoreBase.refresh');
+  final _$_CategoryStreamsStoreBaseActionController =
+      ActionController(name: '_CategoryStreamsStoreBase');
 
   @override
   Future<void> refresh() {
-    return _$refreshAsyncAction.run(() => super.refresh());
+    final _$actionInfo = _$_CategoryStreamsStoreBaseActionController
+        .startAction(name: '_CategoryStreamsStoreBase.refresh');
+    try {
+      return super.refresh();
+    } finally {
+      _$_CategoryStreamsStoreBaseActionController.endAction(_$actionInfo);
+    }
   }
 
   @override

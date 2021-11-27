@@ -50,9 +50,9 @@ abstract class _TopStreamsStoreBase with Store {
 
   /// Resets the cursor and then fetches the top streams.
   @action
-  Future<void> refresh() async {
+  Future<void> refresh() {
     _topStreamsCurrentCursor = null;
 
-    await getTopStreams();
+    return getTopStreams();
   }
 }

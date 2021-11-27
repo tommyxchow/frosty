@@ -12,11 +12,11 @@ abstract class _CategoriesStoreBase with Store {
 
   final categories = ObservableList<CategoryTwitch>();
 
-  String? currentCursor;
+  String? _currentCursor;
 
   var _isLoading = false;
 
-  bool get hasMore => _isLoading == false && currentCursor != null;
+  bool get hasMore => _isLoading == false && _currentCursor != null;
 
   _CategoriesStoreBase({required this.authStore}) {
     getGames();
@@ -26,12 +26,19 @@ abstract class _CategoriesStoreBase with Store {
   Future<void> getGames() async {
     _isLoading = true;
 
-    final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: currentCursor);
+    final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: _currentCursor);
     if (result != null) {
       categories.addAll(result.data);
-      currentCursor = result.pagination['cursor'];
+      _currentCursor = result.pagination['cursor'];
     }
 
     _isLoading = false;
+  }
+
+  @action
+  Future<void> refresh() async {
+    _currentCursor = null;
+
+    getGames();
   }
 }

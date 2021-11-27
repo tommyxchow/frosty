@@ -50,9 +50,9 @@ abstract class _FollowedStreamsStoreBase with Store {
 
   /// Resets the cursor and then fetches the followed streams.
   @action
-  Future<void> refresh() async {
+  Future<void> refresh() {
     _followedStreamsCurrentCursor = null;
 
-    await getFollowedStreams();
+    return getFollowedStreams();
   }
 }

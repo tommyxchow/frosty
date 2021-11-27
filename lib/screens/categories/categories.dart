@@ -13,21 +13,24 @@ class Categories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (_) {
-        return GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-          ),
-          itemCount: store.categories.length,
-          itemBuilder: (context, index) {
-            if (index > store.categories.length / 2 && store.hasMore) {
-              store.getGames();
-            }
-            return CategoryCard(category: store.categories[index]);
-          },
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: store.refresh,
+      child: Observer(
+        builder: (_) {
+          return GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+            ),
+            itemCount: store.categories.length,
+            itemBuilder: (context, index) {
+              if (index > store.categories.length / 2 && store.hasMore) {
+                store.getGames();
+              }
+              return CategoryCard(category: store.categories[index]);
+            },
+          );
+        },
+      ),
     );
   }
 }

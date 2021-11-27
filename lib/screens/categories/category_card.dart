@@ -40,9 +40,12 @@ class CategoryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5),
-            Text(
-              category.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Text(
+                category.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),

@@ -34,11 +34,18 @@ mixin _$FollowedStreamsStore on _FollowedStreamsStoreBase, Store {
         .run(() => super.getFollowedStreams());
   }
 
-  final _$refreshAsyncAction = AsyncAction('_FollowedStreamsStoreBase.refresh');
+  final _$_FollowedStreamsStoreBaseActionController =
+      ActionController(name: '_FollowedStreamsStoreBase');
 
   @override
   Future<void> refresh() {
-    return _$refreshAsyncAction.run(() => super.refresh());
+    final _$actionInfo = _$_FollowedStreamsStoreBaseActionController
+        .startAction(name: '_FollowedStreamsStoreBase.refresh');
+    try {
+      return super.refresh();
+    } finally {
+      _$_FollowedStreamsStoreBaseActionController.endAction(_$actionInfo);
+    }
   }
 
   @override

@@ -16,6 +16,13 @@ mixin _$CategoriesStore on _CategoriesStoreBase, Store {
     return _$getGamesAsyncAction.run(() => super.getGames());
   }
 
+  final _$refreshAsyncAction = AsyncAction('_CategoriesStoreBase.refresh');
+
+  @override
+  Future<void> refresh() {
+    return _$refreshAsyncAction.run(() => super.refresh());
+  }
+
   @override
   String toString() {
     return '''

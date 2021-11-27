@@ -60,9 +60,9 @@ abstract class _CategoryStreamsStoreBase with Store {
 
   /// Resets the cursor and then fetches the streams under the category.
   @action
-  Future<void> refresh() async {
+  Future<void> refresh() {
     streamsCurrentCursor = null;
 
-    await getStreams();
+    return getStreams();
   }
 }

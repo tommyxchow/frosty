@@ -32,11 +32,18 @@ mixin _$TopStreamsStore on _TopStreamsStoreBase, Store {
     return _$getTopStreamsAsyncAction.run(() => super.getTopStreams());
   }
 
-  final _$refreshAsyncAction = AsyncAction('_TopStreamsStoreBase.refresh');
+  final _$_TopStreamsStoreBaseActionController =
+      ActionController(name: '_TopStreamsStoreBase');
 
   @override
   Future<void> refresh() {
-    return _$refreshAsyncAction.run(() => super.refresh());
+    final _$actionInfo = _$_TopStreamsStoreBaseActionController.startAction(
+        name: '_TopStreamsStoreBase.refresh');
+    try {
+      return super.refresh();
+    } finally {
+      _$_TopStreamsStoreBaseActionController.endAction(_$actionInfo);
+    }
   }
 
   @override

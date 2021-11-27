@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -12,21 +13,46 @@ class CategoryStreams extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(store.categoryInfo.name),
-      ),
       body: RefreshIndicator(
         onRefresh: store.refresh,
         child: Observer(
           builder: (_) {
-            return ListView.builder(
-              itemCount: store.streams.length,
-              itemBuilder: (context, index) {
-                if (index > store.streams.length / 2 && store.hasMore) {
-                  store.getStreams();
-                }
-                return StreamCard(streamInfo: store.streams[index]);
-              },
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              slivers: [
+                SliverAppBar(
+                  stretch: true,
+                  pinned: true,
+                  expandedHeight: MediaQuery.of(context).size.height / 8,
+                  flexibleSpace: FlexibleSpaceBar(
+                    centerTitle: true,
+                    stretchModes: const [
+                      StretchMode.zoomBackground,
+                    ],
+                    title: Text(
+                      store.categoryInfo.name,
+                      style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    background: CachedNetworkImage(
+                      imageUrl: store.categoryInfo.boxArtUrl.replaceFirst('-{width}x{height}', '-300x400'),
+                      color: const Color.fromRGBO(255, 255, 255, 0.5),
+                      colorBlendMode: BlendMode.modulate,
+                      fit: BoxFit.fitWidth,
+                    ),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index > store.streams.length / 2 && store.hasMore) {
+                        store.getStreams();
+                      }
+                      return StreamCard(streamInfo: store.streams[index]);
+                    },
+                    childCount: store.streams.length,
+                  ),
+                ),
+              ],
             );
           },
         ),
