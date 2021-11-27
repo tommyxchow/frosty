@@ -41,7 +41,7 @@ class ProfileCard extends StatelessWidget {
                 foregroundImage: CachedNetworkImageProvider(
                   authStore.user!.profileImageUrl,
                 ),
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: const Color(0xFF673AB7),
               ),
               title: Text(authStore.user!.displayName),
               onTap: () => _showDialog(context),

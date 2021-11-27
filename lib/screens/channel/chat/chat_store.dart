@@ -263,10 +263,10 @@ abstract class _ChatStoreBase with Store {
               const SizedBox(height: 5),
               banDuration == null
                   ? (ircMessage.command == Command.clearMessage)
-                      ? const Text('Message deleted.')
-                      : const Text('Permanently Banned.')
+                      ? const Text('Message Deleted', style: TextStyle(fontWeight: FontWeight.bold))
+                      : const Text('User Permanently Banned', style: TextStyle(fontWeight: FontWeight.bold))
                   : Text(
-                      'Timed out for $banDuration second(s).',
+                      'Timed out for $banDuration second(s)',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
             ],
@@ -290,7 +290,7 @@ abstract class _ChatStoreBase with Store {
 
       // Render sub alerts
       return Container(
-        color: Colors.purple.withOpacity(0.3),
+        color: const Color(0xFF673AB7).withOpacity(0.25),
         padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

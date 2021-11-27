@@ -29,7 +29,7 @@ class VideoOverlay extends StatelessWidget {
               opacity: videoStore.menuVisible ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 100),
               child: ColoredBox(
-                color: Colors.black.withOpacity(0.5),
+                color: const Color.fromRGBO(0, 0, 0, 0.5),
                 child: IgnorePointer(
                   ignoring: !videoStore.menuVisible,
                   child: Stack(
@@ -41,7 +41,7 @@ class VideoOverlay extends StatelessWidget {
                               IconButton(
                                 icon: Icon(
                                   Icons.adaptive.arrow_back,
-                                  color: Colors.white,
+                                  color: const Color(0xFFFFFFFF),
                                 ),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
@@ -49,7 +49,7 @@ class VideoOverlay extends StatelessWidget {
                               IconButton(
                                 icon: const Icon(
                                   Icons.settings,
-                                  color: Colors.white,
+                                  color: Color(0xFFFFFFFF),
                                 ),
                                 onPressed: () {
                                   showModalBottomSheet(
@@ -73,7 +73,7 @@ class VideoOverlay extends StatelessWidget {
                                     Text(
                                       userName,
                                       style: const TextStyle(
-                                        color: Colors.white,
+                                        color: Color(0xFFFFFFFF),
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -87,14 +87,14 @@ class VideoOverlay extends StatelessWidget {
                               IconButton(
                                 icon: const Icon(
                                   Icons.picture_in_picture_alt_rounded,
-                                  color: Colors.white,
+                                  color: Color(0xFFFFFFFF),
                                 ),
                                 onPressed: videoStore.enterPictureInPicture,
                               ),
                               IconButton(
                                 icon: const Icon(
                                   Icons.fullscreen,
-                                  color: Colors.white,
+                                  color: Color(0xFFFFFFFF),
                                 ),
                                 onPressed: videoStore.requestFullscreen,
                               )
@@ -107,11 +107,11 @@ class VideoOverlay extends StatelessWidget {
                           icon: videoStore.paused
                               ? const Icon(
                                   Icons.play_arrow,
-                                  color: Colors.white,
+                                  color: Color(0xFFFFFFFF),
                                 )
                               : const Icon(
                                   Icons.pause,
-                                  color: Colors.white,
+                                  color: Color(0xFFFFFFFF),
                                 ),
                           onPressed: videoStore.handlePausePlay,
                         ),

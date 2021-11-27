@@ -62,7 +62,7 @@ class _SearchState extends State<Search> {
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(5.0),
                               child: Container(
-                                color: Colors.red,
+                                color: const Color(0xFFF44336),
                                 padding: const EdgeInsets.all(8.0),
                                 child: const Text(
                                   'LIVE',
