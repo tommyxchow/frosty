@@ -17,7 +17,7 @@ class StreamCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) {
+            builder: (_) {
               return VideoChat(
                 title: streamInfo.title,
                 userName: streamInfo.userName,

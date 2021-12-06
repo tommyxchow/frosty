@@ -75,15 +75,19 @@ class _ChatState extends State<Chat> {
                         );
                       },
                     ),
-                    if (context.read<AuthStore>().isLoggedIn)
+                    if (context.read<AuthStore>().isLoggedIn) ...[
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
                           child: TextField(
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                icon: const Icon(Icons.emoji_emotions_outlined),
+                                onPressed: () {},
+                              ),
                               isDense: true,
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: OutlineInputBorder(
+                              contentPadding: const EdgeInsets.all(10.0),
+                              border: const OutlineInputBorder(
                                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
                               ),
                               hintText: 'Send a message',
@@ -93,6 +97,11 @@ class _ChatState extends State<Chat> {
                           ),
                         ),
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.send),
+                        onPressed: () => widget.chatStore.sendMessage(widget.chatStore.textController.text),
+                      )
+                    ],
                   ],
                 )
               ],
