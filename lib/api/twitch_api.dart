@@ -201,12 +201,9 @@ class Twitch {
     required String? cursor,
   }) async {
     final Uri uri;
-
-    if (cursor == null) {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId');
-    } else {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
-    }
+    cursor == null
+        ? uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId')
+        : uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
 
     final response = await http.get(uri, headers: headers);
 
@@ -217,6 +214,39 @@ class Twitch {
     } else {
       debugPrint('Failed to update game streams');
     }
+  }
+
+  static Future<int> getTotalViewersForGame({
+    required String gameId,
+    required Map<String, String>? headers,
+  }) async {
+    String? currentCursor;
+    var totalViewers = 0;
+
+    for (var i = 0; i < 20; i++) {
+      final Uri uri;
+      currentCursor == null
+          ? uri = Uri.parse('https://api.twitch.tv/helix/streams?first=100&game_id=$gameId')
+          : uri = Uri.parse('https://api.twitch.tv/helix/streams?first=100&game_id=$gameId&after=$currentCursor');
+
+      final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+
+        final streams = StreamsTwitch.fromJson(decoded);
+        for (final stream in streams.data) {
+          totalViewers += stream.viewerCount;
+        }
+
+        currentCursor = streams.pagination['cursor'];
+        if (currentCursor == null) break;
+      } else {
+        debugPrint('Failed to update game streams');
+      }
+    }
+    debugPrint(totalViewers.toString());
+    return totalViewers;
   }
 
   /// Returns the stream info given the user login.

@@ -27,14 +27,22 @@ class Settings extends StatelessWidget {
                 onChanged: (newValue) => settingsStore.videoEnabled = newValue,
               ),
               ListTile(
-                title: Text('Chat Message Limit: ${settingsStore.messageLimit}'),
+                title: Row(
+                  children: [
+                    const Text('Chat Message Limit  '),
+                    const Spacer(),
+                    Text(
+                      settingsStore.messageLimit == 1000 ? 'Unlimited' : '${settingsStore.messageLimit.toInt()}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
                 subtitle: Slider.adaptive(
                   value: settingsStore.messageLimit,
                   onChanged: (newValue) => settingsStore.messageLimit = newValue,
                   min: 200,
                   max: 1000,
                   divisions: 4,
-                  label: settingsStore.messageLimit == 1000 ? 'Unlimited' : '${settingsStore.messageLimit}',
                 ),
               )
             ],
