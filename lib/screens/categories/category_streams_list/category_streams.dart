@@ -23,21 +23,22 @@ class CategoryStreams extends StatelessWidget {
                 SliverAppBar(
                   stretch: true,
                   pinned: true,
-                  expandedHeight: MediaQuery.of(context).size.height / 8,
+                  expandedHeight: MediaQuery.of(context).size.height / 3,
                   flexibleSpace: FlexibleSpaceBar(
-                    centerTitle: true,
-                    stretchModes: const [
-                      StretchMode.zoomBackground,
-                    ],
                     title: Text(
                       store.categoryInfo.name,
                       style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    background: CachedNetworkImage(
-                      imageUrl: store.categoryInfo.boxArtUrl.replaceFirst('-{width}x{height}', '-300x400'),
-                      color: const Color.fromRGBO(255, 255, 255, 0.5),
-                      colorBlendMode: BlendMode.modulate,
-                      fit: BoxFit.fitWidth,
+                    background: Hero(
+                      tag: store.categoryInfo.id,
+                      child: CachedNetworkImage(
+                        imageUrl: store.categoryInfo.boxArtUrl.replaceFirst('-{width}x{height}', '-300x400'),
+                        color: const Color.fromRGBO(255, 255, 255, 0.5),
+                        colorBlendMode: BlendMode.modulate,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
