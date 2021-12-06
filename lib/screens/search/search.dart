@@ -26,10 +26,14 @@ class _SearchState extends State<Search> {
           child: TextField(
             controller: searchStore.textController,
             autocorrect: false,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
+              suffixIcon: IconButton(
+                onPressed: searchStore.clearSearch,
+                icon: const Icon(Icons.clear),
+              ),
               isDense: true,
-              contentPadding: EdgeInsets.all(10.0),
-              border: OutlineInputBorder(
+              contentPadding: const EdgeInsets.all(10.0),
+              border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
               hintText: 'Search for a channel',

@@ -11,11 +11,13 @@ part of 'search_store.dart';
 mixin _$SearchStore on _SearchStoreBase, Store {
   final _$_searchResultsAtom = Atom(name: '_SearchStoreBase._searchResults');
 
-  @override
-  ObservableList<ChannelQuery> get _searchResults {
+  ObservableList<ChannelQuery> get searchResults {
     _$_searchResultsAtom.reportRead();
     return super._searchResults;
   }
+
+  @override
+  ObservableList<ChannelQuery> get _searchResults => searchResults;
 
   @override
   set _searchResults(ObservableList<ChannelQuery> value) {

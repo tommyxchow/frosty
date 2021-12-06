@@ -15,9 +15,8 @@ abstract class _SearchStoreBase with Store {
 
   final AuthStore authStore;
 
-  @observable
+  @readonly
   var _searchResults = ObservableList<ChannelQuery>();
-  ObservableList<ChannelQuery> get searchResults => _searchResults;
 
   _SearchStoreBase({required this.authStore});
 
@@ -55,6 +54,11 @@ abstract class _SearchStoreBase with Store {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
     textController.clear();
+  }
+
+  void clearSearch() {
+    textController.clear();
+    _searchResults.clear();
   }
 
   void dispose() {
