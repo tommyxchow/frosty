@@ -93,10 +93,10 @@ abstract class _ChatStoreBase with Store {
     scrollController.addListener(() {
       // If the user scrolls up, auto-scroll will stop, allowing them to freely scroll back to previous messages.
       // Else if the user scrolls back to the bottom edge (latest message), auto-scroll will resume.
-      if (!scrollController.position.atEdge && scrollController.position.pixels < scrollController.position.maxScrollExtent) {
-        _autoScroll = false;
-      } else if (scrollController.position.atEdge && scrollController.position.pixels != scrollController.position.minScrollExtent) {
-        _autoScroll = true;
+      if (scrollController.position.pixels < scrollController.position.maxScrollExtent) {
+        if (_autoScroll == true) _autoScroll = false;
+      } else if (scrollController.position.atEdge || scrollController.position.pixels > scrollController.position.maxScrollExtent) {
+        if (_autoScroll == false) _autoScroll = true;
       }
     });
   }
@@ -188,7 +188,6 @@ abstract class _ChatStoreBase with Store {
   }
 
   /// Sends the given string message by the logged-in user and adds it to [messages].
-  @action
   void sendMessage(String message) {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) {
