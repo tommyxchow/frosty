@@ -243,7 +243,13 @@ abstract class _ChatStoreBase with Store {
   /// Returns a chat message widget for the given [IRCMessage].
   Widget renderChatMessage(IRCMessage ircMessage, BuildContext context) {
     if (ircMessage.command == Command.clearChat || ircMessage.command == Command.clearMessage) {
-      final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+      final List<InlineSpan> span;
+
+      if (settings.hideBannedMessages) {
+        span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl, hideMessage: true);
+      } else {
+        span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+      }
 
       // Render timeouts and bans
       final banDuration = ircMessage.tags['ban-duration'];
@@ -260,14 +266,16 @@ abstract class _ChatStoreBase with Store {
                 ),
               ),
               const SizedBox(height: 5),
-              banDuration == null
-                  ? (ircMessage.command == Command.clearMessage)
-                      ? const Text('Message Deleted', style: TextStyle(fontWeight: FontWeight.bold))
-                      : const Text('User Permanently Banned', style: TextStyle(fontWeight: FontWeight.bold))
-                  : Text(
-                      'Timed out for $banDuration second(s)',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+              if (banDuration == null)
+                if (ircMessage.command == Command.clearMessage)
+                  const Text('Message Deleted', style: TextStyle(fontWeight: FontWeight.bold))
+                else
+                  const Text('User Permanently Banned', style: TextStyle(fontWeight: FontWeight.bold))
+              else
+                Text(
+                  int.parse(banDuration) > 1 ? 'Timed out for $banDuration seconds' : 'Timed out for $banDuration second',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                )
             ],
           ),
         ),

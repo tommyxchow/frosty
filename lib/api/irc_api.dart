@@ -49,7 +49,7 @@ class IRC {
   }
 
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
-  static List<InlineSpan> generateSpan({required IRCMessage ircMessage, required Map<String, String> assetToUrl}) {
+  static List<InlineSpan> generateSpan({required IRCMessage ircMessage, required Map<String, String> assetToUrl, bool hideMessage = false}) {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
@@ -126,45 +126,49 @@ class IRC {
       const TextSpan(text: ':'),
     );
 
-    // Add the message and any emotes to the span.
-    final message = ircMessage.message;
-    if (message != null) {
-      final words = message.split(' ');
+    if (hideMessage) {
+      span.add(const TextSpan(text: ' <message deleted>'));
+    } else {
+      // Add the message and any emotes to the span.
+      final message = ircMessage.message;
+      if (message != null) {
+        final words = message.split(' ');
 
-      // Discard the last word if it is only the INVALID/UNDEFINED Unicode character.
-      // Rendering this character on iOS shows a question mark inside inside square.
-      // This character is used by some clients to bypass restrictions on repeating message.
-      if (words.last.contains('\u{E0000}')) words.removeLast();
+        // Discard the last word if it is only the INVALID/UNDEFINED Unicode character.
+        // Rendering this character on iOS shows a question mark inside a square.
+        // This character is used by some clients to bypass restrictions on repeating message.
+        if (words.last.contains('\u{E0000}')) words.removeLast();
 
-      final buffer = StringBuffer();
+        final buffer = StringBuffer();
 
-      for (final word in words) {
-        buffer.write(' ');
+        for (final word in words) {
+          buffer.write(' ');
 
-        final emoteUrl = assetToUrl[word] ?? localEmoteToUrl[word];
-        if (emoteUrl != null) {
-          span.add(TextSpan(text: buffer.toString()));
+          final emoteUrl = assetToUrl[word] ?? localEmoteToUrl[word];
+          if (emoteUrl != null) {
+            span.add(TextSpan(text: buffer.toString()));
 
-          buffer.clear();
+            buffer.clear();
 
-          span.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: CachedNetworkImage(
-                imageUrl: emoteUrl,
-                placeholder: (context, url) => const SizedBox(),
-                fadeInDuration: const Duration(seconds: 0),
-                height: 25,
+            span.add(
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: CachedNetworkImage(
+                  imageUrl: emoteUrl,
+                  placeholder: (context, url) => const SizedBox(),
+                  fadeInDuration: const Duration(seconds: 0),
+                  height: 25,
+                ),
               ),
-            ),
-          );
-        } else {
-          buffer.write(word);
+            );
+          } else {
+            buffer.write(word);
+          }
         }
-      }
 
-      if (buffer.isNotEmpty) {
-        span.add(TextSpan(text: buffer.toString()));
+        if (buffer.isNotEmpty) {
+          span.add(TextSpan(text: buffer.toString()));
+        }
       }
     }
 

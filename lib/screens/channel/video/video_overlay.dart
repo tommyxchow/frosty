@@ -52,11 +52,14 @@ class VideoOverlay extends StatelessWidget {
                                   color: Color(0xFFFFFFFF),
                                 ),
                                 onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) {
-                                      return Settings(settingsStore: context.read<SettingsStore>());
-                                    },
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      fullscreenDialog: true,
+                                      builder: (context) {
+                                        return Settings(settingsStore: context.read<SettingsStore>());
+                                      },
+                                    ),
                                   );
                                 },
                               ),
@@ -79,6 +82,8 @@ class VideoOverlay extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 5.0),
+                                    // SingleChildScrollView(scrollDirection: Axis.horizontal, child: Text(title)),
+                                    // const SizedBox(height: 5.0),
                                     if (videoStore.streamInfo != null) Text('${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers'),
                                   ],
                                 ),

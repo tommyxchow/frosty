@@ -8,10 +8,13 @@ class SettingsStore = _SettingsStoreBase with _$SettingsStore;
 
 abstract class _SettingsStoreBase with Store {
   @observable
-  bool videoEnabled = true;
+  var videoEnabled = true;
 
   @observable
-  double messageLimit = 200;
+  var messageLimit = 200.0;
+
+  @observable
+  var hideBannedMessages = false;
 
   Future<void> init() async {
     // Retrieve the instance that will allow us to store and persist settings.
@@ -20,6 +23,7 @@ abstract class _SettingsStoreBase with Store {
     // Initialize settings from stored preferences if any.
     videoEnabled = prefs.getBool('video_enabled') ?? videoEnabled;
     messageLimit = prefs.getDouble('message_limit') ?? messageLimit;
+    hideBannedMessages = prefs.getBool('hide_banned_messages') ?? hideBannedMessages;
 
     // Set up autorun to store setting anytime they're changed.
     // The ReactionDisposer will not be needed since settings will always exist.
@@ -27,6 +31,7 @@ abstract class _SettingsStoreBase with Store {
       debugPrint('settings changed');
       prefs.setBool('video_enabled', videoEnabled);
       prefs.setDouble('message_limit', messageLimit);
+      prefs.setBool('hide_banned_messages', hideBannedMessages);
     });
   }
 }

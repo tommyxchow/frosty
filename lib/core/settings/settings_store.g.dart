@@ -39,11 +39,28 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$hideBannedMessagesAtom =
+      Atom(name: '_SettingsStoreBase.hideBannedMessages');
+
+  @override
+  bool get hideBannedMessages {
+    _$hideBannedMessagesAtom.reportRead();
+    return super.hideBannedMessages;
+  }
+
+  @override
+  set hideBannedMessages(bool value) {
+    _$hideBannedMessagesAtom.reportWrite(value, super.hideBannedMessages, () {
+      super.hideBannedMessages = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
 videoEnabled: ${videoEnabled},
-messageLimit: ${messageLimit}
+messageLimit: ${messageLimit},
+hideBannedMessages: ${hideBannedMessages}
     ''';
   }
 }
