@@ -24,6 +24,7 @@ class Video extends StatelessWidget {
       children: [
         WebView(
           initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
+          backgroundColor: const Color(0x00000000),
           javascriptMode: JavascriptMode.unrestricted,
           allowsInlineMediaPlayback: true,
           initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,

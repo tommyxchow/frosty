@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/widgets.dart';
 import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/irc_api.dart';
