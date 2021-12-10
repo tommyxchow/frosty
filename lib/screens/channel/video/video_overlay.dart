@@ -67,6 +67,7 @@ class VideoOverlay extends StatelessWidget {
                           ),
                           const Spacer(),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(10.0),
@@ -94,7 +95,7 @@ class VideoOverlay extends StatelessWidget {
                                   Icons.picture_in_picture_alt_rounded,
                                   color: Color(0xFFFFFFFF),
                                 ),
-                                onPressed: videoStore.enterPictureInPicture,
+                                onPressed: videoStore.requestPictureInPicture,
                               ),
                               IconButton(
                                 icon: const Icon(
@@ -109,6 +110,7 @@ class VideoOverlay extends StatelessWidget {
                       ),
                       Center(
                         child: IconButton(
+                          iconSize: 50.0,
                           icon: videoStore.paused
                               ? const Icon(
                                   Icons.play_arrow,
