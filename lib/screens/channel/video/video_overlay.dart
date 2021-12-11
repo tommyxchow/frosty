@@ -85,7 +85,13 @@ class VideoOverlay extends StatelessWidget {
                                     const SizedBox(height: 5.0),
                                     // SingleChildScrollView(scrollDirection: Axis.horizontal, child: Text(title)),
                                     // const SizedBox(height: 5.0),
-                                    if (videoStore.streamInfo != null) Text('${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers'),
+                                    if (videoStore.streamInfo != null)
+                                      Text(
+                                        '${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                        style: const TextStyle(
+                                          color: Color(0xFFFFFFFF),
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),

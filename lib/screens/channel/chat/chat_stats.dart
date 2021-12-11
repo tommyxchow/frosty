@@ -21,7 +21,7 @@ class ChatStats extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Text('Emote-only'),
-                  trailing: Text(chatStore.roomState.emoteOnly == '0' ? 'Disabled' : 'Enabled'),
+                  trailing: Text(chatStore.roomState.emoteOnly ? 'Enabled' : 'Disabled'),
                 ),
                 ListTile(
                   leading: const Text('Followers-only'),
@@ -33,7 +33,7 @@ class ChatStats extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Text('R9K'),
-                  trailing: Text(chatStore.roomState.r9k == '0' ? 'Disabled' : 'Enabled'),
+                  trailing: Text(chatStore.roomState.r9k ? 'Enabled' : 'Disabled'),
                 ),
                 ListTile(
                   leading: const Text('Slow'),
@@ -41,7 +41,7 @@ class ChatStats extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Text('Sub-only'),
-                  trailing: Text(chatStore.roomState.subMode == '0' ? 'Disabled' : 'Enabled'),
+                  trailing: Text(chatStore.roomState.subMode ? 'Enabled' : 'Disabled'),
                 ),
               ],
             );

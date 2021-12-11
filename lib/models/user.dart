@@ -31,3 +31,18 @@ class UserTwitch {
 
   factory UserTwitch.fromJson(Map<String, dynamic> json) => _$UserTwitchFromJson(json);
 }
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class UserBlockedTwitch {
+  final String userId;
+  final String userLogin;
+  final String displayName;
+
+  const UserBlockedTwitch(
+    this.userId,
+    this.userLogin,
+    this.displayName,
+  );
+
+  factory UserBlockedTwitch.fromJson(Map<String, dynamic> json) => _$UserBlockedTwitchFromJson(json);
+}

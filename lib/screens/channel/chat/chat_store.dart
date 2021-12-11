@@ -42,7 +42,7 @@ abstract class _ChatStoreBase with Store {
   final SettingsStore settings;
 
   /// The logged-in user's appearance in chat.
-  String? _userState;
+  var _userState = const USERSTATE();
 
   /// Requested message to be sent by the user. Will only be sent on receival of a USERNOTICE command.
   IRCMessage? toSend;
@@ -112,6 +112,11 @@ abstract class _ChatStoreBase with Store {
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message);
 
+        // Filter messages from any blocked users if not moderating and not the channel owner
+        if (!_userState.mod &&
+            channelName != auth.user?.login &&
+            auth.blockedUsers.where((blockedUser) => blockedUser.userLogin == parsedIRCMessage.user).isNotEmpty) continue;
+
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
             messages.add(parsedIRCMessage);
@@ -127,10 +132,10 @@ abstract class _ChatStoreBase with Store {
             messages.add(parsedIRCMessage);
             break;
           case Command.roomState:
-            _roomState = _roomState.copyWith(parsedIRCMessage);
+            _roomState = _roomState.fromIRC(parsedIRCMessage);
             continue;
           case Command.userState:
-            _userState = message;
+            _userState = _userState.fromIRC(parsedIRCMessage);
             if (toSend != null) {
               messages.add(toSend!);
               toSend = null;
@@ -197,8 +202,9 @@ abstract class _ChatStoreBase with Store {
     _channel.sink.add('PRIVMSG #$channelName :$message');
 
     // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
-    if (_userState != null) {
-      final userChatMessage = IRCMessage.fromString(_userState!);
+    final userStateString = _userState.raw;
+    if (userStateString != null) {
+      final userChatMessage = IRCMessage.fromString(userStateString);
       userChatMessage.message = message;
       toSend = userChatMessage;
     }

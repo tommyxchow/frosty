@@ -51,6 +51,23 @@ mixin _$AuthStore on _AuthBase, Store {
     });
   }
 
+  final _$_blockedUsersAtom = Atom(name: '_AuthBase._blockedUsers');
+
+  ObservableList<UserBlockedTwitch> get blockedUsers {
+    _$_blockedUsersAtom.reportRead();
+    return super._blockedUsers;
+  }
+
+  @override
+  ObservableList<UserBlockedTwitch> get _blockedUsers => blockedUsers;
+
+  @override
+  set _blockedUsers(ObservableList<UserBlockedTwitch> value) {
+    _$_blockedUsersAtom.reportWrite(value, super._blockedUsers, () {
+      super._blockedUsers = value;
+    });
+  }
+
   final _$_isLoggedInAtom = Atom(name: '_AuthBase._isLoggedIn');
 
   bool get isLoggedIn {

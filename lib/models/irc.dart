@@ -3,12 +3,19 @@ import 'package:frosty/api/irc_api.dart';
 
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
+  final String raw;
   final Map<String, String> tags;
   final String? user;
   Command command;
   String? message;
 
-  IRCMessage({required this.tags, required this.command, required this.user, required this.message});
+  IRCMessage({
+    required this.raw,
+    required this.tags,
+    required this.command,
+    required this.user,
+    required this.message,
+  });
 
   /// Parses an IRC string and returns its corresponding [IRCMessage] object.
   factory IRCMessage.fromString(String whole) {
@@ -91,6 +98,7 @@ class IRCMessage {
     }
 
     return IRCMessage(
+      raw: whole,
       tags: mappedTags,
       command: messageCommand,
       user: user,
@@ -101,28 +109,50 @@ class IRCMessage {
 
 /// The object representation of the IRC ROOMSTATE message.
 class ROOMSTATE {
-  final String emoteOnly;
+  final bool emoteOnly;
   final String followersOnly;
-  final String r9k;
+  final bool r9k;
   final String slowMode;
-  final String subMode;
+  final bool subMode;
 
   const ROOMSTATE({
-    this.emoteOnly = "0",
-    this.followersOnly = "0",
-    this.r9k = "0",
-    this.slowMode = "0",
-    this.subMode = "0",
+    this.emoteOnly = false,
+    this.followersOnly = '-1',
+    this.r9k = false,
+    this.slowMode = '0',
+    this.subMode = false,
   });
 
   /// Create a new copy with the parameters from the provided [IRCMessage]
-  ROOMSTATE copyWith(IRCMessage ircMessage) {
-    return ROOMSTATE(
-      emoteOnly: ircMessage.tags['emote-only'] ?? emoteOnly,
-      followersOnly: ircMessage.tags['followers-only'] ?? followersOnly,
-      r9k: ircMessage.tags['r9k'] ?? r9k,
-      slowMode: ircMessage.tags['slow'] ?? slowMode,
-      subMode: ircMessage.tags['subs-only'] ?? subMode,
-    );
-  }
+  ROOMSTATE fromIRC(IRCMessage ircMessage) => ROOMSTATE(
+        emoteOnly: ircMessage.tags['emote-only'] == '0' ? false : true,
+        followersOnly: ircMessage.tags['followers-only'] ?? followersOnly,
+        r9k: ircMessage.tags['r9k'] == '0' ? false : true,
+        slowMode: ircMessage.tags['slow'] ?? slowMode,
+        subMode: ircMessage.tags['subs-only'] == '0' ? false : true,
+      );
+}
+
+class USERSTATE {
+  final String? raw;
+  final String color;
+  final String displayName;
+  final bool mod;
+  final bool subscriber;
+
+  const USERSTATE({
+    this.raw,
+    this.color = '',
+    this.displayName = '',
+    this.mod = false,
+    this.subscriber = false,
+  });
+
+  USERSTATE fromIRC(IRCMessage ircMessage) => USERSTATE(
+        raw: ircMessage.raw,
+        color: ircMessage.tags['color'] ?? color,
+        displayName: ircMessage.tags['display-name'] ?? displayName,
+        mod: ircMessage.tags['mod'] == '0' ? false : true,
+        subscriber: ircMessage.tags['subscriber'] == '0' ? false : true,
+      );
 }
