@@ -12,7 +12,7 @@ class SevenTV {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final List<Emote7TV> emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
       for (final emote in emotes) {
@@ -31,7 +31,7 @@ class SevenTV {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final List<Emote7TV> emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
       for (final emote in emotes) {

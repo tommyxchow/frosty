@@ -112,7 +112,7 @@ abstract class _ChatStoreBase with Store {
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message);
 
-        // Filter messages from any blocked users if not moderating and not the channel owner
+        // Filter messages from any blocked users if not a moderator or not the channel owner.
         if (!_userState.mod &&
             channelName != auth.user?.login &&
             auth.blockedUsers.where((blockedUser) => blockedUser.userLogin == parsedIRCMessage.user).isNotEmpty) continue;
@@ -228,8 +228,8 @@ abstract class _ChatStoreBase with Store {
         await BTTV.getEmotesChannel(id: channelInfo.id),
         await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
         await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
-        await Twitch.getBadgesGlobal(headers: auth.headersTwitch),
-        await Twitch.getBadgesChannel(id: channelInfo.id, headers: auth.headersTwitch),
+        await Twitch.getBadgesGlobal(),
+        await Twitch.getBadgesChannel(id: channelInfo.id),
         await SevenTV.getEmotesGlobal(),
         await SevenTV.getEmotesChannel(user: channelInfo.login)
       ];

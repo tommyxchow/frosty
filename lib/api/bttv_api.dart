@@ -11,7 +11,7 @@ class BTTV {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final List<EmoteBTTVGlobal> emotes = decoded.map((emote) => EmoteBTTVGlobal.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => EmoteBTTVGlobal.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
       for (final emote in emotes) {

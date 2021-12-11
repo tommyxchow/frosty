@@ -17,7 +17,7 @@ class Twitch {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
-      final List<EmoteTwitch> emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
       for (final emote in emotes) {
@@ -37,7 +37,7 @@ class Twitch {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
-      final List<EmoteTwitch> emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
       for (final emote in emotes) {
@@ -51,44 +51,39 @@ class Twitch {
   }
 
   /// Returns a map of global Twitch badges to their URL.
-  static Future<Map<String, String>?> getBadgesGlobal({required Map<String, String>? headers}) async {
-    final url = Uri.parse('https://api.twitch.tv/helix/chat/badges/global');
-    final response = await http.get(url, headers: headers);
+  static Future<Map<String, String>?> getBadgesGlobal() async {
+    final url = Uri.parse('https://badges.twitch.tv/v1/badges/global/display');
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body)['data'] as List;
-      final List<BadgesTwitch> badges = decoded.map((emote) => BadgesTwitch.fromJson(emote)).toList();
+      final result = <String, String>{};
 
-      final badgeToUrl = <String, String>{};
-      for (final badge in badges) {
-        for (final badgeVersion in badge.versions) {
-          badgeToUrl['${badge.setId}/${badgeVersion.id}'] = badgeVersion.imageUrl4x;
-        }
-      }
+      final decoded = jsonDecode(response.body)['badge_sets'] as Map;
 
-      return badgeToUrl;
+      // TODO: Figure out cleaner way to decode badge JSON.
+      decoded.forEach((id, versions) =>
+          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = BadgeInfoTwitch.fromJson(badgeInfo).imageUrl4x));
+
+      return result;
     } else {
       debugPrint('Failed to get global Twitch badges. Error code: ${response.statusCode}');
     }
   }
 
   /// Returns a map of a channel's Twitch badges to their URL.
-  static Future<Map<String, String>?> getBadgesChannel({required String id, required Map<String, String>? headers}) async {
-    final url = Uri.parse('https://api.twitch.tv/helix/chat/badges?broadcaster_id=$id');
-    final response = await http.get(url, headers: headers);
+  static Future<Map<String, String>?> getBadgesChannel({required String id}) async {
+    final url = Uri.parse('https://badges.twitch.tv/v1/badges/channels/$id/display');
+    final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body)['data'] as List;
-      final List<BadgesTwitch> badges = decoded.map((emote) => BadgesTwitch.fromJson(emote)).toList();
+      final result = <String, String>{};
 
-      final badgeToUrl = <String, String>{};
-      for (final badge in badges) {
-        for (final badgeVersion in badge.versions) {
-          badgeToUrl['${badge.setId}/${badgeVersion.id}'] = badgeVersion.imageUrl4x;
-        }
-      }
+      final decoded = jsonDecode(response.body)['badge_sets'] as Map;
 
-      return badgeToUrl;
+      decoded.forEach((id, versions) =>
+          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = BadgeInfoTwitch.fromJson(badgeInfo).imageUrl4x));
+
+      return result;
     } else {
       debugPrint('Failed to get Twitch badges for id: $id. Error code: ${response.statusCode}');
     }

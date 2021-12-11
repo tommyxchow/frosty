@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:frosty/models/irc.dart';
 
 class IRC {
@@ -97,11 +97,15 @@ class IRC {
           span.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
-              child: CachedNetworkImage(
-                imageUrl: badgeUrl,
-                placeholder: (context, url) => const SizedBox(),
-                fadeInDuration: const Duration(seconds: 0),
-                height: 20,
+              child: Tooltip(
+                message: badge,
+                preferBelow: false,
+                child: CachedNetworkImage(
+                  imageUrl: badgeUrl,
+                  placeholder: (context, url) => const SizedBox(),
+                  fadeInDuration: const Duration(seconds: 0),
+                  height: 20,
+                ),
               ),
             ),
           );
@@ -153,11 +157,15 @@ class IRC {
             span.add(
               WidgetSpan(
                 alignment: PlaceholderAlignment.middle,
-                child: CachedNetworkImage(
-                  imageUrl: emoteUrl,
-                  placeholder: (context, url) => const SizedBox(),
-                  fadeInDuration: const Duration(seconds: 0),
-                  height: 25,
+                child: Tooltip(
+                  message: word,
+                  preferBelow: false,
+                  child: CachedNetworkImage(
+                    imageUrl: emoteUrl,
+                    placeholder: (context, url) => const SizedBox(),
+                    fadeInDuration: const Duration(seconds: 0),
+                    height: 25,
+                  ),
                 ),
               ),
             );

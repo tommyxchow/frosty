@@ -11,7 +11,7 @@ class FFZ {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final List<EmoteFFZ> emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
       for (final emote in emotes) {
@@ -31,7 +31,7 @@ class FFZ {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final List<EmoteFFZ> emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
 
       final emoteToUrl = <String, String>{};
       for (final emote in emotes) {
