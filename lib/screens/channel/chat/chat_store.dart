@@ -7,6 +7,7 @@ import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
+import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -20,8 +21,11 @@ abstract class _ChatStoreBase with Store {
   /// The Twitch IRC WebSocket channel.
   final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
-  /// The map of badges and emote words to their image or GIF URL.
-  final _assetToUrl = <String, String>{};
+  /// The map of emote words to their image or GIF URL.
+  final _emoteToUrl = <String, String>{};
+
+  /// The map of badges ids to their object representation.
+  final _badgesToObject = <String, BadgeInfoTwitch>{};
 
   /// The list of chat messages to render and display.
   final messages = ObservableList<IRCMessage>();
@@ -213,7 +217,7 @@ abstract class _ChatStoreBase with Store {
     textController.clear();
   }
 
-  /// Fetches global and channel assets (badges and emotes) and stores them in [_assetToUrl]
+  /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
   Future<void> getAssets() async {
     // Fetch the desired channel/user's information.
     final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
@@ -228,17 +232,24 @@ abstract class _ChatStoreBase with Store {
         await BTTV.getEmotesChannel(id: channelInfo.id),
         await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
         await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
-        await Twitch.getBadgesGlobal(),
-        await Twitch.getBadgesChannel(id: channelInfo.id),
         await SevenTV.getEmotesGlobal(),
         await SevenTV.getEmotesChannel(user: channelInfo.login)
       ];
 
-      // Add all the assets to the global word-to-asset map.
-      // 'Global' meaning these assets can be used by any message when rendering.
       for (final map in assets) {
         if (map != null) {
-          _assetToUrl.addAll(map);
+          _emoteToUrl.addAll(map);
+        }
+      }
+
+      final badges = [
+        await Twitch.getBadgesGlobal(),
+        await Twitch.getBadgesChannel(id: channelInfo.id),
+      ];
+
+      for (final map in badges) {
+        if (map != null) {
+          _badgesToObject.addAll(map);
         }
       }
     }
@@ -251,9 +262,18 @@ abstract class _ChatStoreBase with Store {
       final List<InlineSpan> span;
 
       if (settings.hideBannedMessages) {
-        span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl, hideMessage: true);
+        span = IRC.generateSpan(
+          ircMessage: ircMessage,
+          emoteToUrl: _emoteToUrl,
+          badgeToObject: _badgesToObject,
+          hideMessage: true,
+        );
       } else {
-        span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+        span = IRC.generateSpan(
+          ircMessage: ircMessage,
+          badgeToObject: _badgesToObject,
+          emoteToUrl: _emoteToUrl,
+        );
       }
 
       // Render timeouts and bans
@@ -298,7 +318,11 @@ abstract class _ChatStoreBase with Store {
         ),
       );
     } else if (ircMessage.command == Command.userNotice) {
-      final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+      final span = IRC.generateSpan(
+        ircMessage: ircMessage,
+        emoteToUrl: _emoteToUrl,
+        badgeToObject: _badgesToObject,
+      );
 
       // Render sub alerts
       return Container(
@@ -319,7 +343,11 @@ abstract class _ChatStoreBase with Store {
         ),
       );
     } else {
-      final span = IRC.generateSpan(ircMessage: ircMessage, assetToUrl: _assetToUrl);
+      final span = IRC.generateSpan(
+        ircMessage: ircMessage,
+        emoteToUrl: _emoteToUrl,
+        badgeToObject: _badgesToObject,
+      );
 
       // Render normal chat message (PRIVMSG).
       return Padding(

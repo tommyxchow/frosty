@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/irc.dart';
 
 class IRC {
@@ -49,7 +50,12 @@ class IRC {
   }
 
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
-  static List<InlineSpan> generateSpan({required IRCMessage ircMessage, required Map<String, String> assetToUrl, bool hideMessage = false}) {
+  static List<InlineSpan> generateSpan({
+    required IRCMessage ircMessage,
+    required Map<String, String> emoteToUrl,
+    required Map<String, BadgeInfoTwitch> badgeToObject,
+    bool hideMessage = false,
+  }) {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
@@ -92,16 +98,16 @@ class IRC {
     final badges = ircMessage.tags['badges'];
     if (badges != null) {
       for (final badge in badges.split(',')) {
-        final badgeUrl = assetToUrl[badge];
-        if (badgeUrl != null) {
+        final badgeInfo = badgeToObject[badge];
+        if (badgeInfo != null) {
           span.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Tooltip(
-                message: badge,
+                message: badgeInfo.title,
                 preferBelow: false,
                 child: CachedNetworkImage(
-                  imageUrl: badgeUrl,
+                  imageUrl: badgeInfo.imageUrl4x,
                   placeholder: (context, url) => const SizedBox(),
                   fadeInDuration: const Duration(seconds: 0),
                   height: 20,
@@ -148,7 +154,7 @@ class IRC {
         for (final word in words) {
           buffer.write(' ');
 
-          final emoteUrl = assetToUrl[word] ?? localEmoteToUrl[word];
+          final emoteUrl = emoteToUrl[word] ?? localEmoteToUrl[word];
           if (emoteUrl != null) {
             span.add(TextSpan(text: buffer.toString()));
 
