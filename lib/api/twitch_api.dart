@@ -216,10 +216,7 @@ class Twitch {
     }
   }
 
-  static Future<int> getTotalViewersForGame({
-    required String gameId,
-    required Map<String, String>? headers,
-  }) async {
+  static Future<int> getTotalViewersForGame({required String gameId, required Map<String, String>? headers}) async {
     String? currentCursor;
     var totalViewers = 0;
 
@@ -280,6 +277,24 @@ class Twitch {
       }
     } else {
       debugPrint('User does not exist');
+    }
+  }
+
+  /// Returns a user's list of blocked users given their id.
+  static Future<List<UserBlockedTwitch>> getUserBlockedList({required String id, required Map<String, String>? headers}) async {
+    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users/blocks?broadcaster_id=$id'), headers: headers);
+    if (response.statusCode == 200) {
+      final blockedList = jsonDecode(response.body)['data'] as List;
+
+      if (blockedList.isNotEmpty) {
+        return blockedList.map((e) => UserBlockedTwitch.fromJson(e)).toList();
+      } else {
+        debugPrint('User does not have anyone blocked');
+        return [];
+      }
+    } else {
+      debugPrint('User does not exist');
+      return [];
     }
   }
 
