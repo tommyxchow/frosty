@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class FFZ {
   /// Returns a map of global FFZ emotes to their URL.
-  static Future<Map<String, String>?> getEmotesGlobal() async {
+  static Future<List<Emote>> getEmotesGlobal() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/frankerfacez/emotes/global');
     final response = await http.get(url);
 
@@ -13,19 +13,15 @@ class FFZ {
       final decoded = jsonDecode(response.body) as List;
       final emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
 
-      final emoteToUrl = <String, String>{};
-      for (final emote in emotes) {
-        emoteToUrl[emote.code] = emote.images.url4x ?? emote.images.url1x;
-      }
-
-      return emoteToUrl;
+      return emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzGlobal)).toList();
     } else {
       debugPrint('Failed to get global FFZ emotes. Error code: ${response.statusCode}');
+      return [];
     }
   }
 
   /// Returns a map of a channel's FFZ emotes to their URL.
-  static Future<Map<String, String>?> getEmotesChannel({required String id}) async {
+  static Future<List<Emote>> getEmotesChannel({required String id}) async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/frankerfacez/users/twitch/$id');
     final response = await http.get(url);
 
@@ -33,14 +29,10 @@ class FFZ {
       final decoded = jsonDecode(response.body) as List;
       final emotes = decoded.map((emote) => EmoteFFZ.fromJson(emote)).toList();
 
-      final emoteToUrl = <String, String>{};
-      for (final emote in emotes) {
-        emoteToUrl[emote.code] = emote.images.url4x ?? emote.images.url1x;
-      }
-
-      return emoteToUrl;
+      return emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel)).toList();
     } else {
       debugPrint('Failed to get FFZ emotes for id: $id. Error code: ${response.statusCode}');
+      return [];
     }
   }
 }

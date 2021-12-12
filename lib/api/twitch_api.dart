@@ -11,7 +11,7 @@ import 'package:frosty/models/user.dart';
 import 'package:http/http.dart' as http;
 
 class Twitch {
-  static Future<Map<String, String>?> getEmotesGlobal({required Map<String, String>? headers}) async {
+  static Future<List<Emote>> getEmotesGlobal({required Map<String, String>? headers}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
     final response = await http.get(url, headers: headers);
 
@@ -19,19 +19,15 @@ class Twitch {
       final decoded = jsonDecode(response.body)['data'] as List;
       final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
-      final emoteToUrl = <String, String>{};
-      for (final emote in emotes) {
-        emoteToUrl[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0';
-      }
-
-      return emoteToUrl;
+      return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchGlobal)).toList();
     } else {
       debugPrint('Failed to get global Twitch emotes. Error code: ${response.statusCode}');
+      return [];
     }
   }
 
   /// Returns a map of a channel's Twitch emotes to their URL.
-  static Future<Map<String, String>?> getEmotesChannel({required String id, required Map<String, String>? headers}) async {
+  static Future<List<Emote>> getEmotesChannel({required String id, required Map<String, String>? headers}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=$id');
     final response = await http.get(url, headers: headers);
 
@@ -39,14 +35,10 @@ class Twitch {
       final decoded = jsonDecode(response.body)['data'] as List;
       final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
-      final emoteToUrl = <String, String>{};
-      for (final emote in emotes) {
-        emoteToUrl[emote.name] = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0';
-      }
-
-      return emoteToUrl;
+      return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchChannel)).toList();
     } else {
       debugPrint('Failed to get Twitch emotes for id: $id. Error code: ${response.statusCode}');
+      return [];
     }
   }
 

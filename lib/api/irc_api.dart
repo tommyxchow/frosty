@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/badges.dart';
+import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
 
 class IRC {
@@ -52,7 +53,7 @@ class IRC {
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
   static List<InlineSpan> generateSpan({
     required IRCMessage ircMessage,
-    required Map<String, String> emoteToUrl,
+    required Map<String, Emote> emoteToObject,
     required Map<String, BadgeInfoTwitch> badgeToObject,
     bool hideMessage = false,
   }) {
@@ -154,7 +155,7 @@ class IRC {
         for (final word in words) {
           buffer.write(' ');
 
-          final emoteUrl = emoteToUrl[word] ?? localEmoteToUrl[word];
+          final emoteUrl = emoteToObject[word]?.url ?? localEmoteToUrl[word];
           if (emoteUrl != null) {
             span.add(TextSpan(text: buffer.toString()));
 
