@@ -8,6 +8,7 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/models/badges.dart';
+import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -22,7 +23,8 @@ abstract class _ChatStoreBase with Store {
   final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
   /// The map of emote words to their image or GIF URL.
-  final _emoteToUrl = <String, String>{};
+  final _emoteToObject = <String, Emote>{};
+  Map<String, Emote> get emoteToObject => _emoteToObject;
 
   /// The map of badges ids to their object representation.
   final _badgesToObject = <String, BadgeInfoTwitch>{};
@@ -50,6 +52,14 @@ abstract class _ChatStoreBase with Store {
 
   /// Requested message to be sent by the user. Will only be sent on receival of a USERNOTICE command.
   IRCMessage? toSend;
+
+  /// The current index of the emote menu stack.
+  @observable
+  var emoteMenuIndex = 0;
+
+  /// Whether or not the emote menu is visible.
+  @observable
+  var showEmoteMenu = false;
 
   /// If the chat should automatically scroll/jump to the latest message.
   @readonly
@@ -236,9 +246,9 @@ abstract class _ChatStoreBase with Store {
         await SevenTV.getEmotesChannel(user: channelInfo.login)
       ];
 
-      for (final map in assets) {
-        if (map != null) {
-          _emoteToUrl.addAll(map);
+      for (final emotes in assets) {
+        for (var emote in emotes) {
+          _emoteToObject[emote.name] = emote;
         }
       }
 
@@ -264,15 +274,15 @@ abstract class _ChatStoreBase with Store {
       if (settings.hideBannedMessages) {
         span = IRC.generateSpan(
           ircMessage: ircMessage,
-          emoteToUrl: _emoteToUrl,
+          emoteToObject: _emoteToObject,
           badgeToObject: _badgesToObject,
           hideMessage: true,
         );
       } else {
         span = IRC.generateSpan(
           ircMessage: ircMessage,
+          emoteToObject: _emoteToObject,
           badgeToObject: _badgesToObject,
-          emoteToUrl: _emoteToUrl,
         );
       }
 
@@ -320,7 +330,7 @@ abstract class _ChatStoreBase with Store {
     } else if (ircMessage.command == Command.userNotice) {
       final span = IRC.generateSpan(
         ircMessage: ircMessage,
-        emoteToUrl: _emoteToUrl,
+        emoteToObject: _emoteToObject,
         badgeToObject: _badgesToObject,
       );
 
@@ -345,7 +355,7 @@ abstract class _ChatStoreBase with Store {
     } else {
       final span = IRC.generateSpan(
         ircMessage: ircMessage,
-        emoteToUrl: _emoteToUrl,
+        emoteToObject: _emoteToObject,
         badgeToObject: _badgesToObject,
       );
 
@@ -358,6 +368,29 @@ abstract class _ChatStoreBase with Store {
           ),
         ),
       );
+    }
+  }
+
+  String emoteMenuTitle(EmoteType type) {
+    switch (type) {
+      case EmoteType.twitchGlobal:
+        return 'Twitch Global';
+      case EmoteType.twitchChannel:
+        return 'Twitch Channel';
+      case EmoteType.ffzGlobal:
+        return 'Twitch Global';
+      case EmoteType.ffzChannel:
+        return 'FFZ Channel';
+      case EmoteType.bttvGlobal:
+        return 'BTTV Global';
+      case EmoteType.bttvChannel:
+        return 'BTTV Channel';
+      case EmoteType.bttvShared:
+        return 'BTTV Shared';
+      case EmoteType.sevenTvGlobal:
+        return '7TV Global';
+      case EmoteType.sevenTvChannel:
+        return '7TV Channel';
     }
   }
 

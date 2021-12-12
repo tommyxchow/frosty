@@ -9,6 +9,36 @@ part of 'chat_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ChatStore on _ChatStoreBase, Store {
+  final _$emoteMenuIndexAtom = Atom(name: '_ChatStoreBase.emoteMenuIndex');
+
+  @override
+  int get emoteMenuIndex {
+    _$emoteMenuIndexAtom.reportRead();
+    return super.emoteMenuIndex;
+  }
+
+  @override
+  set emoteMenuIndex(int value) {
+    _$emoteMenuIndexAtom.reportWrite(value, super.emoteMenuIndex, () {
+      super.emoteMenuIndex = value;
+    });
+  }
+
+  final _$showEmoteMenuAtom = Atom(name: '_ChatStoreBase.showEmoteMenu');
+
+  @override
+  bool get showEmoteMenu {
+    _$showEmoteMenuAtom.reportRead();
+    return super.showEmoteMenu;
+  }
+
+  @override
+  set showEmoteMenu(bool value) {
+    _$showEmoteMenuAtom.reportWrite(value, super.showEmoteMenu, () {
+      super.showEmoteMenu = value;
+    });
+  }
+
   final _$_autoScrollAtom = Atom(name: '_ChatStoreBase._autoScroll');
 
   bool get autoScroll {
@@ -82,7 +112,8 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   @override
   String toString() {
     return '''
-
+emoteMenuIndex: ${emoteMenuIndex},
+showEmoteMenu: ${showEmoteMenu}
     ''';
   }
 }
