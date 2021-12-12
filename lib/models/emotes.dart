@@ -50,20 +50,22 @@ class EmoteTwitch {
 
 // * BTTV Emotes *
 @JsonSerializable(createToJson: false)
-class EmoteBTTVGlobal {
+class EmoteBTTV {
   final String id;
   final String code;
   final String imageType;
-  final String userId;
+  final String? userId;
+  final UserBTTV? user;
 
-  const EmoteBTTVGlobal(
+  const EmoteBTTV(
     this.id,
     this.code,
     this.imageType,
     this.userId,
+    this.user,
   );
 
-  factory EmoteBTTVGlobal.fromJson(Map<String, dynamic> json) => _$EmoteBTTVGlobalFromJson(json);
+  factory EmoteBTTV.fromJson(Map<String, dynamic> json) => _$EmoteBTTVFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -84,28 +86,11 @@ class UserBTTV {
 }
 
 @JsonSerializable(createToJson: false)
-class EmoteBTTVShared {
-  final String id;
-  final String code;
-  final String imageType;
-  final UserBTTV user;
-
-  const EmoteBTTVShared(
-    this.id,
-    this.code,
-    this.imageType,
-    this.user,
-  );
-
-  factory EmoteBTTVShared.fromJson(Map<String, dynamic> json) => _$EmoteBTTVSharedFromJson(json);
-}
-
-@JsonSerializable(createToJson: false)
 class EmoteBTTVChannel {
   final String id;
   final List<String> bots;
-  final List<EmoteBTTVGlobal> channelEmotes;
-  final List<EmoteBTTVShared> sharedEmotes;
+  final List<EmoteBTTV> channelEmotes;
+  final List<EmoteBTTV> sharedEmotes;
 
   const EmoteBTTVChannel(
     this.id,
@@ -244,4 +229,71 @@ class Emote7TV {
   );
 
   factory Emote7TV.fromJson(Map<String, dynamic> json) => _$Emote7TVFromJson(json);
+}
+
+/// The common emote class.
+class Emote {
+  final String id;
+  final String name;
+  final int? width;
+  final int? height;
+  final String url;
+  final EmoteType type;
+
+  const Emote(
+    this.id,
+    this.name,
+    this.width,
+    this.height,
+    this.url,
+    this.type,
+  );
+
+  factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) => Emote(
+        emote.id,
+        emote.name,
+        null,
+        null,
+        'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
+        type,
+      );
+
+  factory Emote.fromBTTV(EmoteBTTV emote, EmoteType type) => Emote(
+        emote.id,
+        emote.code,
+        null,
+        null,
+        'https://cdn.betterttv.net/emote/${emote.id}/3x',
+        type,
+      );
+
+  factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
+        emote.id.toString(),
+        emote.code,
+        null,
+        null,
+        emote.images.url4x ?? emote.images.url1x,
+        type,
+      );
+
+  factory Emote.from7TV(Emote7TV emote, EmoteType type) => Emote(
+        emote.id,
+        emote.name,
+        emote.width.first,
+        emote.height.first,
+        emote.urls[3][1],
+        type,
+      );
+}
+
+enum EmoteType {
+  twitchGlobal,
+  twitchChannel,
+  ffzGlobal,
+  ffzChannel,
+  bttvGlobal,
+  bttvChannel,
+  bttvShared,
+  sevenTvGlobal,
+  sevenTvChannel,
 }

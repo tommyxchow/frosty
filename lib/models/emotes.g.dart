@@ -24,12 +24,14 @@ EmoteTwitch _$EmoteTwitchFromJson(Map<String, dynamic> json) => EmoteTwitch(
       (json['theme_mode'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
-EmoteBTTVGlobal _$EmoteBTTVGlobalFromJson(Map<String, dynamic> json) =>
-    EmoteBTTVGlobal(
+EmoteBTTV _$EmoteBTTVFromJson(Map<String, dynamic> json) => EmoteBTTV(
       json['id'] as String,
       json['code'] as String,
       json['imageType'] as String,
-      json['userId'] as String,
+      json['userId'] as String?,
+      json['user'] == null
+          ? null
+          : UserBTTV.fromJson(json['user'] as Map<String, dynamic>),
     );
 
 UserBTTV _$UserBTTVFromJson(Map<String, dynamic> json) => UserBTTV(
@@ -39,23 +41,15 @@ UserBTTV _$UserBTTVFromJson(Map<String, dynamic> json) => UserBTTV(
       json['providerId'] as String,
     );
 
-EmoteBTTVShared _$EmoteBTTVSharedFromJson(Map<String, dynamic> json) =>
-    EmoteBTTVShared(
-      json['id'] as String,
-      json['code'] as String,
-      json['imageType'] as String,
-      UserBTTV.fromJson(json['user'] as Map<String, dynamic>),
-    );
-
 EmoteBTTVChannel _$EmoteBTTVChannelFromJson(Map<String, dynamic> json) =>
     EmoteBTTVChannel(
       json['id'] as String,
       (json['bots'] as List<dynamic>).map((e) => e as String).toList(),
       (json['channelEmotes'] as List<dynamic>)
-          .map((e) => EmoteBTTVGlobal.fromJson(e as Map<String, dynamic>))
+          .map((e) => EmoteBTTV.fromJson(e as Map<String, dynamic>))
           .toList(),
       (json['sharedEmotes'] as List<dynamic>)
-          .map((e) => EmoteBTTVShared.fromJson(e as Map<String, dynamic>))
+          .map((e) => EmoteBTTV.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 

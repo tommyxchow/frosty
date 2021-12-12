@@ -61,7 +61,7 @@ void main() {
       """;
 
       final json = jsonDecode(emoteTrollFace);
-      final emote = EmoteBTTVGlobal.fromJson(json);
+      final emote = EmoteBTTV.fromJson(json);
 
       expect(emote.id, "54fa8f1401e468494b85b537");
       expect(emote.code, ":tf:");
@@ -85,15 +85,15 @@ void main() {
       """;
 
       final decoded = jsonDecode(emoteEZ);
-      final emote = EmoteBTTVShared.fromJson(decoded);
+      final emote = EmoteBTTV.fromJson(decoded);
 
       expect(emote.id, "5590b223b344e2c42a9e28e3");
       expect(emote.code, "EZ");
       expect(emote.imageType, "png");
-      expect(emote.user.id, "558f7862b344e2c42a9e2822");
-      expect(emote.user.name, "helloboat");
-      expect(emote.user.displayName, "helloboat");
-      expect(emote.user.providerId, "39819556");
+      expect(emote.user?.id, "558f7862b344e2c42a9e2822");
+      expect(emote.user?.name, "helloboat");
+      expect(emote.user?.displayName, "helloboat");
+      expect(emote.user?.providerId, "39819556");
     });
 
     test("global emotes should parse correctly", () {
@@ -107,7 +107,7 @@ void main() {
       """;
 
       final decoded = jsonDecode(sampleJson) as List;
-      final List<EmoteBTTVGlobal> emotes = decoded.map((emote) => EmoteBTTVGlobal.fromJson(emote)).toList();
+      final List<EmoteBTTV> emotes = decoded.map((emote) => EmoteBTTV.fromJson(emote)).toList();
       expect(emotes.length, 4);
 
       final emoteIds = ["54fa903b01e468494b85b53f", "54fa909b01e468494b85b542", "54fa90ba01e468494b85b543", "54fa90f201e468494b85b545"];
@@ -171,10 +171,10 @@ void main() {
       expect(sharedEmote.id, "5ed3bde8f54be95e2a838279");
       expect(sharedEmote.code, "pugPls");
       expect(sharedEmote.imageType, "gif");
-      expect(sharedEmote.user.id, "5c5510a1c0a5642a696190d9");
-      expect(sharedEmote.user.name, "wolfabelle");
-      expect(sharedEmote.user.displayName, "Wolfabelle");
-      expect(sharedEmote.user.providerId, "190146087");
+      expect(sharedEmote.user?.id, "5c5510a1c0a5642a696190d9");
+      expect(sharedEmote.user?.name, "wolfabelle");
+      expect(sharedEmote.user?.displayName, "Wolfabelle");
+      expect(sharedEmote.user?.providerId, "190146087");
     });
   });
 
