@@ -56,6 +56,23 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
+  final _$_userStateAtom = Atom(name: '_ChatStoreBase._userState');
+
+  USERSTATE get userState {
+    _$_userStateAtom.reportRead();
+    return super._userState;
+  }
+
+  @override
+  USERSTATE get _userState => userState;
+
+  @override
+  set _userState(USERSTATE value) {
+    _$_userStateAtom.reportWrite(value, super._userState, () {
+      super._userState = value;
+    });
+  }
+
   final _$_roomStateAtom = Atom(name: '_ChatStoreBase._roomState');
 
   ROOMSTATE get roomState {

@@ -21,15 +21,20 @@ class EmoteMenu extends StatelessWidget {
           mainAxisSpacing: 10.0,
           crossAxisSpacing: 10.0,
         ),
+        padding: const EdgeInsets.all(10.0),
         itemCount: emotes.length,
         itemBuilder: (context, index) {
           return GestureDetector(
-            onTap: () => chatStore.textController.text += ' ' + emotes[index].name,
+            onTap: emoteType == EmoteType.twitchChannel && !chatStore.userState.subscriber
+                ? null
+                : () => chatStore.textController.text += ' ' + emotes[index].name,
             child: Tooltip(
               message: emotes[index].name,
               preferBelow: false,
               child: CachedNetworkImage(
                 imageUrl: emotes[index].url,
+                color: emoteType == EmoteType.twitchChannel && !chatStore.userState.subscriber ? const Color.fromRGBO(255, 255, 255, 0.5) : null,
+                colorBlendMode: BlendMode.modulate,
               ),
             ),
           );

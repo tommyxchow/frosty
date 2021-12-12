@@ -47,9 +47,6 @@ abstract class _ChatStoreBase with Store {
   /// The provided setting store to account for any user-defined behaviors.
   final SettingsStore settings;
 
-  /// The logged-in user's appearance in chat.
-  var _userState = const USERSTATE();
-
   /// Requested message to be sent by the user. Will only be sent on receival of a USERNOTICE command.
   IRCMessage? toSend;
 
@@ -64,6 +61,10 @@ abstract class _ChatStoreBase with Store {
   /// If the chat should automatically scroll/jump to the latest message.
   @readonly
   var _autoScroll = true;
+
+  /// The logged-in user's appearance in chat.
+  @readonly
+  var _userState = const USERSTATE();
 
   /// The rules and modes being used in the chat.
   @readonly
@@ -378,7 +379,7 @@ abstract class _ChatStoreBase with Store {
       case EmoteType.twitchChannel:
         return 'Twitch Channel';
       case EmoteType.ffzGlobal:
-        return 'Twitch Global';
+        return 'FFZ Global';
       case EmoteType.ffzChannel:
         return 'FFZ Channel';
       case EmoteType.bttvGlobal:

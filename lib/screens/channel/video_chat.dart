@@ -52,11 +52,14 @@ class VideoChat extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.settings),
                       onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Settings(settingsStore: context.read<SettingsStore>());
-                          },
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (context) {
+                              return Settings(settingsStore: context.read<SettingsStore>());
+                            },
+                          ),
                         );
                       },
                     ),

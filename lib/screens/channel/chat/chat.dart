@@ -19,51 +19,50 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
+    final chatStore = widget.chatStore;
     return FutureBuilder(
-      future: widget.chatStore.getAssets(),
+      future: chatStore.getAssets(),
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return GestureDetector(
             onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
             child: Observer(
-              builder: (context) {
-                return Column(
-                  children: [
-                    Expanded(
-                      child: Stack(
-                        alignment: AlignmentDirectional.bottomCenter,
-                        children: [
-                          Observer(
-                            builder: (_) {
-                              return ListView.builder(
-                                addAutomaticKeepAlives: false,
-                                addRepaintBoundaries: false,
-                                itemCount: widget.chatStore.messages.length,
-                                controller: widget.chatStore.scrollController,
-                                itemBuilder: (context, index) {
-                                  return widget.chatStore.renderChatMessage(widget.chatStore.messages[index], context);
-                                },
-                              );
+              builder: (context) => Column(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      alignment: AlignmentDirectional.bottomCenter,
+                      children: [
+                        Observer(
+                          builder: (_) => ListView.builder(
+                            addAutomaticKeepAlives: false,
+                            addRepaintBoundaries: false,
+                            itemCount: chatStore.messages.length,
+                            controller: chatStore.scrollController,
+                            itemBuilder: (context, index) {
+                              return chatStore.renderChatMessage(chatStore.messages[index], context);
                             },
                           ),
-                          Observer(
-                            builder: (_) {
-                              return Visibility(
-                                visible: !widget.chatStore.autoScroll,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: widget.chatStore.resumeScroll,
-                                    child: const Text('Resume Scroll'),
-                                  ),
+                        ),
+                        Observer(
+                          builder: (_) {
+                            return Visibility(
+                              visible: !chatStore.autoScroll,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: chatStore.resumeScroll,
+                                  child: const Text('Resume Scroll'),
                                 ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
+                  ),
+                  if (context.read<AuthStore>().isLoggedIn)
                     Row(
                       children: [
                         IconButton(
@@ -73,69 +72,66 @@ class _ChatState extends State<Chat> {
                               context: context,
                               builder: (context) {
                                 return ChatStats(
-                                  chatStore: widget.chatStore,
+                                  chatStore: chatStore,
                                 );
                               },
                             );
                           },
                         ),
-                        if (context.read<AuthStore>().isLoggedIn) ...[
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                              child: TextField(
-                                minLines: 1,
-                                maxLines: 5,
-                                onTap: () => widget.chatStore.showEmoteMenu = false,
-                                decoration: InputDecoration(
-                                  suffixIcon: IconButton(
-                                    icon: const Icon(Icons.emoji_emotions_outlined),
-                                    onPressed: () {
-                                      FocusManager.instance.primaryFocus?.unfocus();
-                                      widget.chatStore.showEmoteMenu = !widget.chatStore.showEmoteMenu;
-                                    },
-                                  ),
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.all(10.0),
-                                  border: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                                  ),
-                                  hintText: 'Send a message',
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                            child: TextField(
+                              minLines: 1,
+                              maxLines: 5,
+                              onTap: () => chatStore.showEmoteMenu = false,
+                              decoration: InputDecoration(
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.emoji_emotions_outlined),
+                                  onPressed: () {
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                    chatStore.showEmoteMenu = !chatStore.showEmoteMenu;
+                                  },
                                 ),
-                                controller: widget.chatStore.textController,
-                                onSubmitted: (string) => widget.chatStore.sendMessage(string),
+                                isDense: true,
+                                contentPadding: const EdgeInsets.all(10.0),
+                                border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                                ),
+                                hintText: 'Send a message',
                               ),
+                              controller: chatStore.textController,
+                              onSubmitted: chatStore.sendMessage,
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.send),
-                            onPressed: () => widget.chatStore.sendMessage(widget.chatStore.textController.text),
-                          )
-                        ],
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.send),
+                          onPressed: () => chatStore.sendMessage(chatStore.textController.text),
+                        )
                       ],
                     ),
-                    if (widget.chatStore.showEmoteMenu) ...[
-                      IndexedStack(
-                        index: widget.chatStore.emoteMenuIndex,
-                        children: EmoteType.values.map((type) => EmoteMenu(chatStore: widget.chatStore, emoteType: type)).toList(),
-                      ),
-                      SingleChildScrollView(
+                  if (chatStore.showEmoteMenu) ...[
+                    Observer(builder: (_) => EmoteMenu(chatStore: chatStore, emoteType: EmoteType.values[chatStore.emoteMenuIndex])),
+                    Observer(
+                      builder: (_) => SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                            children: EmoteType.values
-                                .asMap()
-                                .entries
-                                .map((e) => TextButton(
-                                      style: e.key == widget.chatStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
-                                      onPressed: () => widget.chatStore.emoteMenuIndex = e.key,
-                                      child: Text(widget.chatStore.emoteMenuTitle(e.value)),
-                                    ))
-                                .toList()),
-                      )
-                    ]
-                  ],
-                );
-              },
+                          children: EmoteType.values.asMap().entries.map((e) {
+                            final emotes = chatStore.emoteToObject.values.toList().where((emote) => emote.type == EmoteType.values[e.key]).toList();
+
+                            return TextButton(
+                              style: e.key == chatStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
+                              onPressed: emotes.isEmpty ? null : () => chatStore.emoteMenuIndex = e.key,
+                              child: Text(chatStore.emoteMenuTitle(e.value)),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    )
+                  ]
+                ],
+              ),
             ),
           );
         }
