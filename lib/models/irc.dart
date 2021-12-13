@@ -105,6 +105,8 @@ class IRCMessage {
       message: message,
     );
   }
+
+  factory IRCMessage.createNotice({required String message}) => IRCMessage(raw: '', tags: {}, command: Command.notice, user: null, message: 'FROSTY: $message');
 }
 
 /// The object representation of the IRC ROOMSTATE message.

@@ -6,10 +6,7 @@ import 'package:frosty/screens/search/search_store.dart';
 class Search extends StatefulWidget {
   final SearchStore searchStore;
 
-  const Search({
-    Key? key,
-    required this.searchStore,
-  }) : super(key: key);
+  const Search({Key? key, required this.searchStore}) : super(key: key);
 
   @override
   _SearchState createState() => _SearchState();

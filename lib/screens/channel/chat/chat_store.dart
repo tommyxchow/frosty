@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:frosty/api/bttv_api.dart';
@@ -21,6 +23,9 @@ class ChatStore = _ChatStoreBase with _$ChatStore;
 abstract class _ChatStoreBase with Store {
   /// The Twitch IRC WebSocket channel.
   final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+
+  /// The stream subscription that is responsible for handling events from the chat.
+  StreamSubscription? _subscription;
 
   /// The map of emote words to their image or GIF URL.
   final _emoteToObject = <String, Emote>{};
@@ -75,10 +80,16 @@ abstract class _ChatStoreBase with Store {
     required this.settings,
     required this.channelName,
   }) {
+    messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+
+    getAssets();
     // Listen for new messages and forward them to the handler.
-    _channel.stream.listen(
+    _subscription = _channel.stream.listen(
       (data) => _handleIRCData(data.toString()),
-      onError: (error) => debugPrint('Failed to connect to chat: ${error.toString()}'),
+      onError: (error) {
+        debugPrint('Failed to connect to chat: ${error.toString()}');
+        messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
+      },
       onDone: () => debugPrint("Disconnected from $channelName's chat."),
     );
 
@@ -102,6 +113,8 @@ abstract class _ChatStoreBase with Store {
     for (final command in commands) {
       _channel.sink.add(command);
     }
+
+    messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat."));
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -230,6 +243,7 @@ abstract class _ChatStoreBase with Store {
 
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
   Future<void> getAssets() async {
+    messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
     // Fetch the desired channel/user's information.
     final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
 
@@ -237,20 +251,20 @@ abstract class _ChatStoreBase with Store {
       // Fetch the global and channel's assets (emotes & badges).
       // Async awaits are placed in a list so they are performed in parallel.
       final assets = [
-        await FFZ.getEmotesGlobal(),
-        await FFZ.getEmotesChannel(id: channelInfo.id),
-        await BTTV.getEmotesGlobal(),
-        await BTTV.getEmotesChannel(id: channelInfo.id),
-        await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
-        await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
-        await SevenTV.getEmotesGlobal(),
-        await SevenTV.getEmotesChannel(user: channelInfo.login)
+        ...await FFZ.getEmotesGlobal(),
+        ...await FFZ.getEmotesChannel(id: channelInfo.id),
+        ...await BTTV.getEmotesGlobal(),
+        ...await BTTV.getEmotesChannel(id: channelInfo.id),
+        ...await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
+        ...await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
+        ...await SevenTV.getEmotesGlobal(),
+        ...await SevenTV.getEmotesChannel(user: channelInfo.login)
       ];
 
-      for (final emotes in assets) {
-        for (var emote in emotes) {
-          _emoteToObject[emote.name] = emote;
-        }
+      assets.sort((a, b) => a.id.compareTo(b.id));
+
+      for (final emote in assets) {
+        _emoteToObject[emote.name] = emote;
       }
 
       final badges = [
@@ -263,6 +277,8 @@ abstract class _ChatStoreBase with Store {
           _badgesToObject.addAll(map);
         }
       }
+
+      messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!'));
     }
   }
 
@@ -372,6 +388,7 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
+  /// Returns the readable text for the given emote type.
   String emoteMenuTitle(EmoteType type) {
     switch (type) {
       case EmoteType.twitchGlobal:
@@ -395,9 +412,26 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
+  /// Pauses or resumes the chat subscription depending on the provided state.
+  void handleAppStateChange(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _subscription?.resume();
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        _subscription?.pause();
+        break;
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
     _channel.sink.close();
+    _subscription?.cancel();
     textController.dispose();
     scrollController.dispose();
   }

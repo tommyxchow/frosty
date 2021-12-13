@@ -16,134 +16,138 @@ class Chat extends StatefulWidget {
   _ChatState createState() => _ChatState();
 }
 
-class _ChatState extends State<Chat> {
+class _ChatState extends State<Chat> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    widget.chatStore.handleAppStateChange(state);
+  }
+
   @override
   Widget build(BuildContext context) {
     final chatStore = widget.chatStore;
-    return FutureBuilder(
-      future: chatStore.getAssets(),
-      builder: (_, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return GestureDetector(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: Observer(
-              builder: (context) => Column(
+
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      child: Observer(
+        builder: (context) => Column(
+          children: [
+            Expanded(
+              child: Stack(
+                alignment: AlignmentDirectional.bottomCenter,
                 children: [
-                  Expanded(
-                    child: Stack(
-                      alignment: AlignmentDirectional.bottomCenter,
-                      children: [
-                        Observer(
-                          builder: (_) => ListView.builder(
-                            addAutomaticKeepAlives: false,
-                            addRepaintBoundaries: false,
-                            itemCount: chatStore.messages.length,
-                            controller: chatStore.scrollController,
-                            itemBuilder: (context, index) {
-                              return chatStore.renderChatMessage(chatStore.messages[index], context);
-                            },
-                          ),
-                        ),
-                        Observer(
-                          builder: (_) {
-                            return Visibility(
-                              visible: !chatStore.autoScroll,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: chatStore.resumeScroll,
-                                  child: const Text('Resume Scroll'),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                  Observer(
+                    builder: (_) => ListView.builder(
+                      addAutomaticKeepAlives: false,
+                      addRepaintBoundaries: false,
+                      itemCount: chatStore.messages.length,
+                      controller: chatStore.scrollController,
+                      itemBuilder: (context, index) {
+                        return chatStore.renderChatMessage(chatStore.messages[index], context);
+                      },
                     ),
                   ),
-                  if (context.read<AuthStore>().isLoggedIn)
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.adaptive.more),
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              builder: (context) {
-                                return ChatStats(
-                                  chatStore: chatStore,
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                            child: TextField(
-                              minLines: 1,
-                              maxLines: 5,
-                              onTap: () => chatStore.showEmoteMenu = false,
-                              decoration: InputDecoration(
-                                suffixIcon: IconButton(
-                                  icon: const Icon(Icons.emoji_emotions_outlined),
-                                  onPressed: () {
-                                    FocusManager.instance.primaryFocus?.unfocus();
-                                    chatStore.showEmoteMenu = !chatStore.showEmoteMenu;
-                                  },
-                                ),
-                                isDense: true,
-                                contentPadding: const EdgeInsets.all(10.0),
-                                border: const OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                                ),
-                                hintText: 'Send a message',
-                              ),
-                              controller: chatStore.textController,
-                              onSubmitted: chatStore.sendMessage,
-                            ),
+                  Observer(
+                    builder: (_) {
+                      return Visibility(
+                        visible: !chatStore.autoScroll,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: chatStore.resumeScroll,
+                            child: const Text('Resume Scroll'),
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: () => chatStore.sendMessage(chatStore.textController.text),
-                        )
-                      ],
-                    ),
-                  if (chatStore.showEmoteMenu) ...[
-                    Observer(builder: (_) => EmoteMenu(chatStore: chatStore, emoteType: EmoteType.values[chatStore.emoteMenuIndex])),
-                    Observer(
-                      builder: (_) => SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: EmoteType.values.asMap().entries.map((e) {
-                            final emotes = chatStore.emoteToObject.values.toList().where((emote) => emote.type == EmoteType.values[e.key]).toList();
-
-                            return TextButton(
-                              style: e.key == chatStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
-                              onPressed: emotes.isEmpty ? null : () => chatStore.emoteMenuIndex = e.key,
-                              child: Text(chatStore.emoteMenuTitle(e.value)),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    )
-                  ]
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
-          );
-        }
-        return const Center(
-          child: CircularProgressIndicator.adaptive(),
-        );
-      },
+            if (context.read<AuthStore>().isLoggedIn)
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.adaptive.more),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return ChatStats(
+                            chatStore: chatStore,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                      child: TextField(
+                        minLines: 1,
+                        maxLines: 5,
+                        onTap: () => chatStore.showEmoteMenu = false,
+                        decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.emoji_emotions_outlined),
+                            onPressed: () {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              chatStore.showEmoteMenu = !chatStore.showEmoteMenu;
+                            },
+                          ),
+                          isDense: true,
+                          contentPadding: const EdgeInsets.all(10.0),
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          ),
+                          hintText: 'Send a message',
+                        ),
+                        controller: chatStore.textController,
+                        onSubmitted: chatStore.sendMessage,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: () => chatStore.sendMessage(chatStore.textController.text),
+                  )
+                ],
+              ),
+            if (chatStore.showEmoteMenu) ...[
+              Observer(builder: (_) => EmoteMenu(chatStore: chatStore, emoteType: EmoteType.values[chatStore.emoteMenuIndex])),
+              Observer(
+                builder: (_) => SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: EmoteType.values.asMap().entries.map((e) {
+                      final emotes = chatStore.emoteToObject.values.toList().where((emote) => emote.type == EmoteType.values[e.key]).toList();
+
+                      return TextButton(
+                        style: e.key == chatStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
+                        onPressed: emotes.isEmpty ? null : () => chatStore.emoteMenuIndex = e.key,
+                        child: Text(chatStore.emoteMenuTitle(e.value)),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              )
+            ]
+          ],
+        ),
+      ),
     );
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
     widget.chatStore.dispose();
     super.dispose();
   }
