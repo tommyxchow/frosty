@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
+import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
@@ -58,9 +62,24 @@ class StreamCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      streamInfo.userName,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        FutureBuilder(
+                          future: Twitch.getUser(userLogin: streamInfo.userLogin, headers: context.read<AuthStore>().headersTwitch),
+                          builder: (context, AsyncSnapshot<UserTwitch?> snapshot) {
+                            return CircleAvatar(
+                              radius: 10.0,
+                              backgroundColor: const Color(0xFFFFFFFF),
+                              foregroundImage: snapshot.hasData && snapshot.data != null ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl) : null,
+                            );
+                          },
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          streamInfo.userName,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 5),
                     SingleChildScrollView(
