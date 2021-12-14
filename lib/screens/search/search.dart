@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/search/search_store.dart';
+import 'package:frosty/widgets/profile_picture.dart';
 
 class Search extends StatefulWidget {
   final SearchStore searchStore;
@@ -61,6 +62,7 @@ class _SearchState extends State<Search> {
                       final channel = searchStore.searchResults[index];
                       return ListTile(
                         title: Text(channel.displayName),
+                        leading: ProfilePicture(userLogin: channel.broadcasterLogin),
                         trailing: channel.isLive
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(5.0),

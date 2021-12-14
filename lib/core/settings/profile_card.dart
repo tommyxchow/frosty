@@ -37,10 +37,10 @@ class ProfileCard extends StatelessWidget {
           if (authStore.isLoggedIn) {
             return ListTile(
               leading: CircleAvatar(
+                backgroundColor: const Color(0xFFFFFFFF),
                 foregroundImage: CachedNetworkImageProvider(
                   authStore.user!.profileImageUrl,
                 ),
-                backgroundColor: const Color(0xFF673AB7),
               ),
               title: Text(authStore.user!.displayName),
               onTap: () => _showDialog(context),
