@@ -419,12 +419,10 @@ abstract class _ChatStoreBase with Store {
   void handleAppStateChange(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        _subscription?.resume();
         break;
       case AppLifecycleState.inactive:
         break;
       case AppLifecycleState.paused:
-        _subscription?.pause();
         break;
       case AppLifecycleState.detached:
         break;

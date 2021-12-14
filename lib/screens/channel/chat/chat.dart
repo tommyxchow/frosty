@@ -48,25 +48,21 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                       addRepaintBoundaries: false,
                       itemCount: chatStore.messages.length,
                       controller: chatStore.scrollController,
-                      itemBuilder: (context, index) {
-                        return chatStore.renderChatMessage(chatStore.messages[index], context);
-                      },
+                      itemBuilder: (context, index) => chatStore.renderChatMessage(chatStore.messages[index], context),
                     ),
                   ),
                   Observer(
-                    builder: (_) {
-                      return Visibility(
-                        visible: !chatStore.autoScroll,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: chatStore.resumeScroll,
-                            child: const Text('Resume Scroll'),
-                          ),
+                    builder: (_) => Visibility(
+                      visible: !chatStore.autoScroll,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: chatStore.resumeScroll,
+                          child: const Text('Resume Scroll'),
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -76,16 +72,10 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                 children: [
                   IconButton(
                     icon: Icon(Icons.adaptive.more),
-                    onPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return ChatStats(
-                            chatStore: chatStore,
-                          );
-                        },
-                      );
-                    },
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      builder: (_) => ChatStats(chatStore: chatStore),
+                    ),
                   ),
                   Expanded(
                     child: Padding(
@@ -121,23 +111,30 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                 ],
               ),
             if (chatStore.showEmoteMenu) ...[
-              Observer(builder: (_) => EmoteMenu(chatStore: chatStore, emoteType: EmoteType.values[chatStore.emoteMenuIndex])),
-              Observer(
-                builder: (_) => SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: EmoteType.values.asMap().entries.map((e) {
-                      final emotes = chatStore.emoteToObject.values.toList().where((emote) => emote.type == EmoteType.values[e.key]).toList();
+              Expanded(
+                child: Observer(
+                  builder: (_) => EmoteMenu(
+                    chatStore: chatStore,
+                    emoteType: EmoteType.values[chatStore.emoteMenuIndex],
+                  ),
+                ),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: EmoteType.values.asMap().entries.map((e) {
+                    final emotes = chatStore.emoteToObject.values.toList().where((emote) => emote.type == EmoteType.values[e.key]).toList();
 
-                      return TextButton(
+                    return Observer(
+                      builder: (_) => TextButton(
                         style: e.key == chatStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
                         onPressed: emotes.isEmpty ? null : () => chatStore.emoteMenuIndex = e.key,
                         child: Text(chatStore.emoteMenuTitle(e.value)),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-              )
+              ),
             ]
           ],
         ),
