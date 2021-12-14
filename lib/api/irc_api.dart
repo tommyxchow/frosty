@@ -143,13 +143,13 @@ class IRC {
       // Add the message and any emotes to the span.
       final message = ircMessage.message;
       if (message != null) {
-        final words = message.split(' ');
-
-        // Discard the last word if it is only the INVALID/UNDEFINED Unicode character.
+        // Remove any "INVALID/UNDEFINED" Unicode characters.
         // Rendering this character on iOS shows a question mark inside a square.
         // This character is used by some clients to bypass restrictions on repeating message.
-        if (words.last.contains('\u{E0000}')) words.removeLast();
+        final words = message.trim().replaceAll('\u{E0000}', '').split(' ');
 
+        // Use a string buffer to minimize TextSpan widgets.
+        // Instead of one TextSpan widget per word, we can have one TextSpan widget across multiple.
         final buffer = StringBuffer();
 
         for (final word in words) {

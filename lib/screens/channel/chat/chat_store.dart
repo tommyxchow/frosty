@@ -87,10 +87,13 @@ abstract class _ChatStoreBase with Store {
     _subscription = _channel.stream.listen(
       (data) => _handleIRCData(data.toString()),
       onError: (error) {
-        debugPrint('Failed to connect to chat: ${error.toString()}');
+        debugPrint('Chat error: ${error.toString()}');
+        messages.add(IRCMessage.createNotice(message: 'Chat error - ${error.toString()}'));
+      },
+      onDone: () {
+        debugPrint("Disconnected from $channelName's chat.");
         messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
       },
-      onDone: () => debugPrint("Disconnected from $channelName's chat."),
     );
 
     // The list of messages sent to the IRC WebSocket channel to connect and join.
