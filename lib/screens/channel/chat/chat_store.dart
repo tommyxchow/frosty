@@ -13,6 +13,7 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'chat_store.g.dart';
@@ -302,6 +303,8 @@ abstract class _ChatStoreBase with Store {
   // TODO: Split render functions and use switch statment.
   /// Returns a chat message widget for the given [IRCMessage].
   Widget renderChatMessage(IRCMessage ircMessage, BuildContext context) {
+    final zeroWidthEnabled = context.read<SettingsStore>().zeroWidthEnabled;
+
     if (ircMessage.command == Command.clearChat || ircMessage.command == Command.clearMessage) {
       final List<InlineSpan> span;
 
@@ -311,12 +314,14 @@ abstract class _ChatStoreBase with Store {
           emoteToObject: _emoteToObject,
           badgeToObject: _badgesToObject,
           hideMessage: true,
+          zeroWidthEnabled: zeroWidthEnabled,
         );
       } else {
         span = IRC.generateSpan(
           ircMessage: ircMessage,
           emoteToObject: _emoteToObject,
           badgeToObject: _badgesToObject,
+          zeroWidthEnabled: zeroWidthEnabled,
         );
       }
 
@@ -366,6 +371,7 @@ abstract class _ChatStoreBase with Store {
         ircMessage: ircMessage,
         emoteToObject: _emoteToObject,
         badgeToObject: _badgesToObject,
+        zeroWidthEnabled: zeroWidthEnabled,
       );
 
       // Render sub alerts
@@ -391,6 +397,7 @@ abstract class _ChatStoreBase with Store {
         ircMessage: ircMessage,
         emoteToObject: _emoteToObject,
         badgeToObject: _badgesToObject,
+        zeroWidthEnabled: zeroWidthEnabled,
       );
 
       // Render normal chat message (PRIVMSG).
