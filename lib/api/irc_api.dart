@@ -56,13 +56,14 @@ class IRC {
     required Map<String, Emote> emoteToObject,
     required Map<String, BadgeInfoTwitch> badgeToObject,
     bool hideMessage = false,
+    bool zeroWidthEnabled = false,
   }) {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
     // The map containing emotes from the user's tags to their URL.
     // This may include sub emotes that they can access but other users cannot.
-    final localEmoteToUrl = <String, String>{};
+    final localEmoteToObject = <String, Emote>{};
 
     final emoteTags = ircMessage.tags['emotes'];
     if (emoteTags != null) {
@@ -91,7 +92,13 @@ class IRC {
         final emoteWord = ircMessage.message!.substring(startIndex, endIndex + 1);
 
         // Store the emote word and its associated URL for later use.
-        localEmoteToUrl[emoteWord] = 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0';
+        localEmoteToObject[emoteWord] = Emote(
+          id: emoteId,
+          name: emoteWord,
+          zeroWidth: false,
+          url: 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0',
+          type: EmoteType.bttvChannel,
+        );
       }
     }
 
@@ -148,41 +155,114 @@ class IRC {
         // This character is used by some clients to bypass restrictions on repeating message.
         final words = message.trim().replaceAll('\u{E0000}', '').split(' ');
 
-        // Use a string buffer to minimize TextSpan widgets.
-        // Instead of one TextSpan widget per word, we can have one TextSpan widget across multiple.
-        final buffer = StringBuffer();
+        if (zeroWidthEnabled) {
+          final localSpan = <InlineSpan>[];
 
-        for (final word in words) {
-          buffer.write(' ');
+          var index = words.length - 1;
+          while (index != -1) {
+            final word = words[index];
+            final emote = emoteToObject[word] ?? localEmoteToObject[word];
 
-          final emoteUrl = emoteToObject[word]?.url ?? localEmoteToUrl[word];
-          if (emoteUrl != null) {
-            span.add(TextSpan(text: buffer.toString()));
+            if (emote != null) {
+              // Handle zero width emotes
+              if (emote.zeroWidth && index != 0) {
+                final emoteStack = <Emote>[];
 
-            buffer.clear();
+                var nextEmote = emoteToObject[word];
+                while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
+                  emoteStack.add(nextEmote);
+                  index--;
+                  nextEmote = emoteToObject[words[index]];
+                }
 
-            span.add(
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Tooltip(
-                  message: word,
-                  preferBelow: false,
-                  child: CachedNetworkImage(
-                    imageUrl: emoteUrl,
-                    placeholder: (context, url) => const SizedBox(),
-                    fadeInDuration: const Duration(seconds: 0),
-                    height: 25,
+                if (nextEmote != null) emoteStack.add(nextEmote);
+
+                localSpan.add(
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Tooltip(
+                      message: emoteStack.reversed.map((emote) => emote.name).join(', '),
+                      preferBelow: false,
+                      child: Stack(
+                        alignment: AlignmentDirectional.center,
+                        children: emoteStack.reversed
+                            .map((emote) => CachedNetworkImage(
+                                  imageUrl: emote.url,
+                                  placeholder: (context, url) => const SizedBox(),
+                                  fadeInDuration: const Duration(seconds: 0),
+                                  height: 25,
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  ),
+                );
+
+                if (nextEmote == null) {
+                  localSpan.add(const TextSpan(text: ' '));
+                  localSpan.add(TextSpan(text: words[index]));
+                }
+              } else {
+                localSpan.add(
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: Tooltip(
+                      message: emote.name,
+                      preferBelow: false,
+                      child: CachedNetworkImage(
+                        imageUrl: emote.url,
+                        placeholder: (context, url) => const SizedBox(),
+                        fadeInDuration: const Duration(seconds: 0),
+                        height: 25,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            } else {
+              localSpan.add(TextSpan(text: word));
+            }
+            localSpan.add(const TextSpan(text: ' '));
+            index--;
+          }
+          span.addAll(localSpan.reversed);
+        } else {
+          // Use a string buffer to minimize TextSpan widgets.
+          // Instead of one TextSpan widget per word, we can have one TextSpan widget across multiple.
+          final buffer = StringBuffer();
+
+          for (final word in words) {
+            buffer.write(' ');
+
+            final emote = emoteToObject[word] ?? localEmoteToObject[word];
+            if (emote != null) {
+              span.add(TextSpan(text: buffer.toString()));
+
+              buffer.clear();
+
+              span.add(
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Tooltip(
+                    message: emote.name,
+                    preferBelow: false,
+                    child: CachedNetworkImage(
+                      imageUrl: emote.url,
+                      placeholder: (context, url) => const SizedBox(),
+                      fadeInDuration: const Duration(seconds: 0),
+                      height: 25,
+                    ),
                   ),
                 ),
-              ),
-            );
-          } else {
-            buffer.write(word);
+              );
+            } else {
+              buffer.write(word);
+            }
           }
-        }
 
-        if (buffer.isNotEmpty) {
-          span.add(TextSpan(text: buffer.toString()));
+          if (buffer.isNotEmpty) {
+            span.add(TextSpan(text: buffer.toString()));
+          }
         }
       }
     }

@@ -23,7 +23,6 @@ class _SearchState extends State<Search> {
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
           child: TextField(
             controller: searchStore.textController,
-            autocorrect: false,
             decoration: InputDecoration(
               suffixIcon: IconButton(
                 onPressed: searchStore.clearSearch,

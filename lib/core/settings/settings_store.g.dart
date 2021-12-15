@@ -55,12 +55,29 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$zeroWidthEnabledAtom =
+      Atom(name: '_SettingsStoreBase.zeroWidthEnabled');
+
+  @override
+  bool get zeroWidthEnabled {
+    _$zeroWidthEnabledAtom.reportRead();
+    return super.zeroWidthEnabled;
+  }
+
+  @override
+  set zeroWidthEnabled(bool value) {
+    _$zeroWidthEnabledAtom.reportWrite(value, super.zeroWidthEnabled, () {
+      super.zeroWidthEnabled = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
 videoEnabled: ${videoEnabled},
 messageLimit: ${messageLimit},
-hideBannedMessages: ${hideBannedMessages}
+hideBannedMessages: ${hideBannedMessages},
+zeroWidthEnabled: ${zeroWidthEnabled}
     ''';
   }
 }

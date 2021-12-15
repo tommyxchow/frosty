@@ -50,6 +50,11 @@ class Settings extends StatelessWidget {
                 value: settingsStore.hideBannedMessages,
                 onChanged: (newValue) => settingsStore.hideBannedMessages = newValue,
               ),
+              SwitchListTile.adaptive(
+                title: const Text('Enable Zero-Width Emotes'),
+                value: settingsStore.zeroWidthEnabled,
+                onChanged: (newValue) => settingsStore.zeroWidthEnabled = newValue,
+              ),
             ],
           );
         },

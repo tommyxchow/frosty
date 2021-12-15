@@ -16,6 +16,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var hideBannedMessages = false;
 
+  @observable
+  var zeroWidthEnabled = false;
+
   Future<void> init() async {
     // Retrieve the instance that will allow us to store and persist settings.
     final prefs = await SharedPreferences.getInstance();
@@ -24,6 +27,7 @@ abstract class _SettingsStoreBase with Store {
     videoEnabled = prefs.getBool('video_enabled') ?? videoEnabled;
     messageLimit = prefs.getDouble('message_limit') ?? messageLimit;
     hideBannedMessages = prefs.getBool('hide_banned_messages') ?? hideBannedMessages;
+    zeroWidthEnabled = prefs.getBool('zero_width_enabled') ?? zeroWidthEnabled;
 
     // Set up autorun to store setting anytime they're changed.
     // The ReactionDisposer will not be needed since settings will always exist.
@@ -32,6 +36,7 @@ abstract class _SettingsStoreBase with Store {
       prefs.setBool('video_enabled', videoEnabled);
       prefs.setDouble('message_limit', messageLimit);
       prefs.setBool('hide_banned_messages', hideBannedMessages);
+      prefs.setBool('zero_width_enabled', zeroWidthEnabled);
     });
   }
 }
