@@ -80,9 +80,22 @@ abstract class _ChatStoreBase with Store {
     required this.settings,
     required this.channelName,
   }) {
+    // Create a reaction where anytime the emote menu is shown or hidden,
+    // scroll to the bottom of the list. This will prevent the emote menu
+    // from covering the latest messages when summoned.
+    final disposeEmoteMenuReaction = reaction((_) => showEmoteMenu, (_) {
+      debugPrint('reaction');
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          scrollController.jumpTo(scrollController.position.maxScrollExtent);
+        }
+      });
+    });
+
     messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     getAssets();
+
     // Listen for new messages and forward them to the handler.
     _subscription = _channel.stream.listen(
       (data) => _handleIRCData(data.toString()),
@@ -93,6 +106,7 @@ abstract class _ChatStoreBase with Store {
       onDone: () {
         debugPrint("Disconnected from $channelName's chat.");
         messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
+        disposeEmoteMenuReaction();
       },
     );
 
@@ -432,7 +446,6 @@ abstract class _ChatStoreBase with Store {
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
     _channel.sink.close();
-    _subscription?.cancel();
     textController.dispose();
     scrollController.dispose();
   }
