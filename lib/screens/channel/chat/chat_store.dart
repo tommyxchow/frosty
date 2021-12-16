@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
-import 'package:frosty/api/irc_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
@@ -23,9 +22,6 @@ class ChatStore = _ChatStoreBase with _$ChatStore;
 abstract class _ChatStoreBase with Store {
   /// The Twitch IRC WebSocket channel.
   final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
-
-  /// The stream subscription that is responsible for handling events from the chat.
-  StreamSubscription? _subscription;
 
   /// The map of emote words to their image or GIF URL.
   final _emoteToObject = <String, Emote>{};
@@ -99,7 +95,7 @@ abstract class _ChatStoreBase with Store {
     getAssets();
 
     // Listen for new messages and forward them to the handler.
-    _subscription = _channel.stream.listen(
+    _channel.stream.listen(
       (data) => _handleIRCData(data.toString()),
       onError: (error) {
         debugPrint('Chat error: ${error.toString()}');
@@ -169,10 +165,10 @@ abstract class _ChatStoreBase with Store {
             _messages.add(parsedIRCMessage);
             break;
           case Command.clearChat:
-            _messages = IRC.clearChat(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
+            _messages = IRCMessage.clearChat(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
             break;
           case Command.clearMessage:
-            _messages = IRC.clearMessage(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
+            _messages = IRCMessage.clearMessage(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
             break;
           case Command.notice:
           case Command.userNotice:

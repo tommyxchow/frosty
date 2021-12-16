@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/api/irc_api.dart';
 import 'package:frosty/models/irc_message.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
 
