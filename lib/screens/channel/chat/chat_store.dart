@@ -11,9 +11,8 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
-import 'package:frosty/models/irc.dart';
+import 'package:frosty/models/irc_message.dart';
 import 'package:mobx/mobx.dart';
-import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'chat_store.g.dart';
@@ -34,9 +33,7 @@ abstract class _ChatStoreBase with Store {
 
   /// The map of badges ids to their object representation.
   final _badgesToObject = <String, BadgeInfoTwitch>{};
-
-  /// The list of chat messages to render and display.
-  final messages = ObservableList<IRCMessage>();
+  Map<String, BadgeInfoTwitch> get badgesToObject => _badgesToObject;
 
   /// The scroll controller that controls auto-scroll and resume-scroll behavior.
   final scrollController = ScrollController();
@@ -63,6 +60,10 @@ abstract class _ChatStoreBase with Store {
   /// Whether or not the emote menu is visible.
   @observable
   var showEmoteMenu = false;
+
+  /// The list of chat messages to render and display.
+  @readonly
+  var _messages = ObservableList<IRCMessage>();
 
   /// If the chat should automatically scroll/jump to the latest message.
   @readonly
@@ -93,7 +94,7 @@ abstract class _ChatStoreBase with Store {
       });
     });
 
-    messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+    _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     getAssets();
 
@@ -102,11 +103,11 @@ abstract class _ChatStoreBase with Store {
       (data) => _handleIRCData(data.toString()),
       onError: (error) {
         debugPrint('Chat error: ${error.toString()}');
-        messages.add(IRCMessage.createNotice(message: 'Chat error - ${error.toString()}'));
+        _messages.add(IRCMessage.createNotice(message: 'Chat error - ${error.toString()}'));
       },
       onDone: () {
         debugPrint("Disconnected from $channelName's chat.");
-        messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
+        _messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
         disposeEmoteMenuReaction();
       },
     );
@@ -132,7 +133,7 @@ abstract class _ChatStoreBase with Store {
       _channel.sink.add(command);
     }
 
-    messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat."));
+    _messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat."));
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -165,17 +166,17 @@ abstract class _ChatStoreBase with Store {
 
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
-            messages.add(parsedIRCMessage);
+            _messages.add(parsedIRCMessage);
             break;
           case Command.clearChat:
-            IRC.clearChat(messages: messages, ircMessage: parsedIRCMessage);
+            _messages = IRC.clearChat(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
             break;
           case Command.clearMessage:
-            IRC.clearMessage(messages: messages, ircMessage: parsedIRCMessage);
+            _messages = IRC.clearMessage(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
             break;
           case Command.notice:
           case Command.userNotice:
-            messages.add(parsedIRCMessage);
+            _messages.add(parsedIRCMessage);
             break;
           case Command.roomState:
             _roomState = _roomState.fromIRC(parsedIRCMessage);
@@ -183,7 +184,7 @@ abstract class _ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRC(parsedIRCMessage);
             if (toSend != null) {
-              messages.add(toSend!);
+              _messages.add(toSend!);
               toSend = null;
             }
             break;
@@ -204,13 +205,13 @@ abstract class _ChatStoreBase with Store {
     }
   }
 
-  /// If [_autoScroll] is enabled, removes messages if [messages] is too large and scrolls to the latest message.
+  /// If [_autoScroll] is enabled, removes messages if [_messages] is too large and scrolls to the latest message.
   @action
   void _deleteAndScrollToEnd() {
     if (_autoScroll) {
       // If there are more messages than the limit, remove around 10% of them from the oldest.
-      if (messages.length > settings.messageLimit && settings.messageLimit != 1000) {
-        messages.removeRange(0, (settings.messageLimit / 5).ceil());
+      if (_messages.length > settings.messageLimit && settings.messageLimit != 1000) {
+        _messages.removeRange(0, (settings.messageLimit / 5).ceil());
       }
 
       // After the end of the frame, scroll to the bottom of the chat.
@@ -237,7 +238,7 @@ abstract class _ChatStoreBase with Store {
     });
   }
 
-  /// Sends the given string message by the logged-in user and adds it to [messages].
+  /// Sends the given string message by the logged-in user and adds it to [_messages].
   void sendMessage(String message) {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) {
@@ -261,7 +262,8 @@ abstract class _ChatStoreBase with Store {
 
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
   Future<void> getAssets() async {
-    messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
+    _messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
+
     // Fetch the desired channel/user's information.
     final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
 
@@ -296,119 +298,7 @@ abstract class _ChatStoreBase with Store {
         }
       }
 
-      messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!'));
-    }
-  }
-
-  // TODO: Split render functions and use switch statment.
-  /// Returns a chat message widget for the given [IRCMessage].
-  Widget renderChatMessage(IRCMessage ircMessage, BuildContext context) {
-    final zeroWidthEnabled = context.read<SettingsStore>().zeroWidthEnabled;
-
-    if (ircMessage.command == Command.clearChat || ircMessage.command == Command.clearMessage) {
-      final List<InlineSpan> span;
-
-      if (settings.hideBannedMessages) {
-        span = IRC.generateSpan(
-          ircMessage: ircMessage,
-          emoteToObject: _emoteToObject,
-          badgeToObject: _badgesToObject,
-          hideMessage: true,
-          zeroWidthEnabled: zeroWidthEnabled,
-        );
-      } else {
-        span = IRC.generateSpan(
-          ircMessage: ircMessage,
-          emoteToObject: _emoteToObject,
-          badgeToObject: _badgesToObject,
-          zeroWidthEnabled: zeroWidthEnabled,
-        );
-      }
-
-      // Render timeouts and bans
-      final banDuration = ircMessage.tags['ban-duration'];
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Opacity(
-          opacity: 0.50,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text.rich(
-                TextSpan(
-                  children: span,
-                ),
-              ),
-              const SizedBox(height: 5),
-              if (banDuration == null)
-                if (ircMessage.command == Command.clearMessage)
-                  const Text('Message Deleted', style: TextStyle(fontWeight: FontWeight.bold))
-                else
-                  const Text('User Permanently Banned', style: TextStyle(fontWeight: FontWeight.bold))
-              else
-                Text(
-                  int.parse(banDuration) > 1 ? 'Timed out for $banDuration seconds' : 'Timed out for $banDuration second',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                )
-            ],
-          ),
-        ),
-      );
-    } else if (ircMessage.command == Command.notice) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text.rich(
-          TextSpan(
-            text: ircMessage.message,
-          ),
-          style: TextStyle(
-            color: Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.5),
-          ),
-        ),
-      );
-    } else if (ircMessage.command == Command.userNotice) {
-      final span = IRC.generateSpan(
-        ircMessage: ircMessage,
-        emoteToObject: _emoteToObject,
-        badgeToObject: _badgesToObject,
-        zeroWidthEnabled: zeroWidthEnabled,
-      );
-
-      // Render sub alerts
-      return Container(
-        color: const Color(0xFF673AB7).withOpacity(0.25),
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(ircMessage.tags['system-msg']!),
-            const SizedBox(height: 5),
-            if (ircMessage.message != null)
-              Text.rich(
-                TextSpan(
-                  children: span,
-                ),
-              ),
-          ],
-        ),
-      );
-    } else {
-      final span = IRC.generateSpan(
-        ircMessage: ircMessage,
-        emoteToObject: _emoteToObject,
-        badgeToObject: _badgesToObject,
-        zeroWidthEnabled: zeroWidthEnabled,
-      );
-
-      // Render normal chat message (PRIVMSG).
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-        child: Text.rich(
-          TextSpan(
-            children: span,
-          ),
-        ),
-      );
+      _messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!'));
     }
   }
 

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/screens/channel/chat/chat_message.dart';
 import 'package:frosty/screens/channel/chat/chat_stats.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
 import 'package:frosty/screens/channel/chat/emote_menu.dart';
@@ -47,12 +49,21 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                     if (chatStore.showEmoteMenu) chatStore.showEmoteMenu = false;
                   },
                   child: Observer(
-                    builder: (context) => ListView.builder(
+                    builder: (context) => ListView.separated(
                       addAutomaticKeepAlives: false,
                       addRepaintBoundaries: false,
+                      padding: const EdgeInsets.all(10.0),
                       itemCount: chatStore.messages.length,
                       controller: chatStore.scrollController,
-                      itemBuilder: (context, index) => chatStore.renderChatMessage(chatStore.messages[index], context),
+                      separatorBuilder: (context, index) => const SizedBox(height: 10.0),
+                      itemBuilder: (context, index) => Observer(
+                        builder: (context) => ChatMessage(
+                          ircMessage: chatStore.messages[index],
+                          chatStore: chatStore,
+                          hideMessageIfBanned: context.read<SettingsStore>().hideBannedMessages,
+                          zeroWidth: context.read<SettingsStore>().zeroWidthEnabled,
+                        ),
+                      ),
                     ),
                   ),
                 ),

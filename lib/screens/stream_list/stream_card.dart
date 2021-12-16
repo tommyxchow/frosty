@@ -65,23 +65,23 @@ class StreamCard extends StatelessWidget {
                           userLogin: streamInfo.userLogin,
                           radius: 10.0,
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 5.0),
                         Text(
                           streamInfo.userName,
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 5.0),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Text(streamInfo.title.replaceAll('\n', '')),
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 5.0),
                     Text(
                       streamInfo.gameName,
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 5.0),
                     Text(
                       '${NumberFormat().format(streamInfo.viewerCount)} viewers',
                       style: const TextStyle(fontSize: 12),

@@ -51,7 +51,7 @@ class ChatMessage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 5.0),
               if (banDuration == null)
                 if (ircMessage.command == Command.clearMessage)
                   const Text('Message Deleted', style: TextStyle(fontWeight: FontWeight.bold))
@@ -81,7 +81,7 @@ class ChatMessage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(ircMessage.tags['system-msg']!),
-              const SizedBox(height: 5),
+              const SizedBox(height: 5.0),
               if (ircMessage.message != null)
                 Text.rich(
                   TextSpan(

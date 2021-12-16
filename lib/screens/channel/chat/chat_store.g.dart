@@ -39,6 +39,23 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
+  final _$_messagesAtom = Atom(name: '_ChatStoreBase._messages');
+
+  ObservableList<IRCMessage> get messages {
+    _$_messagesAtom.reportRead();
+    return super._messages;
+  }
+
+  @override
+  ObservableList<IRCMessage> get _messages => messages;
+
+  @override
+  set _messages(ObservableList<IRCMessage> value) {
+    _$_messagesAtom.reportWrite(value, super._messages, () {
+      super._messages = value;
+    });
+  }
+
   final _$_autoScrollAtom = Atom(name: '_ChatStoreBase._autoScroll');
 
   bool get autoScroll {
