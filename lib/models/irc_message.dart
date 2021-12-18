@@ -6,16 +6,20 @@ import 'package:frosty/models/emotes.dart';
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
   final String raw;
+  final bool action;
   final Map<String, String> tags;
   final String? user;
+  final Map<String, Emote> localEmotes;
   Command command;
   String? message;
 
   IRCMessage({
     required this.raw,
+    required this.action,
     required this.tags,
     required this.command,
     required this.user,
+    required this.localEmotes,
     required this.message,
   });
 
@@ -73,47 +77,6 @@ class IRCMessage {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
-    // The map containing emotes from the user's tags to their URL.
-    // This may include sub emotes that they can access but other users cannot.
-    final localEmoteToObject = <String, Emote>{};
-
-    final emoteTags = tags['emotes'];
-    if (emoteTags != null) {
-      // Emotes and their indices are separated by '/' so split them there.
-      final emotes = emoteTags.split('/');
-
-      for (final emoteIdAndPosition in emotes) {
-        final indexBetweenIdAndPositions = emoteIdAndPosition.indexOf(':');
-        final emoteId = emoteIdAndPosition.substring(0, indexBetweenIdAndPositions);
-
-        // Parse the range in order to extract the associated word.
-        // If there are more than one indices, use the first one.
-        // Else, use the one provided indices.
-        final String range;
-        if (emoteIdAndPosition.contains(',')) {
-          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1, emoteIdAndPosition.indexOf(','));
-        } else {
-          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1);
-        }
-
-        // Extract the word associated with this emoteId by using the provided indices.
-        final indexSplit = range.split('-');
-        final startIndex = int.parse(indexSplit[0]);
-        final endIndex = int.parse(indexSplit[1]);
-
-        final emoteWord = message!.substring(startIndex, endIndex + 1);
-
-        // Store the emote word and its associated URL for later use.
-        localEmoteToObject[emoteWord] = Emote(
-          id: emoteId,
-          name: emoteWord,
-          zeroWidth: false,
-          url: 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0',
-          type: EmoteType.bttvChannel,
-        );
-      }
-    }
-
     // Add any badges to the span.
     final badges = tags['badges'];
     if (badges != null) {
@@ -156,16 +119,16 @@ class IRCMessage {
       const TextSpan(text: ':'),
     );
 
+    // Italicize the text it was called with an IRC Action i.e., "/me".
+    final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : null;
+
     if (hideMessage) {
       span.add(const TextSpan(text: ' <message deleted>'));
     } else {
       // Add the message and any emotes to the span.
       final chatMessage = message;
       if (chatMessage != null) {
-        // Remove any "INVALID/UNDEFINED" Unicode characters.
-        // Rendering this character on iOS shows a question mark inside a square.
-        // This character is used by some clients to bypass restrictions on repeating message.
-        final words = chatMessage.trim().replaceAll('\u{E0000}', '').split(' ');
+        final words = chatMessage.split(' ');
 
         if (zeroWidthEnabled) {
           final localSpan = <InlineSpan>[];
@@ -173,7 +136,7 @@ class IRCMessage {
           var index = words.length - 1;
           while (index != -1) {
             final word = words[index];
-            final emote = emoteToObject[word] ?? localEmoteToObject[word];
+            final emote = emoteToObject[word] ?? localEmotes[word];
 
             if (emote != null) {
               // Handle zero width emotes
@@ -202,7 +165,7 @@ class IRCMessage {
                                   imageUrl: emote.url,
                                   placeholder: (context, url) => const SizedBox(),
                                   fadeInDuration: const Duration(seconds: 0),
-                                  height: 25,
+                                  height: 30,
                                 ))
                             .toList(),
                       ),
@@ -212,7 +175,7 @@ class IRCMessage {
 
                 if (nextEmote == null) {
                   localSpan.add(const TextSpan(text: ' '));
-                  localSpan.add(TextSpan(text: words[index]));
+                  localSpan.add(TextSpan(text: words[index], style: textStyle));
                 }
               } else {
                 localSpan.add(
@@ -225,14 +188,14 @@ class IRCMessage {
                         imageUrl: emote.url,
                         placeholder: (context, url) => const SizedBox(),
                         fadeInDuration: const Duration(seconds: 0),
-                        height: 25,
+                        height: 30,
                       ),
                     ),
                   ),
                 );
               }
             } else {
-              localSpan.add(TextSpan(text: word));
+              localSpan.add(TextSpan(text: word, style: textStyle));
             }
             localSpan.add(const TextSpan(text: ' '));
             index--;
@@ -246,9 +209,9 @@ class IRCMessage {
           for (final word in words) {
             buffer.write(' ');
 
-            final emote = emoteToObject[word] ?? localEmoteToObject[word];
+            final emote = emoteToObject[word] ?? localEmotes[word];
             if (emote != null) {
-              span.add(TextSpan(text: buffer.toString()));
+              span.add(TextSpan(text: buffer.toString(), style: textStyle));
 
               buffer.clear();
 
@@ -262,7 +225,7 @@ class IRCMessage {
                       imageUrl: emote.url,
                       placeholder: (context, url) => const SizedBox(),
                       fadeInDuration: const Duration(seconds: 0),
-                      height: 25,
+                      height: 30,
                     ),
                   ),
                 ),
@@ -273,7 +236,7 @@ class IRCMessage {
           }
 
           if (buffer.isNotEmpty) {
-            span.add(TextSpan(text: buffer.toString()));
+            span.add(TextSpan(text: buffer.toString(), style: textStyle));
           }
         }
       }
@@ -327,7 +290,60 @@ class IRCMessage {
     final String? user = splitMessage[0] == 'tmi.twitch.tv' ? null : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
 
     // If there is an associated message, set it.
-    final String? message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1) : null;
+    //
+    // Also remove any "INVALID/UNDEFINED" Unicode characters.
+    // Rendering this character on iOS shows a question mark inside a square.
+    // This character is used by some clients to bypass restrictions on repeating message.
+    var message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1).replaceAll('\u{E0000}', '').trim() : null;
+
+    // Check if IRC actions like "/me" were called.
+    var action = false;
+    if (message != null && message.startsWith('\x01') && message.endsWith('\x01')) {
+      action = true;
+      message = message.substring(8, message.length - 1);
+    }
+
+    // Now process any Twitch emotes contained in the message tags.
+    // The map containing emotes from the user's tags to their URL.
+    // This may include sub emotes that they can access but other users cannot.
+    final localEmotes = <String, Emote>{};
+
+    final emoteTags = mappedTags['emotes'];
+    if (emoteTags != null) {
+      // Emotes and their indices are separated by '/' so split them there.
+      final emotes = emoteTags.split('/');
+
+      for (final emoteIdAndPosition in emotes) {
+        final indexBetweenIdAndPositions = emoteIdAndPosition.indexOf(':');
+        final emoteId = emoteIdAndPosition.substring(0, indexBetweenIdAndPositions);
+
+        // Parse the range in order to extract the associated word.
+        // If there are more than one indices, use the first one.
+        // Else, use the one provided indices.
+        final String range;
+        if (emoteIdAndPosition.contains(',')) {
+          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1, emoteIdAndPosition.indexOf(','));
+        } else {
+          range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1);
+        }
+
+        // Extract the word associated with this emoteId by using the provided indices.
+        final indexSplit = range.split('-');
+        final startIndex = int.parse(indexSplit[0]);
+        final endIndex = int.parse(indexSplit[1]);
+
+        final emoteWord = message!.substring(startIndex, endIndex + 1);
+
+        // Store the emote word and its associated URL for later use.
+        localEmotes[emoteWord] = Emote(
+          id: emoteId,
+          name: emoteWord,
+          zeroWidth: false,
+          url: 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0',
+          type: EmoteType.bttvChannel,
+        );
+      }
+    }
 
     // Check and parse the command.
     // The majority of messages will be PRIVMSG, so check that first.
@@ -364,8 +380,10 @@ class IRCMessage {
 
     return IRCMessage(
       raw: whole,
+      action: action,
       tags: mappedTags,
       command: messageCommand,
+      localEmotes: localEmotes,
       user: user,
       message: message,
     );
@@ -373,7 +391,9 @@ class IRCMessage {
 
   factory IRCMessage.createNotice({required String message}) => IRCMessage(
         raw: '',
+        action: false,
         tags: {},
+        localEmotes: {},
         command: Command.notice,
         user: null,
         message: message,
@@ -397,7 +417,7 @@ class ROOMSTATE {
   });
 
   /// Create a new copy with the parameters from the provided [IRCMessage]
-  ROOMSTATE fromIRC(IRCMessage ircMessage) => ROOMSTATE(
+  ROOMSTATE fromIRCMessage(IRCMessage ircMessage) => ROOMSTATE(
         emoteOnly: ircMessage.tags['emote-only'] == '0' ? false : true,
         followersOnly: ircMessage.tags['followers-only'] ?? followersOnly,
         r9k: ircMessage.tags['r9k'] == '0' ? false : true,
@@ -421,7 +441,7 @@ class USERSTATE {
     this.subscriber = false,
   });
 
-  USERSTATE fromIRC(IRCMessage ircMessage) => USERSTATE(
+  USERSTATE fromIRCMessage(IRCMessage ircMessage) => USERSTATE(
         raw: ircMessage.raw,
         color: ircMessage.tags['color'] ?? color,
         displayName: ircMessage.tags['display-name'] ?? displayName,

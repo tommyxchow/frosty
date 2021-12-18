@@ -22,7 +22,6 @@ class ProfilePicture extends StatelessWidget {
       builder: (context, AsyncSnapshot<UserTwitch?> snapshot) {
         return CircleAvatar(
           radius: radius,
-          backgroundColor: const Color(0xFFFFFFFF),
           foregroundImage: snapshot.hasData && snapshot.data != null ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl) : null,
         );
       },

@@ -175,10 +175,10 @@ abstract class _ChatStoreBase with Store {
             _messages.add(parsedIRCMessage);
             break;
           case Command.roomState:
-            _roomState = _roomState.fromIRC(parsedIRCMessage);
+            _roomState = _roomState.fromIRCMessage(parsedIRCMessage);
             continue;
           case Command.userState:
-            _userState = _userState.fromIRC(parsedIRCMessage);
+            _userState = _userState.fromIRCMessage(parsedIRCMessage);
             if (toSend != null) {
               _messages.add(toSend!);
               toSend = null;
@@ -247,6 +247,11 @@ abstract class _ChatStoreBase with Store {
     // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
     final userStateString = _userState.raw;
     if (userStateString != null) {
+      // TODO: Add support for /me when sending messages.
+      // if (message.substring(0, 3) == '/me') {
+      //   message = '\x01' + 'ACTION' + message + '\x01';
+      // }
+
       final userChatMessage = IRCMessage.fromString(userStateString);
       userChatMessage.message = message;
       toSend = userChatMessage;
