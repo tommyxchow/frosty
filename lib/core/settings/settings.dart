@@ -46,6 +46,11 @@ class Settings extends StatelessWidget {
                 onChanged: (newValue) => settingsStore.videoEnabled = newValue,
               ),
               SwitchListTile.adaptive(
+                title: const Text('Enable Video Overlay'),
+                value: settingsStore.overlayEnabled,
+                onChanged: (newValue) => settingsStore.overlayEnabled = newValue,
+              ),
+              SwitchListTile.adaptive(
                 title: const Text('Hide Banned Messages'),
                 value: settingsStore.hideBannedMessages,
                 onChanged: (newValue) => settingsStore.hideBannedMessages = newValue,

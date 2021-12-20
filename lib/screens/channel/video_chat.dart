@@ -28,7 +28,7 @@ class VideoChat extends StatelessWidget {
         child: Column(
           children: [
             Observer(
-              builder: (_) {
+              builder: (context) {
                 if (context.read<SettingsStore>().videoEnabled) {
                   return AspectRatio(
                     aspectRatio: 16 / 9,
@@ -51,17 +51,15 @@ class VideoChat extends StatelessWidget {
                   actions: [
                     IconButton(
                       icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            fullscreenDialog: true,
-                            builder: (context) {
-                              return Settings(settingsStore: context.read<SettingsStore>());
-                            },
-                          ),
-                        );
-                      },
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          fullscreenDialog: true,
+                          builder: (context) {
+                            return Settings(settingsStore: context.read<SettingsStore>());
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 );

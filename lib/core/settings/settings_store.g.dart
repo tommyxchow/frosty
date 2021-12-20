@@ -24,6 +24,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$overlayEnabledAtom = Atom(name: '_SettingsStoreBase.overlayEnabled');
+
+  @override
+  bool get overlayEnabled {
+    _$overlayEnabledAtom.reportRead();
+    return super.overlayEnabled;
+  }
+
+  @override
+  set overlayEnabled(bool value) {
+    _$overlayEnabledAtom.reportWrite(value, super.overlayEnabled, () {
+      super.overlayEnabled = value;
+    });
+  }
+
   final _$messageLimitAtom = Atom(name: '_SettingsStoreBase.messageLimit');
 
   @override
@@ -75,6 +90,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   String toString() {
     return '''
 videoEnabled: ${videoEnabled},
+overlayEnabled: ${overlayEnabled},
 messageLimit: ${messageLimit},
 hideBannedMessages: ${hideBannedMessages},
 zeroWidthEnabled: ${zeroWidthEnabled}

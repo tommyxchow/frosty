@@ -11,6 +11,9 @@ abstract class _SettingsStoreBase with Store {
   var videoEnabled = true;
 
   @observable
+  var overlayEnabled = true;
+
+  @observable
   var messageLimit = 200.0;
 
   @observable
@@ -25,6 +28,7 @@ abstract class _SettingsStoreBase with Store {
 
     // Initialize settings from stored preferences if any.
     videoEnabled = prefs.getBool('video_enabled') ?? videoEnabled;
+    overlayEnabled = prefs.getBool('overlay_enabled') ?? overlayEnabled;
     messageLimit = prefs.getDouble('message_limit') ?? messageLimit;
     hideBannedMessages = prefs.getBool('hide_banned_messages') ?? hideBannedMessages;
     zeroWidthEnabled = prefs.getBool('zero_width_enabled') ?? zeroWidthEnabled;
@@ -34,6 +38,7 @@ abstract class _SettingsStoreBase with Store {
     autorun((_) {
       debugPrint('settings changed');
       prefs.setBool('video_enabled', videoEnabled);
+      prefs.setBool('overlay_enabled', overlayEnabled);
       prefs.setDouble('message_limit', messageLimit);
       prefs.setBool('hide_banned_messages', hideBannedMessages);
       prefs.setBool('zero_width_enabled', zeroWidthEnabled);
