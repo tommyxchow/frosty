@@ -30,6 +30,8 @@ abstract class _VideoStoreBase with Store {
   final AuthStore authStore;
 
   _VideoStoreBase({required this.userLogin, required this.authStore}) {
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+
     overlayTimer = Timer(const Duration(seconds: 3), () => _menuVisible = false);
     updateStreamInfo();
   }
