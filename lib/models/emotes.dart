@@ -30,6 +30,7 @@ class EmoteTwitch {
   final String? tier;
   final String? emoteType;
   final String? emoteSetId;
+  final String? ownerId;
   final List<String> format;
   final List<String> scale;
   final List<String> themeMode;
@@ -41,6 +42,7 @@ class EmoteTwitch {
     this.tier,
     this.emoteType,
     this.emoteSetId,
+    this.ownerId,
     this.format,
     this.scale,
     this.themeMode,
@@ -288,7 +290,9 @@ class Emote {
 }
 
 enum EmoteType {
+  twitchSub,
   twitchGlobal,
+  twitchUnlocked,
   twitchChannel,
   ffzGlobal,
   ffzChannel,

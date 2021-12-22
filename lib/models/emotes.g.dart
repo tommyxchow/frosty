@@ -19,6 +19,7 @@ EmoteTwitch _$EmoteTwitchFromJson(Map<String, dynamic> json) => EmoteTwitch(
       json['tier'] as String?,
       json['emote_type'] as String?,
       json['emote_set_id'] as String?,
+      json['owner_id'] as String?,
       (json['format'] as List<dynamic>).map((e) => e as String).toList(),
       (json['scale'] as List<dynamic>).map((e) => e as String).toList(),
       (json['theme_mode'] as List<dynamic>).map((e) => e as String).toList(),

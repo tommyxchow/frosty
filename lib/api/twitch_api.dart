@@ -50,8 +50,17 @@ class Twitch {
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
       final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
-
-      return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchSub)).toList();
+      return emotes.map((emote) {
+        switch (emote.emoteType) {
+          case 'globals':
+          case 'smilies':
+            return Emote.fromTwitch(emote, EmoteType.twitchGlobal);
+          case 'subscriptions':
+            return Emote.fromTwitch(emote, EmoteType.twitchSub);
+          default:
+            return Emote.fromTwitch(emote, EmoteType.twitchUnlocked);
+        }
+      }).toList();
     } else {
       debugPrint('Failed to get Twitch emotes for set id: $setId. Error code: ${response.statusCode}');
       return [];
@@ -266,8 +275,10 @@ class Twitch {
   }
 
   /// Returns a user's info given their login name.
-  static Future<UserTwitch?> getUser({required String userLogin, required Map<String, String>? headers}) async {
-    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users?login=$userLogin'), headers: headers);
+  static Future<UserTwitch?> getUser({String? userLogin, String? id, required Map<String, String>? headers}) async {
+    final uri = id != null ? Uri.parse('https://api.twitch.tv/helix/users?id=$id') : Uri.parse('https://api.twitch.tv/helix/users?login=$userLogin');
+
+    final response = await http.get(uri, headers: headers);
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body)['data'] as List;
 
