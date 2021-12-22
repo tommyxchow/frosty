@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
 
-class ChatStats extends StatelessWidget {
+class ChatDetails extends StatelessWidget {
   final ChatStore chatStore;
 
-  const ChatStats({Key? key, required this.chatStore}) : super(key: key);
+  const ChatDetails({Key? key, required this.chatStore}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

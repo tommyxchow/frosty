@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
-import 'package:frosty/models/emotes.dart';
+import 'package:frosty/screens/channel/chat/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/chat_message.dart';
-import 'package:frosty/screens/channel/chat/chat_stats.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
-import 'package:frosty/screens/channel/chat/emote_menu.dart';
+import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 import 'package:provider/provider.dart';
 
 class Chat extends StatefulWidget {
@@ -83,75 +82,8 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
               ],
             ),
           ),
-          if (context.read<AuthStore>().isLoggedIn)
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.adaptive.more),
-                  onPressed: () => showModalBottomSheet(
-                    context: context,
-                    builder: (_) => ChatStats(chatStore: chatStore),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                    child: TextField(
-                      minLines: 1,
-                      maxLines: 5,
-                      onTap: () => chatStore.showEmoteMenu = false,
-                      decoration: InputDecoration(
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.emoji_emotions_outlined),
-                          onPressed: () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-                            chatStore.showEmoteMenu = !chatStore.showEmoteMenu;
-                          },
-                        ),
-                        isDense: true,
-                        contentPadding: const EdgeInsets.all(10.0),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        ),
-                        hintText: 'Send a message',
-                      ),
-                      controller: chatStore.textController,
-                      onSubmitted: chatStore.sendMessage,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () => chatStore.sendMessage(chatStore.textController.text),
-                )
-              ],
-            ),
-          if (chatStore.showEmoteMenu) ...[
-            Expanded(
-              child: Observer(
-                builder: (_) => EmoteMenu(
-                  chatStore: chatStore,
-                  emoteType: EmoteType.values[chatStore.emoteMenuIndex],
-                ),
-              ),
-            ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: EmoteType.values.asMap().entries.map((e) {
-                  final emotes = chatStore.emoteToObject.values.toList().where((emote) => emote.type == EmoteType.values[e.key]).toList();
-
-                  return Observer(
-                    builder: (_) => TextButton(
-                      style: e.key == chatStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
-                      onPressed: emotes.isEmpty ? null : () => chatStore.emoteMenuIndex = e.key,
-                      child: Text(chatStore.emoteMenuTitle(e.value)),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ]
+          if (context.read<AuthStore>().isLoggedIn) ChatBottomBar(chatStore: chatStore),
+          if (chatStore.showEmoteMenu) Expanded(child: EmoteMenu(chatStore: chatStore)),
         ],
       ),
     );
