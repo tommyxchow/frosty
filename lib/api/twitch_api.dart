@@ -42,6 +42,22 @@ class Twitch {
     }
   }
 
+  /// Returns a map of a channel's Twitch emotes to their URL.
+  static Future<List<Emote>> getEmotesSets({required String setId, required Map<String, String>? headers, sub = false}) async {
+    final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=$setId');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body)['data'] as List;
+      final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
+
+      return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchSub)).toList();
+    } else {
+      debugPrint('Failed to get Twitch emotes for set id: $setId. Error code: ${response.statusCode}');
+      return [];
+    }
+  }
+
   /// Returns a map of global Twitch badges to their URL.
   static Future<Map<String, BadgeInfoTwitch>?> getBadgesGlobal() async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/global/display');
@@ -136,7 +152,7 @@ class Twitch {
   }
 
   /// Returns a map containing top 20 streams and a cursor for further requests.
-  static Future<StreamsTwitch?> getTopStreams({required Map<String, String>? headers, required String? cursor}) async {
+  static Future<StreamsTwitch?> getTopStreams({required Map<String, String>? headers, String? cursor}) async {
     final Uri uri;
 
     if (cursor == null) {
@@ -160,7 +176,7 @@ class Twitch {
   static Future<StreamsTwitch?> getFollowedStreams({
     required String id,
     required Map<String, String>? headers,
-    required String? cursor,
+    String? cursor,
   }) async {
     final Uri uri;
 
@@ -185,12 +201,11 @@ class Twitch {
   static Future<StreamsTwitch?> getStreamsUnderGame({
     required String gameId,
     required Map<String, String>? headers,
-    required String? cursor,
+    String? cursor,
   }) async {
-    final Uri uri;
-    cursor == null
-        ? uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId')
-        : uri = Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
+    final uri = cursor == null
+        ? Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId')
+        : Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
 
     final response = await http.get(uri, headers: headers);
 
@@ -208,10 +223,9 @@ class Twitch {
     var totalViewers = 0;
 
     for (var i = 0; i < 20; i++) {
-      final Uri uri;
-      currentCursor == null
-          ? uri = Uri.parse('https://api.twitch.tv/helix/streams?first=100&game_id=$gameId')
-          : uri = Uri.parse('https://api.twitch.tv/helix/streams?first=100&game_id=$gameId&after=$currentCursor');
+      final uri = currentCursor == null
+          ? Uri.parse('https://api.twitch.tv/helix/streams?first=100&game_id=$gameId')
+          : Uri.parse('https://api.twitch.tv/helix/streams?first=100&game_id=$gameId&after=$currentCursor');
 
       final response = await http.get(uri, headers: headers);
 
@@ -314,7 +328,7 @@ class Twitch {
   }
 
   /// Returns a map containing top 20 categories/games and a cursor for further requests.
-  static Future<CategoriesTwitch?> getTopGames({required Map<String, String>? headers, required String? cursor}) async {
+  static Future<CategoriesTwitch?> getTopGames({required Map<String, String>? headers, String? cursor}) async {
     final Uri uri;
 
     if (cursor == null) {
@@ -329,6 +343,21 @@ class Twitch {
       final decoded = jsonDecode(response.body);
 
       return CategoriesTwitch.fromJson(decoded);
+    } else {
+      debugPrint('Failed to update top games');
+    }
+  }
+
+  /// Returns the sub count for a user.
+  static Future<int?> getSubscriberCount({required String userId, required Map<String, String>? headers}) async {
+    final uri = Uri.parse('https://api.twitch.tv/helix/subscriptions?broadcaster_id=$userId');
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+
+      return decoded['total'] as int;
     } else {
       debugPrint('Failed to update top games');
     }
