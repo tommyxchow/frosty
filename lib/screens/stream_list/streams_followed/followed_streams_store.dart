@@ -34,7 +34,8 @@ abstract class _FollowedStreamsStoreBase with Store {
   Future<void> getFollowedStreams() async {
     _isLoading = true;
 
-    final newFollowedStreams = await Twitch.getFollowedStreams(id: authStore.user!.id, headers: authStore.headersTwitch, cursor: _followedStreamsCurrentCursor);
+    final newFollowedStreams =
+        await Twitch.getFollowedStreams(id: authStore.user.details!.id, headers: authStore.headersTwitch, cursor: _followedStreamsCurrentCursor);
 
     if (newFollowedStreams != null) {
       if (_followedStreamsCurrentCursor == null) {

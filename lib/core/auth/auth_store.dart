@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/models/user.dart';
+import 'package:frosty/core/user/user_store.dart';
 import 'package:mobx/mobx.dart';
 
 part 'auth_store.g.dart';
@@ -17,17 +17,12 @@ abstract class _AuthBase with Store {
   /// Whether the token is valid or not.
   var _tokenIsValid = false;
 
+  /// The store containing information relevant to the current user.
+  final user = UserStore();
+
   /// The current token.
   @readonly
   String? _token;
-
-  /// The current user's info.
-  @readonly
-  UserTwitch? _user;
-
-  /// The user's list of blocked users.
-  @readonly
-  var _blockedUsers = ObservableList<UserBlockedTwitch>();
 
   /// Whether the user is logged in or not.
   @readonly
@@ -54,11 +49,8 @@ abstract class _AuthBase with Store {
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
       }
     } else {
-      // Get and update the current user's info.
-      _user = await Twitch.getUserInfo(headers: headersTwitch);
-
-      // Get and update the current user's list of blocked users.
-      if (_user?.id != null) _blockedUsers = (await Twitch.getUserBlockedList(id: _user!.id, headers: headersTwitch)).asObservable();
+      // Initialize the user store.
+      await user.init(headers: headersTwitch);
 
       _isLoggedIn = true;
     }
@@ -102,10 +94,8 @@ abstract class _AuthBase with Store {
       // Store the user token.
       await _storage.write(key: 'USER_TOKEN', value: _token);
 
-      // Retrieve the user info and set it
-      _user = await Twitch.getUserInfo(headers: headersTwitch);
-
-      if (_user?.id != null) _blockedUsers = (await Twitch.getUserBlockedList(id: _user!.id, headers: headersTwitch)).asObservable();
+      // Initialize the user with the new token.
+      user.init(headers: headersTwitch);
 
       // Set the login status to logged in.
       _isLoggedIn = true;
@@ -122,7 +112,7 @@ abstract class _AuthBase with Store {
     _token = null;
 
     // Clear the user info.
-    _user = null;
+    user.dispose();
 
     // Set the login status to logged out.
     _isLoggedIn = false;
