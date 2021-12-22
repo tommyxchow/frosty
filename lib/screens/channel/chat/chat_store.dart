@@ -23,13 +23,24 @@ abstract class _ChatStoreBase with Store {
   /// The Twitch IRC WebSocket channel.
   final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
-  /// The map of emote words to their image or GIF URL.
-  final _emoteToObject = <String, Emote>{};
-  Map<String, Emote> get emoteToObject => _emoteToObject;
+  /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
+  final emoteToObject = ObservableMap<String, Emote>();
+
+  @computed
+  List<Emote> get bttvEmotes => emoteToObject.values.where((emote) => isBTTV(emote)).toList();
+
+  @computed
+  List<Emote> get ffzEmotes => emoteToObject.values.where((emote) => isFFZ(emote)).toList();
+
+  @computed
+  List<Emote> get sevenTvEmotes => emoteToObject.values.where((emote) => is7TV(emote)).toList();
+
+  /// The emotes that are "owned" and may be used by the current user.
+  @readonly
+  var _userEmotes = ObservableList<Emote>();
 
   /// The map of badges ids to their object representation.
-  final _badgesToObject = <String, BadgeInfoTwitch>{};
-  Map<String, BadgeInfoTwitch> get badgesToObject => _badgesToObject;
+  final badgesToObject = <String, BadgeInfoTwitch>{};
 
   /// The scroll controller that controls auto-scroll and resume-scroll behavior.
   final scrollController = ScrollController();
@@ -92,8 +103,6 @@ abstract class _ChatStoreBase with Store {
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
-    getAssets();
-
     // Listen for new messages and forward them to the handler.
     _channel.stream.listen(
       (data) => _handleIRCData(data.toString()),
@@ -118,7 +127,7 @@ abstract class _ChatStoreBase with Store {
       'PASS oauth:${auth.token}',
 
       // The nickname for the connecting user. 'justinfan888' is the Twitch default if not logged in.
-      'NICK ${auth.isLoggedIn ? auth.user!.login : 'justinfan888'}',
+      'NICK ${auth.isLoggedIn ? auth.user.details!.login : 'justinfan888'}',
 
       // Join the desired channel's room.
       'JOIN #$channelName',
@@ -157,8 +166,8 @@ abstract class _ChatStoreBase with Store {
 
         // Filter messages from any blocked users if not a moderator or not the channel owner.
         if (!_userState.mod &&
-            channelName != auth.user?.login &&
-            auth.blockedUsers.where((blockedUser) => blockedUser.userLogin == parsedIRCMessage.user).isNotEmpty) continue;
+            channelName != auth.user.details?.login &&
+            auth.user.blockedUsers.where((blockedUser) => blockedUser.userLogin == parsedIRCMessage.user).isNotEmpty) continue;
 
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
@@ -185,8 +194,8 @@ abstract class _ChatStoreBase with Store {
             }
             break;
           case Command.globalUserState:
-            // Updates the current global user state data (it includes user-id),
-            // Don't really see a use for it when USERSTATE exists, so leaving it unimplemented for now.
+            final setIds = parsedIRCMessage.tags['emote-sets']?.split(',');
+            getAssets(emoteSets: setIds);
             continue;
           case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
@@ -208,6 +217,11 @@ abstract class _ChatStoreBase with Store {
       // If there are more messages than the limit, remove around 10% of them from the oldest.
       if (_messages.length > settings.messageLimit && settings.messageLimit != 1000) {
         _messages.removeRange(0, (settings.messageLimit / 5).ceil());
+      }
+
+      // Jump to the latest message (bottom of the list/chat).
+      if (scrollController.hasClients) {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
       }
 
       // After the end of the frame, scroll to the bottom of the chat.
@@ -262,8 +276,17 @@ abstract class _ChatStoreBase with Store {
   }
 
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
-  Future<void> getAssets() async {
+  @action
+  Future<void> getAssets({List<String>? emoteSets}) async {
     _messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
+
+    if (emoteSets != null) {
+      final userEmotes = <Emote>[];
+      for (final setId in emoteSets) {
+        userEmotes.addAll(await Twitch.getEmotesSets(setId: setId, headers: auth.headersTwitch));
+      }
+      _userEmotes = userEmotes.asObservable();
+    }
 
     // Fetch the desired channel/user's information.
     final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
@@ -282,10 +305,10 @@ abstract class _ChatStoreBase with Store {
         ...await SevenTV.getEmotesChannel(user: channelInfo.login)
       ];
 
-      assets.sort((a, b) => a.id.compareTo(b.id));
+      // assets.sort((a, b) => a.id.compareTo(b.id));
 
       for (final emote in assets) {
-        _emoteToObject[emote.name] = emote;
+        emoteToObject[emote.name] = emote;
       }
 
       final badges = [
@@ -295,35 +318,11 @@ abstract class _ChatStoreBase with Store {
 
       for (final map in badges) {
         if (map != null) {
-          _badgesToObject.addAll(map);
+          badgesToObject.addAll(map);
         }
       }
 
       _messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!'));
-    }
-  }
-
-  /// Returns the readable text for the given emote type.
-  String emoteMenuTitle(EmoteType type) {
-    switch (type) {
-      case EmoteType.twitchGlobal:
-        return 'Twitch Global';
-      case EmoteType.twitchChannel:
-        return 'Twitch Channel';
-      case EmoteType.ffzGlobal:
-        return 'FFZ Global';
-      case EmoteType.ffzChannel:
-        return 'FFZ Channel';
-      case EmoteType.bttvGlobal:
-        return 'BTTV Global';
-      case EmoteType.bttvChannel:
-        return 'BTTV Channel';
-      case EmoteType.bttvShared:
-        return 'BTTV Shared';
-      case EmoteType.sevenTvGlobal:
-        return '7TV Global';
-      case EmoteType.sevenTvChannel:
-        return '7TV Channel';
     }
   }
 
@@ -339,6 +338,18 @@ abstract class _ChatStoreBase with Store {
       case AppLifecycleState.detached:
         break;
     }
+  }
+
+  bool isBTTV(Emote emote) {
+    return emote.type == EmoteType.bttvChannel || emote.type == EmoteType.bttvGlobal || emote.type == EmoteType.bttvShared;
+  }
+
+  bool isFFZ(Emote emote) {
+    return emote.type == EmoteType.ffzChannel || emote.type == EmoteType.ffzGlobal;
+  }
+
+  bool is7TV(Emote emote) {
+    return emote.type == EmoteType.sevenTvChannel || emote.type == EmoteType.sevenTvGlobal;
   }
 
   /// Closes and disposes all the channels and controllers used by the store.

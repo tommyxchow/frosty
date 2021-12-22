@@ -9,6 +9,45 @@ part of 'chat_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ChatStore on _ChatStoreBase, Store {
+  Computed<List<Emote>>? _$bttvEmotesComputed;
+
+  @override
+  List<Emote> get bttvEmotes =>
+      (_$bttvEmotesComputed ??= Computed<List<Emote>>(() => super.bttvEmotes,
+              name: '_ChatStoreBase.bttvEmotes'))
+          .value;
+  Computed<List<Emote>>? _$ffzEmotesComputed;
+
+  @override
+  List<Emote> get ffzEmotes =>
+      (_$ffzEmotesComputed ??= Computed<List<Emote>>(() => super.ffzEmotes,
+              name: '_ChatStoreBase.ffzEmotes'))
+          .value;
+  Computed<List<Emote>>? _$sevenTvEmotesComputed;
+
+  @override
+  List<Emote> get sevenTvEmotes => (_$sevenTvEmotesComputed ??=
+          Computed<List<Emote>>(() => super.sevenTvEmotes,
+              name: '_ChatStoreBase.sevenTvEmotes'))
+      .value;
+
+  final _$_userEmotesAtom = Atom(name: '_ChatStoreBase._userEmotes');
+
+  ObservableList<Emote> get userEmotes {
+    _$_userEmotesAtom.reportRead();
+    return super._userEmotes;
+  }
+
+  @override
+  ObservableList<Emote> get _userEmotes => userEmotes;
+
+  @override
+  set _userEmotes(ObservableList<Emote> value) {
+    _$_userEmotesAtom.reportWrite(value, super._userEmotes, () {
+      super._userEmotes = value;
+    });
+  }
+
   final _$emoteMenuIndexAtom = Atom(name: '_ChatStoreBase.emoteMenuIndex');
 
   @override
@@ -107,6 +146,14 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
+  final _$getAssetsAsyncAction = AsyncAction('_ChatStoreBase.getAssets');
+
+  @override
+  Future<void> getAssets({List<String>? emoteSets}) {
+    return _$getAssetsAsyncAction
+        .run(() => super.getAssets(emoteSets: emoteSets));
+  }
+
   final _$_ChatStoreBaseActionController =
       ActionController(name: '_ChatStoreBase');
 
@@ -147,7 +194,10 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   String toString() {
     return '''
 emoteMenuIndex: ${emoteMenuIndex},
-showEmoteMenu: ${showEmoteMenu}
+showEmoteMenu: ${showEmoteMenu},
+bttvEmotes: ${bttvEmotes},
+ffzEmotes: ${ffzEmotes},
+sevenTvEmotes: ${sevenTvEmotes}
     ''';
   }
 }
