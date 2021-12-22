@@ -5,27 +5,29 @@ import 'package:frosty/core/auth/auth_store.dart';
 
 class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
+
   const ProfileCard({Key? key, required this.authStore}) : super(key: key);
 
   Future<void> _showDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Logout'),
-          content: const Text('Are you sure you want to log out?'),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
-            TextButton(
-              onPressed: () {
-                authStore.logout();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Yes'),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              authStore.logout();
+              Navigator.of(context).pop();
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -34,15 +36,13 @@ class ProfileCard extends StatelessWidget {
     return Center(
       child: Observer(
         builder: (context) {
-          if (authStore.isLoggedIn) {
+          if (authStore.isLoggedIn && authStore.user.details != null) {
             return ListTile(
               leading: CircleAvatar(
                 backgroundColor: const Color(0xFFFFFFFF),
-                foregroundImage: CachedNetworkImageProvider(
-                  authStore.user!.profileImageUrl,
-                ),
+                foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
               ),
-              title: Text(authStore.user!.displayName),
+              title: Text(authStore.user.details!.displayName),
               onTap: () => _showDialog(context),
             );
           }
