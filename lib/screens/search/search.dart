@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
@@ -45,6 +46,39 @@ class _SearchState extends State<Search> {
               onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
               child: Observer(
                 builder: (_) {
+                  if (searchStore.textController.text.isEmpty) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(15.0),
+                          child: Text(
+                            'HISTORY',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            children: searchStore.searchHistory
+                                .mapIndexed((index, searchTerm) => ListTile(
+                                      leading: const Icon(Icons.history),
+                                      title: Text(searchTerm),
+                                      trailing: IconButton(
+                                        icon: const Icon(Icons.cancel),
+                                        onPressed: () => searchStore.searchHistory.removeAt(index),
+                                      ),
+                                      onTap: () {
+                                        searchStore.textController.text = searchTerm;
+                                        searchStore.handleQuery(searchTerm);
+                                      },
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+
                   return ListView.builder(
                     itemCount: searchStore.searchResults.length + 1,
                     itemBuilder: (context, index) {
@@ -54,7 +88,7 @@ class _SearchState extends State<Search> {
                         }
                         return ListTile(
                           title: Text('Go to ${searchStore.textController.text}'),
-                          onTap: () => searchStore.handleSearch(searchStore.textController.text, context),
+                          onTap: () => searchStore.handleSearch(context, searchStore.textController.text),
                         );
                       }
 

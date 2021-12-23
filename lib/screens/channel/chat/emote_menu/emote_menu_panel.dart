@@ -37,7 +37,7 @@ class EmoteMenuPanel extends StatelessWidget {
         if (globalEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
             child: Padding(
-              padding: headerPadding,
+              padding: EdgeInsets.all(10.0),
               child: Text(
                 'Global Emotes',
                 style: headerStyle,
