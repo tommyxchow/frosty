@@ -33,15 +33,12 @@ abstract class _SettingsStoreBase with Store {
     hideBannedMessages = prefs.getBool('hide_banned_messages') ?? hideBannedMessages;
     zeroWidthEnabled = prefs.getBool('zero_width_enabled') ?? zeroWidthEnabled;
 
-    // Set up autorun to store setting anytime they're changed.
+    // Set up reactions to store setting anytime they're changed.
     // The ReactionDisposer will not be needed since settings will always exist.
-    autorun((_) {
-      debugPrint('settings changed');
-      prefs.setBool('video_enabled', videoEnabled);
-      prefs.setBool('overlay_enabled', overlayEnabled);
-      prefs.setDouble('message_limit', messageLimit);
-      prefs.setBool('hide_banned_messages', hideBannedMessages);
-      prefs.setBool('zero_width_enabled', zeroWidthEnabled);
-    });
+    reaction((_) => messageLimit, (double newValue) => prefs.setDouble('message_limit', newValue));
+    reaction((_) => videoEnabled, (bool newValue) => prefs.setBool('video_enabled', newValue));
+    reaction((_) => overlayEnabled, (bool newValue) => prefs.setBool('overlay_enabled', newValue));
+    reaction((_) => zeroWidthEnabled, (bool newValue) => prefs.setBool('zero_width_enabled', newValue));
+    reaction((_) => hideBannedMessages, (bool newValue) => prefs.setBool('hide_banned_messages', newValue));
   }
 }
