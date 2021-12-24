@@ -149,9 +149,17 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   final _$getAssetsAsyncAction = AsyncAction('_ChatStoreBase.getAssets');
 
   @override
-  Future<void> getAssets({List<String>? emoteSets}) {
-    return _$getAssetsAsyncAction
-        .run(() => super.getAssets(emoteSets: emoteSets));
+  Future<void> getAssets() {
+    return _$getAssetsAsyncAction.run(() => super.getAssets());
+  }
+
+  final _$getUserEmotesAsyncAction =
+      AsyncAction('_ChatStoreBase.getUserEmotes');
+
+  @override
+  Future<void> getUserEmotes({List<String>? emoteSets}) {
+    return _$getUserEmotesAsyncAction
+        .run(() => super.getUserEmotes(emoteSets: emoteSets));
   }
 
   final _$_ChatStoreBaseActionController =

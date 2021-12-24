@@ -93,11 +93,8 @@ abstract class _ChatStoreBase with Store {
     // scroll to the bottom of the list. This will prevent the emote menu
     // from covering the latest messages when summoned.
     final disposeEmoteMenuReaction = reaction((_) => showEmoteMenu, (_) {
-      debugPrint('reaction');
       SchedulerBinding.instance?.addPostFrameCallback((_) {
-        if (scrollController.hasClients) {
-          scrollController.jumpTo(scrollController.position.maxScrollExtent);
-        }
+        if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
       });
     });
 
@@ -114,8 +111,12 @@ abstract class _ChatStoreBase with Store {
         debugPrint("Disconnected from $channelName's chat.");
         _messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
         disposeEmoteMenuReaction();
+        return;
       },
     );
+
+    // Fetch the assets used in chat including badges and emotes.
+    getAssets();
 
     // The list of messages sent to the IRC WebSocket channel to connect and join.
     final commands = [
@@ -195,7 +196,7 @@ abstract class _ChatStoreBase with Store {
             break;
           case Command.globalUserState:
             final setIds = parsedIRCMessage.tags['emote-sets']?.split(',');
-            getAssets(emoteSets: setIds);
+            getUserEmotes(emoteSets: setIds);
             continue;
           case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
@@ -215,21 +216,15 @@ abstract class _ChatStoreBase with Store {
   void _deleteAndScrollToEnd() {
     if (_autoScroll) {
       // If there are more messages than the limit, remove around 10% of them from the oldest.
-      if (_messages.length > settings.messageLimit && settings.messageLimit != 1000) {
-        _messages.removeRange(0, (settings.messageLimit / 5).ceil());
-      }
+      if (_messages.length > settings.messageLimit && settings.messageLimit != 1000) _messages.removeRange(0, (settings.messageLimit / 5).ceil());
 
       // Jump to the latest message (bottom of the list/chat).
-      if (scrollController.hasClients) {
-        scrollController.jumpTo(scrollController.position.maxScrollExtent);
-      }
+      if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
 
       // After the end of the frame, scroll to the bottom of the chat.
       // This is a postFrameCallback because the chat should scroll after the widget is built and rendered.
       SchedulerBinding.instance?.addPostFrameCallback((_) {
-        if (scrollController.hasClients) {
-          scrollController.jumpTo(scrollController.position.maxScrollExtent);
-        }
+        if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
       });
     }
   }
@@ -277,16 +272,8 @@ abstract class _ChatStoreBase with Store {
 
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
   @action
-  Future<void> getAssets({List<String>? emoteSets}) async {
+  Future<void> getAssets() async {
     _messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
-
-    if (emoteSets != null) {
-      final userEmotes = <Emote>[];
-      for (final setId in emoteSets) {
-        userEmotes.addAll(await Twitch.getEmotesSets(setId: setId, headers: auth.headersTwitch));
-      }
-      _userEmotes = userEmotes.asObservable();
-    }
 
     // Fetch the desired channel/user's information.
     final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
@@ -324,6 +311,21 @@ abstract class _ChatStoreBase with Store {
 
       _messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!'));
     }
+  }
+
+  @action
+  Future<void> getUserEmotes({List<String>? emoteSets}) async {
+    _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
+
+    if (emoteSets != null) {
+      final userEmotes = <Emote>[];
+      for (final setId in emoteSets) {
+        userEmotes.addAll(await Twitch.getEmotesSets(setId: setId, headers: auth.headersTwitch));
+      }
+      _userEmotes = userEmotes.asObservable();
+    }
+
+    _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!'));
   }
 
   /// Pauses or resumes the chat subscription depending on the provided state.
