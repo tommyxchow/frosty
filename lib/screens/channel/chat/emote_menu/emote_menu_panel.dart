@@ -25,6 +25,7 @@ class EmoteMenuPanel extends StatelessWidget {
         .where((emote) =>
             emote.type == EmoteType.twitchChannel ||
             emote.type == EmoteType.bttvChannel ||
+            emote.type == EmoteType.bttvShared ||
             emote.type == EmoteType.ffzChannel ||
             emote.type == EmoteType.sevenTvChannel)
         .toList();
