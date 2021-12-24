@@ -40,11 +40,7 @@ class Video extends StatelessWidget {
                   videoStore.initVideo();
                 },
               ),
-              VideoOverlay(
-                title: title,
-                userName: userName,
-                videoStore: videoStore,
-              ),
+              VideoOverlay(videoStore: videoStore),
             ],
           );
         } else {

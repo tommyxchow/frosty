@@ -7,16 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class VideoOverlay extends StatelessWidget {
-  final String title;
-  final String userName;
   final VideoStore videoStore;
 
-  const VideoOverlay({
-    Key? key,
-    required this.title,
-    required this.userName,
-    required this.videoStore,
-  }) : super(key: key);
+  const VideoOverlay({Key? key, required this.videoStore}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +17,7 @@ class VideoOverlay extends StatelessWidget {
       onTap: videoStore.handleVideoTap,
       child: SizedBox.expand(
         child: Observer(
-          builder: (_) {
+          builder: (context) {
             return AnimatedOpacity(
               opacity: videoStore.menuVisible ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 100),
@@ -69,31 +62,39 @@ class VideoOverlay extends StatelessWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      userName,
-                                      style: const TextStyle(
-                                        color: Color(0xFFFFFFFF),
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 5.0),
-                                    if (videoStore.streamInfo != null)
-                                      Text(
-                                        '${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
-                                        style: const TextStyle(
-                                          color: Color(0xFFFFFFFF),
-                                        ),
-                                      ),
-                                  ],
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: videoStore.streamInfo != null
+                                      ? Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              videoStore.streamInfo!.userName,
+                                              style: const TextStyle(
+                                                color: Color(0xFFFFFFFF),
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 5.0),
+                                            Text(
+                                              videoStore.streamInfo!.title,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 5.0),
+                                            Text(
+                                              '${videoStore.streamInfo?.gameName} for ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                              style: const TextStyle(
+                                                color: Color(0xFFFFFFFF),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : null,
                                 ),
                               ),
-                              const Spacer(),
                               IconButton(
                                 icon: const Icon(
                                   Icons.picture_in_picture_alt_rounded,
