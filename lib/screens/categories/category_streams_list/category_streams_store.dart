@@ -12,9 +12,8 @@ abstract class _CategoryStreamsStoreBase with Store {
   final CategoryTwitch categoryInfo;
 
   /// The list of the fetched streams under the category.
-  @observable
+  @readonly
   var _streams = ObservableList<StreamTwitch>();
-  ObservableList<StreamTwitch> get streams => _streams;
 
   /// The loading status for pagination.
   bool _isLoading = false;

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,6 +20,9 @@ abstract class _SettingsStoreBase with Store {
 
   @observable
   var zeroWidthEnabled = false;
+
+  @observable
+  var fullScreen = false;
 
   Future<void> init() async {
     // Retrieve the instance that will allow us to store and persist settings.

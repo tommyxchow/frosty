@@ -11,11 +11,13 @@ part of 'category_streams_store.dart';
 mixin _$CategoryStreamsStore on _CategoryStreamsStoreBase, Store {
   final _$_streamsAtom = Atom(name: '_CategoryStreamsStoreBase._streams');
 
-  @override
-  ObservableList<StreamTwitch> get _streams {
+  ObservableList<StreamTwitch> get streams {
     _$_streamsAtom.reportRead();
     return super._streams;
   }
+
+  @override
+  ObservableList<StreamTwitch> get _streams => streams;
 
   @override
   set _streams(ObservableList<StreamTwitch> value) {

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
@@ -11,7 +10,7 @@ part 'video_store.g.dart';
 class VideoStore = _VideoStoreBase with _$VideoStore;
 
 abstract class _VideoStoreBase with Store {
-  late final WebViewController controller;
+  WebViewController? controller;
 
   late Timer overlayTimer;
   late Timer updateTimer;
@@ -30,8 +29,6 @@ abstract class _VideoStoreBase with Store {
   final AuthStore authStore;
 
   _VideoStoreBase({required this.userLogin, required this.authStore}) {
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
-
     overlayTimer = Timer(const Duration(seconds: 3), () => _menuVisible = false);
     updateStreamInfo();
   }
@@ -39,9 +36,9 @@ abstract class _VideoStoreBase with Store {
   @action
   void handlePausePlay() {
     if (_paused) {
-      controller.runJavascript('document.getElementsByTagName("video")[0].play();');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
     } else {
-      controller.runJavascript('document.getElementsByTagName("video")[0].pause();');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
     }
 
     _paused = !_paused;
@@ -72,19 +69,11 @@ abstract class _VideoStoreBase with Store {
   }
 
   void initVideo() {
-    controller.runJavascript('document.getElementsByTagName("button")[0].click();');
-    controller.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
+    controller?.runJavascript('document.getElementsByTagName("button")[0].click();');
+    controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
   }
 
   void requestPictureInPicture() {
-    controller.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
-  }
-
-  void requestFullscreen() {
-    if (Platform.isIOS) {
-      controller.runJavascript('document.getElementsByTagName("video")[0].webkitEnterFullscreen();');
-    } else {
-      controller.runJavascript('document.getElementsByTagName("video")[0].requestFullscreen();');
-    }
+    controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
   }
 }

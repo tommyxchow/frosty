@@ -86,6 +86,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$fullScreenAtom = Atom(name: '_SettingsStoreBase.fullScreen');
+
+  @override
+  bool get fullScreen {
+    _$fullScreenAtom.reportRead();
+    return super.fullScreen;
+  }
+
+  @override
+  set fullScreen(bool value) {
+    _$fullScreenAtom.reportWrite(value, super.fullScreen, () {
+      super.fullScreen = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
@@ -93,7 +108,8 @@ videoEnabled: ${videoEnabled},
 overlayEnabled: ${overlayEnabled},
 messageLimit: ${messageLimit},
 hideBannedMessages: ${hideBannedMessages},
-zeroWidthEnabled: ${zeroWidthEnabled}
+zeroWidthEnabled: ${zeroWidthEnabled},
+fullScreen: ${fullScreen}
     ''';
   }
 }

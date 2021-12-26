@@ -50,13 +50,14 @@ class _SearchState extends State<Search> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Padding(
-                          padding: EdgeInsets.all(15.0),
-                          child: Text(
-                            'HISTORY',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                        if (searchStore.searchHistory.isNotEmpty)
+                          const Padding(
+                            padding: EdgeInsets.all(15.0),
+                            child: Text(
+                              'HISTORY',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
                         Expanded(
                           child: ListView(
                             children: searchStore.searchHistory

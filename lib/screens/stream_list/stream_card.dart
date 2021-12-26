@@ -78,9 +78,7 @@ class StreamCard extends StatelessWidget {
                       child: Text(streamInfo.title.replaceAll('\n', '')),
                     ),
                     const SizedBox(height: 5.0),
-                    Text(
-                      streamInfo.gameName,
-                    ),
+                    Text(streamInfo.gameName),
                     const SizedBox(height: 5.0),
                     Text(
                       '${NumberFormat().format(streamInfo.viewerCount)} viewers',

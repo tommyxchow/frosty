@@ -44,17 +44,12 @@ class VideoOverlay extends StatelessWidget {
                                   Icons.settings,
                                   color: Color(0xFFFFFFFF),
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      fullscreenDialog: true,
-                                      builder: (context) {
-                                        return Settings(settingsStore: context.read<SettingsStore>());
-                                      },
-                                    ),
-                                  );
-                                },
+                                onPressed: () => showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Settings(settingsStore: context.read<SettingsStore>());
+                                  },
+                                ),
                               ),
                             ],
                           ),
@@ -107,7 +102,7 @@ class VideoOverlay extends StatelessWidget {
                                   Icons.fullscreen,
                                   color: Color(0xFFFFFFFF),
                                 ),
-                                onPressed: videoStore.requestFullscreen,
+                                onPressed: () => context.read<SettingsStore>().fullScreen = !context.read<SettingsStore>().fullScreen,
                               )
                             ],
                           )
