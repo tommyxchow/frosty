@@ -61,69 +61,71 @@ class VideoChat extends StatelessWidget {
     );
 
     return Scaffold(
-      body: OrientationBuilder(
-        builder: (context, orientation) {
-          if (orientation == Orientation.landscape) {
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-            return Observer(
-              builder: (context) {
-                if (context.read<SettingsStore>().videoEnabled) {
-                  return WillPopScope(
-                    onWillPop: () async => false,
-                    child: Observer(
-                      builder: (context) => context.read<SettingsStore>().fullScreen
-                          ? Stack(
-                              children: [
-                                Visibility(
-                                  visible: false,
-                                  maintainState: true,
-                                  child: chat,
-                                ),
-                                Center(child: video),
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Flexible(
-                                  flex: 2,
-                                  child: video,
-                                ),
-                                Flexible(
-                                  flex: 1,
-                                  child: chat,
-                                ),
-                              ],
-                            ),
-                    ),
-                  );
-                }
-                return Column(
-                  children: [
-                    appBar,
-                    Expanded(child: chat),
-                  ],
-                );
-              },
-            );
-          }
-
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
-          return Column(
-            children: [
-              Observer(
+      body: SafeArea(
+        child: OrientationBuilder(
+          builder: (context, orientation) {
+            if (orientation == Orientation.landscape) {
+              SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+              return Observer(
                 builder: (context) {
                   if (context.read<SettingsStore>().videoEnabled) {
-                    return video;
+                    return WillPopScope(
+                      onWillPop: () async => false,
+                      child: Observer(
+                        builder: (context) => context.read<SettingsStore>().fullScreen
+                            ? Stack(
+                                children: [
+                                  Visibility(
+                                    visible: false,
+                                    maintainState: true,
+                                    child: chat,
+                                  ),
+                                  Center(child: video),
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  Flexible(
+                                    flex: 2,
+                                    child: video,
+                                  ),
+                                  Flexible(
+                                    flex: 1,
+                                    child: chat,
+                                  ),
+                                ],
+                              ),
+                      ),
+                    );
                   }
-                  return appBar;
+                  return Column(
+                    children: [
+                      appBar,
+                      Expanded(child: chat),
+                    ],
+                  );
                 },
-              ),
-              Expanded(
-                child: chat,
-              ),
-            ],
-          );
-        },
+              );
+            }
+
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+            return Column(
+              children: [
+                Observer(
+                  builder: (context) {
+                    if (context.read<SettingsStore>().videoEnabled) {
+                      return video;
+                    }
+                    return appBar;
+                  },
+                ),
+                Expanded(
+                  child: chat,
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

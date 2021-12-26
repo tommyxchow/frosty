@@ -19,34 +19,32 @@ class Video extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Observer(
-          builder: (context) {
-            if (context.read<SettingsStore>().overlayEnabled) {
-              return Stack(
-                children: [
-                  WebView(
-                    initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
-                    javascriptMode: JavascriptMode.unrestricted,
-                    allowsInlineMediaPlayback: true,
-                    initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-                    onWebViewCreated: (controller) => videoStore.controller = controller,
-                    onPageFinished: (string) => videoStore.initVideo(),
-                  ),
-                  VideoOverlay(videoStore: videoStore),
-                ],
-              );
-            }
-            return WebView(
-              initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
-              javascriptMode: JavascriptMode.unrestricted,
-              allowsInlineMediaPlayback: true,
-              initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: Observer(
+        builder: (context) {
+          if (context.read<SettingsStore>().overlayEnabled) {
+            return Stack(
+              children: [
+                WebView(
+                  initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
+                  javascriptMode: JavascriptMode.unrestricted,
+                  allowsInlineMediaPlayback: true,
+                  initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+                  onWebViewCreated: (controller) => videoStore.controller = controller,
+                  onPageFinished: (string) => videoStore.initVideo(),
+                ),
+                VideoOverlay(videoStore: videoStore),
+              ],
             );
-          },
-        ),
+          }
+          return WebView(
+            initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
+            javascriptMode: JavascriptMode.unrestricted,
+            allowsInlineMediaPlayback: true,
+            initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+          );
+        },
       ),
     );
   }
