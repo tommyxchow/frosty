@@ -42,72 +42,89 @@ class VideoChat extends StatelessWidget {
       ),
     );
 
-    return Scaffold(
-      body: OrientationBuilder(builder: (context, orientation) {
-        if (orientation == Orientation.landscape) {
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-          return Observer(
+    final appBar = AppBar(
+      title: Text(
+        userName,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () => showModalBottomSheet(
+            context: context,
             builder: (context) {
-              if (context.read<SettingsStore>().fullScreen) {
-                return Stack(
-                  children: [
-                    Visibility(
-                      visible: false,
-                      maintainState: true,
-                      child: chat,
-                    ),
-                    Center(child: video),
-                  ],
-                );
-              }
-              return Row(
-                children: [
-                  Flexible(
-                    flex: 2,
-                    child: video,
-                  ),
-                  Flexible(
-                    flex: 1,
-                    child: chat,
-                  ),
-                ],
-              );
+              return Settings(settingsStore: context.read<SettingsStore>());
             },
-          );
-        }
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
-        return Column(
-          children: [
-            Observer(
+          ),
+        ),
+      ],
+    );
+
+    return Scaffold(
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.landscape) {
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+            return Observer(
               builder: (context) {
                 if (context.read<SettingsStore>().videoEnabled) {
-                  return video;
-                }
-                return AppBar(
-                  title: Text(
-                    userName,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () => showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return Settings(settingsStore: context.read<SettingsStore>());
-                        },
-                      ),
+                  return WillPopScope(
+                    onWillPop: () async => false,
+                    child: Observer(
+                      builder: (context) => context.read<SettingsStore>().fullScreen
+                          ? Stack(
+                              children: [
+                                Visibility(
+                                  visible: false,
+                                  maintainState: true,
+                                  child: chat,
+                                ),
+                                Center(child: video),
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Flexible(
+                                  flex: 2,
+                                  child: video,
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: chat,
+                                ),
+                              ],
+                            ),
                     ),
+                  );
+                }
+                return Column(
+                  children: [
+                    appBar,
+                    Expanded(child: chat),
                   ],
                 );
               },
-            ),
-            Expanded(
-              child: chat,
-            ),
-          ],
-        );
-      }),
+            );
+          }
+
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+          return Column(
+            children: [
+              Observer(
+                builder: (context) {
+                  if (context.read<SettingsStore>().videoEnabled) {
+                    return video;
+                  }
+                  return appBar;
+                },
+              ),
+              Expanded(
+                child: chat,
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

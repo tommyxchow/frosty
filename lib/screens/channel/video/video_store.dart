@@ -22,6 +22,9 @@ abstract class _VideoStoreBase with Store {
   var _paused = false;
 
   @readonly
+  var _expandInfo = false;
+
+  @readonly
   StreamTwitch? _streamInfo;
 
   final String userLogin;
@@ -66,6 +69,13 @@ abstract class _VideoStoreBase with Store {
     if (updatedStreamInfo != null) {
       _streamInfo = updatedStreamInfo;
     }
+  }
+
+  @action
+  void handleExpand() {
+    overlayTimer.cancel();
+    _expandInfo = !_expandInfo;
+    overlayTimer = Timer(const Duration(seconds: 5), () => _menuVisible = false);
   }
 
   void initVideo() {

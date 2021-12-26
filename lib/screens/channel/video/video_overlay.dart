@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/settings/settings.dart';
@@ -13,6 +15,8 @@ class VideoOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final portrait = MediaQuery.of(context).orientation == Orientation.portrait;
+
     return GestureDetector(
       onTap: videoStore.handleVideoTap,
       child: SizedBox.expand(
@@ -31,13 +35,14 @@ class VideoOverlay extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.adaptive.arrow_back,
-                                  color: const Color(0xFFFFFFFF),
+                              if (portrait)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.adaptive.arrow_back,
+                                    color: const Color(0xFFFFFFFF),
+                                  ),
+                                  onPressed: () => Navigator.of(context).pop(),
                                 ),
-                                onPressed: () => Navigator.of(context).pop(),
-                              ),
                               const Spacer(),
                               IconButton(
                                 icon: const Icon(
@@ -58,45 +63,64 @@ class VideoOverlay extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: videoStore.streamInfo != null
-                                      ? Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              videoStore.streamInfo!.userName,
-                                              style: const TextStyle(
-                                                color: Color(0xFFFFFFFF),
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 5.0),
-                                            Text(
-                                              videoStore.streamInfo!.title,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            const SizedBox(height: 5.0),
-                                            Text(
-                                              '${videoStore.streamInfo?.gameName} for ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
-                                              style: const TextStyle(
-                                                color: Color(0xFFFFFFFF),
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      : null,
+                                child: GestureDetector(
+                                  onTap: videoStore.handleExpand,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: videoStore.streamInfo != null
+                                        ? AnimatedSwitcher(
+                                            duration: const Duration(milliseconds: 300),
+                                            child: videoStore.expandInfo
+                                                ? Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        videoStore.streamInfo!.userName,
+                                                        style: const TextStyle(
+                                                          color: Color(0xFFFFFFFF),
+                                                          fontSize: 20,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(height: 5.0),
+                                                      Text(
+                                                        videoStore.streamInfo!.title,
+                                                        maxLines: portrait ? 2 : 4,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                      const SizedBox(height: 5.0),
+                                                      Text(
+                                                        '${videoStore.streamInfo?.gameName} for ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                                        style: const TextStyle(
+                                                          color: Color(0xFFFFFFFF),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Align(
+                                                    alignment: Alignment.bottomLeft,
+                                                    child: Text(
+                                                      videoStore.streamInfo!.userName,
+                                                      style: const TextStyle(
+                                                        color: Color(0xFFFFFFFF),
+                                                        fontSize: 20,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.picture_in_picture_alt_rounded,
-                                  color: Color(0xFFFFFFFF),
+                              if (Platform.isIOS)
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.picture_in_picture_alt_rounded,
+                                    color: Color(0xFFFFFFFF),
+                                  ),
+                                  onPressed: videoStore.requestPictureInPicture,
                                 ),
-                                onPressed: videoStore.requestPictureInPicture,
-                              ),
                               IconButton(
                                 icon: const Icon(
                                   Icons.fullscreen,

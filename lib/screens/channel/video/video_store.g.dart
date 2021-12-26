@@ -43,6 +43,23 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
+  final _$_expandInfoAtom = Atom(name: '_VideoStoreBase._expandInfo');
+
+  bool get expandInfo {
+    _$_expandInfoAtom.reportRead();
+    return super._expandInfo;
+  }
+
+  @override
+  bool get _expandInfo => expandInfo;
+
+  @override
+  set _expandInfo(bool value) {
+    _$_expandInfoAtom.reportWrite(value, super._expandInfo, () {
+      super._expandInfo = value;
+    });
+  }
+
   final _$_streamInfoAtom = Atom(name: '_VideoStoreBase._streamInfo');
 
   StreamTwitch? get streamInfo {
@@ -88,6 +105,17 @@ mixin _$VideoStore on _VideoStoreBase, Store {
         name: '_VideoStoreBase.handleVideoTap');
     try {
       return super.handleVideoTap();
+    } finally {
+      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void handleExpand() {
+    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
+        name: '_VideoStoreBase.handleExpand');
+    try {
+      return super.handleExpand();
     } finally {
       _$_VideoStoreBaseActionController.endAction(_$actionInfo);
     }
