@@ -52,7 +52,7 @@ abstract class _AuthBase with Store {
       // Initialize the user store.
       await user.init(headers: headersTwitch);
 
-      _isLoggedIn = true;
+      if (user.details != null) _isLoggedIn = true;
     }
 
     // Validate the token.
