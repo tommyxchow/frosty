@@ -79,7 +79,6 @@ abstract class _VideoStoreBase with Store {
   }
 
   void initVideo() {
-    controller?.runJavascript('document.getElementsByTagName("button")[0].click();');
     controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
   }
 

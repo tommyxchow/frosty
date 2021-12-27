@@ -121,13 +121,14 @@ class VideoOverlay extends StatelessWidget {
                                   ),
                                   onPressed: videoStore.requestPictureInPicture,
                                 ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.fullscreen,
-                                  color: Color(0xFFFFFFFF),
-                                ),
-                                onPressed: () => context.read<SettingsStore>().fullScreen = !context.read<SettingsStore>().fullScreen,
-                              )
+                              if (MediaQuery.of(context).orientation == Orientation.landscape)
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.fullscreen,
+                                    color: Color(0xFFFFFFFF),
+                                  ),
+                                  onPressed: () => context.read<SettingsStore>().fullScreen = !context.read<SettingsStore>().fullScreen,
+                                )
                             ],
                           )
                         ],

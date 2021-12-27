@@ -65,7 +65,7 @@ class VideoChat extends StatelessWidget {
         child: OrientationBuilder(
           builder: (context, orientation) {
             if (orientation == Orientation.landscape) {
-              SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+              if (context.read<SettingsStore>().fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
               return Observer(
                 builder: (context) {
                   if (context.read<SettingsStore>().videoEnabled) {

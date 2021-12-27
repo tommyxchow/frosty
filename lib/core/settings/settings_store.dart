@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -42,5 +43,12 @@ abstract class _SettingsStoreBase with Store {
     reaction((_) => overlayEnabled, (bool newValue) => prefs.setBool('overlay_enabled', newValue));
     reaction((_) => zeroWidthEnabled, (bool newValue) => prefs.setBool('zero_width_enabled', newValue));
     reaction((_) => hideBannedMessages, (bool newValue) => prefs.setBool('hide_banned_messages', newValue));
+
+    // A reaction that will enable immersive mode when entering fullscreen and disable it when exiting.
+    reaction(
+        (_) => fullScreen,
+        (bool newValue) => newValue == true
+            ? SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive)
+            : SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]));
   }
 }
