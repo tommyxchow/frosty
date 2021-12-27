@@ -35,7 +35,7 @@ class VideoOverlay extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              if (portrait)
+                              if (!context.read<SettingsStore>().fullScreen)
                                 IconButton(
                                   icon: Icon(
                                     Icons.adaptive.arrow_back,

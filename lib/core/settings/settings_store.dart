@@ -48,7 +48,7 @@ abstract class _SettingsStoreBase with Store {
     reaction(
         (_) => fullScreen,
         (bool newValue) => newValue == true
-            ? SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive)
+            ? SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky)
             : SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]));
   }
 }

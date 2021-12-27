@@ -65,15 +65,15 @@ class VideoChat extends StatelessWidget {
         child: OrientationBuilder(
           builder: (context, orientation) {
             if (orientation == Orientation.landscape) {
-              if (context.read<SettingsStore>().fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+              if (context.read<SettingsStore>().fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
               return Observer(
                 builder: (context) {
                   if (context.read<SettingsStore>().videoEnabled) {
-                    return WillPopScope(
-                      onWillPop: () async => false,
-                      child: Observer(
-                        builder: (context) => context.read<SettingsStore>().fullScreen
-                            ? Stack(
+                    return Observer(
+                      builder: (context) => context.read<SettingsStore>().fullScreen
+                          ? WillPopScope(
+                              onWillPop: () async => false,
+                              child: Stack(
                                 children: [
                                   Visibility(
                                     visible: false,
@@ -82,20 +82,20 @@ class VideoChat extends StatelessWidget {
                                   ),
                                   Center(child: video),
                                 ],
-                              )
-                            : Row(
-                                children: [
-                                  Flexible(
-                                    flex: 2,
-                                    child: video,
-                                  ),
-                                  Flexible(
-                                    flex: 1,
-                                    child: chat,
-                                  ),
-                                ],
                               ),
-                      ),
+                            )
+                          : Row(
+                              children: [
+                                Flexible(
+                                  flex: 2,
+                                  child: video,
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: chat,
+                                ),
+                              ],
+                            ),
                     );
                   }
                   return Column(
