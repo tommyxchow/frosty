@@ -30,7 +30,7 @@ class EmoteMenu extends StatelessWidget {
               Observer(
                 builder: (_) => EmoteMenuPanel(
                   textController: chatStore.textController,
-                  emotes: chatStore.userEmotes,
+                  emotes: chatStore.userEmoteToObject.values.toList(),
                 ),
               ),
               Observer(

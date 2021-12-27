@@ -37,7 +37,7 @@ abstract class _ChatStoreBase with Store {
 
   /// The emotes that are "owned" and may be used by the current user.
   @readonly
-  var _userEmotes = ObservableList<Emote>();
+  var _userEmoteToObject = ObservableMap<String, Emote>();
 
   /// The map of badges ids to their object representation.
   final badgesToObject = <String, BadgeInfoTwitch>{};
@@ -262,7 +262,8 @@ abstract class _ChatStoreBase with Store {
       // }
 
       final userChatMessage = IRCMessage.fromString(userStateString);
-      userChatMessage.message = message;
+      userChatMessage.localEmotes.addAll(_userEmoteToObject);
+      userChatMessage.message = message.trim();
       toSend = userChatMessage;
     }
 
@@ -322,7 +323,8 @@ abstract class _ChatStoreBase with Store {
       for (final setId in emoteSets) {
         userEmotes.addAll(await Twitch.getEmotesSets(setId: setId, headers: auth.headersTwitch));
       }
-      _userEmotes = userEmotes.asObservable();
+
+      _userEmoteToObject = {for (final emote in userEmotes) emote.name: emote}.asObservable();
     }
 
     _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!'));

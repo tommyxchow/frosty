@@ -31,20 +31,21 @@ mixin _$ChatStore on _ChatStoreBase, Store {
               name: '_ChatStoreBase.sevenTvEmotes'))
       .value;
 
-  final _$_userEmotesAtom = Atom(name: '_ChatStoreBase._userEmotes');
+  final _$_userEmoteToObjectAtom =
+      Atom(name: '_ChatStoreBase._userEmoteToObject');
 
-  ObservableList<Emote> get userEmotes {
-    _$_userEmotesAtom.reportRead();
-    return super._userEmotes;
+  ObservableMap<String, Emote> get userEmoteToObject {
+    _$_userEmoteToObjectAtom.reportRead();
+    return super._userEmoteToObject;
   }
 
   @override
-  ObservableList<Emote> get _userEmotes => userEmotes;
+  ObservableMap<String, Emote> get _userEmoteToObject => userEmoteToObject;
 
   @override
-  set _userEmotes(ObservableList<Emote> value) {
-    _$_userEmotesAtom.reportWrite(value, super._userEmotes, () {
-      super._userEmotes = value;
+  set _userEmoteToObject(ObservableMap<String, Emote> value) {
+    _$_userEmoteToObjectAtom.reportWrite(value, super._userEmoteToObject, () {
+      super._userEmoteToObject = value;
     });
   }
 
