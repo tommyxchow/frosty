@@ -59,8 +59,8 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                         builder: (context) => ChatMessage(
                           ircMessage: chatStore.messages[index],
                           assetsStore: chatStore.assetsStore,
-                          hideMessageIfBanned: context.read<SettingsStore>().hideBannedMessages,
-                          zeroWidth: context.read<SettingsStore>().zeroWidthEnabled,
+                          hideMessageIfBanned: chatStore.settings.hideBannedMessages,
+                          zeroWidth: chatStore.settings.zeroWidthEnabled,
                         ),
                       ),
                     ),
@@ -82,7 +82,7 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
               ],
             ),
           ),
-          if (context.read<AuthStore>().isLoggedIn) ChatBottomBar(chatStore: chatStore),
+          if (chatStore.auth.isLoggedIn) ChatBottomBar(chatStore: chatStore),
           if (chatStore.assetsStore.showEmoteMenu)
             Expanded(
               child: EmoteMenu(

@@ -24,21 +24,24 @@ class VideoChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authStore = context.read<AuthStore>();
+    final settingsStore = context.read<SettingsStore>();
+
     final video = Video(
       key: GlobalKey(),
       userLogin: userLogin,
       videoStore: VideoStore(
         userLogin: userLogin,
-        authStore: context.read<AuthStore>(),
-        settingsStore: context.read<SettingsStore>(),
+        authStore: authStore,
+        settingsStore: settingsStore,
       ),
     );
 
     final chat = Chat(
       key: GlobalKey(),
       chatStore: ChatStore(
-        auth: context.read<AuthStore>(),
-        settings: context.read<SettingsStore>(),
+        auth: authStore,
+        settings: settingsStore,
         channelName: userLogin,
       ),
     );
@@ -54,7 +57,7 @@ class VideoChat extends StatelessWidget {
           onPressed: () => showModalBottomSheet(
             context: context,
             builder: (context) {
-              return Settings(settingsStore: context.read<SettingsStore>());
+              return Settings(settingsStore: settingsStore);
             },
           ),
         ),
@@ -66,12 +69,12 @@ class VideoChat extends StatelessWidget {
         child: OrientationBuilder(
           builder: (context, orientation) {
             if (orientation == Orientation.landscape) {
-              if (context.read<SettingsStore>().fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+              if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
               return Observer(
                 builder: (context) {
-                  if (context.read<SettingsStore>().videoEnabled) {
+                  if (settingsStore.videoEnabled) {
                     return Observer(
-                      builder: (context) => context.read<SettingsStore>().fullScreen
+                      builder: (context) => settingsStore.fullScreen
                           ? WillPopScope(
                               onWillPop: () async => false,
                               child: Stack(
@@ -114,7 +117,7 @@ class VideoChat extends StatelessWidget {
               children: [
                 Observer(
                   builder: (context) {
-                    if (context.read<SettingsStore>().videoEnabled) {
+                    if (settingsStore.videoEnabled) {
                       return video;
                     }
                     return appBar;
