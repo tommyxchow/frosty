@@ -27,7 +27,13 @@ class ChatBottomBar extends StatelessWidget {
             child: TextField(
               minLines: 1,
               maxLines: 5,
-              onTap: () => chatStore.assetsStore.showEmoteMenu = false,
+              onTap: () {
+                chatStore.assetsStore.showEmoteMenu = false;
+                Future.delayed(
+                  const Duration(milliseconds: 100),
+                  () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
+                );
+              },
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.emoji_emotions_outlined),
