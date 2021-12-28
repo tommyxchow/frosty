@@ -14,10 +14,10 @@ abstract class _ChatDetailsStoreBase with Store {
 
   /// The list and types of chatters in the chat room.
   @readonly
-  ChatUsers? _chatters;
+  ChatUsers? _chatUsers;
 
   @action
   Future<void> updateChatters(String userLogin) async {
-    _chatters = await Twitch.getChatters(userLogin: userLogin);
+    _chatUsers = await Twitch.getChatters(userLogin: userLogin);
   }
 }

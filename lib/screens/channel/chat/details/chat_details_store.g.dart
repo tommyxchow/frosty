@@ -24,20 +24,20 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$_chattersAtom = Atom(name: '_ChatDetailsStoreBase._chatters');
+  final _$_chatUsersAtom = Atom(name: '_ChatDetailsStoreBase._chatUsers');
 
-  ChatUsers? get chatters {
-    _$_chattersAtom.reportRead();
-    return super._chatters;
+  ChatUsers? get chatUsers {
+    _$_chatUsersAtom.reportRead();
+    return super._chatUsers;
   }
 
   @override
-  ChatUsers? get _chatters => chatters;
+  ChatUsers? get _chatUsers => chatUsers;
 
   @override
-  set _chatters(ChatUsers? value) {
-    _$_chattersAtom.reportWrite(value, super._chatters, () {
-      super._chatters = value;
+  set _chatUsers(ChatUsers? value) {
+    _$_chatUsersAtom.reportWrite(value, super._chatUsers, () {
+      super._chatUsers = value;
     });
   }
 
