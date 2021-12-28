@@ -45,13 +45,11 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                     if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                   },
                   child: Observer(
-                    builder: (context) => ListView.separated(
+                    builder: (context) => ListView.builder(
                       addAutomaticKeepAlives: false,
                       addRepaintBoundaries: false,
-                      padding: const EdgeInsets.all(10.0),
                       itemCount: chatStore.messages.length,
                       controller: chatStore.scrollController,
-                      separatorBuilder: (context, index) => const SizedBox(height: 10.0),
                       itemBuilder: (context, index) => Observer(
                         builder: (context) => ChatMessage(
                           ircMessage: chatStore.messages[index],

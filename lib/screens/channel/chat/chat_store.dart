@@ -82,7 +82,6 @@ abstract class _ChatStoreBase with Store {
         debugPrint("Disconnected from $channelName's chat.");
         _messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
         disposeEmoteMenuReaction();
-        return;
       },
     );
 

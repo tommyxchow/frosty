@@ -18,16 +18,21 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const padding = EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0);
+
     switch (ircMessage.command) {
       case Command.privateMessage:
       case Command.userState:
         // Render normal chat message (PRIVMSG).
-        return Text.rich(
-          TextSpan(
-            children: ircMessage.generateSpan(
-              emoteToObject: assetsStore.emoteToObject,
-              badgeToObject: assetsStore.badgesToObject,
-              zeroWidthEnabled: zeroWidth,
+        return Padding(
+          padding: padding,
+          child: Text.rich(
+            TextSpan(
+              children: ircMessage.generateSpan(
+                emoteToObject: assetsStore.emoteToObject,
+                badgeToObject: assetsStore.badgesToObject,
+                zeroWidthEnabled: zeroWidth,
+              ),
             ),
           ),
         );
@@ -35,46 +40,53 @@ class ChatMessage extends StatelessWidget {
       case Command.clearMessage:
         // Render timeouts and bans
         final banDuration = ircMessage.tags['ban-duration'];
-        return Opacity(
-          opacity: 0.50,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text.rich(
-                TextSpan(
-                  children: ircMessage.generateSpan(
-                    emoteToObject: assetsStore.emoteToObject,
-                    badgeToObject: assetsStore.badgesToObject,
-                    hideMessage: hideMessageIfBanned,
-                    zeroWidthEnabled: zeroWidth,
+        return Padding(
+          padding: padding,
+          child: Opacity(
+            opacity: 0.50,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: ircMessage.generateSpan(
+                      emoteToObject: assetsStore.emoteToObject,
+                      badgeToObject: assetsStore.badgesToObject,
+                      hideMessage: hideMessageIfBanned,
+                      zeroWidthEnabled: zeroWidth,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 5.0),
-              if (banDuration == null)
-                if (ircMessage.command == Command.clearMessage)
-                  const Text('Message Deleted', style: TextStyle(fontWeight: FontWeight.bold))
+                const SizedBox(height: 5.0),
+                if (banDuration == null)
+                  if (ircMessage.command == Command.clearMessage)
+                    const Text('Message Deleted', style: TextStyle(fontWeight: FontWeight.bold))
+                  else
+                    const Text('User Permanently Banned', style: TextStyle(fontWeight: FontWeight.bold))
                 else
-                  const Text('User Permanently Banned', style: TextStyle(fontWeight: FontWeight.bold))
-              else
-                Text(
-                  int.parse(banDuration) > 1 ? 'Timed out for $banDuration seconds' : 'Timed out for $banDuration second',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                )
-            ],
+                  Text(
+                    int.parse(banDuration) > 1 ? 'Timed out for $banDuration seconds' : 'Timed out for $banDuration second',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  )
+              ],
+            ),
           ),
         );
       case Command.notice:
-        return Text.rich(
-          TextSpan(
-            text: ircMessage.message,
-          ),
-          style: TextStyle(
-            color: Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.5),
+        return Padding(
+          padding: padding,
+          child: Text.rich(
+            TextSpan(
+              text: ircMessage.message,
+            ),
+            style: TextStyle(
+              color: Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.5),
+            ),
           ),
         );
       case Command.userNotice:
-        return ColoredBox(
+        return Container(
+          padding: padding,
           color: const Color(0xFF673AB7).withOpacity(0.25),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
