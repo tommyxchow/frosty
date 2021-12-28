@@ -79,7 +79,8 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
           ),
           if (chatStore.auth.isLoggedIn) ChatBottomBar(chatStore: chatStore),
           if (chatStore.assetsStore.showEmoteMenu)
-            Expanded(
+            Flexible(
+              flex: 2,
               child: EmoteMenu(
                 assetsStore: chatStore.assetsStore,
                 textController: chatStore.textController,
