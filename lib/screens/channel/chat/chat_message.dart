@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/irc_message.dart';
-import 'package:frosty/screens/channel/chat/chat_store.dart';
+import 'package:frosty/screens/channel/chat/chat_assets_store.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
-  final ChatStore chatStore;
+  final ChatAssetsStore assetsStore;
   final bool hideMessageIfBanned;
   final bool zeroWidth;
 
   const ChatMessage({
     Key? key,
     required this.ircMessage,
-    required this.chatStore,
+    required this.assetsStore,
     this.hideMessageIfBanned = true,
     this.zeroWidth = false,
   }) : super(key: key);
@@ -25,8 +25,8 @@ class ChatMessage extends StatelessWidget {
         return Text.rich(
           TextSpan(
             children: ircMessage.generateSpan(
-              emoteToObject: chatStore.emoteToObject,
-              badgeToObject: chatStore.badgesToObject,
+              emoteToObject: assetsStore.emoteToObject,
+              badgeToObject: assetsStore.badgesToObject,
               zeroWidthEnabled: zeroWidth,
             ),
           ),
@@ -43,8 +43,8 @@ class ChatMessage extends StatelessWidget {
               Text.rich(
                 TextSpan(
                   children: ircMessage.generateSpan(
-                    emoteToObject: chatStore.emoteToObject,
-                    badgeToObject: chatStore.badgesToObject,
+                    emoteToObject: assetsStore.emoteToObject,
+                    badgeToObject: assetsStore.badgesToObject,
                     hideMessage: hideMessageIfBanned,
                     zeroWidthEnabled: zeroWidth,
                   ),
@@ -85,8 +85,8 @@ class ChatMessage extends StatelessWidget {
                 Text.rich(
                   TextSpan(
                     children: ircMessage.generateSpan(
-                      emoteToObject: chatStore.emoteToObject,
-                      badgeToObject: chatStore.badgesToObject,
+                      emoteToObject: assetsStore.emoteToObject,
+                      badgeToObject: assetsStore.badgesToObject,
                       zeroWidthEnabled: zeroWidth,
                     ),
                   ),

@@ -2,15 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:frosty/api/bttv_api.dart';
-import 'package:frosty/api/ffz_api.dart';
-import 'package:frosty/api/seventv_api.dart';
-import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
-import 'package:frosty/models/badges.dart';
-import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc_message.dart';
+import 'package:frosty/screens/channel/chat/chat_assets_store.dart';
+import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -20,27 +16,17 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
+  /// The provided auth store to determine login status, get the token, and use the headers for requests.
+  final AuthStore auth;
+
+  /// The provided setting store to account for any user-defined behaviors.
+  final SettingsStore settings;
+
+  /// The name of the channel to connect to.
+  final String channelName;
+
   /// The Twitch IRC WebSocket channel.
   final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
-
-  /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
-  final emoteToObject = ObservableMap<String, Emote>();
-
-  @computed
-  List<Emote> get bttvEmotes => emoteToObject.values.where((emote) => isBTTV(emote)).toList();
-
-  @computed
-  List<Emote> get ffzEmotes => emoteToObject.values.where((emote) => isFFZ(emote)).toList();
-
-  @computed
-  List<Emote> get sevenTvEmotes => emoteToObject.values.where((emote) => is7TV(emote)).toList();
-
-  /// The emotes that are "owned" and may be used by the current user.
-  @readonly
-  var _userEmoteToObject = ObservableMap<String, Emote>();
-
-  /// The map of badges ids to their object representation.
-  final badgesToObject = <String, BadgeInfoTwitch>{};
 
   /// The scroll controller that controls auto-scroll and resume-scroll behavior.
   final scrollController = ScrollController();
@@ -48,25 +34,14 @@ abstract class _ChatStoreBase with Store {
   /// The text controller that handles the TextField inputs and sending of messages.
   final textController = TextEditingController();
 
-  /// The name of the channel to connect to.
-  final String channelName;
+  /// The chat details store responsible for the chat modes and users in chat.
+  final chatDetailsStore = ChatDetailsStore();
 
-  /// The provided auth store to determine login status, get the token, and use the headers for requests.
-  final AuthStore auth;
-
-  /// The provided setting store to account for any user-defined behaviors.
-  final SettingsStore settings;
+  /// The assets store responsible for badges, emotes, and the emote menu.
+  final assetsStore = ChatAssetsStore();
 
   /// Requested message to be sent by the user. Will only be sent on receival of a USERNOTICE command.
   IRCMessage? toSend;
-
-  /// The current index of the emote menu stack.
-  @observable
-  var emoteMenuIndex = 0;
-
-  /// Whether or not the emote menu is visible.
-  @observable
-  var showEmoteMenu = false;
 
   /// The list of chat messages to render and display.
   @readonly
@@ -80,10 +55,6 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
-  /// The rules and modes being used in the chat.
-  @readonly
-  var _roomState = const ROOMSTATE();
-
   _ChatStoreBase({
     required this.auth,
     required this.settings,
@@ -92,7 +63,7 @@ abstract class _ChatStoreBase with Store {
     // Create a reaction where anytime the emote menu is shown or hidden,
     // scroll to the bottom of the list. This will prevent the emote menu
     // from covering the latest messages when summoned.
-    final disposeEmoteMenuReaction = reaction((_) => showEmoteMenu, (_) {
+    final disposeEmoteMenuReaction = reaction((_) => assetsStore.showEmoteMenu, (_) {
       SchedulerBinding.instance?.addPostFrameCallback((_) {
         if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
       });
@@ -115,8 +86,16 @@ abstract class _ChatStoreBase with Store {
       },
     );
 
+    // Fetch the users in chat.
+    chatDetailsStore.updateChatters(channelName);
+
     // Fetch the assets used in chat including badges and emotes.
-    getAssets();
+    _messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
+
+    assetsStore
+        .getAssets(channelName: channelName, headers: auth.headersTwitch)
+        .then((_) => _messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!')))
+        .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch assets: ${error.toString()}')));
 
     // The list of messages sent to the IRC WebSocket channel to connect and join.
     final commands = [
@@ -185,7 +164,7 @@ abstract class _ChatStoreBase with Store {
             _messages.add(parsedIRCMessage);
             break;
           case Command.roomState:
-            _roomState = _roomState.fromIRCMessage(parsedIRCMessage);
+            chatDetailsStore.roomState = chatDetailsStore.roomState.fromIRCMessage(parsedIRCMessage);
             continue;
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
@@ -196,7 +175,11 @@ abstract class _ChatStoreBase with Store {
             break;
           case Command.globalUserState:
             final setIds = parsedIRCMessage.tags['emote-sets']?.split(',');
-            getUserEmotes(emoteSets: setIds);
+            _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
+            assetsStore
+                .getUserEmotes(emoteSets: setIds, headers: auth.headersTwitch)
+                .then((_) => _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!')))
+                .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch user emotes: ${error.toString()}')));
             continue;
           case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
@@ -262,72 +245,13 @@ abstract class _ChatStoreBase with Store {
       // }
 
       final userChatMessage = IRCMessage.fromString(userStateString);
-      userChatMessage.localEmotes.addAll(_userEmoteToObject);
+      userChatMessage.localEmotes.addAll(assetsStore.userEmoteToObject);
       userChatMessage.message = message.trim();
       toSend = userChatMessage;
     }
 
     // Clear the previous input in the TextField.
     textController.clear();
-  }
-
-  /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
-  @action
-  Future<void> getAssets() async {
-    _messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
-
-    // Fetch the desired channel/user's information.
-    final channelInfo = await Twitch.getUser(userLogin: channelName, headers: auth.headersTwitch);
-
-    if (channelInfo != null) {
-      // Fetch the global and channel's assets (emotes & badges).
-      // Async awaits are placed in a list so they are performed in parallel.
-      final assets = [
-        ...await FFZ.getEmotesGlobal(),
-        ...await FFZ.getEmotesChannel(id: channelInfo.id),
-        ...await BTTV.getEmotesGlobal(),
-        ...await BTTV.getEmotesChannel(id: channelInfo.id),
-        ...await Twitch.getEmotesGlobal(headers: auth.headersTwitch),
-        ...await Twitch.getEmotesChannel(id: channelInfo.id, headers: auth.headersTwitch),
-        ...await SevenTV.getEmotesGlobal(),
-        ...await SevenTV.getEmotesChannel(user: channelInfo.login)
-      ];
-
-      // assets.sort((a, b) => a.id.compareTo(b.id));
-
-      for (final emote in assets) {
-        emoteToObject[emote.name] = emote;
-      }
-
-      final badges = [
-        await Twitch.getBadgesGlobal(),
-        await Twitch.getBadgesChannel(id: channelInfo.id),
-      ];
-
-      for (final map in badges) {
-        if (map != null) {
-          badgesToObject.addAll(map);
-        }
-      }
-
-      _messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!'));
-    }
-  }
-
-  @action
-  Future<void> getUserEmotes({List<String>? emoteSets}) async {
-    _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
-
-    if (emoteSets != null) {
-      final userEmotes = <Emote>[];
-      for (final setId in emoteSets) {
-        userEmotes.addAll(await Twitch.getEmotesSets(setId: setId, headers: auth.headersTwitch));
-      }
-
-      _userEmoteToObject = {for (final emote in userEmotes) emote.name: emote}.asObservable();
-    }
-
-    _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!'));
   }
 
   /// Pauses or resumes the chat subscription depending on the provided state.
@@ -342,18 +266,6 @@ abstract class _ChatStoreBase with Store {
       case AppLifecycleState.detached:
         break;
     }
-  }
-
-  bool isBTTV(Emote emote) {
-    return emote.type == EmoteType.bttvChannel || emote.type == EmoteType.bttvGlobal || emote.type == EmoteType.bttvShared;
-  }
-
-  bool isFFZ(Emote emote) {
-    return emote.type == EmoteType.ffzChannel || emote.type == EmoteType.ffzGlobal;
-  }
-
-  bool is7TV(Emote emote) {
-    return emote.type == EmoteType.sevenTvChannel || emote.type == EmoteType.sevenTvGlobal;
   }
 
   /// Closes and disposes all the channels and controllers used by the store.

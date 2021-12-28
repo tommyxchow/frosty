@@ -15,7 +15,10 @@ class ChatBottomBar extends StatelessWidget {
           icon: Icon(Icons.adaptive.more),
           onPressed: () => showModalBottomSheet(
             context: context,
-            builder: (_) => ChatDetails(chatStore: chatStore),
+            builder: (_) => ChatDetails(
+              chatDetails: chatStore.chatDetailsStore,
+              userLogin: chatStore.channelName,
+            ),
           ),
         ),
         Expanded(
@@ -24,13 +27,13 @@ class ChatBottomBar extends StatelessWidget {
             child: TextField(
               minLines: 1,
               maxLines: 5,
-              onTap: () => chatStore.showEmoteMenu = false,
+              onTap: () => chatStore.assetsStore.showEmoteMenu = false,
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.emoji_emotions_outlined),
                   onPressed: () {
                     FocusManager.instance.primaryFocus?.unfocus();
-                    chatStore.showEmoteMenu = !chatStore.showEmoteMenu;
+                    chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
                   },
                 ),
                 isDense: true,

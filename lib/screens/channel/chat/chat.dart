@@ -45,7 +45,7 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                   onTap: () {
                     // If tapping chat, hide the keyboard and emote menu.
                     FocusManager.instance.primaryFocus?.unfocus();
-                    if (chatStore.showEmoteMenu) chatStore.showEmoteMenu = false;
+                    if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                   },
                   child: Observer(
                     builder: (context) => ListView.separated(
@@ -58,7 +58,7 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                       itemBuilder: (context, index) => Observer(
                         builder: (context) => ChatMessage(
                           ircMessage: chatStore.messages[index],
-                          chatStore: chatStore,
+                          assetsStore: chatStore.assetsStore,
                           hideMessageIfBanned: context.read<SettingsStore>().hideBannedMessages,
                           zeroWidth: context.read<SettingsStore>().zeroWidthEnabled,
                         ),
@@ -83,7 +83,13 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
             ),
           ),
           if (context.read<AuthStore>().isLoggedIn) ChatBottomBar(chatStore: chatStore),
-          if (chatStore.showEmoteMenu) Expanded(child: EmoteMenu(chatStore: chatStore)),
+          if (chatStore.assetsStore.showEmoteMenu)
+            Expanded(
+              child: EmoteMenu(
+                assetsStore: chatStore.assetsStore,
+                textController: chatStore.textController,
+              ),
+            ),
         ],
       ),
     );

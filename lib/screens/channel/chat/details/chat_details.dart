@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/channel/chat/chat_store.dart';
+import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
+import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
+import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 
 class ChatDetails extends StatelessWidget {
-  final ChatStore chatStore;
+  final ChatDetailsStore chatDetails;
+  final String userLogin;
 
-  const ChatDetails({Key? key, required this.chatStore}) : super(key: key);
+  const ChatDetails({
+    Key? key,
+    required this.chatDetails,
+    required this.userLogin,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,35 +21,20 @@ class ChatDetails extends StatelessWidget {
       child: Center(
         child: Observer(
           builder: (_) {
-            return ListView(
+            return Column(
               children: [
-                const ListTile(
-                  title: Text('Modes'),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ChatModes(roomState: chatDetails.roomState),
                 ),
-                ListTile(
-                  leading: const Text('Emote-only'),
-                  trailing: Text(chatStore.roomState.emoteOnly ? 'Enabled' : 'Disabled'),
-                ),
-                ListTile(
-                  leading: const Text('Followers-only'),
-                  trailing: Text(chatStore.roomState.followersOnly == '-1'
-                      ? 'Disabled'
-                      : chatStore.roomState.followersOnly == '0'
-                          ? 'Enabled'
-                          : '${chatStore.roomState.followersOnly} minute(s)'),
-                ),
-                ListTile(
-                  leading: const Text('R9K'),
-                  trailing: Text(chatStore.roomState.r9k ? 'Enabled' : 'Disabled'),
-                ),
-                ListTile(
-                  leading: const Text('Slow'),
-                  trailing: Text(chatStore.roomState.slowMode == '0' ? 'Disabled' : '${chatStore.roomState.slowMode} seconds'),
-                ),
-                ListTile(
-                  leading: const Text('Sub-only'),
-                  trailing: Text(chatStore.roomState.subMode ? 'Enabled' : 'Disabled'),
-                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () => chatDetails.updateChatters(userLogin),
+                    child: ChattersList(
+                      chatUsers: chatDetails.chatters,
+                    ),
+                  ),
+                )
               ],
             );
           },

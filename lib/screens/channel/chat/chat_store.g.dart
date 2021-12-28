@@ -9,76 +9,6 @@ part of 'chat_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ChatStore on _ChatStoreBase, Store {
-  Computed<List<Emote>>? _$bttvEmotesComputed;
-
-  @override
-  List<Emote> get bttvEmotes =>
-      (_$bttvEmotesComputed ??= Computed<List<Emote>>(() => super.bttvEmotes,
-              name: '_ChatStoreBase.bttvEmotes'))
-          .value;
-  Computed<List<Emote>>? _$ffzEmotesComputed;
-
-  @override
-  List<Emote> get ffzEmotes =>
-      (_$ffzEmotesComputed ??= Computed<List<Emote>>(() => super.ffzEmotes,
-              name: '_ChatStoreBase.ffzEmotes'))
-          .value;
-  Computed<List<Emote>>? _$sevenTvEmotesComputed;
-
-  @override
-  List<Emote> get sevenTvEmotes => (_$sevenTvEmotesComputed ??=
-          Computed<List<Emote>>(() => super.sevenTvEmotes,
-              name: '_ChatStoreBase.sevenTvEmotes'))
-      .value;
-
-  final _$_userEmoteToObjectAtom =
-      Atom(name: '_ChatStoreBase._userEmoteToObject');
-
-  ObservableMap<String, Emote> get userEmoteToObject {
-    _$_userEmoteToObjectAtom.reportRead();
-    return super._userEmoteToObject;
-  }
-
-  @override
-  ObservableMap<String, Emote> get _userEmoteToObject => userEmoteToObject;
-
-  @override
-  set _userEmoteToObject(ObservableMap<String, Emote> value) {
-    _$_userEmoteToObjectAtom.reportWrite(value, super._userEmoteToObject, () {
-      super._userEmoteToObject = value;
-    });
-  }
-
-  final _$emoteMenuIndexAtom = Atom(name: '_ChatStoreBase.emoteMenuIndex');
-
-  @override
-  int get emoteMenuIndex {
-    _$emoteMenuIndexAtom.reportRead();
-    return super.emoteMenuIndex;
-  }
-
-  @override
-  set emoteMenuIndex(int value) {
-    _$emoteMenuIndexAtom.reportWrite(value, super.emoteMenuIndex, () {
-      super.emoteMenuIndex = value;
-    });
-  }
-
-  final _$showEmoteMenuAtom = Atom(name: '_ChatStoreBase.showEmoteMenu');
-
-  @override
-  bool get showEmoteMenu {
-    _$showEmoteMenuAtom.reportRead();
-    return super.showEmoteMenu;
-  }
-
-  @override
-  set showEmoteMenu(bool value) {
-    _$showEmoteMenuAtom.reportWrite(value, super.showEmoteMenu, () {
-      super.showEmoteMenu = value;
-    });
-  }
-
   final _$_messagesAtom = Atom(name: '_ChatStoreBase._messages');
 
   ObservableList<IRCMessage> get messages {
@@ -130,39 +60,6 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_roomStateAtom = Atom(name: '_ChatStoreBase._roomState');
-
-  ROOMSTATE get roomState {
-    _$_roomStateAtom.reportRead();
-    return super._roomState;
-  }
-
-  @override
-  ROOMSTATE get _roomState => roomState;
-
-  @override
-  set _roomState(ROOMSTATE value) {
-    _$_roomStateAtom.reportWrite(value, super._roomState, () {
-      super._roomState = value;
-    });
-  }
-
-  final _$getAssetsAsyncAction = AsyncAction('_ChatStoreBase.getAssets');
-
-  @override
-  Future<void> getAssets() {
-    return _$getAssetsAsyncAction.run(() => super.getAssets());
-  }
-
-  final _$getUserEmotesAsyncAction =
-      AsyncAction('_ChatStoreBase.getUserEmotes');
-
-  @override
-  Future<void> getUserEmotes({List<String>? emoteSets}) {
-    return _$getUserEmotesAsyncAction
-        .run(() => super.getUserEmotes(emoteSets: emoteSets));
-  }
-
   final _$_ChatStoreBaseActionController =
       ActionController(name: '_ChatStoreBase');
 
@@ -202,11 +99,7 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   @override
   String toString() {
     return '''
-emoteMenuIndex: ${emoteMenuIndex},
-showEmoteMenu: ${showEmoteMenu},
-bttvEmotes: ${bttvEmotes},
-ffzEmotes: ${ffzEmotes},
-sevenTvEmotes: ${sevenTvEmotes}
+
     ''';
   }
 }

@@ -53,7 +53,6 @@ class IRCMessage {
 
   /// Returns a list of messages where the gievn CLEARMSG message is applied.
   static List<IRCMessage> clearMessage({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
-    // final targetUser = ircMessage.tags['login'];
     final targetId = ircMessage.tags['target-msg-id'];
 
     // Search for the message associated with the ID and mark the message for deletion.
@@ -402,27 +401,27 @@ class IRCMessage {
 
 /// The object representation of the IRC ROOMSTATE message.
 class ROOMSTATE {
-  final bool emoteOnly;
+  final String emoteOnly;
   final String followersOnly;
-  final bool r9k;
+  final String r9k;
   final String slowMode;
-  final bool subMode;
+  final String subMode;
 
   const ROOMSTATE({
-    this.emoteOnly = false,
+    this.emoteOnly = '0',
     this.followersOnly = '-1',
-    this.r9k = false,
+    this.r9k = '0',
     this.slowMode = '0',
-    this.subMode = false,
+    this.subMode = '0',
   });
 
   /// Create a new copy with the parameters from the provided [IRCMessage]
   ROOMSTATE fromIRCMessage(IRCMessage ircMessage) => ROOMSTATE(
-        emoteOnly: ircMessage.tags['emote-only'] == '0' ? false : true,
+        emoteOnly: ircMessage.tags['emote-only'] ?? emoteOnly,
         followersOnly: ircMessage.tags['followers-only'] ?? followersOnly,
-        r9k: ircMessage.tags['r9k'] == '0' ? false : true,
+        r9k: ircMessage.tags['r9k'] ?? r9k,
         slowMode: ircMessage.tags['slow'] ?? slowMode,
-        subMode: ircMessage.tags['subs-only'] == '0' ? false : true,
+        subMode: ircMessage.tags['subs-only'] ?? subMode,
       );
 }
 
