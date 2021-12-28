@@ -1,12 +1,17 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:frosty/models/chatters.dart';
+import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:intl/intl.dart';
 
 class ChattersList extends StatefulWidget {
-  final ChatUsers? chatUsers;
+  final ChatDetailsStore chatDetails;
+  final String userLogin;
 
-  const ChattersList({Key? key, required this.chatUsers}) : super(key: key);
+  const ChattersList({
+    Key? key,
+    required this.chatDetails,
+    required this.userLogin,
+  }) : super(key: key);
 
   @override
   _ChattersListState createState() => _ChattersListState();
@@ -29,7 +34,7 @@ class _ChattersListState extends State<ChattersList> {
 
   @override
   Widget build(BuildContext context) {
-    final chatters = widget.chatUsers?.chatters;
+    final chatters = widget.chatDetails.chatUsers?.chatters;
     if (chatters != null) {
       const textStyle = TextStyle(fontWeight: FontWeight.bold);
 
@@ -75,59 +80,62 @@ class _ChattersListState extends State<ChattersList> {
             ),
           ),
           Expanded(
-            child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              children: [
-                CustomScrollView(
-                  controller: scrollController,
-                  slivers: [
-                    SliverPadding(
-                      padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
-                      sliver: SliverToBoxAdapter(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Users', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                            const SizedBox(height: 5.0),
-                            Text('${NumberFormat().format(widget.chatUsers?.chatterCount)} users in chat'),
-                          ],
+            child: RefreshIndicator(
+              onRefresh: () => widget.chatDetails.updateChatters(widget.userLogin),
+              child: Stack(
+                alignment: AlignmentDirectional.bottomCenter,
+                children: [
+                  CustomScrollView(
+                    controller: scrollController,
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+                        sliver: SliverToBoxAdapter(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Users', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                              const SizedBox(height: 5.0),
+                              Text('${NumberFormat().format(widget.chatDetails.chatUsers?.chatterCount)} users in chat'),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    ...userTypes.expandIndexed(
-                      (index, type) => [
-                        if (type.isNotEmpty) ...[
-                          SliverPadding(
-                            padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
-                            sliver: SliverToBoxAdapter(
-                              child: Text(
-                                headers[index],
-                                style: textStyle,
+                      ...userTypes.expandIndexed(
+                        (index, type) => [
+                          if (type.isNotEmpty) ...[
+                            SliverPadding(
+                              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+                              sliver: SliverToBoxAdapter(
+                                child: Text(
+                                  headers[index],
+                                  style: textStyle,
+                                ),
                               ),
                             ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
-                            sliver: SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) => Text(type[index]),
-                                childCount: type.length,
+                            SliverPadding(
+                              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
+                              sliver: SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) => Text(type[index]),
+                                  childCount: type.length,
+                                ),
                               ),
                             ),
-                          ),
-                        ]
-                      ],
-                    )
-                  ],
-                ),
-                if (showJumpButton)
-                  IconButton(
-                    onPressed: () => scrollController.jumpTo(0.0),
-                    icon: const Icon(
-                      Icons.arrow_circle_up,
-                    ),
+                          ]
+                        ],
+                      )
+                    ],
                   ),
-              ],
+                  if (showJumpButton)
+                    IconButton(
+                      onPressed: () => scrollController.jumpTo(0.0),
+                      icon: const Icon(
+                        Icons.arrow_circle_up,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ],

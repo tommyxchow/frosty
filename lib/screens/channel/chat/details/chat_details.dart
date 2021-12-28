@@ -16,8 +16,6 @@ class ChatDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatUsers = chatDetails.chatUsers;
-
     return SafeArea(
       child: Center(
         child: Observer(
@@ -29,11 +27,9 @@ class ChatDetails extends StatelessWidget {
                   child: ChatModes(roomState: chatDetails.roomState),
                 ),
                 Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () => chatDetails.updateChatters(userLogin),
-                    child: ChattersList(
-                      chatUsers: chatUsers,
-                    ),
+                  child: ChattersList(
+                    chatDetails: chatDetails,
+                    userLogin: userLogin,
                   ),
                 )
               ],
