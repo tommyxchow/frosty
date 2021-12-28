@@ -25,6 +25,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var fullScreen = false;
 
+  @observable
+  var expandInfo = false;
+
   Future<void> init() async {
     // Retrieve the instance that will allow us to store and persist settings.
     final prefs = await SharedPreferences.getInstance();
@@ -35,6 +38,7 @@ abstract class _SettingsStoreBase with Store {
     messageLimit = prefs.getDouble('message_limit') ?? messageLimit;
     hideBannedMessages = prefs.getBool('hide_banned_messages') ?? hideBannedMessages;
     zeroWidthEnabled = prefs.getBool('zero_width_enabled') ?? zeroWidthEnabled;
+    expandInfo = prefs.getBool('expand_info') ?? expandInfo;
 
     // Set up reactions to store setting anytime they're changed.
     // The ReactionDisposer will not be needed since settings will always exist.
@@ -43,6 +47,7 @@ abstract class _SettingsStoreBase with Store {
     reaction((_) => overlayEnabled, (bool newValue) => prefs.setBool('overlay_enabled', newValue));
     reaction((_) => zeroWidthEnabled, (bool newValue) => prefs.setBool('zero_width_enabled', newValue));
     reaction((_) => hideBannedMessages, (bool newValue) => prefs.setBool('hide_banned_messages', newValue));
+    reaction((_) => expandInfo, (bool newValue) => prefs.setBool('expand_info', newValue));
 
     // A reaction that will enable immersive mode when entering fullscreen and disable it when exiting.
     reaction(

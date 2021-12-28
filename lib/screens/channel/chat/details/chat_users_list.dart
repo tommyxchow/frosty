@@ -88,6 +88,7 @@ class _ChattersListState extends State<ChattersList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text('Users', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                            const SizedBox(height: 5.0),
                             Text('${NumberFormat().format(widget.chatUsers?.chatterCount)} users in chat'),
                           ],
                         ),

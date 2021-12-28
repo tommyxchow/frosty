@@ -22,12 +22,12 @@ class ChatModes extends StatelessWidget {
         Tooltip(
           preferBelow: false,
           message: roomState.followersOnly == '-1'
-              ? 'Followers-Only: Disabled'
+              ? 'Followers-only disabled.'
               : roomState.followersOnly == '0'
-                  ? 'Followers-Only: Only followed users can chat.'
+                  ? 'Only followed users can chat.'
                   : roomState.followersOnly == '1'
-                      ? 'Followers-Only: Users followed for at least ${roomState.followersOnly} minute can chat.'
-                      : 'Followers-Only: Users followed for at least ${roomState.followersOnly} minutes can chat',
+                      ? 'Only users followed for at least ${roomState.followersOnly} minute can chat.'
+                      : 'Only users followed for at least ${roomState.followersOnly} minutes can chat.',
           child: Icon(
             Icons.favorite,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,

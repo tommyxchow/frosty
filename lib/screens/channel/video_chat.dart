@@ -30,6 +30,7 @@ class VideoChat extends StatelessWidget {
       videoStore: VideoStore(
         userLogin: userLogin,
         authStore: context.read<AuthStore>(),
+        settingsStore: context.read<SettingsStore>(),
       ),
     );
 

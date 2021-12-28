@@ -101,6 +101,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$expandInfoAtom = Atom(name: '_SettingsStoreBase.expandInfo');
+
+  @override
+  bool get expandInfo {
+    _$expandInfoAtom.reportRead();
+    return super.expandInfo;
+  }
+
+  @override
+  set expandInfo(bool value) {
+    _$expandInfoAtom.reportWrite(value, super.expandInfo, () {
+      super.expandInfo = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
@@ -109,7 +124,8 @@ overlayEnabled: ${overlayEnabled},
 messageLimit: ${messageLimit},
 hideBannedMessages: ${hideBannedMessages},
 zeroWidthEnabled: ${zeroWidthEnabled},
-fullScreen: ${fullScreen}
+fullScreen: ${fullScreen},
+expandInfo: ${expandInfo}
     ''';
   }
 }

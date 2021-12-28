@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -22,16 +23,17 @@ abstract class _VideoStoreBase with Store {
   var _paused = false;
 
   @readonly
-  var _expandInfo = false;
-
-  @readonly
   StreamTwitch? _streamInfo;
 
   final String userLogin;
-
   final AuthStore authStore;
+  final SettingsStore settingsStore;
 
-  _VideoStoreBase({required this.userLogin, required this.authStore}) {
+  _VideoStoreBase({
+    required this.userLogin,
+    required this.authStore,
+    required this.settingsStore,
+  }) {
     overlayTimer = Timer(const Duration(seconds: 3), () => _menuVisible = false);
     updateStreamInfo();
   }
@@ -74,7 +76,7 @@ abstract class _VideoStoreBase with Store {
   @action
   void handleExpand() {
     overlayTimer.cancel();
-    _expandInfo = !_expandInfo;
+    settingsStore.expandInfo = !settingsStore.expandInfo;
     overlayTimer = Timer(const Duration(seconds: 5), () => _menuVisible = false);
   }
 

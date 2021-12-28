@@ -43,23 +43,6 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$_expandInfoAtom = Atom(name: '_VideoStoreBase._expandInfo');
-
-  bool get expandInfo {
-    _$_expandInfoAtom.reportRead();
-    return super._expandInfo;
-  }
-
-  @override
-  bool get _expandInfo => expandInfo;
-
-  @override
-  set _expandInfo(bool value) {
-    _$_expandInfoAtom.reportWrite(value, super._expandInfo, () {
-      super._expandInfo = value;
-    });
-  }
-
   final _$_streamInfoAtom = Atom(name: '_VideoStoreBase._streamInfo');
 
   StreamTwitch? get streamInfo {

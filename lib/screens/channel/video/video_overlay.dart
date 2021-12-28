@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/settings/settings.dart';
-import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
@@ -35,7 +33,7 @@ class VideoOverlay extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              if (!context.read<SettingsStore>().fullScreen)
+                              if (!videoStore.settingsStore.fullScreen)
                                 IconButton(
                                   icon: Icon(
                                     Icons.adaptive.arrow_back,
@@ -52,7 +50,7 @@ class VideoOverlay extends StatelessWidget {
                                 onPressed: () => showModalBottomSheet(
                                   context: context,
                                   builder: (context) {
-                                    return Settings(settingsStore: context.read<SettingsStore>());
+                                    return Settings(settingsStore: videoStore.settingsStore);
                                   },
                                 ),
                               ),
@@ -68,47 +66,41 @@ class VideoOverlay extends StatelessWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.all(10.0),
                                     child: videoStore.streamInfo != null
-                                        ? AnimatedSwitcher(
-                                            duration: const Duration(milliseconds: 300),
-                                            child: videoStore.expandInfo
-                                                ? Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        videoStore.streamInfo!.userName,
-                                                        style: const TextStyle(
-                                                          color: Color(0xFFFFFFFF),
-                                                          fontSize: 20,
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 5.0),
-                                                      Text(
-                                                        videoStore.streamInfo!.title,
-                                                        maxLines: portrait ? 2 : 4,
-                                                        overflow: TextOverflow.ellipsis,
-                                                      ),
-                                                      const SizedBox(height: 5.0),
-                                                      Text(
-                                                        '${videoStore.streamInfo?.gameName} for ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
-                                                        style: const TextStyle(
-                                                          color: Color(0xFFFFFFFF),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                : Align(
-                                                    alignment: Alignment.bottomLeft,
-                                                    child: Text(
-                                                      videoStore.streamInfo!.userName,
-                                                      style: const TextStyle(
-                                                        color: Color(0xFFFFFFFF),
-                                                        fontSize: 20,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
+                                        ? videoStore.settingsStore.expandInfo
+                                            ? Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    videoStore.streamInfo!.userName,
+                                                    style: const TextStyle(
+                                                      color: Color(0xFFFFFFFF),
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold,
                                                     ),
                                                   ),
-                                          )
+                                                  const SizedBox(height: 5.0),
+                                                  Text(
+                                                    videoStore.streamInfo!.title,
+                                                    maxLines: portrait ? 1 : 4,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                  const SizedBox(height: 5.0),
+                                                  Text(
+                                                    '${videoStore.streamInfo?.gameName} for ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                                    style: const TextStyle(
+                                                      color: Color(0xFFFFFFFF),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : Text(
+                                                videoStore.streamInfo!.userName,
+                                                style: const TextStyle(
+                                                  color: Color(0xFFFFFFFF),
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              )
                                         : null,
                                   ),
                                 ),
@@ -127,7 +119,7 @@ class VideoOverlay extends StatelessWidget {
                                     Icons.fullscreen,
                                     color: Color(0xFFFFFFFF),
                                   ),
-                                  onPressed: () => context.read<SettingsStore>().fullScreen = !context.read<SettingsStore>().fullScreen,
+                                  onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
                                 )
                             ],
                           )
