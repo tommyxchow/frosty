@@ -5,6 +5,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/models/chatters.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/user.dart';
@@ -371,6 +372,20 @@ class Twitch {
       return decoded['total'] as int;
     } else {
       debugPrint('Failed to update top games');
+    }
+  }
+
+  static Future<ChatUsers?> getChatters({required String userLogin}) async {
+    final uri = Uri.parse('https://tmi.twitch.tv/group/user/$userLogin/chatters');
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+
+      return ChatUsers.fromJson(decoded);
+    } else {
+      debugPrint('Failed to get chatters');
     }
   }
 }
