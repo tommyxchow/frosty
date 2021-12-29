@@ -294,13 +294,26 @@ class Twitch {
   }
 
   /// Returns a user's list of blocked users given their id.
-  static Future<List<UserBlockedTwitch>> getUserBlockedList({required String id, required Map<String, String>? headers}) async {
-    final response = await http.get(Uri.parse('https://api.twitch.tv/helix/users/blocks?broadcaster_id=$id'), headers: headers);
+  static Future<List<UserBlockedTwitch>> getUserBlockedList({required String id, required Map<String, String>? headers, String? cursor}) async {
+    final uri = cursor == null
+        ? Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id')
+        : Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&after=$cursor&broadcaster_id=$id');
+
+    final response = await http.get(uri, headers: headers);
     if (response.statusCode == 200) {
-      final blockedList = jsonDecode(response.body)['data'] as List;
+      final decoded = jsonDecode(response.body);
+
+      final cursor = decoded['pagination']['cursor'];
+      final blockedList = decoded['data'] as List;
 
       if (blockedList.isNotEmpty) {
-        return blockedList.map((e) => UserBlockedTwitch.fromJson(e)).toList();
+        final result = blockedList.map((e) => UserBlockedTwitch.fromJson(e)).toList();
+
+        if (cursor != null) {
+          result.addAll(await getUserBlockedList(id: id, cursor: cursor, headers: headers));
+        }
+
+        return result;
       } else {
         debugPrint('User does not have anyone blocked');
         return [];
