@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class SectionHeader extends StatelessWidget {
   final String text;
   final EdgeInsets padding;
+  final double fontSize;
 
   const SectionHeader(
     this.text, {
     Key? key,
     this.padding = const EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 5.0),
+    this.fontSize = 18.0,
   }) : super(key: key);
 
   @override
@@ -16,7 +18,10 @@ class SectionHeader extends StatelessWidget {
       padding: padding,
       child: Text(
         text,
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontSize: fontSize,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

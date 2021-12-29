@@ -14,6 +14,7 @@ class ChatBottomBar extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.adaptive.more),
           onPressed: () => showModalBottomSheet(
+            isScrollControlled: true,
             context: context,
             builder: (_) => ChatDetails(
               chatDetails: chatStore.chatDetailsStore,

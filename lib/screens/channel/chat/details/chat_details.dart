@@ -17,7 +17,8 @@ class ChatDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Center(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Observer(
           builder: (_) {
             return Column(
