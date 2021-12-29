@@ -34,23 +34,6 @@ mixin _$AuthStore on _AuthBase, Store {
     });
   }
 
-  final _$_userAtom = Atom(name: '_AuthBase._user');
-
-  UserTwitch? get user {
-    _$_userAtom.reportRead();
-    return super._user;
-  }
-
-  @override
-  UserTwitch? get _user => user;
-
-  @override
-  set _user(UserTwitch? value) {
-    _$_userAtom.reportWrite(value, super._user, () {
-      super._user = value;
-    });
-  }
-
   final _$_isLoggedInAtom = Atom(name: '_AuthBase._isLoggedIn');
 
   bool get isLoggedIn {

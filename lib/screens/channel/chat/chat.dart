@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/screens/channel/chat/chat_stats.dart';
+import 'package:frosty/screens/channel/chat/chat_bottom_bar.dart';
+import 'package:frosty/screens/channel/chat/chat_message.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
-import 'package:provider/provider.dart';
+import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 
 class Chat extends StatefulWidget {
   final ChatStore chatStore;
@@ -14,109 +14,86 @@ class Chat extends StatefulWidget {
   _ChatState createState() => _ChatState();
 }
 
-class _ChatState extends State<Chat> {
+class _ChatState extends State<Chat> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    widget.chatStore.handleAppStateChange(state);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: widget.chatStore.getAssets(),
-      builder: (_, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return GestureDetector(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: Column(
+    final chatStore = widget.chatStore;
+
+    return Observer(
+      builder: (context) => Column(
+        children: [
+          Expanded(
+            child: Stack(
+              alignment: AlignmentDirectional.bottomCenter,
               children: [
-                Expanded(
-                  child: Stack(
-                    alignment: AlignmentDirectional.bottomCenter,
-                    children: [
-                      Observer(
-                        builder: (_) {
-                          return ListView.builder(
-                            addAutomaticKeepAlives: false,
-                            addRepaintBoundaries: false,
-                            itemCount: widget.chatStore.messages.length,
-                            controller: widget.chatStore.scrollController,
-                            itemBuilder: (context, index) {
-                              return widget.chatStore.renderChatMessage(widget.chatStore.messages[index], context);
-                            },
-                          );
-                        },
-                      ),
-                      Observer(
-                        builder: (_) {
-                          return Visibility(
-                            visible: !widget.chatStore.autoScroll,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: widget.chatStore.resumeScroll,
-                                child: const Text('Resume Scroll'),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.adaptive.more),
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return ChatStats(
-                              chatStore: widget.chatStore,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                    if (context.read<AuthStore>().isLoggedIn) ...[
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.emoji_emotions_outlined),
-                                onPressed: () {},
-                              ),
-                              isDense: true,
-                              contentPadding: const EdgeInsets.all(10.0),
-                              border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                              ),
-                              hintText: 'Send a message',
-                            ),
-                            controller: widget.chatStore.textController,
-                            onSubmitted: (string) => widget.chatStore.sendMessage(string),
-                          ),
+                GestureDetector(
+                  onTap: () {
+                    // If tapping chat, hide the keyboard and emote menu.
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
+                  },
+                  child: Observer(
+                    builder: (context) => ListView.builder(
+                      addAutomaticKeepAlives: false,
+                      addRepaintBoundaries: false,
+                      itemCount: chatStore.messages.length,
+                      controller: chatStore.scrollController,
+                      itemBuilder: (context, index) => Observer(
+                        builder: (context) => ChatMessage(
+                          ircMessage: chatStore.messages[index],
+                          assetsStore: chatStore.assetsStore,
+                          hideMessageIfBanned: chatStore.settings.hideBannedMessages,
+                          zeroWidth: chatStore.settings.zeroWidthEnabled,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.send),
-                        onPressed: () => widget.chatStore.sendMessage(widget.chatStore.textController.text),
-                      )
-                    ],
-                  ],
-                )
+                    ),
+                  ),
+                ),
+                Observer(
+                  builder: (_) => Visibility(
+                    visible: !chatStore.autoScroll,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: chatStore.resumeScroll,
+                        child: const Text('Resume Scroll'),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-          );
-        }
-        return const Center(
-          child: CircularProgressIndicator.adaptive(),
-        );
-      },
+          ),
+          if (chatStore.auth.isLoggedIn) ChatBottomBar(chatStore: chatStore),
+          if (chatStore.assetsStore.showEmoteMenu)
+            Flexible(
+              flex: 2,
+              child: EmoteMenu(
+                assetsStore: chatStore.assetsStore,
+                textController: chatStore.textController,
+              ),
+            ),
+        ],
+      ),
     );
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
     widget.chatStore.dispose();
     super.dispose();
   }

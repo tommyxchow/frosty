@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings.dart';
@@ -24,57 +24,111 @@ class VideoChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authStore = context.read<AuthStore>();
+    final settingsStore = context.read<SettingsStore>();
+
+    final video = Video(
+      key: GlobalKey(),
+      userLogin: userLogin,
+      videoStore: VideoStore(
+        userLogin: userLogin,
+        authStore: authStore,
+        settingsStore: settingsStore,
+      ),
+    );
+
+    final chat = Chat(
+      key: GlobalKey(),
+      chatStore: ChatStore(
+        auth: authStore,
+        settings: settingsStore,
+        channelName: userLogin,
+      ),
+    );
+
+    final appBar = AppBar(
+      title: Text(
+        userName,
+        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      ),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () => showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Settings(settingsStore: settingsStore);
+            },
+          ),
+        ),
+      ],
+    );
+
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            Observer(
-              builder: (_) {
-                if (context.read<SettingsStore>().videoEnabled) {
-                  return AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: Video(
-                      title: title,
-                      userName: userName,
-                      userLogin: userLogin,
-                      videoStore: VideoStore(
-                        userLogin: userLogin,
-                        authStore: context.read<AuthStore>(),
-                      ),
-                    ),
+        child: OrientationBuilder(
+          builder: (context, orientation) {
+            if (orientation == Orientation.landscape) {
+              if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+              return Observer(
+                builder: (context) {
+                  if (settingsStore.videoEnabled) {
+                    return Observer(
+                      builder: (context) => settingsStore.fullScreen
+                          ? WillPopScope(
+                              onWillPop: () async => false,
+                              child: Stack(
+                                children: [
+                                  Visibility(
+                                    visible: false,
+                                    maintainState: true,
+                                    child: chat,
+                                  ),
+                                  Center(child: video),
+                                ],
+                              ),
+                            )
+                          : Row(
+                              children: [
+                                Flexible(
+                                  flex: 2,
+                                  child: video,
+                                ),
+                                Flexible(
+                                  flex: 1,
+                                  child: chat,
+                                ),
+                              ],
+                            ),
+                    );
+                  }
+                  return Column(
+                    children: [
+                      appBar,
+                      Expanded(child: chat),
+                    ],
                   );
-                }
-                return AppBar(
-                  title: Text(
-                    userName,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Settings(settingsStore: context.read<SettingsStore>());
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-            Expanded(
-              child: Chat(
-                chatStore: ChatStore(
-                  auth: context.read<AuthStore>(),
-                  settings: context.read<SettingsStore>(),
-                  channelName: userLogin,
+                },
+              );
+            }
+
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+            return Column(
+              children: [
+                Observer(
+                  builder: (context) {
+                    if (settingsStore.videoEnabled) {
+                      return video;
+                    }
+                    return appBar;
+                  },
                 ),
-              ),
-            ),
-          ],
+                Expanded(
+                  child: chat,
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

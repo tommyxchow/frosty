@@ -32,14 +32,15 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('build home');
+    final authStore = context.read<AuthStore>();
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
         title: Observer(
           builder: (_) {
             final titles = [
-              if (context.read<AuthStore>().isLoggedIn) 'Followed Streams',
+              if (authStore.isLoggedIn) 'Followed Streams',
               'Top Streams',
               'Categories',
               'Search',
@@ -70,7 +71,7 @@ class Home extends StatelessWidget {
           return IndexedStack(
             index: homeStore.selectedIndex,
             children: [
-              if (context.read<AuthStore>().isLoggedIn) FollowedStreams(store: followedStreamsStore),
+              if (authStore.isLoggedIn) FollowedStreams(store: followedStreamsStore),
               TopStreams(store: topStreamsStore),
               Categories(store: categoriesStore),
               Search(searchStore: searchStore),
@@ -83,7 +84,7 @@ class Home extends StatelessWidget {
           return BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             items: [
-              if (context.read<AuthStore>().isLoggedIn)
+              if (authStore.isLoggedIn)
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
                   label: 'Followed',

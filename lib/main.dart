@@ -34,7 +34,10 @@ class MyApp extends StatelessWidget {
               fontFamily: 'Inter',
               splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
               appBarTheme: const AppBarTheme(
-                titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                titleTextStyle: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             darkTheme: ThemeData.dark().copyWith(
@@ -45,7 +48,7 @@ class MyApp extends StatelessWidget {
                 color: Colors.black,
                 titleTextStyle: TextStyle(
                   fontFamily: 'Inter',
-                  fontSize: 28,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),

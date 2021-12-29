@@ -3,7 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/models/user.dart';
+import 'package:frosty/core/user/user_store.dart';
 import 'package:mobx/mobx.dart';
 
 part 'auth_store.g.dart';
@@ -17,13 +17,12 @@ abstract class _AuthBase with Store {
   /// Whether the token is valid or not.
   var _tokenIsValid = false;
 
+  /// The store containing information relevant to the current user.
+  final user = UserStore();
+
   /// The current token.
   @readonly
   String? _token;
-
-  /// The current user's info.
-  @readonly
-  UserTwitch? _user;
 
   /// Whether the user is logged in or not.
   @readonly
@@ -40,7 +39,7 @@ abstract class _AuthBase with Store {
     _token = await _storage.read(key: 'USER_TOKEN');
 
     // If the token does not exist, get the default token.
-    // Otherwise, get the user info and log in.
+    // Otherwise, log in.
     if (_token == null) {
       // Retrieve the currently stored default token if it exists.
       _token = await _storage.read(key: 'DEFAULT_TOKEN');
@@ -50,8 +49,10 @@ abstract class _AuthBase with Store {
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
       }
     } else {
-      _user = await Twitch.getUserInfo(headers: headersTwitch);
-      _isLoggedIn = true;
+      // Initialize the user store.
+      await user.init(headers: headersTwitch);
+
+      if (user.details != null) _isLoggedIn = true;
     }
 
     // Validate the token.
@@ -77,7 +78,7 @@ abstract class _AuthBase with Store {
         'client_id': clientId,
         'redirect_uri': 'auth://',
         'response_type': 'token',
-        'scope': 'chat:read chat:edit user:read:follows',
+        'scope': 'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
         'force_verify': 'true',
       },
     );
@@ -93,8 +94,8 @@ abstract class _AuthBase with Store {
       // Store the user token.
       await _storage.write(key: 'USER_TOKEN', value: _token);
 
-      // Retrieve the user info and set it
-      _user = await Twitch.getUserInfo(headers: headersTwitch);
+      // Initialize the user with the new token.
+      user.init(headers: headersTwitch);
 
       // Set the login status to logged in.
       _isLoggedIn = true;
@@ -111,7 +112,7 @@ abstract class _AuthBase with Store {
     _token = null;
 
     // Clear the user info.
-    _user = null;
+    user.dispose();
 
     // Set the login status to logged out.
     _isLoggedIn = false;

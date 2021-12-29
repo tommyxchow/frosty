@@ -5,27 +5,23 @@ import 'package:http/http.dart' as http;
 
 class BTTV {
   /// Returns a map of global BTTV emotes to their URL.
-  static Future<Map<String, String>?> getEmotesGlobal() async {
+  static Future<List<Emote>> getEmotesGlobal() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/emotes/global');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final List<EmoteBTTVGlobal> emotes = decoded.map((emote) => EmoteBTTVGlobal.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => EmoteBTTV.fromJson(emote)).toList();
 
-      final emoteToUrl = <String, String>{};
-      for (final emote in emotes) {
-        emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
-      }
-
-      return emoteToUrl;
+      return emotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvGlobal)).toList();
     } else {
       debugPrint('Failed to get global BTTV emotes. Error code: ${response.statusCode}');
+      return [];
     }
   }
 
   /// Returns a map of a channel's BTTV emotes to their URL.
-  static Future<Map<String, String>?> getEmotesChannel({required String id}) async {
+  static Future<List<Emote>> getEmotesChannel({required String id}) async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/users/twitch/$id');
     final response = await http.get(url);
 
@@ -33,17 +29,14 @@ class BTTV {
       final decoded = jsonDecode(response.body);
       final result = EmoteBTTVChannel.fromJson(decoded);
 
-      final emoteToUrl = <String, String>{};
-      for (final emote in result.channelEmotes) {
-        emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
-      }
-      for (final emote in result.sharedEmotes) {
-        emoteToUrl[emote.code] = 'https://cdn.betterttv.net/emote/${emote.id}/3x';
-      }
+      final emoteToUrl = <Emote>[];
+      emoteToUrl.addAll(result.channelEmotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvChannel)));
+      emoteToUrl.addAll(result.sharedEmotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvShared)));
 
       return emoteToUrl;
     } else {
       debugPrint('Failed to get BTTV emotes for id: $id. Error code: ${response.statusCode}');
+      return [];
     }
   }
 }

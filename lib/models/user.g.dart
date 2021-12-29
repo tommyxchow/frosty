@@ -18,3 +18,10 @@ UserTwitch _$UserTwitchFromJson(Map<String, dynamic> json) => UserTwitch(
       json['view_count'] as int,
       json['created_at'] as String,
     );
+
+UserBlockedTwitch _$UserBlockedTwitchFromJson(Map<String, dynamic> json) =>
+    UserBlockedTwitch(
+      json['user_id'] as String,
+      json['user_login'] as String,
+      json['display_name'] as String,
+    );

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
+import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
@@ -57,22 +58,33 @@ class StreamCard extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 10.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      streamInfo.userName,
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    Row(
+                      children: [
+                        ProfilePicture(
+                          userLogin: streamInfo.userLogin,
+                          radius: 10.0,
+                        ),
+                        const SizedBox(width: 5.0),
+                        Text(
+                          streamInfo.userName,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 5),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text(streamInfo.title.replaceAll('\n', '')),
+                    const SizedBox(height: 5.0),
+                    Tooltip(
+                      message: streamInfo.title,
+                      preferBelow: false,
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        streamInfo.title,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    const SizedBox(height: 5),
-                    Text(
-                      streamInfo.gameName,
-                    ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 5.0),
+                    Text(streamInfo.gameName),
+                    const SizedBox(height: 5.0),
                     Text(
                       '${NumberFormat().format(streamInfo.viewerCount)} viewers',
                       style: const TextStyle(fontSize: 12),

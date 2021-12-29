@@ -9,6 +9,23 @@ part of 'chat_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ChatStore on _ChatStoreBase, Store {
+  final _$_messagesAtom = Atom(name: '_ChatStoreBase._messages');
+
+  ObservableList<IRCMessage> get messages {
+    _$_messagesAtom.reportRead();
+    return super._messages;
+  }
+
+  @override
+  ObservableList<IRCMessage> get _messages => messages;
+
+  @override
+  set _messages(ObservableList<IRCMessage> value) {
+    _$_messagesAtom.reportWrite(value, super._messages, () {
+      super._messages = value;
+    });
+  }
+
   final _$_autoScrollAtom = Atom(name: '_ChatStoreBase._autoScroll');
 
   bool get autoScroll {
@@ -26,20 +43,20 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_roomStateAtom = Atom(name: '_ChatStoreBase._roomState');
+  final _$_userStateAtom = Atom(name: '_ChatStoreBase._userState');
 
-  ROOMSTATE get roomState {
-    _$_roomStateAtom.reportRead();
-    return super._roomState;
+  USERSTATE get userState {
+    _$_userStateAtom.reportRead();
+    return super._userState;
   }
 
   @override
-  ROOMSTATE get _roomState => roomState;
+  USERSTATE get _userState => userState;
 
   @override
-  set _roomState(ROOMSTATE value) {
-    _$_roomStateAtom.reportWrite(value, super._roomState, () {
-      super._roomState = value;
+  set _userState(USERSTATE value) {
+    _$_userStateAtom.reportWrite(value, super._userState, () {
+      super._userState = value;
     });
   }
 

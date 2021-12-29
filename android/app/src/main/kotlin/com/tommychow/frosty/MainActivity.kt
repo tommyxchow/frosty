@@ -1,4 +1,4 @@
-package com.example.frosty
+package com.tommychow.frosty
 
 import io.flutter.embedding.android.FlutterActivity
 

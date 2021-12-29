@@ -1,3 +1,4 @@
+import 'package:frosty/constants.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'emotes.g.dart';
@@ -29,6 +30,7 @@ class EmoteTwitch {
   final String? tier;
   final String? emoteType;
   final String? emoteSetId;
+  final String? ownerId;
   final List<String> format;
   final List<String> scale;
   final List<String> themeMode;
@@ -40,6 +42,7 @@ class EmoteTwitch {
     this.tier,
     this.emoteType,
     this.emoteSetId,
+    this.ownerId,
     this.format,
     this.scale,
     this.themeMode,
@@ -50,20 +53,22 @@ class EmoteTwitch {
 
 // * BTTV Emotes *
 @JsonSerializable(createToJson: false)
-class EmoteBTTVGlobal {
+class EmoteBTTV {
   final String id;
   final String code;
   final String imageType;
-  final String userId;
+  final String? userId;
+  final UserBTTV? user;
 
-  const EmoteBTTVGlobal(
+  const EmoteBTTV(
     this.id,
     this.code,
     this.imageType,
     this.userId,
+    this.user,
   );
 
-  factory EmoteBTTVGlobal.fromJson(Map<String, dynamic> json) => _$EmoteBTTVGlobalFromJson(json);
+  factory EmoteBTTV.fromJson(Map<String, dynamic> json) => _$EmoteBTTVFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -84,28 +89,11 @@ class UserBTTV {
 }
 
 @JsonSerializable(createToJson: false)
-class EmoteBTTVShared {
-  final String id;
-  final String code;
-  final String imageType;
-  final UserBTTV user;
-
-  const EmoteBTTVShared(
-    this.id,
-    this.code,
-    this.imageType,
-    this.user,
-  );
-
-  factory EmoteBTTVShared.fromJson(Map<String, dynamic> json) => _$EmoteBTTVSharedFromJson(json);
-}
-
-@JsonSerializable(createToJson: false)
 class EmoteBTTVChannel {
   final String id;
   final List<String> bots;
-  final List<EmoteBTTVGlobal> channelEmotes;
-  final List<EmoteBTTVShared> sharedEmotes;
+  final List<EmoteBTTV> channelEmotes;
+  final List<EmoteBTTV> sharedEmotes;
 
   const EmoteBTTVChannel(
     this.id,
@@ -244,4 +232,73 @@ class Emote7TV {
   );
 
   factory Emote7TV.fromJson(Map<String, dynamic> json) => _$Emote7TVFromJson(json);
+}
+
+/// The common emote class.
+class Emote {
+  final String id;
+  final String name;
+  final int? width;
+  final int? height;
+  final bool zeroWidth;
+  final String url;
+  final EmoteType type;
+
+  const Emote({
+    required this.id,
+    required this.name,
+    this.width,
+    this.height,
+    required this.zeroWidth,
+    required this.url,
+    required this.type,
+  });
+
+  factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) => Emote(
+        id: emote.id,
+        name: emote.name,
+        zeroWidth: false,
+        url: 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
+        type: type,
+      );
+
+  factory Emote.fromBTTV(EmoteBTTV emote, EmoteType type) => Emote(
+        id: emote.id,
+        name: emote.code,
+        zeroWidth: zeroWidthEmotes.contains(emote.code),
+        url: 'https://cdn.betterttv.net/emote/${emote.id}/3x',
+        type: type,
+      );
+
+  factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
+        id: emote.id.toString(),
+        name: emote.code,
+        zeroWidth: false,
+        url: emote.images.url4x ?? emote.images.url1x,
+        type: type,
+      );
+
+  factory Emote.from7TV(Emote7TV emote, EmoteType type) => Emote(
+        id: emote.id,
+        name: emote.name,
+        width: emote.width.first,
+        height: emote.height.first,
+        zeroWidth: emote.visibilitySimple.isNotEmpty ? emote.visibilitySimple.first == "ZERO_WIDTH" : false,
+        url: emote.urls[3][1],
+        type: type,
+      );
+}
+
+enum EmoteType {
+  twitchSub,
+  twitchGlobal,
+  twitchUnlocked,
+  twitchChannel,
+  ffzGlobal,
+  ffzChannel,
+  bttvGlobal,
+  bttvChannel,
+  bttvShared,
+  sevenTvGlobal,
+  sevenTvChannel,
 }

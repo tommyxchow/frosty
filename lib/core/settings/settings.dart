@@ -26,25 +26,21 @@ class Settings extends StatelessWidget {
                 value: settingsStore.videoEnabled,
                 onChanged: (newValue) => settingsStore.videoEnabled = newValue,
               ),
-              ListTile(
-                title: Row(
-                  children: [
-                    const Text('Chat Message Limit  '),
-                    const Spacer(),
-                    Text(
-                      settingsStore.messageLimit == 1000 ? 'Unlimited' : '${settingsStore.messageLimit.toInt()}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                subtitle: Slider.adaptive(
-                  value: settingsStore.messageLimit,
-                  onChanged: (newValue) => settingsStore.messageLimit = newValue,
-                  min: 200,
-                  max: 1000,
-                  divisions: 4,
-                ),
-              )
+              SwitchListTile.adaptive(
+                title: const Text('Enable Video Overlay'),
+                value: settingsStore.overlayEnabled,
+                onChanged: (newValue) => settingsStore.overlayEnabled = newValue,
+              ),
+              SwitchListTile.adaptive(
+                title: const Text('Hide Banned Messages'),
+                value: settingsStore.hideBannedMessages,
+                onChanged: (newValue) => settingsStore.hideBannedMessages = newValue,
+              ),
+              SwitchListTile.adaptive(
+                title: const Text('Enable Zero-Width Emotes'),
+                value: settingsStore.zeroWidthEnabled,
+                onChanged: (newValue) => settingsStore.zeroWidthEnabled = newValue,
+              ),
             ],
           );
         },

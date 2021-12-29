@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -11,52 +11,56 @@ part 'video_store.g.dart';
 class VideoStore = _VideoStoreBase with _$VideoStore;
 
 abstract class _VideoStoreBase with Store {
-  late final WebViewController controller;
+  WebViewController? controller;
 
-  late Timer timer;
+  late Timer overlayTimer;
+  late Timer updateTimer;
 
-  @observable
-  var menuVisible = true;
+  @readonly
+  var _menuVisible = true;
 
-  @observable
-  var paused = false;
+  @readonly
+  var _paused = false;
 
-  @observable
-  StreamTwitch? streamInfo;
+  @readonly
+  StreamTwitch? _streamInfo;
 
   final String userLogin;
-
   final AuthStore authStore;
+  final SettingsStore settingsStore;
 
-  _VideoStoreBase({required this.userLogin, required this.authStore}) {
-    timer = Timer(const Duration(seconds: 3), () => menuVisible = false);
+  _VideoStoreBase({
+    required this.userLogin,
+    required this.authStore,
+    required this.settingsStore,
+  }) {
+    overlayTimer = Timer(const Duration(seconds: 3), () => _menuVisible = false);
     updateStreamInfo();
   }
 
   @action
   void handlePausePlay() {
-    if (paused) {
-      controller.runJavascript('document.getElementsByTagName("video")[0].play();');
+    if (_paused) {
+      controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
     } else {
-      controller.runJavascript('document.getElementsByTagName("video")[0].pause();');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
     }
 
-    paused = !paused;
+    _paused = !_paused;
   }
 
   @action
   void handleVideoTap() {
-    if (menuVisible) {
-      timer.cancel();
+    if (_menuVisible) {
+      overlayTimer.cancel();
 
-      menuVisible = false;
+      _menuVisible = false;
     } else {
-      timer.cancel();
-      timer = Timer(const Duration(seconds: 5), () {
-        menuVisible = false;
-      });
+      overlayTimer.cancel();
+      overlayTimer = Timer(const Duration(seconds: 5), () => _menuVisible = false);
 
-      menuVisible = true;
+      _menuVisible = true;
+
       updateStreamInfo();
     }
   }
@@ -65,23 +69,22 @@ abstract class _VideoStoreBase with Store {
   Future<void> updateStreamInfo() async {
     final updatedStreamInfo = await Twitch.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
     if (updatedStreamInfo != null) {
-      streamInfo = updatedStreamInfo;
+      _streamInfo = updatedStreamInfo;
     }
   }
 
+  @action
+  void handleExpand() {
+    overlayTimer.cancel();
+    settingsStore.expandInfo = !settingsStore.expandInfo;
+    overlayTimer = Timer(const Duration(seconds: 5), () => _menuVisible = false);
+  }
+
   void initVideo() {
-    controller.runJavascript('document.getElementsByTagName("button")[0].click();');
-    controller.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
+    controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
   }
 
-  void enterPictureInPicture() {
-    controller.runJavascript('document.getElementsByTagName("video")[0].disablePictureInPicture = false;');
-    controller.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
-  }
-
-  void requestFullscreen() {
-    Platform.isIOS
-        ? controller.runJavascript('document.getElementsByTagName("video")[0].webkitEnterFullscreen();')
-        : controller.runJavascript('document.getElementsByTagName("video")[0].requestFullscreen();');
+  void requestPictureInPicture() {
+    controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
   }
 }
