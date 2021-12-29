@@ -39,21 +39,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$messageLimitAtom = Atom(name: '_SettingsStoreBase.messageLimit');
-
-  @override
-  double get messageLimit {
-    _$messageLimitAtom.reportRead();
-    return super.messageLimit;
-  }
-
-  @override
-  set messageLimit(double value) {
-    _$messageLimitAtom.reportWrite(value, super.messageLimit, () {
-      super.messageLimit = value;
-    });
-  }
-
   final _$hideBannedMessagesAtom =
       Atom(name: '_SettingsStoreBase.hideBannedMessages');
 
@@ -121,7 +106,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     return '''
 videoEnabled: ${videoEnabled},
 overlayEnabled: ${overlayEnabled},
-messageLimit: ${messageLimit},
 hideBannedMessages: ${hideBannedMessages},
 zeroWidthEnabled: ${zeroWidthEnabled},
 fullScreen: ${fullScreen},

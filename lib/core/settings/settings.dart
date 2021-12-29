@@ -21,25 +21,6 @@ class Settings extends StatelessWidget {
           return ListView(
             children: [
               ProfileCard(authStore: context.read<AuthStore>()),
-              ListTile(
-                title: Row(
-                  children: [
-                    const Text('Chat Message Limit'),
-                    const Spacer(),
-                    Text(
-                      settingsStore.messageLimit == 1000 ? 'Unlimited' : '${settingsStore.messageLimit.toInt()}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                subtitle: Slider.adaptive(
-                  value: settingsStore.messageLimit,
-                  onChanged: (newValue) => settingsStore.messageLimit = newValue,
-                  min: 200,
-                  max: 1000,
-                  divisions: 4,
-                ),
-              ),
               SwitchListTile.adaptive(
                 title: const Text('Enable Video'),
                 value: settingsStore.videoEnabled,

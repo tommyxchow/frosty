@@ -11,7 +11,7 @@ class EmoteMenuPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
-    const headerPadding = EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 10.0);
+    const headerPadding = EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 5.0);
 
     final globalEmotes = emotes
         .where((emote) =>
@@ -38,7 +38,7 @@ class EmoteMenuPanel extends StatelessWidget {
         if (globalEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(10.0),
+              padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
               child: Text(
                 'Global Emotes',
                 style: headerStyle,
