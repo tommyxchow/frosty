@@ -12,7 +12,7 @@ class ProfileCard extends StatelessWidget {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
+        title: const Text('Log Out'),
         content: const Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
@@ -43,12 +43,20 @@ class ProfileCard extends StatelessWidget {
                 foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
               ),
               title: Text(authStore.user.details!.displayName),
-              onTap: () => _showDialog(context),
+              trailing: OutlinedButton(
+                onPressed: () => _showDialog(context),
+                child: const Text('Log Out'),
+                style: OutlinedButton.styleFrom(primary: Colors.red),
+              ),
             );
           }
-          return ElevatedButton(
-            onPressed: authStore.login,
-            child: const Text('Login'),
+          return Container(
+            padding: const EdgeInsets.all(10.0),
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: authStore.login,
+              child: const Text('Log In'),
+            ),
           );
         },
       ),
