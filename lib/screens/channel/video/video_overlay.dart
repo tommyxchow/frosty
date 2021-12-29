@@ -79,10 +79,15 @@ class VideoOverlay extends StatelessWidget {
                                                     ),
                                                   ),
                                                   const SizedBox(height: 5.0),
-                                                  Text(
-                                                    videoStore.streamInfo!.title,
-                                                    maxLines: portrait ? 1 : 4,
-                                                    overflow: TextOverflow.ellipsis,
+                                                  Tooltip(
+                                                    message: videoStore.streamInfo!.title,
+                                                    preferBelow: false,
+                                                    padding: const EdgeInsets.all(10.0),
+                                                    child: Text(
+                                                      videoStore.streamInfo!.title,
+                                                      maxLines: portrait ? 1 : 3,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
                                                   ),
                                                   const SizedBox(height: 5.0),
                                                   Text(

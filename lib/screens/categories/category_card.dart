@@ -43,10 +43,15 @@ class CategoryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 5.0),
-            Text(
-              category.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
+            Tooltip(
+              message: category.name,
+              preferBelow: false,
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                category.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

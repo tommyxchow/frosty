@@ -73,9 +73,14 @@ class StreamCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 5.0),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Text(streamInfo.title.replaceAll('\n', '')),
+                    Tooltip(
+                      message: streamInfo.title,
+                      preferBelow: false,
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        streamInfo.title,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     const SizedBox(height: 5.0),
                     Text(streamInfo.gameName),
