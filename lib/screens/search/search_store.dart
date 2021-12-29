@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:mobx/mobx.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 part 'search_store.g.dart';
@@ -52,32 +50,14 @@ abstract class _SearchStoreBase with Store {
     _searchResults = results;
   }
 
-  Future<void> handleSearch(BuildContext context, String search) async {
-    final user = await Twitch.getUser(userLogin: search, headers: authStore.headersTwitch);
-    if (user != null) {
-      final channelInfo = await Twitch.getChannel(userId: user.id, headers: context.read<AuthStore>().headersTwitch);
-      if (channelInfo != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) {
-              return VideoChat(
-                title: channelInfo.title,
-                userName: channelInfo.broadcasterName,
-                userLogin: channelInfo.broadcasterLogin,
-              );
-            },
-          ),
-        );
-      } else {
-        const snackBar = SnackBar(content: Text('Failed to get channel info :('));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }
-    } else {
-      const snackBar = SnackBar(content: Text('User does not exist :('));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  Future<Channel?> searchChannel(String channelName) async {
+    try {
+      final user = await Twitch.getUser(userLogin: channelName, headers: authStore.headersTwitch);
+      return await Twitch.getChannel(userId: user!.id, headers: authStore.headersTwitch);
+    } catch (e) {
+      debugPrint(e.toString());
+      rethrow;
     }
-    textController.clear();
   }
 
   void clearSearch() {

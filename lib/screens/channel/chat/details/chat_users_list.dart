@@ -18,17 +18,17 @@ class ChattersList extends StatefulWidget {
 }
 
 class _ChattersListState extends State<ChattersList> {
-  final scrollController = ScrollController();
-  final textController = TextEditingController();
+  final _scrollController = ScrollController();
+  final _textController = TextEditingController();
 
-  var showJumpButton = false;
+  var _showJumpButton = false;
 
   @override
   void initState() {
     super.initState();
-    scrollController.addListener(() {
-      if (scrollController.position.pixels > 0.0 && showJumpButton == false) setState(() => showJumpButton = true);
-      if (scrollController.position.pixels <= 0.0 && showJumpButton == true) setState(() => showJumpButton = false);
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels > 0.0 && _showJumpButton == false) setState(() => _showJumpButton = true);
+      if (_scrollController.position.pixels <= 0.0 && _showJumpButton == true) setState(() => _showJumpButton = false);
     });
   }
 
@@ -56,18 +56,18 @@ class _ChattersListState extends State<ChattersList> {
         chatters.admins,
         chatters.globalMods,
         chatters.viewers,
-      ].map((e) => e.where((user) => user.contains(textController.text)).toList());
+      ].map((e) => e.where((user) => user.contains(_textController.text)).toList());
 
       return Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: TextField(
-              controller: textController,
+              controller: _textController,
               onChanged: (value) => setState(() {}),
               decoration: InputDecoration(
                 suffixIcon: IconButton(
-                  onPressed: () => setState(() => textController.clear()),
+                  onPressed: () => setState(() => _textController.clear()),
                   icon: const Icon(Icons.clear),
                 ),
                 isDense: true,
@@ -86,7 +86,7 @@ class _ChattersListState extends State<ChattersList> {
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
                   CustomScrollView(
-                    controller: scrollController,
+                    controller: _scrollController,
                     slivers: [
                       SliverPadding(
                         padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
@@ -127,9 +127,9 @@ class _ChattersListState extends State<ChattersList> {
                       )
                     ],
                   ),
-                  if (showJumpButton)
+                  if (_showJumpButton)
                     IconButton(
-                      onPressed: () => scrollController.jumpTo(0.0),
+                      onPressed: () => _scrollController.jumpTo(0.0),
                       icon: const Icon(
                         Icons.arrow_circle_up,
                       ),
@@ -146,8 +146,8 @@ class _ChattersListState extends State<ChattersList> {
 
   @override
   void dispose() {
-    scrollController.dispose();
-    textController.dispose();
+    _scrollController.dispose();
+    _textController.dispose();
     super.dispose();
   }
 }

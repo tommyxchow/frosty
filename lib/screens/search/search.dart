@@ -15,6 +15,27 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
+  Future<void> _handleSearch(BuildContext context, String search) async {
+    try {
+      final channelInfo = await widget.searchStore.searchChannel(search);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) {
+            return VideoChat(
+              title: channelInfo!.title,
+              userName: channelInfo.broadcasterName,
+              userLogin: channelInfo.broadcasterLogin,
+            );
+          },
+        ),
+      );
+    } catch (e) {
+      const snackBar = SnackBar(content: Text('Failed to get channel info :('));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final searchStore = widget.searchStore;
@@ -25,16 +46,16 @@ class _SearchState extends State<Search> {
           child: TextField(
             controller: searchStore.textController,
             decoration: InputDecoration(
-              suffixIcon: IconButton(
-                onPressed: searchStore.clearSearch,
-                icon: const Icon(Icons.clear),
-              ),
               isDense: true,
+              hintText: 'Search for a channel',
               contentPadding: const EdgeInsets.all(10.0),
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              hintText: 'Search for a channel',
+              suffixIcon: IconButton(
+                onPressed: searchStore.clearSearch,
+                icon: const Icon(Icons.clear),
+              ),
             ),
             onSubmitted: searchStore.handleQuery,
           ),
@@ -80,40 +101,28 @@ class _SearchState extends State<Search> {
                     );
                   }
 
-                  return ListView.builder(
-                    itemCount: searchStore.searchResults.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == searchStore.searchResults.length) {
-                        if (searchStore.textController.text.isEmpty) {
-                          return const SizedBox();
-                        }
-                        return ListTile(
-                          title: Text('Go to ${searchStore.textController.text}'),
-                          onTap: () => searchStore.handleSearch(context, searchStore.textController.text),
-                        );
-                      }
-
-                      final channel = searchStore.searchResults[index];
-                      return ListTile(
-                        title: Text(channel.displayName),
-                        leading: ProfilePicture(userLogin: channel.broadcasterLogin),
-                        trailing: channel.isLive
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(5.0),
-                                child: Container(
-                                  color: const Color(0xFFF44336),
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: const Text(
-                                    'LIVE',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                  return ListView(
+                    children: [
+                      ...searchStore.searchResults.map(
+                        (channel) => ListTile(
+                          title: Text(channel.displayName),
+                          leading: ProfilePicture(userLogin: channel.broadcasterLogin),
+                          trailing: channel.isLive
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  child: Container(
+                                    color: const Color(0xFFF44336),
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: const Text(
+                                      'LIVE',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                                ),
-                              )
-                            : null,
-                        subtitle:
-                            channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
-                        onTap: () {
-                          Navigator.push(
+                                )
+                              : null,
+                          subtitle:
+                              channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
+                          onTap: () => Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) {
@@ -124,10 +133,15 @@ class _SearchState extends State<Search> {
                                 );
                               },
                             ),
-                          );
-                        },
-                      );
-                    },
+                          ),
+                        ),
+                      ),
+                      if (searchStore.textController.text.isNotEmpty)
+                        ListTile(
+                          title: Text('Go to ${searchStore.textController.text}'),
+                          onTap: () => _handleSearch(context, searchStore.textController.text),
+                        )
+                    ],
                   );
                 },
               ),
