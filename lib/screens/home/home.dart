@@ -66,18 +66,20 @@ class Home extends StatelessWidget {
           )
         ],
       ),
-      body: Observer(
-        builder: (_) {
-          return IndexedStack(
-            index: homeStore.selectedIndex,
-            children: [
-              if (authStore.isLoggedIn) FollowedStreams(store: followedStreamsStore),
-              TopStreams(store: topStreamsStore),
-              Categories(store: categoriesStore),
-              Search(searchStore: searchStore),
-            ],
-          );
-        },
+      body: SafeArea(
+        child: Observer(
+          builder: (_) {
+            return IndexedStack(
+              index: homeStore.selectedIndex,
+              children: [
+                if (authStore.isLoggedIn) FollowedStreams(store: followedStreamsStore),
+                TopStreams(store: topStreamsStore),
+                Categories(store: categoriesStore),
+                Search(searchStore: searchStore),
+              ],
+            );
+          },
+        ),
       ),
       bottomNavigationBar: Observer(
         builder: (_) {
