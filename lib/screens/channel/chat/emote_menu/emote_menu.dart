@@ -55,26 +55,29 @@ class EmoteMenu extends StatelessWidget {
             ],
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: sections
-              .mapIndexed(
-                (index, section) => Observer(
-                  builder: (context) => TextButton(
-                    onPressed: () {
-                      pageContoller.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.ease,
-                      );
-                      assetsStore.emoteMenuIndex = index;
-                    },
-                    style: index == assetsStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
-                    child: Text(section),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: sections
+                .mapIndexed(
+                  (index, section) => Observer(
+                    builder: (context) => TextButton(
+                      onPressed: () {
+                        pageContoller.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                        assetsStore.emoteMenuIndex = index;
+                      },
+                      style: index == assetsStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
+                      child: Text(section),
+                    ),
                   ),
-                ),
-              )
-              .toList(),
+                )
+                .toList(),
+          ),
         ),
       ],
     );
