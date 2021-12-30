@@ -87,6 +87,9 @@ class VideoOverlay extends StatelessWidget {
                                                       videoStore.streamInfo!.title,
                                                       maxLines: portrait ? 1 : 3,
                                                       overflow: TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        color: Color(0xFFFFFFFF),
+                                                      ),
                                                     ),
                                                   ),
                                                   const SizedBox(height: 5.0),

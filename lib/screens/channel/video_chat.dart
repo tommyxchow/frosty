@@ -64,13 +64,14 @@ class VideoChat extends StatelessWidget {
       ],
     );
 
-    return Scaffold(
-      body: SafeArea(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            if (orientation == Orientation.landscape) {
-              if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-              return Observer(
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.landscape) {
+          if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+          return Scaffold(
+            body: SafeArea(
+              bottom: false,
+              child: Observer(
                 builder: (context) {
                   if (settingsStore.videoEnabled) {
                     return Observer(
@@ -109,11 +110,16 @@ class VideoChat extends StatelessWidget {
                     ],
                   );
                 },
-              );
-            }
+              ),
+            ),
+          );
+        }
 
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
-            return Column(
+        settingsStore.fullScreen = false;
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+        return Scaffold(
+          body: SafeArea(
+            child: Column(
               children: [
                 Observer(
                   builder: (context) {
@@ -127,10 +133,10 @@ class VideoChat extends StatelessWidget {
                   child: chat,
                 ),
               ],
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

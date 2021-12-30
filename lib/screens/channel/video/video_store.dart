@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
@@ -81,10 +82,18 @@ abstract class _VideoStoreBase with Store {
   }
 
   void initVideo() {
-    controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
+    try {
+      controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   void requestPictureInPicture() {
-    controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+    try {
+      controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }
