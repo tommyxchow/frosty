@@ -17,14 +17,24 @@ class ChatSettings extends StatelessWidget {
           children: [
             const SectionHeader('CHAT'),
             SwitchListTile.adaptive(
-              title: const Text('Hide Banned Messages'),
+              title: const Text('Hide banned messages'),
               value: settingsStore.hideBannedMessages,
               onChanged: (newValue) => settingsStore.hideBannedMessages = newValue,
             ),
             SwitchListTile.adaptive(
-              title: const Text('Enable Zero-Width Emotes'),
+              title: const Text('Zero-width emotes'),
               value: settingsStore.zeroWidthEnabled,
               onChanged: (newValue) => settingsStore.zeroWidthEnabled = newValue,
+            ),
+            SwitchListTile.adaptive(
+              title: const Text('Timestamps'),
+              value: settingsStore.timeStampsEnabled,
+              onChanged: (newValue) => settingsStore.timeStampsEnabled = newValue,
+            ),
+            SwitchListTile.adaptive(
+              title: const Text('12-hour timestamps'),
+              value: settingsStore.twelveHourTimeStamp,
+              onChanged: settingsStore.timeStampsEnabled ? (newValue) => settingsStore.twelveHourTimeStamp = newValue : null,
             ),
           ],
         );

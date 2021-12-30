@@ -17,14 +17,14 @@ class VideoSettings extends StatelessWidget {
           children: [
             const SectionHeader('VIDEO'),
             SwitchListTile.adaptive(
-              title: const Text('Enable Video'),
+              title: const Text('Video'),
               value: settingsStore.videoEnabled,
               onChanged: (newValue) => settingsStore.videoEnabled = newValue,
             ),
             SwitchListTile.adaptive(
-              title: const Text('Enable Video Overlay'),
+              title: const Text('Video overlay'),
               value: settingsStore.overlayEnabled,
-              onChanged: (newValue) => settingsStore.overlayEnabled = newValue,
+              onChanged: settingsStore.videoEnabled ? (newValue) => settingsStore.overlayEnabled = newValue : null,
             ),
           ],
         );

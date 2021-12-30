@@ -101,6 +101,38 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$timeStampsEnabledAtom =
+      Atom(name: '_SettingsStoreBase.timeStampsEnabled');
+
+  @override
+  bool get timeStampsEnabled {
+    _$timeStampsEnabledAtom.reportRead();
+    return super.timeStampsEnabled;
+  }
+
+  @override
+  set timeStampsEnabled(bool value) {
+    _$timeStampsEnabledAtom.reportWrite(value, super.timeStampsEnabled, () {
+      super.timeStampsEnabled = value;
+    });
+  }
+
+  final _$twelveHourTimeStampAtom =
+      Atom(name: '_SettingsStoreBase.twelveHourTimeStamp');
+
+  @override
+  bool get twelveHourTimeStamp {
+    _$twelveHourTimeStampAtom.reportRead();
+    return super.twelveHourTimeStamp;
+  }
+
+  @override
+  set twelveHourTimeStamp(bool value) {
+    _$twelveHourTimeStampAtom.reportWrite(value, super.twelveHourTimeStamp, () {
+      super.twelveHourTimeStamp = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
@@ -109,7 +141,9 @@ overlayEnabled: ${overlayEnabled},
 hideBannedMessages: ${hideBannedMessages},
 zeroWidthEnabled: ${zeroWidthEnabled},
 fullScreen: ${fullScreen},
-expandInfo: ${expandInfo}
+expandInfo: ${expandInfo},
+timeStampsEnabled: ${timeStampsEnabled},
+twelveHourTimeStamp: ${twelveHourTimeStamp}
     ''';
   }
 }

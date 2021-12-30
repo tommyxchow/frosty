@@ -7,6 +7,7 @@ class ChatMessage extends StatelessWidget {
   final ChatAssetsStore assetsStore;
   final bool hideMessageIfBanned;
   final bool zeroWidth;
+  final Timestamp timestamp;
 
   const ChatMessage({
     Key? key,
@@ -14,6 +15,7 @@ class ChatMessage extends StatelessWidget {
     required this.assetsStore,
     this.hideMessageIfBanned = true,
     this.zeroWidth = false,
+    required this.timestamp,
   }) : super(key: key);
 
   @override
@@ -29,9 +31,11 @@ class ChatMessage extends StatelessWidget {
           child: Text.rich(
             TextSpan(
               children: ircMessage.generateSpan(
+                style: DefaultTextStyle.of(context).style,
                 emoteToObject: assetsStore.emoteToObject,
                 badgeToObject: assetsStore.badgesToObject,
                 zeroWidthEnabled: zeroWidth,
+                timestamp: timestamp,
               ),
             ),
           ),
@@ -50,10 +54,12 @@ class ChatMessage extends StatelessWidget {
                 Text.rich(
                   TextSpan(
                     children: ircMessage.generateSpan(
+                      style: DefaultTextStyle.of(context).style,
                       emoteToObject: assetsStore.emoteToObject,
                       badgeToObject: assetsStore.badgesToObject,
                       hideMessage: hideMessageIfBanned,
                       zeroWidthEnabled: zeroWidth,
+                      timestamp: timestamp,
                     ),
                   ),
                 ),
@@ -97,9 +103,11 @@ class ChatMessage extends StatelessWidget {
                 Text.rich(
                   TextSpan(
                     children: ircMessage.generateSpan(
+                      style: DefaultTextStyle.of(context).style,
                       emoteToObject: assetsStore.emoteToObject,
                       badgeToObject: assetsStore.badgesToObject,
                       zeroWidthEnabled: zeroWidth,
+                      timestamp: timestamp,
                     ),
                   ),
                 ),

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:intl/intl.dart';
 
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
@@ -68,13 +69,38 @@ class IRCMessage {
 
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
   List<InlineSpan> generateSpan({
+    required TextStyle? style,
     required Map<String, Emote> emoteToObject,
     required Map<String, BadgeInfoTwitch> badgeToObject,
     bool hideMessage = false,
     bool zeroWidthEnabled = false,
+    Timestamp timestamp = Timestamp.none,
   }) {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
+
+    if (timestamp != Timestamp.none) {
+      final time = tags['tmi-sent-ts'] ?? DateTime.now().millisecondsSinceEpoch.toString();
+      final parsedTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+
+      if (timestamp == Timestamp.twentyFour) {
+        span.add(
+          TextSpan(
+            text: '${DateFormat.Hm().format(parsedTime)} ',
+            style: style?.copyWith(color: style.color?.withOpacity(0.5)),
+          ),
+        );
+      }
+
+      if (timestamp == Timestamp.twelve) {
+        span.add(
+          TextSpan(
+            text: '${DateFormat('h:mm').format(parsedTime)} ',
+            style: style?.copyWith(color: style.color?.withOpacity(0.5)),
+          ),
+        );
+      }
+    }
 
     // Add any badges to the span.
     final badges = tags['badges'];
@@ -471,4 +497,10 @@ enum Command {
   userState,
   globalUserState,
   none,
+}
+
+enum Timestamp {
+  none,
+  twelve,
+  twentyFour,
 }

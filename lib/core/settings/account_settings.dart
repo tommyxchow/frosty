@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/profile_card.dart';
 import 'package:frosty/core/settings/settings_store.dart';
@@ -17,16 +16,12 @@ class AccountSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SectionHeader('ACCOUNT'),
-            ProfileCard(authStore: authStore),
-          ],
-        );
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader('ACCOUNT'),
+        ProfileCard(authStore: authStore),
+      ],
     );
   }
 }

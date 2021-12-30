@@ -25,6 +25,12 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var expandInfo = false;
 
+  @observable
+  var timeStampsEnabled = false;
+
+  @observable
+  var twelveHourTimeStamp = false;
+
   Future<void> init() async {
     // Retrieve the instance that will allow us to store and persist settings.
     final prefs = await SharedPreferences.getInstance();
@@ -35,6 +41,8 @@ abstract class _SettingsStoreBase with Store {
     hideBannedMessages = prefs.getBool('hide_banned_messages') ?? hideBannedMessages;
     zeroWidthEnabled = prefs.getBool('zero_width_enabled') ?? zeroWidthEnabled;
     expandInfo = prefs.getBool('expand_info') ?? expandInfo;
+    timeStampsEnabled = prefs.getBool('time_stamps_enabled') ?? timeStampsEnabled;
+    twelveHourTimeStamp = prefs.getBool('twelve_hour_time_stamps') ?? twelveHourTimeStamp;
 
     // Set up reactions to store setting anytime they're changed.
     // The ReactionDisposer will not be needed since settings will always exist.
@@ -43,6 +51,8 @@ abstract class _SettingsStoreBase with Store {
     reaction((_) => zeroWidthEnabled, (bool newValue) => prefs.setBool('zero_width_enabled', newValue));
     reaction((_) => hideBannedMessages, (bool newValue) => prefs.setBool('hide_banned_messages', newValue));
     reaction((_) => expandInfo, (bool newValue) => prefs.setBool('expand_info', newValue));
+    reaction((_) => timeStampsEnabled, (bool newValue) => prefs.setBool('time_stamps_enabled', newValue));
+    reaction((_) => twelveHourTimeStamp, (bool newValue) => prefs.setBool('twelve_hour_time_stamps', newValue));
 
     // A reaction that will enable immersive mode when entering fullscreen and disable it when exiting.
     reaction(
