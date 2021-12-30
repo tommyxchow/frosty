@@ -133,6 +133,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$oledThemeAtom = Atom(name: '_SettingsStoreBase.oledTheme');
+
+  @override
+  bool get oledTheme {
+    _$oledThemeAtom.reportRead();
+    return super.oledTheme;
+  }
+
+  @override
+  set oledTheme(bool value) {
+    _$oledThemeAtom.reportWrite(value, super.oledTheme, () {
+      super.oledTheme = value;
+    });
+  }
+
   @override
   String toString() {
     return '''
@@ -143,7 +158,8 @@ zeroWidthEnabled: ${zeroWidthEnabled},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo},
 timeStampsEnabled: ${timeStampsEnabled},
-twelveHourTimeStamp: ${twelveHourTimeStamp}
+twelveHourTimeStamp: ${twelveHourTimeStamp},
+oledTheme: ${oledTheme}
     ''';
   }
 }

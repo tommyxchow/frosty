@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/account_settings.dart';
 import 'package:frosty/core/settings/chat_settings.dart';
+import 'package:frosty/core/settings/general_settings.dart';
 import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/core/settings/video_settings.dart';
 import 'package:provider/provider.dart';
@@ -17,12 +18,15 @@ class Settings extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: ListView(
-        children: [
-          AccountSettings(settingsStore: settingsStore, authStore: context.read<AuthStore>()),
-          VideoSettings(settingsStore: settingsStore),
-          ChatSettings(settingsStore: settingsStore),
-        ],
+      body: SafeArea(
+        child: ListView(
+          children: [
+            AccountSettings(settingsStore: settingsStore, authStore: context.read<AuthStore>()),
+            VideoSettings(settingsStore: settingsStore),
+            ChatSettings(settingsStore: settingsStore),
+            GeneralSettings(settingsStore: settingsStore),
+          ],
+        ),
       ),
     );
   }

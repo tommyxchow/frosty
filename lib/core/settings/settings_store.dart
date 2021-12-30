@@ -31,6 +31,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var twelveHourTimeStamp = false;
 
+  @observable
+  var oledTheme = false;
+
   Future<void> init() async {
     // Retrieve the instance that will allow us to store and persist settings.
     final prefs = await SharedPreferences.getInstance();
@@ -43,6 +46,7 @@ abstract class _SettingsStoreBase with Store {
     expandInfo = prefs.getBool('expand_info') ?? expandInfo;
     timeStampsEnabled = prefs.getBool('time_stamps_enabled') ?? timeStampsEnabled;
     twelveHourTimeStamp = prefs.getBool('twelve_hour_time_stamps') ?? twelveHourTimeStamp;
+    oledTheme = prefs.getBool('oled_theme') ?? oledTheme;
 
     // Set up reactions to store setting anytime they're changed.
     // The ReactionDisposer will not be needed since settings will always exist.
@@ -53,6 +57,7 @@ abstract class _SettingsStoreBase with Store {
     reaction((_) => expandInfo, (bool newValue) => prefs.setBool('expand_info', newValue));
     reaction((_) => timeStampsEnabled, (bool newValue) => prefs.setBool('time_stamps_enabled', newValue));
     reaction((_) => twelveHourTimeStamp, (bool newValue) => prefs.setBool('twelve_hour_time_stamps', newValue));
+    reaction((_) => oledTheme, (bool newValue) => prefs.setBool('oled_theme', newValue));
 
     // A reaction that will enable immersive mode when entering fullscreen and disable it when exiting.
     reaction(

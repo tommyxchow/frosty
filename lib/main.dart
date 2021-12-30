@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/screens/categories/categories_store.dart';
@@ -13,11 +14,27 @@ import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final authStore = AuthStore();
+  final settingsStore = SettingsStore();
+
+  await authStore.init();
+  await settingsStore.init();
+
   await SentryFlutter.init(
     (options) {
       options.tracesSampleRate = 1.0;
     },
-    appRunner: () => runApp(const MyApp()),
+    appRunner: () => runApp(
+      MultiProvider(
+        providers: [
+          Provider<AuthStore>(create: (_) => authStore),
+          Provider<SettingsStore>(create: (_) => settingsStore),
+        ],
+        child: const MyApp(),
+      ),
+    ),
   );
 }
 
@@ -26,67 +43,57 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider<AuthStore>(create: (_) => AuthStore()),
-        Provider<SettingsStore>(create: (_) => SettingsStore()),
-      ],
-      child: Builder(
-        builder: (context) {
-          return MaterialApp(
-            title: 'Frosty',
-            theme: ThemeData(
-              primarySwatch: Colors.deepPurple,
-              fontFamily: 'Inter',
-              splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-              appBarTheme: const AppBarTheme(
-                titleTextStyle: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            darkTheme: ThemeData.dark().copyWith(
-              scaffoldBackgroundColor: Colors.black,
-              splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-              textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'Inter'),
-              appBarTheme: const AppBarTheme(
-                color: Colors.black,
-                titleTextStyle: TextStyle(
-                  fontFamily: 'Inter',
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                backgroundColor: Colors.black,
-              ),
-            ),
-            home: Scaffold(
-              body: FutureBuilder(
-                future: Future.wait([
-                  context.read<AuthStore>().init(),
-                  context.read<SettingsStore>().init(),
-                ]),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    final authStore = context.read<AuthStore>();
+    final authStore = context.read<AuthStore>();
+    final settingsStore = context.read<SettingsStore>();
 
-                    return Home(
-                      homeStore: HomeStore(),
-                      topStreamsStore: TopStreamsStore(authStore: authStore),
-                      followedStreamsStore: FollowedStreamsStore(authStore: authStore),
-                      categoriesStore: CategoriesStore(authStore: authStore),
-                      searchStore: SearchStore(authStore: authStore),
-                    );
-                  }
-                  return const Center(child: CircularProgressIndicator.adaptive());
-                },
-              ),
-            ),
-          );
-        },
+    final defaultTheme = ThemeData(
+      scaffoldBackgroundColor: Colors.grey.shade900,
+      brightness: Brightness.dark,
+      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+      fontFamily: 'Inter',
+      appBarTheme: AppBarTheme(
+        color: Colors.grey.shade900,
+        elevation: 0.0,
+        titleTextStyle: const TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
       ),
+    );
+
+    final oledTheme = ThemeData.dark().copyWith(
+      scaffoldBackgroundColor: Colors.black,
+      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+      textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'Inter'),
+      appBarTheme: const AppBarTheme(
+        color: Colors.black,
+        elevation: 0.0,
+        titleTextStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Colors.black,
+      ),
+    );
+
+    return Observer(
+      builder: (context) {
+        return MaterialApp(
+          title: 'Frosty',
+          theme: settingsStore.oledTheme ? oledTheme : defaultTheme,
+          home: Home(
+            homeStore: HomeStore(),
+            topStreamsStore: TopStreamsStore(authStore: authStore),
+            followedStreamsStore: FollowedStreamsStore(authStore: authStore),
+            categoriesStore: CategoriesStore(authStore: authStore),
+            searchStore: SearchStore(authStore: authStore),
+          ),
+        );
+      },
     );
   }
 }
