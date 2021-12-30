@@ -10,9 +10,15 @@ import 'package:frosty/screens/search/search_store.dart';
 import 'package:frosty/screens/stream_list/streams_followed/followed_streams_store.dart';
 import 'package:frosty/screens/stream_list/streams_top/top_streams_store.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  await SentryFlutter.init(
+    (options) {
+      options.tracesSampleRate = 1.0;
+    },
+    appRunner: () => runApp(const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
