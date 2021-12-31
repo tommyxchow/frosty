@@ -274,7 +274,7 @@ class Emote {
         id: emote.id.toString(),
         name: emote.code,
         zeroWidth: false,
-        url: emote.images.url4x ?? emote.images.url1x,
+        url: emote.images.url4x ?? emote.images.url2x ?? emote.images.url1x,
         type: type,
       );
 
