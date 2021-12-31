@@ -71,7 +71,8 @@ class IRCMessage {
   List<InlineSpan> generateSpan({
     required TextStyle? style,
     required Map<String, Emote> emoteToObject,
-    required Map<String, BadgeInfoTwitch> badgeToObject,
+    required Map<String, BadgeInfoTwitch> twitchBadges,
+    required Map<String, List<BadgeInfoFFZ>> ffzBadges,
     bool hideMessage = false,
     bool zeroWidthEnabled = false,
     Timestamp timestamp = Timestamp.none,
@@ -103,10 +104,43 @@ class IRCMessage {
     }
 
     // Add any badges to the span.
+
+    // FFZ badges
+    var ignoreMod = false;
+    final ffzUserBadges = ffzBadges[user];
+    if (ffzUserBadges != null) {
+      for (final ffzBadge in ffzUserBadges) {
+        if (ffzBadge.replaces != null) ignoreMod = true;
+
+        span.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Tooltip(
+              message: ffzBadge.title,
+              preferBelow: false,
+              child: ColoredBox(
+                color: ffzBadge.name == 'bot' ? HexColor.fromHex('#00AD03') : HexColor.fromHex(ffzBadge.color),
+                child: CachedNetworkImage(
+                  imageUrl: 'https:' + ffzBadge.urls.url4x,
+                  placeholder: (context, url) => const SizedBox(),
+                  fadeInDuration: const Duration(seconds: 0),
+                  height: 20,
+                ),
+              ),
+            ),
+          ),
+        );
+        span.add(const TextSpan(text: ' '));
+      }
+    }
+
+    // Twitch badges
     final badges = tags['badges'];
     if (badges != null) {
       for (final badge in badges.split(',')) {
-        final badgeInfo = badgeToObject[badge];
+        if (badge == 'moderator/1' && ignoreMod) continue;
+
+        final badgeInfo = twitchBadges[badge];
         if (badgeInfo != null) {
           span.add(
             WidgetSpan(

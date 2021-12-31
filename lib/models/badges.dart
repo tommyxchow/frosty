@@ -29,3 +29,46 @@ class BadgeInfoTwitch {
 
   factory BadgeInfoTwitch.fromJson(Map<String, dynamic> json) => _$BadgeInfoTwitchFromJson(json);
 }
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class BadgeInfoFFZ {
+  final int id;
+  final String name;
+  final String title;
+  final int slot;
+  final String? replaces;
+  final String color;
+  final String image;
+  final BadgeUrlsFFZ urls;
+
+  const BadgeInfoFFZ(
+    this.id,
+    this.name,
+    this.title,
+    this.slot,
+    this.replaces,
+    this.color,
+    this.image,
+    this.urls,
+  );
+
+  factory BadgeInfoFFZ.fromJson(Map<String, dynamic> json) => _$BadgeInfoFFZFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class BadgeUrlsFFZ {
+  @JsonKey(name: '1')
+  final String url1x;
+  @JsonKey(name: '2')
+  final String url2x;
+  @JsonKey(name: '4')
+  final String url4x;
+
+  const BadgeUrlsFFZ(
+    this.url1x,
+    this.url2x,
+    this.url4x,
+  );
+
+  factory BadgeUrlsFFZ.fromJson(Map<String, dynamic> json) => _$BadgeUrlsFFZFromJson(json);
+}

@@ -28,7 +28,10 @@ abstract class _ChatAssetsStoreBase with Store {
   var _userEmoteToObject = ObservableMap<String, Emote>();
 
   /// The map of badges ids to their object representation.
-  final badgesToObject = <String, BadgeInfoTwitch>{};
+  final twitchBadgesToObject = <String, BadgeInfoTwitch>{};
+
+  /// The map of usernames to their FFZ badges.
+  final userToFFZBadges = <String, List<BadgeInfoFFZ>>{};
 
   /// The current index of the emote menu stack.
   @observable
@@ -81,9 +84,12 @@ abstract class _ChatAssetsStoreBase with Store {
 
       for (final map in badges) {
         if (map != null) {
-          badgesToObject.addAll(map);
+          twitchBadgesToObject.addAll(map);
         }
       }
+
+      final ffzBadges = await FFZ.getBadges();
+      if (ffzBadges != null) userToFFZBadges.addAll(ffzBadges);
     }
   }
 

@@ -33,7 +33,8 @@ class ChatMessage extends StatelessWidget {
               children: ircMessage.generateSpan(
                 style: DefaultTextStyle.of(context).style,
                 emoteToObject: assetsStore.emoteToObject,
-                badgeToObject: assetsStore.badgesToObject,
+                twitchBadges: assetsStore.twitchBadgesToObject,
+                ffzBadges: assetsStore.userToFFZBadges,
                 zeroWidthEnabled: zeroWidth,
                 timestamp: timestamp,
               ),
@@ -56,7 +57,8 @@ class ChatMessage extends StatelessWidget {
                     children: ircMessage.generateSpan(
                       style: DefaultTextStyle.of(context).style,
                       emoteToObject: assetsStore.emoteToObject,
-                      badgeToObject: assetsStore.badgesToObject,
+                      twitchBadges: assetsStore.twitchBadgesToObject,
+                      ffzBadges: assetsStore.userToFFZBadges,
                       hideMessage: hideMessageIfBanned,
                       zeroWidthEnabled: zeroWidth,
                       timestamp: timestamp,
@@ -105,7 +107,8 @@ class ChatMessage extends StatelessWidget {
                     children: ircMessage.generateSpan(
                       style: DefaultTextStyle.of(context).style,
                       emoteToObject: assetsStore.emoteToObject,
-                      badgeToObject: assetsStore.badgesToObject,
+                      twitchBadges: assetsStore.twitchBadgesToObject,
+                      ffzBadges: assetsStore.userToFFZBadges,
                       zeroWidthEnabled: zeroWidth,
                       timestamp: timestamp,
                     ),
