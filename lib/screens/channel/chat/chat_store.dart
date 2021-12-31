@@ -187,8 +187,8 @@ abstract class _ChatStoreBase with Store {
 
         if (_autoScroll) _deleteAndScrollToEnd();
 
-        // Hard upper-limit of 10000 messages to prevent infinite messages being added when scrolling.
-        if (_messages.length >= 10000) _messages.removeRange(0, 2000);
+        // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
+        if (_messages.length >= 5000) _messages.removeRange(0, 1000);
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel.sink.add('PONG :tmi.twitch.tv');
         return;
