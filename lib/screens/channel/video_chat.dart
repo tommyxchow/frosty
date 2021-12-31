@@ -56,7 +56,7 @@ class VideoChat extends StatelessWidget {
           icon: const Icon(Icons.settings),
           onPressed: () => showModalBottomSheet(
             context: context,
-            builder: (context) {
+            builder: (_) {
               return Settings(settingsStore: settingsStore);
             },
           ),
@@ -64,65 +64,58 @@ class VideoChat extends StatelessWidget {
       ],
     );
 
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        if (orientation == Orientation.landscape) {
-          if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-          return Scaffold(
-            body: SafeArea(
-              bottom: false,
-              child: Observer(
-                builder: (context) {
-                  if (settingsStore.videoEnabled) {
-                    return Observer(
-                      builder: (context) => settingsStore.fullScreen
-                          ? WillPopScope(
-                              onWillPop: () async => false,
-                              child: Stack(
-                                children: [
-                                  Visibility(
-                                    visible: false,
-                                    maintainState: true,
-                                    child: chat,
-                                  ),
-                                  Center(child: video),
-                                ],
-                              ),
-                            )
-                          : Row(
+    return Scaffold(
+      body: OrientationBuilder(
+        builder: (_, orientation) {
+          if (orientation == Orientation.landscape) {
+            if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+            return Observer(
+              builder: (_) => SafeArea(
+                bottom: settingsStore.fullScreen ? false : true,
+                child: settingsStore.videoEnabled
+                    ? settingsStore.fullScreen
+                        ? WillPopScope(
+                            onWillPop: () async => false,
+                            child: Stack(
                               children: [
-                                Flexible(
-                                  flex: 2,
-                                  child: video,
-                                ),
-                                Flexible(
-                                  flex: 1,
+                                Visibility(
+                                  visible: false,
+                                  maintainState: true,
                                   child: chat,
                                 ),
+                                Center(child: video),
                               ],
                             ),
-                    );
-                  }
-                  return Column(
-                    children: [
-                      appBar,
-                      Expanded(child: chat),
-                    ],
-                  );
-                },
+                          )
+                        : Row(
+                            children: [
+                              Flexible(
+                                flex: 2,
+                                child: video,
+                              ),
+                              Flexible(
+                                flex: 1,
+                                child: chat,
+                              ),
+                            ],
+                          )
+                    : Column(
+                        children: [
+                          appBar,
+                          Expanded(child: chat),
+                        ],
+                      ),
               ),
-            ),
-          );
-        }
+            );
+          }
 
-        settingsStore.fullScreen = false;
-        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
-        return Scaffold(
-          body: SafeArea(
+          settingsStore.fullScreen = false;
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+          return SafeArea(
             child: Column(
               children: [
                 Observer(
-                  builder: (context) {
+                  builder: (_) {
                     if (settingsStore.videoEnabled) {
                       return video;
                     }
@@ -134,9 +127,9 @@ class VideoChat extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

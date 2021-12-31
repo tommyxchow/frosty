@@ -14,7 +14,7 @@ class CategoryStreams extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: store.refresh,
       child: Observer(
-        builder: (_) {
+        builder: (context) {
           return CustomScrollView(
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             slivers: [
