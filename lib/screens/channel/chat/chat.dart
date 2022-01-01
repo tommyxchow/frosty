@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/models/irc_message.dart';
 import 'package:frosty/screens/channel/chat/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/chat_message.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
@@ -53,15 +52,10 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
                       controller: chatStore.scrollController,
                       itemBuilder: (context, index) => Observer(
                         builder: (context) => ChatMessage(
-                            ircMessage: chatStore.messages[index],
-                            assetsStore: chatStore.assetsStore,
-                            hideMessageIfBanned: chatStore.settings.hideBannedMessages,
-                            zeroWidth: chatStore.settings.zeroWidthEnabled,
-                            timestamp: chatStore.settings.timeStampsEnabled
-                                ? chatStore.settings.twelveHourTimeStamp
-                                    ? Timestamp.twelve
-                                    : Timestamp.twentyFour
-                                : Timestamp.none),
+                          ircMessage: chatStore.messages[index],
+                          assetsStore: chatStore.assetsStore,
+                          settingsStore: chatStore.settings,
+                        ),
                       ),
                     ),
                   ),
