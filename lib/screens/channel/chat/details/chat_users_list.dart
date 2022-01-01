@@ -84,7 +84,10 @@ class _ChattersListState extends State<ChattersList> {
             ),
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () => widget.chatDetails.updateChatters(widget.userLogin),
+                onRefresh: () async {
+                  await widget.chatDetails.updateChatters(widget.userLogin);
+                  setState(() {});
+                },
                 child: Stack(
                   alignment: AlignmentDirectional.bottomCenter,
                   children: [
