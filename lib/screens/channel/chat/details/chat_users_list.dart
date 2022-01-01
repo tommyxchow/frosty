@@ -40,21 +40,21 @@ class _ChattersListState extends State<ChattersList> {
 
       const headers = [
         'Broadcaster',
-        'Moderators',
-        'VIPs',
         'Staff',
         'Admins',
         'Global Moderators',
+        'Moderators',
+        'VIPs',
         'Users',
       ];
 
       final userTypes = [
         chatters.broadcaster,
-        chatters.moderators,
-        chatters.vips,
         chatters.staff,
         chatters.admins,
         chatters.globalMods,
+        chatters.moderators,
+        chatters.vips,
         chatters.viewers,
       ].map((e) => e.where((user) => user.contains(_textController.text)).toList());
 
@@ -66,18 +66,19 @@ class _ChattersListState extends State<ChattersList> {
               padding: const EdgeInsets.all(10.0),
               child: TextField(
                 controller: _textController,
+                autocorrect: false,
                 onChanged: (value) => setState(() {}),
                 decoration: InputDecoration(
+                  isDense: true,
+                  hintText: 'Filter users',
+                  contentPadding: const EdgeInsets.all(10.0),
                   suffixIcon: IconButton(
                     onPressed: () => setState(() => _textController.clear()),
                     icon: const Icon(Icons.clear),
                   ),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.all(10.0),
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                   ),
-                  hintText: 'Filter users',
                 ),
               ),
             ),
