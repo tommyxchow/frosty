@@ -350,9 +350,11 @@ class IRCMessage {
     );
 
     // Add the colon separator between the username and their message to the span.
-    span.add(
-      const TextSpan(text: ':'),
-    );
+    if (!action) {
+      span.add(
+        const TextSpan(text: ':'),
+      );
+    }
 
     // Italicize the text it was called with an IRC Action i.e., "/me".
     final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : null;

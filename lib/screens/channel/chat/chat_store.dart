@@ -237,16 +237,17 @@ abstract class _ChatStoreBase with Store {
     _channel.sink.add('PRIVMSG #$channelName :$message');
 
     // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
-    final userStateString = _userState.raw;
+    var userStateString = _userState.raw;
     if (userStateString != null) {
-      // TODO: Add support for /me when sending messages.
-      // if (message.substring(0, 3) == '/me') {
-      //   message = '\x01' + 'ACTION' + message + '\x01';
-      // }
+      if (message.length > 3 && message.substring(0, 3) == '/me') {
+        userStateString += ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
+      } else {
+        userStateString += ' :' + message.trim();
+      }
 
       final userChatMessage = IRCMessage.fromString(userStateString);
       userChatMessage.localEmotes.addAll(assetsStore.userEmoteToObject);
-      userChatMessage.message = message.trim();
+
       toSend = userChatMessage;
     }
 
