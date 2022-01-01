@@ -17,8 +17,8 @@ class EmoteMenuSection extends StatelessWidget {
     return SliverPadding(
       padding: const EdgeInsets.all(10.0),
       sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 8,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait ? 8 : 6,
           mainAxisSpacing: 10.0,
           crossAxisSpacing: 10.0,
         ),
