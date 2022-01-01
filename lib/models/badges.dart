@@ -72,3 +72,22 @@ class BadgeUrlsFFZ {
 
   factory BadgeUrlsFFZ.fromJson(Map<String, dynamic> json) => _$BadgeUrlsFFZFromJson(json);
 }
+
+@JsonSerializable(createToJson: false)
+class BadgeInfo7TV {
+  final String id;
+  final String name;
+  final String tooltip;
+  final List<List<String>> urls;
+  final List<String> users;
+
+  BadgeInfo7TV(
+    this.id,
+    this.name,
+    this.tooltip,
+    this.urls,
+    this.users,
+  );
+
+  factory BadgeInfo7TV.fromJson(Map<String, dynamic> json) => _$BadgeInfo7TVFromJson(json);
+}

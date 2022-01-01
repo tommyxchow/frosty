@@ -33,3 +33,13 @@ BadgeUrlsFFZ _$BadgeUrlsFFZFromJson(Map<String, dynamic> json) => BadgeUrlsFFZ(
       json['2'] as String,
       json['4'] as String,
     );
+
+BadgeInfo7TV _$BadgeInfo7TVFromJson(Map<String, dynamic> json) => BadgeInfo7TV(
+      json['id'] as String,
+      json['name'] as String,
+      json['tooltip'] as String,
+      (json['urls'] as List<dynamic>)
+          .map((e) => (e as List<dynamic>).map((e) => e as String).toList())
+          .toList(),
+      (json['users'] as List<dynamic>).map((e) => e as String).toList(),
+    );

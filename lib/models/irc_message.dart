@@ -74,6 +74,7 @@ class IRCMessage {
     required Map<String, Emote> emoteToObject,
     required Map<String, BadgeInfoTwitch> twitchBadgeToObject,
     required Map<String, List<BadgeInfoFFZ>> ffzUserToBadges,
+    required Map<String, List<BadgeInfo7TV>> sevenTVUserToBadges,
     RoomFFZ? ffzRoomInfo,
     bool hideMessage = false,
     bool zeroWidthEnabled = false,
@@ -289,6 +290,29 @@ class IRCMessage {
           );
           span.add(const TextSpan(text: ' '));
         }
+      }
+    }
+
+    // Add 7TV badges to end of badges span
+    final user7TVBadges = sevenTVUserToBadges[tags['user-id']];
+    if (user7TVBadges != null) {
+      for (final badge in user7TVBadges) {
+        span.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Tooltip(
+              message: badge.tooltip,
+              preferBelow: false,
+              child: CachedNetworkImage(
+                imageUrl: badge.urls[2][1],
+                placeholder: (context, url) => const SizedBox(),
+                fadeInDuration: const Duration(seconds: 0),
+                height: 20,
+              ),
+            ),
+          ),
+        );
+        span.add(const TextSpan(text: ' '));
       }
     }
 

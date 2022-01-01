@@ -11,30 +11,37 @@ part 'chat_assets_store.g.dart';
 class ChatAssetsStore = _ChatAssetsStoreBase with _$ChatAssetsStore;
 
 abstract class _ChatAssetsStoreBase with Store {
-  /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
-  final emoteToObject = ObservableMap<String, Emote>();
-
   /// Contains any custom FFZ mod and vip badges for the channel.
   RoomFFZ? ffzRoomInfo;
 
   @computed
-  List<Emote> get bttvEmotes => emoteToObject.values.where((emote) => isBTTV(emote)).toList();
+  List<Emote> get bttvEmotes => _emoteToObject.values.where((emote) => isBTTV(emote)).toList();
 
   @computed
-  List<Emote> get ffzEmotes => emoteToObject.values.where((emote) => isFFZ(emote)).toList();
+  List<Emote> get ffzEmotes => _emoteToObject.values.where((emote) => isFFZ(emote)).toList();
 
   @computed
-  List<Emote> get sevenTvEmotes => emoteToObject.values.where((emote) => is7TV(emote)).toList();
+  List<Emote> get sevenTvEmotes => _emoteToObject.values.where((emote) => is7TV(emote)).toList();
+
+  /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
+  @readonly
+  var _emoteToObject = <String, Emote>{};
 
   /// The emotes that are "owned" and may be used by the current user.
   @readonly
-  var _userEmoteToObject = ObservableMap<String, Emote>();
+  var _userEmoteToObject = <String, Emote>{};
 
   /// The map of badges ids to their object representation.
-  final twitchBadgesToObject = <String, BadgeInfoTwitch>{};
+  @readonly
+  var _twitchBadgesToObject = <String, BadgeInfoTwitch>{};
 
   /// The map of usernames to their FFZ badges.
-  final userToFFZBadges = <String, List<BadgeInfoFFZ>>{};
+  @readonly
+  var _userToFFZBadges = <String, List<BadgeInfoFFZ>>{};
+
+  /// The map of usernames to their 7TV badges.
+  @readonly
+  var _userTo7TVBadges = <String, List<BadgeInfo7TV>>{};
 
   /// The current index of the emote menu stack.
   @observable
@@ -81,23 +88,18 @@ abstract class _ChatAssetsStoreBase with Store {
         ffzRoomInfo = ffzRoom.item1;
       }
 
-      for (final emote in assets) {
-        emoteToObject[emote.name] = emote;
-      }
+      _emoteToObject = {for (final emote in assets) emote.name: emote};
 
-      final badges = [
-        await Twitch.getBadgesGlobal(),
-        await Twitch.getBadgesChannel(id: channelInfo.id),
-      ];
-
-      for (final map in badges) {
-        if (map != null) {
-          twitchBadgesToObject.addAll(map);
-        }
-      }
+      _twitchBadgesToObject = {
+        ...await Twitch.getBadgesGlobal(),
+        ...await Twitch.getBadgesChannel(id: channelInfo.id),
+      };
 
       final ffzBadges = await FFZ.getBadges();
-      if (ffzBadges != null) userToFFZBadges.addAll(ffzBadges);
+      if (ffzBadges != null) _userToFFZBadges = ffzBadges;
+
+      final sevenTVBadges = await SevenTV.getBadges();
+      if (sevenTVBadges != null) _userTo7TVBadges = sevenTVBadges;
     }
   }
 

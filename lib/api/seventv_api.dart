@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,7 +13,7 @@ class SevenTV {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
 
       return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTvGlobal)).toList();
     } else {
@@ -28,12 +29,38 @@ class SevenTV {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
-      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote)).toList();
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
 
       return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTvChannel)).toList();
     } else {
       debugPrint('Failed to get channel 7TV emotes. Error code: ${response.statusCode}');
       return [];
+    }
+  }
+
+  static Future<Map<String, List<BadgeInfo7TV>>?> getBadges() async {
+    final url = Uri.parse('https://api.7tv.app/v2/badges?user_identifier=twitch_id');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body)['badges'] as List;
+      final badges = decoded.map((emote) => BadgeInfo7TV.fromJson(emote));
+
+      final result = <String, List<BadgeInfo7TV>>{};
+      for (final badge in badges) {
+        for (final userId in badge.users) {
+          final entry = result[userId];
+          if (entry == null) {
+            result[userId] = [badge];
+          } else {
+            entry.add(badge);
+          }
+        }
+      }
+
+      return result;
+    } else {
+      debugPrint('Failed to get channel 7TV emotes. Error code: ${response.statusCode}');
     }
   }
 }

@@ -69,7 +69,7 @@ class Twitch {
   }
 
   /// Returns a map of global Twitch badges to their URL.
-  static Future<Map<String, BadgeInfoTwitch>?> getBadgesGlobal() async {
+  static Future<Map<String, BadgeInfoTwitch>> getBadgesGlobal() async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/global/display');
     final response = await http.get(url);
 
@@ -85,11 +85,12 @@ class Twitch {
       return result;
     } else {
       debugPrint('Failed to get global Twitch badges. Error code: ${response.statusCode}');
+      return {};
     }
   }
 
   /// Returns a map of a channel's Twitch badges to their URL.
-  static Future<Map<String, BadgeInfoTwitch>?> getBadgesChannel({required String id}) async {
+  static Future<Map<String, BadgeInfoTwitch>> getBadgesChannel({required String id}) async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/channels/$id/display');
     final response = await http.get(url);
 
@@ -104,6 +105,7 @@ class Twitch {
       return result;
     } else {
       debugPrint('Failed to get Twitch badges for id: $id. Error code: ${response.statusCode}');
+      return {};
     }
   }
 

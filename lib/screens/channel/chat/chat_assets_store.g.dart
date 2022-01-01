@@ -31,21 +31,95 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
               name: '_ChatAssetsStoreBase.sevenTvEmotes'))
       .value;
 
+  final _$_emoteToObjectAtom =
+      Atom(name: '_ChatAssetsStoreBase._emoteToObject');
+
+  Map<String, Emote> get emoteToObject {
+    _$_emoteToObjectAtom.reportRead();
+    return super._emoteToObject;
+  }
+
+  @override
+  Map<String, Emote> get _emoteToObject => emoteToObject;
+
+  @override
+  set _emoteToObject(Map<String, Emote> value) {
+    _$_emoteToObjectAtom.reportWrite(value, super._emoteToObject, () {
+      super._emoteToObject = value;
+    });
+  }
+
   final _$_userEmoteToObjectAtom =
       Atom(name: '_ChatAssetsStoreBase._userEmoteToObject');
 
-  ObservableMap<String, Emote> get userEmoteToObject {
+  Map<String, Emote> get userEmoteToObject {
     _$_userEmoteToObjectAtom.reportRead();
     return super._userEmoteToObject;
   }
 
   @override
-  ObservableMap<String, Emote> get _userEmoteToObject => userEmoteToObject;
+  Map<String, Emote> get _userEmoteToObject => userEmoteToObject;
 
   @override
-  set _userEmoteToObject(ObservableMap<String, Emote> value) {
+  set _userEmoteToObject(Map<String, Emote> value) {
     _$_userEmoteToObjectAtom.reportWrite(value, super._userEmoteToObject, () {
       super._userEmoteToObject = value;
+    });
+  }
+
+  final _$_twitchBadgesToObjectAtom =
+      Atom(name: '_ChatAssetsStoreBase._twitchBadgesToObject');
+
+  Map<String, BadgeInfoTwitch> get twitchBadgesToObject {
+    _$_twitchBadgesToObjectAtom.reportRead();
+    return super._twitchBadgesToObject;
+  }
+
+  @override
+  Map<String, BadgeInfoTwitch> get _twitchBadgesToObject =>
+      twitchBadgesToObject;
+
+  @override
+  set _twitchBadgesToObject(Map<String, BadgeInfoTwitch> value) {
+    _$_twitchBadgesToObjectAtom.reportWrite(value, super._twitchBadgesToObject,
+        () {
+      super._twitchBadgesToObject = value;
+    });
+  }
+
+  final _$_userToFFZBadgesAtom =
+      Atom(name: '_ChatAssetsStoreBase._userToFFZBadges');
+
+  Map<String, List<BadgeInfoFFZ>> get userToFFZBadges {
+    _$_userToFFZBadgesAtom.reportRead();
+    return super._userToFFZBadges;
+  }
+
+  @override
+  Map<String, List<BadgeInfoFFZ>> get _userToFFZBadges => userToFFZBadges;
+
+  @override
+  set _userToFFZBadges(Map<String, List<BadgeInfoFFZ>> value) {
+    _$_userToFFZBadgesAtom.reportWrite(value, super._userToFFZBadges, () {
+      super._userToFFZBadges = value;
+    });
+  }
+
+  final _$_userTo7TVBadgesAtom =
+      Atom(name: '_ChatAssetsStoreBase._userTo7TVBadges');
+
+  Map<String, List<BadgeInfo7TV>> get userTo7TVBadges {
+    _$_userTo7TVBadgesAtom.reportRead();
+    return super._userTo7TVBadges;
+  }
+
+  @override
+  Map<String, List<BadgeInfo7TV>> get _userTo7TVBadges => userTo7TVBadges;
+
+  @override
+  set _userTo7TVBadges(Map<String, List<BadgeInfo7TV>> value) {
+    _$_userTo7TVBadgesAtom.reportWrite(value, super._userTo7TVBadges, () {
+      super._userTo7TVBadges = value;
     });
   }
 
