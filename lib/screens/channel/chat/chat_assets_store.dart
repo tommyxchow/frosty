@@ -14,6 +14,9 @@ abstract class _ChatAssetsStoreBase with Store {
   /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
   final emoteToObject = ObservableMap<String, Emote>();
 
+  /// Contains any custom FFZ mod and vip badges for the channel.
+  RoomFFZ? ffzRoomInfo;
+
   @computed
   List<Emote> get bttvEmotes => emoteToObject.values.where((emote) => isBTTV(emote)).toList();
 
@@ -64,7 +67,6 @@ abstract class _ChatAssetsStoreBase with Store {
       // Async awaits are placed in a list so they are performed in parallel.
       final assets = [
         ...await FFZ.getEmotesGlobal(),
-        ...await FFZ.getEmotesChannel(id: channelInfo.id),
         ...await BTTV.getEmotesGlobal(),
         ...await BTTV.getEmotesChannel(id: channelInfo.id),
         ...await Twitch.getEmotesGlobal(headers: headers),
@@ -72,6 +74,12 @@ abstract class _ChatAssetsStoreBase with Store {
         ...await SevenTV.getEmotesGlobal(),
         ...await SevenTV.getEmotesChannel(user: channelInfo.login)
       ];
+
+      final ffzRoom = await FFZ.getRoomInfo(name: channelInfo.login);
+      if (ffzRoom != null) {
+        assets.addAll(ffzRoom.item2);
+        ffzRoomInfo = ffzRoom.item1;
+      }
 
       for (final emote in assets) {
         emoteToObject[emote.name] = emote;

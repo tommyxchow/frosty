@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
@@ -71,8 +72,9 @@ class IRCMessage {
   List<InlineSpan> generateSpan({
     required TextStyle? style,
     required Map<String, Emote> emoteToObject,
-    required Map<String, BadgeInfoTwitch> twitchBadges,
-    required Map<String, List<BadgeInfoFFZ>> ffzBadges,
+    required Map<String, BadgeInfoTwitch> twitchBadgeToObject,
+    required Map<String, List<BadgeInfoFFZ>> ffzUserToBadges,
+    RoomFFZ? ffzRoomInfo,
     bool hideMessage = false,
     bool zeroWidthEnabled = false,
     Timestamp timestamp = Timestamp.none,
@@ -104,14 +106,129 @@ class IRCMessage {
     }
 
     // Add any badges to the span.
+    // mod/bot/vip -> developer -> supporter -> twitch
+    var skipMod = false;
+    var skipVip = false;
 
-    // FFZ badges
-    var ignoreMod = false;
-    final ffzUserBadges = ffzBadges[user];
+    final twitchBadges = tags['badges']?.split(',');
+    final ffzUserBadges = ffzUserToBadges[tags['user-id']];
     if (ffzUserBadges != null) {
-      for (final ffzBadge in ffzUserBadges) {
-        if (ffzBadge.replaces != null) ignoreMod = true;
+      var skipBot = false;
 
+      var isMod = false;
+      var isVip = false;
+
+      BadgeInfoFFZ? botBadge;
+
+      if (twitchBadges != null) {
+        isMod = twitchBadges.contains('moderator/1');
+        isVip = twitchBadges.contains('vip/1');
+
+        botBadge = ffzUserBadges.firstWhereOrNull((element) => element.id == 2);
+      }
+
+      if (isVip) {
+        skipVip = true;
+        if (ffzRoomInfo != null && ffzRoomInfo.vipBadge != null) {
+          span.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Tooltip(
+                message: 'VIP',
+                preferBelow: false,
+                child: CachedNetworkImage(
+                  imageUrl: 'https:' + (ffzRoomInfo.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x),
+                  placeholder: (context, url) => const SizedBox(),
+                  fadeInDuration: const Duration(seconds: 0),
+                  height: 20,
+                ),
+              ),
+            ),
+          );
+          span.add(const TextSpan(text: ' '));
+        } else {
+          final defaultVipBadge = twitchBadgeToObject['vip/1'];
+          if (defaultVipBadge != null) {
+            span.add(
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Tooltip(
+                  message: 'VIP',
+                  preferBelow: false,
+                  child: CachedNetworkImage(
+                    imageUrl: defaultVipBadge.imageUrl4x,
+                    placeholder: (context, url) => const SizedBox(),
+                    fadeInDuration: const Duration(seconds: 0),
+                    height: 20,
+                  ),
+                ),
+              ),
+            );
+            span.add(const TextSpan(text: ' '));
+          }
+        }
+      }
+
+      if (isMod) {
+        skipMod = true;
+
+        // If moderator is a bot
+        if (botBadge != null) {
+          skipBot = true;
+          span.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Tooltip(
+                message: 'Moderator (Bot)',
+                preferBelow: false,
+                child: ColoredBox(
+                  color: const Color(0xFF00AD03),
+                  child: CachedNetworkImage(
+                    imageUrl: 'https:' + botBadge.urls.url4x,
+                    placeholder: (context, url) => const SizedBox(),
+                    fadeInDuration: const Duration(seconds: 0),
+                    height: 20,
+                  ),
+                ),
+              ),
+            ),
+          );
+          span.add(const TextSpan(text: ' '));
+        } else {
+          String? modBadgeUrl;
+
+          if (ffzRoomInfo != null && ffzRoomInfo.modUrls != null) {
+            modBadgeUrl = 'https:' + (ffzRoomInfo.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
+          } else {
+            modBadgeUrl = twitchBadgeToObject['moderator/1']?.imageUrl4x;
+          }
+
+          if (modBadgeUrl != null) {
+            span.add(
+              WidgetSpan(
+                alignment: PlaceholderAlignment.middle,
+                child: Tooltip(
+                  message: 'Moderator',
+                  preferBelow: false,
+                  child: ColoredBox(
+                    color: const Color(0xFF00AD03),
+                    child: CachedNetworkImage(
+                      imageUrl: modBadgeUrl,
+                      placeholder: (context, url) => const SizedBox(),
+                      fadeInDuration: const Duration(seconds: 0),
+                      height: 20,
+                    ),
+                  ),
+                ),
+              ),
+            );
+            span.add(const TextSpan(text: ' '));
+          }
+        }
+      }
+
+      for (final ffzBadge in ffzUserBadges) {
+        if (ffzBadge.id == 2 && skipBot) continue;
         span.add(
           WidgetSpan(
             alignment: PlaceholderAlignment.middle,
@@ -119,7 +236,7 @@ class IRCMessage {
               message: ffzBadge.title,
               preferBelow: false,
               child: ColoredBox(
-                color: ffzBadge.name == 'bot' ? HexColor.fromHex('#00AD03') : HexColor.fromHex(ffzBadge.color),
+                color: HexColor.fromHex(ffzBadge.color),
                 child: CachedNetworkImage(
                   imageUrl: 'https:' + ffzBadge.urls.url4x,
                   placeholder: (context, url) => const SizedBox(),
@@ -134,14 +251,45 @@ class IRCMessage {
       }
     }
 
-    // Twitch badges
-    final badges = tags['badges'];
-    if (badges != null) {
-      for (final badge in badges.split(',')) {
-        if (badge == 'moderator/1' && ignoreMod) continue;
-
-        final badgeInfo = twitchBadges[badge];
+    if (twitchBadges != null) {
+      for (final badge in twitchBadges) {
+        final badgeInfo = twitchBadgeToObject[badge];
         if (badgeInfo != null) {
+          var badgeUrl = badgeInfo.imageUrl4x;
+
+          if (badge == 'moderator/1') {
+            if (skipMod) continue;
+            if (ffzRoomInfo != null && ffzRoomInfo.modUrls != null) {
+              span.add(
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Tooltip(
+                    message: 'Moderator',
+                    preferBelow: false,
+                    child: ColoredBox(
+                      color: const Color(0xFF00AD03),
+                      child: CachedNetworkImage(
+                        imageUrl: 'https:' + (ffzRoomInfo.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x),
+                        placeholder: (context, url) => const SizedBox(),
+                        fadeInDuration: const Duration(seconds: 0),
+                        height: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+              span.add(const TextSpan(text: ' '));
+              continue;
+            }
+          }
+
+          if (badge == 'vip/1') {
+            if (skipVip) continue;
+            if (ffzRoomInfo != null && ffzRoomInfo.vipBadge != null) {
+              badgeUrl = 'https:' + (ffzRoomInfo.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
+            }
+          }
+
           span.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
@@ -149,7 +297,7 @@ class IRCMessage {
                 message: badgeInfo.title,
                 preferBelow: false,
                 child: CachedNetworkImage(
-                  imageUrl: badgeInfo.imageUrl4x,
+                  imageUrl: badgeUrl,
                   placeholder: (context, url) => const SizedBox(),
                   fadeInDuration: const Duration(seconds: 0),
                   height: 20,
