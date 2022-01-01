@@ -47,6 +47,7 @@ dependencies:
   flutter_mobx: ^2.0.0
   shared_preferences: ^2.0.8
   sentry_flutter: ^6.2.2
+  tuple: ^2.0.0
 
 dev_dependencies:
   flutter_test:
