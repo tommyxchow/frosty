@@ -43,6 +43,10 @@ abstract class _ChatAssetsStoreBase with Store {
   @readonly
   var _userTo7TVBadges = <String, List<BadgeInfo7TV>>{};
 
+  /// The map of usernames to their BTTV badge.
+  @readonly
+  var _userToBTTVBadges = <String, BadgeInfoBTTV>{};
+
   /// The current index of the emote menu stack.
   @observable
   var emoteMenuIndex = 0;
@@ -100,6 +104,9 @@ abstract class _ChatAssetsStoreBase with Store {
 
       final sevenTVBadges = await SevenTV.getBadges();
       if (sevenTVBadges != null) _userTo7TVBadges = sevenTVBadges;
+
+      final bttvBadges = await BTTV.getBadges();
+      if (bttvBadges != null) _userToBTTVBadges = bttvBadges;
     }
   }
 

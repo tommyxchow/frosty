@@ -91,3 +91,35 @@ class BadgeInfo7TV {
 
   factory BadgeInfo7TV.fromJson(Map<String, dynamic> json) => _$BadgeInfo7TVFromJson(json);
 }
+
+@JsonSerializable(createToJson: false)
+class BadgeInfoBTTV {
+  final String id;
+  final String name;
+  final String displayName;
+  final String providerId;
+  final BadgeDetailsBTTV badge;
+
+  BadgeInfoBTTV(
+    this.id,
+    this.name,
+    this.displayName,
+    this.providerId,
+    this.badge,
+  );
+
+  factory BadgeInfoBTTV.fromJson(Map<String, dynamic> json) => _$BadgeInfoBTTVFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class BadgeDetailsBTTV {
+  final String description;
+  final String svg;
+
+  BadgeDetailsBTTV(
+    this.description,
+    this.svg,
+  );
+
+  factory BadgeDetailsBTTV.fromJson(Map<String, dynamic> json) => _$BadgeDetailsBTTVFromJson(json);
+}

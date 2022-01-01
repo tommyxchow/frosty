@@ -43,3 +43,18 @@ BadgeInfo7TV _$BadgeInfo7TVFromJson(Map<String, dynamic> json) => BadgeInfo7TV(
           .toList(),
       (json['users'] as List<dynamic>).map((e) => e as String).toList(),
     );
+
+BadgeInfoBTTV _$BadgeInfoBTTVFromJson(Map<String, dynamic> json) =>
+    BadgeInfoBTTV(
+      json['id'] as String,
+      json['name'] as String,
+      json['displayName'] as String,
+      json['providerId'] as String,
+      BadgeDetailsBTTV.fromJson(json['badge'] as Map<String, dynamic>),
+    );
+
+BadgeDetailsBTTV _$BadgeDetailsBTTVFromJson(Map<String, dynamic> json) =>
+    BadgeDetailsBTTV(
+      json['description'] as String,
+      json['svg'] as String,
+    );

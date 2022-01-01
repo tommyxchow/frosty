@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:intl/intl.dart';
@@ -75,6 +76,7 @@ class IRCMessage {
     required Map<String, BadgeInfoTwitch> twitchBadgeToObject,
     required Map<String, List<BadgeInfoFFZ>> ffzUserToBadges,
     required Map<String, List<BadgeInfo7TV>> sevenTVUserToBadges,
+    required Map<String, BadgeInfoBTTV> bttvUserToBadge,
     RoomFFZ? ffzRoomInfo,
     bool hideMessage = false,
     bool zeroWidthEnabled = false,
@@ -291,6 +293,26 @@ class IRCMessage {
           span.add(const TextSpan(text: ' '));
         }
       }
+    }
+
+    // Add BTTV badges to span
+    final userBTTVBadge = bttvUserToBadge[tags['user-id']];
+    if (userBTTVBadge != null) {
+      span.add(
+        WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
+          child: Tooltip(
+            message: userBTTVBadge.badge.description,
+            preferBelow: false,
+            child: SvgPicture.network(
+              userBTTVBadge.badge.svg,
+              placeholderBuilder: (context) => const SizedBox(),
+              height: 20,
+            ),
+          ),
+        ),
+      );
+      span.add(const TextSpan(text: ' '));
     }
 
     // Add 7TV badges to end of badges span

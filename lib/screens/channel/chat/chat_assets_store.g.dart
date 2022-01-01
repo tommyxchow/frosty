@@ -123,6 +123,24 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
+  final _$_userToBTTVBadgesAtom =
+      Atom(name: '_ChatAssetsStoreBase._userToBTTVBadges');
+
+  Map<String, BadgeInfoBTTV> get userToBTTVBadges {
+    _$_userToBTTVBadgesAtom.reportRead();
+    return super._userToBTTVBadges;
+  }
+
+  @override
+  Map<String, BadgeInfoBTTV> get _userToBTTVBadges => userToBTTVBadges;
+
+  @override
+  set _userToBTTVBadges(Map<String, BadgeInfoBTTV> value) {
+    _$_userToBTTVBadgesAtom.reportWrite(value, super._userToBTTVBadges, () {
+      super._userToBTTVBadges = value;
+    });
+  }
+
   final _$emoteMenuIndexAtom =
       Atom(name: '_ChatAssetsStoreBase.emoteMenuIndex');
 
