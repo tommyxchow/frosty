@@ -54,24 +54,36 @@ EmoteBTTVChannel _$EmoteBTTVChannelFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
-UserFFZ _$UserFFZFromJson(Map<String, dynamic> json) => UserFFZ(
-      json['id'] as int,
-      json['name'] as String,
-      json['displayName'] as String,
+RoomFFZ _$RoomFFZFromJson(Map<String, dynamic> json) => RoomFFZ(
+      json['set'] as int,
+      json['moderator_badge'] as String?,
+      json['vip_badge'] == null
+          ? null
+          : ImagesFFZ.fromJson(json['vip_badge'] as Map<String, dynamic>),
+      json['mod_urls'] == null
+          ? null
+          : ImagesFFZ.fromJson(json['mod_urls'] as Map<String, dynamic>),
     );
 
 ImagesFFZ _$ImagesFFZFromJson(Map<String, dynamic> json) => ImagesFFZ(
-      json['1x'] as String,
-      json['2x'] as String?,
-      json['4x'] as String?,
+      json['1'] as String,
+      json['2'] as String?,
+      json['4'] as String?,
     );
 
 EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
       json['id'] as int,
-      UserFFZ.fromJson(json['user'] as Map<String, dynamic>),
-      json['code'] as String,
-      ImagesFFZ.fromJson(json['images'] as Map<String, dynamic>),
-      json['imageType'] as String,
+      json['name'] as String,
+      json['height'] as int,
+      json['width'] as int,
+      OwnerFFZ.fromJson(json['owner'] as Map<String, dynamic>),
+      ImagesFFZ.fromJson(json['urls'] as Map<String, dynamic>),
+    );
+
+OwnerFFZ _$OwnerFFZFromJson(Map<String, dynamic> json) => OwnerFFZ(
+      json['_id'] as int,
+      json['name'] as String,
+      json['display_name'] as String,
     );
 
 Role7TV _$Role7TVFromJson(Map<String, dynamic> json) => Role7TV(
