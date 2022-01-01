@@ -112,6 +112,9 @@ class IRCMessage {
 
     final twitchBadges = tags['badges']?.split(',');
     final ffzUserBadges = ffzUserToBadges[tags['user-id']];
+
+    // If there are FFZ badges for the user, parse them first.
+    // Bot and vip/mod badges come first, and bot badges replace mod badges.
     if (ffzUserBadges != null) {
       var skipBot = false;
 
@@ -127,9 +130,19 @@ class IRCMessage {
         botBadge = ffzUserBadges.firstWhereOrNull((element) => element.id == 2);
       }
 
+      // If there is a VIP badge, add it.
       if (isVip) {
+        // Mark vip badges for skip so that when parsing the Twitch badges later they won't appear twice.
         skipVip = true;
+
+        String? vipBadgeUrl;
         if (ffzRoomInfo != null && ffzRoomInfo.vipBadge != null) {
+          vipBadgeUrl = 'https:' + (ffzRoomInfo.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
+        } else {
+          vipBadgeUrl = twitchBadgeToObject['vip/1']?.imageUrl4x;
+        }
+
+        if (vipBadgeUrl != null) {
           span.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
@@ -137,7 +150,7 @@ class IRCMessage {
                 message: 'VIP',
                 preferBelow: false,
                 child: CachedNetworkImage(
-                  imageUrl: 'https:' + (ffzRoomInfo.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x),
+                  imageUrl: vipBadgeUrl,
                   placeholder: (context, url) => const SizedBox(),
                   fadeInDuration: const Duration(seconds: 0),
                   height: 20,
@@ -146,45 +159,37 @@ class IRCMessage {
             ),
           );
           span.add(const TextSpan(text: ' '));
-        } else {
-          final defaultVipBadge = twitchBadgeToObject['vip/1'];
-          if (defaultVipBadge != null) {
-            span.add(
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Tooltip(
-                  message: 'VIP',
-                  preferBelow: false,
-                  child: CachedNetworkImage(
-                    imageUrl: defaultVipBadge.imageUrl4x,
-                    placeholder: (context, url) => const SizedBox(),
-                    fadeInDuration: const Duration(seconds: 0),
-                    height: 20,
-                  ),
-                ),
-              ),
-            );
-            span.add(const TextSpan(text: ' '));
-          }
         }
       }
 
       if (isMod) {
         skipMod = true;
 
-        // If moderator is a bot
+        String? modBadgeUrl;
+
+        // If user is a mod but a bot, use the bot badge.
+        // Otherwise, use the channel's custom mod badge if it exists.
+        // Else, use the default Twitch mod badge if no custom badge exists.
         if (botBadge != null) {
           skipBot = true;
+          modBadgeUrl = 'https:' + botBadge.urls.url4x;
+        } else if (ffzRoomInfo != null && ffzRoomInfo.modUrls != null) {
+          modBadgeUrl = 'https:' + (ffzRoomInfo.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
+        } else {
+          modBadgeUrl = twitchBadgeToObject['moderator/1']?.imageUrl4x;
+        }
+
+        if (modBadgeUrl != null) {
           span.add(
             WidgetSpan(
               alignment: PlaceholderAlignment.middle,
               child: Tooltip(
-                message: 'Moderator (Bot)',
+                message: botBadge != null ? 'Moderator (Bot)' : 'Moderator',
                 preferBelow: false,
                 child: ColoredBox(
                   color: const Color(0xFF00AD03),
                   child: CachedNetworkImage(
-                    imageUrl: 'https:' + botBadge.urls.url4x,
+                    imageUrl: modBadgeUrl,
                     placeholder: (context, url) => const SizedBox(),
                     fadeInDuration: const Duration(seconds: 0),
                     height: 20,
@@ -194,40 +199,12 @@ class IRCMessage {
             ),
           );
           span.add(const TextSpan(text: ' '));
-        } else {
-          String? modBadgeUrl;
-
-          if (ffzRoomInfo != null && ffzRoomInfo.modUrls != null) {
-            modBadgeUrl = 'https:' + (ffzRoomInfo.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
-          } else {
-            modBadgeUrl = twitchBadgeToObject['moderator/1']?.imageUrl4x;
-          }
-
-          if (modBadgeUrl != null) {
-            span.add(
-              WidgetSpan(
-                alignment: PlaceholderAlignment.middle,
-                child: Tooltip(
-                  message: 'Moderator',
-                  preferBelow: false,
-                  child: ColoredBox(
-                    color: const Color(0xFF00AD03),
-                    child: CachedNetworkImage(
-                      imageUrl: modBadgeUrl,
-                      placeholder: (context, url) => const SizedBox(),
-                      fadeInDuration: const Duration(seconds: 0),
-                      height: 20,
-                    ),
-                  ),
-                ),
-              ),
-            );
-            span.add(const TextSpan(text: ' '));
-          }
         }
       }
 
+      // Add the rest of the FFZ badges that the user has.
       for (final ffzBadge in ffzUserBadges) {
+        // Skip the bot badge if already accounted for previously by the moderator+bot badge.
         if (ffzBadge.id == 2 && skipBot) continue;
         span.add(
           WidgetSpan(
@@ -251,13 +228,16 @@ class IRCMessage {
       }
     }
 
+    // Pasrse and add the Twitch badges to the span if they exist.
     if (twitchBadges != null) {
       for (final badge in twitchBadges) {
         final badgeInfo = twitchBadgeToObject[badge];
         if (badgeInfo != null) {
           var badgeUrl = badgeInfo.imageUrl4x;
 
-          if (badge == 'moderator/1') {
+          // Add custom FFZ mod badge if it exists
+          if (badgeInfo.title == 'Moderator') {
+            // If the mod badge was already accounted for in the earler FFZ badge check, skip.
             if (skipMod) continue;
             if (ffzRoomInfo != null && ffzRoomInfo.modUrls != null) {
               span.add(
@@ -283,7 +263,9 @@ class IRCMessage {
             }
           }
 
-          if (badge == 'vip/1') {
+          // Add custom FFZ vip badge if it exists
+          if (badgeInfo.title == 'VIP') {
+            // If the vip badge was already accounted for in the earler FFZ badge check, skip.
             if (skipVip) continue;
             if (ffzRoomInfo != null && ffzRoomInfo.vipBadge != null) {
               badgeUrl = 'https:' + (ffzRoomInfo.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
