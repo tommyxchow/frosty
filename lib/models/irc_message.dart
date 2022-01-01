@@ -318,6 +318,7 @@ class IRCMessage {
       final chatMessage = message;
       if (chatMessage != null) {
         final words = chatMessage.split(' ');
+        words.removeWhere((element) => element == '');
 
         if (zeroWidthEnabled) {
           final localSpan = <InlineSpan>[];
