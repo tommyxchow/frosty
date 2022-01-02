@@ -381,11 +381,11 @@ class IRCMessage {
               if (emote.zeroWidth && index != 0) {
                 final emoteStack = <Emote>[];
 
-                var nextEmote = emoteToObject[word];
+                Emote? nextEmote = emote;
                 while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
                   emoteStack.add(nextEmote);
                   index--;
-                  nextEmote = emoteToObject[words[index]];
+                  nextEmote = emoteToObject[words[index]] ?? localEmotes[words[index]];
                 }
 
                 if (nextEmote != null) emoteStack.add(nextEmote);
@@ -552,7 +552,7 @@ class IRCMessage {
     // Also remove any "INVALID/UNDEFINED" Unicode characters.
     // Rendering this character on iOS shows a question mark inside a square.
     // This character is used by some clients to bypass restrictions on repeating message.
-    var message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1).replaceAll('\u{E0000}', '').trim() : null;
+    var message = splitMessage.length > 3 ? splitMessage.sublist(3).map((word) => word.replaceAll('\u{E0000}', '').trim()).join(' ').substring(1) : null;
 
     // Check if IRC actions like "/me" were called.
     var action = false;
