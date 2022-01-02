@@ -11,49 +11,51 @@ class CategoryStreams extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: store.refresh,
-      child: Observer(
-        builder: (context) {
-          return CustomScrollView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            slivers: [
-              SliverAppBar(
-                stretch: true,
-                pinned: true,
-                expandedHeight: MediaQuery.of(context).size.height / 3,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: Text(
-                    store.categoryInfo.name,
-                    style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  background: Hero(
-                    tag: store.categoryInfo.id,
-                    child: CachedNetworkImage(
-                      imageUrl: store.categoryInfo.boxArtUrl.replaceFirst('-{width}x{height}', '-300x400'),
-                      color: const Color.fromRGBO(255, 255, 255, 0.5),
-                      colorBlendMode: BlendMode.modulate,
-                      fit: BoxFit.cover,
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: store.refresh,
+        child: Observer(
+          builder: (context) {
+            return CustomScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              slivers: [
+                SliverAppBar(
+                  stretch: true,
+                  pinned: true,
+                  expandedHeight: MediaQuery.of(context).size.height / 3,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(
+                      store.categoryInfo.name,
+                      style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    background: Hero(
+                      tag: store.categoryInfo.id,
+                      child: CachedNetworkImage(
+                        imageUrl: store.categoryInfo.boxArtUrl.replaceFirst('-{width}x{height}', '-300x400'),
+                        color: const Color.fromRGBO(255, 255, 255, 0.5),
+                        colorBlendMode: BlendMode.modulate,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    if (index > store.streams.length / 2 && store.hasMore) {
-                      store.getStreams();
-                    }
-                    return StreamCard(streamInfo: store.streams[index]);
-                  },
-                  childCount: store.streams.length,
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      if (index > store.streams.length / 2 && store.hasMore) {
+                        store.getStreams();
+                      }
+                      return StreamCard(streamInfo: store.streams[index]);
+                    },
+                    childCount: store.streams.length,
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
