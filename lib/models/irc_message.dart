@@ -82,6 +82,9 @@ class IRCMessage {
     bool zeroWidthEnabled = false,
     Timestamp timestamp = Timestamp.none,
   }) {
+    const badgeHeight = 20.0;
+    const emoteHeight = 30.0;
+
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
@@ -108,129 +111,11 @@ class IRCMessage {
       }
     }
 
-    // Add any badges to the span.
-    // mod/bot/vip -> developer -> supporter -> twitch
-    var skipMod = false;
-    var skipVip = false;
+    // Indicator to skip adding the bot badges later when adding the rest of FFZ badges.
+    var skipBot = false;
 
-    final twitchBadges = tags['badges']?.split(',');
     final ffzUserBadges = ffzUserToBadges[tags['user-id']];
-
-    // If there are FFZ badges for the user, parse them first.
-    // Bot and vip/mod badges come first, and bot badges replace mod badges.
-    if (ffzUserBadges != null) {
-      var skipBot = false;
-
-      var isMod = false;
-      var isVip = false;
-
-      BadgeInfoFFZ? botBadge;
-
-      if (twitchBadges != null) {
-        isMod = twitchBadges.contains('moderator/1');
-        isVip = twitchBadges.contains('vip/1');
-
-        botBadge = ffzUserBadges.firstWhereOrNull((element) => element.id == 2);
-      }
-
-      // If there is a VIP badge, add it.
-      if (isVip) {
-        // Mark vip badges for skip so that when parsing the Twitch badges later they won't appear twice.
-        skipVip = true;
-
-        String? vipBadgeUrl;
-        if (ffzRoomInfo != null && ffzRoomInfo.vipBadge != null) {
-          vipBadgeUrl = 'https:' + (ffzRoomInfo.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
-        } else {
-          vipBadgeUrl = twitchBadgeToObject['vip/1']?.imageUrl4x;
-        }
-
-        if (vipBadgeUrl != null) {
-          span.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: Tooltip(
-                message: 'VIP',
-                preferBelow: false,
-                child: CachedNetworkImage(
-                  imageUrl: vipBadgeUrl,
-                  placeholder: (context, url) => const SizedBox(),
-                  fadeInDuration: const Duration(seconds: 0),
-                  height: 20,
-                ),
-              ),
-            ),
-          );
-          span.add(const TextSpan(text: ' '));
-        }
-      }
-
-      if (isMod) {
-        skipMod = true;
-
-        String? modBadgeUrl;
-
-        // If user is a mod but a bot, use the bot badge.
-        // Otherwise, use the channel's custom mod badge if it exists.
-        // Else, use the default Twitch mod badge if no custom badge exists.
-        if (botBadge != null) {
-          skipBot = true;
-          modBadgeUrl = 'https:' + botBadge.urls.url4x;
-        } else if (ffzRoomInfo != null && ffzRoomInfo.modUrls != null) {
-          modBadgeUrl = 'https:' + (ffzRoomInfo.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
-        } else {
-          modBadgeUrl = twitchBadgeToObject['moderator/1']?.imageUrl4x;
-        }
-
-        if (modBadgeUrl != null) {
-          span.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: Tooltip(
-                message: botBadge != null ? 'Moderator (Bot)' : 'Moderator',
-                preferBelow: false,
-                child: ColoredBox(
-                  color: const Color(0xFF00AD03),
-                  child: CachedNetworkImage(
-                    imageUrl: modBadgeUrl,
-                    placeholder: (context, url) => const SizedBox(),
-                    fadeInDuration: const Duration(seconds: 0),
-                    height: 20,
-                  ),
-                ),
-              ),
-            ),
-          );
-          span.add(const TextSpan(text: ' '));
-        }
-      }
-
-      // Add the rest of the FFZ badges that the user has.
-      for (final ffzBadge in ffzUserBadges) {
-        // Skip the bot badge if already accounted for previously by the moderator+bot badge.
-        if (ffzBadge.id == 2 && skipBot) continue;
-        span.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Tooltip(
-              message: ffzBadge.title,
-              preferBelow: false,
-              child: ColoredBox(
-                color: HexColor.fromHex(ffzBadge.color),
-                child: CachedNetworkImage(
-                  imageUrl: 'https:' + ffzBadge.urls.url4x,
-                  placeholder: (context, url) => const SizedBox(),
-                  fadeInDuration: const Duration(seconds: 0),
-                  height: 20,
-                ),
-              ),
-            ),
-          ),
-        );
-        span.add(const TextSpan(text: ' '));
-      }
-    }
-
+    final twitchBadges = tags['badges']?.split(',');
     // Pasrse and add the Twitch badges to the span if they exist.
     if (twitchBadges != null) {
       for (final badge in twitchBadges) {
@@ -238,56 +123,43 @@ class IRCMessage {
         if (badgeInfo != null) {
           var badgeUrl = badgeInfo.imageUrl4x;
 
-          // Add custom FFZ mod badge if it exists
-          if (badgeInfo.title == 'Moderator') {
-            // If the mod badge was already accounted for in the earler FFZ badge check, skip.
-            if (skipMod) continue;
-            if (ffzRoomInfo != null && ffzRoomInfo.modUrls != null) {
-              span.add(
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: Tooltip(
-                    message: 'Moderator',
-                    preferBelow: false,
-                    child: ColoredBox(
-                      color: const Color(0xFF00AD03),
-                      child: CachedNetworkImage(
-                        imageUrl: 'https:' + (ffzRoomInfo.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x),
-                        placeholder: (context, url) => const SizedBox(),
-                        fadeInDuration: const Duration(seconds: 0),
-                        height: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-              span.add(const TextSpan(text: ' '));
-              continue;
+          // Add custom FFZ mod badge if it exists.
+          if (badgeInfo.title == 'Moderator' && (ffzUserBadges != null || ffzRoomInfo?.modUrls != null)) {
+            // Check if mod is bot.
+            final botBadge = ffzUserBadges?.firstWhereOrNull((element) => element.id == 2);
+
+            if (botBadge != null) {
+              badgeUrl = 'https:' + botBadge.urls.url4x;
+              skipBot = true;
             }
+
+            // Check if room has custom FFZ badges
+            if (ffzRoomInfo?.modUrls != null) {
+              badgeUrl = 'https:' + (ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
+            }
+
+            span.add(
+              _createEmoteSpan(
+                emoteUrl: badgeUrl,
+                tooltip: skipBot ? 'Moderator (Bot)' : 'Moderator',
+                height: badgeHeight,
+                backgroundColor: const Color(0xFF00AD03),
+              ),
+            );
+            span.add(const TextSpan(text: ' '));
+            continue;
           }
 
           // Add custom FFZ vip badge if it exists
-          if (badgeInfo.title == 'VIP') {
-            // If the vip badge was already accounted for in the earler FFZ badge check, skip.
-            if (skipVip) continue;
-            if (ffzRoomInfo != null && ffzRoomInfo.vipBadge != null) {
-              badgeUrl = 'https:' + (ffzRoomInfo.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
-            }
+          if (badgeInfo.title == 'VIP' && ffzRoomInfo?.vipBadge != null) {
+            badgeUrl = 'https:' + (ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
           }
 
           span.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: Tooltip(
-                message: badgeInfo.title,
-                preferBelow: false,
-                child: CachedNetworkImage(
-                  imageUrl: badgeUrl,
-                  placeholder: (context, url) => const SizedBox(),
-                  fadeInDuration: const Duration(seconds: 0),
-                  height: 20,
-                ),
-              ),
+            _createEmoteSpan(
+              emoteUrl: badgeUrl,
+              tooltip: badgeInfo.title,
+              height: badgeHeight,
             ),
           );
           span.add(const TextSpan(text: ' '));
@@ -295,21 +167,44 @@ class IRCMessage {
       }
     }
 
+    // Add FFZ badges to span
+    if (ffzUserBadges != null) {
+      for (final badge in ffzUserBadges) {
+        if (badge.id == 2) {
+          if (!skipBot) {
+            span.insert(
+              0,
+              _createEmoteSpan(
+                emoteUrl: 'https:' + badge.urls.url4x,
+                tooltip: badge.title,
+                height: badgeHeight,
+                backgroundColor: HexColor.fromHex(badge.color),
+              ),
+            );
+          }
+        } else {
+          span.add(
+            _createEmoteSpan(
+              emoteUrl: 'https:' + badge.urls.url4x,
+              tooltip: badge.title,
+              height: badgeHeight,
+              backgroundColor: HexColor.fromHex(badge.color),
+            ),
+          );
+        }
+        span.add(const TextSpan(text: ' '));
+      }
+    }
+
     // Add BTTV badges to span
     final userBTTVBadge = bttvUserToBadge[tags['user-id']];
     if (userBTTVBadge != null) {
       span.add(
-        WidgetSpan(
-          alignment: PlaceholderAlignment.middle,
-          child: Tooltip(
-            message: userBTTVBadge.badge.description,
-            preferBelow: false,
-            child: SvgPicture.network(
-              userBTTVBadge.badge.svg,
-              placeholderBuilder: (context) => const SizedBox(),
-              height: 20,
-            ),
-          ),
+        _createEmoteSpan(
+          emoteUrl: userBTTVBadge.badge.svg,
+          tooltip: userBTTVBadge.badge.description,
+          height: badgeHeight,
+          isSvg: true,
         ),
       );
       span.add(const TextSpan(text: ' '));
@@ -320,18 +215,10 @@ class IRCMessage {
     if (user7TVBadges != null) {
       for (final badge in user7TVBadges) {
         span.add(
-          WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: Tooltip(
-              message: badge.tooltip,
-              preferBelow: false,
-              child: CachedNetworkImage(
-                imageUrl: badge.urls[2][1],
-                placeholder: (context, url) => const SizedBox(),
-                fadeInDuration: const Duration(seconds: 0),
-                height: 20,
-              ),
-            ),
+          _createEmoteSpan(
+            emoteUrl: badge.urls[2][1],
+            tooltip: badge.tooltip,
+            height: badgeHeight,
           ),
         );
         span.add(const TextSpan(text: ' '));
@@ -351,9 +238,7 @@ class IRCMessage {
 
     // Add the colon separator between the username and their message to the span.
     if (!action) {
-      span.add(
-        const TextSpan(text: ':'),
-      );
+      span.add(const TextSpan(text: ':'));
     }
 
     // Italicize the text it was called with an IRC Action i.e., "/me".
@@ -396,11 +281,11 @@ class IRCMessage {
                           imageUrl: emote.url,
                           placeholder: (context, url) => const SizedBox(),
                           fadeInDuration: const Duration(seconds: 0),
-                          height: 30,
+                          height: emoteHeight,
                         ))
                     .toList();
 
-                // Regex from dart_emoji package
+                // Regex from dart_emoji package; used for emoji compatibility with zero-width
                 final regexEmoji = RegExp(
                   r'[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}'
                   r'\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}'
@@ -437,18 +322,10 @@ class IRCMessage {
                 }
               } else {
                 localSpan.add(
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: Tooltip(
-                      message: emote.name,
-                      preferBelow: false,
-                      child: CachedNetworkImage(
-                        imageUrl: emote.url,
-                        placeholder: (context, url) => const SizedBox(),
-                        fadeInDuration: const Duration(seconds: 0),
-                        height: 30,
-                      ),
-                    ),
+                  _createEmoteSpan(
+                    emoteUrl: emote.url,
+                    tooltip: emote.name,
+                    height: emoteHeight,
                   ),
                 );
               }
@@ -474,18 +351,10 @@ class IRCMessage {
               buffer.clear();
 
               span.add(
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: Tooltip(
-                    message: emote.name,
-                    preferBelow: false,
-                    child: CachedNetworkImage(
-                      imageUrl: emote.url,
-                      placeholder: (context, url) => const SizedBox(),
-                      fadeInDuration: const Duration(seconds: 0),
-                      height: 30,
-                    ),
-                  ),
+                _createEmoteSpan(
+                  emoteUrl: emote.url,
+                  tooltip: emote.name,
+                  height: emoteHeight,
                 ),
               );
             } else {
@@ -501,6 +370,49 @@ class IRCMessage {
     }
 
     return span;
+  }
+
+  WidgetSpan _createEmoteSpan({
+    required String emoteUrl,
+    required String tooltip,
+    required double height,
+    Color? backgroundColor,
+    bool? isSvg,
+  }) {
+    final Widget child;
+    if (backgroundColor != null) {
+      child = ColoredBox(
+        color: backgroundColor,
+        child: CachedNetworkImage(
+          imageUrl: emoteUrl,
+          placeholder: (context, url) => const SizedBox(),
+          fadeInDuration: const Duration(seconds: 0),
+          height: height,
+        ),
+      );
+    } else if (isSvg == true) {
+      child = SvgPicture.network(
+        emoteUrl,
+        placeholderBuilder: (context) => const SizedBox(),
+        height: height,
+      );
+    } else {
+      child = CachedNetworkImage(
+        imageUrl: emoteUrl,
+        placeholder: (context, url) => const SizedBox(),
+        fadeInDuration: const Duration(seconds: 0),
+        height: height,
+      );
+    }
+
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: Tooltip(
+        message: tooltip,
+        preferBelow: false,
+        child: child,
+      ),
+    );
   }
 
   /// Parses an IRC string and returns its corresponding [IRCMessage] object.
