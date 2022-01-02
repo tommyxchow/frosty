@@ -74,9 +74,9 @@ class IRCMessage {
     required TextStyle? style,
     required Map<String, Emote> emoteToObject,
     required Map<String, BadgeInfoTwitch> twitchBadgeToObject,
-    required Map<String, List<BadgeInfoFFZ>> ffzUserToBadges,
-    required Map<String, List<BadgeInfo7TV>> sevenTVUserToBadges,
-    required Map<String, BadgeInfoBTTV> bttvUserToBadge,
+    Map<String, List<BadgeInfoFFZ>>? ffzUserToBadges,
+    Map<String, List<BadgeInfo7TV>>? sevenTVUserToBadges,
+    Map<String, BadgeInfoBTTV>? bttvUserToBadge,
     RoomFFZ? ffzRoomInfo,
     bool hideMessage = false,
     bool zeroWidthEnabled = false,
@@ -114,7 +114,7 @@ class IRCMessage {
     // Indicator to skip adding the bot badges later when adding the rest of FFZ badges.
     var skipBot = false;
 
-    final ffzUserBadges = ffzUserToBadges[tags['user-id']];
+    final ffzUserBadges = ffzUserToBadges?[tags['user-id']];
     final twitchBadges = tags['badges']?.split(',');
     // Pasrse and add the Twitch badges to the span if they exist.
     if (twitchBadges != null) {
@@ -128,13 +128,11 @@ class IRCMessage {
             // Check if mod is bot.
             final botBadge = ffzUserBadges?.firstWhereOrNull((element) => element.id == 2);
 
+            // Check if user has bot badge or room has custom FFZ mod badges
             if (botBadge != null) {
               badgeUrl = 'https:' + botBadge.urls.url4x;
               skipBot = true;
-            }
-
-            // Check if room has custom FFZ badges
-            if (ffzRoomInfo?.modUrls != null) {
+            } else if (ffzRoomInfo?.modUrls != null) {
               badgeUrl = 'https:' + (ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
             }
 
@@ -181,6 +179,7 @@ class IRCMessage {
                 backgroundColor: HexColor.fromHex(badge.color),
               ),
             );
+            span.add(const TextSpan(text: ' '));
           }
         } else {
           span.add(
@@ -191,13 +190,13 @@ class IRCMessage {
               backgroundColor: HexColor.fromHex(badge.color),
             ),
           );
+          span.add(const TextSpan(text: ' '));
         }
-        span.add(const TextSpan(text: ' '));
       }
     }
 
     // Add BTTV badges to span
-    final userBTTVBadge = bttvUserToBadge[tags['user-id']];
+    final userBTTVBadge = bttvUserToBadge?[tags['user-id']];
     if (userBTTVBadge != null) {
       span.add(
         _createEmoteSpan(
@@ -211,7 +210,7 @@ class IRCMessage {
     }
 
     // Add 7TV badges to end of badges span
-    final user7TVBadges = sevenTVUserToBadges[tags['user-id']];
+    final user7TVBadges = sevenTVUserToBadges?[tags['user-id']];
     if (user7TVBadges != null) {
       for (final badge in user7TVBadges) {
         span.add(
