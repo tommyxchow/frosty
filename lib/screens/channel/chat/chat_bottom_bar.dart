@@ -16,9 +16,12 @@ class ChatBottomBar extends StatelessWidget {
           onPressed: () => showModalBottomSheet(
             isScrollControlled: true,
             context: context,
-            builder: (_) => ChatDetails(
-              chatDetails: chatStore.chatDetailsStore,
-              userLogin: chatStore.channelName,
+            builder: (_) => SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: ChatDetails(
+                chatDetails: chatStore.chatDetailsStore,
+                userLogin: chatStore.channelName,
+              ),
             ),
           ),
         ),

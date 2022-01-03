@@ -35,10 +35,11 @@ class EmoteMenuPanel extends StatelessWidget {
       slivers: [
         if (globalEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
-              child: SectionHeader(
-            'Global Emotes',
-            padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          )),
+            child: SectionHeader(
+              'Global Emotes',
+              padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+            ),
+          ),
           EmoteMenuSection(
             textController: textController,
             emotes: globalEmotes,

@@ -48,9 +48,13 @@ class VideoOverlay extends StatelessWidget {
                                   color: Color(0xFFFFFFFF),
                                 ),
                                 onPressed: () => showModalBottomSheet(
+                                  isScrollControlled: true,
                                   context: context,
                                   builder: (context) {
-                                    return Settings(settingsStore: videoStore.settingsStore);
+                                    return SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.8,
+                                      child: Settings(settingsStore: videoStore.settingsStore),
+                                    );
                                   },
                                 ),
                               ),
