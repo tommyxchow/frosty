@@ -12,16 +12,35 @@ mixin _$FollowedStreamsStore on _FollowedStreamsStoreBase, Store {
   final _$_followedStreamsAtom =
       Atom(name: '_FollowedStreamsStoreBase._followedStreams');
 
-  @override
-  ObservableList<StreamTwitch> get _followedStreams {
+  ObservableList<StreamTwitch> get followedStreams {
     _$_followedStreamsAtom.reportRead();
     return super._followedStreams;
   }
 
   @override
+  ObservableList<StreamTwitch> get _followedStreams => followedStreams;
+
+  @override
   set _followedStreams(ObservableList<StreamTwitch> value) {
     _$_followedStreamsAtom.reportWrite(value, super._followedStreams, () {
       super._followedStreams = value;
+    });
+  }
+
+  final _$_isLoadingAtom = Atom(name: '_FollowedStreamsStoreBase._isLoading');
+
+  bool get isLoading {
+    _$_isLoadingAtom.reportRead();
+    return super._isLoading;
+  }
+
+  @override
+  bool get _isLoading => isLoading;
+
+  @override
+  set _isLoading(bool value) {
+    _$_isLoadingAtom.reportWrite(value, super._isLoading, () {
+      super._isLoading = value;
     });
   }
 

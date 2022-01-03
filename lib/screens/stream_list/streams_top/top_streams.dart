@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/stream_list/stream_card.dart';
 import 'package:frosty/screens/stream_list/streams_top/top_streams_store.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 
 class TopStreams extends StatelessWidget {
   final TopStreamsStore store;
@@ -14,6 +15,9 @@ class TopStreams extends StatelessWidget {
       onRefresh: store.refresh,
       child: Observer(
         builder: (_) {
+          if (store.topStreams.isEmpty && store.isLoading) {
+            return const LoadingIndicator(subtitle: Text('Loading top streams...'));
+          }
           return ListView.builder(
             itemCount: store.topStreams.length,
             itemBuilder: (context, index) {

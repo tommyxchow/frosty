@@ -11,16 +11,35 @@ part of 'top_streams_store.dart';
 mixin _$TopStreamsStore on _TopStreamsStoreBase, Store {
   final _$_topStreamsAtom = Atom(name: '_TopStreamsStoreBase._topStreams');
 
-  @override
-  ObservableList<StreamTwitch> get _topStreams {
+  ObservableList<StreamTwitch> get topStreams {
     _$_topStreamsAtom.reportRead();
     return super._topStreams;
   }
 
   @override
+  ObservableList<StreamTwitch> get _topStreams => topStreams;
+
+  @override
   set _topStreams(ObservableList<StreamTwitch> value) {
     _$_topStreamsAtom.reportWrite(value, super._topStreams, () {
       super._topStreams = value;
+    });
+  }
+
+  final _$_isLoadingAtom = Atom(name: '_TopStreamsStoreBase._isLoading');
+
+  bool get isLoading {
+    _$_isLoadingAtom.reportRead();
+    return super._isLoading;
+  }
+
+  @override
+  bool get _isLoading => isLoading;
+
+  @override
+  set _isLoading(bool value) {
+    _$_isLoadingAtom.reportWrite(value, super._isLoading, () {
+      super._isLoading = value;
     });
   }
 

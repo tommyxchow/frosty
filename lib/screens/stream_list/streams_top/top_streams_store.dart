@@ -9,11 +9,11 @@ class TopStreamsStore = _TopStreamsStoreBase with _$TopStreamsStore;
 
 abstract class _TopStreamsStoreBase with Store {
   /// The list of the fetched top streams.
-  @observable
+  @readonly
   var _topStreams = ObservableList<StreamTwitch>();
-  ObservableList<StreamTwitch> get topStreams => _topStreams;
 
   /// The loading status for pagination.
+  @readonly
   bool _isLoading = false;
 
   /// The pagination cursor for top streams.
@@ -34,11 +34,14 @@ abstract class _TopStreamsStoreBase with Store {
   Future<void> getTopStreams() async {
     _isLoading = true;
 
-    final newTopStreams = await Twitch.getTopStreams(headers: authStore.headersTwitch, cursor: _topStreamsCurrentCursor);
+    final newTopStreams = await Twitch.getTopStreams(
+      headers: authStore.headersTwitch,
+      cursor: _topStreamsCurrentCursor,
+    );
 
     if (newTopStreams != null) {
       if (_topStreamsCurrentCursor == null) {
-        _topStreams = ObservableList.of(newTopStreams.data);
+        _topStreams = newTopStreams.data.asObservable();
       } else {
         _topStreams.addAll(newTopStreams.data);
       }

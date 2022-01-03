@@ -9,11 +9,11 @@ class FollowedStreamsStore = _FollowedStreamsStoreBase with _$FollowedStreamsSto
 
 abstract class _FollowedStreamsStoreBase with Store {
   /// The list of the fetched followed streams.
-  @observable
+  @readonly
   var _followedStreams = ObservableList<StreamTwitch>();
-  ObservableList<StreamTwitch> get followedStreams => _followedStreams;
 
   /// The loading status for pagination.
+  @readonly
   bool _isLoading = false;
 
   /// The pagination cursor for followed streams.
@@ -34,12 +34,15 @@ abstract class _FollowedStreamsStoreBase with Store {
   Future<void> getFollowedStreams() async {
     _isLoading = true;
 
-    final newFollowedStreams =
-        await Twitch.getFollowedStreams(id: authStore.user.details!.id, headers: authStore.headersTwitch, cursor: _followedStreamsCurrentCursor);
+    final newFollowedStreams = await Twitch.getFollowedStreams(
+      id: authStore.user.details!.id,
+      headers: authStore.headersTwitch,
+      cursor: _followedStreamsCurrentCursor,
+    );
 
     if (newFollowedStreams != null) {
       if (_followedStreamsCurrentCursor == null) {
-        _followedStreams = ObservableList.of(newFollowedStreams.data);
+        _followedStreams = newFollowedStreams.data.asObservable();
       } else {
         _followedStreams.addAll(newFollowedStreams.data);
       }
