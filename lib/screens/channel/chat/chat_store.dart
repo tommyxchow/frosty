@@ -141,7 +141,7 @@ abstract class _ChatStoreBase with Store {
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
       if (message.startsWith('@')) {
-        final parsedIRCMessage = IRCMessage.fromString(message);
+        final parsedIRCMessage = IRCMessage.fromString(message, username: auth.user.details?.login);
 
         // Filter messages from any blocked users if not a moderator or not the channel owner.
         if (!_userState.mod &&

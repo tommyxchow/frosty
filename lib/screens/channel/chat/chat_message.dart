@@ -27,24 +27,35 @@ class ChatMessage extends StatelessWidget {
           case Command.privateMessage:
           case Command.userState:
             // Render normal chat message (PRIVMSG).
-            return Padding(
-              padding: padding,
-              child: Text.rich(
-                TextSpan(
-                  children: ircMessage.generateSpan(
-                    style: DefaultTextStyle.of(context).style,
-                    emoteToObject: assetsStore.emoteToObject,
-                    twitchBadgeToObject: assetsStore.twitchBadgesToObject,
-                    ffzUserToBadges: assetsStore.userToFFZBadges,
-                    sevenTVUserToBadges: assetsStore.userTo7TVBadges,
-                    bttvUserToBadge: assetsStore.userToBTTVBadges,
-                    ffzRoomInfo: assetsStore.ffzRoomInfo,
-                    zeroWidthEnabled: settingsStore.zeroWidthEnabled,
-                    timestamp: timeStamps,
-                  ),
+            final span = Text.rich(
+              TextSpan(
+                children: ircMessage.generateSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  emoteToObject: assetsStore.emoteToObject,
+                  twitchBadgeToObject: assetsStore.twitchBadgesToObject,
+                  ffzUserToBadges: assetsStore.userToFFZBadges,
+                  sevenTVUserToBadges: assetsStore.userTo7TVBadges,
+                  bttvUserToBadge: assetsStore.userToBTTVBadges,
+                  ffzRoomInfo: assetsStore.ffzRoomInfo,
+                  zeroWidthEnabled: settingsStore.zeroWidthEnabled,
+                  timestamp: timeStamps,
                 ),
               ),
             );
+
+            if (ircMessage.mention) {
+              return Container(
+                padding: padding,
+                color: const Color(0x4DFF0000),
+                child: span,
+              );
+            } else {
+              return Padding(
+                padding: padding,
+                child: span,
+              );
+            }
+
           case Command.clearChat:
           case Command.clearMessage:
             // Render timeouts and bans
@@ -102,7 +113,7 @@ class ChatMessage extends StatelessWidget {
           case Command.userNotice:
             return Container(
               padding: padding,
-              color: const Color(0xFF673AB7).withOpacity(0.25),
+              color: const Color(0x339147FF),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

@@ -15,6 +15,7 @@ class IRCMessage {
   final Map<String, Emote> localEmotes;
   Command command;
   String? message;
+  bool mention;
 
   IRCMessage({
     required this.raw,
@@ -24,6 +25,7 @@ class IRCMessage {
     required this.user,
     required this.localEmotes,
     required this.message,
+    required this.mention,
   });
 
   /// Returns a list of messages where the gievn CLEARCHAT message is applied.
@@ -241,7 +243,7 @@ class IRCMessage {
     }
 
     // Italicize the text it was called with an IRC Action i.e., "/me".
-    final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : null;
+    final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;
 
     if (hideMessage) {
       span.add(const TextSpan(text: ' <message deleted>'));
@@ -317,7 +319,7 @@ class IRCMessage {
 
                 if (nextEmote == null && !nextWordIsEmoji) {
                   localSpan.add(const TextSpan(text: ' '));
-                  localSpan.add(TextSpan(text: words[index], style: textStyle));
+                  localSpan.add(_createTextSpan(text: words[index], style: textStyle));
                 }
               } else {
                 localSpan.add(
@@ -329,26 +331,18 @@ class IRCMessage {
                 );
               }
             } else {
-              localSpan.add(TextSpan(text: word, style: textStyle));
+              localSpan.add(_createTextSpan(text: word, style: textStyle));
             }
             localSpan.add(const TextSpan(text: ' '));
             index--;
           }
           span.addAll(localSpan.reversed);
         } else {
-          // Use a string buffer to minimize TextSpan widgets.
-          // Instead of one TextSpan widget per word, we can have one TextSpan widget across multiple.
-          final buffer = StringBuffer();
-
           for (final word in words) {
-            buffer.write(' ');
+            span.add(const TextSpan(text: ' '));
 
             final emote = emoteToObject[word] ?? localEmotes[word];
             if (emote != null) {
-              span.add(TextSpan(text: buffer.toString(), style: textStyle));
-
-              buffer.clear();
-
               span.add(
                 _createEmoteSpan(
                   emoteUrl: emote.url,
@@ -357,12 +351,8 @@ class IRCMessage {
                 ),
               );
             } else {
-              buffer.write(word);
+              span.add(_createTextSpan(text: word, style: textStyle));
             }
-          }
-
-          if (buffer.isNotEmpty) {
-            span.add(TextSpan(text: buffer.toString(), style: textStyle));
           }
         }
       }
@@ -414,8 +404,16 @@ class IRCMessage {
     );
   }
 
+  TextSpan _createTextSpan({required String text, TextStyle? style}) {
+    if (text.startsWith('@')) {
+      return TextSpan(text: text, style: style?.copyWith(fontWeight: FontWeight.bold));
+    } else {
+      return TextSpan(text: text, style: style);
+    }
+  }
+
   /// Parses an IRC string and returns its corresponding [IRCMessage] object.
-  factory IRCMessage.fromString(String whole) {
+  factory IRCMessage.fromString(String whole, {String? username}) {
     // We have three parts:
     // 1. The tags of the IRC message.
     // 2. The metadata (user, command, and channel).
@@ -471,6 +469,10 @@ class IRCMessage {
       action = true;
       message = message.substring(8, message.length - 1);
     }
+
+    // Check if the message mentions the logged-in user
+    var mention = false;
+    if (message != null && username != null) mention = message.toLowerCase().contains(username);
 
     // Now process any Twitch emotes contained in the message tags.
     // The map containing emotes from the user's tags to their URL.
@@ -555,6 +557,7 @@ class IRCMessage {
       localEmotes: localEmotes,
       user: user,
       message: message,
+      mention: mention,
     );
   }
 
@@ -566,6 +569,7 @@ class IRCMessage {
         command: Command.notice,
         user: null,
         message: message,
+        mention: false,
       );
 }
 
