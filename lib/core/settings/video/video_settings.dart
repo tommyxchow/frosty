@@ -15,14 +15,16 @@ class VideoSettings extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionHeader('VIDEO'),
+            const SectionHeader('Video'),
             SwitchListTile.adaptive(
-              title: const Text('Video'),
+              title: const Text('Show video'),
               value: settingsStore.videoEnabled,
               onChanged: (newValue) => settingsStore.videoEnabled = newValue,
             ),
             SwitchListTile.adaptive(
-              title: const Text('Video overlay'),
+              isThreeLine: true,
+              title: const Text('Use custom video overlay'),
+              subtitle: const Text('Replaces the default web video overlay with a simple and mobile-friendly version.'),
               value: settingsStore.overlayEnabled,
               onChanged: settingsStore.videoEnabled ? (newValue) => settingsStore.overlayEnabled = newValue : null,
             ),

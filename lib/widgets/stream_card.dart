@@ -14,20 +14,16 @@ class StreamCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) {
-              return VideoChat(
-                title: streamInfo.title,
-                userName: streamInfo.userName,
-                userLogin: streamInfo.userLogin,
-              );
-            },
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => VideoChat(
+            title: streamInfo.title,
+            userName: streamInfo.userName,
+            userLogin: streamInfo.userLogin,
           ),
-        );
-      },
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
         child: Row(

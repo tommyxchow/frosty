@@ -15,9 +15,10 @@ class GeneralSettings extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionHeader('GENERAL'),
+            const SectionHeader('General'),
             SwitchListTile.adaptive(
-              title: const Text('OLED Theme'),
+              title: const Text('Use OLED theme'),
+              subtitle: const Text('An all-black theme for OLED screens.'),
               value: settingsStore.oledTheme,
               onChanged: (newValue) => settingsStore.oledTheme = newValue,
             ),

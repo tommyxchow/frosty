@@ -15,6 +15,8 @@ abstract class _UserStoreBase with Store {
   @readonly
   var _blockedUsers = ObservableList<UserBlockedTwitch>();
 
+  ReactionDisposer? disposeReaction;
+
   @action
   Future<void> init({required Map<String, String> headers}) async {
     // Get and update the current user's info.
@@ -22,11 +24,30 @@ abstract class _UserStoreBase with Store {
 
     // Get and update the current user's list of blocked users.
     if (_details?.id != null) _blockedUsers = (await Twitch.getUserBlockedList(id: _details!.id, headers: headers)).asObservable();
+
+    disposeReaction = autorun((_) => _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)));
   }
+
+  @action
+  Future<void> block({required String targetId, required Map<String, String> headers}) async {
+    final success = await Twitch.blockUser(userId: targetId, headers: headers);
+    if (success) await refreshBlockedUsers(headers: headers);
+  }
+
+  @action
+  Future<void> unblock({required String targetId, required Map<String, String> headers}) async {
+    final success = await Twitch.unblockUser(userId: targetId, headers: headers);
+    if (success) await refreshBlockedUsers(headers: headers);
+  }
+
+  @action
+  Future<void> refreshBlockedUsers({required Map<String, String> headers}) async =>
+      _blockedUsers = (await Twitch.getUserBlockedList(id: _details!.id, headers: headers)).asObservable();
 
   @action
   void dispose() {
     _details = null;
     _blockedUsers.clear();
+    if (disposeReaction != null) disposeReaction!();
   }
 }

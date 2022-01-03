@@ -34,6 +34,7 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var oledTheme = false;
 
+  @action
   Future<void> init() async {
     // Retrieve the instance that will allow us to store and persist settings.
     final prefs = await SharedPreferences.getInstance();

@@ -16,13 +16,11 @@ class SearchResultsChannels extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) {
-              return VideoChat(
-                title: channelInfo!.title,
-                userName: channelInfo.broadcasterName,
-                userLogin: channelInfo.broadcasterLogin,
-              );
-            },
+            builder: (_) => VideoChat(
+              title: channelInfo!.title,
+              userName: channelInfo.broadcasterName,
+              userLogin: channelInfo.broadcasterLogin,
+            ),
           ),
         );
       } catch (e) {
@@ -54,13 +52,11 @@ class SearchResultsChannels extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) {
-                  return VideoChat(
-                    title: channel.title,
-                    userName: channel.displayName,
-                    userLogin: channel.broadcasterLogin,
-                  );
-                },
+                builder: (_) => VideoChat(
+                  title: channel.title,
+                  userName: channel.displayName,
+                  userLogin: channel.broadcasterLogin,
+                ),
               ),
             ),
           ),

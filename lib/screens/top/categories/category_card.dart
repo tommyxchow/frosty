@@ -15,21 +15,17 @@ class CategoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) {
-              return CategoryStreams(
-                store: CategoryStreamsStore(
-                  categoryInfo: category,
-                  authStore: context.read<AuthStore>(),
-                ),
-              );
-            },
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CategoryStreams(
+            store: CategoryStreamsStore(
+              categoryInfo: category,
+              authStore: context.read<AuthStore>(),
+            ),
           ),
-        );
-      },
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
         child: Column(

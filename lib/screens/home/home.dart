@@ -63,16 +63,12 @@ class _HomeState extends State<Home> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return Settings(settingsStore: context.read<SettingsStore>());
-                  },
-                ),
-              );
-            },
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Settings(settingsStore: context.read<SettingsStore>()),
+              ),
+            ),
           )
         ],
       ),

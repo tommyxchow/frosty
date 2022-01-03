@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/settings/account_settings.dart';
-import 'package:frosty/core/settings/chat_settings.dart';
-import 'package:frosty/core/settings/general_settings.dart';
+import 'package:frosty/core/settings/account/account_settings.dart';
+import 'package:frosty/core/settings/chat/chat_settings.dart';
+import 'package:frosty/core/settings/general/general_settings.dart';
 import 'package:frosty/core/settings/settings_store.dart';
-import 'package:frosty/core/settings/video_settings.dart';
+import 'package:frosty/core/settings/video/video_settings.dart';
 import 'package:provider/provider.dart';
 
 class Settings extends StatelessWidget {
@@ -22,9 +22,9 @@ class Settings extends StatelessWidget {
         child: ListView(
           children: [
             AccountSettings(settingsStore: settingsStore, authStore: context.read<AuthStore>()),
+            GeneralSettings(settingsStore: settingsStore),
             VideoSettings(settingsStore: settingsStore),
             ChatSettings(settingsStore: settingsStore),
-            GeneralSettings(settingsStore: settingsStore),
           ],
         ),
       ),

@@ -15,24 +15,30 @@ class ChatSettings extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionHeader('CHAT'),
+            const SectionHeader('Chat'),
             SwitchListTile.adaptive(
-              title: const Text('Hide banned messages'),
+              isThreeLine: true,
+              title: const Text('Hide banned and deleted messages'),
+              subtitle: const Text('Replaces deleted, timed-out, and banned user messages with "<message deleted>".'),
               value: settingsStore.hideBannedMessages,
               onChanged: (newValue) => settingsStore.hideBannedMessages = newValue,
             ),
             SwitchListTile.adaptive(
+              isThreeLine: true,
               title: const Text('Zero-width emotes'),
+              subtitle: const Text('Enable the visibility of "stacked" emotes from BetterTTV and 7TV.'),
               value: settingsStore.zeroWidthEnabled,
               onChanged: (newValue) => settingsStore.zeroWidthEnabled = newValue,
             ),
             SwitchListTile.adaptive(
-              title: const Text('Timestamps'),
+              isThreeLine: true,
+              title: const Text('Show timestamps'),
+              subtitle: const Text('Display 24-hour timestamps for when a chat message was sent.'),
               value: settingsStore.timeStampsEnabled,
               onChanged: (newValue) => settingsStore.timeStampsEnabled = newValue,
             ),
             SwitchListTile.adaptive(
-              title: const Text('12-hour timestamps'),
+              title: const Text('Use 12-hour timestamps'),
               value: settingsStore.twelveHourTimeStamp,
               onChanged: settingsStore.timeStampsEnabled ? (newValue) => settingsStore.twelveHourTimeStamp = newValue : null,
             ),
