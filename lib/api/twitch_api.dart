@@ -390,4 +390,28 @@ class Twitch {
       debugPrint('Failed to get chatters');
     }
   }
+
+  // Blocks the user with the given ID and returns true on success or false on failure.
+  static Future<bool> blockUser({required String userId, required Map<String, String> headers}) async {
+    final uri = Uri.parse('https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
+
+    final response = await http.put(uri, headers: headers);
+    if (response.statusCode == 204) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // Unblocks the user with the given ID and returns true on success or false on failure.
+  static Future<bool> unblockUser({required String userId, required Map<String, String> headers}) async {
+    final uri = Uri.parse('https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
+
+    final response = await http.delete(uri, headers: headers);
+    if (response.statusCode == 204) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
