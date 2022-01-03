@@ -30,14 +30,11 @@ class CategoryStreams extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    background: Hero(
-                      tag: store.categoryInfo.id,
-                      child: CachedNetworkImage(
-                        imageUrl: store.categoryInfo.boxArtUrl.replaceFirst('-{width}x{height}', '-300x400'),
-                        color: const Color.fromRGBO(255, 255, 255, 0.5),
-                        colorBlendMode: BlendMode.modulate,
-                        fit: BoxFit.cover,
-                      ),
+                    background: CachedNetworkImage(
+                      imageUrl: store.categoryInfo.boxArtUrl.replaceRange(store.categoryInfo.boxArtUrl.lastIndexOf('-') + 1, null, '300x400.jpg'),
+                      color: const Color.fromRGBO(255, 255, 255, 0.5),
+                      colorBlendMode: BlendMode.modulate,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),

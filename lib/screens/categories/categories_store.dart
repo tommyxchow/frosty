@@ -10,7 +10,8 @@ class CategoriesStore = _CategoriesStoreBase with _$CategoriesStore;
 abstract class _CategoriesStoreBase with Store {
   final AuthStore authStore;
 
-  final categories = ObservableList<CategoryTwitch>();
+  @readonly
+  var _categories = ObservableList<CategoryTwitch>();
 
   String? _currentCursor;
 
@@ -28,7 +29,11 @@ abstract class _CategoriesStoreBase with Store {
 
     final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: _currentCursor);
     if (result != null) {
-      categories.addAll(result.data);
+      if (_currentCursor == null) {
+        _categories = result.data.asObservable();
+      } else {
+        _categories.addAll(result.data);
+      }
       _currentCursor = result.pagination['cursor'];
     }
 
@@ -39,6 +44,6 @@ abstract class _CategoriesStoreBase with Store {
   Future<void> refresh() async {
     _currentCursor = null;
 
-    getGames();
+    return getGames();
   }
 }

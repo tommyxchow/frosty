@@ -35,11 +35,8 @@ class CategoryCard extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Hero(
-                tag: category.id,
-                child: CachedNetworkImage(
-                  imageUrl: category.boxArtUrl.replaceFirst('-{width}x{height}', '-300x400'),
-                ),
+              child: CachedNetworkImage(
+                imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '300x400.jpg'),
               ),
             ),
             const SizedBox(height: 5.0),

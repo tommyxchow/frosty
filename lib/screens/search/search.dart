@@ -1,9 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/channel/video_chat.dart';
+import 'package:frosty/screens/search/search_results_categories.dart';
+import 'package:frosty/screens/search/search_results_channels.dart';
 import 'package:frosty/screens/search/search_store.dart';
-import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class Search extends StatefulWidget {
   final SearchStore searchStore;
@@ -15,29 +16,10 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  Future<void> _handleSearch(BuildContext context, String search) async {
-    try {
-      final channelInfo = await widget.searchStore.searchChannel(search);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) {
-            return VideoChat(
-              title: channelInfo!.title,
-              userName: channelInfo.broadcasterName,
-              userLogin: channelInfo.broadcasterLogin,
-            );
-          },
-        ),
-      );
-    } catch (e) {
-      const snackBar = SnackBar(content: Text('Failed to get channel info :('));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    const headerPadding = EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 10.0);
+
     final searchStore = widget.searchStore;
     return Column(
       children: [
@@ -48,7 +30,7 @@ class _SearchState extends State<Search> {
             autocorrect: false,
             decoration: InputDecoration(
               isDense: true,
-              hintText: 'Search for a channel',
+              hintText: 'Search for a channel or category',
               contentPadding: const EdgeInsets.all(10.0),
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -102,46 +84,24 @@ class _SearchState extends State<Search> {
                     );
                   }
 
-                  return ListView(
-                    children: [
-                      ...searchStore.searchResults.map(
-                        (channel) => ListTile(
-                          title: Text(channel.displayName),
-                          leading: ProfilePicture(userLogin: channel.broadcasterLogin),
-                          trailing: channel.isLive
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  child: Container(
-                                    color: const Color(0xFFF44336),
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: const Text(
-                                      'LIVE',
-                                      style: TextStyle(fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                )
-                              : null,
-                          subtitle:
-                              channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) {
-                                return VideoChat(
-                                  title: channel.title,
-                                  userName: channel.displayName,
-                                  userLogin: channel.broadcasterLogin,
-                                );
-                              },
-                            ),
-                          ),
+                  return CustomScrollView(
+                    slivers: [
+                      const SliverToBoxAdapter(
+                        child: SectionHeader(
+                          'Channels',
+                          padding: headerPadding,
                         ),
                       ),
-                      if (searchStore.textController.text.isNotEmpty)
-                        ListTile(
-                          title: Text('Go to ${searchStore.textController.text}'),
-                          onTap: () => _handleSearch(context, searchStore.textController.text),
-                        )
+                      SearchResultsChannels(searchStore: searchStore),
+                      if (searchStore.categorySearchResults.isNotEmpty) ...[
+                        const SliverToBoxAdapter(
+                          child: SectionHeader(
+                            'Categories',
+                            padding: headerPadding,
+                          ),
+                        ),
+                        SearchResultsCategories(categories: searchStore.categorySearchResults),
+                      ]
                     ],
                   );
                 },
