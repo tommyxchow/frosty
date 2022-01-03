@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/stream_list/stream_card.dart';
-import 'package:frosty/screens/stream_list/streams_top/top_streams_store.dart';
+import 'package:frosty/screens/top/streams/top_streams_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/stream_card.dart';
 
 class TopStreams extends StatelessWidget {
   final TopStreamsStore store;

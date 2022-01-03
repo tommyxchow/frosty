@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/settings_store.dart';
-import 'package:frosty/screens/categories/categories_store.dart';
+import 'package:frosty/screens/followed_streams/followed_streams_store.dart';
 import 'package:frosty/screens/home/home.dart';
-import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/search/search_store.dart';
-import 'package:frosty/screens/stream_list/streams_followed/followed_streams_store.dart';
-import 'package:frosty/screens/stream_list/streams_top/top_streams_store.dart';
+import 'package:frosty/screens/top/categories/categories_store.dart';
+import 'package:frosty/screens/top/streams/top_streams_store.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -86,7 +85,6 @@ class MyApp extends StatelessWidget {
           title: 'Frosty',
           theme: settingsStore.oledTheme ? oledTheme : defaultTheme,
           home: Home(
-            homeStore: HomeStore(),
             topStreamsStore: TopStreamsStore(authStore: authStore),
             followedStreamsStore: FollowedStreamsStore(authStore: authStore),
             categoriesStore: CategoriesStore(authStore: authStore),

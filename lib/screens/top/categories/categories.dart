@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/categories/categories_store.dart';
-import 'package:frosty/screens/categories/category_card.dart';
+import 'package:frosty/screens/top/categories/categories_store.dart';
+import 'package:frosty/screens/top/categories/category_card.dart';
 
 class Categories extends StatelessWidget {
   final CategoriesStore store;
