@@ -45,7 +45,7 @@ class _ChattersListState extends State<ChattersList> {
         'Global Moderators',
         'Moderators',
         'VIPs',
-        'Users',
+        'Viewers',
       ];
 
       final userTypes = [
@@ -70,7 +70,7 @@ class _ChattersListState extends State<ChattersList> {
                 onChanged: (value) => setState(() {}),
                 decoration: InputDecoration(
                   isDense: true,
-                  hintText: 'Filter users',
+                  hintText: 'Filter chatters',
                   contentPadding: const EdgeInsets.all(10.0),
                   suffixIcon: IconButton(
                     onPressed: () => setState(() => _textController.clear()),
@@ -100,7 +100,7 @@ class _ChattersListState extends State<ChattersList> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Users', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                                const Text('Chatters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                                 const SizedBox(height: 5.0),
                                 Text('${NumberFormat().format(widget.chatDetails.chatUsers?.chatterCount)} in chat'),
                               ],

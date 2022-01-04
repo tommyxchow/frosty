@@ -50,10 +50,12 @@ class ProfileCard extends StatelessWidget {
               ),
             );
           }
-          return Container(
-            padding: const EdgeInsets.all(10.0),
-            width: double.infinity,
-            child: OutlinedButton(
+          return ListTile(
+            isThreeLine: true,
+            leading: const Icon(Icons.account_circle_outlined),
+            title: const Text('Anonymous User'),
+            subtitle: const Text('Log in with your Twitch account to view your followed streams, send chat messages, and more.'),
+            trailing: OutlinedButton(
               onPressed: authStore.login,
               child: const Text('Log In'),
             ),

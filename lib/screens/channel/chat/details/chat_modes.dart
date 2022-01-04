@@ -13,7 +13,7 @@ class ChatModes extends StatelessWidget {
       children: [
         Tooltip(
           preferBelow: false,
-          message: 'Emote-Only: ${roomState.emoteOnly != '0' ? 'Enabled' : 'Disabled'}',
+          message: 'Emote-Only Mode: ${roomState.emoteOnly != '0' ? 'On' : 'Off'}',
           child: Icon(
             Icons.emoji_emotions_outlined,
             color: roomState.emoteOnly != '0' ? Colors.yellow : Colors.grey,
@@ -22,12 +22,12 @@ class ChatModes extends StatelessWidget {
         Tooltip(
           preferBelow: false,
           message: roomState.followersOnly == '-1'
-              ? 'Followers-only disabled.'
+              ? 'Followers-Only Mode: Off'
               : roomState.followersOnly == '0'
-                  ? 'Only followed users can chat.'
+                  ? 'Followers-Only Mode: On'
                   : roomState.followersOnly == '1'
-                      ? 'Only users followed for at least ${roomState.followersOnly} minute can chat.'
-                      : 'Only users followed for at least ${roomState.followersOnly} minutes can chat.',
+                      ? 'Followers-Only Mode: On, ${roomState.followersOnly} minute'
+                      : 'Followers-Only Mode: On, ${roomState.followersOnly} minutes',
           child: Icon(
             Icons.favorite,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
@@ -35,7 +35,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
-          message: 'Unique Chat Messages: ${roomState.r9k != '0' ? 'Enabled' : 'Disabled'}',
+          message: 'R9K Mode: ${roomState.r9k != '0' ? 'On' : 'Off'}',
           child: Text(
             'R9K',
             style: TextStyle(color: roomState.r9k != '0' ? Colors.purple : Colors.grey),
@@ -43,7 +43,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
-          message: 'Slow: ${roomState.slowMode == '0' ? 'Disabled' : '${roomState.slowMode} seconds'}',
+          message: 'Slow Mode: ${roomState.slowMode != '0' ? 'On, ${roomState.slowMode} seconds' : 'Off'}',
           child: Icon(
             Icons.history_toggle_off,
             color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,
@@ -51,7 +51,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
-          message: 'Subs-Only: ${roomState.subMode != '0' ? 'Enabled' : 'Disabled'}',
+          message: 'Subs-Only Mode: ${roomState.subMode != '0' ? 'On' : 'Off'}',
           child: Icon(
             Icons.attach_money,
             color: roomState.subMode != '0' ? Colors.green : Colors.grey,

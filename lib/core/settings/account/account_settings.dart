@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/core/settings/account/blocked_users.dart';
-import 'package:frosty/core/settings/profile_card.dart';
+import 'package:frosty/core/settings/account/profile_card.dart';
 import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
 
@@ -22,18 +22,19 @@ class AccountSettings extends StatelessWidget {
       children: [
         const SectionHeader('Account'),
         ProfileCard(authStore: authStore),
-        ListTile(
-          title: const Text('Blocked Users'),
-          trailing: Icon(Icons.adaptive.arrow_forward),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlockedUsers(
-                authStore: authStore,
+        if (authStore.isLoggedIn)
+          ListTile(
+            title: const Text('Blocked Users'),
+            trailing: Icon(Icons.adaptive.arrow_forward),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlockedUsers(
+                  authStore: authStore,
+                ),
               ),
             ),
-          ),
-        )
+          )
         // Add prompt explaining what this does before proceeding.
         // Center(
         //   child: ElevatedButton(
