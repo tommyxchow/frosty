@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/screens/top/categories/categories.dart';
-import 'package:frosty/screens/top/categories/categories_store.dart';
-import 'package:frosty/screens/top/streams/top_streams.dart';
-import 'package:frosty/screens/top/streams/top_streams_store.dart';
+import 'package:frosty/screens/home/stores/list_store.dart';
+import 'package:frosty/screens/home/streams_list.dart';
+import 'package:frosty/screens/home/top/categories/categories.dart';
 
 class TopSection extends StatelessWidget {
-  final TopStreamsStore topStreamsStore;
-  final CategoriesStore categoriesStore;
+  final ListStore topStreamsStore;
+  final ListStore categoriesStore;
 
   const TopSection({
     Key? key,
@@ -29,7 +28,7 @@ class TopSection extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
-                TopStreams(store: topStreamsStore),
+                StreamsList(store: topStreamsStore),
                 Categories(store: categoriesStore),
               ],
             ),

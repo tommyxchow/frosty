@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
-import 'package:frosty/screens/search/search_store.dart';
+import 'package:frosty/screens/home/search/stores/search_store.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 
 class SearchResultsChannels extends StatelessWidget {

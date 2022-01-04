@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/models/irc_message.dart';
 import 'package:frosty/screens/channel/chat/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -140,6 +140,7 @@ abstract class _ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
+      debugPrint(message);
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message, username: auth.user.details?.login);
 

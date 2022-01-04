@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/core/settings/settings_store.dart';
-import 'package:frosty/screens/top/streams/top_streams_store.dart';
+import 'package:frosty/screens/home/stores/list_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/stream_card.dart';
 import 'package:provider/provider.dart';
 
-class TopStreams extends StatelessWidget {
-  final TopStreamsStore store;
+class StreamsList extends StatelessWidget {
+  final ListStore store;
 
-  const TopStreams({Key? key, required this.store}) : super(key: key);
+  const StreamsList({Key? key, required this.store}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,18 +17,18 @@ class TopStreams extends StatelessWidget {
       onRefresh: store.refresh,
       child: Observer(
         builder: (_) {
-          if (store.topStreams.isEmpty && store.isLoading) {
-            return const LoadingIndicator(subtitle: Text('Loading top streams...'));
+          if (store.streams.isEmpty && store.isLoading) {
+            return const LoadingIndicator(subtitle: Text('Loading streams...'));
           }
           return ListView.builder(
-            itemCount: store.topStreams.length,
+            itemCount: store.streams.length,
             itemBuilder: (context, index) {
-              if (index > store.topStreams.length / 2 && store.hasMore) {
-                store.getTopStreams();
+              if (index > store.streams.length / 2 && store.hasMore) {
+                store.getData();
               }
               return Observer(
                 builder: (context) => StreamCard(
-                  streamInfo: store.topStreams[index],
+                  streamInfo: store.streams[index],
                   showUptime: context.read<SettingsStore>().showThumbnailUptime,
                 ),
               );

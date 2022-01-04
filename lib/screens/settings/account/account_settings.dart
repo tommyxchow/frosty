@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/settings/account/blocked_users.dart';
-import 'package:frosty/core/settings/account/profile_card.dart';
-import 'package:frosty/core/settings/settings_store.dart';
+import 'package:frosty/screens/settings/account/blocked_users.dart';
+import 'package:frosty/screens/settings/account/profile_card.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class AccountSettings extends StatelessWidget {
@@ -20,7 +20,10 @@ class AccountSettings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Account'),
+        const SectionHeader(
+          'Account',
+          padding: EdgeInsets.all(10.0),
+        ),
         ProfileCard(authStore: authStore),
         if (authStore.isLoggedIn)
           ListTile(

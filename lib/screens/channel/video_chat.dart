@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/settings/settings.dart';
-import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 class VideoChat extends StatelessWidget {

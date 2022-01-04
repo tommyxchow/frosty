@@ -73,7 +73,10 @@ class _ChattersListState extends State<ChattersList> {
                   hintText: 'Filter chatters',
                   contentPadding: const EdgeInsets.all(10.0),
                   suffixIcon: IconButton(
-                    onPressed: () => setState(() => _textController.clear()),
+                    onPressed: () => setState(() {
+                      _textController.clear();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    }),
                     icon: const Icon(Icons.clear),
                   ),
                   border: const OutlineInputBorder(

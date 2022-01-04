@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/settings/settings.dart';
-import 'package:frosty/core/settings/settings_store.dart';
-import 'package:frosty/screens/followed_streams/followed_streams.dart';
-import 'package:frosty/screens/followed_streams/followed_streams_store.dart';
-import 'package:frosty/screens/search/search.dart';
-import 'package:frosty/screens/search/search_store.dart';
-import 'package:frosty/screens/top/categories/categories_store.dart';
-import 'package:frosty/screens/top/streams/top_streams_store.dart';
-import 'package:frosty/screens/top/top_section.dart';
+import 'package:frosty/screens/home/search/search.dart';
+import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/list_store.dart';
+import 'package:frosty/screens/home/streams_list.dart';
+import 'package:frosty/screens/home/top/top_section.dart';
+import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
-  final TopStreamsStore topStreamsStore;
-  final FollowedStreamsStore followedStreamsStore;
-  final CategoriesStore categoriesStore;
+  final ListStore topStreamsStore;
+  final ListStore categoriesStore;
   final SearchStore searchStore;
+  final ListStore? followedStreamsStore;
 
   const Home({
     Key? key,
     required this.topStreamsStore,
-    required this.followedStreamsStore,
     required this.categoriesStore,
     required this.searchStore,
+    required this.followedStreamsStore,
   }) : super(key: key);
 
   @override
@@ -78,8 +76,11 @@ class _HomeState extends State<Home> {
             return IndexedStack(
               index: _selectedIndex,
               children: [
-                if (authStore.isLoggedIn) FollowedStreams(store: widget.followedStreamsStore),
-                TopSection(topStreamsStore: widget.topStreamsStore, categoriesStore: widget.categoriesStore),
+                if (authStore.isLoggedIn) StreamsList(store: widget.followedStreamsStore!),
+                TopSection(
+                  topStreamsStore: widget.topStreamsStore,
+                  categoriesStore: widget.categoriesStore,
+                ),
                 Search(searchStore: widget.searchStore),
               ],
             );

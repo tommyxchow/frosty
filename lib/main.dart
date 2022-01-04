@@ -4,12 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/settings/settings_store.dart';
-import 'package:frosty/screens/followed_streams/followed_streams_store.dart';
 import 'package:frosty/screens/home/home.dart';
-import 'package:frosty/screens/search/search_store.dart';
-import 'package:frosty/screens/top/categories/categories_store.dart';
-import 'package:frosty/screens/top/streams/top_streams_store.dart';
+import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/list_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -94,9 +92,20 @@ class MyApp extends StatelessWidget {
           title: 'Frosty',
           theme: settingsStore.useOledTheme ? oledTheme : defaultTheme,
           home: Home(
-            topStreamsStore: TopStreamsStore(authStore: authStore),
-            followedStreamsStore: FollowedStreamsStore(authStore: authStore),
-            categoriesStore: CategoriesStore(authStore: authStore),
+            topStreamsStore: ListStore(
+              authStore: authStore,
+              listType: StreamListType.top,
+            ),
+            categoriesStore: ListStore(
+              authStore: authStore,
+              listType: StreamListType.categories,
+            ),
+            followedStreamsStore: authStore.isLoggedIn
+                ? ListStore(
+                    authStore: authStore,
+                    listType: StreamListType.followed,
+                  )
+                : null,
             searchStore: SearchStore(authStore: authStore),
           ),
         );

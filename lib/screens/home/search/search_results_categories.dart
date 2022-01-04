@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/category.dart';
-import 'package:frosty/screens/top/categories/category_card.dart';
+import 'package:frosty/screens/home/top/categories/category_card.dart';
 
 class SearchResultsCategories extends StatelessWidget {
   final List<CategoryTwitch> categories;
