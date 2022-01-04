@@ -17,8 +17,8 @@ class ChatMessage extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final timeStamps = settingsStore.timeStampsEnabled
-            ? settingsStore.twelveHourTimeStamp
+        final timeStamps = settingsStore.showTimestamps
+            ? settingsStore.useTwelveHourTimestamps
                 ? Timestamp.twelve
                 : Timestamp.twentyFour
             : Timestamp.none;
@@ -37,7 +37,7 @@ class ChatMessage extends StatelessWidget {
                   sevenTVUserToBadges: assetsStore.userTo7TVBadges,
                   bttvUserToBadge: assetsStore.userToBTTVBadges,
                   ffzRoomInfo: assetsStore.ffzRoomInfo,
-                  zeroWidthEnabled: settingsStore.zeroWidthEnabled,
+                  zeroWidthEnabled: settingsStore.showZeroWidth,
                   timestamp: timeStamps,
                 ),
               ),
@@ -78,7 +78,7 @@ class ChatMessage extends StatelessWidget {
                           bttvUserToBadge: assetsStore.userToBTTVBadges,
                           ffzRoomInfo: assetsStore.ffzRoomInfo,
                           hideMessage: settingsStore.hideBannedMessages,
-                          zeroWidthEnabled: settingsStore.zeroWidthEnabled,
+                          zeroWidthEnabled: settingsStore.showZeroWidth,
                           timestamp: timeStamps,
                         ),
                       ),
@@ -130,7 +130,7 @@ class ChatMessage extends StatelessWidget {
                           sevenTVUserToBadges: assetsStore.userTo7TVBadges,
                           bttvUserToBadge: assetsStore.userToBTTVBadges,
                           ffzRoomInfo: assetsStore.ffzRoomInfo,
-                          zeroWidthEnabled: settingsStore.zeroWidthEnabled,
+                          zeroWidthEnabled: settingsStore.showZeroWidth,
                           timestamp: timeStamps,
                         ),
                       ),

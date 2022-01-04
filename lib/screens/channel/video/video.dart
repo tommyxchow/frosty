@@ -20,7 +20,7 @@ class Video extends StatelessWidget {
       aspectRatio: 16 / 9,
       child: Observer(
         builder: (context) {
-          if (videoStore.settingsStore.overlayEnabled) {
+          if (videoStore.settingsStore.showOverlay) {
             return Stack(
               children: [
                 WebView(

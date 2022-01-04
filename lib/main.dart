@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,17 +10,27 @@ import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/search/search_store.dart';
 import 'package:frosty/screens/top/categories/categories_store.dart';
 import 'package:frosty/screens/top/streams/top_streams_store.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Create and initialize the authenticatino store
   final authStore = AuthStore();
-  final settingsStore = SettingsStore();
-
   await authStore.init();
-  await settingsStore.init();
+
+  // Get the shared pereferences instance and obtain the existing user settings if it exists.
+  final preferences = await SharedPreferences.getInstance();
+  final userSettings = preferences.getString('settings');
+
+  // Initialize a settings store from existing settings. If existing settings don't exist create a new one.
+  final settingsStore = userSettings != null ? SettingsStore.fromJson(jsonDecode(userSettings)) : SettingsStore();
+
+  // Create a MobX reaction that will save the settings on disk everytime they are changed.
+  autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
 
   await SentryFlutter.init(
     (options) {
@@ -74,16 +85,14 @@ class MyApp extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Colors.black,
-      ),
+      canvasColor: Colors.black,
     );
 
     return Observer(
       builder: (context) {
         return MaterialApp(
           title: 'Frosty',
-          theme: settingsStore.oledTheme ? oledTheme : defaultTheme,
+          theme: settingsStore.useOledTheme ? oledTheme : defaultTheme,
           home: Home(
             topStreamsStore: TopStreamsStore(authStore: authStore),
             followedStreamsStore: FollowedStreamsStore(authStore: authStore),

@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/screens/top/categories/category_streams_list/category_streams_store.dart';
 import 'package:frosty/widgets/stream_card.dart';
+import 'package:provider/provider.dart';
 
 class CategoryStreams extends StatelessWidget {
   final CategoryStreamsStore store;
@@ -44,7 +46,12 @@ class CategoryStreams extends StatelessWidget {
                       if (index > store.streams.length / 2 && store.hasMore) {
                         store.getStreams();
                       }
-                      return StreamCard(streamInfo: store.streams[index]);
+                      return Observer(
+                        builder: (context) => StreamCard(
+                          streamInfo: store.streams[index],
+                          showUptime: context.read<SettingsStore>().showThumbnailUptime,
+                        ),
+                      );
                     },
                     childCount: store.streams.length,
                   ),

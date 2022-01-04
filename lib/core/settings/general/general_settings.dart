@@ -19,8 +19,13 @@ class GeneralSettings extends StatelessWidget {
             SwitchListTile.adaptive(
               title: const Text('Use OLED theme'),
               subtitle: const Text('An all-black theme for OLED screens.'),
-              value: settingsStore.oledTheme,
-              onChanged: (newValue) => settingsStore.oledTheme = newValue,
+              value: settingsStore.useOledTheme,
+              onChanged: (newValue) => settingsStore.useOledTheme = newValue,
+            ),
+            SwitchListTile.adaptive(
+              title: const Text('Show stream uptime on thumbnails'),
+              value: settingsStore.showThumbnailUptime,
+              onChanged: (newValue) => settingsStore.showThumbnailUptime = newValue,
             ),
           ],
         );

@@ -72,7 +72,7 @@ class VideoChat extends StatelessWidget {
             return Observer(
               builder: (_) => SafeArea(
                 bottom: settingsStore.fullScreen ? false : true,
-                child: settingsStore.videoEnabled
+                child: settingsStore.showVideo
                     ? settingsStore.fullScreen
                         ? WillPopScope(
                             onWillPop: () async => false,
@@ -116,7 +116,7 @@ class VideoChat extends StatelessWidget {
               children: [
                 Observer(
                   builder: (_) {
-                    if (settingsStore.videoEnabled) {
+                    if (settingsStore.showVideo) {
                       return video;
                     }
                     return appBar;

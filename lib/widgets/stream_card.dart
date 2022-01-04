@@ -8,11 +8,21 @@ import 'package:intl/intl.dart';
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
   final StreamTwitch streamInfo;
+  final bool showUptime;
 
-  const StreamCard({Key? key, required this.streamInfo}) : super(key: key);
+  const StreamCard({
+    Key? key,
+    required this.streamInfo,
+    required this.showUptime,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final thumbnail = CachedNetworkImage(
+      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
+      useOldImageOnUrlChange: true,
+    );
+
     return InkWell(
       onTap: () => Navigator.push(
         context,
@@ -30,23 +40,22 @@ class StreamCard extends StatelessWidget {
           children: [
             Flexible(
               flex: 1,
-              child: Stack(
-                alignment: AlignmentDirectional.bottomEnd,
-                children: [
-                  CachedNetworkImage(
-                    imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
-                    useOldImageOnUrlChange: true,
-                  ),
-                  Container(
-                    color: const Color.fromRGBO(0, 0, 0, 0.5),
-                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                    child: Text(
-                      DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
-                      style: const TextStyle(fontSize: 12, color: Color(0xFFFFFFFF)),
-                    ),
-                  )
-                ],
-              ),
+              child: showUptime
+                  ? Stack(
+                      alignment: AlignmentDirectional.bottomEnd,
+                      children: [
+                        thumbnail,
+                        Container(
+                          color: const Color.fromRGBO(0, 0, 0, 0.5),
+                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                          child: Text(
+                            DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
+                            style: const TextStyle(fontSize: 12, color: Color(0xFFFFFFFF)),
+                          ),
+                        )
+                      ],
+                    )
+                  : thumbnail,
             ),
             Flexible(
               flex: 2,

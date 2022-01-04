@@ -18,15 +18,15 @@ class VideoSettings extends StatelessWidget {
             const SectionHeader('Video'),
             SwitchListTile.adaptive(
               title: const Text('Show video'),
-              value: settingsStore.videoEnabled,
-              onChanged: (newValue) => settingsStore.videoEnabled = newValue,
+              value: settingsStore.showVideo,
+              onChanged: (newValue) => settingsStore.showVideo = newValue,
             ),
             SwitchListTile.adaptive(
               isThreeLine: true,
               title: const Text('Use custom video overlay'),
               subtitle: const Text('Replaces the default web video overlay with a simple and mobile-friendly version.'),
-              value: settingsStore.overlayEnabled,
-              onChanged: settingsStore.videoEnabled ? (newValue) => settingsStore.overlayEnabled = newValue : null,
+              value: settingsStore.showOverlay,
+              onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
             ),
           ],
         );

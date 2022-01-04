@@ -3,39 +3,101 @@
 part of 'settings_store.dart';
 
 // **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
+    SettingsStore()
+      ..useOledTheme = json['useOledTheme'] as bool
+      ..showVideo = json['showVideo'] as bool
+      ..showOverlay = json['showOverlay'] as bool
+      ..showThumbnailUptime = json['showThumbnailUptime'] as bool
+      ..hideBannedMessages = json['hideBannedMessages'] as bool
+      ..showZeroWidth = json['showZeroWidth'] as bool
+      ..showTimestamps = json['showTimestamps'] as bool
+      ..useTwelveHourTimestamps = json['useTwelveHourTimestamps'] as bool
+      ..fullScreen = json['fullScreen'] as bool
+      ..expandInfo = json['expandInfo'] as bool;
+
+Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
+    <String, dynamic>{
+      'useOledTheme': instance.useOledTheme,
+      'showVideo': instance.showVideo,
+      'showOverlay': instance.showOverlay,
+      'showThumbnailUptime': instance.showThumbnailUptime,
+      'hideBannedMessages': instance.hideBannedMessages,
+      'showZeroWidth': instance.showZeroWidth,
+      'showTimestamps': instance.showTimestamps,
+      'useTwelveHourTimestamps': instance.useTwelveHourTimestamps,
+      'fullScreen': instance.fullScreen,
+      'expandInfo': instance.expandInfo,
+    };
+
+// **************************************************************************
 // StoreGenerator
 // **************************************************************************
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$SettingsStore on _SettingsStoreBase, Store {
-  final _$videoEnabledAtom = Atom(name: '_SettingsStoreBase.videoEnabled');
+  final _$useOledThemeAtom = Atom(name: '_SettingsStoreBase.useOledTheme');
 
   @override
-  bool get videoEnabled {
-    _$videoEnabledAtom.reportRead();
-    return super.videoEnabled;
+  bool get useOledTheme {
+    _$useOledThemeAtom.reportRead();
+    return super.useOledTheme;
   }
 
   @override
-  set videoEnabled(bool value) {
-    _$videoEnabledAtom.reportWrite(value, super.videoEnabled, () {
-      super.videoEnabled = value;
+  set useOledTheme(bool value) {
+    _$useOledThemeAtom.reportWrite(value, super.useOledTheme, () {
+      super.useOledTheme = value;
     });
   }
 
-  final _$overlayEnabledAtom = Atom(name: '_SettingsStoreBase.overlayEnabled');
+  final _$showVideoAtom = Atom(name: '_SettingsStoreBase.showVideo');
 
   @override
-  bool get overlayEnabled {
-    _$overlayEnabledAtom.reportRead();
-    return super.overlayEnabled;
+  bool get showVideo {
+    _$showVideoAtom.reportRead();
+    return super.showVideo;
   }
 
   @override
-  set overlayEnabled(bool value) {
-    _$overlayEnabledAtom.reportWrite(value, super.overlayEnabled, () {
-      super.overlayEnabled = value;
+  set showVideo(bool value) {
+    _$showVideoAtom.reportWrite(value, super.showVideo, () {
+      super.showVideo = value;
+    });
+  }
+
+  final _$showOverlayAtom = Atom(name: '_SettingsStoreBase.showOverlay');
+
+  @override
+  bool get showOverlay {
+    _$showOverlayAtom.reportRead();
+    return super.showOverlay;
+  }
+
+  @override
+  set showOverlay(bool value) {
+    _$showOverlayAtom.reportWrite(value, super.showOverlay, () {
+      super.showOverlay = value;
+    });
+  }
+
+  final _$showThumbnailUptimeAtom =
+      Atom(name: '_SettingsStoreBase.showThumbnailUptime');
+
+  @override
+  bool get showThumbnailUptime {
+    _$showThumbnailUptimeAtom.reportRead();
+    return super.showThumbnailUptime;
+  }
+
+  @override
+  set showThumbnailUptime(bool value) {
+    _$showThumbnailUptimeAtom.reportWrite(value, super.showThumbnailUptime, () {
+      super.showThumbnailUptime = value;
     });
   }
 
@@ -55,19 +117,50 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$zeroWidthEnabledAtom =
-      Atom(name: '_SettingsStoreBase.zeroWidthEnabled');
+  final _$showZeroWidthAtom = Atom(name: '_SettingsStoreBase.showZeroWidth');
 
   @override
-  bool get zeroWidthEnabled {
-    _$zeroWidthEnabledAtom.reportRead();
-    return super.zeroWidthEnabled;
+  bool get showZeroWidth {
+    _$showZeroWidthAtom.reportRead();
+    return super.showZeroWidth;
   }
 
   @override
-  set zeroWidthEnabled(bool value) {
-    _$zeroWidthEnabledAtom.reportWrite(value, super.zeroWidthEnabled, () {
-      super.zeroWidthEnabled = value;
+  set showZeroWidth(bool value) {
+    _$showZeroWidthAtom.reportWrite(value, super.showZeroWidth, () {
+      super.showZeroWidth = value;
+    });
+  }
+
+  final _$showTimestampsAtom = Atom(name: '_SettingsStoreBase.showTimestamps');
+
+  @override
+  bool get showTimestamps {
+    _$showTimestampsAtom.reportRead();
+    return super.showTimestamps;
+  }
+
+  @override
+  set showTimestamps(bool value) {
+    _$showTimestampsAtom.reportWrite(value, super.showTimestamps, () {
+      super.showTimestamps = value;
+    });
+  }
+
+  final _$useTwelveHourTimestampsAtom =
+      Atom(name: '_SettingsStoreBase.useTwelveHourTimestamps');
+
+  @override
+  bool get useTwelveHourTimestamps {
+    _$useTwelveHourTimestampsAtom.reportRead();
+    return super.useTwelveHourTimestamps;
+  }
+
+  @override
+  set useTwelveHourTimestamps(bool value) {
+    _$useTwelveHourTimestampsAtom
+        .reportWrite(value, super.useTwelveHourTimestamps, () {
+      super.useTwelveHourTimestamps = value;
     });
   }
 
@@ -101,65 +194,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$timeStampsEnabledAtom =
-      Atom(name: '_SettingsStoreBase.timeStampsEnabled');
-
-  @override
-  bool get timeStampsEnabled {
-    _$timeStampsEnabledAtom.reportRead();
-    return super.timeStampsEnabled;
-  }
-
-  @override
-  set timeStampsEnabled(bool value) {
-    _$timeStampsEnabledAtom.reportWrite(value, super.timeStampsEnabled, () {
-      super.timeStampsEnabled = value;
-    });
-  }
-
-  final _$twelveHourTimeStampAtom =
-      Atom(name: '_SettingsStoreBase.twelveHourTimeStamp');
-
-  @override
-  bool get twelveHourTimeStamp {
-    _$twelveHourTimeStampAtom.reportRead();
-    return super.twelveHourTimeStamp;
-  }
-
-  @override
-  set twelveHourTimeStamp(bool value) {
-    _$twelveHourTimeStampAtom.reportWrite(value, super.twelveHourTimeStamp, () {
-      super.twelveHourTimeStamp = value;
-    });
-  }
-
-  final _$oledThemeAtom = Atom(name: '_SettingsStoreBase.oledTheme');
-
-  @override
-  bool get oledTheme {
-    _$oledThemeAtom.reportRead();
-    return super.oledTheme;
-  }
-
-  @override
-  set oledTheme(bool value) {
-    _$oledThemeAtom.reportWrite(value, super.oledTheme, () {
-      super.oledTheme = value;
-    });
-  }
-
   @override
   String toString() {
     return '''
-videoEnabled: ${videoEnabled},
-overlayEnabled: ${overlayEnabled},
+useOledTheme: ${useOledTheme},
+showVideo: ${showVideo},
+showOverlay: ${showOverlay},
+showThumbnailUptime: ${showThumbnailUptime},
 hideBannedMessages: ${hideBannedMessages},
-zeroWidthEnabled: ${zeroWidthEnabled},
+showZeroWidth: ${showZeroWidth},
+showTimestamps: ${showTimestamps},
+useTwelveHourTimestamps: ${useTwelveHourTimestamps},
 fullScreen: ${fullScreen},
-expandInfo: ${expandInfo},
-timeStampsEnabled: ${timeStampsEnabled},
-twelveHourTimeStamp: ${twelveHourTimeStamp},
-oledTheme: ${oledTheme}
+expandInfo: ${expandInfo}
     ''';
   }
 }

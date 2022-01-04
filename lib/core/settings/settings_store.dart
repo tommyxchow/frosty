@@ -1,70 +1,62 @@
 import 'package:flutter/services.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 part 'settings_store.g.dart';
 
-class SettingsStore = _SettingsStoreBase with _$SettingsStore;
+@JsonSerializable()
+class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
+  SettingsStore();
+
+  factory SettingsStore.fromJson(Map<String, dynamic> json) => _$SettingsStoreFromJson(json);
+  Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
+}
 
 abstract class _SettingsStoreBase with Store {
+  //General Settings
   @observable
-  var videoEnabled = true;
+  var useOledTheme = false;
+
+  // Video Settings
+  @observable
+  var showVideo = true;
 
   @observable
-  var overlayEnabled = true;
+  var showOverlay = true;
 
+  @observable
+  var showThumbnailUptime = true;
+
+  // Chat Settings
   @observable
   var hideBannedMessages = false;
 
   @observable
-  var zeroWidthEnabled = false;
+  var showZeroWidth = false;
 
+  @observable
+  var showTimestamps = false;
+
+  @observable
+  var useTwelveHourTimestamps = false;
+
+  // Global configs
   @observable
   var fullScreen = false;
 
   @observable
   var expandInfo = false;
 
-  @observable
-  var timeStampsEnabled = false;
-
-  @observable
-  var twelveHourTimeStamp = false;
-
-  @observable
-  var oledTheme = false;
-
-  @action
-  Future<void> init() async {
-    // Retrieve the instance that will allow us to store and persist settings.
-    final prefs = await SharedPreferences.getInstance();
-
-    // Initialize settings from stored preferences if any.
-    videoEnabled = prefs.getBool('video_enabled') ?? videoEnabled;
-    overlayEnabled = prefs.getBool('overlay_enabled') ?? overlayEnabled;
-    hideBannedMessages = prefs.getBool('hide_banned_messages') ?? hideBannedMessages;
-    zeroWidthEnabled = prefs.getBool('zero_width_enabled') ?? zeroWidthEnabled;
-    expandInfo = prefs.getBool('expand_info') ?? expandInfo;
-    timeStampsEnabled = prefs.getBool('time_stamps_enabled') ?? timeStampsEnabled;
-    twelveHourTimeStamp = prefs.getBool('twelve_hour_time_stamps') ?? twelveHourTimeStamp;
-    oledTheme = prefs.getBool('oled_theme') ?? oledTheme;
-
-    // Set up reactions to store setting anytime they're changed.
-    // The ReactionDisposer will not be needed since settings will always exist.
-    reaction((_) => videoEnabled, (bool newValue) => prefs.setBool('video_enabled', newValue));
-    reaction((_) => overlayEnabled, (bool newValue) => prefs.setBool('overlay_enabled', newValue));
-    reaction((_) => zeroWidthEnabled, (bool newValue) => prefs.setBool('zero_width_enabled', newValue));
-    reaction((_) => hideBannedMessages, (bool newValue) => prefs.setBool('hide_banned_messages', newValue));
-    reaction((_) => expandInfo, (bool newValue) => prefs.setBool('expand_info', newValue));
-    reaction((_) => timeStampsEnabled, (bool newValue) => prefs.setBool('time_stamps_enabled', newValue));
-    reaction((_) => twelveHourTimeStamp, (bool newValue) => prefs.setBool('twelve_hour_time_stamps', newValue));
-    reaction((_) => oledTheme, (bool newValue) => prefs.setBool('oled_theme', newValue));
-
-    // A reaction that will enable immersive mode when entering fullscreen and disable it when exiting.
+  _SettingsStoreBase() {
+    // A MobX reaction that will toggle immersive mode whenever the user enters and exits fullscreen mode.
     reaction(
-        (_) => fullScreen,
-        (bool newValue) => newValue == true
-            ? SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky)
-            : SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]));
+      (_) => fullScreen,
+      (bool isFullscreen) => isFullscreen == true
+          ? SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky)
+          : SystemChrome.setEnabledSystemUIMode(
+              SystemUiMode.manual,
+              overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+            ),
+    );
   }
 }

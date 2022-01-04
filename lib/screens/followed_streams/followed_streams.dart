@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/screens/followed_streams/followed_streams_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/stream_card.dart';
+import 'package:provider/provider.dart';
 
 class FollowedStreams extends StatelessWidget {
   final FollowedStreamsStore store;
@@ -26,7 +28,12 @@ class FollowedStreams extends StatelessWidget {
               if (index > store.followedStreams.length / 2 && store.hasMore) {
                 store.getFollowedStreams();
               }
-              return StreamCard(streamInfo: store.followedStreams[index]);
+              return Observer(
+                builder: (context) => StreamCard(
+                  streamInfo: store.followedStreams[index],
+                  showUptime: context.read<SettingsStore>().showThumbnailUptime,
+                ),
+              );
             },
           );
         },
