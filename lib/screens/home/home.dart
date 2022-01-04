@@ -11,15 +11,13 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
-  final ListStore topStreamsStore;
-  final ListStore categoriesStore;
+  final ListStore topSectionStore;
   final SearchStore searchStore;
   final ListStore? followedStreamsStore;
 
   const Home({
     Key? key,
-    required this.topStreamsStore,
-    required this.categoriesStore,
+    required this.topSectionStore,
     required this.searchStore,
     required this.followedStreamsStore,
   }) : super(key: key);
@@ -77,10 +75,7 @@ class _HomeState extends State<Home> {
               index: _selectedIndex,
               children: [
                 if (authStore.isLoggedIn) StreamsList(store: widget.followedStreamsStore!),
-                TopSection(
-                  topStreamsStore: widget.topStreamsStore,
-                  categoriesStore: widget.categoriesStore,
-                ),
+                TopSection(topSectionStore: widget.topSectionStore),
                 Search(searchStore: widget.searchStore),
               ],
             );

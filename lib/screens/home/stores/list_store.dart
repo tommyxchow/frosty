@@ -21,17 +21,20 @@ abstract class _ListStoreBase with Store {
   bool _isLoading = false;
 
   /// The pagination cursor for the streams.
-  String? _currentCursor;
+  String? _streamsCursor;
 
-  StreamListType listType;
+  /// The pagination cursor for the categories.
+  String? _categoriesCursor;
 
   final CategoryTwitch? categoryInfo;
+
+  final ListType listType;
 
   /// The authentication store.
   final AuthStore authStore;
 
   /// Returns whether or not there are more streams and loading status for pagination.
-  bool get hasMore => _isLoading == false && _currentCursor != null;
+  bool get hasMore => _isLoading == false && _streamsCursor != null;
 
   _ListStoreBase({
     required this.authStore,
@@ -39,59 +42,55 @@ abstract class _ListStoreBase with Store {
     this.categoryInfo,
   }) {
     switch (listType) {
-      case StreamListType.followed:
-        if (listType == StreamListType.followed && authStore.isLoggedIn) {
-          getData();
-        }
+      case ListType.followed:
+        if (listType == ListType.followed && authStore.isLoggedIn) getStreams();
         break;
-      case StreamListType.top:
-      case StreamListType.category:
-        getData();
+      case ListType.top:
+        getStreams();
+        getCategories();
         break;
-      case StreamListType.categories:
-        getGames();
+      case ListType.category:
+        getStreams();
         break;
     }
   }
 
   /// Fetches the streams based on the type and current cursor.
   @action
-  Future<void> getData() async {
+  Future<void> getStreams() async {
     _isLoading = true;
 
     final StreamsTwitch? newStreams;
     switch (listType) {
-      case StreamListType.followed:
+      case ListType.followed:
         newStreams = await Twitch.getFollowedStreams(
           id: authStore.user.details!.id,
           headers: authStore.headersTwitch,
-          cursor: _currentCursor,
+          cursor: _streamsCursor,
         );
         break;
-      case StreamListType.top:
+      case ListType.top:
         newStreams = await Twitch.getTopStreams(
           headers: authStore.headersTwitch,
-          cursor: _currentCursor,
+          cursor: _streamsCursor,
         );
         break;
-      case StreamListType.category:
+      case ListType.category:
         newStreams = await Twitch.getStreamsUnderGame(
           gameId: categoryInfo!.id,
           headers: authStore.headersTwitch,
-          cursor: _currentCursor,
+          cursor: _streamsCursor,
         );
         break;
-      case StreamListType.categories:
-        return getGames();
     }
 
     if (newStreams != null) {
-      if (_currentCursor == null) {
+      if (_streamsCursor == null) {
         _streams = newStreams.data.asObservable();
       } else {
         _streams.addAll(newStreams.data);
       }
-      _currentCursor = newStreams.pagination['cursor'];
+      _streamsCursor = newStreams.pagination['cursor'];
     }
 
     _isLoading = false;
@@ -99,15 +98,17 @@ abstract class _ListStoreBase with Store {
 
   // Fetches the top categories based on the current cursor.
   @action
-  Future<void> getGames() async {
-    final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: _currentCursor);
+  Future<void> getCategories() async {
+    _isLoading = true;
+
+    final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: _categoriesCursor);
     if (result != null) {
-      if (_currentCursor == null) {
+      if (_categoriesCursor == null) {
         _categories = result.data.asObservable();
       } else {
         _categories.addAll(result.data);
       }
-      _currentCursor = result.pagination['cursor'];
+      _categoriesCursor = result.pagination['cursor'];
     }
 
     _isLoading = false;
@@ -115,16 +116,23 @@ abstract class _ListStoreBase with Store {
 
   /// Resets the cursor and then fetches the streams.
   @action
-  Future<void> refresh() {
-    _currentCursor = null;
+  Future<void> refreshStreams() {
+    _streamsCursor = null;
 
-    return getData();
+    return getStreams();
+  }
+
+  /// Resets the cursor and then fetches the categories.
+  @action
+  Future<void> refreshCategories() {
+    _categoriesCursor = null;
+
+    return getCategories();
   }
 }
 
-enum StreamListType {
+enum ListType {
   followed,
   top,
   category,
-  categories,
 }

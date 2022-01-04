@@ -92,18 +92,14 @@ class MyApp extends StatelessWidget {
           title: 'Frosty',
           theme: settingsStore.useOledTheme ? oledTheme : defaultTheme,
           home: Home(
-            topStreamsStore: ListStore(
+            topSectionStore: ListStore(
               authStore: authStore,
-              listType: StreamListType.top,
-            ),
-            categoriesStore: ListStore(
-              authStore: authStore,
-              listType: StreamListType.categories,
+              listType: ListType.top,
             ),
             followedStreamsStore: authStore.isLoggedIn
                 ? ListStore(
                     authStore: authStore,
-                    listType: StreamListType.followed,
+                    listType: ListType.followed,
                   )
                 : null,
             searchStore: SearchStore(authStore: authStore),

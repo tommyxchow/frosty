@@ -4,13 +4,11 @@ import 'package:frosty/screens/home/streams_list.dart';
 import 'package:frosty/screens/home/top/categories/categories.dart';
 
 class TopSection extends StatelessWidget {
-  final ListStore topStreamsStore;
-  final ListStore categoriesStore;
+  final ListStore topSectionStore;
 
   const TopSection({
     Key? key,
-    required this.topStreamsStore,
-    required this.categoriesStore,
+    required this.topSectionStore,
   }) : super(key: key);
 
   @override
@@ -28,8 +26,8 @@ class TopSection extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
-                StreamsList(store: topStreamsStore),
-                Categories(store: categoriesStore),
+                StreamsList(store: topSectionStore),
+                Categories(store: topSectionStore),
               ],
             ),
           ),

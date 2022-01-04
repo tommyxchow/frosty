@@ -14,7 +14,7 @@ class StreamsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: store.refresh,
+      onRefresh: store.refreshStreams,
       child: Observer(
         builder: (_) {
           if (store.streams.isEmpty && store.isLoading) {
@@ -24,7 +24,7 @@ class StreamsList extends StatelessWidget {
             itemCount: store.streams.length,
             itemBuilder: (context, index) {
               if (index > store.streams.length / 2 && store.hasMore) {
-                store.getData();
+                store.getStreams();
               }
               return Observer(
                 builder: (context) => StreamCard(

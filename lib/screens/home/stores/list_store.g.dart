@@ -60,29 +60,41 @@ mixin _$ListStore on _ListStoreBase, Store {
     });
   }
 
-  final _$getDataAsyncAction = AsyncAction('_ListStoreBase.getData');
+  final _$getStreamsAsyncAction = AsyncAction('_ListStoreBase.getStreams');
 
   @override
-  Future<void> getData() {
-    return _$getDataAsyncAction.run(() => super.getData());
+  Future<void> getStreams() {
+    return _$getStreamsAsyncAction.run(() => super.getStreams());
   }
 
-  final _$getGamesAsyncAction = AsyncAction('_ListStoreBase.getGames');
+  final _$getCategoriesAsyncAction =
+      AsyncAction('_ListStoreBase.getCategories');
 
   @override
-  Future<void> getGames() {
-    return _$getGamesAsyncAction.run(() => super.getGames());
+  Future<void> getCategories() {
+    return _$getCategoriesAsyncAction.run(() => super.getCategories());
   }
 
   final _$_ListStoreBaseActionController =
       ActionController(name: '_ListStoreBase');
 
   @override
-  Future<void> refresh() {
+  Future<void> refreshStreams() {
     final _$actionInfo = _$_ListStoreBaseActionController.startAction(
-        name: '_ListStoreBase.refresh');
+        name: '_ListStoreBase.refreshStreams');
     try {
-      return super.refresh();
+      return super.refreshStreams();
+    } finally {
+      _$_ListStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  Future<void> refreshCategories() {
+    final _$actionInfo = _$_ListStoreBaseActionController.startAction(
+        name: '_ListStoreBase.refreshCategories');
+    try {
+      return super.refreshCategories();
     } finally {
       _$_ListStoreBaseActionController.endAction(_$actionInfo);
     }

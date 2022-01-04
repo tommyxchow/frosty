@@ -15,7 +15,7 @@ class CategoryStreams extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: store.refresh,
+        onRefresh: store.refreshStreams,
         child: Observer(
           builder: (context) {
             return CustomScrollView(
@@ -44,7 +44,7 @@ class CategoryStreams extends StatelessWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       if (index > store.streams.length / 2 && store.hasMore) {
-                        store.getData();
+                        store.getStreams();
                       }
                       return Observer(
                         builder: (context) => StreamCard(

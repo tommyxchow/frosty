@@ -14,7 +14,7 @@ class Categories extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: store.refresh,
+      onRefresh: store.refreshCategories,
       child: Observer(
         builder: (_) {
           return GridView.builder(
@@ -24,7 +24,7 @@ class Categories extends StatelessWidget {
             itemCount: store.categories.length,
             itemBuilder: (context, index) {
               if (index > store.categories.length / 2 && store.hasMore) {
-                store.getGames();
+                store.getCategories();
               }
               return CategoryCard(category: store.categories[index]);
             },

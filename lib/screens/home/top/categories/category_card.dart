@@ -21,7 +21,7 @@ class CategoryCard extends StatelessWidget {
           builder: (context) => CategoryStreams(
             store: ListStore(
               authStore: context.read<AuthStore>(),
-              listType: StreamListType.category,
+              listType: ListType.category,
               categoryInfo: category,
             ),
           ),
