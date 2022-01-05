@@ -85,7 +85,6 @@ class _HomeState extends State<Home> {
       bottomNavigationBar: Observer(
         builder: (_) {
           return BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
             items: [
               if (authStore.isLoggedIn)
                 const BottomNavigationBarItem(

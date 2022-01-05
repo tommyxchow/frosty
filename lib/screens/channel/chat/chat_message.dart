@@ -9,7 +9,12 @@ class ChatMessage extends StatelessWidget {
   final ChatAssetsStore assetsStore;
   final SettingsStore settingsStore;
 
-  const ChatMessage({Key? key, required this.ircMessage, required this.assetsStore, required this.settingsStore}) : super(key: key);
+  const ChatMessage({
+    Key? key,
+    required this.ircMessage,
+    required this.assetsStore,
+    required this.settingsStore,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +54,11 @@ class ChatMessage extends StatelessWidget {
                 color: const Color(0x4DFF0000),
                 child: span,
               );
-            } else {
-              return Padding(
-                padding: padding,
-                child: span,
-              );
             }
-
+            return Padding(
+              padding: padding,
+              child: span,
+            );
           case Command.clearChat:
           case Command.clearMessage:
             // Render timeouts and bans

@@ -265,37 +265,6 @@ class Twitch {
     }
   }
 
-  /// Returns a user's list of blocked users given their id.
-  static Future<List<UserBlockedTwitch>> getUserBlockedList({required String id, required Map<String, String>? headers, String? cursor}) async {
-    final uri = cursor == null
-        ? Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id')
-        : Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&after=$cursor&broadcaster_id=$id');
-
-    final response = await http.get(uri, headers: headers);
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-
-      final cursor = decoded['pagination']['cursor'];
-      final blockedList = decoded['data'] as List;
-
-      if (blockedList.isNotEmpty) {
-        final result = blockedList.map((e) => UserBlockedTwitch.fromJson(e)).toList();
-
-        if (cursor != null) {
-          result.addAll(await getUserBlockedList(id: id, cursor: cursor, headers: headers));
-        }
-
-        return result;
-      } else {
-        debugPrint('User does not have anyone blocked');
-        return [];
-      }
-    } else {
-      debugPrint('User does not exist');
-      return [];
-    }
-  }
-
   /// Returns a channels's info associated with the given ID.
   static Future<Channel?> getChannel({required String userId, required Map<String, String>? headers}) async {
     final response = await http.get(Uri.parse('https://api.twitch.tv/helix/channels?broadcaster_id=$userId'), headers: headers);
@@ -388,6 +357,41 @@ class Twitch {
       return ChatUsers.fromJson(decoded);
     } else {
       debugPrint('Failed to get chatters');
+    }
+  }
+
+  /// Returns a user's list of blocked users given their id.
+  static Future<List<UserBlockedTwitch>> getUserBlockedList({
+    required String id,
+    required Map<String, String>? headers,
+    String? cursor,
+  }) async {
+    final uri = cursor == null
+        ? Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id')
+        : Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id&after=$cursor');
+
+    final response = await http.get(uri, headers: headers);
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+
+      final cursor = decoded['pagination']['cursor'];
+      final blockedList = decoded['data'] as List;
+
+      if (blockedList.isNotEmpty) {
+        final result = blockedList.map((e) => UserBlockedTwitch.fromJson(e)).toList();
+
+        if (cursor != null) {
+          result.addAll(await getUserBlockedList(id: id, cursor: cursor, headers: headers));
+        }
+
+        return result;
+      } else {
+        debugPrint('User does not have anyone blocked');
+        return [];
+      }
+    } else {
+      debugPrint('User does not exist');
+      return [];
     }
   }
 

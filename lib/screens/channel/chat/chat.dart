@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/chat_message.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
+import 'package:frosty/screens/channel/chat/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 
 class Chat extends StatefulWidget {
@@ -39,11 +40,34 @@ class _ChatState extends State<Chat> {
                       itemCount: chatStore.messages.length,
                       controller: chatStore.scrollController,
                       itemBuilder: (context, index) => Observer(
-                        builder: (context) => ChatMessage(
-                          ircMessage: chatStore.messages[index],
-                          assetsStore: chatStore.assetsStore,
-                          settingsStore: chatStore.settings,
-                        ),
+                        builder: (context) {
+                          final message = chatStore.messages[index];
+
+                          if (message.user != null && message.user != chatStore.auth.user.details?.login) {
+                            return InkWell(
+                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                              onLongPress: () => showModalBottomSheet(
+                                context: context,
+                                builder: (context) => ChatUserModal(
+                                  username: message.user!,
+                                  chatStore: chatStore,
+                                  userId: message.tags['user-id']!,
+                                  displayName: message.tags['display-name']!,
+                                ),
+                              ),
+                              child: ChatMessage(
+                                ircMessage: message,
+                                assetsStore: chatStore.assetsStore,
+                                settingsStore: chatStore.settings,
+                              ),
+                            );
+                          }
+                          return ChatMessage(
+                            ircMessage: message,
+                            assetsStore: chatStore.assetsStore,
+                            settingsStore: chatStore.settings,
+                          );
+                        },
                       ),
                     ),
                   ),

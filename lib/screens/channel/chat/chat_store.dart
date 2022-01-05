@@ -104,7 +104,7 @@ abstract class _ChatStoreBase with Store {
     for (final message in data.trimRight().split('\r\n')) {
       debugPrint(message);
       if (message.startsWith('@')) {
-        final parsedIRCMessage = IRCMessage.fromString(message, username: auth.user.details?.login);
+        final parsedIRCMessage = IRCMessage.fromString(message, userLogin: auth.user.details?.login);
 
         // Filter messages from any blocked users if not a moderator or not the channel owner.
         if (!_userState.mod &&
@@ -148,10 +148,15 @@ abstract class _ChatStoreBase with Store {
             continue;
         }
 
-        if (_autoScroll) _deleteAndScrollToEnd();
+        if (_messages.length >= 5000) _messages.removeAt(0);
+
+        if (_autoScroll) {
+          SchedulerBinding.instance?.addPostFrameCallback((_) {
+            if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
+          });
+        }
 
         // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
-        if (_messages.length >= 5000) _messages.removeRange(0, 1000);
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
@@ -174,22 +179,6 @@ abstract class _ChatStoreBase with Store {
         _backoffTime = 0;
       }
     }
-  }
-
-  /// If [_autoScroll] is enabled, removes messages if [_messages] is too large and scrolls to the latest message.
-  @action
-  void _deleteAndScrollToEnd() {
-    // If we reach 1000 messages, remove the oldest 200.
-    if (_messages.length >= 1000) _messages.removeRange(0, 200);
-
-    // Jump to the latest message (bottom of the list/chat).
-    if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-
-    // After the end of the frame, scroll to the bottom of the chat.
-    // This is a postFrameCallback because the chat should scroll after the widget is built and rendered.
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
   }
 
   /// Re-enables [_autoScroll] and jumps to the latest message.

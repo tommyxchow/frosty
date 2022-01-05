@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/widgets/block_button.dart';
 
 class BlockedUsers extends StatelessWidget {
   final AuthStore authStore;
@@ -11,29 +12,6 @@ class BlockedUsers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _showDialog(BuildContext context, {required String targetUser, required String targetUserId}) {
-      return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Unblock'),
-          content: Text('Are you sure you want to unblock $targetUser?'),
-          actions: [
-            TextButton(
-              onPressed: Navigator.of(context).pop,
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                authStore.user.unblock(targetId: targetUserId, headers: authStore.headersTwitch);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Yes'),
-            ),
-          ],
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Blocked Users'),
@@ -52,10 +30,10 @@ class BlockedUsers extends StatelessWidget {
                   .map(
                     (user) => ListTile(
                       title: Text(user.displayName),
-                      trailing: OutlinedButton(
-                        child: const Text('Unblock'),
-                        onPressed: () => _showDialog(context, targetUser: user.displayName, targetUserId: user.userId),
-                        style: OutlinedButton.styleFrom(primary: Colors.red),
+                      trailing: BlockButton(
+                        authStore: authStore,
+                        targetUser: user.displayName,
+                        targetUserId: user.userId,
                       ),
                     ),
                   )

@@ -34,7 +34,7 @@ class ChatBottomBar extends StatelessWidget {
               onTap: () {
                 chatStore.assetsStore.showEmoteMenu = false;
                 Future.delayed(
-                  const Duration(milliseconds: 100),
+                  const Duration(milliseconds: 200),
                   () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
                 );
               },

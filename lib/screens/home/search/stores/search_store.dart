@@ -72,6 +72,7 @@ abstract class _SearchStoreBase with Store {
   @action
   void clearSearch() {
     textController.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
     _channelSearchResults = <ChannelQuery>[];
     _categorySearchResults = <CategoryTwitch>[];
   }

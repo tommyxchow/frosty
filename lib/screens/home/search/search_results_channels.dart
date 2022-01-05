@@ -24,7 +24,10 @@ class SearchResultsChannels extends StatelessWidget {
           ),
         );
       } catch (e) {
-        const snackBar = SnackBar(content: Text('Failed to get channel info :('));
+        const snackBar = SnackBar(
+          content: Text('Failed to get channel info :('),
+          behavior: SnackBarBehavior.floating,
+        );
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }

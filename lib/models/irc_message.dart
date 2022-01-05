@@ -413,7 +413,7 @@ class IRCMessage {
   }
 
   /// Parses an IRC string and returns its corresponding [IRCMessage] object.
-  factory IRCMessage.fromString(String whole, {String? username}) {
+  factory IRCMessage.fromString(String whole, {String? userLogin}) {
     // We have three parts:
     // 1. The tags of the IRC message.
     // 2. The metadata (user, command, and channel).
@@ -472,7 +472,7 @@ class IRCMessage {
 
     // Check if the message mentions the logged-in user
     var mention = false;
-    if (message != null && username != null) mention = message.toLowerCase().contains(username);
+    if (message != null && userLogin != null) mention = message.toLowerCase().contains(userLogin);
 
     // Now process any Twitch emotes contained in the message tags.
     // The map containing emotes from the user's tags to their URL.
