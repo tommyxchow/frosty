@@ -14,19 +14,7 @@ class Chat extends StatefulWidget {
   _ChatState createState() => _ChatState();
 }
 
-class _ChatState extends State<Chat> with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance!.addObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    widget.chatStore.handleAppStateChange(state);
-  }
-
+class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     final chatStore = widget.chatStore;
@@ -92,7 +80,6 @@ class _ChatState extends State<Chat> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
     widget.chatStore.dispose();
     super.dispose();
   }

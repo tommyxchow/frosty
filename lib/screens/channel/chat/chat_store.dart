@@ -26,7 +26,13 @@ abstract class _ChatStoreBase with Store {
   final String channelName;
 
   /// The Twitch IRC WebSocket channel.
-  final _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+  WebSocketChannel? _channel;
+
+  // The retry counter for exponential backoff.
+  var _retries = 0;
+
+  // The current time to wait between retries for exponential backoff.
+  var _backoffTime = 0;
 
   /// The scroll controller that controls auto-scroll and resume-scroll behavior.
   final scrollController = ScrollController();
@@ -55,6 +61,8 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
+  late ReactionDisposer disposeEmoteMenuReaction;
+
   _ChatStoreBase({
     required this.auth,
     required this.settings,
@@ -63,7 +71,7 @@ abstract class _ChatStoreBase with Store {
     // Create a reaction where anytime the emote menu is shown or hidden,
     // scroll to the bottom of the list. This will prevent the emote menu
     // from covering the latest messages when summoned.
-    final disposeEmoteMenuReaction = reaction((_) => assetsStore.showEmoteMenu, (_) {
+    disposeEmoteMenuReaction = reaction((_) => assetsStore.showEmoteMenu, (_) {
       SchedulerBinding.instance?.addPostFrameCallback((_) {
         if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
       });
@@ -71,53 +79,7 @@ abstract class _ChatStoreBase with Store {
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
-    // Listen for new messages and forward them to the handler.
-    _channel.stream.listen(
-      (data) => _handleIRCData(data.toString()),
-      onError: (error) {
-        debugPrint('Chat error: ${error.toString()}');
-        _messages.add(IRCMessage.createNotice(message: 'Chat error - ${error.toString()}'));
-      },
-      onDone: () {
-        debugPrint("Disconnected from $channelName's chat.");
-        _messages.add(IRCMessage.createNotice(message: 'Failed to connect to chat, please try again.'));
-        disposeEmoteMenuReaction();
-      },
-    );
-
-    // Fetch the users in chat.
-    chatDetailsStore.updateChatters(channelName);
-
-    // Fetch the assets used in chat including badges and emotes.
-    _messages.add(IRCMessage.createNotice(message: 'Fetching channel assets...'));
-
-    assetsStore
-        .getAssets(channelName: channelName, headers: auth.headersTwitch)
-        .then((_) => _messages.add(IRCMessage.createNotice(message: 'Channel assets fetched!')))
-        .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch assets: ${error.toString()}')));
-
-    // The list of messages sent to the IRC WebSocket channel to connect and join.
-    final commands = [
-      // Request the tags and commands capabilities.
-      // This will display tags containing metadata along with each IRC message.
-      'CAP REQ :twitch.tv/tags twitch.tv/commands',
-
-      // The OAuth token in order to connect, default or user token.
-      'PASS oauth:${auth.token}',
-
-      // The nickname for the connecting user. 'justinfan888' is the Twitch default if not logged in.
-      'NICK ${auth.isLoggedIn ? auth.user.details!.login : 'justinfan888'}',
-
-      // Join the desired channel's room.
-      'JOIN #$channelName',
-    ];
-
-    // Send each command in order.
-    for (final command in commands) {
-      _channel.sink.add(command);
-    }
-
-    _messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat."));
+    reconnect();
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -191,8 +153,25 @@ abstract class _ChatStoreBase with Store {
         // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
         if (_messages.length >= 5000) _messages.removeRange(0, 1000);
       } else if (message == 'PING :tmi.twitch.tv') {
-        _channel.sink.add('PONG :tmi.twitch.tv');
+        _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
+      } else if (message.contains('Welcome, GLHF!')) {
+        _messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat."));
+
+        // Fetch the users in chat.
+        chatDetailsStore.updateChatters(channelName);
+
+        // Fetch the assets used in chat including badges and emotes.
+        _messages.add(IRCMessage.createNotice(message: 'Fetching badges and emotes...'));
+
+        assetsStore
+            .getAssets(channelName: channelName, headers: auth.headersTwitch)
+            .then((_) => _messages.add(IRCMessage.createNotice(message: 'Badges and emotes fetched!')))
+            .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch assets: ${error.toString()}')));
+
+        // Reset exponential backoff if successfully connected.
+        _retries = 0;
+        _backoffTime = 0;
       }
     }
   }
@@ -227,15 +206,68 @@ abstract class _ChatStoreBase with Store {
     });
   }
 
+  void reconnect() async {
+    _channel?.sink.close(1001);
+    _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+
+    // Listen for new messages and forward them to the handler.
+    _channel?.stream.listen(
+      (data) => _handleIRCData(data.toString()),
+      onError: (error) {
+        debugPrint('Chat error: ${error.toString()}');
+        _messages.add(IRCMessage.createNotice(message: 'Chat error - ${error.toString()}'));
+      },
+      onDone: () async {
+        if (_channel == null) return;
+
+        // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
+        _messages.add(IRCMessage.createNotice(message: 'Disconnected from chat, waiting $_backoffTime seconds before reconnecting...'));
+        await Future.delayed(Duration(seconds: _backoffTime));
+
+        // Increase the backoff time for the next retry.
+        _backoffTime == 0 ? _backoffTime++ : _backoffTime *= 2;
+
+        // Increment the retry count and attempt the reconnect.
+        _retries++;
+        _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries).'));
+        reconnect();
+      },
+    );
+
+    // The list of messages sent to the IRC WebSocket channel to connect and join.
+    final commands = [
+      // Request the tags and commands capabilities.
+      // This will display tags containing metadata along with each IRC message.
+      'CAP REQ :twitch.tv/tags twitch.tv/commands',
+
+      // The OAuth token in order to connect, default or user token.
+      'PASS oauth:${auth.token}',
+
+      // The nickname for the connecting user. 'justinfan888' is the Twitch default if not logged in.
+      'NICK ${auth.isLoggedIn ? auth.user.details!.login : 'justinfan888'}',
+
+      // Join the desired channel's room.
+      'JOIN #$channelName',
+    ];
+
+    // Send each command in order.
+    for (final command in commands) {
+      _channel?.sink.add(command);
+    }
+  }
+
   /// Sends the given string message by the logged-in user and adds it to [_messages].
   void sendMessage(String message) {
     // Do not send if the message is blank/empty.
-    if (message.isEmpty) {
+    if (message.isEmpty) return;
+
+    if (_channel == null || _channel?.closeCode != null) {
+      _messages.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
       return;
     }
 
     // Send the message to the IRC chat room.
-    _channel.sink.add('PRIVMSG #$channelName :$message');
+    _channel?.sink.add('PRIVMSG #$channelName :$message');
 
     // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
     var userStateString = _userState.raw;
@@ -256,23 +288,12 @@ abstract class _ChatStoreBase with Store {
     textController.clear();
   }
 
-  /// Pauses or resumes the chat subscription depending on the provided state.
-  void handleAppStateChange(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        break;
-      case AppLifecycleState.inactive:
-        break;
-      case AppLifecycleState.paused:
-        break;
-      case AppLifecycleState.detached:
-        break;
-    }
-  }
-
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
-    _channel.sink.close();
+    _channel?.sink.close(1001);
+    _channel = null;
+
+    disposeEmoteMenuReaction();
     textController.dispose();
     scrollController.dispose();
   }
