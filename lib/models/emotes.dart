@@ -106,28 +106,32 @@ class EmoteBTTVChannel {
 }
 
 // * FFZ Emotes *
-@JsonSerializable(createToJson: false)
-class UserFFZ {
-  final int id;
-  final String name;
-  final String displayName;
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class RoomFFZ {
+  final int set;
+  final String? moderatorBadge;
+  final ImagesFFZ? vipBadge;
+  final ImagesFFZ? modUrls;
+  // final Map<String, List<String>> userBadges;
+  // final Map<String, List<int>> userBadgesIds;
 
-  const UserFFZ(
-    this.id,
-    this.name,
-    this.displayName,
+  const RoomFFZ(
+    this.set,
+    this.moderatorBadge,
+    this.vipBadge,
+    this.modUrls,
   );
 
-  factory UserFFZ.fromJson(Map<String, dynamic> json) => _$UserFFZFromJson(json);
+  factory RoomFFZ.fromJson(Map<String, dynamic> json) => _$RoomFFZFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
 class ImagesFFZ {
-  @JsonKey(name: '1x')
+  @JsonKey(name: '1')
   final String url1x;
-  @JsonKey(name: '2x')
+  @JsonKey(name: '2')
   final String? url2x;
-  @JsonKey(name: '4x')
+  @JsonKey(name: '4')
   final String? url4x;
 
   const ImagesFFZ(
@@ -142,20 +146,38 @@ class ImagesFFZ {
 @JsonSerializable(createToJson: false)
 class EmoteFFZ {
   final int id;
-  final UserFFZ user;
-  final String code;
-  final ImagesFFZ images;
-  final String imageType;
+  final String name;
+  final int height;
+  final int width;
+  final OwnerFFZ owner;
+  final ImagesFFZ urls;
 
   const EmoteFFZ(
     this.id,
-    this.user,
-    this.code,
-    this.images,
-    this.imageType,
+    this.name,
+    this.height,
+    this.width,
+    this.owner,
+    this.urls,
   );
 
   factory EmoteFFZ.fromJson(Map<String, dynamic> json) => _$EmoteFFZFromJson(json);
+}
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class OwnerFFZ {
+  @JsonKey(name: '_id')
+  final int id;
+  final String name;
+  final String displayName;
+
+  const OwnerFFZ(
+    this.id,
+    this.name,
+    this.displayName,
+  );
+
+  factory OwnerFFZ.fromJson(Map<String, dynamic> json) => _$OwnerFFZFromJson(json);
 }
 
 // * 7TV Emotes *
@@ -272,9 +294,9 @@ class Emote {
 
   factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
         id: emote.id.toString(),
-        name: emote.code,
+        name: emote.name,
         zeroWidth: false,
-        url: emote.images.url4x ?? emote.images.url1x,
+        url: 'https:' + (emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x),
         type: type,
       );
 

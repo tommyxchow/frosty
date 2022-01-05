@@ -85,7 +85,7 @@ abstract class _AuthBase with Store {
 
     try {
       // Retrieve the OAuth redirect URI.
-      final result = await FlutterWebAuth.authenticate(url: loginUrl.toString(), callbackUrlScheme: 'auth', preferEphemeral: true);
+      final result = await FlutterWebAuth.authenticate(url: loginUrl.toString(), callbackUrlScheme: 'auth');
 
       // Parse the user token from the redirect URI fragment.
       final fragment = Uri.parse(result).fragment;
@@ -95,7 +95,7 @@ abstract class _AuthBase with Store {
       await _storage.write(key: 'USER_TOKEN', value: _token);
 
       // Initialize the user with the new token.
-      user.init(headers: headersTwitch);
+      await user.init(headers: headersTwitch);
 
       // Set the login status to logged in.
       _isLoggedIn = true;

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/settings/settings.dart';
-import 'package:frosty/core/settings/settings_store.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/chat_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 class VideoChat extends StatelessWidget {
@@ -56,68 +56,65 @@ class VideoChat extends StatelessWidget {
           icon: const Icon(Icons.settings),
           onPressed: () => showModalBottomSheet(
             context: context,
-            builder: (context) {
-              return Settings(settingsStore: settingsStore);
-            },
+            builder: (_) => Settings(settingsStore: settingsStore),
           ),
         ),
       ],
     );
 
     return Scaffold(
-      body: SafeArea(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            if (orientation == Orientation.landscape) {
-              if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-              return Observer(
-                builder: (context) {
-                  if (settingsStore.videoEnabled) {
-                    return Observer(
-                      builder: (context) => settingsStore.fullScreen
-                          ? WillPopScope(
-                              onWillPop: () async => false,
-                              child: Stack(
-                                children: [
-                                  Visibility(
-                                    visible: false,
-                                    maintainState: true,
-                                    child: chat,
-                                  ),
-                                  Center(child: video),
-                                ],
-                              ),
-                            )
-                          : Row(
+      body: OrientationBuilder(
+        builder: (_, orientation) {
+          if (orientation == Orientation.landscape) {
+            if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+            return Observer(
+              builder: (_) => SafeArea(
+                bottom: settingsStore.fullScreen ? false : true,
+                child: settingsStore.showVideo
+                    ? settingsStore.fullScreen
+                        ? WillPopScope(
+                            onWillPop: () async => false,
+                            child: Stack(
                               children: [
-                                Flexible(
-                                  flex: 2,
-                                  child: video,
-                                ),
-                                Flexible(
-                                  flex: 1,
+                                Visibility(
+                                  visible: false,
+                                  maintainState: true,
                                   child: chat,
                                 ),
+                                Center(child: video),
                               ],
                             ),
-                    );
-                  }
-                  return Column(
-                    children: [
-                      appBar,
-                      Expanded(child: chat),
-                    ],
-                  );
-                },
-              );
-            }
+                          )
+                        : Row(
+                            children: [
+                              Flexible(
+                                flex: 2,
+                                child: video,
+                              ),
+                              Flexible(
+                                flex: 1,
+                                child: chat,
+                              ),
+                            ],
+                          )
+                    : Column(
+                        children: [
+                          appBar,
+                          Expanded(child: chat),
+                        ],
+                      ),
+              ),
+            );
+          }
 
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
-            return Column(
+          settingsStore.fullScreen = false;
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+          return SafeArea(
+            child: Column(
               children: [
                 Observer(
-                  builder: (context) {
-                    if (settingsStore.videoEnabled) {
+                  builder: (_) {
+                    if (settingsStore.showVideo) {
                       return video;
                     }
                     return appBar;
@@ -127,9 +124,9 @@ class VideoChat extends StatelessWidget {
                   child: chat,
                 ),
               ],
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_section.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class EmoteMenuPanel extends StatelessWidget {
   final TextEditingController textController;
@@ -10,9 +11,6 @@ class EmoteMenuPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const headerStyle = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
-    const headerPadding = EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 5.0);
-
     final globalEmotes = emotes
         .where((emote) =>
             emote.type == EmoteType.twitchGlobal ||
@@ -37,12 +35,9 @@ class EmoteMenuPanel extends StatelessWidget {
       slivers: [
         if (globalEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
-            child: Padding(
+            child: SectionHeader(
+              'Global Emotes',
               padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-              child: Text(
-                'Global Emotes',
-                style: headerStyle,
-              ),
             ),
           ),
           EmoteMenuSection(
@@ -52,13 +47,7 @@ class EmoteMenuPanel extends StatelessWidget {
         ],
         if (channelEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
-            child: Padding(
-              padding: headerPadding,
-              child: Text(
-                'Channel Emotes',
-                style: headerStyle,
-              ),
-            ),
+            child: SectionHeader('Channel Emotes'),
           ),
           EmoteMenuSection(
             textController: textController,
@@ -67,13 +56,7 @@ class EmoteMenuPanel extends StatelessWidget {
         ],
         if (subEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
-            child: Padding(
-              padding: headerPadding,
-              child: Text(
-                'Subbed Emotes',
-                style: headerStyle,
-              ),
-            ),
+            child: SectionHeader('Subbed Emotes'),
           ),
           EmoteMenuSection(
             textController: textController,
@@ -82,13 +65,7 @@ class EmoteMenuPanel extends StatelessWidget {
         ],
         if (miscEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
-            child: Padding(
-              padding: headerPadding,
-              child: Text(
-                'Unlocked Emotes',
-                style: headerStyle,
-              ),
-            ),
+            child: SectionHeader('Unlocked Emotes'),
           ),
           EmoteMenuSection(
             textController: textController,

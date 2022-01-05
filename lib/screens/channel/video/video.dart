@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
@@ -21,7 +20,7 @@ class Video extends StatelessWidget {
       aspectRatio: 16 / 9,
       child: Observer(
         builder: (context) {
-          if (videoStore.settingsStore.overlayEnabled) {
+          if (videoStore.settingsStore.showOverlay) {
             return Stack(
               children: [
                 WebView(

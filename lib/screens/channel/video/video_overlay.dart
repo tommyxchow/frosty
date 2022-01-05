@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/core/settings/settings.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/settings.dart';
 import 'package:intl/intl.dart';
 
 class VideoOverlay extends StatelessWidget {
@@ -48,9 +48,13 @@ class VideoOverlay extends StatelessWidget {
                                   color: Color(0xFFFFFFFF),
                                 ),
                                 onPressed: () => showModalBottomSheet(
+                                  isScrollControlled: true,
                                   context: context,
                                   builder: (context) {
-                                    return Settings(settingsStore: videoStore.settingsStore);
+                                    return SizedBox(
+                                      height: MediaQuery.of(context).size.height * 0.8,
+                                      child: Settings(settingsStore: videoStore.settingsStore),
+                                    );
                                   },
                                 ),
                               ),
@@ -87,6 +91,9 @@ class VideoOverlay extends StatelessWidget {
                                                       videoStore.streamInfo!.title,
                                                       maxLines: portrait ? 1 : 3,
                                                       overflow: TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        color: Color(0xFFFFFFFF),
+                                                      ),
                                                     ),
                                                   ),
                                                   const SizedBox(height: 5.0),

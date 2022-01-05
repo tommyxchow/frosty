@@ -182,34 +182,46 @@ void main() {
     test("emote should parse correctly", () {
       const sampleJson = """
         {
-          "id": 317897,
-          "user": {
-            "id": 84534,
-            "name": "vulpeshd",
-            "displayName": "VulpesHD"
+          "id": 27081,
+          "name": "ZreknarF",
+          "height": 30,
+          "width": 40,
+          "public": false,
+          "hidden": false,
+          "modifier": false,
+          "offset": null,
+          "margins": null,
+          "css": null,
+          "owner": {
+            "_id": 1,
+            "name": "sirstendec",
+            "display_name": "SirStendec"
           },
-          "code": "peepoPog",
-          "images": {
-            "1x": "https://cdn.betterttv.net/frankerfacez_emote/317897/1",
-            "2x": "https://cdn.betterttv.net/frankerfacez_emote/317897/2",
-            "4x": null
+          "urls": {
+            "1": "//cdn.frankerfacez.com/emote/27081/1",
+            "2": "//cdn.frankerfacez.com/emote/27081/2",
+            "4": "//cdn.frankerfacez.com/emote/27081/4"
           },
-          "imageType": "png"
+          "status": 1,
+          "usage_count": 1,
+          "created_at": "2015-06-01T05:52:57.770Z",
+          "last_updated": "2015-06-01T05:53:03.744Z"
         }
       """;
 
       final json = jsonDecode(sampleJson);
       final emote = EmoteFFZ.fromJson(json);
 
-      expect(emote.id, 317897);
-      expect(emote.user.id, 84534);
-      expect(emote.user.name, "vulpeshd");
-      expect(emote.user.displayName, "VulpesHD");
-      expect(emote.code, "peepoPog");
-      expect(emote.images.url1x, "https://cdn.betterttv.net/frankerfacez_emote/317897/1");
-      expect(emote.images.url2x, "https://cdn.betterttv.net/frankerfacez_emote/317897/2");
-      expect(emote.images.url4x, null);
-      expect(emote.imageType, "png");
+      expect(emote.id, 27081);
+      expect(emote.height, 30);
+      expect(emote.width, 40);
+      expect(emote.name, 'ZreknarF');
+      expect(emote.owner.id, 1);
+      expect(emote.owner.name, 'sirstendec');
+      expect(emote.owner.displayName, 'SirStendec');
+      expect(emote.urls.url1x, '//cdn.frankerfacez.com/emote/27081/1');
+      expect(emote.urls.url2x, '//cdn.frankerfacez.com/emote/27081/2');
+      expect(emote.urls.url4x, '//cdn.frankerfacez.com/emote/27081/4');
     });
   });
 

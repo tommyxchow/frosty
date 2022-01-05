@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart' as http;
 
@@ -38,5 +39,19 @@ class BTTV {
       debugPrint('Failed to get BTTV emotes for id: $id. Error code: ${response.statusCode}');
       return [];
     }
+  }
+
+  static Future<Map<String, BadgeInfoBTTV>?> getBadges() async {
+    final url = Uri.parse('https://api.betterttv.net/3/cached/badges');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final badges = jsonDecode(response.body) as List;
+
+      final badgeObjects = badges.map((badge) => BadgeInfoBTTV.fromJson(badge)).toList();
+
+      return {for (final badge in badgeObjects) badge.providerId: badge};
+    }
+    debugPrint('Failed to get FFZ badges');
   }
 }

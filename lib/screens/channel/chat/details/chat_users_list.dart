@@ -40,105 +40,115 @@ class _ChattersListState extends State<ChattersList> {
 
       const headers = [
         'Broadcaster',
-        'Moderators',
-        'VIPs',
         'Staff',
         'Admins',
         'Global Moderators',
-        'Users',
+        'Moderators',
+        'VIPs',
+        'Viewers',
       ];
 
       final userTypes = [
         chatters.broadcaster,
-        chatters.moderators,
-        chatters.vips,
         chatters.staff,
         chatters.admins,
         chatters.globalMods,
+        chatters.moderators,
+        chatters.vips,
         chatters.viewers,
       ].map((e) => e.where((user) => user.contains(_textController.text)).toList());
 
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: TextField(
-              controller: _textController,
-              onChanged: (value) => setState(() {}),
-              decoration: InputDecoration(
-                suffixIcon: IconButton(
-                  onPressed: () => setState(() => _textController.clear()),
-                  icon: const Icon(Icons.clear),
+      return GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: TextField(
+                controller: _textController,
+                autocorrect: false,
+                onChanged: (value) => setState(() {}),
+                decoration: InputDecoration(
+                  isDense: true,
+                  hintText: 'Filter chatters',
+                  contentPadding: const EdgeInsets.all(10.0),
+                  suffixIcon: IconButton(
+                    onPressed: () => setState(() {
+                      _textController.clear();
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    }),
+                    icon: const Icon(Icons.clear),
+                  ),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
                 ),
-                isDense: true,
-                contentPadding: const EdgeInsets.all(10.0),
-                border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                ),
-                hintText: 'Filter users',
               ),
             ),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () => widget.chatDetails.updateChatters(widget.userLogin),
-              child: Stack(
-                alignment: AlignmentDirectional.bottomCenter,
-                children: [
-                  CustomScrollView(
-                    controller: _scrollController,
-                    slivers: [
-                      SliverPadding(
-                        padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
-                        sliver: SliverToBoxAdapter(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Users', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                              const SizedBox(height: 5.0),
-                              Text('${NumberFormat().format(widget.chatDetails.chatUsers?.chatterCount)} users in chat'),
-                            ],
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await widget.chatDetails.updateChatters(widget.userLogin);
+                  setState(() {});
+                },
+                child: Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    CustomScrollView(
+                      controller: _scrollController,
+                      slivers: [
+                        SliverPadding(
+                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+                          sliver: SliverToBoxAdapter(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Chatters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                                const SizedBox(height: 5.0),
+                                Text('${NumberFormat().format(widget.chatDetails.chatUsers?.chatterCount)} in chat'),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      ...userTypes.expandIndexed(
-                        (index, type) => [
-                          if (type.isNotEmpty) ...[
-                            SliverPadding(
-                              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
-                              sliver: SliverToBoxAdapter(
-                                child: Text(
-                                  headers[index],
-                                  style: textStyle,
+                        ...userTypes.expandIndexed(
+                          (index, type) => [
+                            if (type.isNotEmpty) ...[
+                              SliverPadding(
+                                padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+                                sliver: SliverToBoxAdapter(
+                                  child: Text(
+                                    headers[index],
+                                    style: textStyle,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SliverPadding(
-                              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) => Text(type[index]),
-                                  childCount: type.length,
+                              SliverPadding(
+                                padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
+                                sliver: SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) => Text(type[index]),
+                                    childCount: type.length,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ]
-                        ],
-                      )
-                    ],
-                  ),
-                  if (_showJumpButton)
-                    IconButton(
-                      onPressed: () => _scrollController.jumpTo(0.0),
-                      icon: const Icon(
-                        Icons.arrow_circle_up,
-                      ),
+                            ]
+                          ],
+                        )
+                      ],
                     ),
-                ],
+                    if (_showJumpButton)
+                      IconButton(
+                        onPressed: () => _scrollController.jumpTo(0.0),
+                        icon: const Icon(
+                          Icons.arrow_circle_up,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
     return const Center(child: Text('Failed to get chatters :('));

@@ -50,6 +50,33 @@ mixin _$UserStore on _UserStoreBase, Store {
     return _$initAsyncAction.run(() => super.init(headers: headers));
   }
 
+  final _$blockAsyncAction = AsyncAction('_UserStoreBase.block');
+
+  @override
+  Future<void> block(
+      {required String targetId, required Map<String, String> headers}) {
+    return _$blockAsyncAction
+        .run(() => super.block(targetId: targetId, headers: headers));
+  }
+
+  final _$unblockAsyncAction = AsyncAction('_UserStoreBase.unblock');
+
+  @override
+  Future<void> unblock(
+      {required String targetId, required Map<String, String> headers}) {
+    return _$unblockAsyncAction
+        .run(() => super.unblock(targetId: targetId, headers: headers));
+  }
+
+  final _$refreshBlockedUsersAsyncAction =
+      AsyncAction('_UserStoreBase.refreshBlockedUsers');
+
+  @override
+  Future<void> refreshBlockedUsers({required Map<String, String> headers}) {
+    return _$refreshBlockedUsersAsyncAction
+        .run(() => super.refreshBlockedUsers(headers: headers));
+  }
+
   final _$_UserStoreBaseActionController =
       ActionController(name: '_UserStoreBase');
 

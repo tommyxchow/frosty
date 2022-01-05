@@ -14,10 +14,14 @@ class ChatBottomBar extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.adaptive.more),
           onPressed: () => showModalBottomSheet(
+            isScrollControlled: true,
             context: context,
-            builder: (_) => ChatDetails(
-              chatDetails: chatStore.chatDetailsStore,
-              userLogin: chatStore.channelName,
+            builder: (_) => SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: ChatDetails(
+                chatDetails: chatStore.chatDetailsStore,
+                userLogin: chatStore.channelName,
+              ),
             ),
           ),
         ),
@@ -30,7 +34,7 @@ class ChatBottomBar extends StatelessWidget {
               onTap: () {
                 chatStore.assetsStore.showEmoteMenu = false;
                 Future.delayed(
-                  const Duration(milliseconds: 100),
+                  const Duration(milliseconds: 200),
                   () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
                 );
               },
