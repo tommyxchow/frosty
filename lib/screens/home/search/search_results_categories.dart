@@ -17,11 +17,7 @@ class SearchResultsCategories extends StatelessWidget {
       builder: (context) {
         final future = searchStore.categoryFuture;
 
-        if (future == null) {
-          return const CircularProgressIndicator.adaptive();
-        }
-
-        switch (future.status) {
+        switch (future!.status) {
           case FutureStatus.pending:
             return const SliverToBoxAdapter(child: LoadingIndicator(subtitle: Text('Loading categories...')));
           case FutureStatus.rejected:

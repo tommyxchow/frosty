@@ -45,11 +45,7 @@ class SearchResultsChannels extends StatelessWidget {
       builder: (context) {
         final future = searchStore.channelFuture;
 
-        if (future == null) {
-          return const CircularProgressIndicator.adaptive();
-        }
-
-        switch (future.status) {
+        switch (future!.status) {
           case FutureStatus.pending:
             return const SliverToBoxAdapter(
               child: LoadingIndicator(
