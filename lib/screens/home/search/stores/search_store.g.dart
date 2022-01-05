@@ -26,41 +26,37 @@ mixin _$SearchStore on _SearchStoreBase, Store {
     });
   }
 
-  final _$_channelSearchResultsAtom =
-      Atom(name: '_SearchStoreBase._channelSearchResults');
+  final _$_channelFutureAtom = Atom(name: '_SearchStoreBase._channelFuture');
 
-  List<ChannelQuery> get channelSearchResults {
-    _$_channelSearchResultsAtom.reportRead();
-    return super._channelSearchResults;
+  ObservableFuture<List<ChannelQuery>>? get channelFuture {
+    _$_channelFutureAtom.reportRead();
+    return super._channelFuture;
   }
 
   @override
-  List<ChannelQuery> get _channelSearchResults => channelSearchResults;
+  ObservableFuture<List<ChannelQuery>>? get _channelFuture => channelFuture;
 
   @override
-  set _channelSearchResults(List<ChannelQuery> value) {
-    _$_channelSearchResultsAtom.reportWrite(value, super._channelSearchResults,
-        () {
-      super._channelSearchResults = value;
+  set _channelFuture(ObservableFuture<List<ChannelQuery>>? value) {
+    _$_channelFutureAtom.reportWrite(value, super._channelFuture, () {
+      super._channelFuture = value;
     });
   }
 
-  final _$_categorySearchResultsAtom =
-      Atom(name: '_SearchStoreBase._categorySearchResults');
+  final _$_categoryFutureAtom = Atom(name: '_SearchStoreBase._categoryFuture');
 
-  List<CategoryTwitch> get categorySearchResults {
-    _$_categorySearchResultsAtom.reportRead();
-    return super._categorySearchResults;
+  ObservableFuture<CategoriesTwitch?>? get categoryFuture {
+    _$_categoryFutureAtom.reportRead();
+    return super._categoryFuture;
   }
 
   @override
-  List<CategoryTwitch> get _categorySearchResults => categorySearchResults;
+  ObservableFuture<CategoriesTwitch?>? get _categoryFuture => categoryFuture;
 
   @override
-  set _categorySearchResults(List<CategoryTwitch> value) {
-    _$_categorySearchResultsAtom
-        .reportWrite(value, super._categorySearchResults, () {
-      super._categorySearchResults = value;
+  set _categoryFuture(ObservableFuture<CategoriesTwitch?>? value) {
+    _$_categoryFutureAtom.reportWrite(value, super._categoryFuture, () {
+      super._categoryFuture = value;
     });
   }
 
@@ -76,20 +72,6 @@ mixin _$SearchStore on _SearchStoreBase, Store {
   @override
   Future<void> handleQuery(String query) {
     return _$handleQueryAsyncAction.run(() => super.handleQuery(query));
-  }
-
-  final _$_SearchStoreBaseActionController =
-      ActionController(name: '_SearchStoreBase');
-
-  @override
-  void clearSearch() {
-    final _$actionInfo = _$_SearchStoreBaseActionController.startAction(
-        name: '_SearchStoreBase.clearSearch');
-    try {
-      return super.clearSearch();
-    } finally {
-      _$_SearchStoreBaseActionController.endAction(_$actionInfo);
-    }
   }
 
   @override

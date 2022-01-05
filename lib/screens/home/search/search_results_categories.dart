@@ -1,18 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/category.dart';
+import 'package:frosty/screens/home/search/stores/search_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:mobx/mobx.dart';
 
 class SearchResultsCategories extends StatelessWidget {
-  final List<CategoryTwitch> categories;
+  final SearchStore searchStore;
 
-  const SearchResultsCategories({Key? key, required this.categories}) : super(key: key);
+  const SearchResultsCategories({Key? key, required this.searchStore}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SliverGrid.count(
-      crossAxisCount: 2,
-      mainAxisSpacing: 20,
-      children: categories.map((category) => GridTile(child: CategoryCard(category: category))).toList(),
+    return Observer(
+      builder: (context) {
+        final future = searchStore.categoryFuture;
+
+        if (future == null) {
+          return const CircularProgressIndicator.adaptive();
+        }
+
+        switch (future.status) {
+          case FutureStatus.pending:
+            return const SliverToBoxAdapter(child: LoadingIndicator(subtitle: Text('Loading categories...')));
+          case FutureStatus.rejected:
+            return const SliverToBoxAdapter(child: Text('Failed to get categories.'));
+          case FutureStatus.fulfilled:
+            final CategoriesTwitch? categories = future.result;
+
+            if (categories == null) {
+              return const SliverToBoxAdapter(child: Text('Failed to get categories.'));
+            }
+
+            if (categories.data.isEmpty) {
+              return const SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 100.0,
+                  child: Center(child: Text('No matching categories.')),
+                ),
+              );
+            }
+
+            return SliverGrid.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 20,
+              children: categories.data.map((category) => GridTile(child: CategoryCard(category: category))).toList(),
+            );
+        }
+      },
     );
   }
 }

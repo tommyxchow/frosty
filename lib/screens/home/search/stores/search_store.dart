@@ -11,18 +11,16 @@ part 'search_store.g.dart';
 class SearchStore = _SearchStoreBase with _$SearchStore;
 
 abstract class _SearchStoreBase with Store {
-  final textController = TextEditingController();
-
   final AuthStore authStore;
 
   @readonly
   var _searchHistory = ObservableList<String>();
 
   @readonly
-  var _channelSearchResults = <ChannelQuery>[];
+  ObservableFuture<List<ChannelQuery>>? _channelFuture;
 
   @readonly
-  var _categorySearchResults = <CategoryTwitch>[];
+  ObservableFuture<CategoriesTwitch?>? _categoryFuture;
 
   _SearchStoreBase({required this.authStore}) {
     init();
@@ -48,15 +46,20 @@ abstract class _SearchStoreBase with Store {
     _searchHistory.remove(query);
     _searchHistory.insert(0, query);
 
-    final channelResults = await Twitch.searchChannels(query: query, headers: authStore.headersTwitch);
-    channelResults.sort((c1, c2) => c2.isLive ? 1 : -1);
+    _channelFuture = Twitch.searchChannels(
+      query: query,
+      headers: authStore.headersTwitch,
+    ).then(
+      (channels) {
+        channels.sort((c1, c2) => c2.isLive ? 1 : -1);
+        return channels;
+      },
+    ).asObservable();
 
-    _channelSearchResults = channelResults;
-
-    final categoryResults = await Twitch.searchCategories(query: query, headers: authStore.headersTwitch);
-    if (categoryResults != null) {
-      _categorySearchResults = categoryResults.data;
-    }
+    _categoryFuture = Twitch.searchCategories(
+      query: query,
+      headers: authStore.headersTwitch,
+    ).asObservable();
   }
 
   Future<Channel?> searchChannel(String query) async {
@@ -67,17 +70,5 @@ abstract class _SearchStoreBase with Store {
       debugPrint(e.toString());
       rethrow;
     }
-  }
-
-  @action
-  void clearSearch() {
-    textController.clear();
-    FocusManager.instance.primaryFocus?.unfocus();
-    _channelSearchResults = <ChannelQuery>[];
-    _categorySearchResults = <CategoryTwitch>[];
-  }
-
-  void dispose() {
-    textController.dispose();
   }
 }
