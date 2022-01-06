@@ -26,7 +26,7 @@ class Settings extends StatelessWidget {
             GeneralSettings(settingsStore: settingsStore),
             VideoSettings(settingsStore: settingsStore),
             ChatSettings(settingsStore: settingsStore),
-            const SectionHeader('Misc'),
+            const SectionHeader('Other'),
             ListTile(
               leading: const Icon(Icons.info),
               title: const Text('About'),
