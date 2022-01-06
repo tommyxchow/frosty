@@ -16,7 +16,7 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
-  static const _messageLimit = 5555;
+  static const _messageLimit = 5000;
 
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;

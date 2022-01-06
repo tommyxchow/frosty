@@ -56,8 +56,12 @@ class VideoChat extends StatelessWidget {
           tooltip: 'Settings',
           icon: const Icon(Icons.settings),
           onPressed: () => showModalBottomSheet(
+            isScrollControlled: true,
             context: context,
-            builder: (_) => Settings(settingsStore: settingsStore),
+            builder: (_) => SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Settings(settingsStore: settingsStore),
+            ),
           ),
         ),
       ],
