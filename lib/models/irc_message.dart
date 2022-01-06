@@ -420,16 +420,13 @@ class IRCMessage {
   TextSpan _createTextSpan({required String text, TextStyle? style}) {
     if (text.startsWith('@')) {
       return TextSpan(text: text, style: style?.copyWith(fontWeight: FontWeight.bold));
-    } else if (RegExp(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+').hasMatch(text)) {
-      // Regex above from https://stackoverflow.com/questions/59444837/flutter-dart-regex-to-extract-urls-from-a-string
-      final url = text.startsWith('http') ? text : 'https://' + text;
-
+    } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
         text: text,
         style: style?.copyWith(color: Colors.blue),
         recognizer: TapGestureRecognizer()
           ..onTap = () async {
-            if (await canLaunch(url)) launch(url);
+            if (await canLaunch(text)) launch(text);
           },
       );
     } else {
