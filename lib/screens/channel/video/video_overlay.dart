@@ -35,14 +35,16 @@ class VideoOverlay extends StatelessWidget {
                             children: [
                               if (!videoStore.settingsStore.fullScreen)
                                 IconButton(
+                                  tooltip: 'Back',
                                   icon: Icon(
                                     Icons.adaptive.arrow_back,
                                     color: const Color(0xFFFFFFFF),
                                   ),
-                                  onPressed: () => Navigator.of(context).pop(),
+                                  onPressed: Navigator.of(context).pop,
                                 ),
                               const Spacer(),
                               IconButton(
+                                tooltip: 'Settings',
                                 icon: const Icon(
                                   Icons.settings,
                                   color: Color(0xFFFFFFFF),
@@ -119,6 +121,7 @@ class VideoOverlay extends StatelessWidget {
                               ),
                               if (Platform.isIOS)
                                 IconButton(
+                                  tooltip: 'Picture-in-Picture',
                                   icon: const Icon(
                                     Icons.picture_in_picture_alt_rounded,
                                     color: Color(0xFFFFFFFF),
@@ -139,6 +142,7 @@ class VideoOverlay extends StatelessWidget {
                       ),
                       Center(
                         child: IconButton(
+                          tooltip: videoStore.paused ? 'Play' : 'Pause',
                           iconSize: 50.0,
                           icon: videoStore.paused
                               ? const Icon(

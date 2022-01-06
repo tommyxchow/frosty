@@ -18,22 +18,20 @@ class ChatDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Observer(
-        builder: (_) {
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
-                child: ChatModes(roomState: chatDetails.roomState),
+        builder: (_) => Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 15.0),
+              child: ChatModes(roomState: chatDetails.roomState),
+            ),
+            Expanded(
+              child: ChattersList(
+                chatDetails: chatDetails,
+                userLogin: userLogin,
               ),
-              Expanded(
-                child: ChattersList(
-                  chatDetails: chatDetails,
-                  userLogin: userLogin,
-                ),
-              )
-            ],
-          );
-        },
+            )
+          ],
+        ),
       ),
     );
   }

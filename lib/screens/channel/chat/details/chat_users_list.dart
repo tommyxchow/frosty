@@ -70,9 +70,10 @@ class _ChattersListState extends State<ChattersList> {
                 onChanged: (value) => setState(() {}),
                 decoration: InputDecoration(
                   isDense: true,
-                  hintText: 'Filter chatters',
+                  hintText: 'Filter',
                   contentPadding: const EdgeInsets.all(10.0),
                   suffixIcon: IconButton(
+                    tooltip: 'Clear Filter',
                     onPressed: () => setState(() {
                       _textController.clear();
                       FocusManager.instance.primaryFocus?.unfocus();
@@ -137,7 +138,8 @@ class _ChattersListState extends State<ChattersList> {
                       ],
                     ),
                     if (_showJumpButton)
-                      IconButton(
+                      ElevatedButton.icon(
+                        label: const Text('Scroll to Top'),
                         onPressed: () => _scrollController.jumpTo(0.0),
                         icon: const Icon(
                           Icons.arrow_circle_up,

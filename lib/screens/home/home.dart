@@ -58,6 +58,7 @@ class _HomeState extends State<Home> {
         ),
         actions: [
           IconButton(
+            tooltip: 'Settings',
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.push(
               context,

@@ -38,6 +38,7 @@ class _SearchState extends State<Search> {
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
               suffixIcon: IconButton(
+                tooltip: 'Clear Search',
                 onPressed: () {
                   setState(() {
                     textEditingController.clear();
@@ -77,6 +78,7 @@ class _SearchState extends State<Search> {
                                     leading: const Icon(Icons.history),
                                     title: Text(searchTerm),
                                     trailing: IconButton(
+                                      tooltip: 'Remove',
                                       icon: const Icon(Icons.cancel),
                                       onPressed: () => setState(() {
                                         searchStore.searchHistory.removeAt(index);

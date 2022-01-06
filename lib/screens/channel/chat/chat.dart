@@ -79,11 +79,12 @@ class _ChatState extends State<Chat> {
                   builder: (_) => Visibility(
                     visible: !chatStore.autoScroll,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       width: double.infinity,
-                      child: ElevatedButton(
+                      child: ElevatedButton.icon(
                         onPressed: chatStore.resumeScroll,
-                        child: const Text('Resume Scroll'),
+                        label: const Text('Resume Scroll'),
+                        icon: const Icon(Icons.arrow_circle_down),
                       ),
                     ),
                   ),
