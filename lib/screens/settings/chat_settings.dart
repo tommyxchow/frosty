@@ -18,6 +18,13 @@ class ChatSettings extends StatelessWidget {
             const SectionHeader('Chat'),
             SwitchListTile.adaptive(
               isThreeLine: true,
+              title: const Text('Use more readable colors for chat names'),
+              subtitle: const Text('Attempts to make names more readable by boosting the lightness of darker colors.'),
+              value: settingsStore.useReadableColors,
+              onChanged: (newValue) => settingsStore.useReadableColors = newValue,
+            ),
+            SwitchListTile.adaptive(
+              isThreeLine: true,
               title: const Text('Hide banned and deleted messages'),
               subtitle: const Text('Replaces deleted, timed-out, and banned user messages with "<message deleted>".'),
               value: settingsStore.hideBannedMessages,

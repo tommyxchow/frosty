@@ -104,7 +104,7 @@ abstract class _ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      debugPrint(message);
+      // debugPrint(message);
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message, userLogin: auth.user.details?.login);
 

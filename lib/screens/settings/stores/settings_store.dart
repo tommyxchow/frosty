@@ -29,6 +29,9 @@ abstract class _SettingsStoreBase with Store {
 
   // Chat Settings
   @observable
+  var useReadableColors = false;
+
+  @observable
   var hideBannedMessages = false;
 
   @observable

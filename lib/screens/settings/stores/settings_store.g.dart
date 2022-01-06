@@ -12,6 +12,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showVideo = json['showVideo'] as bool
       ..showOverlay = json['showOverlay'] as bool
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool
+      ..useReadableColors = json['useReadableColors'] as bool
       ..hideBannedMessages = json['hideBannedMessages'] as bool
       ..showZeroWidth = json['showZeroWidth'] as bool
       ..showTimestamps = json['showTimestamps'] as bool
@@ -25,6 +26,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'showThumbnailUptime': instance.showThumbnailUptime,
+      'useReadableColors': instance.useReadableColors,
       'hideBannedMessages': instance.hideBannedMessages,
       'showZeroWidth': instance.showZeroWidth,
       'showTimestamps': instance.showTimestamps,
@@ -98,6 +100,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showThumbnailUptime(bool value) {
     _$showThumbnailUptimeAtom.reportWrite(value, super.showThumbnailUptime, () {
       super.showThumbnailUptime = value;
+    });
+  }
+
+  final _$useReadableColorsAtom =
+      Atom(name: '_SettingsStoreBase.useReadableColors');
+
+  @override
+  bool get useReadableColors {
+    _$useReadableColorsAtom.reportRead();
+    return super.useReadableColors;
+  }
+
+  @override
+  set useReadableColors(bool value) {
+    _$useReadableColorsAtom.reportWrite(value, super.useReadableColors, () {
+      super.useReadableColors = value;
     });
   }
 
@@ -201,6 +219,7 @@ useOledTheme: ${useOledTheme},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 showThumbnailUptime: ${showThumbnailUptime},
+useReadableColors: ${useReadableColors},
 hideBannedMessages: ${hideBannedMessages},
 showZeroWidth: ${showZeroWidth},
 showTimestamps: ${showTimestamps},

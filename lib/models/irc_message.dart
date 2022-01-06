@@ -84,6 +84,7 @@ class IRCMessage {
     RoomFFZ? ffzRoomInfo,
     bool hideMessage = false,
     bool zeroWidthEnabled = false,
+    bool useReadableColors = false,
     Timestamp timestamp = Timestamp.none,
   }) {
     const badgeHeight = 20.0;
@@ -228,12 +229,22 @@ class IRCMessage {
       }
     }
 
-    // Add the username to the span.
+    var color = HexColor.fromHex(tags['color'] ?? '#868686');
+
+    if (useReadableColors) {
+      final hsl = HSLColor.fromColor(color);
+      if (hsl.lightness <= 0.5) color = hsl.withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5)).toColor();
+    }
+
+    // Printing template for debugging purposes.
+    // debugPrint('OLD - NAME: ${tags['display-name']!}, HUE: ${hsl.hue}, SATURATION: ${hsl.saturation}, LIGHNTESS: ${hsl.lightness}');
+    // debugPrint('NEW - NAME: ${tags['display-name']!}, HUE: ${hsl.hue}, SATURATION: ${hsl.saturation}, LIGHNTESS: ${hsl.lightness}');
+
     span.add(
       TextSpan(
         text: tags['display-name']!,
         style: TextStyle(
-          color: HexColor.fromHex(tags['color'] ?? '#868686'),
+          color: color,
           fontWeight: FontWeight.bold,
         ),
       ),
