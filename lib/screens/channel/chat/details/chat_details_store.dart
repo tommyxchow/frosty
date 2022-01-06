@@ -16,8 +16,23 @@ abstract class _ChatDetailsStoreBase with Store {
   @readonly
   ChatUsers? _chatUsers;
 
+  @observable
+  var showJumpButton = false;
+
+  @observable
+  var filterText = '';
+
+  @computed
+  Iterable<List<String>> get filteredUsers => [
+        _chatUsers!.chatters.broadcaster,
+        _chatUsers!.chatters.staff,
+        _chatUsers!.chatters.admins,
+        _chatUsers!.chatters.globalMods,
+        _chatUsers!.chatters.moderators,
+        _chatUsers!.chatters.vips,
+        _chatUsers!.chatters.viewers,
+      ].map((e) => e.where((user) => user.contains(filterText)).toList());
+
   @action
-  Future<void> updateChatters(String userLogin) async {
-    _chatUsers = await Twitch.getChatters(userLogin: userLogin);
-  }
+  Future<void> updateChatters(String userLogin) async => _chatUsers = await Twitch.getChatters(userLogin: userLogin);
 }
