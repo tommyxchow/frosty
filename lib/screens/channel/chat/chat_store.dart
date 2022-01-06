@@ -63,7 +63,7 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
-  late ReactionDisposer disposeEmoteMenuReaction;
+  late final ReactionDisposer disposeEmoteMenuReaction;
 
   _ChatStoreBase({
     required this.auth,

@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/search/search.dart';
 import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/streams_list.dart';
 import 'package:frosty/screens/home/top/top_section.dart';
@@ -12,12 +13,14 @@ import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
   final ListStore topSectionStore;
+  final CategoriesStore categoriesSectionStore;
   final SearchStore searchStore;
   final ListStore? followedStreamsStore;
 
   const Home({
     Key? key,
     required this.topSectionStore,
+    required this.categoriesSectionStore,
     required this.searchStore,
     required this.followedStreamsStore,
   }) : super(key: key);
@@ -76,7 +79,10 @@ class _HomeState extends State<Home> {
               index: _selectedIndex,
               children: [
                 if (authStore.isLoggedIn) StreamsList(store: widget.followedStreamsStore!),
-                TopSection(topSectionStore: widget.topSectionStore),
+                TopSection(
+                  topSectionStore: widget.topSectionStore,
+                  categoriesSectionStore: widget.categoriesSectionStore,
+                ),
                 Search(searchStore: widget.searchStore),
               ],
             );

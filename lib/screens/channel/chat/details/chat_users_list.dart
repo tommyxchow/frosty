@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
+import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:intl/intl.dart';
 
 class ChattersList extends StatefulWidget {
@@ -137,14 +138,7 @@ class _ChattersListState extends State<ChattersList> {
                         )
                       ],
                     ),
-                    if (_showJumpButton)
-                      ElevatedButton.icon(
-                        label: const Text('Scroll to Top'),
-                        onPressed: () => _scrollController.jumpTo(0.0),
-                        icon: const Icon(
-                          Icons.arrow_circle_up,
-                        ),
-                      ),
+                    if (_showJumpButton) ScrollToTopButton(scrollController: _scrollController)
                   ],
                 ),
               ),

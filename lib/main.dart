@@ -6,6 +6,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
@@ -24,8 +25,15 @@ Future<void> main() async {
   final preferences = await SharedPreferences.getInstance();
   final userSettings = preferences.getString('settings');
 
-  // Initialize a settings store from existing settings. If existing settings don't exist create a new one.
-  final settingsStore = userSettings != null ? SettingsStore.fromJson(jsonDecode(userSettings)) : SettingsStore();
+  SettingsStore settingsStore;
+  try {
+    // Initialize a settings store from existing settings.
+    settingsStore = SettingsStore.fromJson(jsonDecode(userSettings!));
+  } catch (e) {
+    // If existing settings don't exist or if the settings could not be decoded properly, create a new one.
+    // This will also occur when new settings are added to the app.
+    settingsStore = SettingsStore();
+  }
 
   // Create a MobX reaction that will save the settings on disk everytime they are changed.
   autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
@@ -96,6 +104,7 @@ class MyApp extends StatelessWidget {
               authStore: authStore,
               listType: ListType.top,
             ),
+            categoriesSectionStore: CategoriesStore(authStore: authStore),
             followedStreamsStore: authStore.isLoggedIn
                 ? ListStore(
                     authStore: authStore,
