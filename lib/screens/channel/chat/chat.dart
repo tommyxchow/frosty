@@ -45,7 +45,10 @@ class _ChatState extends State<Chat> {
 
                           if (message.user != null && message.user != chatStore.auth.user.details?.login) {
                             return InkWell(
-                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                              onTap: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                                if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
+                              },
                               onLongPress: () => showModalBottomSheet(
                                 context: context,
                                 builder: (context) => ChatUserModal(

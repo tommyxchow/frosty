@@ -16,6 +16,8 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
+  static const _messageLimit = 5555;
+
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
 
@@ -148,9 +150,9 @@ abstract class _ChatStoreBase with Store {
             continue;
         }
 
-        if (_messages.length >= 5000) _messages.removeAt(0);
-
         if (_autoScroll) {
+          if (_messages.length >= _messageLimit) _messages.removeAt(0);
+
           SchedulerBinding.instance?.addPostFrameCallback((_) {
             if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
           });
@@ -184,6 +186,8 @@ abstract class _ChatStoreBase with Store {
   /// Re-enables [_autoScroll] and jumps to the latest message.
   @action
   void resumeScroll() {
+    if (_messages.length >= _messageLimit) _messages.removeRange(0, _messages.length - _messageLimit);
+
     _autoScroll = true;
 
     // Jump to the latest message (bottom of the list/chat).
