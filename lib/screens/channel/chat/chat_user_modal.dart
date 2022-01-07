@@ -22,8 +22,11 @@ class ChatUserModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userMessages = chatStore.messages.reversed.where((message) => message.user == username).toList();
+
     return Scaffold(
       body: SafeArea(
+        bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -51,29 +54,31 @@ class ChatUserModal extends StatelessWidget {
               padding: EdgeInsets.all(10.0),
             ),
             Expanded(
-              child: ListView(
-                reverse: true,
-                children: chatStore.messages.reversed
-                    .where((message) => message.user == username)
-                    .map(
-                      (message) => InkWell(
-                        onLongPress: () async {
-                          await Clipboard.setData(ClipboardData(text: message.message!));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Message copied!'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        },
-                        child: ChatMessage(
-                          ircMessage: message,
-                          assetsStore: chatStore.assetsStore,
-                          settingsStore: chatStore.settings,
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.fontScale),
+                child: ListView.separated(
+                  reverse: true,
+                  itemBuilder: (context, index) => InkWell(
+                    onLongPress: () async {
+                      await Clipboard.setData(ClipboardData(text: userMessages[index].message));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Message copied!'),
+                          behavior: SnackBarBehavior.floating,
                         ),
-                      ),
-                    )
-                    .toList(),
+                      );
+                    },
+                    child: ChatMessage(
+                      ircMessage: userMessages[index],
+                      assetsStore: chatStore.assetsStore,
+                      settingsStore: chatStore.settings,
+                    ),
+                  ),
+                  separatorBuilder: (context, index) => SizedBox(
+                    height: chatStore.settings.messageSpacing,
+                  ),
+                  itemCount: userMessages.length,
+                ),
               ),
             )
           ],
