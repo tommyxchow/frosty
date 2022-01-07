@@ -14,42 +14,54 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
 
 abstract class _SettingsStoreBase with Store {
   //General Settings
+  @JsonKey(defaultValue: false)
   @observable
   var useOledTheme = false;
 
+  @JsonKey(defaultValue: true)
   @observable
   var showThumbnailUptime = true;
 
   // Video Settings
+  @JsonKey(defaultValue: true)
   @observable
   var showVideo = true;
 
+  @JsonKey(defaultValue: true)
   @observable
   var showOverlay = true;
 
+  @JsonKey(defaultValue: false)
   @observable
   var pictureInPicture = false;
 
   // Chat Settings
+  @JsonKey(defaultValue: false)
   @observable
   var showDeletedMessages = false;
 
+  @JsonKey(defaultValue: false)
   @observable
   var showZeroWidth = false;
 
+  @JsonKey(defaultValue: false)
   @observable
   var showTimestamps = false;
 
+  @JsonKey(defaultValue: false)
   @observable
   var useTwelveHourTimestamps = false;
 
+  @JsonKey(defaultValue: true)
   @observable
   var useReadableColors = true;
 
   // Global configs
+  @JsonKey(defaultValue: false)
   @observable
   var fullScreen = false;
 
+  @JsonKey(defaultValue: true)
   @observable
   var expandInfo = true;
 

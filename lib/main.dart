@@ -22,18 +22,12 @@ Future<void> main() async {
   await authStore.init();
 
   // Get the shared pereferences instance and obtain the existing user settings if it exists.
+  // If default settings don't exist, use an empty JSON string to use the default values.
   final preferences = await SharedPreferences.getInstance();
-  final userSettings = preferences.getString('settings');
+  final userSettings = preferences.getString('settings') ?? '{}';
 
-  SettingsStore settingsStore;
-  try {
-    // Initialize a settings store from existing settings.
-    settingsStore = SettingsStore.fromJson(jsonDecode(userSettings!));
-  } catch (e) {
-    // If existing settings don't exist or if the settings could not be decoded properly, create a new one.
-    // This will also occur when new settings are added to the app.
-    settingsStore = SettingsStore();
-  }
+  // Initialize a settings store from the settings JSON string.
+  final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
 
   // Create a MobX reaction that will save the settings on disk everytime they are changed.
   autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));

@@ -8,18 +8,19 @@ part of 'settings_store.dart';
 
 SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
     SettingsStore()
-      ..useOledTheme = json['useOledTheme'] as bool
-      ..showThumbnailUptime = json['showThumbnailUptime'] as bool
-      ..showVideo = json['showVideo'] as bool
-      ..showOverlay = json['showOverlay'] as bool
-      ..pictureInPicture = json['pictureInPicture'] as bool
-      ..showDeletedMessages = json['showDeletedMessages'] as bool
-      ..showZeroWidth = json['showZeroWidth'] as bool
-      ..showTimestamps = json['showTimestamps'] as bool
-      ..useTwelveHourTimestamps = json['useTwelveHourTimestamps'] as bool
-      ..useReadableColors = json['useReadableColors'] as bool
-      ..fullScreen = json['fullScreen'] as bool
-      ..expandInfo = json['expandInfo'] as bool;
+      ..useOledTheme = json['useOledTheme'] as bool? ?? false
+      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? true
+      ..showVideo = json['showVideo'] as bool? ?? true
+      ..showOverlay = json['showOverlay'] as bool? ?? true
+      ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
+      ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
+      ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
+      ..showTimestamps = json['showTimestamps'] as bool? ?? false
+      ..useTwelveHourTimestamps =
+          json['useTwelveHourTimestamps'] as bool? ?? false
+      ..useReadableColors = json['useReadableColors'] as bool? ?? true
+      ..fullScreen = json['fullScreen'] as bool? ?? false
+      ..expandInfo = json['expandInfo'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
