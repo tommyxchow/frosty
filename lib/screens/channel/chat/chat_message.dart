@@ -18,7 +18,8 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const padding = EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0);
+    const highlightPadding = EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0);
+    const messagePadding = EdgeInsets.symmetric(horizontal: 10.0);
 
     return Observer(
       builder: (context) {
@@ -46,13 +47,13 @@ class ChatMessage extends StatelessWidget {
 
             if (ircMessage.mention) {
               return Container(
-                padding: padding,
+                padding: highlightPadding,
                 color: const Color(0x4DFF0000),
                 child: span,
               );
             }
             return Padding(
-              padding: padding,
+              padding: messagePadding,
               child: span,
             );
           case Command.clearChat:
@@ -60,7 +61,7 @@ class ChatMessage extends StatelessWidget {
             // Render timeouts and bans
             final banDuration = ircMessage.tags['ban-duration'];
             return Padding(
-              padding: padding,
+              padding: highlightPadding,
               child: Opacity(
                 opacity: 0.50,
                 child: Column(
@@ -95,7 +96,7 @@ class ChatMessage extends StatelessWidget {
             );
           case Command.notice:
             return Padding(
-              padding: padding,
+              padding: messagePadding,
               child: Text.rich(
                 TextSpan(
                   text: ircMessage.message,
@@ -107,7 +108,7 @@ class ChatMessage extends StatelessWidget {
             );
           case Command.userNotice:
             return Container(
-              padding: padding,
+              padding: highlightPadding,
               color: const Color(0x339147FF),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

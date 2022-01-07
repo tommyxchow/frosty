@@ -60,6 +60,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var fontScale = 1.0;
 
+  @JsonKey(defaultValue: 10.0)
+  @observable
+  var messageSpacing = 10.0;
+
   // Global configs
   @JsonKey(defaultValue: false)
   @observable

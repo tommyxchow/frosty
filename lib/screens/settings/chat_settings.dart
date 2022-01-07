@@ -50,17 +50,37 @@ class ChatSettings extends StatelessWidget {
             ListTile(
               isThreeLine: true,
               title: Text('Font scale: ${settingsStore.fontScale.toStringAsFixed(1)}x'),
+              subtitle: Slider.adaptive(
+                value: settingsStore.fontScale,
+                min: 0.5,
+                max: 2.0,
+                divisions: 15,
+                onChanged: (newValue) => settingsStore.fontScale = newValue,
+              ),
+            ),
+            ListTile(
+              title: Text('Message spacing: ${settingsStore.messageSpacing.toStringAsFixed(0)}'),
+              subtitle: Slider.adaptive(
+                value: settingsStore.messageSpacing,
+                min: 0.0,
+                max: 30.0,
+                divisions: 30,
+                onChanged: (newValue) => settingsStore.messageSpacing = newValue,
+              ),
+            ),
+            ListTile(
+              isThreeLine: true,
+              title: const Text('Preview'),
               subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Slider.adaptive(
-                    value: settingsStore.fontScale,
-                    min: 0.5,
-                    max: 2.0,
-                    divisions: 15,
-                    onChanged: (newValue) => settingsStore.fontScale = newValue,
-                  ),
                   Text(
                     'Hello! This is a preview for the font scale.',
+                    textScaleFactor: settingsStore.fontScale,
+                  ),
+                  SizedBox(height: settingsStore.messageSpacing),
+                  Text(
+                    'This is a another message to see spacing!',
                     textScaleFactor: settingsStore.fontScale,
                   ),
                 ],

@@ -36,11 +36,12 @@ class _ChatState extends State<Chat> {
                   child: MediaQuery(
                     data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.fontScale),
                     child: Observer(
-                      builder: (context) => ListView.builder(
+                      builder: (context) => ListView.separated(
                         addAutomaticKeepAlives: false,
                         addRepaintBoundaries: false,
                         itemCount: chatStore.messages.length,
                         controller: chatStore.scrollController,
+                        separatorBuilder: (context, index) => SizedBox(height: chatStore.settings.messageSpacing),
                         itemBuilder: (context, index) => Observer(
                           builder: (context) {
                             final message = chatStore.messages[index];
@@ -95,6 +96,7 @@ class _ChatState extends State<Chat> {
               ],
             ),
           ),
+          const SizedBox(height: 5.0),
           if (chatStore.auth.isLoggedIn) ChatBottomBar(chatStore: chatStore),
           if (chatStore.assetsStore.showEmoteMenu)
             Flexible(
