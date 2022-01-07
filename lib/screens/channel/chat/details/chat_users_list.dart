@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:intl/intl.dart';
 
@@ -50,9 +51,10 @@ class _ChattersListState extends State<ChattersList> {
     ];
 
     final chatDetailStore = widget.chatDetails;
+    chatDetailStore.updateChatters(widget.userLogin);
 
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: FocusManager.instance.primaryFocus?.unfocus,
       child: Column(
         children: [
           Padding(
@@ -89,7 +91,7 @@ class _ChattersListState extends State<ChattersList> {
                   Observer(
                     builder: (context) {
                       if (chatDetailStore.chatUsers == null) {
-                        return const Center(child: Text('Failed to get chatters :('));
+                        return const LoadingIndicator(subtitle: Text('Fetching chatters...'));
                       }
 
                       return CustomScrollView(
