@@ -47,6 +47,24 @@ class ChatSettings extends StatelessWidget {
               value: settingsStore.useReadableColors,
               onChanged: (newValue) => settingsStore.useReadableColors = newValue,
             ),
+            const SizedBox(height: 20),
+            ListTile(
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Hello! This is a text preview message.',
+                    textScaleFactor: settingsStore.fontScale,
+                  ),
+                  SizedBox(height: settingsStore.messageSpacing),
+                  Text(
+                    'This is a another message to visualize spacing!',
+                    textScaleFactor: settingsStore.fontScale,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
             ListTile(
               isThreeLine: true,
               title: Text('Font scale: ${settingsStore.fontScale.toStringAsFixed(1)}x'),
@@ -66,24 +84,6 @@ class ChatSettings extends StatelessWidget {
                 max: 30.0,
                 divisions: 30,
                 onChanged: (newValue) => settingsStore.messageSpacing = newValue,
-              ),
-            ),
-            ListTile(
-              isThreeLine: true,
-              title: const Text('Preview'),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Hello! This is a preview for the font scale.',
-                    textScaleFactor: settingsStore.fontScale,
-                  ),
-                  SizedBox(height: settingsStore.messageSpacing),
-                  Text(
-                    'This is a another message to see spacing!',
-                    textScaleFactor: settingsStore.fontScale,
-                  ),
-                ],
               ),
             ),
           ],

@@ -20,6 +20,7 @@ class Settings extends StatelessWidget {
         title: const Text('Settings'),
       ),
       body: SafeArea(
+        bottom: false,
         child: ListView(
           children: [
             AccountSettings(
