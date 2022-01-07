@@ -119,6 +119,14 @@ class VideoOverlay extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              IconButton(
+                                tooltip: 'Refresh',
+                                icon: const Icon(
+                                  Icons.refresh,
+                                  color: Color(0xFFFFFFFF),
+                                ),
+                                onPressed: videoStore.controller?.reload,
+                              ),
                               if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                                 IconButton(
                                   tooltip: 'Picture-in-Picture',
@@ -130,6 +138,7 @@ class VideoOverlay extends StatelessWidget {
                                 ),
                               if (MediaQuery.of(context).orientation == Orientation.landscape)
                                 IconButton(
+                                  tooltip: 'Fullscreen',
                                   icon: const Icon(
                                     Icons.fullscreen,
                                     color: Color(0xFFFFFFFF),
