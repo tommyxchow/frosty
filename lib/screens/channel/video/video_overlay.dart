@@ -125,7 +125,7 @@ class VideoOverlay extends StatelessWidget {
                                   Icons.refresh,
                                   color: Color(0xFFFFFFFF),
                                 ),
-                                onPressed: videoStore.controller?.reload,
+                                onPressed: videoStore.handleRefresh,
                               ),
                               if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                                 IconButton(

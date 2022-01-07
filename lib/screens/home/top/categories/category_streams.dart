@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -16,7 +17,10 @@ class CategoryStreams extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: store.refreshStreams,
+        onRefresh: () async {
+          HapticFeedback.lightImpact();
+          await store.refreshStreams();
+        },
         child: Observer(
           builder: (context) {
             return Stack(

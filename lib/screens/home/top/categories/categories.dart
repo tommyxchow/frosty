@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
@@ -24,7 +25,10 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
     store.refreshCategories();
 
     return RefreshIndicator(
-      onRefresh: store.refreshCategories,
+      onRefresh: () async {
+        HapticFeedback.lightImpact();
+        await store.refreshCategories();
+      },
       child: Observer(
         builder: (_) {
           return Stack(

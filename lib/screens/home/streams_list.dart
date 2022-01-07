@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -24,7 +25,10 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
     store.refreshStreams();
 
     return RefreshIndicator(
-      onRefresh: store.refreshStreams,
+      onRefresh: () async {
+        HapticFeedback.lightImpact();
+        await store.refreshStreams();
+      },
       child: Observer(
         builder: (_) {
           if (store.streams.isEmpty && store.isLoading) {
