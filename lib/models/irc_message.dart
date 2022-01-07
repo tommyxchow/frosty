@@ -82,8 +82,8 @@ class IRCMessage {
     Map<String, List<BadgeInfo7TV>>? sevenTVUserToBadges,
     Map<String, BadgeInfoBTTV>? bttvUserToBadge,
     RoomFFZ? ffzRoomInfo,
-    bool hideMessage = false,
-    bool zeroWidthEnabled = false,
+    bool showMessage = true,
+    bool useZeroWidth = false,
     bool useReadableColors = false,
     Timestamp timestamp = Timestamp.none,
   }) {
@@ -258,7 +258,7 @@ class IRCMessage {
     // Italicize the text it was called with an IRC Action i.e., "/me".
     final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;
 
-    if (hideMessage) {
+    if (!showMessage) {
       span.add(const TextSpan(text: ' <message deleted>'));
     } else {
       // Add the message and any emotes to the span.
@@ -267,7 +267,7 @@ class IRCMessage {
         final words = chatMessage.split(' ');
         words.removeWhere((element) => element == '');
 
-        if (zeroWidthEnabled) {
+        if (useZeroWidth) {
           final localSpan = <InlineSpan>[];
 
           var index = words.length - 1;

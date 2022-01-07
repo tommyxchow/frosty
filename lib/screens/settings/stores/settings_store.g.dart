@@ -6,28 +6,26 @@ part of 'settings_store.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
-    SettingsStore()
-      ..useOledTheme = json['useOledTheme'] as bool
-      ..showVideo = json['showVideo'] as bool
-      ..showOverlay = json['showOverlay'] as bool
-      ..showThumbnailUptime = json['showThumbnailUptime'] as bool
-      ..useReadableColors = json['useReadableColors'] as bool
-      ..hideBannedMessages = json['hideBannedMessages'] as bool
-      ..showZeroWidth = json['showZeroWidth'] as bool
-      ..showTimestamps = json['showTimestamps'] as bool
-      ..useTwelveHourTimestamps = json['useTwelveHourTimestamps'] as bool
-      ..fullScreen = json['fullScreen'] as bool
-      ..expandInfo = json['expandInfo'] as bool;
+SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) => SettingsStore()
+  ..useOledTheme = json['useOledTheme'] as bool
+  ..showVideo = json['showVideo'] as bool
+  ..showOverlay = json['showOverlay'] as bool
+  ..showThumbnailUptime = json['showThumbnailUptime'] as bool
+  ..useReadableColors = json['useReadableColors'] as bool
+  ..showDeletedMessages = json['hideBannedMessages'] as bool
+  ..showZeroWidth = json['showZeroWidth'] as bool
+  ..showTimestamps = json['showTimestamps'] as bool
+  ..useTwelveHourTimestamps = json['useTwelveHourTimestamps'] as bool
+  ..fullScreen = json['fullScreen'] as bool
+  ..expandInfo = json['expandInfo'] as bool;
 
-Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) => <String, dynamic>{
       'useOledTheme': instance.useOledTheme,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'showThumbnailUptime': instance.showThumbnailUptime,
       'useReadableColors': instance.useReadableColors,
-      'hideBannedMessages': instance.hideBannedMessages,
+      'hideBannedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
       'showTimestamps': instance.showTimestamps,
       'useTwelveHourTimestamps': instance.useTwelveHourTimestamps,
@@ -87,8 +85,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showThumbnailUptimeAtom =
-      Atom(name: '_SettingsStoreBase.showThumbnailUptime');
+  final _$showThumbnailUptimeAtom = Atom(name: '_SettingsStoreBase.showThumbnailUptime');
 
   @override
   bool get showThumbnailUptime {
@@ -103,8 +100,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$useReadableColorsAtom =
-      Atom(name: '_SettingsStoreBase.useReadableColors');
+  final _$useReadableColorsAtom = Atom(name: '_SettingsStoreBase.useReadableColors');
 
   @override
   bool get useReadableColors {
@@ -119,19 +115,18 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$hideBannedMessagesAtom =
-      Atom(name: '_SettingsStoreBase.hideBannedMessages');
+  final _$hideBannedMessagesAtom = Atom(name: '_SettingsStoreBase.hideBannedMessages');
 
   @override
-  bool get hideBannedMessages {
+  bool get showDeletedMessages {
     _$hideBannedMessagesAtom.reportRead();
-    return super.hideBannedMessages;
+    return super.showDeletedMessages;
   }
 
   @override
-  set hideBannedMessages(bool value) {
-    _$hideBannedMessagesAtom.reportWrite(value, super.hideBannedMessages, () {
-      super.hideBannedMessages = value;
+  set showDeletedMessages(bool value) {
+    _$hideBannedMessagesAtom.reportWrite(value, super.showDeletedMessages, () {
+      super.showDeletedMessages = value;
     });
   }
 
@@ -165,8 +160,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$useTwelveHourTimestampsAtom =
-      Atom(name: '_SettingsStoreBase.useTwelveHourTimestamps');
+  final _$useTwelveHourTimestampsAtom = Atom(name: '_SettingsStoreBase.useTwelveHourTimestamps');
 
   @override
   bool get useTwelveHourTimestamps {
@@ -176,8 +170,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set useTwelveHourTimestamps(bool value) {
-    _$useTwelveHourTimestampsAtom
-        .reportWrite(value, super.useTwelveHourTimestamps, () {
+    _$useTwelveHourTimestampsAtom.reportWrite(value, super.useTwelveHourTimestamps, () {
       super.useTwelveHourTimestamps = value;
     });
   }
@@ -220,7 +213,7 @@ showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 showThumbnailUptime: ${showThumbnailUptime},
 useReadableColors: ${useReadableColors},
-hideBannedMessages: ${hideBannedMessages},
+hideBannedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
 showTimestamps: ${showTimestamps},
 useTwelveHourTimestamps: ${useTwelveHourTimestamps},

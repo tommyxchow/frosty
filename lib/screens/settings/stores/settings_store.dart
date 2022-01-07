@@ -32,7 +32,7 @@ abstract class _SettingsStoreBase with Store {
   var useReadableColors = false;
 
   @observable
-  var hideBannedMessages = false;
+  var showDeletedMessages = false;
 
   @observable
   var showZeroWidth = false;

@@ -17,18 +17,16 @@ class ChatSettings extends StatelessWidget {
           children: [
             const SectionHeader('Chat'),
             SwitchListTile.adaptive(
-              isThreeLine: true,
-              title: const Text('Use more readable colors for chat names'),
-              subtitle: const Text('Attempts to make names more readable by boosting the lightness of darker colors.'),
-              value: settingsStore.useReadableColors,
-              onChanged: (newValue) => settingsStore.useReadableColors = newValue,
+              title: const Text('Show deleted messages'),
+              value: settingsStore.showDeletedMessages,
+              onChanged: (newValue) => settingsStore.showDeletedMessages = newValue,
             ),
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Hide banned and deleted messages'),
-              subtitle: const Text('Replaces deleted, timed-out, and banned user messages with "<message deleted>".'),
-              value: settingsStore.hideBannedMessages,
-              onChanged: (newValue) => settingsStore.hideBannedMessages = newValue,
+              title: const Text('Use readable colors for chat names'),
+              subtitle: const Text('Make chat names more readable by boosting the lightness of darker colors.'),
+              value: settingsStore.useReadableColors,
+              onChanged: (newValue) => settingsStore.useReadableColors = newValue,
             ),
             SwitchListTile.adaptive(
               isThreeLine: true,
@@ -39,8 +37,8 @@ class ChatSettings extends StatelessWidget {
             ),
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Show timestamps'),
-              subtitle: const Text('Displays 24-hour timestamps for when a chat message was sent.'),
+              title: const Text('Show message timestamps'),
+              subtitle: const Text('Displays timestamps for when a chat message was sent.'),
               value: settingsStore.showTimestamps,
               onChanged: (newValue) => settingsStore.showTimestamps = newValue,
             ),
