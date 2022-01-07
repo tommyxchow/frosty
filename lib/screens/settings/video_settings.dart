@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -24,10 +26,16 @@ class VideoSettings extends StatelessWidget {
             SwitchListTile.adaptive(
               isThreeLine: true,
               title: const Text('Use custom video overlay'),
-              subtitle: const Text('Replaces the default web video overlay with a simple and mobile-friendly version.'),
+              subtitle: const Text('Replaces the default video overlay with a mobile-friendly version.'),
               value: settingsStore.showOverlay,
               onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
             ),
+            if (Platform.isIOS)
+              SwitchListTile.adaptive(
+                title: const Text('Picture-in-picture button'),
+                value: settingsStore.pictureInPicture,
+                onChanged: settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
+              ),
           ],
         );
       },

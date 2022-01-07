@@ -17,6 +17,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var useOledTheme = false;
 
+  @observable
+  var showThumbnailUptime = true;
+
   // Video Settings
   @observable
   var showVideo = true;
@@ -25,12 +28,9 @@ abstract class _SettingsStoreBase with Store {
   var showOverlay = true;
 
   @observable
-  var showThumbnailUptime = true;
+  var pictureInPicture = false;
 
   // Chat Settings
-  @observable
-  var useReadableColors = false;
-
   @observable
   var showDeletedMessages = false;
 
@@ -43,12 +43,15 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var useTwelveHourTimestamps = false;
 
+  @observable
+  var useReadableColors = true;
+
   // Global configs
   @observable
   var fullScreen = false;
 
   @observable
-  var expandInfo = false;
+  var expandInfo = true;
 
   _SettingsStoreBase() {
     // A MobX reaction that will toggle immersive mode whenever the user enters and exits fullscreen mode.

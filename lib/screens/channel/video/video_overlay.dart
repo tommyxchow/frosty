@@ -119,7 +119,7 @@ class VideoOverlay extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (Platform.isIOS)
+                              if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                                 IconButton(
                                   tooltip: 'Picture-in-Picture',
                                   icon: const Icon(

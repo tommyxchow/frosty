@@ -23,13 +23,6 @@ class ChatSettings extends StatelessWidget {
             ),
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Use readable colors for chat names'),
-              subtitle: const Text('Make chat names more readable by boosting the lightness of darker colors.'),
-              value: settingsStore.useReadableColors,
-              onChanged: (newValue) => settingsStore.useReadableColors = newValue,
-            ),
-            SwitchListTile.adaptive(
-              isThreeLine: true,
               title: const Text('Show zero-width emotes'),
               subtitle: const Text('Makes "stacked" emotes from BetterTTV and 7TV visible in chat messages.'),
               value: settingsStore.showZeroWidth,
@@ -46,6 +39,13 @@ class ChatSettings extends StatelessWidget {
               title: const Text('Use 12-hour timestamps'),
               value: settingsStore.useTwelveHourTimestamps,
               onChanged: settingsStore.showTimestamps ? (newValue) => settingsStore.useTwelveHourTimestamps = newValue : null,
+            ),
+            SwitchListTile.adaptive(
+              isThreeLine: true,
+              title: const Text('Use readable colors for chat names'),
+              subtitle: const Text('Makes dark names in chat readable by boosting their lightness value.'),
+              value: settingsStore.useReadableColors,
+              onChanged: (newValue) => settingsStore.useReadableColors = newValue,
             ),
           ],
         );

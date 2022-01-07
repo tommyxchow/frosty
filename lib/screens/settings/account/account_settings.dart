@@ -42,7 +42,7 @@ class AccountSettings extends StatelessWidget {
         ListTile(
           isThreeLine: true,
           title: const Text('Log in to WebView'),
-          subtitle: const Text('Lets you avoid ads on your subscribed streamers (or if you have Turbo).'),
+          subtitle: const Text('Lets you avoid ads on your subscribed streamers or if you have Turbo.'),
           trailing: Icon(Icons.adaptive.arrow_forward),
           onTap: () => Navigator.push(
             context,
