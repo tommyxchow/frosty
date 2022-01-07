@@ -139,11 +139,13 @@ abstract class _ChatStoreBase with Store {
             break;
           case Command.globalUserState:
             final setIds = parsedIRCMessage.tags['emote-sets']?.split(',');
-            _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
-            assetsStore
-                .getUserEmotes(emoteSets: setIds, headers: auth.headersTwitch)
-                .then((_) => _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!')))
-                .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch user emotes: ${error.toString()}')));
+            if (setIds != null) {
+              _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
+              assetsStore
+                  .getUserEmotes(emoteSets: setIds, headers: auth.headersTwitch)
+                  .then((_) => _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!')))
+                  .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch user emotes: ${error.toString()}')));
+            }
             continue;
           case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
@@ -213,8 +215,12 @@ abstract class _ChatStoreBase with Store {
       onDone: () async {
         if (_channel == null) return;
 
-        // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
-        _messages.add(IRCMessage.createNotice(message: 'Disconnected from chat, waiting $_backoffTime seconds before reconnecting...'));
+        if (_backoffTime > 0) {
+          // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
+          final notice = 'Disconnected from chat, waiting ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
+          _messages.add(IRCMessage.createNotice(message: notice));
+        }
+
         await Future.delayed(Duration(seconds: _backoffTime));
 
         // Increase the backoff time for the next retry.
@@ -222,7 +228,7 @@ abstract class _ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries).'));
+        _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
         reconnect();
       },
     );
