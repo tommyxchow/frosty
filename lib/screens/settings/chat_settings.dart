@@ -47,6 +47,25 @@ class ChatSettings extends StatelessWidget {
               value: settingsStore.useReadableColors,
               onChanged: (newValue) => settingsStore.useReadableColors = newValue,
             ),
+            ListTile(
+              isThreeLine: true,
+              title: Text('Font scale: ${settingsStore.fontScale.toStringAsFixed(1)}x'),
+              subtitle: Column(
+                children: [
+                  Slider.adaptive(
+                    value: settingsStore.fontScale,
+                    min: 0.5,
+                    max: 2.0,
+                    divisions: 15,
+                    onChanged: (newValue) => settingsStore.fontScale = newValue,
+                  ),
+                  Text(
+                    'Hello! This is a preview for the font scale.',
+                    textScaleFactor: settingsStore.fontScale,
+                  ),
+                ],
+              ),
+            ),
           ],
         );
       },

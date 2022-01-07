@@ -36,12 +36,7 @@ class ChatMessage extends StatelessWidget {
               TextSpan(
                 children: ircMessage.generateSpan(
                   style: DefaultTextStyle.of(context).style,
-                  emoteToObject: assetsStore.emoteToObject,
-                  twitchBadgeToObject: assetsStore.twitchBadgesToObject,
-                  ffzUserToBadges: assetsStore.userToFFZBadges,
-                  sevenTVUserToBadges: assetsStore.userTo7TVBadges,
-                  bttvUserToBadge: assetsStore.userToBTTVBadges,
-                  ffzRoomInfo: assetsStore.ffzRoomInfo,
+                  assetsStore: assetsStore,
                   useZeroWidth: settingsStore.showZeroWidth,
                   useReadableColors: settingsStore.useReadableColors,
                   timestamp: timeStamps,
@@ -75,12 +70,7 @@ class ChatMessage extends StatelessWidget {
                       TextSpan(
                         children: ircMessage.generateSpan(
                           style: DefaultTextStyle.of(context).style,
-                          emoteToObject: assetsStore.emoteToObject,
-                          twitchBadgeToObject: assetsStore.twitchBadgesToObject,
-                          ffzUserToBadges: assetsStore.userToFFZBadges,
-                          sevenTVUserToBadges: assetsStore.userTo7TVBadges,
-                          bttvUserToBadge: assetsStore.userToBTTVBadges,
-                          ffzRoomInfo: assetsStore.ffzRoomInfo,
+                          assetsStore: assetsStore,
                           showMessage: settingsStore.showDeletedMessages,
                           useZeroWidth: settingsStore.showZeroWidth,
                           useReadableColors: settingsStore.useReadableColors,
@@ -129,12 +119,7 @@ class ChatMessage extends StatelessWidget {
                       TextSpan(
                         children: ircMessage.generateSpan(
                           style: DefaultTextStyle.of(context).style,
-                          emoteToObject: assetsStore.emoteToObject,
-                          twitchBadgeToObject: assetsStore.twitchBadgesToObject,
-                          ffzUserToBadges: assetsStore.userToFFZBadges,
-                          sevenTVUserToBadges: assetsStore.userTo7TVBadges,
-                          bttvUserToBadge: assetsStore.userToBTTVBadges,
-                          ffzRoomInfo: assetsStore.ffzRoomInfo,
+                          assetsStore: assetsStore,
                           useZeroWidth: settingsStore.showZeroWidth,
                           useReadableColors: settingsStore.useReadableColors,
                           timestamp: timeStamps,

@@ -33,44 +33,47 @@ class _ChatState extends State<Chat> {
                     FocusManager.instance.primaryFocus?.unfocus();
                     if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                   },
-                  child: Observer(
-                    builder: (context) => ListView.builder(
-                      addAutomaticKeepAlives: false,
-                      addRepaintBoundaries: false,
-                      itemCount: chatStore.messages.length,
-                      controller: chatStore.scrollController,
-                      itemBuilder: (context, index) => Observer(
-                        builder: (context) {
-                          final message = chatStore.messages[index];
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.fontScale),
+                    child: Observer(
+                      builder: (context) => ListView.builder(
+                        addAutomaticKeepAlives: false,
+                        addRepaintBoundaries: false,
+                        itemCount: chatStore.messages.length,
+                        controller: chatStore.scrollController,
+                        itemBuilder: (context, index) => Observer(
+                          builder: (context) {
+                            final message = chatStore.messages[index];
 
-                          if (message.user != null && message.user != chatStore.auth.user.details?.login) {
-                            return InkWell(
-                              onTap: () {
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
-                              },
-                              onLongPress: () => showModalBottomSheet(
-                                context: context,
-                                builder: (context) => ChatUserModal(
-                                  username: message.user!,
-                                  chatStore: chatStore,
-                                  userId: message.tags['user-id']!,
-                                  displayName: message.tags['display-name']!,
+                            if (message.user != null && message.user != chatStore.auth.user.details?.login) {
+                              return InkWell(
+                                onTap: () {
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
+                                },
+                                onLongPress: () => showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) => ChatUserModal(
+                                    username: message.user!,
+                                    chatStore: chatStore,
+                                    userId: message.tags['user-id']!,
+                                    displayName: message.tags['display-name']!,
+                                  ),
                                 ),
-                              ),
-                              child: ChatMessage(
-                                ircMessage: message,
-                                assetsStore: chatStore.assetsStore,
-                                settingsStore: chatStore.settings,
-                              ),
+                                child: ChatMessage(
+                                  ircMessage: message,
+                                  assetsStore: chatStore.assetsStore,
+                                  settingsStore: chatStore.settings,
+                                ),
+                              );
+                            }
+                            return ChatMessage(
+                              ircMessage: message,
+                              assetsStore: chatStore.assetsStore,
+                              settingsStore: chatStore.settings,
                             );
-                          }
-                          return ChatMessage(
-                            ircMessage: message,
-                            assetsStore: chatStore.assetsStore,
-                            settingsStore: chatStore.settings,
-                          );
-                        },
+                          },
+                        ),
                       ),
                     ),
                   ),

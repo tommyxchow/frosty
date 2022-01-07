@@ -19,6 +19,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..useTwelveHourTimestamps =
           json['useTwelveHourTimestamps'] as bool? ?? false
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
+      ..fontScale = (json['fontScale'] as num?)?.toDouble() ?? 1.0
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true;
 
@@ -34,6 +35,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showTimestamps': instance.showTimestamps,
       'useTwelveHourTimestamps': instance.useTwelveHourTimestamps,
       'useReadableColors': instance.useReadableColors,
+      'fontScale': instance.fontScale,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
     };
@@ -201,6 +203,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$fontScaleAtom = Atom(name: '_SettingsStoreBase.fontScale');
+
+  @override
+  double get fontScale {
+    _$fontScaleAtom.reportRead();
+    return super.fontScale;
+  }
+
+  @override
+  set fontScale(double value) {
+    _$fontScaleAtom.reportWrite(value, super.fontScale, () {
+      super.fontScale = value;
+    });
+  }
+
   final _$fullScreenAtom = Atom(name: '_SettingsStoreBase.fullScreen');
 
   @override
@@ -244,6 +261,7 @@ showZeroWidth: ${showZeroWidth},
 showTimestamps: ${showTimestamps},
 useTwelveHourTimestamps: ${useTwelveHourTimestamps},
 useReadableColors: ${useReadableColors},
+fontScale: ${fontScale},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}
     ''';

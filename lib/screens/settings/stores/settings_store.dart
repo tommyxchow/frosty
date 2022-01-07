@@ -56,6 +56,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var useReadableColors = true;
 
+  @JsonKey(defaultValue: 1.0)
+  @observable
+  var fontScale = 1.0;
+
   // Global configs
   @JsonKey(defaultValue: false)
   @observable

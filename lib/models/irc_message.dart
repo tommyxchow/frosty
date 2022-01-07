@@ -3,8 +3,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/screens/channel/chat/chat_assets_store.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -76,12 +76,7 @@ class IRCMessage {
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
   List<InlineSpan> generateSpan({
     required TextStyle? style,
-    required Map<String, Emote> emoteToObject,
-    required Map<String, BadgeInfoTwitch> twitchBadgeToObject,
-    Map<String, List<BadgeInfoFFZ>>? ffzUserToBadges,
-    Map<String, List<BadgeInfo7TV>>? sevenTVUserToBadges,
-    Map<String, BadgeInfoBTTV>? bttvUserToBadge,
-    RoomFFZ? ffzRoomInfo,
+    required ChatAssetsStore assetsStore,
     bool showMessage = true,
     bool useZeroWidth = false,
     bool useReadableColors = false,
@@ -89,6 +84,13 @@ class IRCMessage {
   }) {
     const badgeHeight = 20.0;
     const emoteHeight = 30.0;
+
+    final emoteToObject = assetsStore.emoteToObject;
+    final twitchBadgeToObject = assetsStore.twitchBadgesToObject;
+    final ffzUserToBadges = assetsStore.userToFFZBadges;
+    final sevenTVUserToBadges = assetsStore.userTo7TVBadges;
+    final bttvUserToBadge = assetsStore.userToBTTVBadges;
+    final ffzRoomInfo = assetsStore.ffzRoomInfo;
 
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
@@ -119,7 +121,7 @@ class IRCMessage {
     // Indicator to skip adding the bot badges later when adding the rest of FFZ badges.
     var skipBot = false;
 
-    final ffzUserBadges = ffzUserToBadges?[tags['user-id']];
+    final ffzUserBadges = ffzUserToBadges[tags['user-id']];
     final twitchBadges = tags['badges']?.split(',');
     // Pasrse and add the Twitch badges to the span if they exist.
     if (twitchBadges != null) {
@@ -201,7 +203,7 @@ class IRCMessage {
     }
 
     // Add BTTV badges to span
-    final userBTTVBadge = bttvUserToBadge?[tags['user-id']];
+    final userBTTVBadge = bttvUserToBadge[tags['user-id']];
     if (userBTTVBadge != null) {
       span.add(
         _createEmoteSpan(
@@ -215,7 +217,7 @@ class IRCMessage {
     }
 
     // Add 7TV badges to end of badges span
-    final user7TVBadges = sevenTVUserToBadges?[tags['user-id']];
+    final user7TVBadges = sevenTVUserToBadges[tags['user-id']];
     if (user7TVBadges != null) {
       for (final badge in user7TVBadges) {
         span.add(
