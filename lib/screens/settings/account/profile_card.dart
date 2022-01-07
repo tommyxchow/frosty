@@ -25,6 +25,7 @@ class ProfileCard extends StatelessWidget {
               Navigator.of(context).pop();
             },
             child: const Text('Yes'),
+            style: TextButton.styleFrom(primary: Colors.red),
           ),
         ],
       ),

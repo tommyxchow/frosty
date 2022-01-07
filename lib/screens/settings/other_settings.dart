@@ -30,7 +30,6 @@ class OtherSettings extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           width: double.infinity,
           child: OutlinedButton(
-            style: OutlinedButton.styleFrom(),
             child: const Text('Clear Image Cache'),
             onPressed: () async {
               await DefaultCacheManager().emptyCache();

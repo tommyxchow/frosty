@@ -31,6 +31,11 @@ class CategoryStreams extends StatelessWidget {
                       pinned: true,
                       expandedHeight: MediaQuery.of(context).size.height / 3,
                       flexibleSpace: FlexibleSpaceBar(
+                        stretchModes: const [
+                          StretchMode.fadeTitle,
+                          StretchMode.zoomBackground,
+                        ],
+                        centerTitle: true,
                         title: Text(
                           store.categoryInfo!.name,
                           style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
@@ -38,7 +43,11 @@ class CategoryStreams extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                         background: CachedNetworkImage(
-                          imageUrl: store.categoryInfo!.boxArtUrl.replaceRange(store.categoryInfo!.boxArtUrl.lastIndexOf('-') + 1, null, '300x400.jpg'),
+                          imageUrl: store.categoryInfo!.boxArtUrl.replaceRange(
+                            store.categoryInfo!.boxArtUrl.lastIndexOf('-') + 1,
+                            null,
+                            '300x400.jpg',
+                          ),
                           color: const Color.fromRGBO(255, 255, 255, 0.5),
                           colorBlendMode: BlendMode.modulate,
                           fit: BoxFit.cover,

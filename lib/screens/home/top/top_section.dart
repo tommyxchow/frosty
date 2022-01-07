@@ -21,6 +21,7 @@ class TopSection extends StatelessWidget {
       child: Column(
         children: [
           const TabBar(
+            indicatorColor: Colors.deepPurpleAccent,
             tabs: [
               Tab(text: 'Streams'),
               Tab(text: 'Categories'),

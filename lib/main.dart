@@ -76,12 +76,18 @@ class MyApp extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
+      colorScheme: ColorScheme.fromSwatch(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.deepPurple,
+        accentColor: Colors.deepPurpleAccent,
+      ),
+      dialogBackgroundColor: Colors.grey.shade900,
     );
 
-    final oledTheme = ThemeData.dark().copyWith(
-      scaffoldBackgroundColor: Colors.black,
+    final oledTheme = ThemeData(
+      canvasColor: Colors.black,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'Inter'),
+      fontFamily: 'Inter',
       appBarTheme: const AppBarTheme(
         color: Colors.black,
         elevation: 0.0,
@@ -91,7 +97,12 @@ class MyApp extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      canvasColor: Colors.black,
+      colorScheme: ColorScheme.fromSwatch(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.deepPurple,
+        accentColor: Colors.deepPurpleAccent,
+      ),
+      dialogBackgroundColor: Colors.black,
     );
 
     return Observer(
