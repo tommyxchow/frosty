@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/screens/channel/chat/chat_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;

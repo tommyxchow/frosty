@@ -60,13 +60,11 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_ChatStoreBaseActionController =
-      ActionController(name: '_ChatStoreBase');
+  final _$_ChatStoreBaseActionController = ActionController(name: '_ChatStoreBase');
 
   @override
   void _handleIRCData(String data) {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase._handleIRCData');
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(name: '_ChatStoreBase._handleIRCData');
     try {
       return super._handleIRCData(data);
     } finally {
@@ -76,8 +74,7 @@ mixin _$ChatStore on _ChatStoreBase, Store {
 
   @override
   void resumeScroll() {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.resumeScroll');
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(name: '_ChatStoreBase.resumeScroll');
     try {
       return super.resumeScroll();
     } finally {

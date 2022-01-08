@@ -12,10 +12,8 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
   Computed<Iterable<List<String>>>? _$filteredUsersComputed;
 
   @override
-  Iterable<List<String>> get filteredUsers => (_$filteredUsersComputed ??=
-          Computed<Iterable<List<String>>>(() => super.filteredUsers,
-              name: '_ChatDetailsStoreBase.filteredUsers'))
-      .value;
+  Iterable<List<String>> get filteredUsers =>
+      (_$filteredUsersComputed ??= Computed<Iterable<List<String>>>(() => super.filteredUsers, name: '_ChatDetailsStoreBase.filteredUsers')).value;
 
   final _$roomStateAtom = Atom(name: '_ChatDetailsStoreBase.roomState');
 
@@ -49,8 +47,7 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$showJumpButtonAtom =
-      Atom(name: '_ChatDetailsStoreBase.showJumpButton');
+  final _$showJumpButtonAtom = Atom(name: '_ChatDetailsStoreBase.showJumpButton');
 
   @override
   bool get showJumpButton {
@@ -80,13 +77,11 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$updateChattersAsyncAction =
-      AsyncAction('_ChatDetailsStoreBase.updateChatters');
+  final _$updateChattersAsyncAction = AsyncAction('_ChatDetailsStoreBase.updateChatters');
 
   @override
   Future<void> updateChatters(String userLogin) {
-    return _$updateChattersAsyncAction
-        .run(() => super.updateChatters(userLogin));
+    return _$updateChattersAsyncAction.run(() => super.updateChatters(userLogin));
   }
 
   @override

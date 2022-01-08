@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/chat_message.dart';
-import 'package:frosty/screens/channel/chat/chat_store.dart';
 import 'package:frosty/screens/channel/chat/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 
 class Chat extends StatefulWidget {
   final ChatStore chatStore;

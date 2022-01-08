@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
+import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 
 class ChatDetails extends StatelessWidget {
   final ChatDetailsStore chatDetails;

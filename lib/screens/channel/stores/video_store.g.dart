@@ -60,21 +60,18 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$updateStreamInfoAsyncAction =
-      AsyncAction('_VideoStoreBase.updateStreamInfo');
+  final _$updateStreamInfoAsyncAction = AsyncAction('_VideoStoreBase.updateStreamInfo');
 
   @override
   Future<void> updateStreamInfo() {
     return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
   }
 
-  final _$_VideoStoreBaseActionController =
-      ActionController(name: '_VideoStoreBase');
+  final _$_VideoStoreBaseActionController = ActionController(name: '_VideoStoreBase');
 
   @override
   void handlePausePlay() {
-    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
-        name: '_VideoStoreBase.handlePausePlay');
+    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(name: '_VideoStoreBase.handlePausePlay');
     try {
       return super.handlePausePlay();
     } finally {
@@ -84,8 +81,7 @@ mixin _$VideoStore on _VideoStoreBase, Store {
 
   @override
   void handleVideoTap() {
-    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
-        name: '_VideoStoreBase.handleVideoTap');
+    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(name: '_VideoStoreBase.handleVideoTap');
     try {
       return super.handleVideoTap();
     } finally {
@@ -95,8 +91,7 @@ mixin _$VideoStore on _VideoStoreBase, Store {
 
   @override
   void handleExpand() {
-    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
-        name: '_VideoStoreBase.handleExpand');
+    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(name: '_VideoStoreBase.handleExpand');
     try {
       return super.handleExpand();
     } finally {

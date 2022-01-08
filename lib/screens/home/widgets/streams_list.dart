@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
+import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
-import 'package:frosty/widgets/stream_card.dart';
 import 'package:provider/provider.dart';
 
 class StreamsList extends StatefulWidget {

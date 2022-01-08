@@ -12,27 +12,18 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
   Computed<List<Emote>>? _$bttvEmotesComputed;
 
   @override
-  List<Emote> get bttvEmotes =>
-      (_$bttvEmotesComputed ??= Computed<List<Emote>>(() => super.bttvEmotes,
-              name: '_ChatAssetsStoreBase.bttvEmotes'))
-          .value;
+  List<Emote> get bttvEmotes => (_$bttvEmotesComputed ??= Computed<List<Emote>>(() => super.bttvEmotes, name: '_ChatAssetsStoreBase.bttvEmotes')).value;
   Computed<List<Emote>>? _$ffzEmotesComputed;
 
   @override
-  List<Emote> get ffzEmotes =>
-      (_$ffzEmotesComputed ??= Computed<List<Emote>>(() => super.ffzEmotes,
-              name: '_ChatAssetsStoreBase.ffzEmotes'))
-          .value;
+  List<Emote> get ffzEmotes => (_$ffzEmotesComputed ??= Computed<List<Emote>>(() => super.ffzEmotes, name: '_ChatAssetsStoreBase.ffzEmotes')).value;
   Computed<List<Emote>>? _$sevenTvEmotesComputed;
 
   @override
-  List<Emote> get sevenTvEmotes => (_$sevenTvEmotesComputed ??=
-          Computed<List<Emote>>(() => super.sevenTvEmotes,
-              name: '_ChatAssetsStoreBase.sevenTvEmotes'))
-      .value;
+  List<Emote> get sevenTvEmotes =>
+      (_$sevenTvEmotesComputed ??= Computed<List<Emote>>(() => super.sevenTvEmotes, name: '_ChatAssetsStoreBase.sevenTvEmotes')).value;
 
-  final _$_emoteToObjectAtom =
-      Atom(name: '_ChatAssetsStoreBase._emoteToObject');
+  final _$_emoteToObjectAtom = Atom(name: '_ChatAssetsStoreBase._emoteToObject');
 
   Map<String, Emote> get emoteToObject {
     _$_emoteToObjectAtom.reportRead();
@@ -49,8 +40,7 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userEmoteToObjectAtom =
-      Atom(name: '_ChatAssetsStoreBase._userEmoteToObject');
+  final _$_userEmoteToObjectAtom = Atom(name: '_ChatAssetsStoreBase._userEmoteToObject');
 
   Map<String, Emote> get userEmoteToObject {
     _$_userEmoteToObjectAtom.reportRead();
@@ -67,8 +57,7 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userToFFZBadgesAtom =
-      Atom(name: '_ChatAssetsStoreBase._userToFFZBadges');
+  final _$_userToFFZBadgesAtom = Atom(name: '_ChatAssetsStoreBase._userToFFZBadges');
 
   Map<String, List<BadgeInfoFFZ>> get userToFFZBadges {
     _$_userToFFZBadgesAtom.reportRead();
@@ -85,8 +74,7 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userTo7TVBadgesAtom =
-      Atom(name: '_ChatAssetsStoreBase._userTo7TVBadges');
+  final _$_userTo7TVBadgesAtom = Atom(name: '_ChatAssetsStoreBase._userTo7TVBadges');
 
   Map<String, List<BadgeInfo7TV>> get userTo7TVBadges {
     _$_userTo7TVBadgesAtom.reportRead();
@@ -103,8 +91,7 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userToBTTVBadgesAtom =
-      Atom(name: '_ChatAssetsStoreBase._userToBTTVBadges');
+  final _$_userToBTTVBadgesAtom = Atom(name: '_ChatAssetsStoreBase._userToBTTVBadges');
 
   Map<String, BadgeInfoBTTV> get userToBTTVBadges {
     _$_userToBTTVBadgesAtom.reportRead();
@@ -121,8 +108,7 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$emoteMenuIndexAtom =
-      Atom(name: '_ChatAssetsStoreBase.emoteMenuIndex');
+  final _$emoteMenuIndexAtom = Atom(name: '_ChatAssetsStoreBase.emoteMenuIndex');
 
   @override
   int get emoteMenuIndex {
@@ -155,38 +141,29 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
   final _$getAssetsAsyncAction = AsyncAction('_ChatAssetsStoreBase.getAssets');
 
   @override
-  Future<void> getAssets(
-      {required String channelName, required Map<String, String> headers}) {
-    return _$getAssetsAsyncAction
-        .run(() => super.getAssets(channelName: channelName, headers: headers));
+  Future<void> getAssets({required String channelName, required Map<String, String> headers}) {
+    return _$getAssetsAsyncAction.run(() => super.getAssets(channelName: channelName, headers: headers));
   }
 
   final _$getEmotesAsyncAction = AsyncAction('_ChatAssetsStoreBase.getEmotes');
 
   @override
-  Future<void> getEmotes(
-      {required UserTwitch channelInfo, required Map<String, String> headers}) {
-    return _$getEmotesAsyncAction
-        .run(() => super.getEmotes(channelInfo: channelInfo, headers: headers));
+  Future<void> getEmotes({required UserTwitch channelInfo, required Map<String, String> headers}) {
+    return _$getEmotesAsyncAction.run(() => super.getEmotes(channelInfo: channelInfo, headers: headers));
   }
 
   final _$getBadgesAsyncAction = AsyncAction('_ChatAssetsStoreBase.getBadges');
 
   @override
-  Future<void> getBadges(
-      {required UserTwitch channelInfo, required Map<String, String> headers}) {
-    return _$getBadgesAsyncAction
-        .run(() => super.getBadges(channelInfo: channelInfo, headers: headers));
+  Future<void> getBadges({required UserTwitch channelInfo, required Map<String, String> headers}) {
+    return _$getBadgesAsyncAction.run(() => super.getBadges(channelInfo: channelInfo, headers: headers));
   }
 
-  final _$getUserEmotesAsyncAction =
-      AsyncAction('_ChatAssetsStoreBase.getUserEmotes');
+  final _$getUserEmotesAsyncAction = AsyncAction('_ChatAssetsStoreBase.getUserEmotes');
 
   @override
-  Future<void> getUserEmotes(
-      {required List<String> emoteSets, required Map<String, String> headers}) {
-    return _$getUserEmotesAsyncAction
-        .run(() => super.getUserEmotes(emoteSets: emoteSets, headers: headers));
+  Future<void> getUserEmotes({required List<String> emoteSets, required Map<String, String> headers}) {
+    return _$getUserEmotesAsyncAction.run(() => super.getUserEmotes(emoteSets: emoteSets, headers: headers));
   }
 
   @override

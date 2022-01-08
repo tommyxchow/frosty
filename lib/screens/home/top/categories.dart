@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
-import 'package:frosty/screens/home/top/categories/category_card.dart';
+import 'package:frosty/screens/home/widgets/category_card.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 
 class Categories extends StatefulWidget {

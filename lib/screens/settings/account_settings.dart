@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/screens/settings/account/blocked_users.dart';
-import 'package:frosty/screens/settings/account/profile_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/blocked_users.dart';
+import 'package:frosty/screens/settings/widgets/profile_card.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

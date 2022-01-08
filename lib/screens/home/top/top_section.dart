@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/streams_list.dart';
-import 'package:frosty/screens/home/top/categories/categories.dart';
+import 'package:frosty/screens/home/top/categories.dart';
+import 'package:frosty/screens/home/widgets/streams_list.dart';
 
 class TopSection extends StatelessWidget {
   final ListStore topSectionStore;

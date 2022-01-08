@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/screens/settings/account/account_settings.dart';
+import 'package:frosty/screens/settings/account_settings.dart';
 import 'package:frosty/screens/settings/chat_settings.dart';
 import 'package:frosty/screens/settings/general_settings.dart';
 import 'package:frosty/screens/settings/other_settings.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/irc_message.dart';
-import 'package:frosty/screens/channel/chat/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 
 class ChatMessage extends StatelessWidget {

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/search/search_results_categories.dart';
 import 'package:frosty/screens/home/search/search_results_channels.dart';
-import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class Search extends StatefulWidget {

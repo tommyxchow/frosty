@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:intl/intl.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
-import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:mobx/mobx.dart';
