@@ -22,7 +22,6 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
     final store = widget.store;
-    store.refreshCategories();
 
     return RefreshIndicator(
       onRefresh: () async {

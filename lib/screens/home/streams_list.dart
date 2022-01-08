@@ -22,7 +22,6 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
     super.build(context);
     final store = widget.store;
-    store.refreshStreams();
 
     return RefreshIndicator(
       onRefresh: () async {
