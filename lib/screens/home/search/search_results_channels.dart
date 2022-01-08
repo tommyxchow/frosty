@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
-import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:mobx/mobx.dart';
@@ -45,11 +45,7 @@ class SearchResultsChannels extends StatelessWidget {
       builder: (context) {
         final future = searchStore.channelFuture;
 
-        if (future == null) {
-          return const CircularProgressIndicator.adaptive();
-        }
-
-        switch (future.status) {
+        switch (future!.status) {
           case FutureStatus.pending:
             return const SliverToBoxAdapter(
               child: LoadingIndicator(
@@ -58,7 +54,9 @@ class SearchResultsChannels extends StatelessWidget {
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
-              child: Center(child: Text('Failed to fetch streams.')),
+              child: Center(
+                child: Text('Failed to fetch streams.'),
+              ),
             );
           case FutureStatus.fulfilled:
             final List<ChannelQuery> results = future.result;

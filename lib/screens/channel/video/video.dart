@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
-import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class Video extends StatelessWidget {

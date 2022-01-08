@@ -2,40 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/search/search.dart';
-import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/categories_store.dart';
+import 'package:frosty/screens/home/stores/home_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/streams_list.dart';
+import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/home/top/top_section.dart';
+import 'package:frosty/screens/home/widgets/streams_list.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
+  final HomeStore homeStore;
   final ListStore topSectionStore;
+  final CategoriesStore categoriesSectionStore;
   final SearchStore searchStore;
   final ListStore? followedStreamsStore;
 
   const Home({
     Key? key,
+    required this.homeStore,
     required this.topSectionStore,
+    required this.categoriesSectionStore,
     required this.searchStore,
     required this.followedStreamsStore,
   }) : super(key: key);
-
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  int _selectedIndex = 0;
-
-  void _handleTap(int index) {
-    if (index != _selectedIndex) {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,12 +43,13 @@ class _HomeState extends State<Home> {
               'Search',
             ];
             return Text(
-              titles[_selectedIndex],
+              titles[homeStore.selectedIndex],
             );
           },
         ),
         actions: [
           IconButton(
+            tooltip: 'Settings',
             icon: const Icon(Icons.settings),
             onPressed: () => Navigator.push(
               context,
@@ -72,11 +64,14 @@ class _HomeState extends State<Home> {
         child: Observer(
           builder: (_) {
             return IndexedStack(
-              index: _selectedIndex,
+              index: homeStore.selectedIndex,
               children: [
-                if (authStore.isLoggedIn) StreamsList(store: widget.followedStreamsStore!),
-                TopSection(topSectionStore: widget.topSectionStore),
-                Search(searchStore: widget.searchStore),
+                if (authStore.isLoggedIn) StreamsList(store: followedStreamsStore!),
+                TopSection(
+                  topSectionStore: topSectionStore,
+                  categoriesSectionStore: categoriesSectionStore,
+                ),
+                Search(searchStore: searchStore),
               ],
             );
           },
@@ -100,8 +95,8 @@ class _HomeState extends State<Home> {
                 label: 'Search',
               ),
             ],
-            currentIndex: _selectedIndex,
-            onTap: _handleTap,
+            currentIndex: homeStore.selectedIndex,
+            onTap: homeStore.handleTap,
           );
         },
       ),

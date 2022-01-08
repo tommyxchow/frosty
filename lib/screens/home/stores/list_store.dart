@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
@@ -9,29 +10,28 @@ part 'list_store.g.dart';
 class ListStore = _ListStoreBase with _$ListStore;
 
 abstract class _ListStoreBase with Store {
-  /// The list of the fetched streams.
-  @readonly
-  var _streams = ObservableList<StreamTwitch>();
+  /// The authentication store.
+  final AuthStore authStore;
 
-  @readonly
-  var _categories = ObservableList<CategoryTwitch>();
+  final ListType listType;
 
-  /// The loading status for pagination.
-  @readonly
-  bool _isLoading = false;
+  final CategoryTwitch? categoryInfo;
+
+  final scrollController = ScrollController();
 
   /// The pagination cursor for the streams.
   String? _streamsCursor;
 
-  /// The pagination cursor for the categories.
-  String? _categoriesCursor;
+  @observable
+  var showJumpButton = false;
 
-  final CategoryTwitch? categoryInfo;
+  /// The list of the fetched streams.
+  @readonly
+  var _streams = ObservableList<StreamTwitch>();
 
-  final ListType listType;
-
-  /// The authentication store.
-  final AuthStore authStore;
+  /// The loading status for pagination.
+  @readonly
+  bool _isLoading = false;
 
   /// Returns whether or not there are more streams and loading status for pagination.
   bool get hasMore => _isLoading == false && _streamsCursor != null;
@@ -41,14 +41,19 @@ abstract class _ListStoreBase with Store {
     required this.listType,
     this.categoryInfo,
   }) {
+    scrollController.addListener(() {
+      if (scrollController.position.atEdge || scrollController.position.outOfRange) {
+        showJumpButton = false;
+      } else {
+        showJumpButton = true;
+      }
+    });
+
     switch (listType) {
       case ListType.followed:
         if (listType == ListType.followed && authStore.isLoggedIn) getStreams();
         break;
       case ListType.top:
-        getStreams();
-        getCategories();
-        break;
       case ListType.category:
         getStreams();
         break;
@@ -96,24 +101,6 @@ abstract class _ListStoreBase with Store {
     _isLoading = false;
   }
 
-  // Fetches the top categories based on the current cursor.
-  @action
-  Future<void> getCategories() async {
-    _isLoading = true;
-
-    final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: _categoriesCursor);
-    if (result != null) {
-      if (_categoriesCursor == null) {
-        _categories = result.data.asObservable();
-      } else {
-        _categories.addAll(result.data);
-      }
-      _categoriesCursor = result.pagination['cursor'];
-    }
-
-    _isLoading = false;
-  }
-
   /// Resets the cursor and then fetches the streams.
   @action
   Future<void> refreshStreams() {
@@ -122,12 +109,8 @@ abstract class _ListStoreBase with Store {
     return getStreams();
   }
 
-  /// Resets the cursor and then fetches the categories.
-  @action
-  Future<void> refreshCategories() {
-    _categoriesCursor = null;
-
-    return getCategories();
+  void dispose() {
+    scrollController.dispose();
   }
 }
 

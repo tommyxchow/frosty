@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/top/categories/category_streams.dart';
+import 'package:frosty/screens/home/top/category_streams.dart';
 import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a category's box art and name.

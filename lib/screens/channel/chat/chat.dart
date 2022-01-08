@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/chat_message.dart';
-import 'package:frosty/screens/channel/chat/chat_store.dart';
 import 'package:frosty/screens/channel/chat/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 
 class Chat extends StatefulWidget {
   final ChatStore chatStore;
@@ -33,41 +33,48 @@ class _ChatState extends State<Chat> {
                     FocusManager.instance.primaryFocus?.unfocus();
                     if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                   },
-                  child: Observer(
-                    builder: (context) => ListView.builder(
-                      addAutomaticKeepAlives: false,
-                      addRepaintBoundaries: false,
-                      itemCount: chatStore.messages.length,
-                      controller: chatStore.scrollController,
-                      itemBuilder: (context, index) => Observer(
-                        builder: (context) {
-                          final message = chatStore.messages[index];
+                  child: MediaQuery(
+                    data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.fontScale),
+                    child: Observer(
+                      builder: (context) => ListView.separated(
+                        addAutomaticKeepAlives: false,
+                        addRepaintBoundaries: false,
+                        itemCount: chatStore.messages.length,
+                        controller: chatStore.scrollController,
+                        separatorBuilder: (context, index) => SizedBox(height: chatStore.settings.messageSpacing),
+                        itemBuilder: (context, index) => Observer(
+                          builder: (context) {
+                            final message = chatStore.messages[index];
 
-                          if (message.user != null && message.user != chatStore.auth.user.details?.login) {
-                            return InkWell(
-                              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                              onLongPress: () => showModalBottomSheet(
-                                context: context,
-                                builder: (context) => ChatUserModal(
-                                  username: message.user!,
-                                  chatStore: chatStore,
-                                  userId: message.tags['user-id']!,
-                                  displayName: message.tags['display-name']!,
+                            if (message.user != null && message.user != chatStore.auth.user.details?.login) {
+                              return InkWell(
+                                onTap: () {
+                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
+                                },
+                                onLongPress: () => showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) => ChatUserModal(
+                                    username: message.user!,
+                                    chatStore: chatStore,
+                                    userId: message.tags['user-id']!,
+                                    displayName: message.tags['display-name']!,
+                                  ),
                                 ),
-                              ),
-                              child: ChatMessage(
-                                ircMessage: message,
-                                assetsStore: chatStore.assetsStore,
-                                settingsStore: chatStore.settings,
-                              ),
+                                child: ChatMessage(
+                                  ircMessage: message,
+                                  assetsStore: chatStore.assetsStore,
+                                  settingsStore: chatStore.settings,
+                                ),
+                              );
+                            }
+                            return ChatMessage(
+                              ircMessage: message,
+                              assetsStore: chatStore.assetsStore,
+                              settingsStore: chatStore.settings,
                             );
-                          }
-                          return ChatMessage(
-                            ircMessage: message,
-                            assetsStore: chatStore.assetsStore,
-                            settingsStore: chatStore.settings,
-                          );
-                        },
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -76,11 +83,12 @@ class _ChatState extends State<Chat> {
                   builder: (_) => Visibility(
                     visible: !chatStore.autoScroll,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       width: double.infinity,
-                      child: ElevatedButton(
+                      child: ElevatedButton.icon(
                         onPressed: chatStore.resumeScroll,
-                        child: const Text('Resume Scroll'),
+                        label: const Text('Resume Scroll'),
+                        icon: const Icon(Icons.arrow_circle_down),
                       ),
                     ),
                   ),
@@ -88,6 +96,7 @@ class _ChatState extends State<Chat> {
               ],
             ),
           ),
+          const SizedBox(height: 5.0),
           if (chatStore.auth.isLoggedIn) ChatBottomBar(chatStore: chatStore),
           if (chatStore.assetsStore.showEmoteMenu)
             Flexible(

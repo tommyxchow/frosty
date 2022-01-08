@@ -67,26 +67,6 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_twitchBadgesToObjectAtom =
-      Atom(name: '_ChatAssetsStoreBase._twitchBadgesToObject');
-
-  Map<String, BadgeInfoTwitch> get twitchBadgesToObject {
-    _$_twitchBadgesToObjectAtom.reportRead();
-    return super._twitchBadgesToObject;
-  }
-
-  @override
-  Map<String, BadgeInfoTwitch> get _twitchBadgesToObject =>
-      twitchBadgesToObject;
-
-  @override
-  set _twitchBadgesToObject(Map<String, BadgeInfoTwitch> value) {
-    _$_twitchBadgesToObjectAtom.reportWrite(value, super._twitchBadgesToObject,
-        () {
-      super._twitchBadgesToObject = value;
-    });
-  }
-
   final _$_userToFFZBadgesAtom =
       Atom(name: '_ChatAssetsStoreBase._userToFFZBadges');
 
@@ -181,12 +161,30 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
         .run(() => super.getAssets(channelName: channelName, headers: headers));
   }
 
+  final _$getEmotesAsyncAction = AsyncAction('_ChatAssetsStoreBase.getEmotes');
+
+  @override
+  Future<void> getEmotes(
+      {required UserTwitch channelInfo, required Map<String, String> headers}) {
+    return _$getEmotesAsyncAction
+        .run(() => super.getEmotes(channelInfo: channelInfo, headers: headers));
+  }
+
+  final _$getBadgesAsyncAction = AsyncAction('_ChatAssetsStoreBase.getBadges');
+
+  @override
+  Future<void> getBadges(
+      {required UserTwitch channelInfo, required Map<String, String> headers}) {
+    return _$getBadgesAsyncAction
+        .run(() => super.getBadges(channelInfo: channelInfo, headers: headers));
+  }
+
   final _$getUserEmotesAsyncAction =
       AsyncAction('_ChatAssetsStoreBase.getUserEmotes');
 
   @override
   Future<void> getUserEmotes(
-      {List<String>? emoteSets, required Map<String, String> headers}) {
+      {required List<String> emoteSets, required Map<String, String> headers}) {
     return _$getUserEmotesAsyncAction
         .run(() => super.getUserEmotes(emoteSets: emoteSets, headers: headers));
   }

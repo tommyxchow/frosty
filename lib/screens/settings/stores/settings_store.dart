@@ -14,38 +14,64 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
 
 abstract class _SettingsStoreBase with Store {
   //General Settings
+  @JsonKey(defaultValue: false)
   @observable
   var useOledTheme = false;
 
-  // Video Settings
-  @observable
-  var showVideo = true;
-
-  @observable
-  var showOverlay = true;
-
+  @JsonKey(defaultValue: true)
   @observable
   var showThumbnailUptime = true;
 
-  // Chat Settings
+  // Video Settings
+  @JsonKey(defaultValue: true)
   @observable
-  var hideBannedMessages = false;
+  var showVideo = true;
 
+  @JsonKey(defaultValue: true)
+  @observable
+  var showOverlay = true;
+
+  @JsonKey(defaultValue: false)
+  @observable
+  var pictureInPicture = false;
+
+  // Chat Settings
+  @JsonKey(defaultValue: false)
+  @observable
+  var showDeletedMessages = false;
+
+  @JsonKey(defaultValue: false)
   @observable
   var showZeroWidth = false;
 
+  @JsonKey(defaultValue: false)
   @observable
   var showTimestamps = false;
 
+  @JsonKey(defaultValue: false)
   @observable
   var useTwelveHourTimestamps = false;
 
+  @JsonKey(defaultValue: true)
+  @observable
+  var useReadableColors = true;
+
+  @JsonKey(defaultValue: 1.0)
+  @observable
+  var fontScale = 1.0;
+
+  @JsonKey(defaultValue: 10.0)
+  @observable
+  var messageSpacing = 10.0;
+
   // Global configs
+  @JsonKey(defaultValue: false)
   @observable
   var fullScreen = false;
 
+  @JsonKey(defaultValue: true)
   @observable
-  var expandInfo = false;
+  var expandInfo = true;
 
   _SettingsStoreBase() {
     // A MobX reaction that will toggle immersive mode whenever the user enters and exits fullscreen mode.

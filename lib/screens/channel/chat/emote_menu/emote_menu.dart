@@ -1,8 +1,8 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/channel/chat/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 
 class EmoteMenu extends StatelessWidget {
   final ChatAssetsStore assetsStore;

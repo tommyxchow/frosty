@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
-import 'package:frosty/screens/home/search/stores/search_store.dart';
+import 'package:frosty/screens/home/stores/categories_store.dart';
+import 'package:frosty/screens/home/stores/home_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
+import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
@@ -21,11 +23,12 @@ Future<void> main() async {
   await authStore.init();
 
   // Get the shared pereferences instance and obtain the existing user settings if it exists.
+  // If default settings don't exist, use an empty JSON string to use the default values.
   final preferences = await SharedPreferences.getInstance();
-  final userSettings = preferences.getString('settings');
+  final userSettings = preferences.getString('settings') ?? '{}';
 
-  // Initialize a settings store from existing settings. If existing settings don't exist create a new one.
-  final settingsStore = userSettings != null ? SettingsStore.fromJson(jsonDecode(userSettings)) : SettingsStore();
+  // Initialize a settings store from the settings JSON string.
+  final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
 
   // Create a MobX reaction that will save the settings on disk everytime they are changed.
   autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
@@ -68,12 +71,18 @@ class MyApp extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
+      colorScheme: ColorScheme.fromSwatch(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.deepPurple,
+        accentColor: Colors.deepPurpleAccent,
+      ),
+      dialogBackgroundColor: Colors.grey.shade900,
     );
 
-    final oledTheme = ThemeData.dark().copyWith(
-      scaffoldBackgroundColor: Colors.black,
+    final oledTheme = ThemeData(
+      canvasColor: Colors.black,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'Inter'),
+      fontFamily: 'Inter',
       appBarTheme: const AppBarTheme(
         color: Colors.black,
         elevation: 0.0,
@@ -83,7 +92,12 @@ class MyApp extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      canvasColor: Colors.black,
+      colorScheme: ColorScheme.fromSwatch(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.deepPurple,
+        accentColor: Colors.deepPurpleAccent,
+      ),
+      dialogBackgroundColor: Colors.black,
     );
 
     return Observer(
@@ -92,10 +106,12 @@ class MyApp extends StatelessWidget {
           title: 'Frosty',
           theme: settingsStore.useOledTheme ? oledTheme : defaultTheme,
           home: Home(
+            homeStore: HomeStore(),
             topSectionStore: ListStore(
               authStore: authStore,
               listType: ListType.top,
             ),
+            categoriesSectionStore: CategoriesStore(authStore: authStore),
             followedStreamsStore: authStore.isLoggedIn
                 ? ListStore(
                     authStore: authStore,

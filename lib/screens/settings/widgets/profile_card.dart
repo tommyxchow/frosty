@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:intl/intl.dart';
 
 class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
@@ -25,6 +26,7 @@ class ProfileCard extends StatelessWidget {
               Navigator.of(context).pop();
             },
             child: const Text('Yes'),
+            style: TextButton.styleFrom(primary: Colors.red),
           ),
         ],
       ),
@@ -43,6 +45,7 @@ class ProfileCard extends StatelessWidget {
                 foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
               ),
               title: Text(authStore.user.details!.displayName),
+              subtitle: Text('Joined on ${DateFormat.yMMMd().format(DateTime.parse(authStore.user.details!.createdAt))}'),
               trailing: OutlinedButton(
                 onPressed: () => _showDialog(context),
                 child: const Text('Log Out'),
@@ -52,9 +55,12 @@ class ProfileCard extends StatelessWidget {
           }
           return ListTile(
             isThreeLine: true,
-            leading: const Icon(Icons.account_circle_outlined),
+            leading: const Icon(
+              Icons.account_circle_outlined,
+              size: 40,
+            ),
             title: const Text('Anonymous User'),
-            subtitle: const Text('Log in with your Twitch account to view your followed streams, send chat messages, and more.'),
+            subtitle: const Text('Log in with to view your followed streams, send chat messages, and more.'),
             trailing: OutlinedButton(
               onPressed: authStore.login,
               child: const Text('Log In'),

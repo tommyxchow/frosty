@@ -26,8 +26,8 @@ class ChatModes extends StatelessWidget {
               : roomState.followersOnly == '0'
                   ? 'Followers-Only Mode: On'
                   : roomState.followersOnly == '1'
-                      ? 'Followers-Only Mode: On, ${roomState.followersOnly} minute'
-                      : 'Followers-Only Mode: On, ${roomState.followersOnly} minutes',
+                      ? 'Followers-Only Mode: On (${roomState.followersOnly} minute)'
+                      : 'Followers-Only Mode: On (${roomState.followersOnly} minutes)',
           child: Icon(
             Icons.favorite,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
@@ -43,7 +43,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
-          message: 'Slow Mode: ${roomState.slowMode != '0' ? 'On, ${roomState.slowMode} seconds' : 'Off'}',
+          message: 'Slow Mode: ${roomState.slowMode != '0' ? 'On (${roomState.slowMode} seconds)' : 'Off'}',
           child: Icon(
             Icons.history_toggle_off,
             color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,

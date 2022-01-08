@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/screens/channel/chat/chat_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -13,6 +13,7 @@ class ChatBottomBar extends StatelessWidget {
       children: [
         IconButton(
           icon: Icon(Icons.adaptive.more),
+          tooltip: 'Chat Details',
           onPressed: () => showModalBottomSheet(
             isScrollControlled: true,
             context: context,
@@ -40,6 +41,7 @@ class ChatBottomBar extends StatelessWidget {
               },
               decoration: InputDecoration(
                 suffixIcon: IconButton(
+                  tooltip: 'Emote Menu',
                   icon: const Icon(Icons.emoji_emotions_outlined),
                   onPressed: () {
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -59,6 +61,7 @@ class ChatBottomBar extends StatelessWidget {
           ),
         ),
         IconButton(
+          tooltip: 'Send',
           icon: const Icon(Icons.send),
           onPressed: () => chatStore.sendMessage(chatStore.textController.text),
         )

@@ -8,27 +8,36 @@ part of 'settings_store.dart';
 
 SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
     SettingsStore()
-      ..useOledTheme = json['useOledTheme'] as bool
-      ..showVideo = json['showVideo'] as bool
-      ..showOverlay = json['showOverlay'] as bool
-      ..showThumbnailUptime = json['showThumbnailUptime'] as bool
-      ..hideBannedMessages = json['hideBannedMessages'] as bool
-      ..showZeroWidth = json['showZeroWidth'] as bool
-      ..showTimestamps = json['showTimestamps'] as bool
-      ..useTwelveHourTimestamps = json['useTwelveHourTimestamps'] as bool
-      ..fullScreen = json['fullScreen'] as bool
-      ..expandInfo = json['expandInfo'] as bool;
+      ..useOledTheme = json['useOledTheme'] as bool? ?? false
+      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? true
+      ..showVideo = json['showVideo'] as bool? ?? true
+      ..showOverlay = json['showOverlay'] as bool? ?? true
+      ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
+      ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
+      ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
+      ..showTimestamps = json['showTimestamps'] as bool? ?? false
+      ..useTwelveHourTimestamps =
+          json['useTwelveHourTimestamps'] as bool? ?? false
+      ..useReadableColors = json['useReadableColors'] as bool? ?? true
+      ..fontScale = (json['fontScale'] as num?)?.toDouble() ?? 1.0
+      ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
+      ..fullScreen = json['fullScreen'] as bool? ?? false
+      ..expandInfo = json['expandInfo'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
       'useOledTheme': instance.useOledTheme,
+      'showThumbnailUptime': instance.showThumbnailUptime,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
-      'showThumbnailUptime': instance.showThumbnailUptime,
-      'hideBannedMessages': instance.hideBannedMessages,
+      'pictureInPicture': instance.pictureInPicture,
+      'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
       'showTimestamps': instance.showTimestamps,
       'useTwelveHourTimestamps': instance.useTwelveHourTimestamps,
+      'useReadableColors': instance.useReadableColors,
+      'fontScale': instance.fontScale,
+      'messageSpacing': instance.messageSpacing,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
     };
@@ -52,6 +61,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set useOledTheme(bool value) {
     _$useOledThemeAtom.reportWrite(value, super.useOledTheme, () {
       super.useOledTheme = value;
+    });
+  }
+
+  final _$showThumbnailUptimeAtom =
+      Atom(name: '_SettingsStoreBase.showThumbnailUptime');
+
+  @override
+  bool get showThumbnailUptime {
+    _$showThumbnailUptimeAtom.reportRead();
+    return super.showThumbnailUptime;
+  }
+
+  @override
+  set showThumbnailUptime(bool value) {
+    _$showThumbnailUptimeAtom.reportWrite(value, super.showThumbnailUptime, () {
+      super.showThumbnailUptime = value;
     });
   }
 
@@ -85,35 +110,35 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showThumbnailUptimeAtom =
-      Atom(name: '_SettingsStoreBase.showThumbnailUptime');
+  final _$pictureInPictureAtom =
+      Atom(name: '_SettingsStoreBase.pictureInPicture');
 
   @override
-  bool get showThumbnailUptime {
-    _$showThumbnailUptimeAtom.reportRead();
-    return super.showThumbnailUptime;
+  bool get pictureInPicture {
+    _$pictureInPictureAtom.reportRead();
+    return super.pictureInPicture;
   }
 
   @override
-  set showThumbnailUptime(bool value) {
-    _$showThumbnailUptimeAtom.reportWrite(value, super.showThumbnailUptime, () {
-      super.showThumbnailUptime = value;
+  set pictureInPicture(bool value) {
+    _$pictureInPictureAtom.reportWrite(value, super.pictureInPicture, () {
+      super.pictureInPicture = value;
     });
   }
 
-  final _$hideBannedMessagesAtom =
-      Atom(name: '_SettingsStoreBase.hideBannedMessages');
+  final _$showDeletedMessagesAtom =
+      Atom(name: '_SettingsStoreBase.showDeletedMessages');
 
   @override
-  bool get hideBannedMessages {
-    _$hideBannedMessagesAtom.reportRead();
-    return super.hideBannedMessages;
+  bool get showDeletedMessages {
+    _$showDeletedMessagesAtom.reportRead();
+    return super.showDeletedMessages;
   }
 
   @override
-  set hideBannedMessages(bool value) {
-    _$hideBannedMessagesAtom.reportWrite(value, super.hideBannedMessages, () {
-      super.hideBannedMessages = value;
+  set showDeletedMessages(bool value) {
+    _$showDeletedMessagesAtom.reportWrite(value, super.showDeletedMessages, () {
+      super.showDeletedMessages = value;
     });
   }
 
@@ -164,6 +189,52 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$useReadableColorsAtom =
+      Atom(name: '_SettingsStoreBase.useReadableColors');
+
+  @override
+  bool get useReadableColors {
+    _$useReadableColorsAtom.reportRead();
+    return super.useReadableColors;
+  }
+
+  @override
+  set useReadableColors(bool value) {
+    _$useReadableColorsAtom.reportWrite(value, super.useReadableColors, () {
+      super.useReadableColors = value;
+    });
+  }
+
+  final _$fontScaleAtom = Atom(name: '_SettingsStoreBase.fontScale');
+
+  @override
+  double get fontScale {
+    _$fontScaleAtom.reportRead();
+    return super.fontScale;
+  }
+
+  @override
+  set fontScale(double value) {
+    _$fontScaleAtom.reportWrite(value, super.fontScale, () {
+      super.fontScale = value;
+    });
+  }
+
+  final _$messageSpacingAtom = Atom(name: '_SettingsStoreBase.messageSpacing');
+
+  @override
+  double get messageSpacing {
+    _$messageSpacingAtom.reportRead();
+    return super.messageSpacing;
+  }
+
+  @override
+  set messageSpacing(double value) {
+    _$messageSpacingAtom.reportWrite(value, super.messageSpacing, () {
+      super.messageSpacing = value;
+    });
+  }
+
   final _$fullScreenAtom = Atom(name: '_SettingsStoreBase.fullScreen');
 
   @override
@@ -198,13 +269,17 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   String toString() {
     return '''
 useOledTheme: ${useOledTheme},
+showThumbnailUptime: ${showThumbnailUptime},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
-showThumbnailUptime: ${showThumbnailUptime},
-hideBannedMessages: ${hideBannedMessages},
+pictureInPicture: ${pictureInPicture},
+showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
 showTimestamps: ${showTimestamps},
 useTwelveHourTimestamps: ${useTwelveHourTimestamps},
+useReadableColors: ${useReadableColors},
+fontScale: ${fontScale},
+messageSpacing: ${messageSpacing},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}
     ''';

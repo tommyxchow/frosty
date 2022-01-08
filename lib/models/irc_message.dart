@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
@@ -74,18 +76,21 @@ class IRCMessage {
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
   List<InlineSpan> generateSpan({
     required TextStyle? style,
-    required Map<String, Emote> emoteToObject,
-    required Map<String, BadgeInfoTwitch> twitchBadgeToObject,
-    Map<String, List<BadgeInfoFFZ>>? ffzUserToBadges,
-    Map<String, List<BadgeInfo7TV>>? sevenTVUserToBadges,
-    Map<String, BadgeInfoBTTV>? bttvUserToBadge,
-    RoomFFZ? ffzRoomInfo,
-    bool hideMessage = false,
-    bool zeroWidthEnabled = false,
+    required ChatAssetsStore assetsStore,
+    bool showMessage = true,
+    bool useZeroWidth = false,
+    bool useReadableColors = false,
     Timestamp timestamp = Timestamp.none,
   }) {
     const badgeHeight = 20.0;
     const emoteHeight = 30.0;
+
+    final emoteToObject = assetsStore.emoteToObject;
+    final twitchBadgeToObject = assetsStore.twitchBadgesToObject;
+    final ffzUserToBadges = assetsStore.userToFFZBadges;
+    final sevenTVUserToBadges = assetsStore.userTo7TVBadges;
+    final bttvUserToBadge = assetsStore.userToBTTVBadges;
+    final ffzRoomInfo = assetsStore.ffzRoomInfo;
 
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
@@ -116,7 +121,7 @@ class IRCMessage {
     // Indicator to skip adding the bot badges later when adding the rest of FFZ badges.
     var skipBot = false;
 
-    final ffzUserBadges = ffzUserToBadges?[tags['user-id']];
+    final ffzUserBadges = ffzUserToBadges[tags['user-id']];
     final twitchBadges = tags['badges']?.split(',');
     // Pasrse and add the Twitch badges to the span if they exist.
     if (twitchBadges != null) {
@@ -198,7 +203,7 @@ class IRCMessage {
     }
 
     // Add BTTV badges to span
-    final userBTTVBadge = bttvUserToBadge?[tags['user-id']];
+    final userBTTVBadge = bttvUserToBadge[tags['user-id']];
     if (userBTTVBadge != null) {
       span.add(
         _createEmoteSpan(
@@ -212,7 +217,7 @@ class IRCMessage {
     }
 
     // Add 7TV badges to end of badges span
-    final user7TVBadges = sevenTVUserToBadges?[tags['user-id']];
+    final user7TVBadges = sevenTVUserToBadges[tags['user-id']];
     if (user7TVBadges != null) {
       for (final badge in user7TVBadges) {
         span.add(
@@ -226,12 +231,22 @@ class IRCMessage {
       }
     }
 
-    // Add the username to the span.
+    var color = HexColor.fromHex(tags['color'] ?? '#868686');
+
+    if (useReadableColors) {
+      final hsl = HSLColor.fromColor(color);
+      if (hsl.lightness <= 0.5) color = hsl.withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5)).toColor();
+    }
+
+    // Printing template for debugging purposes.
+    // debugPrint('OLD - NAME: ${tags['display-name']!}, HUE: ${hsl.hue}, SATURATION: ${hsl.saturation}, LIGHNTESS: ${hsl.lightness}');
+    // debugPrint('NEW - NAME: ${tags['display-name']!}, HUE: ${hsl.hue}, SATURATION: ${hsl.saturation}, LIGHNTESS: ${hsl.lightness}');
+
     span.add(
       TextSpan(
         text: tags['display-name']!,
         style: TextStyle(
-          color: HexColor.fromHex(tags['color'] ?? '#868686'),
+          color: color,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -245,7 +260,7 @@ class IRCMessage {
     // Italicize the text it was called with an IRC Action i.e., "/me".
     final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;
 
-    if (hideMessage) {
+    if (!showMessage) {
       span.add(const TextSpan(text: ' <message deleted>'));
     } else {
       // Add the message and any emotes to the span.
@@ -254,7 +269,7 @@ class IRCMessage {
         final words = chatMessage.split(' ');
         words.removeWhere((element) => element == '');
 
-        if (zeroWidthEnabled) {
+        if (useZeroWidth) {
           final localSpan = <InlineSpan>[];
 
           var index = words.length - 1;
@@ -407,6 +422,15 @@ class IRCMessage {
   TextSpan _createTextSpan({required String text, TextStyle? style}) {
     if (text.startsWith('@')) {
       return TextSpan(text: text, style: style?.copyWith(fontWeight: FontWeight.bold));
+    } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
+      return TextSpan(
+        text: text,
+        style: style?.copyWith(color: Colors.blue),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () async {
+            if (await canLaunch(text)) launch(text);
+          },
+      );
     } else {
       return TextSpan(text: text, style: style);
     }

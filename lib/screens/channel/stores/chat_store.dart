@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/irc_message.dart';
-import 'package:frosty/screens/channel/chat/chat_assets_store.dart';
-import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -16,6 +16,8 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
+  static const _messageLimit = 5000;
+
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
 
@@ -61,7 +63,7 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
-  late ReactionDisposer disposeEmoteMenuReaction;
+  late final ReactionDisposer disposeEmoteMenuReaction;
 
   _ChatStoreBase({
     required this.auth,
@@ -102,7 +104,7 @@ abstract class _ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      debugPrint(message);
+      // debugPrint(message);
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message, userLogin: auth.user.details?.login);
 
@@ -137,20 +139,22 @@ abstract class _ChatStoreBase with Store {
             break;
           case Command.globalUserState:
             final setIds = parsedIRCMessage.tags['emote-sets']?.split(',');
-            _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
-            assetsStore
-                .getUserEmotes(emoteSets: setIds, headers: auth.headersTwitch)
-                .then((_) => _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!')))
-                .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch user emotes: ${error.toString()}')));
+            if (setIds != null) {
+              _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
+              assetsStore
+                  .getUserEmotes(emoteSets: setIds, headers: auth.headersTwitch)
+                  .then((_) => _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!')))
+                  .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch user emotes: ${error.toString()}')));
+            }
             continue;
           case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
             continue;
         }
 
-        if (_messages.length >= 5000) _messages.removeAt(0);
-
         if (_autoScroll) {
+          if (_messages.length >= _messageLimit) _messages.removeAt(0);
+
           SchedulerBinding.instance?.addPostFrameCallback((_) {
             if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
           });
@@ -161,14 +165,10 @@ abstract class _ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat."));
-
-        // Fetch the users in chat.
-        chatDetailsStore.updateChatters(channelName);
+        _messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat"));
 
         // Fetch the assets used in chat including badges and emotes.
         _messages.add(IRCMessage.createNotice(message: 'Fetching badges and emotes...'));
-
         assetsStore
             .getAssets(channelName: channelName, headers: auth.headersTwitch)
             .then((_) => _messages.add(IRCMessage.createNotice(message: 'Badges and emotes fetched!')))
@@ -184,6 +184,8 @@ abstract class _ChatStoreBase with Store {
   /// Re-enables [_autoScroll] and jumps to the latest message.
   @action
   void resumeScroll() {
+    if (_messages.length >= _messageLimit) _messages.removeRange(0, _messages.length - _messageLimit);
+
     _autoScroll = true;
 
     // Jump to the latest message (bottom of the list/chat).
@@ -209,8 +211,12 @@ abstract class _ChatStoreBase with Store {
       onDone: () async {
         if (_channel == null) return;
 
-        // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
-        _messages.add(IRCMessage.createNotice(message: 'Disconnected from chat, waiting $_backoffTime seconds before reconnecting...'));
+        if (_backoffTime > 0) {
+          // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
+          final notice = 'Disconnected from chat, waiting ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
+          _messages.add(IRCMessage.createNotice(message: notice));
+        }
+
         await Future.delayed(Duration(seconds: _backoffTime));
 
         // Increase the backoff time for the next retry.
@@ -218,7 +224,7 @@ abstract class _ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries).'));
+        _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
         reconnect();
       },
     );

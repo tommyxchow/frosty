@@ -9,6 +9,21 @@ part of 'list_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ListStore on _ListStoreBase, Store {
+  final _$showJumpButtonAtom = Atom(name: '_ListStoreBase.showJumpButton');
+
+  @override
+  bool get showJumpButton {
+    _$showJumpButtonAtom.reportRead();
+    return super.showJumpButton;
+  }
+
+  @override
+  set showJumpButton(bool value) {
+    _$showJumpButtonAtom.reportWrite(value, super.showJumpButton, () {
+      super.showJumpButton = value;
+    });
+  }
+
   final _$_streamsAtom = Atom(name: '_ListStoreBase._streams');
 
   ObservableList<StreamTwitch> get streams {
@@ -23,23 +38,6 @@ mixin _$ListStore on _ListStoreBase, Store {
   set _streams(ObservableList<StreamTwitch> value) {
     _$_streamsAtom.reportWrite(value, super._streams, () {
       super._streams = value;
-    });
-  }
-
-  final _$_categoriesAtom = Atom(name: '_ListStoreBase._categories');
-
-  ObservableList<CategoryTwitch> get categories {
-    _$_categoriesAtom.reportRead();
-    return super._categories;
-  }
-
-  @override
-  ObservableList<CategoryTwitch> get _categories => categories;
-
-  @override
-  set _categories(ObservableList<CategoryTwitch> value) {
-    _$_categoriesAtom.reportWrite(value, super._categories, () {
-      super._categories = value;
     });
   }
 
@@ -67,14 +65,6 @@ mixin _$ListStore on _ListStoreBase, Store {
     return _$getStreamsAsyncAction.run(() => super.getStreams());
   }
 
-  final _$getCategoriesAsyncAction =
-      AsyncAction('_ListStoreBase.getCategories');
-
-  @override
-  Future<void> getCategories() {
-    return _$getCategoriesAsyncAction.run(() => super.getCategories());
-  }
-
   final _$_ListStoreBaseActionController =
       ActionController(name: '_ListStoreBase');
 
@@ -90,20 +80,9 @@ mixin _$ListStore on _ListStoreBase, Store {
   }
 
   @override
-  Future<void> refreshCategories() {
-    final _$actionInfo = _$_ListStoreBaseActionController.startAction(
-        name: '_ListStoreBase.refreshCategories');
-    try {
-      return super.refreshCategories();
-    } finally {
-      _$_ListStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   String toString() {
     return '''
-
+showJumpButton: ${showJumpButton}
     ''';
   }
 }

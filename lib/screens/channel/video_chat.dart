@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
-import 'package:frosty/screens/channel/chat/chat_store.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
-import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
@@ -53,10 +53,15 @@ class VideoChat extends StatelessWidget {
       ),
       actions: [
         IconButton(
+          tooltip: 'Settings',
           icon: const Icon(Icons.settings),
           onPressed: () => showModalBottomSheet(
+            isScrollControlled: true,
             context: context,
-            builder: (_) => Settings(settingsStore: settingsStore),
+            builder: (_) => SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Settings(settingsStore: settingsStore),
+            ),
           ),
         ),
       ],

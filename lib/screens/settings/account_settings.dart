@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/screens/settings/account/blocked_users.dart';
-import 'package:frosty/screens/settings/account/profile_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/blocked_users.dart';
+import 'package:frosty/screens/settings/widgets/profile_card.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class AccountSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -25,7 +26,7 @@ class AccountSettings extends StatelessWidget {
           padding: EdgeInsets.all(10.0),
         ),
         ProfileCard(authStore: authStore),
-        if (authStore.isLoggedIn)
+        if (authStore.isLoggedIn) ...[
           ListTile(
             title: const Text('Blocked Users'),
             trailing: Icon(Icons.adaptive.arrow_forward),
@@ -37,29 +38,30 @@ class AccountSettings extends StatelessWidget {
                 ),
               ),
             ),
-          )
-        // Add prompt explaining what this does before proceeding.
-        // Center(
-        //   child: ElevatedButton(
-        //     child: const Text('Log In to WebView'),
-        //     onPressed: () => Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (context) {
-        //           return Scaffold(
-        //             appBar: AppBar(
-        //               title: const Text('Log In to WebView'),
-        //             ),
-        //             body: const WebView(
-        //               initialUrl: 'https://www.twitch.tv/login',
-        //               javascriptMode: JavascriptMode.unrestricted,
-        //             ),
-        //           );
-        //         },
-        //       ),
-        //     ),
-        //   ),
-        // ),
+          ),
+          ListTile(
+            isThreeLine: true,
+            title: const Text('Log in to WebView'),
+            subtitle: const Text('Lets you avoid ads on your subscribed streamers or if you have Turbo.'),
+            trailing: Icon(Icons.adaptive.arrow_forward),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: const Text('Log In to WebView'),
+                    ),
+                    body: const WebView(
+                      initialUrl: 'https://www.twitch.tv/login',
+                      javascriptMode: JavascriptMode.unrestricted,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }

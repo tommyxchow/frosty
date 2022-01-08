@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
@@ -79,6 +80,11 @@ abstract class _VideoStoreBase with Store {
     overlayTimer.cancel();
     settingsStore.expandInfo = !settingsStore.expandInfo;
     overlayTimer = Timer(const Duration(seconds: 5), () => _menuVisible = false);
+  }
+
+  void handleRefresh() async {
+    HapticFeedback.lightImpact();
+    controller?.reload();
   }
 
   void initVideo() {
