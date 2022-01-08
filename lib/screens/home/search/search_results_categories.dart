@@ -19,14 +19,26 @@ class SearchResultsCategories extends StatelessWidget {
 
         switch (future!.status) {
           case FutureStatus.pending:
-            return const SliverToBoxAdapter(child: LoadingIndicator(subtitle: Text('Loading categories...')));
+            return const SliverToBoxAdapter(
+              child: LoadingIndicator(
+                subtitle: Text('Loading categories...'),
+              ),
+            );
           case FutureStatus.rejected:
-            return const SliverToBoxAdapter(child: Text('Failed to get categories.'));
+            return const SliverToBoxAdapter(
+              child: Center(
+                child: Text('Failed to get categories.'),
+              ),
+            );
           case FutureStatus.fulfilled:
             final CategoriesTwitch? categories = future.result;
 
             if (categories == null) {
-              return const SliverToBoxAdapter(child: Text('Failed to get categories.'));
+              return const SliverToBoxAdapter(
+                child: Center(
+                  child: Text('Failed to get categories.'),
+                ),
+              );
             }
 
             if (categories.data.isEmpty) {
@@ -41,7 +53,13 @@ class SearchResultsCategories extends StatelessWidget {
             return SliverGrid.count(
               crossAxisCount: 2,
               mainAxisSpacing: 20,
-              children: categories.data.map((category) => GridTile(child: CategoryCard(category: category))).toList(),
+              children: categories.data
+                  .map(
+                    (category) => GridTile(
+                      child: CategoryCard(category: category),
+                    ),
+                  )
+                  .toList(),
             );
         }
       },

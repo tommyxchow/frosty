@@ -65,7 +65,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                       padding: const EdgeInsets.all(20.0),
                       margin: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.purpleAccent),
+                        border: Border.all(color: Colors.deepPurple),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       child: Column(

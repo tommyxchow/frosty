@@ -54,7 +54,9 @@ class SearchResultsChannels extends StatelessWidget {
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
-              child: Center(child: Text('Failed to fetch streams.')),
+              child: Center(
+                child: Text('Failed to fetch streams.'),
+              ),
             );
           case FutureStatus.fulfilled:
             final List<ChannelQuery> results = future.result;

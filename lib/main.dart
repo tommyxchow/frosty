@@ -6,6 +6,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
+import 'package:frosty/screens/home/stores/home_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -105,6 +106,7 @@ class MyApp extends StatelessWidget {
           title: 'Frosty',
           theme: settingsStore.useOledTheme ? oledTheme : defaultTheme,
           home: Home(
+            homeStore: HomeStore(),
             topSectionStore: ListStore(
               authStore: authStore,
               listType: ListType.top,
