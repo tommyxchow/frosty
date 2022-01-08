@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
 
@@ -21,9 +22,9 @@ class OtherSettings extends StatelessWidget {
           title: const Text('About'),
           onTap: () => showAboutDialog(
             context: context,
-            applicationName: 'Frosty for Twitch',
-            applicationVersion: '1.0.0',
-            applicationLegalese: '\u{a9} 2021 Tommy Chow',
+            applicationName: 'Frosty',
+            applicationVersion: version,
+            applicationLegalese: '\u{a9} 2022 Tommy Chow',
           ),
         ),
         Container(
