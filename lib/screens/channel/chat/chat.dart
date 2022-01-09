@@ -80,24 +80,26 @@ class _ChatState extends State<Chat> {
                   ),
                 ),
                 Observer(
-                  builder: (_) => Visibility(
-                    visible: !chatStore.autoScroll,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: chatStore.resumeScroll,
-                        label: const Text('Resume Scroll'),
-                        icon: const Icon(Icons.arrow_circle_down),
-                      ),
-                    ),
+                  builder: (_) => AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: chatStore.autoScroll
+                        ? const SizedBox()
+                        : Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: chatStore.resumeScroll,
+                              label: const Text('Resume Scroll'),
+                              icon: const Icon(Icons.arrow_circle_down),
+                            ),
+                          ),
                   ),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 5.0),
-          if (chatStore.auth.isLoggedIn) ChatBottomBar(chatStore: chatStore),
+          ChatBottomBar(chatStore: chatStore),
           if (chatStore.assetsStore.showEmoteMenu)
             Flexible(
               flex: 2,
