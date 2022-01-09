@@ -48,7 +48,7 @@ abstract class _ChatStoreBase with Store {
   /// The assets store responsible for badges, emotes, and the emote menu.
   final assetsStore = ChatAssetsStore();
 
-  /// Requested message to be sent by the user. Will only be sent on receival of a USERNOTICE command.
+  /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
 
   /// The list of chat messages to render and display.

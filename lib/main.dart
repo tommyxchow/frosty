@@ -18,11 +18,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Create and initialize the authenticatino store
+  // Create and initialize the authentication store
   final authStore = AuthStore();
   await authStore.init();
 
-  // Get the shared pereferences instance and obtain the existing user settings if it exists.
+  // Get the shared preferences instance and obtain the existing user settings if it exists.
   // If default settings don't exist, use an empty JSON string to use the default values.
   final preferences = await SharedPreferences.getInstance();
   final userSettings = preferences.getString('settings') ?? '{}';
@@ -30,7 +30,7 @@ Future<void> main() async {
   // Initialize a settings store from the settings JSON string.
   final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
 
-  // Create a MobX reaction that will save the settings on disk everytime they are changed.
+  // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
 
   await SentryFlutter.init(
@@ -77,6 +77,7 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.deepPurpleAccent,
       ),
       dialogBackgroundColor: Colors.grey.shade900,
+      toggleableActiveColor: Colors.deepPurpleAccent,
     );
 
     final oledTheme = ThemeData(
@@ -98,6 +99,7 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.deepPurpleAccent,
       ),
       dialogBackgroundColor: Colors.black,
+      toggleableActiveColor: Colors.deepPurpleAccent,
     );
 
     return Observer(
