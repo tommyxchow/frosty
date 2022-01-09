@@ -68,31 +68,41 @@ abstract class _AuthBase with Store {
 
   /// Initiates the OAuth sign-in process and updates fields accordingly upon successful login.
   @action
-  Future<void> login() async {
-    // Create the OAuth sign-in URI.
-    final loginUrl = Uri(
-      scheme: 'https',
-      host: 'id.twitch.tv',
-      path: '/oauth2/authorize',
-      queryParameters: {
-        'client_id': clientId,
-        'redirect_uri': 'auth://',
-        'response_type': 'token',
-        'scope': 'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
-        'force_verify': 'true',
-      },
-    );
-
+  Future<void> login({String? customToken}) async {
     try {
-      // Retrieve the OAuth redirect URI.
-      final result = await FlutterWebAuth.authenticate(url: loginUrl.toString(), callbackUrlScheme: 'auth');
+      if (customToken == null) {
+        // Create the OAuth sign-in URI.
+        final loginUrl = Uri(
+          scheme: 'https',
+          host: 'id.twitch.tv',
+          path: '/oauth2/authorize',
+          queryParameters: {
+            'client_id': clientId,
+            'redirect_uri': 'auth://',
+            'response_type': 'token',
+            'scope': 'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
+            'force_verify': 'true',
+          },
+        );
 
-      // Parse the user token from the redirect URI fragment.
-      final fragment = Uri.parse(result).fragment;
-      _token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
+        // Retrieve the OAuth redirect URI.
+        final result = await FlutterWebAuth.authenticate(
+          url: loginUrl.toString(),
+          callbackUrlScheme: 'auth',
+        );
+
+        // Parse the user token from the redirect URI fragment.
+        final fragment = Uri.parse(result).fragment;
+        _token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
+      } else {
+        _token = customToken;
+      }
+
+      _tokenIsValid = await Twitch.validateToken(token: _token!);
+      if (!_tokenIsValid) return;
 
       // Store the user token.
-      await _storage.write(key: 'USER_TOKEN', value: _token);
+      await _storage.write(key: 'USER_TOKEN', value: customToken ?? _token);
 
       // Initialize the user with the new token.
       await user.init(headers: headersTwitch);

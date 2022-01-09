@@ -9,7 +9,7 @@ part of 'settings_store.dart';
 SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
     SettingsStore()
       ..useOledTheme = json['useOledTheme'] as bool? ?? false
-      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? true
+      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false

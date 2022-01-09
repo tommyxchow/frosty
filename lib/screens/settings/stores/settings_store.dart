@@ -27,9 +27,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showVideo = true;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: true)
   @observable
-  var showOverlay = false;
+  var showOverlay = true;
 
   @JsonKey(defaultValue: false)
   @observable

@@ -9,7 +9,40 @@ class ProfileCard extends StatelessWidget {
 
   const ProfileCard({Key? key, required this.authStore}) : super(key: key);
 
-  Future<void> _showDialog(BuildContext context) {
+  Future<void> _showLoginDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('Log In With'),
+        children: [
+          SimpleDialogOption(
+            child: const Text('Twitch Account'),
+            onPressed: () {
+              authStore.login();
+              Navigator.pop(context);
+            },
+          ),
+          const Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Center(child: Text('Or')),
+          ),
+          SimpleDialogOption(
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Token',
+              ),
+              onSubmitted: (token) {
+                authStore.login(customToken: token);
+                Navigator.pop(context);
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showLogoutDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -23,7 +56,7 @@ class ProfileCard extends StatelessWidget {
           TextButton(
             onPressed: () {
               authStore.logout();
-              Navigator.of(context).pop();
+              Navigator.pop(context);
             },
             child: const Text('Yes'),
             style: TextButton.styleFrom(primary: Colors.red),
@@ -47,7 +80,7 @@ class ProfileCard extends StatelessWidget {
               title: Text(authStore.user.details!.displayName),
               subtitle: Text('Joined on ${DateFormat.yMMMd().format(DateTime.parse(authStore.user.details!.createdAt))}'),
               trailing: OutlinedButton(
-                onPressed: () => _showDialog(context),
+                onPressed: () => _showLogoutDialog(context),
                 child: const Text('Log Out'),
                 style: OutlinedButton.styleFrom(primary: Colors.red),
               ),
@@ -62,7 +95,7 @@ class ProfileCard extends StatelessWidget {
             title: const Text('Anonymous User'),
             subtitle: const Text('Log in with to view your followed streams, send chat messages, and more.'),
             trailing: OutlinedButton(
-              onPressed: authStore.login,
+              onPressed: () => _showLoginDialog(context),
               child: const Text('Log In'),
             ),
           );
