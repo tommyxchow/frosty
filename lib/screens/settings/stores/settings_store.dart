@@ -18,18 +18,18 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var useOledTheme = false;
 
-  @JsonKey(defaultValue: true)
+  @JsonKey(defaultValue: false)
   @observable
-  var showThumbnailUptime = true;
+  var showThumbnailUptime = false;
 
   // Video Settings
   @JsonKey(defaultValue: true)
   @observable
   var showVideo = true;
 
-  @JsonKey(defaultValue: true)
+  @JsonKey(defaultValue: false)
   @observable
-  var showOverlay = true;
+  var showOverlay = false;
 
   @JsonKey(defaultValue: false)
   @observable
