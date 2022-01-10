@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
@@ -28,6 +27,7 @@ class Video extends StatelessWidget {
                 return Stack(
                   children: [
                     WebView(
+                      backgroundColor: const Color(0x00000000),
                       initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
                       javascriptMode: JavascriptMode.unrestricted,
                       allowsInlineMediaPlayback: true,
@@ -86,6 +86,7 @@ class Video extends StatelessWidget {
                 );
               }
               return WebView(
+                backgroundColor: const Color(0x00000000),
                 initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
                 javascriptMode: JavascriptMode.unrestricted,
                 allowsInlineMediaPlayback: true,
