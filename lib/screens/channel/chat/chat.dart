@@ -6,20 +6,13 @@ import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 
-class Chat extends StatefulWidget {
+class Chat extends StatelessWidget {
   final ChatStore chatStore;
 
   const Chat({Key? key, required this.chatStore}) : super(key: key);
 
   @override
-  _ChatState createState() => _ChatState();
-}
-
-class _ChatState extends State<Chat> {
-  @override
   Widget build(BuildContext context) {
-    final chatStore = widget.chatStore;
-
     return Observer(
       builder: (context) => Column(
         children: [
@@ -111,11 +104,5 @@ class _ChatState extends State<Chat> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    widget.chatStore.dispose();
-    super.dispose();
   }
 }

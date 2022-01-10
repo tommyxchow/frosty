@@ -1,9 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
@@ -27,10 +32,18 @@ class StreamCard extends StatelessWidget {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => VideoChat(
-            title: streamInfo.title,
-            userName: streamInfo.userName,
-            userLogin: streamInfo.userLogin,
+          builder: (context) => VideoChat(
+            displayName: streamInfo.userName,
+            videoStore: VideoStore(
+              userLogin: streamInfo.userLogin,
+              authStore: context.read<AuthStore>(),
+              settingsStore: context.read<SettingsStore>(),
+            ),
+            chatStore: ChatStore(
+              channelName: streamInfo.userLogin,
+              auth: context.read<AuthStore>(),
+              settings: context.read<SettingsStore>(),
+            ),
           ),
         ),
       ),
