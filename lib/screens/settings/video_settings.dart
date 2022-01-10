@@ -33,13 +33,13 @@ class VideoSettings extends StatelessWidget {
             SwitchListTile.adaptive(
               title: const Text('Long-press player to toggle overlay'),
               value: settingsStore.toggleableOverlay,
-              onChanged: settingsStore.showOverlay ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
+              onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
             ),
             if (Platform.isIOS)
               SwitchListTile.adaptive(
                 title: const Text('Picture-in-picture button'),
                 value: settingsStore.pictureInPicture,
-                onChanged: settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
+                onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
               ),
           ],
         );
