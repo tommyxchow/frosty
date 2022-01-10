@@ -17,86 +17,88 @@ class Video extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: videoStore.settingsStore.toggleableOverlay ? () => videoStore.settingsStore.showOverlay = !videoStore.settingsStore.showOverlay : null,
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Observer(
-          builder: (context) {
-            if (videoStore.settingsStore.showOverlay) {
-              return Stack(
-                children: [
-                  WebView(
-                    initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
-                    javascriptMode: JavascriptMode.unrestricted,
-                    allowsInlineMediaPlayback: true,
-                    initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-                    onWebViewCreated: (controller) => videoStore.controller = controller,
-                    onPageFinished: (string) => videoStore.initVideo(),
-                    navigationDelegate: (navigation) {
-                      if (navigation.url.startsWith('https://player.twitch.tv')) {
-                        return NavigationDecision.navigate;
-                      }
-                      return NavigationDecision.prevent;
-                    },
-                    javascriptChannels: {
-                      JavascriptChannel(
-                        name: 'Pause',
-                        onMessageReceived: (message) {
-                          videoStore.paused = true;
-                        },
-                      ),
-                      JavascriptChannel(
-                        name: 'Play',
-                        onMessageReceived: (message) {
-                          videoStore.paused = false;
-                        },
-                      ),
-                    },
-                  ),
-                  Observer(
-                    builder: (context) {
-                      if (videoStore.paused) {
-                        return VideoOverlay(videoStore: videoStore);
-                      }
-                      return GestureDetector(
-                        onTap: videoStore.handleVideoTap,
-                        child: SizedBox.expand(
-                          child: Observer(
-                            builder: (context) {
-                              return AnimatedOpacity(
-                                opacity: videoStore.overlayVisible ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 200),
-                                child: ColoredBox(
-                                  color: const Color.fromRGBO(0, 0, 0, 0.5),
-                                  child: IgnorePointer(
-                                    ignoring: !videoStore.overlayVisible,
-                                    child: VideoOverlay(videoStore: videoStore),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+    return Observer(
+      builder: (context) => GestureDetector(
+        onLongPress: videoStore.settingsStore.toggleableOverlay ? () => videoStore.settingsStore.showOverlay = !videoStore.settingsStore.showOverlay : null,
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Observer(
+            builder: (context) {
+              if (videoStore.settingsStore.showOverlay) {
+                return Stack(
+                  children: [
+                    WebView(
+                      initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
+                      javascriptMode: JavascriptMode.unrestricted,
+                      allowsInlineMediaPlayback: true,
+                      initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+                      onWebViewCreated: (controller) => videoStore.controller = controller,
+                      onPageFinished: (string) => videoStore.initVideo(),
+                      navigationDelegate: (navigation) {
+                        if (navigation.url.startsWith('https://player.twitch.tv')) {
+                          return NavigationDecision.navigate;
+                        }
+                        return NavigationDecision.prevent;
+                      },
+                      javascriptChannels: {
+                        JavascriptChannel(
+                          name: 'Pause',
+                          onMessageReceived: (message) {
+                            videoStore.paused = true;
+                          },
                         ),
-                      );
-                    },
-                  )
-                ],
+                        JavascriptChannel(
+                          name: 'Play',
+                          onMessageReceived: (message) {
+                            videoStore.paused = false;
+                          },
+                        ),
+                      },
+                    ),
+                    Observer(
+                      builder: (context) {
+                        if (videoStore.paused) {
+                          return VideoOverlay(videoStore: videoStore);
+                        }
+                        return GestureDetector(
+                          onTap: videoStore.handleVideoTap,
+                          child: SizedBox.expand(
+                            child: Observer(
+                              builder: (context) {
+                                return AnimatedOpacity(
+                                  opacity: videoStore.overlayVisible ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 200),
+                                  child: ColoredBox(
+                                    color: const Color.fromRGBO(0, 0, 0, 0.5),
+                                    child: IgnorePointer(
+                                      ignoring: !videoStore.overlayVisible,
+                                      child: VideoOverlay(videoStore: videoStore),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  ],
+                );
+              }
+              return WebView(
+                initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
+                javascriptMode: JavascriptMode.unrestricted,
+                allowsInlineMediaPlayback: true,
+                initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+                navigationDelegate: (navigation) {
+                  if (navigation.url.startsWith('https://player.twitch.tv')) {
+                    return NavigationDecision.navigate;
+                  }
+                  return NavigationDecision.prevent;
+                },
               );
-            }
-            return WebView(
-              initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
-              javascriptMode: JavascriptMode.unrestricted,
-              allowsInlineMediaPlayback: true,
-              initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-              navigationDelegate: (navigation) {
-                if (navigation.url.startsWith('https://player.twitch.tv')) {
-                  return NavigationDecision.navigate;
-                }
-                return NavigationDecision.prevent;
-              },
-            );
-          },
+            },
+          ),
         ),
       ),
     );
