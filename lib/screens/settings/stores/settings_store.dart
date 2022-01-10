@@ -33,6 +33,10 @@ abstract class _SettingsStoreBase with Store {
 
   @JsonKey(defaultValue: false)
   @observable
+  var toggleableOverlay = false;
+
+  @JsonKey(defaultValue: false)
+  @observable
   var pictureInPicture = false;
 
   // Chat Settings

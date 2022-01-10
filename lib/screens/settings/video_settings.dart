@@ -25,10 +25,15 @@ class VideoSettings extends StatelessWidget {
             ),
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Use custom video overlay'),
-              subtitle: const Text('Replaces the default video overlay with a mobile-friendly version.'),
+              title: const Text('Use custom stream overlay'),
+              subtitle: const Text('Replaces the default stream overlay with a mobile-friendly version.'),
               value: settingsStore.showOverlay,
               onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
+            ),
+            SwitchListTile.adaptive(
+              title: const Text('Long-press player to toggle overlay'),
+              value: settingsStore.toggleableOverlay,
+              onChanged: settingsStore.showOverlay ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
             ),
             if (Platform.isIOS)
               SwitchListTile.adaptive(

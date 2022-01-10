@@ -12,6 +12,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
+      ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
@@ -30,6 +31,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showThumbnailUptime': instance.showThumbnailUptime,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
+      'toggleableOverlay': instance.toggleableOverlay,
       'pictureInPicture': instance.pictureInPicture,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
@@ -107,6 +109,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showOverlay(bool value) {
     _$showOverlayAtom.reportWrite(value, super.showOverlay, () {
       super.showOverlay = value;
+    });
+  }
+
+  final _$toggleableOverlayAtom =
+      Atom(name: '_SettingsStoreBase.toggleableOverlay');
+
+  @override
+  bool get toggleableOverlay {
+    _$toggleableOverlayAtom.reportRead();
+    return super.toggleableOverlay;
+  }
+
+  @override
+  set toggleableOverlay(bool value) {
+    _$toggleableOverlayAtom.reportWrite(value, super.toggleableOverlay, () {
+      super.toggleableOverlay = value;
     });
   }
 
@@ -272,6 +290,7 @@ useOledTheme: ${useOledTheme},
 showThumbnailUptime: ${showThumbnailUptime},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
+toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
