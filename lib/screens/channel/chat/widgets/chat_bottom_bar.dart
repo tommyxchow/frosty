@@ -30,6 +30,7 @@ class ChatBottomBar extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
             child: TextField(
+              focusNode: chatStore.textFieldFocusNode,
               minLines: 1,
               maxLines: 5,
               enabled: chatStore.auth.isLoggedIn ? true : false,

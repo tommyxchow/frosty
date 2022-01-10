@@ -24,6 +24,9 @@ abstract class _ChatStoreBase with Store {
   /// The provided setting store to account for any user-defined behaviors.
   final SettingsStore settings;
 
+  /// The focus node for the textfield to allow for showing and hiding the keyboard/focus.
+  final textFieldFocusNode = FocusNode();
+
   /// The name of the channel to connect to.
   final String channelName;
 

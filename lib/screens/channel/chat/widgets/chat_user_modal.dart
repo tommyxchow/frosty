@@ -41,10 +41,28 @@ class ChatUserModal extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 trailing: chatStore.auth.isLoggedIn
-                    ? BlockButton(
-                        authStore: chatStore.auth,
-                        targetUser: username,
-                        targetUserId: userId,
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () {
+                              chatStore.textController.text = '@$username ';
+                              Navigator.pop(context);
+                              chatStore.textFieldFocusNode.requestFocus();
+                              Future.delayed(
+                                const Duration(milliseconds: 200),
+                                () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
+                              );
+                            },
+                            child: const Text('Reply'),
+                          ),
+                          const SizedBox(width: 10.0),
+                          BlockButton(
+                            authStore: chatStore.auth,
+                            targetUser: username,
+                            targetUserId: userId,
+                          )
+                        ],
                       )
                     : null,
               ),
