@@ -72,22 +72,29 @@ class _ChatSettingsState extends State<ChatSettings> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text.rich(
-                            TextSpan(children: [
-                              const TextSpan(text: 'Hello! This is a text preview message '),
-                              WidgetSpan(
-                                alignment: PlaceholderAlignment.middle,
-                                child: CachedNetworkImage(
-                                  imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
-                                  placeholder: (context, url) => const SizedBox(),
-                                  height: 30.0,
+                            TextSpan(
+                              children: [
+                                const TextSpan(text: 'Hello! This is a text preview message '),
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: CachedNetworkImage(
+                                    imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
+                                    placeholder: (context, url) => const SizedBox(),
+                                    height: 30.0,
+                                  ),
                                 ),
-                              )
-                            ]),
+                              ],
+                            ),
                             textScaleFactor: settingsStore.fontScale,
                           ),
                           SizedBox(height: settingsStore.messageSpacing),
                           Text(
                             'Here is a another message to visualize spacing!',
+                            textScaleFactor: settingsStore.fontScale,
+                          ),
+                          SizedBox(height: settingsStore.messageSpacing),
+                          Text(
+                            'And one more for spacing without an emote!',
                             textScaleFactor: settingsStore.fontScale,
                           ),
                         ],
