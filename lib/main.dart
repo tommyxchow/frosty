@@ -133,7 +133,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Frosty',
           theme: lightTheme,
-          darkTheme: settingsStore.themeType == ThemeType.dark ? darkTheme : oledTheme,
+          darkTheme: settingsStore.themeType == ThemeType.dark || settingsStore.themeType == ThemeType.system ? darkTheme : oledTheme,
           themeMode: settingsStore.themeType == ThemeType.system
               ? ThemeMode.system
               : settingsStore.themeType == ThemeType.light

@@ -14,7 +14,7 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
 
 abstract class _SettingsStoreBase with Store {
   //General Settings
-  @JsonKey(defaultValue: ThemeType.system)
+  @JsonKey(defaultValue: ThemeType.system, unknownEnumValue: ThemeType.system)
   @observable
   var themeType = ThemeType.system;
 
@@ -48,13 +48,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showZeroWidth = false;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: TimestampType.disabled, unknownEnumValue: TimestampType.disabled)
   @observable
-  var showTimestamps = false;
-
-  @JsonKey(defaultValue: false)
-  @observable
-  var useTwelveHourTimestamps = false;
+  var timestampType = TimestampType.disabled;
 
   @JsonKey(defaultValue: true)
   @observable
@@ -96,4 +92,10 @@ enum ThemeType {
   light,
   dark,
   black,
+}
+
+enum TimestampType {
+  disabled,
+  twelve,
+  twentyFour,
 }

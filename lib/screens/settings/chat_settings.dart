@@ -18,6 +18,8 @@ class _ChatSettingsState extends State<ChatSettings> {
 
   @override
   Widget build(BuildContext context) {
+    const timestamps = ['Disabled', '12-Hour', '24-Hour'];
+
     final settingsStore = widget.settingsStore;
 
     return Observer(
@@ -40,30 +42,34 @@ class _ChatSettingsState extends State<ChatSettings> {
             ),
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Show message timestamps'),
-              subtitle: const Text('Displays timestamps for when a chat message was sent.'),
-              value: settingsStore.showTimestamps,
-              onChanged: (newValue) => settingsStore.showTimestamps = newValue,
-            ),
-            SwitchListTile.adaptive(
-              title: const Text('Use 12-hour timestamps'),
-              value: settingsStore.useTwelveHourTimestamps,
-              onChanged: settingsStore.showTimestamps ? (newValue) => settingsStore.useTwelveHourTimestamps = newValue : null,
-            ),
-            SwitchListTile.adaptive(
-              isThreeLine: true,
               title: const Text('Use readable colors for chat names'),
               subtitle: const Text('Adjusts the lightness value of overly bright/dark names in chat.'),
               value: settingsStore.useReadableColors,
               onChanged: (newValue) => settingsStore.useReadableColors = newValue,
             ),
+            ListTile(
+              isThreeLine: true,
+              title: const Text('Message timestamps'),
+              subtitle: const Text('Displays timestamps for when a chat message was sent.'),
+              trailing: DropdownButton(
+                value: settingsStore.timestampType,
+                onChanged: (TimestampType? newTimestamp) => settingsStore.timestampType = newTimestamp!,
+                items: TimestampType.values
+                    .map((TimestampType value) => DropdownMenuItem(
+                          value: value,
+                          child: Text(timestamps[value.index]),
+                        ))
+                    .toList(),
+              ),
+            ),
+            const SizedBox(height: 10.0),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: showPreview
                   ? Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(20.0),
-                      margin: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 10.0),
+                      margin: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
                         border: Border.all(color: Colors.deepPurple),
                         borderRadius: BorderRadius.circular(10.0),

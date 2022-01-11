@@ -8,9 +8,9 @@ part of 'settings_store.dart';
 
 SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
     SettingsStore()
-      ..themeType =
-          $enumDecodeNullable(_$ThemeTypeEnumMap, json['themeType']) ??
-              ThemeType.system
+      ..themeType = $enumDecodeNullable(_$ThemeTypeEnumMap, json['themeType'],
+              unknownValue: ThemeType.system) ??
+          ThemeType.system
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
@@ -18,9 +18,10 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
-      ..showTimestamps = json['showTimestamps'] as bool? ?? false
-      ..useTwelveHourTimestamps =
-          json['useTwelveHourTimestamps'] as bool? ?? false
+      ..timestampType = $enumDecodeNullable(
+              _$TimestampTypeEnumMap, json['timestampType'],
+              unknownValue: TimestampType.disabled) ??
+          TimestampType.disabled
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
       ..fontScale = (json['fontScale'] as num?)?.toDouble() ?? 1.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
@@ -37,8 +38,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'pictureInPicture': instance.pictureInPicture,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
-      'showTimestamps': instance.showTimestamps,
-      'useTwelveHourTimestamps': instance.useTwelveHourTimestamps,
+      'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
       'useReadableColors': instance.useReadableColors,
       'fontScale': instance.fontScale,
       'messageSpacing': instance.messageSpacing,
@@ -51,6 +51,12 @@ const _$ThemeTypeEnumMap = {
   ThemeType.light: 'light',
   ThemeType.dark: 'dark',
   ThemeType.black: 'black',
+};
+
+const _$TimestampTypeEnumMap = {
+  TimestampType.disabled: 'disabled',
+  TimestampType.twelve: 'twelve',
+  TimestampType.twentyFour: 'twentyFour',
 };
 
 // **************************************************************************
@@ -184,35 +190,18 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showTimestampsAtom = Atom(name: '_SettingsStoreBase.showTimestamps');
+  final _$timestampTypeAtom = Atom(name: '_SettingsStoreBase.timestampType');
 
   @override
-  bool get showTimestamps {
-    _$showTimestampsAtom.reportRead();
-    return super.showTimestamps;
+  TimestampType get timestampType {
+    _$timestampTypeAtom.reportRead();
+    return super.timestampType;
   }
 
   @override
-  set showTimestamps(bool value) {
-    _$showTimestampsAtom.reportWrite(value, super.showTimestamps, () {
-      super.showTimestamps = value;
-    });
-  }
-
-  final _$useTwelveHourTimestampsAtom =
-      Atom(name: '_SettingsStoreBase.useTwelveHourTimestamps');
-
-  @override
-  bool get useTwelveHourTimestamps {
-    _$useTwelveHourTimestampsAtom.reportRead();
-    return super.useTwelveHourTimestamps;
-  }
-
-  @override
-  set useTwelveHourTimestamps(bool value) {
-    _$useTwelveHourTimestampsAtom
-        .reportWrite(value, super.useTwelveHourTimestamps, () {
-      super.useTwelveHourTimestamps = value;
+  set timestampType(TimestampType value) {
+    _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
+      super.timestampType = value;
     });
   }
 
@@ -303,8 +292,7 @@ toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
-showTimestamps: ${showTimestamps},
-useTwelveHourTimestamps: ${useTwelveHourTimestamps},
+timestampType: ${timestampType},
 useReadableColors: ${useReadableColors},
 fontScale: ${fontScale},
 messageSpacing: ${messageSpacing},

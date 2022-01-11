@@ -13,7 +13,7 @@ class VideoOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final portrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    final orientation = MediaQuery.of(context).orientation;
 
     return Observer(
       builder: (context) => Stack(
@@ -41,12 +41,10 @@ class VideoOverlay extends StatelessWidget {
               onPressed: () => showModalBottomSheet(
                 isScrollControlled: true,
                 context: context,
-                builder: (context) {
-                  return SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.8,
-                    child: Settings(settingsStore: videoStore.settingsStore),
-                  );
-                },
+                builder: (context) => SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: Settings(settingsStore: videoStore.settingsStore),
+                ),
               ),
             ),
           ),
@@ -110,7 +108,7 @@ class VideoOverlay extends StatelessWidget {
                                         padding: const EdgeInsets.all(10.0),
                                         child: Text(
                                           videoStore.streamInfo!.title,
-                                          maxLines: portrait ? 1 : 3,
+                                          maxLines: orientation == Orientation.portrait ? 1 : 3,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             color: Colors.white,
@@ -155,7 +153,7 @@ class VideoOverlay extends StatelessWidget {
                     ),
                     onPressed: videoStore.requestPictureInPicture,
                   ),
-                if (MediaQuery.of(context).orientation == Orientation.landscape)
+                if (orientation == Orientation.landscape)
                   IconButton(
                     tooltip: 'Fullscreen',
                     icon: const Icon(

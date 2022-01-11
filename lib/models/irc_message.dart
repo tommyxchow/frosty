@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -81,7 +82,7 @@ class IRCMessage {
     bool useZeroWidth = false,
     bool useReadableColors = false,
     bool? isLightTheme,
-    Timestamp timestamp = Timestamp.none,
+    TimestampType timestamp = TimestampType.disabled,
   }) {
     const badgeHeight = 20.0;
     const emoteHeight = 30.0;
@@ -96,11 +97,11 @@ class IRCMessage {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
-    if (timestamp != Timestamp.none) {
+    if (timestamp != TimestampType.disabled) {
       final time = tags['tmi-sent-ts'] ?? DateTime.now().millisecondsSinceEpoch.toString();
       final parsedTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
 
-      if (timestamp == Timestamp.twentyFour) {
+      if (timestamp == TimestampType.twentyFour) {
         span.add(
           TextSpan(
             text: '${DateFormat.Hm().format(parsedTime)} ',
@@ -109,7 +110,7 @@ class IRCMessage {
         );
       }
 
-      if (timestamp == Timestamp.twelve) {
+      if (timestamp == TimestampType.twelve) {
         span.add(
           TextSpan(
             text: '${DateFormat('h:mm').format(parsedTime)} ',
@@ -674,10 +675,4 @@ enum Command {
   userState,
   globalUserState,
   none,
-}
-
-enum Timestamp {
-  none,
-  twelve,
-  twentyFour,
 }

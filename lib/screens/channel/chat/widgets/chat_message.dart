@@ -23,12 +23,6 @@ class ChatMessage extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final timeStamps = settingsStore.showTimestamps
-            ? settingsStore.useTwelveHourTimestamps
-                ? Timestamp.twelve
-                : Timestamp.twentyFour
-            : Timestamp.none;
-
         switch (ircMessage.command) {
           case Command.privateMessage:
           case Command.userState:
@@ -41,7 +35,7 @@ class ChatMessage extends StatelessWidget {
                   useZeroWidth: settingsStore.showZeroWidth,
                   useReadableColors: settingsStore.useReadableColors,
                   isLightTheme: Theme.of(context).brightness == Brightness.light,
-                  timestamp: timeStamps,
+                  timestamp: settingsStore.timestampType,
                 ),
               ),
             );
@@ -77,7 +71,7 @@ class ChatMessage extends StatelessWidget {
                           useZeroWidth: settingsStore.showZeroWidth,
                           useReadableColors: settingsStore.useReadableColors,
                           isLightTheme: Theme.of(context).brightness == Brightness.light,
-                          timestamp: timeStamps,
+                          timestamp: settingsStore.timestampType,
                         ),
                       ),
                     ),
@@ -126,7 +120,7 @@ class ChatMessage extends StatelessWidget {
                           useZeroWidth: settingsStore.showZeroWidth,
                           useReadableColors: settingsStore.useReadableColors,
                           isLightTheme: Theme.of(context).brightness == Brightness.light,
-                          timestamp: timeStamps,
+                          timestamp: settingsStore.timestampType,
                         ),
                       ),
                     ),
