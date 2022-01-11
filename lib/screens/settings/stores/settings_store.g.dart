@@ -8,7 +8,9 @@ part of 'settings_store.dart';
 
 SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
     SettingsStore()
-      ..useOledTheme = json['useOledTheme'] as bool? ?? false
+      ..themeType =
+          $enumDecodeNullable(_$ThemeTypeEnumMap, json['themeType']) ??
+              ThemeType.system
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
@@ -27,7 +29,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
-      'useOledTheme': instance.useOledTheme,
+      'themeType': _$ThemeTypeEnumMap[instance.themeType],
       'showThumbnailUptime': instance.showThumbnailUptime,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
@@ -44,6 +46,13 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'expandInfo': instance.expandInfo,
     };
 
+const _$ThemeTypeEnumMap = {
+  ThemeType.system: 'system',
+  ThemeType.light: 'light',
+  ThemeType.dark: 'dark',
+  ThemeType.black: 'black',
+};
+
 // **************************************************************************
 // StoreGenerator
 // **************************************************************************
@@ -51,18 +60,18 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$SettingsStore on _SettingsStoreBase, Store {
-  final _$useOledThemeAtom = Atom(name: '_SettingsStoreBase.useOledTheme');
+  final _$themeTypeAtom = Atom(name: '_SettingsStoreBase.themeType');
 
   @override
-  bool get useOledTheme {
-    _$useOledThemeAtom.reportRead();
-    return super.useOledTheme;
+  ThemeType get themeType {
+    _$themeTypeAtom.reportRead();
+    return super.themeType;
   }
 
   @override
-  set useOledTheme(bool value) {
-    _$useOledThemeAtom.reportWrite(value, super.useOledTheme, () {
-      super.useOledTheme = value;
+  set themeType(ThemeType value) {
+    _$themeTypeAtom.reportWrite(value, super.themeType, () {
+      super.themeType = value;
     });
   }
 
@@ -286,7 +295,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   @override
   String toString() {
     return '''
-useOledTheme: ${useOledTheme},
+themeType: ${themeType},
 showThumbnailUptime: ${showThumbnailUptime},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},

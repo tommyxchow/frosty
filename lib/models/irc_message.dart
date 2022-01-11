@@ -80,6 +80,7 @@ class IRCMessage {
     bool showMessage = true,
     bool useZeroWidth = false,
     bool useReadableColors = false,
+    bool? isLightTheme,
     Timestamp timestamp = Timestamp.none,
   }) {
     const badgeHeight = 20.0;
@@ -235,7 +236,11 @@ class IRCMessage {
 
     if (useReadableColors) {
       final hsl = HSLColor.fromColor(color);
-      if (hsl.lightness <= 0.5) color = hsl.withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5)).toColor();
+      if (isLightTheme == true) {
+        if (hsl.lightness >= 0.5) color = hsl.withLightness(hsl.lightness + ((0 - hsl.lightness) * 0.5)).toColor();
+      } else {
+        if (hsl.lightness <= 0.5) color = hsl.withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5)).toColor();
+      }
     }
 
     // Printing template for debugging purposes.

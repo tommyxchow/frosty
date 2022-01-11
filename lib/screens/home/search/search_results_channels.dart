@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
-import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -29,11 +28,6 @@ class SearchResultsChannels extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => VideoChat(
             displayName: channelInfo!.broadcasterName,
-            videoStore: VideoStore(
-              userLogin: channelInfo.broadcasterLogin,
-              authStore: searchStore.authStore,
-              settingsStore: context.read<SettingsStore>(),
-            ),
             chatStore: ChatStore(
               channelName: channelInfo.broadcasterLogin,
               auth: searchStore.authStore,
@@ -98,11 +92,6 @@ class SearchResultsChannels extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => VideoChat(
                           displayName: channel.displayName,
-                          videoStore: VideoStore(
-                            userLogin: channel.broadcasterLogin,
-                            authStore: searchStore.authStore,
-                            settingsStore: context.read<SettingsStore>(),
-                          ),
                           chatStore: ChatStore(
                             channelName: channel.broadcasterLogin,
                             auth: searchStore.authStore,

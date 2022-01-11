@@ -55,7 +55,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
               Observer(
                 builder: (context) => AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
-                  child: store.showJumpButton ? ScrollToTopButton(scrollController: store.scrollController) : const SizedBox(),
+                  child: store.showJumpButton ? ScrollToTopButton(scrollController: store.scrollController) : null,
                 ),
               ),
             ],

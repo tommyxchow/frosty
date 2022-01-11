@@ -14,9 +14,9 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
 
 abstract class _SettingsStoreBase with Store {
   //General Settings
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: ThemeType.system)
   @observable
-  var useOledTheme = false;
+  var themeType = ThemeType.system;
 
   @JsonKey(defaultValue: false)
   @observable
@@ -89,4 +89,11 @@ abstract class _SettingsStoreBase with Store {
             ),
     );
   }
+}
+
+enum ThemeType {
+  system,
+  light,
+  dark,
+  black,
 }

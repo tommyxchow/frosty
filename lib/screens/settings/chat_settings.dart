@@ -53,7 +53,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             SwitchListTile.adaptive(
               isThreeLine: true,
               title: const Text('Use readable colors for chat names'),
-              subtitle: const Text('Makes dark names in chat readable by boosting their lightness value.'),
+              subtitle: const Text('Adjusts the lightness value of overly bright/dark names in chat.'),
               value: settingsStore.useReadableColors,
               onChanged: (newValue) => settingsStore.useReadableColors = newValue,
             ),

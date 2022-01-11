@@ -76,7 +76,7 @@ class Chat extends StatelessWidget {
                   builder: (_) => AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
                     child: chatStore.autoScroll
-                        ? const SizedBox()
+                        ? null
                         : Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10.0),
                             width: double.infinity,

@@ -57,7 +57,33 @@ class MyApp extends StatelessWidget {
     final authStore = context.read<AuthStore>();
     final settingsStore = context.read<SettingsStore>();
 
-    final defaultTheme = ThemeData(
+    final lightTheme = ThemeData(
+      scaffoldBackgroundColor: Colors.white,
+      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+      fontFamily: 'Inter',
+      appBarTheme: const AppBarTheme(
+        color: Colors.white,
+        elevation: 0.0,
+        titleTextStyle: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+        iconTheme: IconThemeData(color: Colors.black),
+      ),
+      colorScheme: ColorScheme.fromSwatch(
+        primarySwatch: Colors.deepPurple,
+        accentColor: Colors.deepPurpleAccent,
+      ),
+      toggleableActiveColor: Colors.deepPurpleAccent,
+      tabBarTheme: const TabBarTheme(
+        labelColor: Colors.black,
+        unselectedLabelColor: Colors.grey,
+      ),
+    );
+
+    final darkTheme = ThemeData(
       scaffoldBackgroundColor: Colors.grey.shade900,
       brightness: Brightness.dark,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
@@ -106,7 +132,13 @@ class MyApp extends StatelessWidget {
       builder: (context) {
         return MaterialApp(
           title: 'Frosty',
-          theme: settingsStore.useOledTheme ? oledTheme : defaultTheme,
+          theme: lightTheme,
+          darkTheme: settingsStore.themeType == ThemeType.dark ? darkTheme : oledTheme,
+          themeMode: settingsStore.themeType == ThemeType.system
+              ? ThemeMode.system
+              : settingsStore.themeType == ThemeType.light
+                  ? ThemeMode.light
+                  : ThemeMode.dark,
           home: Home(
             homeStore: HomeStore(),
             topSectionStore: ListStore(

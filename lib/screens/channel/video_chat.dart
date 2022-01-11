@@ -9,13 +9,11 @@ import 'package:frosty/screens/settings/settings.dart';
 
 class VideoChat extends StatefulWidget {
   final String displayName;
-  final VideoStore videoStore;
   final ChatStore chatStore;
 
   const VideoChat({
     Key? key,
     required this.displayName,
-    required this.videoStore,
     required this.chatStore,
   }) : super(key: key);
 
@@ -24,23 +22,23 @@ class VideoChat extends StatefulWidget {
 }
 
 class _VideoChatState extends State<VideoChat> {
-  final videoKey = GlobalKey();
-  final chatKey = GlobalKey();
-
   @override
   Widget build(BuildContext context) {
-    final videoStore = widget.videoStore;
     final chatStore = widget.chatStore;
     final settingsStore = chatStore.settings;
 
     final video = Video(
-      key: videoKey,
-      userLogin: videoStore.userLogin,
-      videoStore: videoStore,
+      key: GlobalKey(),
+      userLogin: chatStore.channelName,
+      videoStore: VideoStore(
+        userLogin: chatStore.channelName,
+        authStore: chatStore.auth,
+        settingsStore: chatStore.settings,
+      ),
     );
 
     final chat = Chat(
-      key: chatKey,
+      key: GlobalKey(),
       chatStore: chatStore,
     );
 

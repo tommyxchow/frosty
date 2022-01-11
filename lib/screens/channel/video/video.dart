@@ -27,7 +27,7 @@ class Video extends StatelessWidget {
                 return Stack(
                   children: [
                     WebView(
-                      backgroundColor: const Color(0x00000000),
+                      backgroundColor: Colors.black,
                       initialUrl: 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty',
                       javascriptMode: JavascriptMode.unrestricted,
                       allowsInlineMediaPlayback: true,
@@ -86,7 +86,7 @@ class Video extends StatelessWidget {
                 );
               }
               return WebView(
-                backgroundColor: const Color(0x00000000),
+                backgroundColor: Colors.black,
                 initialUrl: 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty',
                 javascriptMode: JavascriptMode.unrestricted,
                 allowsInlineMediaPlayback: true,

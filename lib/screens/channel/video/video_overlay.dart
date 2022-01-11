@@ -25,7 +25,7 @@ class VideoOverlay extends StatelessWidget {
                 tooltip: 'Back',
                 icon: Icon(
                   Icons.adaptive.arrow_back,
-                  color: const Color(0xFFFFFFFF),
+                  color: Colors.white,
                 ),
                 onPressed: Navigator.of(context).pop,
               ),
@@ -36,7 +36,7 @@ class VideoOverlay extends StatelessWidget {
               tooltip: 'Settings',
               icon: const Icon(
                 Icons.settings,
-                color: Color(0xFFFFFFFF),
+                color: Colors.white,
               ),
               onPressed: () => showModalBottomSheet(
                 isScrollControlled: true,
@@ -50,22 +50,35 @@ class VideoOverlay extends StatelessWidget {
               ),
             ),
           ),
-          Center(
-            child: IconButton(
-              tooltip: videoStore.paused ? 'Play' : 'Pause',
-              iconSize: 50.0,
-              icon: videoStore.paused
-                  ? const Icon(
-                      Icons.play_arrow,
-                      color: Color(0xFFFFFFFF),
-                    )
-                  : const Icon(
-                      Icons.pause,
-                      color: Color(0xFFFFFFFF),
-                    ),
-              onPressed: videoStore.handlePausePlay,
+          if (Platform.isAndroid)
+            Center(
+              child: IconButton(
+                tooltip: videoStore.paused ? 'Play' : 'Pause',
+                iconSize: 80.0,
+                icon: videoStore.paused
+                    ? const Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                      )
+                    : const Icon(
+                        Icons.pause,
+                        color: Colors.white,
+                      ),
+                onPressed: videoStore.handlePausePlay,
+              ),
+            )
+          else if (!videoStore.paused)
+            Center(
+              child: IconButton(
+                tooltip: 'Pause',
+                iconSize: 80.0,
+                icon: const Icon(
+                  Icons.pause,
+                  color: Colors.white,
+                ),
+                onPressed: videoStore.handlePausePlay,
+              ),
             ),
-          ),
           Align(
             alignment: Alignment.bottomLeft,
             child: Row(
@@ -85,7 +98,7 @@ class VideoOverlay extends StatelessWidget {
                                       Text(
                                         videoStore.streamInfo!.userName,
                                         style: const TextStyle(
-                                          color: Color(0xFFFFFFFF),
+                                          color: Colors.white,
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -100,7 +113,7 @@ class VideoOverlay extends StatelessWidget {
                                           maxLines: portrait ? 1 : 3,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
-                                            color: Color(0xFFFFFFFF),
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
@@ -108,7 +121,7 @@ class VideoOverlay extends StatelessWidget {
                                       Text(
                                         '${videoStore.streamInfo?.gameName} for ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
                                         style: const TextStyle(
-                                          color: Color(0xFFFFFFFF),
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ],
@@ -116,7 +129,7 @@ class VideoOverlay extends StatelessWidget {
                                 : Text(
                                     videoStore.streamInfo!.userName,
                                     style: const TextStyle(
-                                      color: Color(0xFFFFFFFF),
+                                      color: Colors.white,
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -129,7 +142,7 @@ class VideoOverlay extends StatelessWidget {
                   tooltip: 'Refresh',
                   icon: const Icon(
                     Icons.refresh,
-                    color: Color(0xFFFFFFFF),
+                    color: Colors.white,
                   ),
                   onPressed: videoStore.handleRefresh,
                 ),
@@ -138,7 +151,7 @@ class VideoOverlay extends StatelessWidget {
                     tooltip: 'Picture-in-Picture',
                     icon: const Icon(
                       Icons.picture_in_picture_alt_rounded,
-                      color: Color(0xFFFFFFFF),
+                      color: Colors.white,
                     ),
                     onPressed: videoStore.requestPictureInPicture,
                   ),
@@ -147,7 +160,7 @@ class VideoOverlay extends StatelessWidget {
                     tooltip: 'Fullscreen',
                     icon: const Icon(
                       Icons.fullscreen,
-                      color: Color(0xFFFFFFFF),
+                      color: Colors.white,
                     ),
                     onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
                   )

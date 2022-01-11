@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
-import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -34,11 +33,6 @@ class StreamCard extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => VideoChat(
             displayName: streamInfo.userName,
-            videoStore: VideoStore(
-              userLogin: streamInfo.userLogin,
-              authStore: context.read<AuthStore>(),
-              settingsStore: context.read<SettingsStore>(),
-            ),
             chatStore: ChatStore(
               channelName: streamInfo.userLogin,
               auth: context.read<AuthStore>(),
@@ -63,7 +57,7 @@ class StreamCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 2.0),
                           child: Text(
                             DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
-                            style: const TextStyle(fontSize: 12, color: Color(0xFFFFFFFF)),
+                            style: const TextStyle(fontSize: 12, color: Colors.white),
                           ),
                         )
                       ],
