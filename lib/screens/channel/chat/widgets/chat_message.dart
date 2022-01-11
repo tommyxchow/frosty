@@ -105,7 +105,7 @@ class ChatMessage extends StatelessWidget {
           case Command.userNotice:
             return Container(
               padding: highlightPadding,
-              color: const Color(0x339147FF),
+              color: const Color(0x339146FF),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

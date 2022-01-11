@@ -15,17 +15,25 @@ class ProfileCard extends StatelessWidget {
       builder: (context) => SimpleDialog(
         title: const Text('Log In With'),
         children: [
-          SimpleDialogOption(
-            child: const Text('Twitch Account'),
-            onPressed: () {
-              authStore.login();
-              Navigator.pop(context);
-            },
+          ColoredBox(
+            color: const Color.fromRGBO(145, 70, 255, 0.8),
+            child: SimpleDialogOption(
+              padding: const EdgeInsets.all(24.0),
+              child: const Text(
+                'Twitch Account',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+              onPressed: () {
+                authStore.login();
+                Navigator.pop(context);
+              },
+            ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Center(child: Text('Or')),
-          ),
+          const SizedBox(height: 20.0),
+          const Center(child: Text('Or')),
           SimpleDialogOption(
             child: TextField(
               decoration: const InputDecoration(
