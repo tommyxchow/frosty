@@ -142,10 +142,12 @@ class _ChattersListState extends State<ChattersList> {
                       );
                     },
                   ),
-                  Observer(
-                    builder: (context) => AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: chatDetailStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
+                  SafeArea(
+                    child: Observer(
+                      builder: (context) => AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: chatDetailStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
+                      ),
                     ),
                   ),
                 ],
