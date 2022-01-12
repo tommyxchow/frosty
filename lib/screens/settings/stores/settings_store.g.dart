@@ -23,7 +23,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               unknownValue: TimestampType.disabled) ??
           TimestampType.disabled
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
-      ..fontScale = (json['fontScale'] as num?)?.toDouble() ?? 1.0
+      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
+      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 14.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
       ..badgeHeight = (json['badgeHeight'] as num?)?.toDouble() ?? 20.0
       ..emoteHeight = (json['emoteHeight'] as num?)?.toDouble() ?? 30.0
@@ -42,7 +43,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showZeroWidth': instance.showZeroWidth,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
       'useReadableColors': instance.useReadableColors,
-      'fontScale': instance.fontScale,
+      'messageScale': instance.messageScale,
+      'fontSize': instance.fontSize,
       'messageSpacing': instance.messageSpacing,
       'badgeHeight': instance.badgeHeight,
       'emoteHeight': instance.emoteHeight,
@@ -225,18 +227,33 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$fontScaleAtom = Atom(name: '_SettingsStoreBase.fontScale');
+  final _$messageScaleAtom = Atom(name: '_SettingsStoreBase.messageScale');
 
   @override
-  double get fontScale {
-    _$fontScaleAtom.reportRead();
-    return super.fontScale;
+  double get messageScale {
+    _$messageScaleAtom.reportRead();
+    return super.messageScale;
   }
 
   @override
-  set fontScale(double value) {
-    _$fontScaleAtom.reportWrite(value, super.fontScale, () {
-      super.fontScale = value;
+  set messageScale(double value) {
+    _$messageScaleAtom.reportWrite(value, super.messageScale, () {
+      super.messageScale = value;
+    });
+  }
+
+  final _$fontSizeAtom = Atom(name: '_SettingsStoreBase.fontSize');
+
+  @override
+  double get fontSize {
+    _$fontSizeAtom.reportRead();
+    return super.fontSize;
+  }
+
+  @override
+  set fontSize(double value) {
+    _$fontSizeAtom.reportWrite(value, super.fontSize, () {
+      super.fontSize = value;
     });
   }
 
@@ -328,7 +345,8 @@ showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
 timestampType: ${timestampType},
 useReadableColors: ${useReadableColors},
-fontScale: ${fontScale},
+messageScale: ${messageScale},
+fontSize: ${fontSize},
 messageSpacing: ${messageSpacing},
 badgeHeight: ${badgeHeight},
 emoteHeight: ${emoteHeight},

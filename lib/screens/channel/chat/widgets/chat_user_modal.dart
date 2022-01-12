@@ -73,7 +73,7 @@ class ChatUserModal extends StatelessWidget {
             ),
             Expanded(
               child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.fontScale),
+                data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.messageScale),
                 child: ListView.separated(
                   reverse: true,
                   itemBuilder: (context, index) => InkWell(

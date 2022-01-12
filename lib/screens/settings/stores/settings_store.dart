@@ -58,7 +58,11 @@ abstract class _SettingsStoreBase with Store {
 
   @JsonKey(defaultValue: 1.0)
   @observable
-  var fontScale = 1.0;
+  var messageScale = 1.0;
+
+  @JsonKey(defaultValue: 14.0)
+  @observable
+  var fontSize = 14.0;
 
   @JsonKey(defaultValue: 10.0)
   @observable
