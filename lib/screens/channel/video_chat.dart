@@ -37,12 +37,9 @@ class _VideoChatState extends State<VideoChat> {
       ),
     );
 
-    final chat = ColoredBox(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: Chat(
-        key: GlobalKey(),
-        chatStore: chatStore,
-      ),
+    final chat = Chat(
+      key: GlobalKey(),
+      chatStore: chatStore,
     );
 
     final appBar = AppBar(
@@ -99,7 +96,10 @@ class _VideoChatState extends State<VideoChat> {
                                 ),
                                 Flexible(
                                   flex: 1,
-                                  child: chat,
+                                  child: ColoredBox(
+                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    child: chat,
+                                  ),
                                 ),
                               ],
                             )
