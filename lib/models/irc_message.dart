@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
+  final String raw;
   Command command;
   final Map<String, String> tags;
   final String? user;
@@ -22,6 +23,7 @@ class IRCMessage {
   bool? mention;
 
   IRCMessage({
+    required this.raw,
     required this.command,
     required this.tags,
     this.user,
@@ -696,6 +698,7 @@ class IRCMessage {
     }
 
     return IRCMessage(
+      raw: whole,
       command: messageCommand,
       tags: mappedTags,
       user: user,
@@ -708,6 +711,7 @@ class IRCMessage {
   }
 
   factory IRCMessage.createNotice({required String message}) => IRCMessage(
+        raw: '',
         tags: {},
         command: Command.notice,
         message: message,
@@ -756,6 +760,7 @@ class USERSTATE {
   });
 
   USERSTATE fromIRCMessage(IRCMessage ircMessage) => USERSTATE(
+        raw: ircMessage.raw,
         color: ircMessage.tags['color'] ?? color,
         displayName: ircMessage.tags['display-name'] ?? displayName,
         mod: ircMessage.tags['mod'] == '0' ? false : true,
