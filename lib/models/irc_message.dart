@@ -512,20 +512,7 @@ class IRCMessage {
     // Also remove any "INVALID/UNDEFINED" Unicode characters.
     // Rendering this character on iOS shows a question mark inside a square.
     // This character is used by some clients to bypass restrictions on repeating message.
-    var message = splitMessage.length > 3
-        ? splitMessage.sublist(3).map((word) => word.replaceAll('\u{E0000}', '').trim()).where((element) => element != '').join(' ').substring(1)
-        : null;
-
-    // Check if IRC actions like "/me" were called.
-    var action = false;
-    if (message != null && message.startsWith('\x01') && message.endsWith('\x01')) {
-      action = true;
-      message = message.substring(8, message.length - 1);
-    }
-
-    // Check if the message mentions the logged-in user
-    var mention = false;
-    if (message != null && userLogin != null) mention = message.toLowerCase().contains(userLogin);
+    var message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1) : null;
 
     // Now process any Twitch emotes contained in the message tags.
     // The map containing emotes from the user's tags to their URL.
@@ -566,6 +553,22 @@ class IRCMessage {
           type: EmoteType.bttvChannel,
         );
       }
+    }
+
+    var action = false;
+    var mention = false;
+    if (message != null) {
+      // Check if IRC actions like "/me" were called.
+      if (message.startsWith('\x01') && message.endsWith('\x01')) {
+        action = true;
+        message = message.substring(8, message.length - 1);
+      }
+
+      // Check if the message mentions the logged-in user
+      if (userLogin != null) mention = message.toLowerCase().contains(userLogin);
+
+      // Escape the message
+      message = message.split(' ').map((word) => word.replaceAll('\u{E0000}', '').trim()).where((element) => element != '').join(' ');
     }
 
     // Check and parse the command.
