@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -138,16 +139,21 @@ class IRCMessage {
 
             // Check if user has bot badge or room has custom FFZ mod badges
             if (botBadge != null) {
-              badgeUrl = 'https:' + botBadge.url;
+              badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
               badgeUrl = 'https:' + (ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
             }
 
+            final newBadge = Badge(
+              name: skipBot ? 'Moderator (Bot)' : 'Moderator',
+              url: badgeUrl,
+              type: BadgeType.twitch,
+            );
+
             span.add(
-              _createEmoteSpan(
-                emoteUrl: badgeUrl,
-                tooltip: skipBot ? 'Moderator (Bot)' : 'Moderator',
+              _createBadgeSpan(
+                badge: newBadge,
                 height: badgeHeight,
                 backgroundColor: const Color(0xFF00AD03),
               ),
@@ -161,10 +167,15 @@ class IRCMessage {
             badgeUrl = 'https:' + (ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
           }
 
+          final newBadge = Badge(
+            name: badgeInfo.name,
+            url: badgeUrl,
+            type: BadgeType.twitch,
+          );
+
           span.add(
-            _createEmoteSpan(
-              emoteUrl: badgeUrl,
-              tooltip: badgeInfo.name,
+            _createBadgeSpan(
+              badge: newBadge,
               height: badgeHeight,
             ),
           );
@@ -180,9 +191,8 @@ class IRCMessage {
           if (!skipBot) {
             span.insert(
               0,
-              _createEmoteSpan(
-                emoteUrl: 'https:' + badge.url,
-                tooltip: badge.name,
+              _createBadgeSpan(
+                badge: badge,
                 height: badgeHeight,
                 backgroundColor: HexColor.fromHex(badge.color!),
               ),
@@ -191,9 +201,8 @@ class IRCMessage {
           }
         } else {
           span.add(
-            _createEmoteSpan(
-              emoteUrl: 'https:' + badge.url,
-              tooltip: badge.name,
+            _createBadgeSpan(
+              badge: badge,
               height: badgeHeight,
               backgroundColor: HexColor.fromHex(badge.color!),
             ),
@@ -207,9 +216,8 @@ class IRCMessage {
     final userBTTVBadge = bttvUserToBadge[tags['user-id']];
     if (userBTTVBadge != null) {
       span.add(
-        _createEmoteSpan(
-          emoteUrl: userBTTVBadge.url,
-          tooltip: userBTTVBadge.name,
+        _createBadgeSpan(
+          badge: userBTTVBadge,
           height: badgeHeight,
           isSvg: true,
         ),
@@ -222,9 +230,8 @@ class IRCMessage {
     if (user7TVBadges != null) {
       for (final badge in user7TVBadges) {
         span.add(
-          _createEmoteSpan(
-            emoteUrl: badge.url,
-            tooltip: badge.name,
+          _createBadgeSpan(
+            badge: badge,
             height: badgeHeight,
           ),
         );
@@ -335,8 +342,7 @@ class IRCMessage {
               } else {
                 localSpan.add(
                   _createEmoteSpan(
-                    emoteUrl: emote.url,
-                    tooltip: emote.name,
+                    emote: emote,
                     height: emoteHeight,
                   ),
                 );
@@ -360,8 +366,7 @@ class IRCMessage {
             if (emote != null) {
               span.add(
                 _createEmoteSpan(
-                  emoteUrl: emote.url,
-                  tooltip: emote.name,
+                  emote: emote,
                   height: emoteHeight,
                 ),
               );
@@ -380,50 +385,135 @@ class IRCMessage {
     return span;
   }
 
-  WidgetSpan _createEmoteSpan({
-    required String emoteUrl,
-    required String tooltip,
+  static Widget _createBadgeWidget({
+    required Badge badge,
     required double height,
     Color? backgroundColor,
     bool? isSvg,
   }) {
-    final Widget child;
     if (backgroundColor != null) {
-      child = ColoredBox(
+      return ColoredBox(
         color: backgroundColor,
         child: CachedNetworkImage(
-          imageUrl: emoteUrl,
+          imageUrl: badge.url,
           placeholder: (context, url) => const SizedBox(),
           fadeInDuration: const Duration(seconds: 0),
           height: height,
         ),
       );
     } else if (isSvg == true) {
-      child = SvgPicture.network(
-        emoteUrl,
+      return SvgPicture.network(
+        badge.url,
         placeholderBuilder: (context) => const SizedBox(),
         height: height,
       );
     } else {
-      child = CachedNetworkImage(
-        imageUrl: emoteUrl,
+      return CachedNetworkImage(
+        imageUrl: badge.url,
         placeholder: (context, url) => const SizedBox(),
         fadeInDuration: const Duration(seconds: 0),
         height: height,
       );
     }
+  }
 
+  static WidgetSpan _createBadgeSpan({
+    required Badge badge,
+    required double height,
+    Color? backgroundColor,
+    bool? isSvg,
+  }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
-        message: tooltip,
+        richMessage: WidgetSpan(
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Column(
+              children: [
+                _createBadgeWidget(
+                  badge: badge,
+                  height: 80,
+                  backgroundColor: backgroundColor,
+                  isSvg: isSvg,
+                ),
+                const SizedBox(height: 5.0),
+                Text(
+                  badge.name,
+                  style: const TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
         preferBelow: false,
-        child: child,
+        child: _createBadgeWidget(
+          badge: badge,
+          height: height,
+          backgroundColor: backgroundColor,
+          isSvg: isSvg,
+        ),
       ),
     );
   }
 
-  TextSpan _createTextSpan({required String text, TextStyle? style}) {
+  static WidgetSpan _createEmoteSpan({
+    required Emote emote,
+    required double height,
+  }) {
+    const emoteType = [
+      'Twitch (Sub)',
+      'Twitch (Global)',
+      'Twitch (Unlocked)',
+      'Twitch (Channel)',
+      'FFZ (Global)',
+      'FFZ (Channel)',
+      'BTTV (Global)',
+      'BTTV (Channel)',
+      'BTTV (Shared)',
+      '7TV (Global)',
+      '7TV (Channel)',
+    ];
+
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: Tooltip(
+        richMessage: WidgetSpan(
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Column(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: emote.url,
+                  placeholder: (context, url) => const SizedBox(),
+                  fadeInDuration: const Duration(seconds: 0),
+                  height: 80,
+                ),
+                const SizedBox(height: 5.0),
+                Text(
+                  emote.name,
+                  style: const TextStyle(color: Colors.black),
+                ),
+                Text(
+                  emoteType[emote.type.index],
+                  style: const TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        preferBelow: false,
+        child: CachedNetworkImage(
+          imageUrl: emote.url,
+          placeholder: (context, url) => const SizedBox(),
+          fadeInDuration: const Duration(seconds: 0),
+          height: height,
+        ),
+      ),
+    );
+  }
+
+  static TextSpan _createTextSpan({required String text, TextStyle? style}) {
     if (text.startsWith('@')) {
       return TextSpan(text: text, style: style?.copyWith(fontWeight: FontWeight.bold));
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
