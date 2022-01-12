@@ -277,7 +277,7 @@ abstract class _ChatStoreBase with Store {
       }
 
       final userChatMessage = IRCMessage.fromString(userStateString);
-      userChatMessage.localEmotes.addAll(assetsStore.userEmoteToObject);
+      userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
 
       toSend = userChatMessage;
     }

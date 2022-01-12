@@ -11,24 +11,24 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
-  final String raw;
-  final bool action;
+  Command command;
   final Map<String, String> tags;
   final String? user;
-  final Map<String, Emote> localEmotes;
-  Command command;
+  final Map<String, Emote>? localEmotes;
   String? message;
-  bool mention;
+  List<String>? split;
+  bool? action;
+  bool? mention;
 
   IRCMessage({
-    required this.raw,
-    required this.action,
-    required this.tags,
     required this.command,
-    required this.user,
-    required this.localEmotes,
-    required this.message,
-    required this.mention,
+    required this.tags,
+    this.user,
+    this.localEmotes,
+    this.message,
+    this.split,
+    this.action,
+    this.mention,
   });
 
   /// Returns a list of messages where the gievn CLEARCHAT message is applied.
@@ -258,7 +258,7 @@ class IRCMessage {
     );
 
     // Add the colon separator between the username and their message to the span.
-    if (!action) {
+    if (action == false) {
       span.add(const TextSpan(text: ':'));
     }
 
@@ -269,38 +269,15 @@ class IRCMessage {
       span.add(const TextSpan(text: ' <message deleted>'));
     } else {
       // Add the message and any emotes to the span.
-      final chatMessage = message;
-      if (chatMessage != null) {
-        final words = <String>[];
-        final emojiBuffer = StringBuffer();
-        final wordBuffer = StringBuffer();
-
-        for (final character in chatMessage.characters) {
-          if (regexEmoji.hasMatch(character)) {
-            if (wordBuffer.isNotEmpty) {
-              words.addAll(wordBuffer.toString().split(' '));
-              wordBuffer.clear();
-            }
-            emojiBuffer.write(character);
-          } else {
-            if (emojiBuffer.isNotEmpty) {
-              words.add(emojiBuffer.toString());
-              emojiBuffer.clear();
-            }
-            wordBuffer.write(character);
-          }
-        }
-
-        if (wordBuffer.isNotEmpty) words.addAll(wordBuffer.toString().split(' ').where((element) => element != ''));
-        if (emojiBuffer.isNotEmpty) words.add(emojiBuffer.toString());
-
+      final words = split;
+      if (words != null) {
         if (useZeroWidth) {
           final localSpan = <InlineSpan>[];
 
           var index = words.length - 1;
           while (index != -1) {
             final word = words[index];
-            final emote = emoteToObject[word] ?? localEmotes[word];
+            final emote = emoteToObject[word] ?? localEmotes?[word];
 
             if (emote != null) {
               // Handle zero width emotes
@@ -311,7 +288,7 @@ class IRCMessage {
                 while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
                   emoteStack.add(nextEmote);
                   index--;
-                  nextEmote = emoteToObject[words[index]] ?? localEmotes[words[index]];
+                  nextEmote = emoteToObject[words[index]] ?? localEmotes?[words[index]];
                 }
 
                 if (nextEmote != null) emoteStack.add(nextEmote);
@@ -379,7 +356,7 @@ class IRCMessage {
           for (final word in words) {
             span.add(const TextSpan(text: ' '));
 
-            final emote = emoteToObject[word] ?? localEmotes[word];
+            final emote = emoteToObject[word] ?? localEmotes?[word];
             if (emote != null) {
               span.add(
                 _createEmoteSpan(
@@ -557,6 +534,7 @@ class IRCMessage {
 
     var action = false;
     var mention = false;
+    List<String>? split;
     if (message != null) {
       // Check if IRC actions like "/me" were called.
       if (message.startsWith('\x01') && message.endsWith('\x01')) {
@@ -569,6 +547,29 @@ class IRCMessage {
 
       // Escape the message
       message = message.split(' ').map((word) => word.replaceAll('\u{E0000}', '').trim()).where((element) => element != '').join(' ');
+
+      final emojiBuffer = StringBuffer();
+      final wordBuffer = StringBuffer();
+      split = <String>[];
+
+      for (final character in message.characters) {
+        if (regexEmoji.hasMatch(character)) {
+          if (wordBuffer.isNotEmpty) {
+            split.addAll(wordBuffer.toString().split(' '));
+            wordBuffer.clear();
+          }
+          emojiBuffer.write(character);
+        } else {
+          if (emojiBuffer.isNotEmpty) {
+            split.add(emojiBuffer.toString());
+            emojiBuffer.clear();
+          }
+          wordBuffer.write(character);
+        }
+      }
+
+      if (wordBuffer.isNotEmpty) split.addAll(wordBuffer.toString().split(' ').where((element) => element != ''));
+      if (emojiBuffer.isNotEmpty) split.add(emojiBuffer.toString());
     }
 
     // Check and parse the command.
@@ -605,26 +606,21 @@ class IRCMessage {
     }
 
     return IRCMessage(
-      raw: whole,
-      action: action,
-      tags: mappedTags,
       command: messageCommand,
-      localEmotes: localEmotes,
+      tags: mappedTags,
       user: user,
+      localEmotes: localEmotes,
       message: message,
+      split: split,
+      action: action,
       mention: mention,
     );
   }
 
   factory IRCMessage.createNotice({required String message}) => IRCMessage(
-        raw: '',
-        action: false,
         tags: {},
-        localEmotes: {},
         command: Command.notice,
-        user: null,
         message: message,
-        mention: false,
       );
 }
 
@@ -670,7 +666,6 @@ class USERSTATE {
   });
 
   USERSTATE fromIRCMessage(IRCMessage ircMessage) => USERSTATE(
-        raw: ircMessage.raw,
         color: ircMessage.tags['color'] ?? color,
         displayName: ircMessage.tags['display-name'] ?? displayName,
         mod: ircMessage.tags['mod'] == '0' ? false : true,

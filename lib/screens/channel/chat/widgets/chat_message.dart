@@ -42,7 +42,7 @@ class ChatMessage extends StatelessWidget {
           ),
         );
 
-        if (ircMessage.mention) {
+        if (ircMessage.mention == true) {
           return Container(
             padding: highlightPadding,
             color: const Color(0x4DFF0000),
