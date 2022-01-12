@@ -37,9 +37,12 @@ class _VideoChatState extends State<VideoChat> {
       ),
     );
 
-    final chat = Chat(
-      key: GlobalKey(),
-      chatStore: chatStore,
+    final chat = ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Chat(
+        key: GlobalKey(),
+        chatStore: chatStore,
+      ),
     );
 
     final appBar = AppBar(
@@ -69,41 +72,44 @@ class _VideoChatState extends State<VideoChat> {
           if (orientation == Orientation.landscape) {
             if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
             return Observer(
-              builder: (_) => SafeArea(
-                bottom: settingsStore.fullScreen ? false : true,
-                child: settingsStore.showVideo
-                    ? settingsStore.fullScreen
-                        ? WillPopScope(
-                            onWillPop: () async => false,
-                            child: Stack(
+              builder: (_) => ColoredBox(
+                color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
+                child: SafeArea(
+                  bottom: settingsStore.fullScreen ? false : true,
+                  child: settingsStore.showVideo
+                      ? settingsStore.fullScreen
+                          ? WillPopScope(
+                              onWillPop: () async => false,
+                              child: Stack(
+                                children: [
+                                  Visibility(
+                                    visible: false,
+                                    maintainState: true,
+                                    child: chat,
+                                  ),
+                                  Center(child: video),
+                                ],
+                              ),
+                            )
+                          : Row(
                               children: [
-                                Visibility(
-                                  visible: false,
-                                  maintainState: true,
+                                Flexible(
+                                  flex: 2,
+                                  child: video,
+                                ),
+                                Flexible(
+                                  flex: 1,
                                   child: chat,
                                 ),
-                                Center(child: video),
                               ],
-                            ),
-                          )
-                        : Row(
-                            children: [
-                              Flexible(
-                                flex: 2,
-                                child: video,
-                              ),
-                              Flexible(
-                                flex: 1,
-                                child: chat,
-                              ),
-                            ],
-                          )
-                    : Column(
-                        children: [
-                          appBar,
-                          Expanded(child: chat),
-                        ],
-                      ),
+                            )
+                      : Column(
+                          children: [
+                            appBar,
+                            Expanded(child: chat),
+                          ],
+                        ),
+                ),
               ),
             );
           }
