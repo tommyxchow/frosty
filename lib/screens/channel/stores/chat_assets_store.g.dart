@@ -70,16 +70,16 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
   final _$_userToFFZBadgesAtom =
       Atom(name: '_ChatAssetsStoreBase._userToFFZBadges');
 
-  Map<String, List<BadgeInfoFFZ>> get userToFFZBadges {
+  Map<String, List<Badge>> get userToFFZBadges {
     _$_userToFFZBadgesAtom.reportRead();
     return super._userToFFZBadges;
   }
 
   @override
-  Map<String, List<BadgeInfoFFZ>> get _userToFFZBadges => userToFFZBadges;
+  Map<String, List<Badge>> get _userToFFZBadges => userToFFZBadges;
 
   @override
-  set _userToFFZBadges(Map<String, List<BadgeInfoFFZ>> value) {
+  set _userToFFZBadges(Map<String, List<Badge>> value) {
     _$_userToFFZBadgesAtom.reportWrite(value, super._userToFFZBadges, () {
       super._userToFFZBadges = value;
     });
@@ -88,16 +88,16 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
   final _$_userTo7TVBadgesAtom =
       Atom(name: '_ChatAssetsStoreBase._userTo7TVBadges');
 
-  Map<String, List<BadgeInfo7TV>> get userTo7TVBadges {
+  Map<String, List<Badge>> get userTo7TVBadges {
     _$_userTo7TVBadgesAtom.reportRead();
     return super._userTo7TVBadges;
   }
 
   @override
-  Map<String, List<BadgeInfo7TV>> get _userTo7TVBadges => userTo7TVBadges;
+  Map<String, List<Badge>> get _userTo7TVBadges => userTo7TVBadges;
 
   @override
-  set _userTo7TVBadges(Map<String, List<BadgeInfo7TV>> value) {
+  set _userTo7TVBadges(Map<String, List<Badge>> value) {
     _$_userTo7TVBadgesAtom.reportWrite(value, super._userTo7TVBadges, () {
       super._userTo7TVBadges = value;
     });
@@ -106,16 +106,16 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
   final _$_userToBTTVBadgesAtom =
       Atom(name: '_ChatAssetsStoreBase._userToBTTVBadges');
 
-  Map<String, BadgeInfoBTTV> get userToBTTVBadges {
+  Map<String, Badge> get userToBTTVBadges {
     _$_userToBTTVBadgesAtom.reportRead();
     return super._userToBTTVBadges;
   }
 
   @override
-  Map<String, BadgeInfoBTTV> get _userToBTTVBadges => userToBTTVBadges;
+  Map<String, Badge> get _userToBTTVBadges => userToBTTVBadges;
 
   @override
-  set _userToBTTVBadges(Map<String, BadgeInfoBTTV> value) {
+  set _userToBTTVBadges(Map<String, Badge> value) {
     _$_userToBTTVBadgesAtom.reportWrite(value, super._userToBTTVBadges, () {
       super._userToBTTVBadges = value;
     });
