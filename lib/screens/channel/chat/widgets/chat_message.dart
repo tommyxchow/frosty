@@ -31,6 +31,8 @@ class ChatMessage extends StatelessWidget {
               children: ircMessage.generateSpan(
                 style: DefaultTextStyle.of(context).style,
                 assetsStore: assetsStore,
+                emoteHeight: settingsStore.emoteHeight,
+                badgeHeight: settingsStore.badgeHeight,
                 useZeroWidth: settingsStore.showZeroWidth,
                 useReadableColors: settingsStore.useReadableColors,
                 isLightTheme: Theme.of(context).brightness == Brightness.light,
@@ -68,6 +70,8 @@ class ChatMessage extends StatelessWidget {
                       children: ircMessage.generateSpan(
                         style: DefaultTextStyle.of(context).style,
                         assetsStore: assetsStore,
+                        emoteHeight: settingsStore.emoteHeight,
+                        badgeHeight: settingsStore.badgeHeight,
                         showMessage: settingsStore.showDeletedMessages,
                         useZeroWidth: settingsStore.showZeroWidth,
                         useReadableColors: settingsStore.useReadableColors,
@@ -122,6 +126,8 @@ class ChatMessage extends StatelessWidget {
                       children: ircMessage.generateSpan(
                         style: DefaultTextStyle.of(context).style,
                         assetsStore: assetsStore,
+                        emoteHeight: settingsStore.emoteHeight,
+                        badgeHeight: settingsStore.badgeHeight,
                         useZeroWidth: settingsStore.showZeroWidth,
                         useReadableColors: settingsStore.useReadableColors,
                         isLightTheme: Theme.of(context).brightness == Brightness.light,

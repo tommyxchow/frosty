@@ -80,13 +80,21 @@ class _ChatSettingsState extends State<ChatSettings> {
                           Text.rich(
                             TextSpan(
                               children: [
-                                const TextSpan(text: 'Hello! This is a text preview message '),
+                                WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: CachedNetworkImage(
+                                    imageUrl: 'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
+                                    placeholder: (context, url) => const SizedBox(),
+                                    height: settingsStore.badgeHeight,
+                                  ),
+                                ),
+                                const TextSpan(text: ' Badge and emote preview '),
                                 WidgetSpan(
                                   alignment: PlaceholderAlignment.middle,
                                   child: CachedNetworkImage(
                                     imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
                                     placeholder: (context, url) => const SizedBox(),
-                                    height: 30.0,
+                                    height: settingsStore.emoteHeight,
                                   ),
                                 ),
                               ],
@@ -95,12 +103,12 @@ class _ChatSettingsState extends State<ChatSettings> {
                           ),
                           SizedBox(height: settingsStore.messageSpacing),
                           Text(
-                            'Here is a another message to visualize spacing!',
+                            'Hello! Here\'s a text preview.',
                             textScaleFactor: settingsStore.fontScale,
                           ),
                           SizedBox(height: settingsStore.messageSpacing),
                           Text(
-                            'And one more for spacing without an emote!',
+                            'And another for spacing without an emote!',
                             textScaleFactor: settingsStore.fontScale,
                           ),
                         ],
@@ -127,6 +135,26 @@ class _ChatSettingsState extends State<ChatSettings> {
                 max: 30.0,
                 divisions: 30,
                 onChanged: (newValue) => settingsStore.messageSpacing = newValue,
+              ),
+            ),
+            ListTile(
+              title: Text('Badge height: ${settingsStore.badgeHeight.toStringAsFixed(0)}'),
+              subtitle: Slider.adaptive(
+                value: settingsStore.badgeHeight,
+                min: 10.0,
+                max: 50.0,
+                divisions: 8,
+                onChanged: (newValue) => settingsStore.badgeHeight = newValue,
+              ),
+            ),
+            ListTile(
+              title: Text('Emote height: ${settingsStore.emoteHeight.toStringAsFixed(0)}'),
+              subtitle: Slider.adaptive(
+                value: settingsStore.emoteHeight,
+                min: 10.0,
+                max: 50.0,
+                divisions: 8,
+                onChanged: (newValue) => settingsStore.emoteHeight = newValue,
               ),
             ),
             Container(

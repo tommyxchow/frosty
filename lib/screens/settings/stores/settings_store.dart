@@ -64,6 +64,14 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var messageSpacing = 10.0;
 
+  @JsonKey(defaultValue: 20.0)
+  @observable
+  var badgeHeight = 20.0;
+
+  @JsonKey(defaultValue: 30.0)
+  @observable
+  var emoteHeight = 30.0;
+
   // Global configs
   @JsonKey(defaultValue: false)
   @observable

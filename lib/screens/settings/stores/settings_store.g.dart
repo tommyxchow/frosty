@@ -25,6 +25,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
       ..fontScale = (json['fontScale'] as num?)?.toDouble() ?? 1.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
+      ..badgeHeight = (json['badgeHeight'] as num?)?.toDouble() ?? 20.0
+      ..emoteHeight = (json['emoteHeight'] as num?)?.toDouble() ?? 30.0
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true;
 
@@ -42,6 +44,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'useReadableColors': instance.useReadableColors,
       'fontScale': instance.fontScale,
       'messageSpacing': instance.messageSpacing,
+      'badgeHeight': instance.badgeHeight,
+      'emoteHeight': instance.emoteHeight,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
     };
@@ -251,6 +255,36 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$badgeHeightAtom = Atom(name: '_SettingsStoreBase.badgeHeight');
+
+  @override
+  double get badgeHeight {
+    _$badgeHeightAtom.reportRead();
+    return super.badgeHeight;
+  }
+
+  @override
+  set badgeHeight(double value) {
+    _$badgeHeightAtom.reportWrite(value, super.badgeHeight, () {
+      super.badgeHeight = value;
+    });
+  }
+
+  final _$emoteHeightAtom = Atom(name: '_SettingsStoreBase.emoteHeight');
+
+  @override
+  double get emoteHeight {
+    _$emoteHeightAtom.reportRead();
+    return super.emoteHeight;
+  }
+
+  @override
+  set emoteHeight(double value) {
+    _$emoteHeightAtom.reportWrite(value, super.emoteHeight, () {
+      super.emoteHeight = value;
+    });
+  }
+
   final _$fullScreenAtom = Atom(name: '_SettingsStoreBase.fullScreen');
 
   @override
@@ -296,6 +330,8 @@ timestampType: ${timestampType},
 useReadableColors: ${useReadableColors},
 fontScale: ${fontScale},
 messageSpacing: ${messageSpacing},
+badgeHeight: ${badgeHeight},
+emoteHeight: ${emoteHeight},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}
     ''';
