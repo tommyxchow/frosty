@@ -35,9 +35,7 @@ class OtherSettings extends StatelessWidget {
             value: settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
-                SentryFlutter.init((options) {
-                  options.tracesSampleRate = sampleRate;
-                });
+                SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
               } else {
                 Sentry.close();
               }

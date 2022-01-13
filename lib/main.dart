@@ -35,11 +35,7 @@ Future<void> main() async {
   autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
 
   if (settingsStore.sendCrashLogs) {
-    await SentryFlutter.init(
-      (options) {
-        options.tracesSampleRate = sampleRate;
-      },
-    );
+    await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
   }
 
   runApp(
