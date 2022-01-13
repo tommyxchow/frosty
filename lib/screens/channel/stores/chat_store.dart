@@ -24,6 +24,9 @@ abstract class _ChatStoreBase with Store {
   /// The provided setting store to account for any user-defined behaviors.
   final SettingsStore settings;
 
+  /// The focus node for the textfield to allow for showing and hiding the keyboard/focus.
+  final textFieldFocusNode = FocusNode();
+
   /// The name of the channel to connect to.
   final String channelName;
 
@@ -48,7 +51,7 @@ abstract class _ChatStoreBase with Store {
   /// The assets store responsible for badges, emotes, and the emote menu.
   final assetsStore = ChatAssetsStore();
 
-  /// Requested message to be sent by the user. Will only be sent on receival of a USERNOTICE command.
+  /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
 
   /// The list of chat messages to render and display.
@@ -274,7 +277,7 @@ abstract class _ChatStoreBase with Store {
       }
 
       final userChatMessage = IRCMessage.fromString(userStateString);
-      userChatMessage.localEmotes.addAll(assetsStore.userEmoteToObject);
+      userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
 
       toSend = userChatMessage;
     }

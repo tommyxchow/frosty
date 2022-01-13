@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
 
 class SearchResultsChannels extends StatelessWidget {
   final SearchStore searchStore;
@@ -23,10 +26,13 @@ class SearchResultsChannels extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => VideoChat(
-            title: channelInfo!.title,
-            userName: channelInfo.broadcasterName,
-            userLogin: channelInfo.broadcasterLogin,
+          builder: (context) => VideoChat(
+            displayName: channelInfo!.broadcasterName,
+            chatStore: ChatStore(
+              channelName: channelInfo.broadcasterLogin,
+              auth: searchStore.authStore,
+              settings: context.read<SettingsStore>(),
+            ),
           ),
         ),
       );
@@ -84,10 +90,13 @@ class SearchResultsChannels extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => VideoChat(
-                          title: channel.title,
-                          userName: channel.displayName,
-                          userLogin: channel.broadcasterLogin,
+                        builder: (context) => VideoChat(
+                          displayName: channel.displayName,
+                          chatStore: ChatStore(
+                            channelName: channel.broadcasterLogin,
+                            auth: searchStore.authStore,
+                            settings: context.read<SettingsStore>(),
+                          ),
                         ),
                       ),
                     ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frosty/screens/channel/chat/chat_message.dart';
+import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/block_button.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -41,10 +41,28 @@ class ChatUserModal extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 trailing: chatStore.auth.isLoggedIn
-                    ? BlockButton(
-                        authStore: chatStore.auth,
-                        targetUser: username,
-                        targetUserId: userId,
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () {
+                              chatStore.textController.text = '@$username ';
+                              Navigator.pop(context);
+                              chatStore.textFieldFocusNode.requestFocus();
+                              Future.delayed(
+                                const Duration(milliseconds: 200),
+                                () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
+                              );
+                            },
+                            child: const Text('Reply'),
+                          ),
+                          const SizedBox(width: 10.0),
+                          BlockButton(
+                            authStore: chatStore.auth,
+                            targetUser: username,
+                            targetUserId: userId,
+                          )
+                        ],
                       )
                     : null,
               ),
@@ -55,8 +73,9 @@ class ChatUserModal extends StatelessWidget {
             ),
             Expanded(
               child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.fontScale),
+                data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.messageScale),
                 child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
                   reverse: true,
                   itemBuilder: (context, index) => InkWell(
                     onLongPress: () async {

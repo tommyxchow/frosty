@@ -37,7 +37,7 @@ class BlockButton extends StatelessWidget {
               } else {
                 authStore.user.block(targetId: targetUserId, headers: authStore.headersTwitch);
               }
-              Navigator.of(context).pop();
+              Navigator.pop(context);
             },
             child: const Text('Yes'),
             style: TextButton.styleFrom(primary: Colors.red),

@@ -5,7 +5,10 @@ const clientId = String.fromEnvironment('CLIENT_ID');
 const secret = String.fromEnvironment('SECRET');
 
 /// The current version of the app.
-const version = '1.0.0-beta';
+const appVersion = '1.0.0-beta+6';
+
+/// The tracesSampleRate for sentry crash reporting.
+const sampleRate = 1.0;
 
 /// BTTV emotes with zero width to allow for overlaying other emotes.
 const zeroWidthEmotes = [

@@ -3,31 +3,35 @@ import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
   final String raw;
-  final bool action;
+  Command command;
   final Map<String, String> tags;
   final String? user;
-  final Map<String, Emote> localEmotes;
-  Command command;
+  final Map<String, Emote>? localEmotes;
   String? message;
-  bool mention;
+  List<String>? split;
+  bool? action;
+  bool? mention;
 
   IRCMessage({
     required this.raw,
-    required this.action,
-    required this.tags,
     required this.command,
-    required this.user,
-    required this.localEmotes,
-    required this.message,
-    required this.mention,
+    required this.tags,
+    this.user,
+    this.localEmotes,
+    this.message,
+    this.split,
+    this.action,
+    this.mention,
   });
 
   /// Returns a list of messages where the gievn CLEARCHAT message is applied.
@@ -77,14 +81,14 @@ class IRCMessage {
   List<InlineSpan> generateSpan({
     required TextStyle? style,
     required ChatAssetsStore assetsStore,
+    required double badgeHeight,
+    required double emoteHeight,
     bool showMessage = true,
     bool useZeroWidth = false,
     bool useReadableColors = false,
-    Timestamp timestamp = Timestamp.none,
+    bool? isLightTheme,
+    TimestampType timestamp = TimestampType.disabled,
   }) {
-    const badgeHeight = 20.0;
-    const emoteHeight = 30.0;
-
     final emoteToObject = assetsStore.emoteToObject;
     final twitchBadgeToObject = assetsStore.twitchBadgesToObject;
     final ffzUserToBadges = assetsStore.userToFFZBadges;
@@ -95,11 +99,11 @@ class IRCMessage {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
-    if (timestamp != Timestamp.none) {
+    if (timestamp != TimestampType.disabled) {
       final time = tags['tmi-sent-ts'] ?? DateTime.now().millisecondsSinceEpoch.toString();
       final parsedTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
 
-      if (timestamp == Timestamp.twentyFour) {
+      if (timestamp == TimestampType.twentyFour) {
         span.add(
           TextSpan(
             text: '${DateFormat.Hm().format(parsedTime)} ',
@@ -108,7 +112,7 @@ class IRCMessage {
         );
       }
 
-      if (timestamp == Timestamp.twelve) {
+      if (timestamp == TimestampType.twelve) {
         span.add(
           TextSpan(
             text: '${DateFormat('h:mm').format(parsedTime)} ',
@@ -128,25 +132,30 @@ class IRCMessage {
       for (final badge in twitchBadges) {
         final badgeInfo = twitchBadgeToObject[badge];
         if (badgeInfo != null) {
-          var badgeUrl = badgeInfo.imageUrl4x;
+          var badgeUrl = badgeInfo.url;
 
           // Add custom FFZ mod badge if it exists.
-          if (badgeInfo.title == 'Moderator' && (ffzUserBadges != null || ffzRoomInfo?.modUrls != null)) {
+          if (badgeInfo.name == 'Moderator' && (ffzUserBadges != null || ffzRoomInfo?.modUrls != null)) {
             // Check if mod is bot.
-            final botBadge = ffzUserBadges?.firstWhereOrNull((element) => element.id == 2);
+            final botBadge = ffzUserBadges?.firstWhereOrNull((element) => element.name == 'Bot');
 
             // Check if user has bot badge or room has custom FFZ mod badges
             if (botBadge != null) {
-              badgeUrl = 'https:' + botBadge.urls.url4x;
+              badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
               badgeUrl = 'https:' + (ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
             }
 
+            final newBadge = Badge(
+              name: skipBot ? 'Moderator (Bot)' : 'Moderator',
+              url: badgeUrl,
+              type: BadgeType.twitch,
+            );
+
             span.add(
-              _createEmoteSpan(
-                emoteUrl: badgeUrl,
-                tooltip: skipBot ? 'Moderator (Bot)' : 'Moderator',
+              _createBadgeSpan(
+                badge: newBadge,
                 height: badgeHeight,
                 backgroundColor: const Color(0xFF00AD03),
               ),
@@ -156,14 +165,19 @@ class IRCMessage {
           }
 
           // Add custom FFZ vip badge if it exists
-          if (badgeInfo.title == 'VIP' && ffzRoomInfo?.vipBadge != null) {
+          if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
             badgeUrl = 'https:' + (ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
           }
 
+          final newBadge = Badge(
+            name: badgeInfo.name,
+            url: badgeUrl,
+            type: BadgeType.twitch,
+          );
+
           span.add(
-            _createEmoteSpan(
-              emoteUrl: badgeUrl,
-              tooltip: badgeInfo.title,
+            _createBadgeSpan(
+              badge: newBadge,
               height: badgeHeight,
             ),
           );
@@ -175,26 +189,24 @@ class IRCMessage {
     // Add FFZ badges to span
     if (ffzUserBadges != null) {
       for (final badge in ffzUserBadges) {
-        if (badge.id == 2) {
+        if (badge.name == 'Bot') {
           if (!skipBot) {
             span.insert(
               0,
-              _createEmoteSpan(
-                emoteUrl: 'https:' + badge.urls.url4x,
-                tooltip: badge.title,
+              _createBadgeSpan(
+                badge: badge,
                 height: badgeHeight,
-                backgroundColor: HexColor.fromHex(badge.color),
+                backgroundColor: HexColor.fromHex(badge.color!),
               ),
             );
             span.add(const TextSpan(text: ' '));
           }
         } else {
           span.add(
-            _createEmoteSpan(
-              emoteUrl: 'https:' + badge.urls.url4x,
-              tooltip: badge.title,
+            _createBadgeSpan(
+              badge: badge,
               height: badgeHeight,
-              backgroundColor: HexColor.fromHex(badge.color),
+              backgroundColor: HexColor.fromHex(badge.color!),
             ),
           );
           span.add(const TextSpan(text: ' '));
@@ -206,9 +218,8 @@ class IRCMessage {
     final userBTTVBadge = bttvUserToBadge[tags['user-id']];
     if (userBTTVBadge != null) {
       span.add(
-        _createEmoteSpan(
-          emoteUrl: userBTTVBadge.badge.svg,
-          tooltip: userBTTVBadge.badge.description,
+        _createBadgeSpan(
+          badge: userBTTVBadge,
           height: badgeHeight,
           isSvg: true,
         ),
@@ -221,9 +232,8 @@ class IRCMessage {
     if (user7TVBadges != null) {
       for (final badge in user7TVBadges) {
         span.add(
-          _createEmoteSpan(
-            emoteUrl: badge.urls[2][1],
-            tooltip: badge.tooltip,
+          _createBadgeSpan(
+            badge: badge,
             height: badgeHeight,
           ),
         );
@@ -235,7 +245,11 @@ class IRCMessage {
 
     if (useReadableColors) {
       final hsl = HSLColor.fromColor(color);
-      if (hsl.lightness <= 0.5) color = hsl.withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5)).toColor();
+      if (isLightTheme == true) {
+        if (hsl.lightness >= 0.5) color = hsl.withLightness(hsl.lightness + ((0 - hsl.lightness) * 0.5)).toColor();
+      } else {
+        if (hsl.lightness <= 0.5) color = hsl.withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5)).toColor();
+      }
     }
 
     // Printing template for debugging purposes.
@@ -253,7 +267,7 @@ class IRCMessage {
     );
 
     // Add the colon separator between the username and their message to the span.
-    if (!action) {
+    if (action == false) {
       span.add(const TextSpan(text: ':'));
     }
 
@@ -264,18 +278,15 @@ class IRCMessage {
       span.add(const TextSpan(text: ' <message deleted>'));
     } else {
       // Add the message and any emotes to the span.
-      final chatMessage = message;
-      if (chatMessage != null) {
-        final words = chatMessage.split(' ');
-        words.removeWhere((element) => element == '');
-
+      final words = split;
+      if (words != null) {
         if (useZeroWidth) {
           final localSpan = <InlineSpan>[];
 
           var index = words.length - 1;
           while (index != -1) {
             final word = words[index];
-            final emote = emoteToObject[word] ?? localEmotes[word];
+            final emote = emoteToObject[word] ?? localEmotes?[word];
 
             if (emote != null) {
               // Handle zero width emotes
@@ -286,7 +297,7 @@ class IRCMessage {
                 while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
                   emoteStack.add(nextEmote);
                   index--;
-                  nextEmote = emoteToObject[words[index]] ?? localEmotes[words[index]];
+                  nextEmote = emoteToObject[words[index]] ?? localEmotes?[words[index]];
                 }
 
                 if (nextEmote != null) emoteStack.add(nextEmote);
@@ -301,20 +312,6 @@ class IRCMessage {
                         ))
                     .toList();
 
-                // Regex from dart_emoji package; used for emoji compatibility with zero-width
-                final regexEmoji = RegExp(
-                  r'[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}'
-                  r'\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}'
-                  r'-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}'
-                  r'\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}'
-                  r'-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}'
-                  r'\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}'
-                  r'-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}'
-                  r'\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}'
-                  r'-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}\u{200d}]+',
-                  unicode: true,
-                );
-
                 var nextWordIsEmoji = false;
                 if (regexEmoji.hasMatch(words[index])) nextWordIsEmoji = true;
 
@@ -326,7 +323,15 @@ class IRCMessage {
                       preferBelow: false,
                       child: Stack(
                         alignment: AlignmentDirectional.center,
-                        children: nextWordIsEmoji ? [Text(words[index]), ...stack] : stack,
+                        children: nextWordIsEmoji
+                            ? [
+                                Text(
+                                  words[index],
+                                  style: textStyle?.copyWith(fontSize: emoteHeight),
+                                ),
+                                ...stack
+                              ]
+                            : stack,
                       ),
                     ),
                   ),
@@ -339,14 +344,17 @@ class IRCMessage {
               } else {
                 localSpan.add(
                   _createEmoteSpan(
-                    emoteUrl: emote.url,
-                    tooltip: emote.name,
+                    emote: emote,
                     height: emoteHeight,
                   ),
                 );
               }
             } else {
-              localSpan.add(_createTextSpan(text: word, style: textStyle));
+              if (regexEmoji.hasMatch(word)) {
+                localSpan.add(_createTextSpan(text: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
+              } else {
+                localSpan.add(_createTextSpan(text: word, style: textStyle));
+              }
             }
             localSpan.add(const TextSpan(text: ' '));
             index--;
@@ -356,17 +364,20 @@ class IRCMessage {
           for (final word in words) {
             span.add(const TextSpan(text: ' '));
 
-            final emote = emoteToObject[word] ?? localEmotes[word];
+            final emote = emoteToObject[word] ?? localEmotes?[word];
             if (emote != null) {
               span.add(
                 _createEmoteSpan(
-                  emoteUrl: emote.url,
-                  tooltip: emote.name,
+                  emote: emote,
                   height: emoteHeight,
                 ),
               );
             } else {
-              span.add(_createTextSpan(text: word, style: textStyle));
+              if (regexEmoji.hasMatch(word)) {
+                span.add(_createTextSpan(text: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
+              } else {
+                span.add(_createTextSpan(text: word, style: textStyle));
+              }
             }
           }
         }
@@ -376,50 +387,135 @@ class IRCMessage {
     return span;
   }
 
-  WidgetSpan _createEmoteSpan({
-    required String emoteUrl,
-    required String tooltip,
+  static Widget _createBadgeWidget({
+    required Badge badge,
     required double height,
     Color? backgroundColor,
     bool? isSvg,
   }) {
-    final Widget child;
     if (backgroundColor != null) {
-      child = ColoredBox(
+      return ColoredBox(
         color: backgroundColor,
         child: CachedNetworkImage(
-          imageUrl: emoteUrl,
+          imageUrl: badge.url,
           placeholder: (context, url) => const SizedBox(),
           fadeInDuration: const Duration(seconds: 0),
           height: height,
         ),
       );
     } else if (isSvg == true) {
-      child = SvgPicture.network(
-        emoteUrl,
+      return SvgPicture.network(
+        badge.url,
         placeholderBuilder: (context) => const SizedBox(),
         height: height,
       );
     } else {
-      child = CachedNetworkImage(
-        imageUrl: emoteUrl,
+      return CachedNetworkImage(
+        imageUrl: badge.url,
         placeholder: (context, url) => const SizedBox(),
         fadeInDuration: const Duration(seconds: 0),
         height: height,
       );
     }
+  }
 
+  static WidgetSpan _createBadgeSpan({
+    required Badge badge,
+    required double height,
+    Color? backgroundColor,
+    bool? isSvg,
+  }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
-        message: tooltip,
+        richMessage: WidgetSpan(
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Column(
+              children: [
+                _createBadgeWidget(
+                  badge: badge,
+                  height: 80,
+                  backgroundColor: backgroundColor,
+                  isSvg: isSvg,
+                ),
+                const SizedBox(height: 5.0),
+                Text(
+                  badge.name,
+                  style: const TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
         preferBelow: false,
-        child: child,
+        child: _createBadgeWidget(
+          badge: badge,
+          height: height,
+          backgroundColor: backgroundColor,
+          isSvg: isSvg,
+        ),
       ),
     );
   }
 
-  TextSpan _createTextSpan({required String text, TextStyle? style}) {
+  static WidgetSpan _createEmoteSpan({
+    required Emote emote,
+    required double height,
+  }) {
+    const emoteType = [
+      'Twitch (Sub)',
+      'Twitch (Global)',
+      'Twitch (Unlocked)',
+      'Twitch (Channel)',
+      'FFZ (Global)',
+      'FFZ (Channel)',
+      'BTTV (Global)',
+      'BTTV (Channel)',
+      'BTTV (Shared)',
+      '7TV (Global)',
+      '7TV (Channel)',
+    ];
+
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: Tooltip(
+        richMessage: WidgetSpan(
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Column(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: emote.url,
+                  placeholder: (context, url) => const SizedBox(),
+                  fadeInDuration: const Duration(seconds: 0),
+                  height: 80,
+                ),
+                const SizedBox(height: 5.0),
+                Text(
+                  emote.name,
+                  style: const TextStyle(color: Colors.black),
+                ),
+                Text(
+                  emoteType[emote.type.index],
+                  style: const TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        ),
+        preferBelow: false,
+        child: CachedNetworkImage(
+          imageUrl: emote.url,
+          placeholder: (context, url) => const SizedBox(),
+          fadeInDuration: const Duration(seconds: 0),
+          height: height,
+        ),
+      ),
+    );
+  }
+
+  static TextSpan _createTextSpan({required String text, TextStyle? style}) {
     if (text.startsWith('@')) {
       return TextSpan(text: text, style: style?.copyWith(fontWeight: FontWeight.bold));
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
@@ -485,18 +581,7 @@ class IRCMessage {
     // Also remove any "INVALID/UNDEFINED" Unicode characters.
     // Rendering this character on iOS shows a question mark inside a square.
     // This character is used by some clients to bypass restrictions on repeating message.
-    var message = splitMessage.length > 3 ? splitMessage.sublist(3).map((word) => word.replaceAll('\u{E0000}', '').trim()).join(' ').substring(1) : null;
-
-    // Check if IRC actions like "/me" were called.
-    var action = false;
-    if (message != null && message.startsWith('\x01') && message.endsWith('\x01')) {
-      action = true;
-      message = message.substring(8, message.length - 1);
-    }
-
-    // Check if the message mentions the logged-in user
-    var mention = false;
-    if (message != null && userLogin != null) mention = message.toLowerCase().contains(userLogin);
+    var message = splitMessage.length > 3 ? splitMessage.sublist(3).join(' ').substring(1) : null;
 
     // Now process any Twitch emotes contained in the message tags.
     // The map containing emotes from the user's tags to their URL.
@@ -531,13 +616,52 @@ class IRCMessage {
 
         // Store the emote word and its associated URL for later use.
         localEmotes[emoteWord] = Emote(
-          id: emoteId,
           name: emoteWord,
           zeroWidth: false,
           url: 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0',
           type: EmoteType.bttvChannel,
         );
       }
+    }
+
+    var action = false;
+    var mention = false;
+    List<String>? split;
+    if (message != null) {
+      // Check if IRC actions like "/me" were called.
+      if (message.startsWith('\x01') && message.endsWith('\x01')) {
+        action = true;
+        message = message.substring(8, message.length - 1);
+      }
+
+      // Check if the message mentions the logged-in user
+      if (userLogin != null) mention = message.toLowerCase().contains(userLogin);
+
+      // Escape the message
+      message = message.split(' ').map((word) => word.replaceAll('\u{E0000}', '').trim()).where((element) => element != '').join(' ');
+
+      final emojiBuffer = StringBuffer();
+      final wordBuffer = StringBuffer();
+      split = <String>[];
+
+      for (final character in message.characters) {
+        if (regexEmoji.hasMatch(character)) {
+          if (wordBuffer.isNotEmpty) {
+            split.addAll(wordBuffer.toString().split(' '));
+            wordBuffer.clear();
+          }
+          emojiBuffer.write(character);
+        } else {
+          if (emojiBuffer.isNotEmpty) {
+            split.add(emojiBuffer.toString());
+            emojiBuffer.clear();
+          }
+          wordBuffer.write(character);
+        }
+      }
+
+      if (wordBuffer.isNotEmpty) split.addAll(wordBuffer.toString().split(' ').where((element) => element != ''));
+      if (emojiBuffer.isNotEmpty) split.add(emojiBuffer.toString());
     }
 
     // Check and parse the command.
@@ -575,25 +699,22 @@ class IRCMessage {
 
     return IRCMessage(
       raw: whole,
-      action: action,
-      tags: mappedTags,
       command: messageCommand,
-      localEmotes: localEmotes,
+      tags: mappedTags,
       user: user,
+      localEmotes: localEmotes,
       message: message,
+      split: split,
+      action: action,
       mention: mention,
     );
   }
 
   factory IRCMessage.createNotice({required String message}) => IRCMessage(
         raw: '',
-        action: false,
         tags: {},
-        localEmotes: {},
         command: Command.notice,
-        user: null,
         message: message,
-        mention: false,
       );
 }
 
@@ -671,8 +792,16 @@ enum Command {
   none,
 }
 
-enum Timestamp {
-  none,
-  twelve,
-  twentyFour,
-}
+// Regex from dart_emoji package; used for emoji compatibility with zero-width
+final regexEmoji = RegExp(
+  r'[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}'
+  r'\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}'
+  r'-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}'
+  r'\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}'
+  r'-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}'
+  r'\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}'
+  r'-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}'
+  r'\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}'
+  r'-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}\u{200d}]+',
+  unicode: true,
+);

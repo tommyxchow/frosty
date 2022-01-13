@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class OtherSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -23,8 +25,22 @@ class OtherSettings extends StatelessWidget {
           onTap: () => showAboutDialog(
             context: context,
             applicationName: 'Frosty',
-            applicationVersion: version,
+            applicationVersion: appVersion,
             applicationLegalese: '\u{a9} 2022 Tommy Chow',
+          ),
+        ),
+        Observer(
+          builder: (_) => SwitchListTile.adaptive(
+            title: const Text('Send anonymous crash logs'),
+            value: settingsStore.sendCrashLogs,
+            onChanged: (newValue) {
+              if (newValue == true) {
+                SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
+              } else {
+                Sentry.close();
+              }
+              settingsStore.sendCrashLogs = newValue;
+            },
           ),
         ),
         Container(

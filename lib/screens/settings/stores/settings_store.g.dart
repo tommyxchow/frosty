@@ -8,39 +8,64 @@ part of 'settings_store.dart';
 
 SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
     SettingsStore()
-      ..useOledTheme = json['useOledTheme'] as bool? ?? false
-      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? true
+      ..themeType = $enumDecodeNullable(_$ThemeTypeEnumMap, json['themeType'],
+              unknownValue: ThemeType.system) ??
+          ThemeType.system
+      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
+      ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
-      ..showTimestamps = json['showTimestamps'] as bool? ?? false
-      ..useTwelveHourTimestamps =
-          json['useTwelveHourTimestamps'] as bool? ?? false
+      ..timestampType = $enumDecodeNullable(
+              _$TimestampTypeEnumMap, json['timestampType'],
+              unknownValue: TimestampType.disabled) ??
+          TimestampType.disabled
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
-      ..fontScale = (json['fontScale'] as num?)?.toDouble() ?? 1.0
+      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
+      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 14.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
+      ..badgeHeight = (json['badgeHeight'] as num?)?.toDouble() ?? 20.0
+      ..emoteHeight = (json['emoteHeight'] as num?)?.toDouble() ?? 30.0
+      ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
-      'useOledTheme': instance.useOledTheme,
+      'themeType': _$ThemeTypeEnumMap[instance.themeType],
       'showThumbnailUptime': instance.showThumbnailUptime,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
+      'toggleableOverlay': instance.toggleableOverlay,
       'pictureInPicture': instance.pictureInPicture,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
-      'showTimestamps': instance.showTimestamps,
-      'useTwelveHourTimestamps': instance.useTwelveHourTimestamps,
+      'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
       'useReadableColors': instance.useReadableColors,
-      'fontScale': instance.fontScale,
+      'messageScale': instance.messageScale,
+      'fontSize': instance.fontSize,
       'messageSpacing': instance.messageSpacing,
+      'badgeHeight': instance.badgeHeight,
+      'emoteHeight': instance.emoteHeight,
+      'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
     };
+
+const _$ThemeTypeEnumMap = {
+  ThemeType.system: 'system',
+  ThemeType.light: 'light',
+  ThemeType.dark: 'dark',
+  ThemeType.black: 'black',
+};
+
+const _$TimestampTypeEnumMap = {
+  TimestampType.disabled: 'disabled',
+  TimestampType.twelve: 'twelve',
+  TimestampType.twentyFour: 'twentyFour',
+};
 
 // **************************************************************************
 // StoreGenerator
@@ -49,18 +74,18 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$SettingsStore on _SettingsStoreBase, Store {
-  final _$useOledThemeAtom = Atom(name: '_SettingsStoreBase.useOledTheme');
+  final _$themeTypeAtom = Atom(name: '_SettingsStoreBase.themeType');
 
   @override
-  bool get useOledTheme {
-    _$useOledThemeAtom.reportRead();
-    return super.useOledTheme;
+  ThemeType get themeType {
+    _$themeTypeAtom.reportRead();
+    return super.themeType;
   }
 
   @override
-  set useOledTheme(bool value) {
-    _$useOledThemeAtom.reportWrite(value, super.useOledTheme, () {
-      super.useOledTheme = value;
+  set themeType(ThemeType value) {
+    _$themeTypeAtom.reportWrite(value, super.themeType, () {
+      super.themeType = value;
     });
   }
 
@@ -107,6 +132,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showOverlay(bool value) {
     _$showOverlayAtom.reportWrite(value, super.showOverlay, () {
       super.showOverlay = value;
+    });
+  }
+
+  final _$toggleableOverlayAtom =
+      Atom(name: '_SettingsStoreBase.toggleableOverlay');
+
+  @override
+  bool get toggleableOverlay {
+    _$toggleableOverlayAtom.reportRead();
+    return super.toggleableOverlay;
+  }
+
+  @override
+  set toggleableOverlay(bool value) {
+    _$toggleableOverlayAtom.reportWrite(value, super.toggleableOverlay, () {
+      super.toggleableOverlay = value;
     });
   }
 
@@ -157,35 +198,18 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showTimestampsAtom = Atom(name: '_SettingsStoreBase.showTimestamps');
+  final _$timestampTypeAtom = Atom(name: '_SettingsStoreBase.timestampType');
 
   @override
-  bool get showTimestamps {
-    _$showTimestampsAtom.reportRead();
-    return super.showTimestamps;
+  TimestampType get timestampType {
+    _$timestampTypeAtom.reportRead();
+    return super.timestampType;
   }
 
   @override
-  set showTimestamps(bool value) {
-    _$showTimestampsAtom.reportWrite(value, super.showTimestamps, () {
-      super.showTimestamps = value;
-    });
-  }
-
-  final _$useTwelveHourTimestampsAtom =
-      Atom(name: '_SettingsStoreBase.useTwelveHourTimestamps');
-
-  @override
-  bool get useTwelveHourTimestamps {
-    _$useTwelveHourTimestampsAtom.reportRead();
-    return super.useTwelveHourTimestamps;
-  }
-
-  @override
-  set useTwelveHourTimestamps(bool value) {
-    _$useTwelveHourTimestampsAtom
-        .reportWrite(value, super.useTwelveHourTimestamps, () {
-      super.useTwelveHourTimestamps = value;
+  set timestampType(TimestampType value) {
+    _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
+      super.timestampType = value;
     });
   }
 
@@ -205,18 +229,33 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$fontScaleAtom = Atom(name: '_SettingsStoreBase.fontScale');
+  final _$messageScaleAtom = Atom(name: '_SettingsStoreBase.messageScale');
 
   @override
-  double get fontScale {
-    _$fontScaleAtom.reportRead();
-    return super.fontScale;
+  double get messageScale {
+    _$messageScaleAtom.reportRead();
+    return super.messageScale;
   }
 
   @override
-  set fontScale(double value) {
-    _$fontScaleAtom.reportWrite(value, super.fontScale, () {
-      super.fontScale = value;
+  set messageScale(double value) {
+    _$messageScaleAtom.reportWrite(value, super.messageScale, () {
+      super.messageScale = value;
+    });
+  }
+
+  final _$fontSizeAtom = Atom(name: '_SettingsStoreBase.fontSize');
+
+  @override
+  double get fontSize {
+    _$fontSizeAtom.reportRead();
+    return super.fontSize;
+  }
+
+  @override
+  set fontSize(double value) {
+    _$fontSizeAtom.reportWrite(value, super.fontSize, () {
+      super.fontSize = value;
     });
   }
 
@@ -232,6 +271,51 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set messageSpacing(double value) {
     _$messageSpacingAtom.reportWrite(value, super.messageSpacing, () {
       super.messageSpacing = value;
+    });
+  }
+
+  final _$badgeHeightAtom = Atom(name: '_SettingsStoreBase.badgeHeight');
+
+  @override
+  double get badgeHeight {
+    _$badgeHeightAtom.reportRead();
+    return super.badgeHeight;
+  }
+
+  @override
+  set badgeHeight(double value) {
+    _$badgeHeightAtom.reportWrite(value, super.badgeHeight, () {
+      super.badgeHeight = value;
+    });
+  }
+
+  final _$emoteHeightAtom = Atom(name: '_SettingsStoreBase.emoteHeight');
+
+  @override
+  double get emoteHeight {
+    _$emoteHeightAtom.reportRead();
+    return super.emoteHeight;
+  }
+
+  @override
+  set emoteHeight(double value) {
+    _$emoteHeightAtom.reportWrite(value, super.emoteHeight, () {
+      super.emoteHeight = value;
+    });
+  }
+
+  final _$sendCrashLogsAtom = Atom(name: '_SettingsStoreBase.sendCrashLogs');
+
+  @override
+  bool get sendCrashLogs {
+    _$sendCrashLogsAtom.reportRead();
+    return super.sendCrashLogs;
+  }
+
+  @override
+  set sendCrashLogs(bool value) {
+    _$sendCrashLogsAtom.reportWrite(value, super.sendCrashLogs, () {
+      super.sendCrashLogs = value;
     });
   }
 
@@ -268,18 +352,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   @override
   String toString() {
     return '''
-useOledTheme: ${useOledTheme},
+themeType: ${themeType},
 showThumbnailUptime: ${showThumbnailUptime},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
+toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
-showTimestamps: ${showTimestamps},
-useTwelveHourTimestamps: ${useTwelveHourTimestamps},
+timestampType: ${timestampType},
 useReadableColors: ${useReadableColors},
-fontScale: ${fontScale},
+messageScale: ${messageScale},
+fontSize: ${fontSize},
 messageSpacing: ${messageSpacing},
+badgeHeight: ${badgeHeight},
+emoteHeight: ${emoteHeight},
+sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}
     ''';

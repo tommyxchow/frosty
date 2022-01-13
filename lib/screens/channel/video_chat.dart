@@ -1,54 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/settings/settings.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:provider/provider.dart';
 
-class VideoChat extends StatelessWidget {
-  final String title;
-  final String userName;
-  final String userLogin;
+class VideoChat extends StatefulWidget {
+  final String displayName;
+  final ChatStore chatStore;
 
   const VideoChat({
     Key? key,
-    required this.title,
-    required this.userName,
-    required this.userLogin,
+    required this.displayName,
+    required this.chatStore,
   }) : super(key: key);
 
   @override
+  _VideoChatState createState() => _VideoChatState();
+}
+
+class _VideoChatState extends State<VideoChat> {
+  @override
   Widget build(BuildContext context) {
-    final authStore = context.read<AuthStore>();
-    final settingsStore = context.read<SettingsStore>();
+    final chatStore = widget.chatStore;
+    final settingsStore = chatStore.settings;
 
     final video = Video(
       key: GlobalKey(),
-      userLogin: userLogin,
+      userLogin: chatStore.channelName,
       videoStore: VideoStore(
-        userLogin: userLogin,
-        authStore: authStore,
-        settingsStore: settingsStore,
+        userLogin: chatStore.channelName,
+        authStore: chatStore.auth,
+        settingsStore: chatStore.settings,
       ),
     );
 
     final chat = Chat(
       key: GlobalKey(),
-      chatStore: ChatStore(
-        auth: authStore,
-        settings: settingsStore,
-        channelName: userLogin,
-      ),
+      chatStore: chatStore,
     );
 
     final appBar = AppBar(
       title: Text(
-        userName,
+        widget.displayName,
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       actions: [
@@ -58,7 +54,7 @@ class VideoChat extends StatelessWidget {
           onPressed: () => showModalBottomSheet(
             isScrollControlled: true,
             context: context,
-            builder: (_) => SizedBox(
+            builder: (context) => SizedBox(
               height: MediaQuery.of(context).size.height * 0.8,
               child: Settings(settingsStore: settingsStore),
             ),
@@ -73,41 +69,47 @@ class VideoChat extends StatelessWidget {
           if (orientation == Orientation.landscape) {
             if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
             return Observer(
-              builder: (_) => SafeArea(
-                bottom: settingsStore.fullScreen ? false : true,
-                child: settingsStore.showVideo
-                    ? settingsStore.fullScreen
-                        ? WillPopScope(
-                            onWillPop: () async => false,
-                            child: Stack(
+              builder: (_) => ColoredBox(
+                color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
+                child: SafeArea(
+                  bottom: settingsStore.fullScreen ? false : true,
+                  child: settingsStore.showVideo
+                      ? settingsStore.fullScreen
+                          ? WillPopScope(
+                              onWillPop: () async => false,
+                              child: Stack(
+                                children: [
+                                  Visibility(
+                                    visible: false,
+                                    maintainState: true,
+                                    child: chat,
+                                  ),
+                                  Center(child: video),
+                                ],
+                              ),
+                            )
+                          : Row(
                               children: [
-                                Visibility(
-                                  visible: false,
-                                  maintainState: true,
-                                  child: chat,
+                                Flexible(
+                                  flex: 2,
+                                  child: video,
                                 ),
-                                Center(child: video),
+                                Flexible(
+                                  flex: 1,
+                                  child: ColoredBox(
+                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    child: chat,
+                                  ),
+                                ),
                               ],
-                            ),
-                          )
-                        : Row(
-                            children: [
-                              Flexible(
-                                flex: 2,
-                                child: video,
-                              ),
-                              Flexible(
-                                flex: 1,
-                                child: chat,
-                              ),
-                            ],
-                          )
-                    : Column(
-                        children: [
-                          appBar,
-                          Expanded(child: chat),
-                        ],
-                      ),
+                            )
+                      : Column(
+                          children: [
+                            appBar,
+                            Expanded(child: chat),
+                          ],
+                        ),
+                ),
               ),
             );
           }
@@ -134,5 +136,11 @@ class VideoChat extends StatelessWidget {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    widget.chatStore.dispose();
+    super.dispose();
   }
 }

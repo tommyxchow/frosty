@@ -19,10 +19,10 @@ abstract class _VideoStoreBase with Store {
   late Timer updateTimer;
 
   @readonly
-  var _menuVisible = true;
+  var _overlayVisible = true;
 
-  @readonly
-  var _paused = false;
+  @observable
+  var paused = true;
 
   @readonly
   StreamTwitch? _streamInfo;
@@ -36,32 +36,32 @@ abstract class _VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
-    overlayTimer = Timer(const Duration(seconds: 3), () => _menuVisible = false);
+    overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
     updateStreamInfo();
   }
 
   @action
   void handlePausePlay() {
-    if (_paused) {
+    if (paused) {
       controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
     } else {
       controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
     }
 
-    _paused = !_paused;
+    paused = !paused;
   }
 
   @action
   void handleVideoTap() {
-    if (_menuVisible) {
+    if (_overlayVisible) {
       overlayTimer.cancel();
 
-      _menuVisible = false;
+      _overlayVisible = false;
     } else {
       overlayTimer.cancel();
-      overlayTimer = Timer(const Duration(seconds: 5), () => _menuVisible = false);
+      overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
 
-      _menuVisible = true;
+      _overlayVisible = true;
 
       updateStreamInfo();
     }
@@ -79,7 +79,7 @@ abstract class _VideoStoreBase with Store {
   void handleExpand() {
     overlayTimer.cancel();
     settingsStore.expandInfo = !settingsStore.expandInfo;
-    overlayTimer = Timer(const Duration(seconds: 5), () => _menuVisible = false);
+    overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
   }
 
   void handleRefresh() async {
@@ -90,6 +90,8 @@ abstract class _VideoStoreBase with Store {
   void initVideo() {
     try {
       controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => Pause.postMessage("video paused"));');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("play", () => Play.postMessage("video playing"));');
     } catch (e) {
       debugPrint(e.toString());
     }

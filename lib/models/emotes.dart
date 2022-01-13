@@ -258,7 +258,6 @@ class Emote7TV {
 
 /// The common emote class.
 class Emote {
-  final String id;
   final String name;
   final int? width;
   final int? height;
@@ -267,7 +266,6 @@ class Emote {
   final EmoteType type;
 
   const Emote({
-    required this.id,
     required this.name,
     this.width,
     this.height,
@@ -277,7 +275,6 @@ class Emote {
   });
 
   factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) => Emote(
-        id: emote.id,
         name: emote.name,
         zeroWidth: false,
         url: 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
@@ -285,7 +282,6 @@ class Emote {
       );
 
   factory Emote.fromBTTV(EmoteBTTV emote, EmoteType type) => Emote(
-        id: emote.id,
         name: emote.code,
         zeroWidth: zeroWidthEmotes.contains(emote.code),
         url: 'https://cdn.betterttv.net/emote/${emote.id}/3x',
@@ -293,7 +289,6 @@ class Emote {
       );
 
   factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
-        id: emote.id.toString(),
         name: emote.name,
         zeroWidth: false,
         url: 'https:' + (emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x),
@@ -301,7 +296,6 @@ class Emote {
       );
 
   factory Emote.from7TV(Emote7TV emote, EmoteType type) => Emote(
-        id: emote.id,
         name: emote.name,
         width: emote.width.first,
         height: emote.height.first,

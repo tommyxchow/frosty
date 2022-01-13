@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/widgets/block_button.dart';
@@ -17,7 +18,10 @@ class BlockedUsers extends StatelessWidget {
         title: const Text('Blocked Users'),
       ),
       body: RefreshIndicator(
-        onRefresh: () => authStore.user.refreshBlockedUsers(headers: authStore.headersTwitch),
+        onRefresh: () async {
+          HapticFeedback.lightImpact();
+          await authStore.user.refreshBlockedUsers(headers: authStore.headersTwitch);
+        },
         child: Observer(
           builder: (context) {
             if (authStore.user.blockedUsers.isEmpty) {

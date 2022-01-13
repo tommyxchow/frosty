@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
@@ -84,7 +85,10 @@ class _ChattersListState extends State<ChattersList> {
           ),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => chatDetailStore.updateChatters(widget.userLogin),
+              onRefresh: () async {
+                HapticFeedback.lightImpact();
+                await chatDetailStore.updateChatters(widget.userLogin);
+              },
               child: Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
@@ -138,12 +142,14 @@ class _ChattersListState extends State<ChattersList> {
                       );
                     },
                   ),
-                  Observer(builder: (context) {
-                    return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: chatDetailStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : const SizedBox(),
-                    );
-                  }),
+                  SafeArea(
+                    child: Observer(
+                      builder: (context) => AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: chatDetailStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

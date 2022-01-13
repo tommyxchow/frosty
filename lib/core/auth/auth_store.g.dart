@@ -61,8 +61,8 @@ mixin _$AuthStore on _AuthBase, Store {
   final _$loginAsyncAction = AsyncAction('_AuthBase.login');
 
   @override
-  Future<void> login() {
-    return _$loginAsyncAction.run(() => super.login());
+  Future<void> login({String? customToken}) {
+    return _$loginAsyncAction.run(() => super.login(customToken: customToken));
   }
 
   final _$logoutAsyncAction = AsyncAction('_AuthBase.logout');

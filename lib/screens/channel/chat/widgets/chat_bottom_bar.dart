@@ -30,8 +30,10 @@ class ChatBottomBar extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
             child: TextField(
+              focusNode: chatStore.textFieldFocusNode,
               minLines: 1,
               maxLines: 5,
+              enabled: chatStore.auth.isLoggedIn ? true : false,
               onTap: () {
                 chatStore.assetsStore.showEmoteMenu = false;
                 Future.delayed(
@@ -49,11 +51,12 @@ class ChatBottomBar extends StatelessWidget {
                   },
                 ),
                 isDense: true,
+                hintMaxLines: 1,
                 contentPadding: const EdgeInsets.all(10.0),
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
                 ),
-                hintText: 'Send a message',
+                hintText: chatStore.auth.isLoggedIn ? 'Send a message' : "Log in to chat",
               ),
               controller: chatStore.textController,
               onSubmitted: chatStore.sendMessage,
@@ -63,7 +66,7 @@ class ChatBottomBar extends StatelessWidget {
         IconButton(
           tooltip: 'Send',
           icon: const Icon(Icons.send),
-          onPressed: () => chatStore.sendMessage(chatStore.textController.text),
+          onPressed: chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
         )
       ],
     );

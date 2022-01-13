@@ -25,7 +25,7 @@ abstract class _ChatAssetsStoreBase with Store {
   List<Emote> get sevenTvEmotes => _emoteToObject.values.where((emote) => is7TV(emote)).toList();
 
   /// The map of badges ids to their object representation.
-  final twitchBadgesToObject = ObservableMap<String, BadgeInfoTwitch>();
+  final twitchBadgesToObject = ObservableMap<String, Badge>();
 
   /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
   @readonly
@@ -35,17 +35,17 @@ abstract class _ChatAssetsStoreBase with Store {
   @readonly
   var _userEmoteToObject = <String, Emote>{};
 
-  /// The map of usernames to their FFZ badges.
+  /// The map of user IDs to their FFZ badges.
   @readonly
-  var _userToFFZBadges = <String, List<BadgeInfoFFZ>>{};
+  var _userToFFZBadges = <String, List<Badge>>{};
 
-  /// The map of usernames to their 7TV badges.
+  /// The map of user IDs to their 7TV badges.
   @readonly
-  var _userTo7TVBadges = <String, List<BadgeInfo7TV>>{};
+  var _userTo7TVBadges = <String, List<Badge>>{};
 
-  /// The map of usernames to their BTTV badge.
+  /// The map of user IDs to their BTTV badge.
   @readonly
-  var _userToBTTVBadges = <String, BadgeInfoBTTV>{};
+  var _userToBTTVBadges = <String, Badge>{};
 
   /// The current index of the emote menu stack.
   @observable

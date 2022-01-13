@@ -38,7 +38,7 @@ class SevenTV {
     }
   }
 
-  static Future<Map<String, List<BadgeInfo7TV>>?> getBadges() async {
+  static Future<Map<String, List<Badge>>?> getBadges() async {
     final url = Uri.parse('https://api.7tv.app/v2/badges?user_identifier=twitch_id');
     final response = await http.get(url);
 
@@ -46,14 +46,15 @@ class SevenTV {
       final decoded = jsonDecode(response.body)['badges'] as List;
       final badges = decoded.map((emote) => BadgeInfo7TV.fromJson(emote));
 
-      final result = <String, List<BadgeInfo7TV>>{};
+      final result = <String, List<Badge>>{};
       for (final badge in badges) {
         for (final userId in badge.users) {
           final entry = result[userId];
+          final normalBadge = Badge.from7TV(badge);
           if (entry == null) {
-            result[userId] = [badge];
+            result[userId] = [normalBadge];
           } else {
-            entry.add(badge);
+            entry.add(normalBadge);
           }
         }
       }

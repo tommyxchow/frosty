@@ -14,13 +14,13 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
 
 abstract class _SettingsStoreBase with Store {
   //General Settings
+  @JsonKey(defaultValue: ThemeType.system, unknownEnumValue: ThemeType.system)
+  @observable
+  var themeType = ThemeType.system;
+
   @JsonKey(defaultValue: false)
   @observable
-  var useOledTheme = false;
-
-  @JsonKey(defaultValue: true)
-  @observable
-  var showThumbnailUptime = true;
+  var showThumbnailUptime = false;
 
   // Video Settings
   @JsonKey(defaultValue: true)
@@ -30,6 +30,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: true)
   @observable
   var showOverlay = true;
+
+  @JsonKey(defaultValue: false)
+  @observable
+  var toggleableOverlay = false;
 
   @JsonKey(defaultValue: false)
   @observable
@@ -44,13 +48,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showZeroWidth = false;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: TimestampType.disabled, unknownEnumValue: TimestampType.disabled)
   @observable
-  var showTimestamps = false;
-
-  @JsonKey(defaultValue: false)
-  @observable
-  var useTwelveHourTimestamps = false;
+  var timestampType = TimestampType.disabled;
 
   @JsonKey(defaultValue: true)
   @observable
@@ -58,11 +58,28 @@ abstract class _SettingsStoreBase with Store {
 
   @JsonKey(defaultValue: 1.0)
   @observable
-  var fontScale = 1.0;
+  var messageScale = 1.0;
+
+  @JsonKey(defaultValue: 14.0)
+  @observable
+  var fontSize = 14.0;
 
   @JsonKey(defaultValue: 10.0)
   @observable
   var messageSpacing = 10.0;
+
+  @JsonKey(defaultValue: 20.0)
+  @observable
+  var badgeHeight = 20.0;
+
+  @JsonKey(defaultValue: 30.0)
+  @observable
+  var emoteHeight = 30.0;
+
+  // Other settings
+  @JsonKey(defaultValue: true)
+  @observable
+  var sendCrashLogs = true;
 
   // Global configs
   @JsonKey(defaultValue: false)
@@ -85,4 +102,17 @@ abstract class _SettingsStoreBase with Store {
             ),
     );
   }
+}
+
+enum ThemeType {
+  system,
+  light,
+  dark,
+  black,
+}
+
+enum TimestampType {
+  disabled,
+  twelve,
+  twentyFour,
 }

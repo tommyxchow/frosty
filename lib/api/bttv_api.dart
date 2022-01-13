@@ -41,7 +41,7 @@ class BTTV {
     }
   }
 
-  static Future<Map<String, BadgeInfoBTTV>?> getBadges() async {
+  static Future<Map<String, Badge>?> getBadges() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/badges');
     final response = await http.get(url);
 
@@ -50,7 +50,7 @@ class BTTV {
 
       final badgeObjects = badges.map((badge) => BadgeInfoBTTV.fromJson(badge)).toList();
 
-      return {for (final badge in badgeObjects) badge.providerId: badge};
+      return {for (final badge in badgeObjects) badge.providerId: Badge.fromBTTV(badge)};
     }
     debugPrint('Failed to get FFZ badges');
   }
