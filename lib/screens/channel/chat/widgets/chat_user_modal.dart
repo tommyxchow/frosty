@@ -75,6 +75,7 @@ class ChatUserModal extends StatelessWidget {
               child: MediaQuery(
                 data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.messageScale),
                 child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0),
                   reverse: true,
                   itemBuilder: (context, index) => InkWell(
                     onLongPress: () async {

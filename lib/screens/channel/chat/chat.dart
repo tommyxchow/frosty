@@ -32,6 +32,7 @@ class Chat extends StatelessWidget {
                       style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
                       child: Observer(
                         builder: (context) => ListView.separated(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
                           addAutomaticKeepAlives: false,
                           addRepaintBoundaries: false,
                           itemCount: chatStore.messages.length,
@@ -94,7 +95,6 @@ class Chat extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 5.0),
           ChatBottomBar(chatStore: chatStore),
           if (chatStore.assetsStore.showEmoteMenu)
             SizedBox(

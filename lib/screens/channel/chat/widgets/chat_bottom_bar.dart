@@ -51,6 +51,7 @@ class ChatBottomBar extends StatelessWidget {
                   },
                 ),
                 isDense: true,
+                hintMaxLines: 1,
                 contentPadding: const EdgeInsets.all(10.0),
                 border: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(10.0)),
