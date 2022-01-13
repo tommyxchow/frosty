@@ -5,7 +5,7 @@ const clientId = String.fromEnvironment('CLIENT_ID');
 const secret = String.fromEnvironment('SECRET');
 
 /// The current version of the app.
-const version = '1.0.0-beta+4';
+const version = '1.0.0-beta+5';
 
 /// BTTV emotes with zero width to allow for overlaying other emotes.
 const zeroWidthEmotes = [
