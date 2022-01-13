@@ -2,14 +2,15 @@
 
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
 
+Now available on [TestFlight](https://testflight.apple.com/join/UZLoznpr)!
+
 ## Features
 
 - Browse followed streams, top streams, and top categories
-- Search for a specific channel or category
+- Search for channels and categories
 - Watch live streams with chat
-- Twitch, BTTV, FFZ, and 7TV emotes and badges
-- Emote menu
-- Local chat user message history
+- Support for BTTV, FFZ, and 7TV emotes/badges
+- View local chat user message history
 - Theater and full-screen mode
 - Block and unblock users
 - Customizable settings
@@ -20,7 +21,7 @@ A major problem with the official Twitch app for many users is that emotes from 
 
 As a result, the millions of users of these services have an unideal viewing experience on the official Twitch app. In the stream chat, only text is positioned where emotes should be (imagine only being able to see :emoji_code: rather than the emojis themselves).
 
-This app aims to bring these emotes and other general quality of life features to both iOS and Android.
+Frosty aims to bring these emotes and other general quality of life features to **both iOS and Android**.
 
 ## Setup
 
