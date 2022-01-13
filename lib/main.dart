@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
@@ -33,18 +34,21 @@ Future<void> main() async {
   // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
 
-  await SentryFlutter.init(
-    (options) {
-      options.tracesSampleRate = 1.0;
-    },
-    appRunner: () => runApp(
-      MultiProvider(
-        providers: [
-          Provider<AuthStore>(create: (_) => authStore),
-          Provider<SettingsStore>(create: (_) => settingsStore),
-        ],
-        child: const MyApp(),
-      ),
+  if (settingsStore.sendCrashLogs) {
+    await SentryFlutter.init(
+      (options) {
+        options.tracesSampleRate = sampleRate;
+      },
+    );
+  }
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<AuthStore>(create: (_) => authStore),
+        Provider<SettingsStore>(create: (_) => settingsStore),
+      ],
+      child: const MyApp(),
     ),
   );
 }

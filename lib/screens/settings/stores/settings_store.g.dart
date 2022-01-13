@@ -28,6 +28,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
       ..badgeHeight = (json['badgeHeight'] as num?)?.toDouble() ?? 20.0
       ..emoteHeight = (json['emoteHeight'] as num?)?.toDouble() ?? 30.0
+      ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true;
 
@@ -48,6 +49,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'messageSpacing': instance.messageSpacing,
       'badgeHeight': instance.badgeHeight,
       'emoteHeight': instance.emoteHeight,
+      'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
     };
@@ -302,6 +304,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$sendCrashLogsAtom = Atom(name: '_SettingsStoreBase.sendCrashLogs');
+
+  @override
+  bool get sendCrashLogs {
+    _$sendCrashLogsAtom.reportRead();
+    return super.sendCrashLogs;
+  }
+
+  @override
+  set sendCrashLogs(bool value) {
+    _$sendCrashLogsAtom.reportWrite(value, super.sendCrashLogs, () {
+      super.sendCrashLogs = value;
+    });
+  }
+
   final _$fullScreenAtom = Atom(name: '_SettingsStoreBase.fullScreen');
 
   @override
@@ -350,6 +367,7 @@ fontSize: ${fontSize},
 messageSpacing: ${messageSpacing},
 badgeHeight: ${badgeHeight},
 emoteHeight: ${emoteHeight},
+sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}
     ''';

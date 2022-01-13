@@ -76,6 +76,11 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteHeight = 30.0;
 
+  // Other settings
+  @JsonKey(defaultValue: true)
+  @observable
+  var sendCrashLogs = true;
+
   // Global configs
   @JsonKey(defaultValue: false)
   @observable
