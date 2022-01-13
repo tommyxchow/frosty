@@ -1,4 +1,7 @@
-# Frosty ![CI](https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg)
+# Frosty
+
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
+![CI](https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg)
 
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
 
@@ -65,4 +68,4 @@ This seems to be caused by the Flutter framework itself (see [here](https://gith
 
 ## License
 
-Frosty is licensed under AGPLv3. See the [LICENSE](https://github.com/tommyxchow/frosty/blob/main/LICENSE) for more details.
+Frosty is licensed under AGPLv3. See the [LICENSE](LICENSE) for more details.
