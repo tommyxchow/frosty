@@ -25,7 +25,7 @@ class OtherSettings extends StatelessWidget {
           onTap: () => showAboutDialog(
             context: context,
             applicationName: 'Frosty',
-            applicationVersion: version,
+            applicationVersion: appVersion,
             applicationLegalese: '\u{a9} 2022 Tommy Chow',
           ),
         ),
