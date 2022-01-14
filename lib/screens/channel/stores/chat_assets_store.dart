@@ -107,8 +107,9 @@ abstract class _ChatAssetsStoreBase with Store {
 
   @action
   Future<void> getBadges({required UserTwitch channelInfo, required Map<String, String> headers}) async => await Future.wait([
-        Twitch.getBadgesGlobal().then((badges) => twitchBadgesToObject.addAll(badges)),
-        Twitch.getBadgesChannel(id: channelInfo.id).then((badges) => twitchBadgesToObject.addAll(badges)),
+        Twitch.getBadgesGlobal()
+            .then((badges) => twitchBadgesToObject.addAll(badges))
+            .then((_) => Twitch.getBadgesChannel(id: channelInfo.id).then((badges) => twitchBadgesToObject.addAll(badges))),
         FFZ.getBadges().then((badges) => _userToFFZBadges = badges ?? {}),
         SevenTV.getBadges().then((badges) => _userTo7TVBadges = badges ?? {}),
         BTTV.getBadges().then((badges) => _userToBTTVBadges = badges ?? {}),
