@@ -218,7 +218,7 @@ abstract class _ChatStoreBase with Store {
 
         if (_backoffTime > 0) {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
-          final notice = 'Disconnected from chat, waiting ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
+          final notice = 'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
           _messages.add(IRCMessage.createNotice(message: notice));
         }
 
