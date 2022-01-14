@@ -12,6 +12,11 @@ part 'chat_assets_store.g.dart';
 class ChatAssetsStore = _ChatAssetsStoreBase with _$ChatAssetsStore;
 
 abstract class _ChatAssetsStoreBase with Store {
+  final TwitchApi twitchApi;
+  final BTTVApi bttvApi;
+  final FFZApi ffzApi;
+  final SevenTVAPI sevenTvApi;
+
   /// Contains any custom FFZ mod and vip badges for the channel.
   RoomFFZ? ffzRoomInfo;
 
@@ -67,11 +72,18 @@ abstract class _ChatAssetsStoreBase with Store {
     return emote.type == EmoteType.sevenTvChannel || emote.type == EmoteType.sevenTvGlobal;
   }
 
+  _ChatAssetsStoreBase({
+    required this.twitchApi,
+    required this.bttvApi,
+    required this.ffzApi,
+    required this.sevenTvApi,
+  });
+
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
   @action
   Future<void> getAssets({required String channelName, required Map<String, String> headers}) async {
     // Fetch the desired channel/user's information.
-    final channelInfo = await Twitch.getUser(userLogin: channelName, headers: headers);
+    final channelInfo = await twitchApi.getUser(userLogin: channelName, headers: headers);
 
     if (channelInfo != null) {
       // Fetch the global and channel's assets (emotes & badges).
@@ -87,14 +99,14 @@ abstract class _ChatAssetsStoreBase with Store {
   @action
   Future<void> getEmotes({required UserTwitch channelInfo, required Map<String, String> headers}) async {
     final assets = await Future.wait([
-      FFZ.getEmotesGlobal(),
-      BTTV.getEmotesGlobal(),
-      BTTV.getEmotesChannel(id: channelInfo.id),
-      Twitch.getEmotesGlobal(headers: headers),
-      Twitch.getEmotesChannel(id: channelInfo.id, headers: headers),
-      SevenTV.getEmotesGlobal(),
-      SevenTV.getEmotesChannel(user: channelInfo.login),
-      FFZ.getRoomInfo(name: channelInfo.login).then((ffzRoom) {
+      ffzApi.getEmotesGlobal(),
+      bttvApi.getEmotesGlobal(),
+      bttvApi.getEmotesChannel(id: channelInfo.id),
+      twitchApi.getEmotesGlobal(headers: headers),
+      twitchApi.getEmotesChannel(id: channelInfo.id, headers: headers),
+      sevenTvApi.getEmotesGlobal(),
+      sevenTvApi.getEmotesChannel(user: channelInfo.login),
+      ffzApi.getRoomInfo(name: channelInfo.login).then((ffzRoom) {
         ffzRoomInfo = ffzRoom?.item1;
         return ffzRoom?.item2 ?? <Emote>[];
       }),
@@ -107,17 +119,18 @@ abstract class _ChatAssetsStoreBase with Store {
 
   @action
   Future<void> getBadges({required UserTwitch channelInfo, required Map<String, String> headers}) async => await Future.wait([
-        Twitch.getBadgesGlobal()
+        twitchApi
+            .getBadgesGlobal()
             .then((badges) => twitchBadgesToObject.addAll(badges))
-            .then((_) => Twitch.getBadgesChannel(id: channelInfo.id).then((badges) => twitchBadgesToObject.addAll(badges))),
-        FFZ.getBadges().then((badges) => _userToFFZBadges = badges ?? {}),
-        SevenTV.getBadges().then((badges) => _userTo7TVBadges = badges ?? {}),
-        BTTV.getBadges().then((badges) => _userToBTTVBadges = badges ?? {}),
+            .then((_) => twitchApi.getBadgesChannel(id: channelInfo.id).then((badges) => twitchBadgesToObject.addAll(badges))),
+        ffzApi.getBadges().then((badges) => _userToFFZBadges = badges ?? {}),
+        sevenTvApi.getBadges().then((badges) => _userTo7TVBadges = badges ?? {}),
+        bttvApi.getBadges().then((badges) => _userToBTTVBadges = badges ?? {}),
       ]);
 
   @action
   Future<void> getUserEmotes({required List<String> emoteSets, required Map<String, String> headers}) async =>
-      await Future.wait(emoteSets.map((setId) => Twitch.getEmotesSets(setId: setId, headers: headers)))
+      await Future.wait(emoteSets.map((setId) => twitchApi.getEmotesSets(setId: setId, headers: headers)))
           .then((emotes) => emotes.expand((list) => list).toList())
           .then((userEmotes) => _userEmoteToObject = {for (final emote in userEmotes) emote.name: emote}.asObservable());
 }

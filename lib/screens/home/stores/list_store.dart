@@ -13,6 +13,8 @@ abstract class _ListStoreBase with Store {
   /// The authentication store.
   final AuthStore authStore;
 
+  final TwitchApi twitchApi;
+
   final ListType listType;
 
   final CategoryTwitch? categoryInfo;
@@ -38,6 +40,7 @@ abstract class _ListStoreBase with Store {
 
   _ListStoreBase({
     required this.authStore,
+    required this.twitchApi,
     required this.listType,
     this.categoryInfo,
   }) {
@@ -68,20 +71,20 @@ abstract class _ListStoreBase with Store {
     final StreamsTwitch? newStreams;
     switch (listType) {
       case ListType.followed:
-        newStreams = await Twitch.getFollowedStreams(
+        newStreams = await twitchApi.getFollowedStreams(
           id: authStore.user.details!.id,
           headers: authStore.headersTwitch,
           cursor: _streamsCursor,
         );
         break;
       case ListType.top:
-        newStreams = await Twitch.getTopStreams(
+        newStreams = await twitchApi.getTopStreams(
           headers: authStore.headersTwitch,
           cursor: _streamsCursor,
         );
         break;
       case ListType.category:
-        newStreams = await Twitch.getStreamsUnderGame(
+        newStreams = await twitchApi.getStreamsUnderGame(
           gameId: categoryInfo!.id,
           headers: authStore.headersTwitch,
           cursor: _streamsCursor,

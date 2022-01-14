@@ -46,10 +46,10 @@ abstract class _ChatStoreBase with Store {
   final textController = TextEditingController();
 
   /// The chat details store responsible for the chat modes and users in chat.
-  final chatDetailsStore = ChatDetailsStore();
+  final ChatDetailsStore chatDetailsStore;
 
   /// The assets store responsible for badges, emotes, and the emote menu.
-  final assetsStore = ChatAssetsStore();
+  final ChatAssetsStore assetsStore;
 
   /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
@@ -70,6 +70,8 @@ abstract class _ChatStoreBase with Store {
 
   _ChatStoreBase({
     required this.auth,
+    required this.chatDetailsStore,
+    required this.assetsStore,
     required this.settings,
     required this.channelName,
   }) {

@@ -8,6 +8,8 @@ part 'chat_details_store.g.dart';
 class ChatDetailsStore = _ChatDetailsStoreBase with _$ChatDetailsStore;
 
 abstract class _ChatDetailsStoreBase with Store {
+  final TwitchApi twitchApi;
+
   /// The rules and modes being used in the chat.
   @observable
   var roomState = const ROOMSTATE();
@@ -33,6 +35,8 @@ abstract class _ChatDetailsStoreBase with Store {
         _chatUsers!.chatters.viewers,
       ].map((e) => e.where((user) => user.contains(filterText)).toList());
 
+  _ChatDetailsStoreBase({required this.twitchApi});
+
   @action
-  Future<void> updateChatters(String userLogin) async => _chatUsers = await Twitch.getChatters(userLogin: userLogin);
+  Future<void> updateChatters(String userLogin) async => _chatUsers = await twitchApi.getChatters(userLogin: userLogin);
 }

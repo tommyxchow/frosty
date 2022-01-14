@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/bttv_api.dart';
+import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/seventv_api.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
@@ -29,6 +35,15 @@ class SearchResultsChannels extends StatelessWidget {
           builder: (context) => VideoChat(
             displayName: channelInfo!.broadcasterName,
             chatStore: ChatStore(
+              chatDetailsStore: ChatDetailsStore(
+                twitchApi: context.read<TwitchApi>(),
+              ),
+              assetsStore: ChatAssetsStore(
+                twitchApi: context.read<TwitchApi>(),
+                ffzApi: context.read<FFZApi>(),
+                bttvApi: context.read<BTTVApi>(),
+                sevenTvApi: context.read<SevenTVAPI>(),
+              ),
               channelName: channelInfo.broadcasterLogin,
               auth: searchStore.authStore,
               settings: context.read<SettingsStore>(),
@@ -93,6 +108,15 @@ class SearchResultsChannels extends StatelessWidget {
                         builder: (context) => VideoChat(
                           displayName: channel.displayName,
                           chatStore: ChatStore(
+                            chatDetailsStore: ChatDetailsStore(
+                              twitchApi: context.read<TwitchApi>(),
+                            ),
+                            assetsStore: ChatAssetsStore(
+                              twitchApi: context.read<TwitchApi>(),
+                              ffzApi: context.read<FFZApi>(),
+                              bttvApi: context.read<BTTVApi>(),
+                              sevenTvApi: context.read<SevenTVAPI>(),
+                            ),
                             channelName: channel.broadcasterLogin,
                             auth: searchStore.authStore,
                             settings: context.read<SettingsStore>(),

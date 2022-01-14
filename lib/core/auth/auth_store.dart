@@ -14,11 +14,13 @@ abstract class _AuthBase with Store {
   /// Secure storage to store tokens.
   final _storage = const FlutterSecureStorage();
 
+  final TwitchApi twitchApi;
+
   /// Whether the token is valid or not.
   var _tokenIsValid = false;
 
   /// The store containing information relevant to the current user.
-  final user = UserStore();
+  final UserStore user;
 
   /// The current token.
   @readonly
@@ -31,6 +33,8 @@ abstract class _AuthBase with Store {
   /// Authentication headers for Twitch API requests.
   @computed
   Map<String, String> get headersTwitch => {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
+
+  _AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
 
   /// Initialize by retrieving a token if it does not already exist.
   @action
@@ -45,7 +49,7 @@ abstract class _AuthBase with Store {
       _token = await _storage.read(key: 'DEFAULT_TOKEN');
       // If the token does not exist, get a new token and store it.
       if (_token == null) {
-        _token = await Twitch.getDefaultToken();
+        _token = await twitchApi.getDefaultToken();
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
       }
     } else {
@@ -56,7 +60,7 @@ abstract class _AuthBase with Store {
     }
 
     // Validate the token.
-    _tokenIsValid = await Twitch.validateToken(token: _token!);
+    _tokenIsValid = await twitchApi.validateToken(token: _token!);
 
     // If the token is invalid, logout.
     if (!_tokenIsValid) {
@@ -98,7 +102,7 @@ abstract class _AuthBase with Store {
         _token = customToken;
       }
 
-      _tokenIsValid = await Twitch.validateToken(token: _token!);
+      _tokenIsValid = await twitchApi.validateToken(token: _token!);
       if (!_tokenIsValid) return;
 
       // Store the user token.
@@ -133,18 +137,18 @@ abstract class _AuthBase with Store {
     // If the default token does not already exist, get the new default token and store it.
     // Else, validate the existing token.
     if (_token == null) {
-      _token = await Twitch.getDefaultToken();
+      _token = await twitchApi.getDefaultToken();
       await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
-      _tokenIsValid = await Twitch.validateToken(token: _token!);
+      _tokenIsValid = await twitchApi.validateToken(token: _token!);
     } else {
       // Validate the stored token.
-      _tokenIsValid = await Twitch.validateToken(token: _token!);
+      _tokenIsValid = await twitchApi.validateToken(token: _token!);
 
       // If the stored token is invalid, get a new default token and store it.
       if (!_tokenIsValid) {
-        _token = await Twitch.getDefaultToken();
+        _token = await twitchApi.getDefaultToken();
         await _storage.write(key: 'DEFAULT_TOKEN', value: _token);
-        _tokenIsValid = await Twitch.validateToken(token: _token!);
+        _tokenIsValid = await twitchApi.validateToken(token: _token!);
       }
     }
 

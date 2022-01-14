@@ -29,7 +29,9 @@ abstract class _CategoriesStoreBase with Store {
   /// Returns whether or not there are more streams and loading status for pagination.
   bool get hasMore => _isLoading == false && _categoriesCursor != null;
 
-  _CategoriesStoreBase({required this.authStore}) {
+  final TwitchApi twitchApi;
+
+  _CategoriesStoreBase({required this.authStore, required this.twitchApi}) {
     scrollController.addListener(() {
       if (scrollController.position.atEdge || scrollController.position.outOfRange) {
         showJumpButton = false;
@@ -45,7 +47,7 @@ abstract class _CategoriesStoreBase with Store {
   Future<void> getCategories() async {
     _isLoading = true;
 
-    final result = await Twitch.getTopGames(headers: authStore.headersTwitch, cursor: _categoriesCursor);
+    final result = await twitchApi.getTopGames(headers: authStore.headersTwitch, cursor: _categoriesCursor);
     if (result != null) {
       if (_categoriesCursor == null) {
         _categories = result.data.asObservable();

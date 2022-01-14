@@ -1,14 +1,19 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
-import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
-class BTTV {
+class BTTVApi {
+  final Client _client;
+
+  BTTVApi(this._client);
+
   /// Returns a map of global BTTV emotes to their URL.
-  static Future<List<Emote>> getEmotesGlobal() async {
+  Future<List<Emote>> getEmotesGlobal() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/emotes/global');
-    final response = await http.get(url);
+    final response = await _client.get(url);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body) as List;
@@ -22,9 +27,9 @@ class BTTV {
   }
 
   /// Returns a map of a channel's BTTV emotes to their URL.
-  static Future<List<Emote>> getEmotesChannel({required String id}) async {
+  Future<List<Emote>> getEmotesChannel({required String id}) async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/users/twitch/$id');
-    final response = await http.get(url);
+    final response = await _client.get(url);
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
@@ -41,9 +46,9 @@ class BTTV {
     }
   }
 
-  static Future<Map<String, Badge>?> getBadges() async {
+  Future<Map<String, Badge>?> getBadges() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/badges');
-    final response = await http.get(url);
+    final response = await _client.get(url);
 
     if (response.statusCode == 200) {
       final badges = jsonDecode(response.body) as List;
