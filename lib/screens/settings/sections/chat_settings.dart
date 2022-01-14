@@ -131,6 +131,16 @@ class _ChatSettingsState extends State<ChatSettings> {
               ),
             ),
             ListTile(
+              title: Text('Message spacing: ${settingsStore.messageSpacing.toStringAsFixed(0)}'),
+              subtitle: Slider.adaptive(
+                value: settingsStore.messageSpacing,
+                min: 0.0,
+                max: 30.0,
+                divisions: 30,
+                onChanged: (newValue) => settingsStore.messageSpacing = newValue,
+              ),
+            ),
+            ListTile(
               isThreeLine: true,
               title: Text('Font size: ${settingsStore.fontSize.toInt()}'),
               subtitle: Slider.adaptive(
@@ -139,16 +149,6 @@ class _ChatSettingsState extends State<ChatSettings> {
                 max: 20,
                 divisions: 15,
                 onChanged: (newValue) => settingsStore.fontSize = newValue,
-              ),
-            ),
-            ListTile(
-              title: Text('Message spacing: ${settingsStore.messageSpacing.toStringAsFixed(0)}'),
-              subtitle: Slider.adaptive(
-                value: settingsStore.messageSpacing,
-                min: 0.0,
-                max: 30.0,
-                divisions: 30,
-                onChanged: (newValue) => settingsStore.messageSpacing = newValue,
               ),
             ),
             ListTile(

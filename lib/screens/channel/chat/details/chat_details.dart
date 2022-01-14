@@ -17,7 +17,6 @@ class ChatDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: false,
       child: Observer(
         builder: (_) => Column(
           children: [
