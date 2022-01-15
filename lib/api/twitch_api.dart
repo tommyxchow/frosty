@@ -167,12 +167,11 @@ class TwitchApi {
     final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/streams' : 'https://api.twitch.tv/helix/streams?after=$cursor');
 
     final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-
       return StreamsTwitch.fromJson(decoded);
     } else {
-      throw Exception('Failed to get top streams');
+      return Future.error('Failed to get top streams: ${decoded['message']}');
     }
   }
 
@@ -187,12 +186,11 @@ class TwitchApi {
         : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
 
     final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-
       return StreamsTwitch.fromJson(decoded);
     } else {
-      throw Exception('Failed to get followed streams.');
+      return Future.error('Failed to get followed streams: ${decoded['message']}');
     }
   }
 
@@ -206,12 +204,11 @@ class TwitchApi {
         cursor == null ? 'https://api.twitch.tv/helix/streams?game_id=$gameId' : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
 
     final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-
       return StreamsTwitch.fromJson(decoded);
     } else {
-      throw Exception('Failed to get streams under category.');
+      return Future.error('Failed to get streams under category: ${decoded['message']}');
     }
   }
 

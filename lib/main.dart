@@ -9,7 +9,6 @@ import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/core/user/user_store.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/stores/home_store.dart';
