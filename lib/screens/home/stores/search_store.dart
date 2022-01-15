@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
@@ -68,13 +67,8 @@ abstract class _SearchStoreBase with Store {
         .asObservable();
   }
 
-  Future<Channel?> searchChannel(String query) async {
-    try {
-      final user = await twitchApi.getUser(userLogin: query, headers: authStore.headersTwitch);
-      return await twitchApi.getChannel(userId: user!.id, headers: authStore.headersTwitch);
-    } catch (e) {
-      debugPrint(e.toString());
-      rethrow;
-    }
+  Future<Channel> searchChannel(String query) async {
+    final user = await twitchApi.getUser(userLogin: query, headers: authStore.headersTwitch);
+    return await twitchApi.getChannel(userId: user.id, headers: authStore.headersTwitch);
   }
 }

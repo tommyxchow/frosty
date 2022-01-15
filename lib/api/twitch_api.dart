@@ -243,16 +243,18 @@ class TwitchApi {
     final url = Uri.parse(id != null ? 'https://api.twitch.tv/helix/users?id=$id' : 'https://api.twitch.tv/helix/users?login=$userLogin');
 
     final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
+
     if (response.statusCode == 200) {
-      final userData = jsonDecode(response.body)['data'] as List;
+      final userData = decoded['data'] as List;
 
       if (userData.isNotEmpty) {
         return UserTwitch.fromJson(userData.first);
       } else {
-        throw Exception('User does not exist.');
+        return Future.error('User does not exist');
       }
     } else {
-      throw Exception('Failed to get user.');
+      return Future.error('Failed to get user: ${decoded['message']}');
     }
   }
 
@@ -264,16 +266,17 @@ class TwitchApi {
     final url = Uri.parse('https://api.twitch.tv/helix/channels?broadcaster_id=$userId');
 
     final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final channelData = jsonDecode(response.body)['data'] as List;
+      final channelData = decoded['data'] as List;
 
       if (channelData.isNotEmpty) {
         return Channel.fromJson(channelData.first);
       } else {
-        throw Exception('Channel does not exist');
+        return Future.error('Channel does not exist');
       }
     } else {
-      throw Exception('Failed to get channel.');
+      return Future.error('Failed to get channel: ${decoded['message']}');
     }
   }
 

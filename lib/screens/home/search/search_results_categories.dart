@@ -27,7 +27,7 @@ class SearchResultsCategories extends StatelessWidget {
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
               child: Center(
-                child: Text('Failed to get categories.'),
+                child: Text('Failed to get categories'),
               ),
             );
           case FutureStatus.fulfilled:
@@ -36,7 +36,7 @@ class SearchResultsCategories extends StatelessWidget {
             if (categories == null) {
               return const SliverToBoxAdapter(
                 child: Center(
-                  child: Text('Failed to get categories.'),
+                  child: Text('Failed to get categories'),
                 ),
               );
             }
@@ -45,7 +45,7 @@ class SearchResultsCategories extends StatelessWidget {
               return const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 100.0,
-                  child: Center(child: Text('No matching categories.')),
+                  child: Center(child: Text('No matching categories')),
                 ),
               );
             }
