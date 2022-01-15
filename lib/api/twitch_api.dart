@@ -26,7 +26,7 @@ class TwitchApi {
 
       return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchGlobal)).toList();
     } else {
-      throw Exception('Failed to get global Twitch emotes.');
+      return Future.error('Failed to get Twitch global emotes.');
     }
   }
 
@@ -44,7 +44,7 @@ class TwitchApi {
 
       return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchChannel)).toList();
     } else {
-      throw Exception('Failed to get channel Twitch emotes.');
+      return Future.error('Failed to get Twitch channel emotes.');
     }
   }
 
@@ -72,7 +72,7 @@ class TwitchApi {
         }
       }).toList();
     } else {
-      throw Exception('Failed to get Twitch emotes set.');
+      return Future.error('Failed to get Twitch emotes set.');
     }
   }
 
@@ -89,7 +89,7 @@ class TwitchApi {
 
       return result;
     } else {
-      throw Exception('Failed to get global Twitch badges.');
+      return Future.error('Failed to get Twitch global badges.');
     }
   }
 
@@ -106,7 +106,7 @@ class TwitchApi {
 
       return result;
     } else {
-      throw Exception('Failed to get Twitch channel badges.');
+      return Future.error('Failed to get Twitch channel badges.');
     }
   }
 
@@ -120,7 +120,7 @@ class TwitchApi {
 
       return UserTwitch.fromJson(userData.first);
     } else {
-      throw Exception('Failed to get user info');
+      return Future.error('Failed to get Twitch user info');
     }
   }
 
@@ -141,7 +141,7 @@ class TwitchApi {
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['access_token'];
     } else {
-      throw Exception('Failed to get default token.');
+      return Future.error('Failed to get default token.');
     }
   }
 
@@ -227,10 +227,10 @@ class TwitchApi {
       if (data.isNotEmpty) {
         return StreamTwitch.fromJson(data.first);
       } else {
-        throw Exception('$userLogin is offline');
+        return Future.error('$userLogin is offline');
       }
     } else {
-      throw Exception('Failed to get stream info.');
+      return Future.error('Failed to get stream info.');
     }
   }
 
@@ -293,7 +293,7 @@ class TwitchApi {
 
       return channelData.map((e) => ChannelQuery.fromJson(e)).toList();
     } else {
-      throw Exception('Failed to get channels.');
+      return Future.error('Failed to get channels.');
     }
   }
 
@@ -325,7 +325,7 @@ class TwitchApi {
 
       return CategoriesTwitch.fromJson(decoded);
     } else {
-      throw Exception('Failed to get categories.');
+      return Future.error('Failed to get categories.');
     }
   }
 
@@ -339,7 +339,7 @@ class TwitchApi {
 
       return decoded['total'] as int;
     } else {
-      throw Exception('Failed to get sub count.');
+      return Future.error('Failed to get sub count.');
     }
   }
 
@@ -352,7 +352,7 @@ class TwitchApi {
 
       return ChatUsers.fromJson(decoded);
     } else {
-      throw Exception('Failed to get chatters.');
+      return Future.error('Failed to get chatters.');
     }
   }
 
@@ -381,10 +381,10 @@ class TwitchApi {
 
         return result;
       } else {
-        throw Exception('User does not have anyone blocked');
+        return Future.error('User does not have anyone blocked');
       }
     } else {
-      throw Exception('User does not exist');
+      return Future.error('User does not exist');
     }
   }
 

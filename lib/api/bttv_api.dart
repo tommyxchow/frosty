@@ -20,7 +20,7 @@ class BTTVApi {
 
       return emotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvGlobal)).toList();
     } else {
-      throw Exception('Failed to get global BTTV emotes.');
+      return Future.error('Failed to get BTTV global emotes.');
     }
   }
 
@@ -39,7 +39,7 @@ class BTTVApi {
 
       return emoteToUrl;
     } else {
-      throw Exception('Failed to get channel BTTV emotes.');
+      return Future.error('Failed to get BTTV channel emotes.');
     }
   }
 
@@ -54,7 +54,7 @@ class BTTVApi {
 
       return {for (final badge in badgeObjects) badge.providerId: Badge.fromBTTV(badge)};
     } else {
-      throw Exception('Failed to get BTTV badges');
+      return Future.error('Failed to get BTTV badges');
     }
   }
 }

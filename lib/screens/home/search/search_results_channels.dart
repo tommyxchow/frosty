@@ -35,6 +35,9 @@ class SearchResultsChannels extends StatelessWidget {
           builder: (context) => VideoChat(
             displayName: channelInfo.broadcasterName,
             chatStore: ChatStore(
+              channelName: channelInfo.broadcasterLogin,
+              channelId: channelInfo.broadcasterId,
+              displayName: channelInfo.broadcasterName,
               chatDetailsStore: ChatDetailsStore(
                 twitchApi: context.read<TwitchApi>(),
               ),
@@ -44,7 +47,6 @@ class SearchResultsChannels extends StatelessWidget {
                 bttvApi: context.read<BTTVApi>(),
                 sevenTvApi: context.read<SevenTVAPI>(),
               ),
-              channelName: channelInfo.broadcasterLogin,
               auth: searchStore.authStore,
               settings: context.read<SettingsStore>(),
             ),
@@ -110,6 +112,9 @@ class SearchResultsChannels extends StatelessWidget {
                         builder: (context) => VideoChat(
                           displayName: channel.displayName,
                           chatStore: ChatStore(
+                            channelName: channel.broadcasterLogin,
+                            channelId: channel.id,
+                            displayName: channel.displayName,
                             chatDetailsStore: ChatDetailsStore(
                               twitchApi: context.read<TwitchApi>(),
                             ),
@@ -119,7 +124,6 @@ class SearchResultsChannels extends StatelessWidget {
                               bttvApi: context.read<BTTVApi>(),
                               sevenTvApi: context.read<SevenTVAPI>(),
                             ),
-                            channelName: channel.broadcasterLogin,
                             auth: searchStore.authStore,
                             settings: context.read<SettingsStore>(),
                           ),

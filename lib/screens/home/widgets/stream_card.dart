@@ -44,6 +44,8 @@ class StreamCard extends StatelessWidget {
             displayName: streamInfo.userName,
             chatStore: ChatStore(
               channelName: streamInfo.userLogin,
+              channelId: streamInfo.userId,
+              displayName: streamInfo.userName,
               auth: context.read<AuthStore>(),
               settings: context.read<SettingsStore>(),
               chatDetailsStore: ChatDetailsStore(

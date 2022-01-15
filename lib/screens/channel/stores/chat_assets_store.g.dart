@@ -152,41 +152,77 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$getAssetsAsyncAction = AsyncAction('_ChatAssetsStoreBase.getAssets');
+  final _$_ChatAssetsStoreBaseActionController =
+      ActionController(name: '_ChatAssetsStoreBase');
 
   @override
-  Future<void> getAssets(
-      {required String channelName, required Map<String, String> headers}) {
-    return _$getAssetsAsyncAction
-        .run(() => super.getAssets(channelName: channelName, headers: headers));
+  Future<void> assetsFuture(
+      {required String channelName,
+      required String channelId,
+      required Map<String, String> headers,
+      required Function onEmoteError,
+      required Function onBadgeError}) {
+    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
+        name: '_ChatAssetsStoreBase.assetsFuture');
+    try {
+      return super.assetsFuture(
+          channelName: channelName,
+          channelId: channelId,
+          headers: headers,
+          onEmoteError: onEmoteError,
+          onBadgeError: onBadgeError);
+    } finally {
+      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+    }
   }
 
-  final _$getEmotesAsyncAction = AsyncAction('_ChatAssetsStoreBase.getEmotes');
-
   @override
-  Future<void> getEmotes(
-      {required UserTwitch channelInfo, required Map<String, String> headers}) {
-    return _$getEmotesAsyncAction
-        .run(() => super.getEmotes(channelInfo: channelInfo, headers: headers));
+  Future<void> emotesFuture(
+      {required String channelId,
+      required String channelName,
+      required Map<String, String> headers,
+      required Function onError}) {
+    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
+        name: '_ChatAssetsStoreBase.emotesFuture');
+    try {
+      return super.emotesFuture(
+          channelId: channelId,
+          channelName: channelName,
+          headers: headers,
+          onError: onError);
+    } finally {
+      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+    }
   }
 
-  final _$getBadgesAsyncAction = AsyncAction('_ChatAssetsStoreBase.getBadges');
-
   @override
-  Future<void> getBadges(
-      {required UserTwitch channelInfo, required Map<String, String> headers}) {
-    return _$getBadgesAsyncAction
-        .run(() => super.getBadges(channelInfo: channelInfo, headers: headers));
+  Future<void> badgesFuture(
+      {required String channelId,
+      required Map<String, String> headers,
+      required Function onError}) {
+    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
+        name: '_ChatAssetsStoreBase.badgesFuture');
+    try {
+      return super.badgesFuture(
+          channelId: channelId, headers: headers, onError: onError);
+    } finally {
+      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+    }
   }
 
-  final _$getUserEmotesAsyncAction =
-      AsyncAction('_ChatAssetsStoreBase.getUserEmotes');
-
   @override
-  Future<void> getUserEmotes(
-      {required List<String> emoteSets, required Map<String, String> headers}) {
-    return _$getUserEmotesAsyncAction
-        .run(() => super.getUserEmotes(emoteSets: emoteSets, headers: headers));
+  Future<void> userEmotesFuture(
+      {required List<String> emoteSets,
+      required Map<String, String> headers,
+      required Function onError}) {
+    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
+        name: '_ChatAssetsStoreBase.userEmotesFuture');
+    try {
+      return super.userEmotesFuture(
+          emoteSets: emoteSets, headers: headers, onError: onError);
+    } finally {
+      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+    }
   }
 
   @override

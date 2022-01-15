@@ -21,7 +21,7 @@ class SevenTVAPI {
 
       return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTvGlobal)).toList();
     } else {
-      throw Exception('Failed to get global 7TV emotes.');
+      return Future.error('Failed to get 7TV global emotes');
     }
   }
 
@@ -36,7 +36,7 @@ class SevenTVAPI {
 
       return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTvChannel)).toList();
     } else {
-      throw Exception('Failed to get channel 7TV emotes.');
+      return Future.error('Failed to get 7TV channel emotes');
     }
   }
 
@@ -63,7 +63,7 @@ class SevenTVAPI {
 
       return result;
     } else {
-      throw Exception('Failed to get 7TV badges.');
+      return Future.error('Failed to get 7TV badges.');
     }
   }
 }
