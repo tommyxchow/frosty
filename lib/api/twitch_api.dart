@@ -227,7 +227,7 @@ class TwitchApi {
       if (data.isNotEmpty) {
         return StreamTwitch.fromJson(data.first);
       } else {
-        throw Exception('User is offline or does not exist.');
+        throw Exception('$userLogin is offline');
       }
     } else {
       throw Exception('Failed to get stream info.');

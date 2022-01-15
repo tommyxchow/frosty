@@ -72,9 +72,11 @@ abstract class _VideoStoreBase with Store {
 
   @action
   Future<void> updateStreamInfo() async {
-    final updatedStreamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
-    if (updatedStreamInfo != null) {
+    try {
+      final updatedStreamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
       _streamInfo = updatedStreamInfo;
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 
