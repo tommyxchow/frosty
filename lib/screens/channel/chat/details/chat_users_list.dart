@@ -94,6 +94,19 @@ class _ChattersListState extends State<ChattersList> {
                 children: [
                   Observer(
                     builder: (context) {
+                      if (chatDetailStore.error != null) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Failed to get chatters'),
+                            TextButton(
+                              onPressed: () => chatDetailStore.updateChatters(widget.userLogin),
+                              child: const Text('Try Again'),
+                            )
+                          ],
+                        );
+                      }
+
                       if (chatDetailStore.chatUsers == null) {
                         return const LoadingIndicator(subtitle: Text('Fetching chatters...'));
                       }

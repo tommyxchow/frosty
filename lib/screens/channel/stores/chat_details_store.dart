@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/chatters.dart';
 import 'package:frosty/models/irc_message.dart';
@@ -13,10 +16,6 @@ abstract class _ChatDetailsStoreBase with Store {
   /// The rules and modes being used in the chat.
   @observable
   var roomState = const ROOMSTATE();
-
-  /// The list and types of chatters in the chat room.
-  @readonly
-  ChatUsers? _chatUsers;
 
   @observable
   var showJumpButton = false;
@@ -35,8 +34,25 @@ abstract class _ChatDetailsStoreBase with Store {
         _chatUsers!.chatters.viewers,
       ].map((e) => e.where((user) => user.contains(filterText)).toList());
 
+  /// The list and types of chatters in the chat room.
+  @readonly
+  ChatUsers? _chatUsers;
+
+  @readonly
+  String? _error;
+
   _ChatDetailsStoreBase({required this.twitchApi});
 
   @action
-  Future<void> updateChatters(String userLogin) async => _chatUsers = await twitchApi.getChatters(userLogin: userLogin);
+  Future<void> updateChatters(String userLogin) async {
+    try {
+      _chatUsers = await twitchApi.getChatters(userLogin: userLogin);
+      _error = null;
+    } on SocketException {
+      _error = 'Failed to connect :(';
+    } catch (e) {
+      debugPrint(e.toString());
+      _error = e.toString();
+    }
+  }
 }
