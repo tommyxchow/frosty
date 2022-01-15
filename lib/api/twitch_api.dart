@@ -294,7 +294,7 @@ class TwitchApi {
     }
   }
 
-  /// Returns a map containing top 20 categories/games and a cursor for further requests.
+  /// Returns the next top 20 categories/games and a cursor for further requests.
   Future<CategoriesTwitch> getTopCategories({
     required Map<String, String>? headers,
     String? cursor,
@@ -302,16 +302,15 @@ class TwitchApi {
     final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/games/top' : 'https://api.twitch.tv/helix/games/top?after=$cursor');
 
     final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-
       return CategoriesTwitch.fromJson(decoded);
     } else {
-      throw Exception('Failed to get top categories.');
+      return Future.error('Failed to get top categories: ${decoded['message']}');
     }
   }
 
-  /// Returns a map containing top 20 categories/games and a cursor for further requests.
+  /// Returns up to 20 categories/games closest matching the [query] and a cursor for further requests.
   Future<CategoriesTwitch> searchCategories({required Map<String, String>? headers, required String query, String? cursor}) async {
     final url = Uri.parse(cursor == null
         ? 'https://api.twitch.tv/helix/search/categories?first=8&query=$query'

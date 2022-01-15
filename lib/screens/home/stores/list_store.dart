@@ -27,19 +27,19 @@ abstract class _ListStoreBase with Store {
   /// The pagination cursor for the streams.
   String? _streamsCursor;
 
-  /// The scroll controller used for handling scroll to top.
-  final scrollController = ScrollController();
-
-  /// Whether or not the scroll to top button is visible.
-  @observable
-  var showJumpButton = false;
-
   /// Returns whether or not there are more streams and loading status for pagination.
   bool get hasMore => _isLoading == false && _streamsCursor != null;
 
   /// The loading status for pagination.
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  /// The scroll controller used for handling scroll to top.
+  final scrollController = ScrollController();
+
+  /// Whether or not the scroll to top button is visible.
+  @observable
+  var showJumpButton = false;
 
   /// The list of the fetched streams.
   @readonly

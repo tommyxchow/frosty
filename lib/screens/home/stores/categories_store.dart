@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
@@ -11,25 +13,33 @@ abstract class _CategoriesStoreBase with Store {
   /// The authentication store.
   final AuthStore authStore;
 
-  final scrollController = ScrollController();
+  /// Twitch API service class for making requests.
+  final TwitchApi twitchApi;
 
   /// The pagination cursor for the categories.
   String? _categoriesCursor;
 
-  @observable
-  var showJumpButton = false;
-
-  @readonly
-  var _categories = ObservableList<CategoryTwitch>();
-
   /// The loading status for pagination.
-  @readonly
   bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   /// Returns whether or not there are more streams and loading status for pagination.
   bool get hasMore => _isLoading == false && _categoriesCursor != null;
 
-  final TwitchApi twitchApi;
+  /// The scroll controller used for handling scroll to top.
+  final scrollController = ScrollController();
+
+  /// Whether or not the scroll to top button is visible.
+  @observable
+  var showJumpButton = false;
+
+  /// The current visible categories, sorted by total viewers.
+  @readonly
+  var _categories = ObservableList<CategoryTwitch>();
+
+  /// The error message to show if any. Will be non-null if there is an error.
+  @readonly
+  String? _error;
 
   _CategoriesStoreBase({required this.authStore, required this.twitchApi}) {
     scrollController.addListener(() {
@@ -39,6 +49,7 @@ abstract class _CategoriesStoreBase with Store {
         showJumpButton = true;
       }
     });
+
     getCategories();
   }
 
@@ -47,14 +58,23 @@ abstract class _CategoriesStoreBase with Store {
   Future<void> getCategories() async {
     _isLoading = true;
 
-    final result = await twitchApi.getTopGames(headers: authStore.headersTwitch, cursor: _categoriesCursor);
-    if (result != null) {
+    try {
+      final result = await twitchApi.getTopCategories(
+        headers: authStore.headersTwitch,
+        cursor: _categoriesCursor,
+      );
       if (_categoriesCursor == null) {
         _categories = result.data.asObservable();
       } else {
         _categories.addAll(result.data);
       }
       _categoriesCursor = result.pagination['cursor'];
+
+      _error = null;
+    } on SocketException {
+      _error = 'Failed to connect :(';
+    } catch (e) {
+      _error = e.toString();
     }
 
     _isLoading = false;
