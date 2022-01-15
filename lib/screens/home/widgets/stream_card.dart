@@ -28,8 +28,11 @@ class StreamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final time = DateTime.now();
+    final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
+
     final thumbnail = CachedNetworkImage(
-      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
+      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + cacheUrlExtension,
       useOldImageOnUrlChange: true,
     );
 
