@@ -27,10 +27,18 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
       onRefresh: () async {
         HapticFeedback.lightImpact();
         await store.refreshStreams();
+
+        if (store.error != null) {
+          final snackBar = SnackBar(
+            content: Text(store.error!),
+            behavior: SnackBarBehavior.floating,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
       },
       child: Observer(
         builder: (_) {
-          if (store.streams.isEmpty && store.isLoading) {
+          if (store.streams.isEmpty && store.isLoading && store.error == null) {
             return const LoadingIndicator(subtitle: Text('Loading streams...'));
           }
           return Stack(

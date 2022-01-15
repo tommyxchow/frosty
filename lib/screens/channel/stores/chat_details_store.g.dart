@@ -32,23 +32,6 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$_chatUsersAtom = Atom(name: '_ChatDetailsStoreBase._chatUsers');
-
-  ChatUsers? get chatUsers {
-    _$_chatUsersAtom.reportRead();
-    return super._chatUsers;
-  }
-
-  @override
-  ChatUsers? get _chatUsers => chatUsers;
-
-  @override
-  set _chatUsers(ChatUsers? value) {
-    _$_chatUsersAtom.reportWrite(value, super._chatUsers, () {
-      super._chatUsers = value;
-    });
-  }
-
   final _$showJumpButtonAtom =
       Atom(name: '_ChatDetailsStoreBase.showJumpButton');
 
@@ -77,6 +60,40 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
   set filterText(String value) {
     _$filterTextAtom.reportWrite(value, super.filterText, () {
       super.filterText = value;
+    });
+  }
+
+  final _$_chatUsersAtom = Atom(name: '_ChatDetailsStoreBase._chatUsers');
+
+  ChatUsers? get chatUsers {
+    _$_chatUsersAtom.reportRead();
+    return super._chatUsers;
+  }
+
+  @override
+  ChatUsers? get _chatUsers => chatUsers;
+
+  @override
+  set _chatUsers(ChatUsers? value) {
+    _$_chatUsersAtom.reportWrite(value, super._chatUsers, () {
+      super._chatUsers = value;
+    });
+  }
+
+  final _$_errorAtom = Atom(name: '_ChatDetailsStoreBase._error');
+
+  String? get error {
+    _$_errorAtom.reportRead();
+    return super._error;
+  }
+
+  @override
+  String? get _error => error;
+
+  @override
+  set _error(String? value) {
+    _$_errorAtom.reportWrite(value, super._error, () {
+      super._error = value;
     });
   }
 

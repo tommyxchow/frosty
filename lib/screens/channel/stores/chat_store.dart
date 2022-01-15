@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/models/badges.dart';
+import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc_message.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
@@ -30,6 +32,12 @@ abstract class _ChatStoreBase with Store {
   /// The name of the channel to connect to.
   final String channelName;
 
+  /// The channel's ID for API requests.
+  final String channelId;
+
+  /// The channel's display name to show on widgets.
+  final String displayName;
+
   /// The Twitch IRC WebSocket channel.
   WebSocketChannel? _channel;
 
@@ -46,10 +54,10 @@ abstract class _ChatStoreBase with Store {
   final textController = TextEditingController();
 
   /// The chat details store responsible for the chat modes and users in chat.
-  final chatDetailsStore = ChatDetailsStore();
+  final ChatDetailsStore chatDetailsStore;
 
   /// The assets store responsible for badges, emotes, and the emote menu.
-  final assetsStore = ChatAssetsStore();
+  final ChatAssetsStore assetsStore;
 
   /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
@@ -70,8 +78,12 @@ abstract class _ChatStoreBase with Store {
 
   _ChatStoreBase({
     required this.auth,
+    required this.chatDetailsStore,
+    required this.assetsStore,
     required this.settings,
     required this.channelName,
+    required this.channelId,
+    required this.displayName,
   }) {
     // Create a reaction where anytime the emote menu is shown or hidden,
     // scroll to the bottom of the list. This will prevent the emote menu
@@ -143,11 +155,14 @@ abstract class _ChatStoreBase with Store {
           case Command.globalUserState:
             final setIds = parsedIRCMessage.tags['emote-sets']?.split(',');
             if (setIds != null) {
-              _messages.add(IRCMessage.createNotice(message: 'Fetching user emotes...'));
-              assetsStore
-                  .getUserEmotes(emoteSets: setIds, headers: auth.headersTwitch)
-                  .then((_) => _messages.add(IRCMessage.createNotice(message: 'User emotes fetched!')))
-                  .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch user emotes: ${error.toString()}')));
+              assetsStore.userEmotesFuture(
+                emoteSets: setIds,
+                headers: auth.headersTwitch,
+                onError: (error) {
+                  debugPrint(error.toString());
+                  return <Emote>[];
+                },
+              );
             }
             continue;
           case Command.none:
@@ -168,15 +183,22 @@ abstract class _ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messages.add(IRCMessage.createNotice(message: "Connected to $channelName's chat"));
+        _messages.add(IRCMessage.createNotice(message: "Connected to $displayName's chat!"));
 
         // Fetch the assets used in chat including badges and emotes.
-        _messages.add(IRCMessage.createNotice(message: 'Fetching badges and emotes...'));
-        assetsStore
-            .getAssets(channelName: channelName, headers: auth.headersTwitch)
-            .then((_) => _messages.add(IRCMessage.createNotice(message: 'Badges and emotes fetched!')))
-            .onError((error, stackTrace) => _messages.add(IRCMessage.createNotice(message: 'Failed to fetch assets: ${error.toString()}')));
-
+        assetsStore.assetsFuture(
+          channelName: channelName,
+          channelId: channelId,
+          headers: auth.headersTwitch,
+          onEmoteError: (error) {
+            debugPrint(error.toString());
+            return <Emote>[];
+          },
+          onBadgeError: (error) {
+            debugPrint(error.toString());
+            return <Badge>[];
+          },
+        );
         // Reset exponential backoff if successfully connected.
         _retries = 0;
         _backoffTime = 0;
@@ -209,14 +231,13 @@ abstract class _ChatStoreBase with Store {
       (data) => _handleIRCData(data.toString()),
       onError: (error) {
         debugPrint('Chat error: ${error.toString()}');
-        _messages.add(IRCMessage.createNotice(message: 'Chat error - ${error.toString()}'));
       },
       onDone: () async {
         if (_channel == null) return;
 
         if (_backoffTime > 0) {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
-          final notice = 'Disconnected from chat, waiting ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
+          final notice = 'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
           _messages.add(IRCMessage.createNotice(message: notice));
         }
 

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
@@ -13,6 +12,8 @@ class SearchStore = _SearchStoreBase with _$SearchStore;
 abstract class _SearchStoreBase with Store {
   final AuthStore authStore;
 
+  final TwitchApi twitchApi;
+
   @readonly
   var _searchHistory = ObservableList<String>();
 
@@ -22,7 +23,7 @@ abstract class _SearchStoreBase with Store {
   @readonly
   ObservableFuture<CategoriesTwitch?>? _categoryFuture;
 
-  _SearchStoreBase({required this.authStore}) {
+  _SearchStoreBase({required this.authStore, required this.twitchApi}) {
     init();
   }
 
@@ -46,29 +47,28 @@ abstract class _SearchStoreBase with Store {
     _searchHistory.remove(query);
     _searchHistory.insert(0, query);
 
-    _channelFuture = Twitch.searchChannels(
+    _channelFuture = twitchApi
+        .searchChannels(
       query: query,
       headers: authStore.headersTwitch,
-    ).then(
+    )
+        .then(
       (channels) {
         channels.sort((c1, c2) => c2.isLive ? 1 : -1);
         return channels;
       },
     ).asObservable();
 
-    _categoryFuture = Twitch.searchCategories(
-      query: query,
-      headers: authStore.headersTwitch,
-    ).asObservable();
+    _categoryFuture = twitchApi
+        .searchCategories(
+          query: query,
+          headers: authStore.headersTwitch,
+        )
+        .asObservable();
   }
 
-  Future<Channel?> searchChannel(String query) async {
-    try {
-      final user = await Twitch.getUser(userLogin: query, headers: authStore.headersTwitch);
-      return await Twitch.getChannel(userId: user!.id, headers: authStore.headersTwitch);
-    } catch (e) {
-      debugPrint(e.toString());
-      rethrow;
-    }
+  Future<Channel> searchChannel(String query) async {
+    final user = await twitchApi.getUser(userLogin: query, headers: authStore.headersTwitch);
+    return await twitchApi.getChannel(userId: user.id, headers: authStore.headersTwitch);
   }
 }

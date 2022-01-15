@@ -3,6 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/bttv_api.dart';
+import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/seventv_api.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
@@ -11,6 +15,7 @@ import 'package:frosty/screens/home/stores/home_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -18,10 +23,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Create and initialize the authentication store
-  final authStore = AuthStore();
-  await authStore.init();
 
   // Get the shared preferences instance and obtain the existing user settings if it exists.
   // If default settings don't exist, use an empty JSON string to use the default values.
@@ -38,11 +39,25 @@ Future<void> main() async {
     await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
   }
 
+  final client = Client();
+  final twitchApiService = TwitchApi(client);
+  final bttvApiService = BTTVApi(client);
+  final ffzApiService = FFZApi(client);
+  final sevenTvApiService = SevenTVAPI(client);
+
+  // Create and initialize the authentication store
+  final authStore = AuthStore(twitchApi: twitchApiService);
+  await authStore.init();
+
   runApp(
     MultiProvider(
       providers: [
         Provider<AuthStore>(create: (_) => authStore),
         Provider<SettingsStore>(create: (_) => settingsStore),
+        Provider<TwitchApi>(create: (_) => twitchApiService),
+        Provider<BTTVApi>(create: (_) => bttvApiService),
+        Provider<FFZApi>(create: (_) => ffzApiService),
+        Provider<SevenTVAPI>(create: (_) => sevenTvApiService),
       ],
       child: const MyApp(),
     ),
@@ -54,9 +69,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authStore = context.read<AuthStore>();
-    final settingsStore = context.read<SettingsStore>();
-
     final lightTheme = ThemeData(
       scaffoldBackgroundColor: Colors.white,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
@@ -130,6 +142,10 @@ class MyApp extends StatelessWidget {
 
     return Observer(
       builder: (context) {
+        final authStore = context.read<AuthStore>();
+        final settingsStore = context.read<SettingsStore>();
+        final twitchApi = context.read<TwitchApi>();
+
         return MaterialApp(
           title: 'Frosty',
           theme: lightTheme,
@@ -143,16 +159,24 @@ class MyApp extends StatelessWidget {
             homeStore: HomeStore(),
             topSectionStore: ListStore(
               authStore: authStore,
+              twitchApi: twitchApi,
               listType: ListType.top,
             ),
-            categoriesSectionStore: CategoriesStore(authStore: authStore),
+            categoriesSectionStore: CategoriesStore(
+              authStore: authStore,
+              twitchApi: twitchApi,
+            ),
             followedStreamsStore: authStore.isLoggedIn
                 ? ListStore(
                     authStore: authStore,
+                    twitchApi: twitchApi,
                     listType: ListType.followed,
                   )
                 : null,
-            searchStore: SearchStore(authStore: authStore),
+            searchStore: SearchStore(
+              authStore: authStore,
+              twitchApi: twitchApi,
+            ),
           ),
         );
       },

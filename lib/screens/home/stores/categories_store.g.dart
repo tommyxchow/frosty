@@ -42,20 +42,20 @@ mixin _$CategoriesStore on _CategoriesStoreBase, Store {
     });
   }
 
-  final _$_isLoadingAtom = Atom(name: '_CategoriesStoreBase._isLoading');
+  final _$_errorAtom = Atom(name: '_CategoriesStoreBase._error');
 
-  bool get isLoading {
-    _$_isLoadingAtom.reportRead();
-    return super._isLoading;
+  String? get error {
+    _$_errorAtom.reportRead();
+    return super._error;
   }
 
   @override
-  bool get _isLoading => isLoading;
+  String? get _error => error;
 
   @override
-  set _isLoading(bool value) {
-    _$_isLoadingAtom.reportWrite(value, super._isLoading, () {
-      super._isLoading = value;
+  set _error(String? value) {
+    _$_errorAtom.reportWrite(value, super._error, () {
+      super._error = value;
     });
   }
 

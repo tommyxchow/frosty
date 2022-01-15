@@ -1,7 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frosty/api/bttv_api.dart';
+import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/seventv_api.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -22,8 +28,11 @@ class StreamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final time = DateTime.now();
+    final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
+
     final thumbnail = CachedNetworkImage(
-      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + (DateTime.now().minute ~/ 5).toString(),
+      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + cacheUrlExtension,
       useOldImageOnUrlChange: true,
     );
 
@@ -35,8 +44,19 @@ class StreamCard extends StatelessWidget {
             displayName: streamInfo.userName,
             chatStore: ChatStore(
               channelName: streamInfo.userLogin,
+              channelId: streamInfo.userId,
+              displayName: streamInfo.userName,
               auth: context.read<AuthStore>(),
               settings: context.read<SettingsStore>(),
+              chatDetailsStore: ChatDetailsStore(
+                twitchApi: context.read<TwitchApi>(),
+              ),
+              assetsStore: ChatAssetsStore(
+                twitchApi: context.read<TwitchApi>(),
+                ffzApi: context.read<FFZApi>(),
+                bttvApi: context.read<BTTVApi>(),
+                sevenTvApi: context.read<SevenTVAPI>(),
+              ),
             ),
           ),
         ),

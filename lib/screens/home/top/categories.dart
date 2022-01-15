@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/widgets/category_card.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 
 class Categories extends StatefulWidget {
@@ -27,13 +28,25 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
       onRefresh: () async {
         HapticFeedback.lightImpact();
         await store.refreshCategories();
+
+        if (store.error != null) {
+          final snackBar = SnackBar(
+            content: Text(store.error!),
+            behavior: SnackBarBehavior.floating,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }
       },
       child: Observer(
         builder: (_) {
+          if (store.categories.isEmpty && store.isLoading && store.error == null) {
+            return const LoadingIndicator(subtitle: Text('Loading categories...'));
+          }
           return Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: [
               GridView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
                 controller: store.scrollController,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,

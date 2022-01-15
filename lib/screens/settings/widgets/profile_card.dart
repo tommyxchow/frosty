@@ -79,6 +79,15 @@ class ProfileCard extends StatelessWidget {
     return Center(
       child: Observer(
         builder: (context) {
+          if (authStore.error != null) {
+            return ListTile(
+              title: const Text('Failed to connect'),
+              trailing: OutlinedButton(
+                onPressed: authStore.init,
+                child: const Text('Try Again'),
+              ),
+            );
+          }
           if (authStore.isLoggedIn && authStore.user.details != null) {
             return ListTile(
               leading: CircleAvatar(

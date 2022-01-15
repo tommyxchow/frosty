@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +21,20 @@ class CategoryStreams extends StatelessWidget {
         onRefresh: () async {
           HapticFeedback.lightImpact();
           await store.refreshStreams();
+
+          if (store.error != null) {
+            final snackBar = SnackBar(
+              content: Text(store.error!),
+              behavior: SnackBarBehavior.floating,
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
         },
         child: Observer(
           builder: (context) {
+            if (store.streams.isEmpty && store.isLoading && store.error == null) {
+              return const LoadingIndicator(subtitle: Text('Loading streams...'));
+            }
             return Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: [

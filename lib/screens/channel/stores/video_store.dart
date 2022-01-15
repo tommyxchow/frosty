@@ -13,6 +13,8 @@ part 'video_store.g.dart';
 class VideoStore = _VideoStoreBase with _$VideoStore;
 
 abstract class _VideoStoreBase with Store {
+  final TwitchApi twitchApi;
+
   WebViewController? controller;
 
   late Timer overlayTimer;
@@ -32,6 +34,7 @@ abstract class _VideoStoreBase with Store {
   final SettingsStore settingsStore;
 
   _VideoStoreBase({
+    required this.twitchApi,
     required this.userLogin,
     required this.authStore,
     required this.settingsStore,
@@ -69,9 +72,11 @@ abstract class _VideoStoreBase with Store {
 
   @action
   Future<void> updateStreamInfo() async {
-    final updatedStreamInfo = await Twitch.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
-    if (updatedStreamInfo != null) {
+    try {
+      final updatedStreamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
       _streamInfo = updatedStreamInfo;
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 
