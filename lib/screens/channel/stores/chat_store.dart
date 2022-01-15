@@ -183,7 +183,7 @@ abstract class _ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messages.add(IRCMessage.createNotice(message: "Connected to $displayName's chat"));
+        _messages.add(IRCMessage.createNotice(message: "Connected to $displayName's chat!"));
 
         // Fetch the assets used in chat including badges and emotes.
         assetsStore.assetsFuture(

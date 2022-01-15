@@ -23,7 +23,10 @@ class CategoryStreams extends StatelessWidget {
           await store.refreshStreams();
 
           if (store.error != null) {
-            final snackBar = SnackBar(content: Text(store.error!));
+            final snackBar = SnackBar(
+              content: Text(store.error!),
+              behavior: SnackBarBehavior.floating,
+            );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
         },

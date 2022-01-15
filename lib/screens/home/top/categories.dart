@@ -30,7 +30,10 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
         await store.refreshCategories();
 
         if (store.error != null) {
-          final snackBar = SnackBar(content: Text(store.error!));
+          final snackBar = SnackBar(
+            content: Text(store.error!),
+            behavior: SnackBarBehavior.floating,
+          );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       },

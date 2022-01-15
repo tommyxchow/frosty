@@ -51,6 +51,23 @@ mixin _$AuthStore on _AuthBase, Store {
     });
   }
 
+  final _$_errorAtom = Atom(name: '_AuthBase._error');
+
+  String? get error {
+    _$_errorAtom.reportRead();
+    return super._error;
+  }
+
+  @override
+  String? get _error => error;
+
+  @override
+  set _error(String? value) {
+    _$_errorAtom.reportWrite(value, super._error, () {
+      super._error = value;
+    });
+  }
+
   final _$initAsyncAction = AsyncAction('_AuthBase.init');
 
   @override
