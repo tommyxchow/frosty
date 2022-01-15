@@ -26,35 +26,40 @@ class TwitchApi {
 
       return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchGlobal)).toList();
     } else {
-      debugPrint('Failed to get global Twitch emotes. Error code: ${response.statusCode}');
-      return [];
+      throw Exception('Failed to get global Twitch emotes.');
     }
   }
 
   /// Returns a map of a channel's Twitch emotes to their URL.
-  Future<List<Emote>> getEmotesChannel({required String id, required Map<String, String>? headers}) async {
+  Future<List<Emote>> getEmotesChannel({
+    required String id,
+    required Map<String, String>? headers,
+  }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=$id');
-    final response = await _client.get(url, headers: headers);
 
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
       final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
       return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchChannel)).toList();
     } else {
-      debugPrint('Failed to get Twitch emotes for id: $id. Error code: ${response.statusCode}');
-      return [];
+      throw Exception('Failed to get channel Twitch emotes.');
     }
   }
 
   /// Returns a map of a channel's Twitch emotes to their URL.
-  Future<List<Emote>> getEmotesSets({required String setId, required Map<String, String>? headers, sub = false}) async {
+  Future<List<Emote>> getEmotesSets({
+    required String setId,
+    required Map<String, String>? headers,
+  }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=$setId');
-    final response = await _client.get(url, headers: headers);
 
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['data'] as List;
       final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
+
       return emotes.map((emote) {
         switch (emote.emoteType) {
           case 'globals':
@@ -67,68 +72,60 @@ class TwitchApi {
         }
       }).toList();
     } else {
-      debugPrint('Failed to get Twitch emotes for set id: $setId. Error code: ${response.statusCode}');
-      return [];
+      throw Exception('Failed to get Twitch emotes set.');
     }
   }
 
   /// Returns a map of global Twitch badges to their URL.
   Future<Map<String, Badge>> getBadgesGlobal() async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/global/display');
-    final response = await _client.get(url);
 
+    final response = await _client.get(url);
     if (response.statusCode == 200) {
       final result = <String, Badge>{};
-
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
-
-      decoded.forEach((id, versions) =>
-          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+      decoded.forEach((id, versions) => (versions['versions'] as Map)
+          .forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {
-      debugPrint('Failed to get global Twitch badges. Error code: ${response.statusCode}');
-      return {};
+      throw Exception('Failed to get global Twitch badges.');
     }
   }
 
   /// Returns a map of a channel's Twitch badges to their URL.
   Future<Map<String, Badge>> getBadgesChannel({required String id}) async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/channels/$id/display');
-    final response = await _client.get(url);
 
+    final response = await _client.get(url);
     if (response.statusCode == 200) {
       final result = <String, Badge>{};
-
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
-
-      decoded.forEach((id, versions) =>
-          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+      decoded.forEach((id, versions) => (versions['versions'] as Map)
+          .forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {
-      debugPrint('Failed to get Twitch badges for id: $id. Error code: ${response.statusCode}');
-      return {};
+      throw Exception('Failed to get Twitch channel badges.');
     }
   }
 
   /// Returns the user's info given their token (headers)
-  Future<UserTwitch?> getUserInfo({required Map<String, String>? headers}) async {
-    final response = await _client.get(Uri.parse('https://api.twitch.tv/helix/users'), headers: headers);
+  Future<UserTwitch> getUserInfo({required Map<String, String>? headers}) async {
+    final url = Uri.parse('https://api.twitch.tv/helix/users');
 
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body)['data'] as List;
 
       return UserTwitch.fromJson(userData.first);
     } else {
-      debugPrint('Failed to get user info');
+      throw Exception('Failed to get user info');
     }
   }
 
   /// Returns a token for an anonymous user.
-  Future<String?> getDefaultToken() async {
-    debugPrint('Getting default token...');
-
+  Future<String> getDefaultToken() async {
     final url = Uri(
       scheme: 'https',
       host: 'id.twitch.tv',
@@ -141,226 +138,222 @@ class TwitchApi {
     );
 
     final response = await _client.post(url);
-
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['access_token'];
     } else {
-      debugPrint('Failed to get default token.');
+      throw Exception('Failed to get default token.');
     }
   }
 
   /// Returns the validity of the given token
   Future<bool> validateToken({required String token}) async {
-    debugPrint('Validating token...');
-    final response = await _client.get(
-      Uri.parse('https://id.twitch.tv/oauth2/validate'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    final url = Uri.parse('https://id.twitch.tv/oauth2/validate');
 
+    final response = await _client.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
       debugPrint('Token validated!');
       return true;
+    } else {
+      debugPrint('Token invalidated :(');
+      return false;
     }
-
-    debugPrint('Token invalidated :(');
-    return false;
   }
 
   /// Returns a map containing top 20 streams and a cursor for further requests.
-  Future<StreamsTwitch?> getTopStreams({required Map<String, String>? headers, String? cursor}) async {
-    final Uri uri;
+  Future<StreamsTwitch> getTopStreams({
+    required Map<String, String>? headers,
+    String? cursor,
+  }) async {
+    final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/streams' : 'https://api.twitch.tv/helix/streams?after=$cursor');
 
-    if (cursor == null) {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams');
-    } else {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams?after=$cursor');
-    }
-
-    final response = await _client.get(uri, headers: headers);
-
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 
       return StreamsTwitch.fromJson(decoded);
     } else {
-      debugPrint('Failed to update top streams');
+      throw Exception('Failed to get top streams');
     }
   }
 
   /// Returns a map with the given user's top 20 followed streams and a cursor for further requests.
-  Future<StreamsTwitch?> getFollowedStreams({
+  Future<StreamsTwitch> getFollowedStreams({
     required String id,
     required Map<String, String>? headers,
     String? cursor,
   }) async {
-    final Uri uri;
+    final url = Uri.parse(cursor == null
+        ? 'https://api.twitch.tv/helix/streams/followed?user_id=$id'
+        : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
 
-    if (cursor == null) {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams/followed?user_id=$id');
-    } else {
-      uri = Uri.parse('https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
-    }
-
-    final response = await _client.get(uri, headers: headers);
-
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 
       return StreamsTwitch.fromJson(decoded);
     } else {
-      debugPrint('Failed to update followed streams');
+      throw Exception('Failed to get followed streams.');
     }
   }
 
   /// Returns the list of streams under the given game/category ID.
-  Future<StreamsTwitch?> getStreamsUnderGame({
+  Future<StreamsTwitch> getStreamsUnderCategory({
     required String gameId,
     required Map<String, String>? headers,
     String? cursor,
   }) async {
-    final uri = cursor == null
-        ? Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId')
-        : Uri.parse('https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
+    final url = Uri.parse(
+        cursor == null ? 'https://api.twitch.tv/helix/streams?game_id=$gameId' : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
 
-    final response = await _client.get(uri, headers: headers);
-
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 
       return StreamsTwitch.fromJson(decoded);
     } else {
-      debugPrint('Failed to update game streams');
+      throw Exception('Failed to get streams under category.');
     }
   }
 
   /// Returns the stream info given the user login.
-  Future<StreamTwitch?> getStream({required String userLogin, required Map<String, String>? headers}) async {
+  Future<StreamTwitch> getStream({
+    required String userLogin,
+    required Map<String, String>? headers,
+  }) async {
     final uri = Uri.parse('https://api.twitch.tv/helix/streams?user_login=$userLogin');
 
     final response = await _client.get(uri, headers: headers);
-
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final data = decoded['data'] as List;
 
-      if (data.isEmpty) return null;
-
-      return StreamTwitch.fromJson(data.first);
+      if (data.isNotEmpty) {
+        return StreamTwitch.fromJson(data.first);
+      } else {
+        throw Exception('User is offline or does not exist.');
+      }
     } else {
-      debugPrint('Failed to update top streams');
+      throw Exception('Failed to get stream info.');
     }
   }
 
   /// Returns a user's info given their login name.
-  Future<UserTwitch?> getUser({String? userLogin, String? id, required Map<String, String>? headers}) async {
-    final uri = id != null ? Uri.parse('https://api.twitch.tv/helix/users?id=$id') : Uri.parse('https://api.twitch.tv/helix/users?login=$userLogin');
+  Future<UserTwitch> getUser({
+    String? userLogin,
+    String? id,
+    required Map<String, String>? headers,
+  }) async {
+    final url = Uri.parse(id != null ? 'https://api.twitch.tv/helix/users?id=$id' : 'https://api.twitch.tv/helix/users?login=$userLogin');
 
-    final response = await _client.get(uri, headers: headers);
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final userData = jsonDecode(response.body)['data'] as List;
 
       if (userData.isNotEmpty) {
         return UserTwitch.fromJson(userData.first);
       } else {
-        debugPrint('User does not exist');
+        throw Exception('User does not exist.');
       }
     } else {
-      debugPrint('User does not exist');
+      throw Exception('Failed to get user.');
     }
   }
 
   /// Returns a channels's info associated with the given ID.
-  Future<Channel?> getChannel({required String userId, required Map<String, String>? headers}) async {
-    final response = await _client.get(Uri.parse('https://api.twitch.tv/helix/channels?broadcaster_id=$userId'), headers: headers);
+  Future<Channel> getChannel({
+    required String userId,
+    required Map<String, String>? headers,
+  }) async {
+    final url = Uri.parse('https://api.twitch.tv/helix/channels?broadcaster_id=$userId');
+
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final channelData = jsonDecode(response.body)['data'] as List;
 
       if (channelData.isNotEmpty) {
         return Channel.fromJson(channelData.first);
       } else {
-        debugPrint('Channel does not exist');
+        throw Exception('Channel does not exist');
       }
     } else {
-      debugPrint('Channel does not exist');
+      throw Exception('Failed to get channel.');
     }
   }
 
   /// Returns a list of channel query objects closest matching the given query string.
-  Future<List<ChannelQuery>> searchChannels({required String query, required Map<String, String>? headers}) async {
-    final response = await _client.get(Uri.parse('https://api.twitch.tv/helix/search/channels?first=8&query=$query'), headers: headers);
+  Future<List<ChannelQuery>> searchChannels({
+    required String query,
+    required Map<String, String>? headers,
+  }) async {
+    final url = Uri.parse('https://api.twitch.tv/helix/search/channels?first=8&query=$query');
+
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final channelData = jsonDecode(response.body)['data'] as List;
 
       return channelData.map((e) => ChannelQuery.fromJson(e)).toList();
     } else {
-      return [];
+      throw Exception('Failed to get channels.');
     }
   }
 
   /// Returns a map containing top 20 categories/games and a cursor for further requests.
-  Future<CategoriesTwitch?> getTopGames({required Map<String, String>? headers, String? cursor}) async {
-    final Uri uri;
+  Future<CategoriesTwitch> getTopCategories({
+    required Map<String, String>? headers,
+    String? cursor,
+  }) async {
+    final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/games/top' : 'https://api.twitch.tv/helix/games/top?after=$cursor');
 
-    if (cursor == null) {
-      uri = Uri.parse('https://api.twitch.tv/helix/games/top');
-    } else {
-      uri = Uri.parse('https://api.twitch.tv/helix/games/top?after=$cursor');
-    }
-
-    final response = await _client.get(uri, headers: headers);
-
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 
       return CategoriesTwitch.fromJson(decoded);
     } else {
-      debugPrint('Failed to update top games');
+      throw Exception('Failed to get top categories.');
     }
   }
 
   /// Returns a map containing top 20 categories/games and a cursor for further requests.
-  Future<CategoriesTwitch?> searchCategories({required Map<String, String>? headers, required String query, String? cursor}) async {
-    final uri = cursor == null
-        ? Uri.parse('https://api.twitch.tv/helix/search/categories?first=8&query=$query')
-        : Uri.parse('https://api.twitch.tv/helix/search/categories?first=8&query=$query&after=$cursor');
+  Future<CategoriesTwitch> searchCategories({required Map<String, String>? headers, required String query, String? cursor}) async {
+    final url = Uri.parse(cursor == null
+        ? 'https://api.twitch.tv/helix/search/categories?first=8&query=$query'
+        : 'https://api.twitch.tv/helix/search/categories?first=8&query=$query&after=$cursor');
 
-    final response = await _client.get(uri, headers: headers);
-
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 
       return CategoriesTwitch.fromJson(decoded);
     } else {
-      debugPrint('Failed to update top games');
+      throw Exception('Failed to get categories.');
     }
   }
 
   /// Returns the sub count for a user.
-  Future<int?> getSubscriberCount({required String userId, required Map<String, String>? headers}) async {
+  Future<int> getSubscriberCount({required String userId, required Map<String, String>? headers}) async {
     final uri = Uri.parse('https://api.twitch.tv/helix/subscriptions?broadcaster_id=$userId');
 
     final response = await _client.get(uri, headers: headers);
-
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 
       return decoded['total'] as int;
     } else {
-      debugPrint('Failed to update top games');
+      throw Exception('Failed to get sub count.');
     }
   }
 
-  Future<ChatUsers?> getChatters({required String userLogin}) async {
+  Future<ChatUsers> getChatters({required String userLogin}) async {
     final uri = Uri.parse('https://tmi.twitch.tv/group/user/$userLogin/chatters');
 
     final response = await _client.get(uri);
-
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
 
       return ChatUsers.fromJson(decoded);
     } else {
-      debugPrint('Failed to get chatters');
+      throw Exception('Failed to get chatters.');
     }
   }
 
@@ -370,14 +363,13 @@ class TwitchApi {
     required Map<String, String>? headers,
     String? cursor,
   }) async {
-    final uri = cursor == null
-        ? Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id')
-        : Uri.parse('https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id&after=$cursor');
+    final url = Uri.parse(cursor == null
+        ? 'https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id'
+        : 'https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id&after=$cursor');
 
-    final response = await _client.get(uri, headers: headers);
+    final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-
       final cursor = decoded['pagination']['cursor'];
       final blockedList = decoded['data'] as List;
 
@@ -390,20 +382,18 @@ class TwitchApi {
 
         return result;
       } else {
-        debugPrint('User does not have anyone blocked');
-        return [];
+        throw Exception('User does not have anyone blocked');
       }
     } else {
-      debugPrint('User does not exist');
-      return [];
+      throw Exception('User does not exist');
     }
   }
 
   // Blocks the user with the given ID and returns true on success or false on failure.
   Future<bool> blockUser({required String userId, required Map<String, String> headers}) async {
-    final uri = Uri.parse('https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
+    final url = Uri.parse('https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
 
-    final response = await _client.put(uri, headers: headers);
+    final response = await _client.put(url, headers: headers);
     if (response.statusCode == 204) {
       return true;
     } else {
@@ -413,9 +403,9 @@ class TwitchApi {
 
   // Unblocks the user with the given ID and returns true on success or false on failure.
   Future<bool> unblockUser({required String userId, required Map<String, String> headers}) async {
-    final uri = Uri.parse('https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
+    final url = Uri.parse('https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
 
-    final response = await _client.delete(uri, headers: headers);
+    final response = await _client.delete(url, headers: headers);
     if (response.statusCode == 204) {
       return true;
     } else {

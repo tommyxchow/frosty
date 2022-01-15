@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart';
@@ -14,8 +13,8 @@ class FFZApi {
   /// Returns a map of global FFZ emotes to their URL.
   Future<List<Emote>> getEmotesGlobal() async {
     final url = Uri.parse('https://api.frankerfacez.com/v1/set/global');
-    final response = await _client.get(url);
 
+    final response = await _client.get(url);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final defaultSets = decoded['default_sets'] as List;
@@ -28,16 +27,15 @@ class FFZApi {
 
       return emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzGlobal)).toList();
     } else {
-      debugPrint('Failed to get global FFZ emotes. Error code: ${response.statusCode}');
-      return [];
+      throw Exception('Failed to get global FFZ emotes.');
     }
   }
 
   /// Returns a channel's FFZ room info including custom badges and emote used.
-  Future<Tuple2<RoomFFZ, List<Emote>>?> getRoomInfo({required String name}) async {
+  Future<Tuple2<RoomFFZ, List<Emote>>> getRoomInfo({required String name}) async {
     final url = Uri.parse('https://api.frankerfacez.com/v1/room/$name');
-    final response = await _client.get(url);
 
+    final response = await _client.get(url);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final roomInfo = RoomFFZ.fromJson(decoded['room']);
@@ -47,22 +45,20 @@ class FFZApi {
 
       return Tuple2(roomInfo, emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel)).toList());
     } else {
-      debugPrint('Failed to get FFZ emotes for id: $name. Error code: ${response.statusCode}');
+      throw Exception('Failed to get FFZ room info.}');
     }
   }
 
-  Future<Map<String, List<Badge>>?> getBadges() async {
+  Future<Map<String, List<Badge>>> getBadges() async {
     final url = Uri.parse('https://api.frankerfacez.com/v1/badges/ids');
-    final response = await _client.get(url);
 
+    final response = await _client.get(url);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-
       final badges = decoded['badges'] as List;
       final badgeObjects = badges.map((badge) => BadgeInfoFFZ.fromJson(badge)).toList();
 
       final result = <String, List<Badge>>{};
-
       for (final badge in badgeObjects.reversed) {
         for (final userId in decoded['users'][badge.id.toString()]) {
           final entry = result[userId.toString()];
@@ -76,7 +72,8 @@ class FFZApi {
       }
 
       return result;
+    } else {
+      throw Exception('Failed to get FFZ badges.');
     }
-    debugPrint('Failed to get FFZ badges');
   }
 }
