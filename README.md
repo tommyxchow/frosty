@@ -5,7 +5,9 @@
 
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
 
-Now available on [TestFlight](https://testflight.apple.com/join/UZLoznpr)!
+**Now available on [TestFlight](https://testflight.apple.com/join/UZLoznpr)!**
+
+Coming to the Play Store soon!
 
 ## Features
 
