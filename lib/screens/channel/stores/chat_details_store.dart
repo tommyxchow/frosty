@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/chatters.dart';
-import 'package:frosty/models/irc_message.dart';
+import 'package:frosty/models/irc.dart';
 import 'package:mobx/mobx.dart';
 
 part 'chat_details_store.g.dart';

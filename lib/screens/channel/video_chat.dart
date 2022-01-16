@@ -10,14 +10,9 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:provider/provider.dart';
 
 class VideoChat extends StatefulWidget {
-  final String displayName;
   final ChatStore chatStore;
 
-  const VideoChat({
-    Key? key,
-    required this.displayName,
-    required this.chatStore,
-  }) : super(key: key);
+  const VideoChat({Key? key, required this.chatStore}) : super(key: key);
 
   @override
   _VideoChatState createState() => _VideoChatState();
@@ -47,7 +42,7 @@ class _VideoChatState extends State<VideoChat> {
 
     final appBar = AppBar(
       title: Text(
-        widget.displayName,
+        chatStore.displayName,
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       actions: [

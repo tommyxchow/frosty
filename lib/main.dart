@@ -39,11 +39,13 @@ Future<void> main() async {
     await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
   }
 
+  /// Initialize API services with a common client.
+  /// This will prevent every request from creating a new client instance.
   final client = Client();
   final twitchApiService = TwitchApi(client);
   final bttvApiService = BTTVApi(client);
   final ffzApiService = FFZApi(client);
-  final sevenTvApiService = SevenTVAPI(client);
+  final sevenTvApiService = SevenTVApi(client);
 
   // Create and initialize the authentication store
   final authStore = AuthStore(twitchApi: twitchApiService);
@@ -57,7 +59,7 @@ Future<void> main() async {
         Provider<TwitchApi>(create: (_) => twitchApiService),
         Provider<BTTVApi>(create: (_) => bttvApiService),
         Provider<FFZApi>(create: (_) => ffzApiService),
-        Provider<SevenTVAPI>(create: (_) => sevenTvApiService),
+        Provider<SevenTVApi>(create: (_) => sevenTvApiService),
       ],
       child: const MyApp(),
     ),

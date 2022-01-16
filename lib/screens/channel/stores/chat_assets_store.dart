@@ -14,7 +14,7 @@ abstract class _ChatAssetsStoreBase with Store {
   final TwitchApi twitchApi;
   final BTTVApi bttvApi;
   final FFZApi ffzApi;
-  final SevenTVAPI sevenTvApi;
+  final SevenTVApi sevenTvApi;
 
   /// Contains any custom FFZ mod and vip badges for the channel.
   RoomFFZ? ffzRoomInfo;

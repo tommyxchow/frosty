@@ -5,10 +5,11 @@ import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart';
 import 'package:tuple/tuple.dart';
 
+/// The FFZ service for making API calls.
 class FFZApi {
   final Client _client;
 
-  FFZApi(this._client);
+  const FFZApi(this._client);
 
   /// Returns a map of global FFZ emotes to their URL.
   Future<List<Emote>> getEmotesGlobal() async {
@@ -49,6 +50,7 @@ class FFZApi {
     }
   }
 
+  /// Returns a map of badges user IDs to a list of their FFZ badges.
   Future<Map<String, List<Badge>>> getBadges() async {
     final url = Uri.parse('https://api.frankerfacez.com/v1/badges/ids');
 

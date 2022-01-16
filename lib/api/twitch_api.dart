@@ -11,12 +11,14 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/user.dart';
 import 'package:http/http.dart';
 
+/// The Twitch service for making API calls.
 class TwitchApi {
   final Client _client;
 
-  TwitchApi(this._client);
+  const TwitchApi(this._client);
 
-  Future<List<Emote>> getEmotesGlobal({required Map<String, String>? headers}) async {
+  /// Returns a list of all Twitch global emotes.
+  Future<List<Emote>> getEmotesGlobal({required Map<String, String> headers}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
     final response = await _client.get(url, headers: headers);
 
@@ -30,10 +32,10 @@ class TwitchApi {
     }
   }
 
-  /// Returns a map of a channel's Twitch emotes to their URL.
+  /// Returns a list of a channel's Twitch emotes given their [id].
   Future<List<Emote>> getEmotesChannel({
     required String id,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
   }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes?broadcaster_id=$id');
 
@@ -48,10 +50,10 @@ class TwitchApi {
     }
   }
 
-  /// Returns a map of a channel's Twitch emotes to their URL.
+  /// Returns a list of Twitch emotes under the provided [setId].
   Future<List<Emote>> getEmotesSets({
     required String setId,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
   }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=$setId');
 
@@ -76,7 +78,7 @@ class TwitchApi {
     }
   }
 
-  /// Returns a map of global Twitch badges to their URL.
+  /// Returns a map of global Twitch badges to their [Emote] object.
   Future<Map<String, Badge>> getBadgesGlobal() async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/global/display');
 
@@ -93,7 +95,7 @@ class TwitchApi {
     }
   }
 
-  /// Returns a map of a channel's Twitch badges to their URL.
+  /// Returns a map of a channel's Twitch badges to their [Emote] object.
   Future<Map<String, Badge>> getBadgesChannel({required String id}) async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/channels/$id/display');
 
@@ -110,8 +112,8 @@ class TwitchApi {
     }
   }
 
-  /// Returns the user's info given their token (headers)
-  Future<UserTwitch> getUserInfo({required Map<String, String>? headers}) async {
+  /// Returns the user's info given their token through [headers].
+  Future<UserTwitch> getUserInfo({required Map<String, String> headers}) async {
     final url = Uri.parse('https://api.twitch.tv/helix/users');
 
     final response = await _client.get(url, headers: headers);
@@ -145,7 +147,7 @@ class TwitchApi {
     }
   }
 
-  /// Returns the validity of the given token
+  /// Returns a bool indicating the validity of the given token.
   Future<bool> validateToken({required String token}) async {
     final url = Uri.parse('https://id.twitch.tv/oauth2/validate');
 
@@ -159,9 +161,9 @@ class TwitchApi {
     }
   }
 
-  /// Returns a map containing top 20 streams and a cursor for further requests.
+  /// Returns a [StreamsTwitch] object that contains the top 20 streams and a cursor for further requests.
   Future<StreamsTwitch> getTopStreams({
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
     String? cursor,
   }) async {
     final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/streams' : 'https://api.twitch.tv/helix/streams?after=$cursor');
@@ -175,10 +177,10 @@ class TwitchApi {
     }
   }
 
-  /// Returns a map with the given user's top 20 followed streams and a cursor for further requests.
+  /// Returns a [StreamsTwitch] object that contains the given user ID's top 20 followed streams and a cursor for further requests.
   Future<StreamsTwitch> getFollowedStreams({
     required String id,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
     String? cursor,
   }) async {
     final url = Uri.parse(cursor == null
@@ -194,10 +196,10 @@ class TwitchApi {
     }
   }
 
-  /// Returns the list of streams under the given game/category ID.
+  /// Returns a [StreamsTwitch] object that contains the list of streams under the given game/category ID.
   Future<StreamsTwitch> getStreamsUnderCategory({
     required String gameId,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
     String? cursor,
   }) async {
     final url = Uri.parse(
@@ -212,10 +214,10 @@ class TwitchApi {
     }
   }
 
-  /// Returns the stream info given the user login.
+  /// Returns a [StreamTwitch] object containing the stream info associated with the given [userLogin].
   Future<StreamTwitch> getStream({
     required String userLogin,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
   }) async {
     final uri = Uri.parse('https://api.twitch.tv/helix/streams?user_login=$userLogin');
 
@@ -234,11 +236,11 @@ class TwitchApi {
     }
   }
 
-  /// Returns a user's info given their login name.
+  /// Returns a [UserTwitch] object containing the user info associated with the given [userLogin].
   Future<UserTwitch> getUser({
     String? userLogin,
     String? id,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
   }) async {
     final url = Uri.parse(id != null ? 'https://api.twitch.tv/helix/users?id=$id' : 'https://api.twitch.tv/helix/users?login=$userLogin');
 
@@ -258,10 +260,10 @@ class TwitchApi {
     }
   }
 
-  /// Returns a channels's info associated with the given ID.
+  /// Returns a [Channel] object containing a channels's info associated with the given [userId].
   Future<Channel> getChannel({
     required String userId,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
   }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/channels?broadcaster_id=$userId');
 
@@ -280,10 +282,10 @@ class TwitchApi {
     }
   }
 
-  /// Returns a list of channel query objects closest matching the given query string.
+  /// Returns a list of [ChannelQuery] objects closest matching the given [query].
   Future<List<ChannelQuery>> searchChannels({
     required String query,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
   }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/search/channels?first=8&query=$query');
 
@@ -297,9 +299,9 @@ class TwitchApi {
     }
   }
 
-  /// Returns the next top 20 categories/games and a cursor for further requests.
+  /// Returns a [CategoriesTwitch] object containing the next top 20 categories/games and a cursor for further requests.
   Future<CategoriesTwitch> getTopCategories({
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
     String? cursor,
   }) async {
     final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/games/top' : 'https://api.twitch.tv/helix/games/top?after=$cursor');
@@ -313,8 +315,12 @@ class TwitchApi {
     }
   }
 
-  /// Returns up to 20 categories/games closest matching the [query] and a cursor for further requests.
-  Future<CategoriesTwitch> searchCategories({required Map<String, String>? headers, required String query, String? cursor}) async {
+  /// Returns a [CategoriesTwitch] containing up to 20 categories/games closest matching the [query] and a cursor for further requests.
+  Future<CategoriesTwitch> searchCategories({
+    required Map<String, String> headers,
+    required String query,
+    String? cursor,
+  }) async {
     final url = Uri.parse(cursor == null
         ? 'https://api.twitch.tv/helix/search/categories?first=8&query=$query'
         : 'https://api.twitch.tv/helix/search/categories?first=8&query=$query&after=$cursor');
@@ -329,8 +335,11 @@ class TwitchApi {
     }
   }
 
-  /// Returns the sub count for a user.
-  Future<int> getSubscriberCount({required String userId, required Map<String, String>? headers}) async {
+  /// Returns the sub count associated with the given [userId].
+  Future<int> getSubscriberCount({
+    required String userId,
+    required Map<String, String> headers,
+  }) async {
     final uri = Uri.parse('https://api.twitch.tv/helix/subscriptions?broadcaster_id=$userId');
 
     final response = await _client.get(uri, headers: headers);
@@ -343,6 +352,7 @@ class TwitchApi {
     }
   }
 
+  /// Returns a [ChatUsers] object containing the names of chatters in the given [userLogin]'s chat.
   Future<ChatUsers> getChatters({required String userLogin}) async {
     final uri = Uri.parse('https://tmi.twitch.tv/group/user/$userLogin/chatters');
 
@@ -359,7 +369,7 @@ class TwitchApi {
   /// Returns a user's list of blocked users given their id.
   Future<List<UserBlockedTwitch>> getUserBlockedList({
     required String id,
-    required Map<String, String>? headers,
+    required Map<String, String> headers,
     String? cursor,
   }) async {
     final url = Uri.parse(cursor == null

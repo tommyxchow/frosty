@@ -4,10 +4,11 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart';
 
+/// The BTTV service for making API calls.
 class BTTVApi {
   final Client _client;
 
-  BTTVApi(this._client);
+  const BTTVApi(this._client);
 
   /// Returns a map of global BTTV emotes to their URL.
   Future<List<Emote>> getEmotesGlobal() async {
@@ -43,6 +44,7 @@ class BTTVApi {
     }
   }
 
+  /// Returns a map of username to their BTTV badge.
   Future<Map<String, Badge>> getBadges() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/badges');
 

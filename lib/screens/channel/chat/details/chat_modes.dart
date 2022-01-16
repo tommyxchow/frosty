@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/models/irc_message.dart';
+import 'package:frosty/models/irc.dart';
 
 class ChatModes extends StatelessWidget {
   final ROOMSTATE roomState;

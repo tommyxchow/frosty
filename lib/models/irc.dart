@@ -83,10 +83,10 @@ class IRCMessage {
     required ChatAssetsStore assetsStore,
     required double badgeHeight,
     required double emoteHeight,
+    required bool isLightTheme,
     bool showMessage = true,
     bool useZeroWidth = false,
     bool useReadableColors = false,
-    bool? isLightTheme,
     TimestampType timestamp = TimestampType.disabled,
   }) {
     final emoteToObject = assetsStore.emoteToObject;
@@ -267,9 +267,7 @@ class IRCMessage {
     );
 
     // Add the colon separator between the username and their message to the span.
-    if (action == false) {
-      span.add(const TextSpan(text: ':'));
-    }
+    if (action == false) span.add(const TextSpan(text: ':'));
 
     // Italicize the text it was called with an IRC Action i.e., "/me".
     final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;

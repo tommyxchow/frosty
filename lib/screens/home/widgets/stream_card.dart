@@ -41,7 +41,6 @@ class StreamCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => VideoChat(
-            displayName: streamInfo.userName,
             chatStore: ChatStore(
               channelName: streamInfo.userLogin,
               channelId: streamInfo.userId,
@@ -55,7 +54,7 @@ class StreamCard extends StatelessWidget {
                 twitchApi: context.read<TwitchApi>(),
                 ffzApi: context.read<FFZApi>(),
                 bttvApi: context.read<BTTVApi>(),
-                sevenTvApi: context.read<SevenTVAPI>(),
+                sevenTvApi: context.read<SevenTVApi>(),
               ),
             ),
           ),

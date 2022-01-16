@@ -4,11 +4,11 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart';
 
-// A class for general requests.
-class SevenTVAPI {
+/// The 7TV service for making API calls.
+class SevenTVApi {
   final Client _client;
 
-  SevenTVAPI(this._client);
+  const SevenTVApi(this._client);
 
   /// Returns a map of global 7TV emotes to their URL.
   Future<List<Emote>> getEmotesGlobal() async {
@@ -40,6 +40,7 @@ class SevenTVAPI {
     }
   }
 
+  /// Returns a map of user IDS to a list of their 7TV badges.
   Future<Map<String, List<Badge>>> getBadges() async {
     final url = Uri.parse('https://api.7tv.app/v2/badges?user_identifier=twitch_id');
 
