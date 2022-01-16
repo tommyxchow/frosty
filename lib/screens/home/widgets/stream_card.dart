@@ -18,11 +18,15 @@ import 'package:provider/provider.dart';
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
   final StreamTwitch streamInfo;
+  final int width;
+  final int height;
   final bool showUptime;
 
   const StreamCard({
     Key? key,
     required this.streamInfo,
+    required this.width,
+    required this.height,
     required this.showUptime,
   }) : super(key: key);
 
@@ -32,7 +36,7 @@ class StreamCard extends StatelessWidget {
     final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
 
     final thumbnail = CachedNetworkImage(
-      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-440x248') + cacheUrlExtension,
+      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${width}x$height') + cacheUrlExtension,
       useOldImageOnUrlChange: true,
     );
 

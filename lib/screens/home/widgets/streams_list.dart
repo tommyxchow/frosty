@@ -23,6 +23,12 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
     super.build(context);
     final store = widget.store;
 
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    final thumbnailWidth = (size.width * pixelRatio) ~/ 3;
+    final thumbnailHeight = (thumbnailWidth * (9 / 16)).toInt();
+
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
@@ -55,6 +61,8 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
                   return Observer(
                     builder: (context) => StreamCard(
                       streamInfo: store.streams[index],
+                      width: thumbnailWidth,
+                      height: thumbnailHeight,
                       showUptime: context.read<SettingsStore>().showThumbnailUptime,
                     ),
                   );

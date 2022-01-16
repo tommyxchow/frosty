@@ -13,6 +13,12 @@ class SearchResultsCategories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    final artWidth = (size.width * pixelRatio) ~/ 3;
+    final artHeight = (artWidth * (4 / 3)).toInt();
+
     return Observer(
       builder: (context) {
         final future = searchStore.categoryFuture;
@@ -56,7 +62,11 @@ class SearchResultsCategories extends StatelessWidget {
               children: categories.data
                   .map(
                     (category) => GridTile(
-                      child: CategoryCard(category: category),
+                      child: CategoryCard(
+                        category: category,
+                        width: artWidth,
+                        height: artHeight,
+                      ),
                     ),
                   )
                   .toList(),

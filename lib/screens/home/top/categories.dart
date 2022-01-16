@@ -24,6 +24,12 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
     super.build(context);
     final store = widget.store;
 
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    final artWidth = (size.width * pixelRatio) ~/ 3;
+    final artHeight = (artWidth * (4 / 3)).toInt();
+
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
@@ -56,7 +62,11 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
                   if (index > store.categories.length / 2 && store.hasMore) {
                     store.getCategories();
                   }
-                  return CategoryCard(category: store.categories[index]);
+                  return CategoryCard(
+                    category: store.categories[index],
+                    width: artWidth,
+                    height: artHeight,
+                  );
                 },
               ),
               Observer(

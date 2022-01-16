@@ -10,8 +10,15 @@ import 'package:provider/provider.dart';
 /// A tappable card widget that displays a category's box art and name.
 class CategoryCard extends StatelessWidget {
   final CategoryTwitch category;
+  final int width;
+  final int height;
 
-  const CategoryCard({Key? key, required this.category}) : super(key: key);
+  const CategoryCard({
+    Key? key,
+    required this.category,
+    required this.width,
+    required this.height,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +42,7 @@ class CategoryCard extends StatelessWidget {
           children: [
             Expanded(
               child: CachedNetworkImage(
-                imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '300x400.jpg'),
+                imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${width}x$height.jpg'),
               ),
             ),
             const SizedBox(height: 5.0),
