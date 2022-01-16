@@ -139,9 +139,6 @@ abstract class _AuthBase with Store {
       // Clear the user info.
       user.dispose();
 
-      // Set the login status to logged out.
-      _isLoggedIn = false;
-
       // If the default token already exists, set it.
       _token = await _storage.read(key: 'DEFAULT_TOKEN');
 
@@ -165,6 +162,8 @@ abstract class _AuthBase with Store {
     } catch (e) {
       debugPrint(e.toString());
     }
+    // Set the login status to logged out.
+    _isLoggedIn = false;
 
     debugPrint('Successfully logged out');
   }

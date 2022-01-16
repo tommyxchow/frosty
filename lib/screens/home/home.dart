@@ -14,18 +14,18 @@ import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
   final HomeStore homeStore;
+  final ListStore? followedStreamsStore;
   final ListStore topSectionStore;
   final CategoriesStore categoriesSectionStore;
   final SearchStore searchStore;
-  final ListStore? followedStreamsStore;
 
   const Home({
     Key? key,
     required this.homeStore,
+    required this.followedStreamsStore,
     required this.topSectionStore,
     required this.categoriesSectionStore,
     required this.searchStore,
-    required this.followedStreamsStore,
   }) : super(key: key);
 
   @override
@@ -42,9 +42,8 @@ class Home extends StatelessWidget {
               'Top',
               'Search',
             ];
-            return Text(
-              titles[homeStore.selectedIndex],
-            );
+
+            return Text(titles[homeStore.selectedIndex]);
           },
         ),
         actions: [
@@ -62,43 +61,39 @@ class Home extends StatelessWidget {
       ),
       body: SafeArea(
         child: Observer(
-          builder: (_) {
-            return IndexedStack(
-              index: homeStore.selectedIndex,
-              children: [
-                if (authStore.isLoggedIn) StreamsList(store: followedStreamsStore!),
-                TopSection(
-                  topSectionStore: topSectionStore,
-                  categoriesSectionStore: categoriesSectionStore,
-                ),
-                Search(searchStore: searchStore),
-              ],
-            );
-          },
+          builder: (_) => IndexedStack(
+            index: homeStore.selectedIndex,
+            children: [
+              if (authStore.isLoggedIn) StreamsList(store: followedStreamsStore!),
+              TopSection(
+                topSectionStore: topSectionStore,
+                categoriesSectionStore: categoriesSectionStore,
+              ),
+              Search(searchStore: searchStore),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: Observer(
-        builder: (_) {
-          return BottomNavigationBar(
-            items: [
-              if (authStore.isLoggedIn)
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite),
-                  label: 'Followed',
-                ),
+        builder: (_) => BottomNavigationBar(
+          items: [
+            if (authStore.isLoggedIn)
               const BottomNavigationBarItem(
-                icon: Icon(Icons.arrow_upward),
-                label: 'Top',
+                icon: Icon(Icons.favorite),
+                label: 'Followed',
               ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.search),
-                label: 'Search',
-              ),
-            ],
-            currentIndex: homeStore.selectedIndex,
-            onTap: homeStore.handleTap,
-          );
-        },
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.arrow_upward),
+              label: 'Top',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Search',
+            ),
+          ],
+          currentIndex: homeStore.selectedIndex,
+          onTap: homeStore.handleTap,
+        ),
       ),
     );
   }

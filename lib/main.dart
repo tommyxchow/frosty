@@ -159,6 +159,13 @@ class MyApp extends StatelessWidget {
                   : ThemeMode.dark,
           home: Home(
             homeStore: HomeStore(),
+            followedStreamsStore: authStore.isLoggedIn
+                ? ListStore(
+                    authStore: authStore,
+                    twitchApi: twitchApi,
+                    listType: ListType.followed,
+                  )
+                : null,
             topSectionStore: ListStore(
               authStore: authStore,
               twitchApi: twitchApi,
@@ -168,13 +175,6 @@ class MyApp extends StatelessWidget {
               authStore: authStore,
               twitchApi: twitchApi,
             ),
-            followedStreamsStore: authStore.isLoggedIn
-                ? ListStore(
-                    authStore: authStore,
-                    twitchApi: twitchApi,
-                    listType: ListType.followed,
-                  )
-                : null,
             searchStore: SearchStore(
               authStore: authStore,
               twitchApi: twitchApi,
