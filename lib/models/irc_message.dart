@@ -351,7 +351,7 @@ class IRCMessage {
               }
             } else {
               if (regexEmoji.hasMatch(word)) {
-                localSpan.add(_createTextSpan(text: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
+                localSpan.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
               } else {
                 localSpan.add(_createTextSpan(text: word, style: textStyle));
               }
@@ -374,7 +374,7 @@ class IRCMessage {
               );
             } else {
               if (regexEmoji.hasMatch(word)) {
-                span.add(_createTextSpan(text: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
+                span.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
               } else {
                 span.add(_createTextSpan(text: word, style: textStyle));
               }
@@ -385,6 +385,19 @@ class IRCMessage {
     }
 
     return span;
+  }
+
+  static WidgetSpan _createEmojiSpan({
+    required String emoji,
+    TextStyle? style,
+  }) {
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: Text(
+        emoji,
+        style: style,
+      ),
+    );
   }
 
   static Widget _createBadgeWidget({
