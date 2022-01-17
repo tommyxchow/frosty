@@ -69,7 +69,7 @@ class VideoOverlay extends StatelessWidget {
             Center(
               child: IconButton(
                 tooltip: 'Pause',
-                iconSize: 80.0,
+                iconSize: 50.0,
                 icon: const Icon(
                   Icons.pause,
                   color: Colors.white,
