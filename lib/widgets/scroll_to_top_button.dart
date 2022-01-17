@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ScrollToTopButton extends StatelessWidget {
   final ScrollController scrollController;
@@ -8,18 +9,20 @@ class ScrollToTopButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      label: const Text('Scroll to Top'),
-      onPressed: () {
-        HapticFeedback.lightImpact();
-        scrollController.animateTo(
-          0.0,
-          curve: Curves.fastOutSlowIn,
-          duration: const Duration(milliseconds: 500),
-        );
-      },
-      icon: const Icon(
-        Icons.arrow_circle_up,
+    return Tooltip(
+      message: 'Scroll to top',
+      preferBelow: false,
+      child: FloatingActionButton(
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          scrollController.animateTo(
+            0.0,
+            curve: Curves.fastOutSlowIn,
+            duration: const Duration(milliseconds: 500),
+          );
+        },
+        child: const FaIcon(Icons.arrow_drop_up),
+        mini: true,
       ),
     );
   }

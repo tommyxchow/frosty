@@ -16,7 +16,7 @@ class EmoteMenuPanel extends StatelessWidget {
             emote.type == EmoteType.twitchGlobal ||
             emote.type == EmoteType.bttvGlobal ||
             emote.type == EmoteType.ffzGlobal ||
-            emote.type == EmoteType.sevenTvGlobal)
+            emote.type == EmoteType.sevenTVGlobal)
         .toList();
 
     final channelEmotes = emotes
@@ -25,7 +25,7 @@ class EmoteMenuPanel extends StatelessWidget {
             emote.type == EmoteType.bttvChannel ||
             emote.type == EmoteType.bttvShared ||
             emote.type == EmoteType.ffzChannel ||
-            emote.type == EmoteType.sevenTvChannel)
+            emote.type == EmoteType.sevenTVChannel)
         .toList();
 
     final subEmotes = emotes.where((emote) => emote.type == EmoteType.twitchSub).toList();

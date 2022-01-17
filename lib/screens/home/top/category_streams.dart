@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
@@ -15,14 +16,34 @@ class CategoryStreams extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    final artWidth = (size.width * pixelRatio).toInt();
+    final artHeight = (artWidth * (4 / 3)).toInt();
+
+    final thumbnailWidth = (size.width * pixelRatio) ~/ 3;
+    final thumbnailHeight = (thumbnailWidth * (9 / 16)).toInt();
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.lightImpact();
           await store.refreshStreams();
+
+          if (store.error != null) {
+            final snackBar = SnackBar(
+              content: Text(store.error!),
+              behavior: SnackBarBehavior.floating,
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
         },
         child: Observer(
           builder: (context) {
+            if (store.streams.isEmpty && store.isLoading && store.error == null) {
+              return const LoadingIndicator(subtitle: Text('Loading streams...'));
+            }
             return Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: [
@@ -50,7 +71,7 @@ class CategoryStreams extends StatelessWidget {
                           imageUrl: store.categoryInfo!.boxArtUrl.replaceRange(
                             store.categoryInfo!.boxArtUrl.lastIndexOf('-') + 1,
                             null,
-                            '300x400.jpg',
+                            '${artWidth}x$artHeight.jpg',
                           ),
                           color: const Color.fromRGBO(255, 255, 255, 0.5),
                           colorBlendMode: BlendMode.modulate,
@@ -69,6 +90,8 @@ class CategoryStreams extends StatelessWidget {
                             return Observer(
                               builder: (context) => StreamCard(
                                 streamInfo: store.streams[index],
+                                width: thumbnailWidth,
+                                height: thumbnailHeight,
                                 showUptime: context.read<SettingsStore>().showThumbnailUptime,
                               ),
                             );

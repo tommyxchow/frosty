@@ -159,7 +159,7 @@ class Badge {
   factory Badge.from7TV(BadgeInfo7TV badge) => Badge(
         name: badge.tooltip,
         url: badge.urls[2][1],
-        type: BadgeType.sevenTv,
+        type: BadgeType.sevenTV,
       );
 }
 
@@ -167,5 +167,5 @@ enum BadgeType {
   twitch,
   bttv,
   ffz,
-  sevenTv,
+  sevenTV,
 }

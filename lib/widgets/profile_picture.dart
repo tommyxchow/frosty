@@ -18,7 +18,7 @@ class ProfilePicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Twitch.getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
+      future: context.read<TwitchApi>().getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
       builder: (context, AsyncSnapshot<UserTwitch?> snapshot) {
         return CircleAvatar(
           radius: radius,

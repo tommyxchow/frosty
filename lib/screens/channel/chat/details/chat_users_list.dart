@@ -78,7 +78,7 @@ class _ChattersListState extends State<ChattersList> {
                   icon: const Icon(Icons.clear),
                 ),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  borderRadius: BorderRadius.all(Radius.circular(15.0)),
                 ),
               ),
             ),
@@ -94,6 +94,19 @@ class _ChattersListState extends State<ChattersList> {
                 children: [
                   Observer(
                     builder: (context) {
+                      if (chatDetailStore.error != null) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('Failed to get chatters'),
+                            TextButton(
+                              onPressed: () => chatDetailStore.updateChatters(widget.userLogin),
+                              child: const Text('Try Again'),
+                            )
+                          ],
+                        );
+                      }
+
                       if (chatDetailStore.chatUsers == null) {
                         return const LoadingIndicator(subtitle: Text('Fetching chatters...'));
                       }

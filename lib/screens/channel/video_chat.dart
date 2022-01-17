@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/settings/settings.dart';
+import 'package:provider/provider.dart';
 
 class VideoChat extends StatefulWidget {
-  final String displayName;
   final ChatStore chatStore;
 
-  const VideoChat({
-    Key? key,
-    required this.displayName,
-    required this.chatStore,
-  }) : super(key: key);
+  const VideoChat({Key? key, required this.chatStore}) : super(key: key);
 
   @override
   _VideoChatState createState() => _VideoChatState();
@@ -31,6 +28,7 @@ class _VideoChatState extends State<VideoChat> {
       key: GlobalKey(),
       userLogin: chatStore.channelName,
       videoStore: VideoStore(
+        twitchApi: context.read<TwitchApi>(),
         userLogin: chatStore.channelName,
         authStore: chatStore.auth,
         settingsStore: chatStore.settings,
@@ -44,7 +42,7 @@ class _VideoChatState extends State<VideoChat> {
 
     final appBar = AppBar(
       title: Text(
-        widget.displayName,
+        chatStore.displayName,
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       actions: [

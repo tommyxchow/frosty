@@ -49,7 +49,7 @@ class EmoteMenu extends StatelessWidget {
               Observer(
                 builder: (_) => EmoteMenuPanel(
                   textController: textController,
-                  emotes: assetsStore.sevenTvEmotes,
+                  emotes: assetsStore.sevenTVEmotes,
                 ),
               ),
             ],

@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/bttv_api.dart';
+import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/seventv_api.dart';
+import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
@@ -27,9 +33,19 @@ class SearchResultsChannels extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => VideoChat(
-            displayName: channelInfo!.broadcasterName,
             chatStore: ChatStore(
               channelName: channelInfo.broadcasterLogin,
+              channelId: channelInfo.broadcasterId,
+              displayName: channelInfo.broadcasterName,
+              chatDetailsStore: ChatDetailsStore(
+                twitchApi: context.read<TwitchApi>(),
+              ),
+              assetsStore: ChatAssetsStore(
+                twitchApi: context.read<TwitchApi>(),
+                ffzApi: context.read<FFZApi>(),
+                bttvApi: context.read<BTTVApi>(),
+                sevenTVApi: context.read<SevenTVApi>(),
+              ),
               auth: searchStore.authStore,
               settings: context.read<SettingsStore>(),
             ),
@@ -37,8 +53,8 @@ class SearchResultsChannels extends StatelessWidget {
         ),
       );
     } catch (e) {
-      const snackBar = SnackBar(
-        content: Text('Failed to get channel info :('),
+      final snackBar = SnackBar(
+        content: Text(e.toString()),
         behavior: SnackBarBehavior.floating,
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -61,7 +77,7 @@ class SearchResultsChannels extends StatelessWidget {
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
               child: Center(
-                child: Text('Failed to fetch streams.'),
+                child: Text('Failed to get channels'),
               ),
             );
           case FutureStatus.fulfilled:
@@ -86,14 +102,26 @@ class SearchResultsChannels extends StatelessWidget {
                             ),
                           )
                         : null,
-                    subtitle: channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
+                    subtitle: channel.isLive
+                        ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}')
+                        : null,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => VideoChat(
-                          displayName: channel.displayName,
                           chatStore: ChatStore(
                             channelName: channel.broadcasterLogin,
+                            channelId: channel.id,
+                            displayName: channel.displayName,
+                            chatDetailsStore: ChatDetailsStore(
+                              twitchApi: context.read<TwitchApi>(),
+                            ),
+                            assetsStore: ChatAssetsStore(
+                              twitchApi: context.read<TwitchApi>(),
+                              ffzApi: context.read<FFZApi>(),
+                              bttvApi: context.read<BTTVApi>(),
+                              sevenTVApi: context.read<SevenTVApi>(),
+                            ),
                             auth: searchStore.authStore,
                             settings: context.read<SettingsStore>(),
                           ),

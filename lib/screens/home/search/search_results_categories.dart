@@ -13,6 +13,12 @@ class SearchResultsCategories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    final artWidth = (size.width * pixelRatio) ~/ 3;
+    final artHeight = (artWidth * (4 / 3)).toInt();
+
     return Observer(
       builder: (context) {
         final future = searchStore.categoryFuture;
@@ -27,7 +33,7 @@ class SearchResultsCategories extends StatelessWidget {
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
               child: Center(
-                child: Text('Failed to get categories.'),
+                child: Text('Failed to get categories'),
               ),
             );
           case FutureStatus.fulfilled:
@@ -36,7 +42,7 @@ class SearchResultsCategories extends StatelessWidget {
             if (categories == null) {
               return const SliverToBoxAdapter(
                 child: Center(
-                  child: Text('Failed to get categories.'),
+                  child: Text('Failed to get categories'),
                 ),
               );
             }
@@ -45,7 +51,7 @@ class SearchResultsCategories extends StatelessWidget {
               return const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 100.0,
-                  child: Center(child: Text('No matching categories.')),
+                  child: Center(child: Text('No matching categories')),
                 ),
               );
             }
@@ -56,7 +62,11 @@ class SearchResultsCategories extends StatelessWidget {
               children: categories.data
                   .map(
                     (category) => GridTile(
-                      child: CategoryCard(category: category),
+                      child: CategoryCard(
+                        category: category,
+                        width: artWidth,
+                        height: artHeight,
+                      ),
                     ),
                   )
                   .toList(),
