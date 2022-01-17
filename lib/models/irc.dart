@@ -189,6 +189,8 @@ class IRCMessage {
     // Add FFZ badges to span
     if (ffzUserBadges != null) {
       for (final badge in ffzUserBadges) {
+        final color = Color(int.parse(badge.color!.replaceFirst('#', '0xff')));
+
         if (badge.name == 'Bot') {
           if (!skipBot) {
             span.insert(
@@ -196,7 +198,7 @@ class IRCMessage {
               _createBadgeSpan(
                 badge: badge,
                 height: badgeHeight,
-                backgroundColor: HexColor.fromHex(badge.color!),
+                backgroundColor: color,
               ),
             );
             span.add(const TextSpan(text: ' '));
@@ -206,7 +208,7 @@ class IRCMessage {
             _createBadgeSpan(
               badge: badge,
               height: badgeHeight,
-              backgroundColor: HexColor.fromHex(badge.color!),
+              backgroundColor: color,
             ),
           );
           span.add(const TextSpan(text: ' '));
@@ -241,7 +243,7 @@ class IRCMessage {
       }
     }
 
-    var color = HexColor.fromHex(tags['color'] ?? '#868686');
+    var color = Color(int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xff')));
 
     if (useReadableColors) {
       final hsl = HSLColor.fromColor(color);
@@ -822,17 +824,6 @@ class USERSTATE {
         mod: ircMessage.tags['mod'] == '0' ? false : true,
         subscriber: ircMessage.tags['subscriber'] == '0' ? false : true,
       );
-}
-
-/// https://stackoverflow.com/questions/50081213/how-do-i-use-hexadecimal-color-strings-in-flutter
-extension HexColor on Color {
-  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
-  static Color fromHex(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
-  }
 }
 
 /// The possible types of Twitch IRC commands.
