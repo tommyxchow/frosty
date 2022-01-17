@@ -63,14 +63,14 @@ class _VideoChatState extends State<VideoChat> {
 
     return Scaffold(
       body: OrientationBuilder(
-        builder: (_, orientation) {
+        builder: (context, orientation) {
           if (orientation == Orientation.landscape) {
-            if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
             return Observer(
-              builder: (_) => ColoredBox(
+              builder: (context) => ColoredBox(
                 color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
                 child: SafeArea(
-                  bottom: settingsStore.fullScreen ? false : true,
+                  bottom: false,
                   child: settingsStore.showVideo
                       ? settingsStore.fullScreen
                           ? WillPopScope(
