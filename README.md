@@ -14,9 +14,25 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 - Watch live streams with chat
 - Support for BTTV, FFZ, and 7TV emotes/badges
 - View local chat user message history
+- See the list of users in chat and filter them
 - Theater and full-screen mode
 - Block and unblock users
+- Light, dark, and black (OLED) themes
 - Customizable settings
+
+## Screenshots
+
+<p>
+    <img src="screenshots/../assets/screenshots/followed.png" width="32%">
+    <img src="screenshots/../assets/screenshots/categories.png" width="32%">
+    <img src="screenshots/../assets/screenshots/search.png" width="32%">
+</p>
+
+<p>
+    <img src="screenshots/../assets/screenshots/lirik.png" width="32%">
+    <img src="screenshots/../assets/screenshots/soda.png" width="32%">
+    <img src="screenshots/../assets/screenshots/settings.png" width="32%">
+</p>
 
 ## Motivation
 
