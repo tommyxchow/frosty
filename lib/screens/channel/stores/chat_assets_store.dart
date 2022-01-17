@@ -14,7 +14,7 @@ abstract class _ChatAssetsStoreBase with Store {
   final TwitchApi twitchApi;
   final BTTVApi bttvApi;
   final FFZApi ffzApi;
-  final SevenTVApi sevenTvApi;
+  final SevenTVApi sevenTVApi;
 
   /// Contains any custom FFZ mod and vip badges for the channel.
   RoomFFZ? ffzRoomInfo;
@@ -26,7 +26,7 @@ abstract class _ChatAssetsStoreBase with Store {
   List<Emote> get ffzEmotes => _emoteToObject.values.where((emote) => isFFZ(emote)).toList();
 
   @computed
-  List<Emote> get sevenTvEmotes => _emoteToObject.values.where((emote) => is7TV(emote)).toList();
+  List<Emote> get sevenTVEmotes => _emoteToObject.values.where((emote) => is7TV(emote)).toList();
 
   /// The map of badges ids to their object representation.
   final twitchBadgesToObject = ObservableMap<String, Badge>();
@@ -68,14 +68,14 @@ abstract class _ChatAssetsStoreBase with Store {
   }
 
   bool is7TV(Emote emote) {
-    return emote.type == EmoteType.sevenTvChannel || emote.type == EmoteType.sevenTvGlobal;
+    return emote.type == EmoteType.sevenTVChannel || emote.type == EmoteType.sevenTVGlobal;
   }
 
   _ChatAssetsStoreBase({
     required this.twitchApi,
     required this.bttvApi,
     required this.ffzApi,
-    required this.sevenTvApi,
+    required this.sevenTVApi,
   });
 
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
@@ -119,8 +119,8 @@ abstract class _ChatAssetsStoreBase with Store {
         bttvApi.getEmotesChannel(id: channelId).catchError(onError),
         twitchApi.getEmotesGlobal(headers: headers).catchError(onError),
         twitchApi.getEmotesChannel(id: channelId, headers: headers).catchError(onError),
-        sevenTvApi.getEmotesGlobal().catchError(onError),
-        sevenTvApi.getEmotesChannel(user: channelName).catchError(onError),
+        sevenTVApi.getEmotesGlobal().catchError(onError),
+        sevenTVApi.getEmotesChannel(user: channelName).catchError(onError),
         ffzApi.getRoomInfo(name: channelName).then((ffzRoom) {
           ffzRoomInfo = ffzRoom.item1;
           return ffzRoom.item2;
@@ -139,7 +139,7 @@ abstract class _ChatAssetsStoreBase with Store {
             .then((badges) => twitchBadgesToObject.addAll(badges))
             .then((_) => twitchApi.getBadgesChannel(id: channelId).then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError)),
         ffzApi.getBadges().then((badges) => _userToFFZBadges = badges).catchError(onError),
-        sevenTvApi.getBadges().then((badges) => _userTo7TVBadges = badges).catchError(onError),
+        sevenTVApi.getBadges().then((badges) => _userTo7TVBadges = badges).catchError(onError),
         bttvApi.getBadges().then((badges) => _userToBTTVBadges = badges).catchError(onError),
       ]);
 

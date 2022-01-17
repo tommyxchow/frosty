@@ -19,7 +19,7 @@ class SevenTVApi {
       final decoded = jsonDecode(response.body) as List;
       final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
 
-      return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTvGlobal)).toList();
+      return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTVGlobal)).toList();
     } else {
       return Future.error('Failed to get 7TV global emotes');
     }
@@ -34,7 +34,7 @@ class SevenTVApi {
       final decoded = jsonDecode(response.body) as List;
       final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
 
-      return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTvChannel)).toList();
+      return emotes.map((emote) => Emote.from7TV(emote, EmoteType.sevenTVChannel)).toList();
     } else {
       return Future.error('Failed to get 7TV channel emotes');
     }

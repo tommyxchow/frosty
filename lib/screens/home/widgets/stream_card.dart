@@ -58,7 +58,7 @@ class StreamCard extends StatelessWidget {
                 twitchApi: context.read<TwitchApi>(),
                 ffzApi: context.read<FFZApi>(),
                 bttvApi: context.read<BTTVApi>(),
-                sevenTvApi: context.read<SevenTVApi>(),
+                sevenTVApi: context.read<SevenTVApi>(),
               ),
             ),
           ),

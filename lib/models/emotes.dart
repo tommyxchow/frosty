@@ -315,6 +315,6 @@ enum EmoteType {
   bttvGlobal,
   bttvChannel,
   bttvShared,
-  sevenTvGlobal,
-  sevenTvChannel,
+  sevenTVGlobal,
+  sevenTVChannel,
 }

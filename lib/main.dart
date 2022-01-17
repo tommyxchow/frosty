@@ -45,7 +45,7 @@ Future<void> main() async {
   final twitchApiService = TwitchApi(client);
   final bttvApiService = BTTVApi(client);
   final ffzApiService = FFZApi(client);
-  final sevenTvApiService = SevenTVApi(client);
+  final sevenTVApiService = SevenTVApi(client);
 
   // Create and initialize the authentication store
   final authStore = AuthStore(twitchApi: twitchApiService);
@@ -59,7 +59,7 @@ Future<void> main() async {
         Provider<TwitchApi>(create: (_) => twitchApiService),
         Provider<BTTVApi>(create: (_) => bttvApiService),
         Provider<FFZApi>(create: (_) => ffzApiService),
-        Provider<SevenTVApi>(create: (_) => sevenTvApiService),
+        Provider<SevenTVApi>(create: (_) => sevenTVApiService),
       ],
       child: const MyApp(),
     ),

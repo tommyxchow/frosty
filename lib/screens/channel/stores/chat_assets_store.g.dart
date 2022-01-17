@@ -23,12 +23,12 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
       (_$ffzEmotesComputed ??= Computed<List<Emote>>(() => super.ffzEmotes,
               name: '_ChatAssetsStoreBase.ffzEmotes'))
           .value;
-  Computed<List<Emote>>? _$sevenTvEmotesComputed;
+  Computed<List<Emote>>? _$sevenTVEmotesComputed;
 
   @override
-  List<Emote> get sevenTvEmotes => (_$sevenTvEmotesComputed ??=
-          Computed<List<Emote>>(() => super.sevenTvEmotes,
-              name: '_ChatAssetsStoreBase.sevenTvEmotes'))
+  List<Emote> get sevenTVEmotes => (_$sevenTVEmotesComputed ??=
+          Computed<List<Emote>>(() => super.sevenTVEmotes,
+              name: '_ChatAssetsStoreBase.sevenTVEmotes'))
       .value;
 
   final _$_emoteToObjectAtom =
@@ -232,7 +232,7 @@ emoteMenuIndex: ${emoteMenuIndex},
 showEmoteMenu: ${showEmoteMenu},
 bttvEmotes: ${bttvEmotes},
 ffzEmotes: ${ffzEmotes},
-sevenTvEmotes: ${sevenTvEmotes}
+sevenTVEmotes: ${sevenTVEmotes}
     ''';
   }
 }
