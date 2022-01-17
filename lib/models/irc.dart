@@ -189,7 +189,7 @@ class IRCMessage {
     // Add FFZ badges to span
     if (ffzUserBadges != null) {
       for (final badge in ffzUserBadges) {
-        final color = Color(int.parse(badge.color!.replaceFirst('#', '0xff')));
+        final color = Color(int.parse(badge.color!.replaceFirst('#', '0xFF')));
 
         if (badge.name == 'Bot') {
           if (!skipBot) {
@@ -243,7 +243,7 @@ class IRCMessage {
       }
     }
 
-    var color = Color(int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xff')));
+    var color = Color(int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xFF')));
 
     if (useReadableColors) {
       final hsl = HSLColor.fromColor(color);

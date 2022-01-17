@@ -54,7 +54,7 @@ class ChatBottomBar extends StatelessWidget {
                 hintMaxLines: 1,
                 contentPadding: const EdgeInsets.all(10.0),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  borderRadius: BorderRadius.all(Radius.circular(15.0)),
                 ),
                 hintText: chatStore.auth.isLoggedIn ? 'Send a message' : "Log in to chat",
               ),

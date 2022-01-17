@@ -35,7 +35,7 @@ class _SearchState extends State<Search> {
               hintText: 'Search for a channel or category',
               contentPadding: const EdgeInsets.all(10.0),
               border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                borderRadius: BorderRadius.all(Radius.circular(15.0)),
               ),
               suffixIcon: IconButton(
                 tooltip: 'Clear Search',
@@ -48,9 +48,7 @@ class _SearchState extends State<Search> {
                 icon: const Icon(Icons.clear),
               ),
             ),
-            onSubmitted: (query) => setState(() {
-              searchStore.handleQuery(query);
-            }),
+            onSubmitted: (query) => setState(() => searchStore.handleQuery(query)),
           ),
         ),
         Expanded(
