@@ -5,9 +5,7 @@
 
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
 
-**Now available on [TestFlight](https://testflight.apple.com/join/UZLoznpr)!**
-
-Coming to the Play Store soon!
+**Beta now available on [TestFlight (iOS)](https://testflight.apple.com/join/UZLoznpr) and [Play Store (Android)](https://play.google.com/store/apps/details?id=com.tommychow.frosty)!**
 
 ## Features
 
@@ -28,7 +26,7 @@ As a result, the millions of users of these services have an unideal viewing exp
 
 Frosty aims to bring these emotes and other general quality of life features to **both iOS and Android**.
 
-## Setup
+## Development Setup
 
 1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **client ID** and **client secret** and add a **OAuth redirect URL**.
 
