@@ -112,8 +112,10 @@ class _VideoChatState extends State<VideoChat> {
             );
           }
 
-          settingsStore.fullScreen = false;
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.manual,
+            overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+          );
           return SafeArea(
             child: Column(
               children: [
