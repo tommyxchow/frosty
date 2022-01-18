@@ -391,7 +391,8 @@ class TwitchApi {
 
         return result;
       } else {
-        return Future.error('User does not have anyone blocked');
+        debugPrint('User does not have anyone blocked');
+        return [];
       }
     } else {
       return Future.error('User does not exist');

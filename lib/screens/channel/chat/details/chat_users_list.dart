@@ -108,7 +108,7 @@ class _ChattersListState extends State<ChattersList> {
                       }
 
                       if (chatDetailStore.chatUsers == null) {
-                        return const LoadingIndicator(subtitle: Text('Fetching chatters...'));
+                        return const LoadingIndicator(subtitle: Text('Getting chatters...'));
                       }
 
                       return CustomScrollView(
