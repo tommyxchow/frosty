@@ -52,73 +52,70 @@ class _SearchState extends State<Search> {
           ),
         ),
         Expanded(
-          child: GestureDetector(
-            onTap: FocusManager.instance.primaryFocus?.unfocus,
-            child: Observer(
-              builder: (context) {
-                if (textEditingController.text.isEmpty || searchStore.channelFuture == null || searchStore.categoryFuture == null) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (searchStore.searchHistory.isNotEmpty)
-                        const Padding(
-                          padding: EdgeInsets.all(15.0),
-                          child: Text(
-                            'HISTORY',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
+          child: Observer(
+            builder: (context) {
+              if (textEditingController.text.isEmpty || searchStore.channelFuture == null || searchStore.categoryFuture == null) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (searchStore.searchHistory.isNotEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Text(
+                          'HISTORY',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      Expanded(
-                        child: ListView(
-                          children: searchStore.searchHistory
-                              .mapIndexed(
-                                (index, searchTerm) => ListTile(
-                                  leading: const Icon(Icons.history),
-                                  title: Text(searchTerm),
-                                  trailing: IconButton(
-                                    tooltip: 'Remove',
-                                    icon: const Icon(Icons.cancel),
-                                    onPressed: () => setState(() {
-                                      searchStore.searchHistory.removeAt(index);
-                                    }),
-                                  ),
-                                  onTap: () {
-                                    setState(() {
-                                      textEditingController.text = searchTerm;
-                                      searchStore.handleQuery(searchTerm);
-                                    });
-                                  },
+                      ),
+                    Expanded(
+                      child: ListView(
+                        children: searchStore.searchHistory
+                            .mapIndexed(
+                              (index, searchTerm) => ListTile(
+                                leading: const Icon(Icons.history),
+                                title: Text(searchTerm),
+                                trailing: IconButton(
+                                  tooltip: 'Remove',
+                                  icon: const Icon(Icons.cancel),
+                                  onPressed: () => setState(() {
+                                    searchStore.searchHistory.removeAt(index);
+                                  }),
                                 ),
-                              )
-                              .toList(),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-                return CustomScrollView(
-                  slivers: [
-                    const SliverToBoxAdapter(
-                      child: SectionHeader(
-                        'Channels',
-                        padding: headerPadding,
+                                onTap: () {
+                                  setState(() {
+                                    textEditingController.text = searchTerm;
+                                    searchStore.handleQuery(searchTerm);
+                                  });
+                                },
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
-                    SearchResultsChannels(
-                      searchStore: searchStore,
-                      query: textEditingController.text,
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SectionHeader(
-                        'Categories',
-                        padding: headerPadding,
-                      ),
-                    ),
-                    SearchResultsCategories(searchStore: searchStore),
                   ],
                 );
-              },
-            ),
+              }
+              return CustomScrollView(
+                slivers: [
+                  const SliverToBoxAdapter(
+                    child: SectionHeader(
+                      'Channels',
+                      padding: headerPadding,
+                    ),
+                  ),
+                  SearchResultsChannels(
+                    searchStore: searchStore,
+                    query: textEditingController.text,
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SectionHeader(
+                      'Categories',
+                      padding: headerPadding,
+                    ),
+                  ),
+                  SearchResultsCategories(searchStore: searchStore),
+                ],
+              );
+            },
           ),
         ),
       ],
