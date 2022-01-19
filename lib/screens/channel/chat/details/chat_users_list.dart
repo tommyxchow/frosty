@@ -69,9 +69,9 @@ class _ChattersListState extends State<ChattersList> {
               suffixIcon: IconButton(
                 tooltip: 'Clear Filter',
                 onPressed: () {
+                  FocusScope.of(context).unfocus();
                   chatDetailStore.filterText = '';
                   _textController.clear();
-                  FocusManager.instance.primaryFocus?.unfocus();
                 },
                 icon: const Icon(Icons.clear),
               ),

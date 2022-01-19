@@ -39,7 +39,7 @@ class Chat extends StatelessWidget {
                             if (message.user != null && message.user != chatStore.auth.user.details?.login) {
                               return InkWell(
                                 onTap: () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
+                                  FocusScope.of(context).unfocus();
                                   if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                                 },
                                 onLongPress: () => showModalBottomSheet(

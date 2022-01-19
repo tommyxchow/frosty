@@ -33,7 +33,7 @@ class Home extends StatelessWidget {
     final authStore = context.read<AuthStore>();
 
     return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+      onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
         appBar: AppBar(
           centerTitle: false,

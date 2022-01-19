@@ -40,10 +40,10 @@ class _SearchState extends State<Search> {
               suffixIcon: IconButton(
                 tooltip: 'Clear Search',
                 onPressed: () {
+                  FocusScope.of(context).unfocus();
                   setState(() {
                     textEditingController.clear();
                   });
-                  FocusManager.instance.primaryFocus?.unfocus();
                 },
                 icon: const Icon(Icons.clear),
               ),

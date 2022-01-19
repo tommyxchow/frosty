@@ -46,7 +46,7 @@ class ChatBottomBar extends StatelessWidget {
                   tooltip: 'Emote Menu',
                   icon: const Icon(Icons.emoji_emotions_outlined),
                   onPressed: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
+                    FocusScope.of(context).unfocus();
                     chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
                   },
                 ),

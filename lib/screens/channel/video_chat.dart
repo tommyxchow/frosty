@@ -56,12 +56,8 @@ class _VideoChatState extends State<VideoChat> {
       onTap: () {
         if (chatStore.assetsStore.showEmoteMenu) {
           chatStore.assetsStore.showEmoteMenu = false;
-        } else {
-          if (chatStore.textFieldFocusNode.hasFocus) {
-            chatStore.textFieldFocusNode.unfocus();
-          } else {
-            videoStore.handleVideoTap();
-          }
+        } else if (chatStore.textFieldFocusNode.hasFocus) {
+          chatStore.textFieldFocusNode.unfocus();
         }
       },
       child: Chat(
