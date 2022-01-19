@@ -28,6 +28,7 @@ class _VideoChatState extends State<VideoChat> {
     final video = Video(
       key: GlobalKey(),
       userLogin: chatStore.channelName,
+      textFieldFocus: chatStore.textFieldFocusNode,
       videoStore: VideoStore(
         twitchApi: context.read<TwitchApi>(),
         userLogin: chatStore.channelName,
