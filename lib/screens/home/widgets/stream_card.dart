@@ -4,6 +4,7 @@ import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
@@ -102,7 +103,7 @@ class StreamCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 5.0),
                         Text(
-                          streamInfo.userName,
+                          regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})',
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],

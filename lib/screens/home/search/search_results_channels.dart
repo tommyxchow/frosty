@@ -4,6 +4,7 @@ import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
@@ -87,7 +88,8 @@ class SearchResultsChannels extends StatelessWidget {
               delegate: SliverChildListDelegate.fixed([
                 ...results.map(
                   (channel) => ListTile(
-                    title: Text(channel.displayName),
+                    title: Text(
+                        regexEnglish.hasMatch(channel.displayName) ? channel.displayName : channel.displayName + ' (${channel.broadcasterLogin})'),
                     leading: ProfilePicture(userLogin: channel.broadcasterLogin),
                     trailing: channel.isLive
                         ? ClipRRect(

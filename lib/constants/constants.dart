@@ -21,3 +21,6 @@ const zeroWidthEmotes = [
   "cvMask",
   "cvHazmat",
 ];
+
+// Regex for matching strings that contain lower or upper case English characters.
+final regexEnglish = RegExp(r'[a-zA-Z]');
