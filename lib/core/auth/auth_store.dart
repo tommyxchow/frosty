@@ -106,8 +106,8 @@ abstract class _AuthBase with Store {
         );
 
         // Parse the user token from the redirect URI fragment.
-        final fragment = Uri.parse(result).fragment;
-        _token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
+        final url = Uri.parse(result.replaceFirst('#', '?'));
+        _token = url.queryParameters['access_token'];
       } else {
         _token = customToken;
       }
