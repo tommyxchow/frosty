@@ -132,7 +132,8 @@ abstract class _AuthBase with Store {
   @action
   Future<void> logout() async {
     try {
-      // Delete the existing user token.
+      // Revoke the existing user token and delete it.
+      await twitchApi.revokeToken(token: _token!);
       await _storage.delete(key: 'USER_TOKEN');
       _token = null;
 
@@ -159,12 +160,12 @@ abstract class _AuthBase with Store {
           _tokenIsValid = await twitchApi.validateToken(token: _token!);
         }
       }
+      // Set the login status to logged out.
+      _isLoggedIn = false;
+
+      debugPrint('Successfully logged out');
     } catch (e) {
       debugPrint(e.toString());
     }
-    // Set the login status to logged out.
-    _isLoggedIn = false;
-
-    debugPrint('Successfully logged out');
   }
 }
