@@ -18,18 +18,17 @@ class VideoOverlay extends StatelessWidget {
     return Observer(
       builder: (context) => Stack(
         children: [
-          if (!videoStore.settingsStore.fullScreen)
-            Align(
-              alignment: Alignment.topLeft,
-              child: IconButton(
-                tooltip: 'Back',
-                icon: Icon(
-                  Icons.adaptive.arrow_back,
-                  color: Colors.white,
-                ),
-                onPressed: Navigator.of(context).pop,
+          Align(
+            alignment: Alignment.topLeft,
+            child: IconButton(
+              tooltip: 'Back',
+              icon: Icon(
+                Icons.adaptive.arrow_back,
+                color: Colors.white,
               ),
+              onPressed: Navigator.of(context).pop,
             ),
+          ),
           Align(
             alignment: Alignment.topRight,
             child: IconButton(

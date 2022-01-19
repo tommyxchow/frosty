@@ -73,18 +73,15 @@ class _VideoChatState extends State<VideoChat> {
                   bottom: false,
                   child: settingsStore.showVideo
                       ? settingsStore.fullScreen
-                          ? WillPopScope(
-                              onWillPop: () async => false,
-                              child: Stack(
-                                children: [
-                                  Visibility(
-                                    visible: false,
-                                    maintainState: true,
-                                    child: chat,
-                                  ),
-                                  Center(child: video),
-                                ],
-                              ),
+                          ? Stack(
+                              children: [
+                                Visibility(
+                                  visible: false,
+                                  maintainState: true,
+                                  child: chat,
+                                ),
+                                Center(child: video),
+                              ],
                             )
                           : Row(
                               children: [
@@ -141,6 +138,12 @@ class _VideoChatState extends State<VideoChat> {
   @override
   void dispose() {
     widget.chatStore.dispose();
+
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+    );
+
     super.dispose();
   }
 }
