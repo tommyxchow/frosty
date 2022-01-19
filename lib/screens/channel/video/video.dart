@@ -58,34 +58,25 @@ class Video extends StatelessWidget {
                         ),
                       },
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        if (textFieldFocus.hasFocus) {
-                          textFieldFocus.unfocus();
-                        } else {
-                          videoStore.handleVideoTap();
-                        }
-                      },
-                      child: Observer(
-                        builder: (_) {
-                          if (videoStore.paused) return VideoOverlay(videoStore: videoStore);
-                          return SizedBox.expand(
-                            child: Observer(
-                              builder: (_) => AnimatedOpacity(
-                                opacity: videoStore.overlayVisible ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 200),
-                                child: ColoredBox(
-                                  color: const Color.fromRGBO(0, 0, 0, 0.5),
-                                  child: IgnorePointer(
-                                    ignoring: !videoStore.overlayVisible,
-                                    child: VideoOverlay(videoStore: videoStore),
-                                  ),
+                    Observer(
+                      builder: (_) {
+                        if (videoStore.paused) return VideoOverlay(videoStore: videoStore);
+                        return SizedBox.expand(
+                          child: Observer(
+                            builder: (_) => AnimatedOpacity(
+                              opacity: videoStore.overlayVisible ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 200),
+                              child: ColoredBox(
+                                color: const Color.fromRGBO(0, 0, 0, 0.5),
+                                child: IgnorePointer(
+                                  ignoring: !videoStore.overlayVisible,
+                                  child: VideoOverlay(videoStore: videoStore),
                                 ),
                               ),
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     )
                   ],
                 );

@@ -25,21 +25,49 @@ class _VideoChatState extends State<VideoChat> {
     final chatStore = widget.chatStore;
     final settingsStore = chatStore.settings;
 
-    final video = Video(
-      key: GlobalKey(),
+    final videoStore = VideoStore(
+      twitchApi: context.read<TwitchApi>(),
       userLogin: chatStore.channelName,
-      textFieldFocus: chatStore.textFieldFocusNode,
-      videoStore: VideoStore(
-        twitchApi: context.read<TwitchApi>(),
+      authStore: chatStore.auth,
+      settingsStore: chatStore.settings,
+    );
+
+    final video = GestureDetector(
+      onTap: () {
+        if (chatStore.assetsStore.showEmoteMenu) {
+          chatStore.assetsStore.showEmoteMenu = false;
+        } else {
+          if (chatStore.textFieldFocusNode.hasFocus) {
+            chatStore.textFieldFocusNode.unfocus();
+          } else {
+            videoStore.handleVideoTap();
+          }
+        }
+      },
+      child: Video(
+        key: GlobalKey(),
         userLogin: chatStore.channelName,
-        authStore: chatStore.auth,
-        settingsStore: chatStore.settings,
+        textFieldFocus: chatStore.textFieldFocusNode,
+        videoStore: videoStore,
       ),
     );
 
-    final chat = Chat(
-      key: GlobalKey(),
-      chatStore: chatStore,
+    final chat = GestureDetector(
+      onTap: () {
+        if (chatStore.assetsStore.showEmoteMenu) {
+          chatStore.assetsStore.showEmoteMenu = false;
+        } else {
+          if (chatStore.textFieldFocusNode.hasFocus) {
+            chatStore.textFieldFocusNode.unfocus();
+          } else {
+            videoStore.handleVideoTap();
+          }
+        }
+      },
+      child: Chat(
+        key: GlobalKey(),
+        chatStore: chatStore,
+      ),
     );
 
     final appBar = AppBar(
