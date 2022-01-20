@@ -4,6 +4,7 @@ import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
@@ -39,6 +40,8 @@ class StreamCard extends StatelessWidget {
       imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${width}x$height') + cacheUrlExtension,
       useOldImageOnUrlChange: true,
     );
+
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})';
 
     return InkWell(
       onTap: () => Navigator.push(
@@ -101,9 +104,16 @@ class StreamCard extends StatelessWidget {
                           radius: 10.0,
                         ),
                         const SizedBox(width: 5.0),
-                        Text(
-                          streamInfo.userName,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Tooltip(
+                            message: streamerName,
+                            preferBelow: false,
+                            child: Text(
+                              streamerName,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ],
                     ),

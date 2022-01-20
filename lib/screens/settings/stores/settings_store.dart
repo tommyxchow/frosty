@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
 
@@ -89,19 +88,6 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: true)
   @observable
   var expandInfo = true;
-
-  _SettingsStoreBase() {
-    // A MobX reaction that will toggle immersive mode whenever the user enters and exits fullscreen mode.
-    reaction(
-      (_) => fullScreen,
-      (bool isFullscreen) => isFullscreen == true
-          ? SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky)
-          : SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.manual,
-              overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
-            ),
-    );
-  }
 }
 
 enum ThemeType {

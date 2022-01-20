@@ -17,16 +17,18 @@ class Chat extends StatelessWidget {
       builder: (context) => Column(
         children: [
           Expanded(
-            child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    // If tapping chat, hide the keyboard and emote menu.
-                    FocusManager.instance.primaryFocus?.unfocus();
-                    if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
-                  },
-                  child: MediaQuery(
+            child: GestureDetector(
+              onTap: () {
+                if (chatStore.assetsStore.showEmoteMenu) {
+                  chatStore.assetsStore.showEmoteMenu = false;
+                } else if (chatStore.textFieldFocusNode.hasFocus) {
+                  chatStore.textFieldFocusNode.unfocus();
+                }
+              },
+              child: Stack(
+                alignment: AlignmentDirectional.bottomCenter,
+                children: [
+                  MediaQuery(
                     data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.messageScale),
                     child: DefaultTextStyle(
                       style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
@@ -45,7 +47,7 @@ class Chat extends StatelessWidget {
                               if (message.user != null && message.user != chatStore.auth.user.details?.login) {
                                 return InkWell(
                                   onTap: () {
-                                    FocusManager.instance.primaryFocus?.unfocus();
+                                    FocusScope.of(context).unfocus();
                                     if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                                   },
                                   onLongPress: () => showModalBottomSheet(
@@ -75,24 +77,24 @@ class Chat extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-                Observer(
-                  builder: (_) => AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 200),
-                    child: chatStore.autoScroll
-                        ? null
-                        : Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: chatStore.resumeScroll,
-                              label: const Text('Resume Scroll'),
-                              icon: const Icon(Icons.arrow_circle_down),
+                  Observer(
+                    builder: (_) => AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: chatStore.autoScroll
+                          ? null
+                          : Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: chatStore.resumeScroll,
+                                label: const Text('Resume Scroll'),
+                                icon: const Icon(Icons.arrow_circle_down),
+                              ),
                             ),
-                          ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           ChatBottomBar(chatStore: chatStore),

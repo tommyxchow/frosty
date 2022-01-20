@@ -6,11 +6,13 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class Video extends StatelessWidget {
   final String userLogin;
+  final FocusNode textFieldFocus;
   final VideoStore videoStore;
 
   const Video({
     Key? key,
     required this.userLogin,
+    required this.textFieldFocus,
     required this.videoStore,
   }) : super(key: key);
 
@@ -18,7 +20,8 @@ class Video extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) => GestureDetector(
-        onLongPress: videoStore.settingsStore.toggleableOverlay ? () => videoStore.settingsStore.showOverlay = !videoStore.settingsStore.showOverlay : null,
+        onLongPress:
+            videoStore.settingsStore.toggleableOverlay ? () => videoStore.settingsStore.showOverlay = !videoStore.settingsStore.showOverlay : null,
         child: AspectRatio(
           aspectRatio: 16 / 9,
           child: Observer(
@@ -56,27 +59,20 @@ class Video extends StatelessWidget {
                       },
                     ),
                     Observer(
-                      builder: (context) {
-                        if (videoStore.paused) {
-                          return VideoOverlay(videoStore: videoStore);
-                        }
-                        return GestureDetector(
-                          onTap: videoStore.handleVideoTap,
-                          child: SizedBox.expand(
-                            child: Observer(
-                              builder: (context) {
-                                return AnimatedOpacity(
-                                  opacity: videoStore.overlayVisible ? 1.0 : 0.0,
-                                  duration: const Duration(milliseconds: 200),
-                                  child: ColoredBox(
-                                    color: const Color.fromRGBO(0, 0, 0, 0.5),
-                                    child: IgnorePointer(
-                                      ignoring: !videoStore.overlayVisible,
-                                      child: VideoOverlay(videoStore: videoStore),
-                                    ),
-                                  ),
-                                );
-                              },
+                      builder: (_) {
+                        if (videoStore.paused) return VideoOverlay(videoStore: videoStore);
+                        return SizedBox.expand(
+                          child: Observer(
+                            builder: (_) => AnimatedOpacity(
+                              opacity: videoStore.overlayVisible ? 1.0 : 0.0,
+                              duration: const Duration(milliseconds: 200),
+                              child: ColoredBox(
+                                color: const Color.fromRGBO(0, 0, 0, 0.5),
+                                child: IgnorePointer(
+                                  ignoring: !videoStore.overlayVisible,
+                                  child: VideoOverlay(videoStore: videoStore),
+                                ),
+                              ),
                             ),
                           ),
                         );

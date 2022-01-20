@@ -161,6 +161,20 @@ class TwitchApi {
     }
   }
 
+  /// Revokes the given [token] and returns a bool indicating success.
+  Future<bool> revokeToken({required String token}) async {
+    final url = Uri.parse('https://id.twitch.tv/oauth2/revoke');
+
+    final response = await _client.post(url, body: {'client_id': clientId, 'token': token});
+    if (response.statusCode == 200) {
+      debugPrint('Token revoked!');
+      return true;
+    } else {
+      debugPrint('Failed to revoke token :(');
+      return false;
+    }
+  }
+
   /// Returns a [StreamsTwitch] object that contains the top 20 streams and a cursor for further requests.
   Future<StreamsTwitch> getTopStreams({
     required Map<String, String> headers,
@@ -391,7 +405,8 @@ class TwitchApi {
 
         return result;
       } else {
-        return Future.error('User does not have anyone blocked');
+        debugPrint('User does not have anyone blocked');
+        return [];
       }
     } else {
       return Future.error('User does not exist');

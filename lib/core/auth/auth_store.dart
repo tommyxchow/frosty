@@ -106,8 +106,8 @@ abstract class _AuthBase with Store {
         );
 
         // Parse the user token from the redirect URI fragment.
-        final fragment = Uri.parse(result).fragment;
-        _token = fragment.substring(fragment.indexOf('=') + 1, fragment.indexOf('&'));
+        final url = Uri.parse(result.replaceFirst('#', '?'));
+        _token = url.queryParameters['access_token'];
       } else {
         _token = customToken;
       }
@@ -132,7 +132,8 @@ abstract class _AuthBase with Store {
   @action
   Future<void> logout() async {
     try {
-      // Delete the existing user token.
+      // Revoke the existing user token and delete it.
+      await twitchApi.revokeToken(token: _token!);
       await _storage.delete(key: 'USER_TOKEN');
       _token = null;
 
@@ -159,12 +160,12 @@ abstract class _AuthBase with Store {
           _tokenIsValid = await twitchApi.validateToken(token: _token!);
         }
       }
+      // Set the login status to logged out.
+      _isLoggedIn = false;
+
+      debugPrint('Successfully logged out');
     } catch (e) {
       debugPrint(e.toString());
     }
-    // Set the login status to logged out.
-    _isLoggedIn = false;
-
-    debugPrint('Successfully logged out');
   }
 }

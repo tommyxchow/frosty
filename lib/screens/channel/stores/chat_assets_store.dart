@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/seventv_api.dart';
@@ -5,6 +7,7 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:mobx/mobx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'chat_assets_store.g.dart';
 
@@ -30,6 +33,9 @@ abstract class _ChatAssetsStoreBase with Store {
 
   /// The map of badges ids to their object representation.
   final twitchBadgesToObject = ObservableMap<String, Badge>();
+
+  @readonly
+  var _recentEmotes = ObservableList<Emote>();
 
   /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
   @readonly
@@ -71,12 +77,28 @@ abstract class _ChatAssetsStoreBase with Store {
     return emote.type == EmoteType.sevenTVChannel || emote.type == EmoteType.sevenTVGlobal;
   }
 
+  late final ReactionDisposer _disposeReaction;
+
   _ChatAssetsStoreBase({
     required this.twitchApi,
     required this.bttvApi,
     required this.ffzApi,
     required this.sevenTVApi,
   });
+
+  @action
+  Future<void> init() async {
+    // Retrieve the instance that will allow us to retrieve local search history.
+    final prefs = await SharedPreferences.getInstance();
+
+    _recentEmotes = prefs.getStringList('recent_emotes')?.map((emoteJson) => Emote.fromJson(jsonDecode(emoteJson))).toList().asObservable() ??
+        ObservableList<Emote>();
+
+    _disposeReaction = autorun((_) {
+      if (_recentEmotes.length > 48) _recentEmotes.removeLast();
+      prefs.setStringList('recent_emotes', _recentEmotes.map((emote) => jsonEncode(emote)).toList());
+    });
+  }
 
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
   @action
@@ -152,4 +174,6 @@ abstract class _ChatAssetsStoreBase with Store {
       Future.wait(emoteSets.map((setId) => twitchApi.getEmotesSets(setId: setId, headers: headers).catchError(onError)))
           .then((emotes) => emotes.expand((list) => list).toList())
           .then((userEmotes) => _userEmoteToObject = {for (final emote in userEmotes) emote.name: emote}.asObservable());
+
+  void dispose() => _disposeReaction();
 }

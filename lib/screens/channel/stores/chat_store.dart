@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
@@ -94,6 +95,8 @@ abstract class _ChatStoreBase with Store {
       });
     });
 
+    assetsStore.init();
+
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     reconnect();
@@ -183,7 +186,8 @@ abstract class _ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messages.add(IRCMessage.createNotice(message: "Connected to $displayName's chat!"));
+        _messages
+            .add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
         // Fetch the assets used in chat including badges and emotes.
         assetsStore.assetsFuture(
@@ -315,5 +319,6 @@ abstract class _ChatStoreBase with Store {
     disposeEmoteMenuReaction();
     textController.dispose();
     scrollController.dispose();
+    assetsStore.dispose();
   }
 }

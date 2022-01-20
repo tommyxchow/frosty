@@ -40,85 +40,83 @@ class _SearchState extends State<Search> {
               suffixIcon: IconButton(
                 tooltip: 'Clear Search',
                 onPressed: () {
+                  FocusScope.of(context).unfocus();
                   setState(() {
                     textEditingController.clear();
                   });
-                  FocusManager.instance.primaryFocus?.unfocus();
                 },
                 icon: const Icon(Icons.clear),
               ),
             ),
-            onSubmitted: (query) => setState(() => searchStore.handleQuery(query)),
+            onSubmitted: searchStore.handleQuery,
           ),
         ),
         Expanded(
-          child: GestureDetector(
-              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-              child: Observer(
-                builder: (context) {
-                  if (textEditingController.text.isEmpty || searchStore.channelFuture == null || searchStore.categoryFuture == null) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (searchStore.searchHistory.isNotEmpty)
-                          const Padding(
-                            padding: EdgeInsets.all(15.0),
-                            child: Text(
-                              'HISTORY',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        Expanded(
-                          child: ListView(
-                            children: searchStore.searchHistory
-                                .mapIndexed(
-                                  (index, searchTerm) => ListTile(
-                                    leading: const Icon(Icons.history),
-                                    title: Text(searchTerm),
-                                    trailing: IconButton(
-                                      tooltip: 'Remove',
-                                      icon: const Icon(Icons.cancel),
-                                      onPressed: () => setState(() {
-                                        searchStore.searchHistory.removeAt(index);
-                                      }),
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        textEditingController.text = searchTerm;
-                                        searchStore.handleQuery(searchTerm);
-                                      });
-                                    },
-                                  ),
-                                )
-                                .toList(),
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                  return CustomScrollView(
-                    slivers: [
-                      const SliverToBoxAdapter(
-                        child: SectionHeader(
-                          'Channels',
-                          padding: headerPadding,
+          child: Observer(
+            builder: (context) {
+              if (textEditingController.text.isEmpty || searchStore.channelFuture == null || searchStore.categoryFuture == null) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (searchStore.searchHistory.isNotEmpty)
+                      const Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Text(
+                          'HISTORY',
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
-                      SearchResultsChannels(
-                        searchStore: searchStore,
-                        query: textEditingController.text,
+                    Expanded(
+                      child: ListView(
+                        children: searchStore.searchHistory
+                            .mapIndexed(
+                              (index, searchTerm) => ListTile(
+                                leading: const Icon(Icons.history),
+                                title: Text(searchTerm),
+                                trailing: IconButton(
+                                  tooltip: 'Remove',
+                                  icon: const Icon(Icons.cancel),
+                                  onPressed: () => setState(() {
+                                    searchStore.searchHistory.removeAt(index);
+                                  }),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    textEditingController.text = searchTerm;
+                                    searchStore.handleQuery(searchTerm);
+                                  });
+                                },
+                              ),
+                            )
+                            .toList(),
                       ),
-                      const SliverToBoxAdapter(
-                        child: SectionHeader(
-                          'Categories',
-                          padding: headerPadding,
-                        ),
-                      ),
-                      SearchResultsCategories(searchStore: searchStore),
-                    ],
-                  );
-                },
-              )),
+                    ),
+                  ],
+                );
+              }
+              return CustomScrollView(
+                slivers: [
+                  const SliverToBoxAdapter(
+                    child: SectionHeader(
+                      'Channels',
+                      padding: headerPadding,
+                    ),
+                  ),
+                  SearchResultsChannels(
+                    searchStore: searchStore,
+                    query: textEditingController.text,
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SectionHeader(
+                      'Categories',
+                      padding: headerPadding,
+                    ),
+                  ),
+                  SearchResultsCategories(searchStore: searchStore),
+                ],
+              );
+            },
+          ),
         ),
       ],
     );

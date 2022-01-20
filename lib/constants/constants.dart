@@ -5,7 +5,7 @@ const clientId = String.fromEnvironment('CLIENT_ID');
 const secret = String.fromEnvironment('SECRET');
 
 /// The current version of the app.
-const appVersion = '1.0.0-beta+7';
+const appVersion = '1.0.0-beta+9';
 
 /// The tracesSampleRate for sentry crash reporting.
 const sampleRate = 1.0;
@@ -21,3 +21,6 @@ const zeroWidthEmotes = [
   "cvMask",
   "cvHazmat",
 ];
+
+// Regex for matching strings that contain lower or upper case English characters.
+final regexEnglish = RegExp(r'[a-zA-Z]');

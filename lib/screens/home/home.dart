@@ -32,67 +32,70 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     final authStore = context.read<AuthStore>();
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: Observer(
-          builder: (_) {
-            final titles = [
-              if (authStore.isLoggedIn) 'Followed Streams',
-              'Top',
-              'Search',
-            ];
+    return GestureDetector(
+      onTap: FocusScope.of(context).unfocus,
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: false,
+          title: Observer(
+            builder: (_) {
+              final titles = [
+                if (authStore.isLoggedIn) 'Followed Streams',
+                'Top',
+                'Search',
+              ];
 
-            return Text(titles[homeStore.selectedIndex]);
-          },
+              return Text(titles[homeStore.selectedIndex]);
+            },
+          ),
+          actions: [
+            IconButton(
+              tooltip: 'Settings',
+              icon: const Icon(Icons.settings),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Settings(settingsStore: context.read<SettingsStore>()),
+                ),
+              ),
+            )
+          ],
         ),
-        actions: [
-          IconButton(
-            tooltip: 'Settings',
-            icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Settings(settingsStore: context.read<SettingsStore>()),
-              ),
+        body: SafeArea(
+          child: Observer(
+            builder: (_) => IndexedStack(
+              index: homeStore.selectedIndex,
+              children: [
+                if (authStore.isLoggedIn) StreamsList(store: followedStreamsStore!),
+                TopSection(
+                  topSectionStore: topSectionStore,
+                  categoriesSectionStore: categoriesSectionStore,
+                ),
+                Search(searchStore: searchStore),
+              ],
             ),
-          )
-        ],
-      ),
-      body: SafeArea(
-        child: Observer(
-          builder: (_) => IndexedStack(
-            index: homeStore.selectedIndex,
-            children: [
-              if (authStore.isLoggedIn) StreamsList(store: followedStreamsStore!),
-              TopSection(
-                topSectionStore: topSectionStore,
-                categoriesSectionStore: categoriesSectionStore,
-              ),
-              Search(searchStore: searchStore),
-            ],
           ),
         ),
-      ),
-      bottomNavigationBar: Observer(
-        builder: (_) => BottomNavigationBar(
-          items: [
-            if (authStore.isLoggedIn)
+        bottomNavigationBar: Observer(
+          builder: (_) => BottomNavigationBar(
+            items: [
+              if (authStore.isLoggedIn)
+                const BottomNavigationBarItem(
+                  icon: Icon(Icons.favorite),
+                  label: 'Followed',
+                ),
               const BottomNavigationBarItem(
-                icon: Icon(Icons.favorite),
-                label: 'Followed',
+                icon: Icon(Icons.arrow_upward),
+                label: 'Top',
               ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.arrow_upward),
-              label: 'Top',
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'Search',
-            ),
-          ],
-          currentIndex: homeStore.selectedIndex,
-          onTap: homeStore.handleTap,
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.search),
+                label: 'Search',
+              ),
+            ],
+            currentIndex: homeStore.selectedIndex,
+            onTap: homeStore.handleTap,
+          ),
         ),
       ),
     );

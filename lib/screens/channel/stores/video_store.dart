@@ -45,13 +45,17 @@ abstract class _VideoStoreBase with Store {
 
   @action
   void handlePausePlay() {
-    if (paused) {
-      controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
-    } else {
-      controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
-    }
+    try {
+      if (paused) {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
+      } else {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
+      }
 
-    paused = !paused;
+      paused = !paused;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @action
@@ -94,9 +98,9 @@ abstract class _VideoStoreBase with Store {
 
   void initVideo() {
     try {
-      controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => Pause.postMessage("video paused"));');
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("play", () => Play.postMessage("video playing"));');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
     } catch (e) {
       debugPrint(e.toString());
     }

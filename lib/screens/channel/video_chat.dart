@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
@@ -24,14 +25,30 @@ class _VideoChatState extends State<VideoChat> {
     final chatStore = widget.chatStore;
     final settingsStore = chatStore.settings;
 
-    final video = Video(
-      key: GlobalKey(),
+    final videoStore = VideoStore(
+      twitchApi: context.read<TwitchApi>(),
       userLogin: chatStore.channelName,
-      videoStore: VideoStore(
-        twitchApi: context.read<TwitchApi>(),
+      authStore: chatStore.auth,
+      settingsStore: chatStore.settings,
+    );
+
+    final video = GestureDetector(
+      onTap: () {
+        if (chatStore.assetsStore.showEmoteMenu) {
+          chatStore.assetsStore.showEmoteMenu = false;
+        } else {
+          if (chatStore.textFieldFocusNode.hasFocus) {
+            chatStore.textFieldFocusNode.unfocus();
+          } else {
+            videoStore.handleVideoTap();
+          }
+        }
+      },
+      child: Video(
+        key: GlobalKey(),
         userLogin: chatStore.channelName,
-        authStore: chatStore.auth,
-        settingsStore: chatStore.settings,
+        textFieldFocus: chatStore.textFieldFocusNode,
+        videoStore: videoStore,
       ),
     );
 
@@ -42,7 +59,7 @@ class _VideoChatState extends State<VideoChat> {
 
     final appBar = AppBar(
       title: Text(
-        chatStore.displayName,
+        regexEnglish.hasMatch(chatStore.displayName) ? chatStore.displayName : chatStore.displayName + ' (${chatStore.channelName})',
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       actions: [
@@ -63,28 +80,25 @@ class _VideoChatState extends State<VideoChat> {
 
     return Scaffold(
       body: OrientationBuilder(
-        builder: (_, orientation) {
+        builder: (context, orientation) {
           if (orientation == Orientation.landscape) {
-            if (settingsStore.fullScreen) SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
             return Observer(
-              builder: (_) => ColoredBox(
+              builder: (context) => ColoredBox(
                 color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
                 child: SafeArea(
-                  bottom: settingsStore.fullScreen ? false : true,
+                  bottom: false,
                   child: settingsStore.showVideo
                       ? settingsStore.fullScreen
-                          ? WillPopScope(
-                              onWillPop: () async => false,
-                              child: Stack(
-                                children: [
-                                  Visibility(
-                                    visible: false,
-                                    maintainState: true,
-                                    child: chat,
-                                  ),
-                                  Center(child: video),
-                                ],
-                              ),
+                          ? Stack(
+                              children: [
+                                Visibility(
+                                  visible: false,
+                                  maintainState: true,
+                                  child: chat,
+                                ),
+                                Center(child: video),
+                              ],
                             )
                           : Row(
                               children: [
@@ -112,8 +126,10 @@ class _VideoChatState extends State<VideoChat> {
             );
           }
 
-          settingsStore.fullScreen = false;
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.manual,
+            overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+          );
           return SafeArea(
             child: Column(
               children: [
@@ -139,6 +155,12 @@ class _VideoChatState extends State<VideoChat> {
   @override
   void dispose() {
     widget.chatStore.dispose();
+
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+    );
+
     super.dispose();
   }
 }
