@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
@@ -38,30 +39,32 @@ class RecentEmotesPanel extends StatelessWidget {
               crossAxisSpacing: 10.0,
             ),
             delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final emote = assetsStore.recentEmotes[index];
-                final validEmotes = [...assetsStore.emoteToObject.values, ...assetsStore.userEmoteToObject.values];
-                final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name);
+              (context, index) => Observer(
+                builder: (context) {
+                  final emote = assetsStore.recentEmotes[index];
+                  final validEmotes = [...assetsStore.emoteToObject.values, ...assetsStore.userEmoteToObject.values];
+                  final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name);
 
-                return GestureDetector(
-                  onTap: matchingEmotes.isNotEmpty
-                      ? () {
-                          textController.text += ' ' + emote.name;
-                          assetsStore.recentEmotes.removeWhere((recentEmote) => recentEmote.name == matchingEmotes.first.name);
-                          assetsStore.recentEmotes.insert(0, matchingEmotes.first);
-                        }
-                      : null,
-                  child: Tooltip(
-                    message: emote.name,
-                    preferBelow: false,
-                    child: CachedNetworkImage(
-                      imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
-                      color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
-                      colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
+                  return GestureDetector(
+                    onTap: matchingEmotes.isNotEmpty
+                        ? () {
+                            textController.text += ' ' + emote.name;
+                            assetsStore.recentEmotes.removeWhere((recentEmote) => recentEmote.name == matchingEmotes.first.name);
+                            assetsStore.recentEmotes.insert(0, matchingEmotes.first);
+                          }
+                        : null,
+                    child: Tooltip(
+                      message: emote.name,
+                      preferBelow: false,
+                      child: CachedNetworkImage(
+                        imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
+                        color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
+                        colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
               childCount: assetsStore.recentEmotes.length,
             ),
           ),
