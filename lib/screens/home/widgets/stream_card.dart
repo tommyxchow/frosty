@@ -41,6 +41,8 @@ class StreamCard extends StatelessWidget {
       useOldImageOnUrlChange: true,
     );
 
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})';
+
     return InkWell(
       onTap: () => Navigator.push(
         context,
@@ -102,9 +104,16 @@ class StreamCard extends StatelessWidget {
                           radius: 10.0,
                         ),
                         const SizedBox(width: 5.0),
-                        Text(
-                          regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Tooltip(
+                            message: streamerName,
+                            preferBelow: false,
+                            child: Text(
+                              streamerName,
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ],
                     ),
