@@ -31,6 +31,23 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
               name: '_ChatAssetsStoreBase.sevenTVEmotes'))
       .value;
 
+  final _$_recentEmotesAtom = Atom(name: '_ChatAssetsStoreBase._recentEmotes');
+
+  ObservableList<Emote> get recentEmotes {
+    _$_recentEmotesAtom.reportRead();
+    return super._recentEmotes;
+  }
+
+  @override
+  ObservableList<Emote> get _recentEmotes => recentEmotes;
+
+  @override
+  set _recentEmotes(ObservableList<Emote> value) {
+    _$_recentEmotesAtom.reportWrite(value, super._recentEmotes, () {
+      super._recentEmotes = value;
+    });
+  }
+
   final _$_emoteToObjectAtom =
       Atom(name: '_ChatAssetsStoreBase._emoteToObject');
 
@@ -150,6 +167,13 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     _$showEmoteMenuAtom.reportWrite(value, super.showEmoteMenu, () {
       super.showEmoteMenu = value;
     });
+  }
+
+  final _$initAsyncAction = AsyncAction('_ChatAssetsStoreBase.init');
+
+  @override
+  Future<void> init() {
+    return _$initAsyncAction.run(() => super.init());
   }
 
   final _$_ChatAssetsStoreBaseActionController =

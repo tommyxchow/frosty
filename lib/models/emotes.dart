@@ -257,6 +257,7 @@ class Emote7TV {
 }
 
 /// The common emote class.
+@JsonSerializable()
 class Emote {
   final String name;
   final int? width;
@@ -303,6 +304,9 @@ class Emote {
         url: emote.urls[3][1],
         type: type,
       );
+
+  factory Emote.fromJson(Map<String, dynamic> json) => _$EmoteFromJson(json);
+  Map<String, dynamic> toJson() => _$EmoteToJson(this);
 }
 
 enum EmoteType {

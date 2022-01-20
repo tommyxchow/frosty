@@ -95,6 +95,8 @@ abstract class _ChatStoreBase with Store {
       });
     });
 
+    assetsStore.init();
+
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     reconnect();
@@ -317,5 +319,6 @@ abstract class _ChatStoreBase with Store {
     disposeEmoteMenuReaction();
     textController.dispose();
     scrollController.dispose();
+    assetsStore.dispose();
   }
 }
