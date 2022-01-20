@@ -52,18 +52,9 @@ class _VideoChatState extends State<VideoChat> {
       ),
     );
 
-    final chat = GestureDetector(
-      onTap: () {
-        if (chatStore.assetsStore.showEmoteMenu) {
-          chatStore.assetsStore.showEmoteMenu = false;
-        } else if (chatStore.textFieldFocusNode.hasFocus) {
-          chatStore.textFieldFocusNode.unfocus();
-        }
-      },
-      child: Chat(
-        key: GlobalKey(),
-        chatStore: chatStore,
-      ),
+    final chat = Chat(
+      key: GlobalKey(),
+      chatStore: chatStore,
     );
 
     final appBar = AppBar(
