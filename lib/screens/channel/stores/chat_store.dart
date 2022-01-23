@@ -19,6 +19,7 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
+  static const _messageUpperLimit = 7500;
   static const _messageLimit = 5000;
 
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
@@ -195,6 +196,10 @@ abstract class _ChatStoreBase with Store {
           });
         }
 
+        // Remove messages when an upper limit is reached.
+        // This will prevent an infinite amount of messages when autoscroll is off.
+        if (_messages.length >= _messageUpperLimit) _messages.removeRange(0, 500);
+
         // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
@@ -240,7 +245,8 @@ abstract class _ChatStoreBase with Store {
     });
   }
 
-  void reconnect() async {
+  @action
+  void reconnect() {
     _channel?.sink.close(1001);
     _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 

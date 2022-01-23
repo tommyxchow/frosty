@@ -86,6 +86,17 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   }
 
   @override
+  void reconnect() {
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
+        name: '_ChatStoreBase.reconnect');
+    try {
+      return super.reconnect();
+    } finally {
+      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void sendMessage(String message) {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
         name: '_ChatStoreBase.sendMessage');
