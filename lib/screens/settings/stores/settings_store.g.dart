@@ -16,6 +16,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
+      ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
       ..timestampType = $enumDecodeNullable(
@@ -40,6 +41,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
       'pictureInPicture': instance.pictureInPicture,
+      'showBottomBar': instance.showBottomBar,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
@@ -164,6 +166,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set pictureInPicture(bool value) {
     _$pictureInPictureAtom.reportWrite(value, super.pictureInPicture, () {
       super.pictureInPicture = value;
+    });
+  }
+
+  final _$showBottomBarAtom = Atom(name: '_SettingsStoreBase.showBottomBar');
+
+  @override
+  bool get showBottomBar {
+    _$showBottomBarAtom.reportRead();
+    return super.showBottomBar;
+  }
+
+  @override
+  set showBottomBar(bool value) {
+    _$showBottomBarAtom.reportWrite(value, super.showBottomBar, () {
+      super.showBottomBar = value;
     });
   }
 
@@ -358,6 +375,7 @@ showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
+showBottomBar: ${showBottomBar},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
 timestampType: ${timestampType},

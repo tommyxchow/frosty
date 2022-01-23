@@ -29,6 +29,11 @@ class _ChatSettingsState extends State<ChatSettings> {
           children: [
             const SectionHeader('Chat'),
             SwitchListTile.adaptive(
+              title: const Text('Show bottom bar'),
+              value: settingsStore.showBottomBar,
+              onChanged: (newValue) => settingsStore.showBottomBar = newValue,
+            ),
+            SwitchListTile.adaptive(
               title: const Text('Show deleted messages'),
               value: settingsStore.showDeletedMessages,
               onChanged: (newValue) => settingsStore.showDeletedMessages = newValue,
