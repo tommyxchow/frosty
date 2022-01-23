@@ -49,10 +49,6 @@ class ChatUserModal extends StatelessWidget {
                               chatStore.textController.text = '@$username ';
                               Navigator.pop(context);
                               chatStore.textFieldFocusNode.requestFocus();
-                              Future.delayed(
-                                const Duration(milliseconds: 200),
-                                () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
-                              );
                             },
                             child: const Text('Reply'),
                           ),

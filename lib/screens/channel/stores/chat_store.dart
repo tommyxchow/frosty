@@ -111,6 +111,20 @@ abstract class _ChatStoreBase with Store {
         if (_autoScroll == false) _autoScroll = true;
       }
     });
+
+    // Add a listener to the textfield that will do the following when focused:
+    // 1. Hide the emote menu if it is currently shown
+    // 2. Scroll to the latest message (after a brief delay)
+    textFieldFocusNode.addListener(() {
+      if (textFieldFocusNode.hasFocus) {
+        if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
+
+        Future.delayed(
+          const Duration(milliseconds: 500),
+          () => scrollController.jumpTo(scrollController.position.maxScrollExtent),
+        );
+      }
+    });
   }
 
   /// Handle and process the provided string-representation of the IRC data.
@@ -280,6 +294,7 @@ abstract class _ChatStoreBase with Store {
   }
 
   /// Sends the given string message by the logged-in user and adds it to [_messages].
+  @action
   void sendMessage(String message) {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) return;

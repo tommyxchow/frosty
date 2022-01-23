@@ -34,13 +34,6 @@ class ChatBottomBar extends StatelessWidget {
               minLines: 1,
               maxLines: 5,
               enabled: chatStore.auth.isLoggedIn ? true : false,
-              onTap: () {
-                chatStore.assetsStore.showEmoteMenu = false;
-                Future.delayed(
-                  const Duration(milliseconds: 200),
-                  () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
-                );
-              },
               decoration: InputDecoration(
                 suffixIcon: IconButton(
                   tooltip: 'Emote Menu',
