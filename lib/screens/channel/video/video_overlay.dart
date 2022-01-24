@@ -56,6 +56,20 @@ class VideoOverlay extends StatelessWidget {
       onPressed: videoStore.handleRefresh,
     );
 
+    final fullScreenButton = IconButton(
+      tooltip: 'Fullscreen',
+      icon: videoStore.settingsStore.fullScreen
+          ? const Icon(
+              Icons.fullscreen_exit,
+              color: Colors.white,
+            )
+          : const Icon(
+              Icons.fullscreen,
+              color: Colors.white,
+            ),
+      onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
+    );
+
     final streamInfo = videoStore.streamInfo;
 
     if (streamInfo == null) {
@@ -63,7 +77,16 @@ class VideoOverlay extends StatelessWidget {
         children: [
           backButton,
           settingsButton,
-          Align(alignment: Alignment.bottomRight, child: refreshButton),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                refreshButton,
+                if (orientation == Orientation.landscape) fullScreenButton,
+              ],
+            ),
+          ),
         ],
       );
     }
@@ -136,7 +159,7 @@ class VideoOverlay extends StatelessWidget {
                                   padding: const EdgeInsets.all(10.0),
                                   child: Text(
                                     videoStore.streamInfo!.title,
-                                    maxLines: orientation == Orientation.portrait ? 1 : 3,
+                                    maxLines: orientation == Orientation.portrait ? 1 : 5,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.white,
@@ -166,15 +189,7 @@ class VideoOverlay extends StatelessWidget {
                     ),
                     onPressed: videoStore.requestPictureInPicture,
                   ),
-                if (orientation == Orientation.landscape)
-                  IconButton(
-                    tooltip: 'Fullscreen',
-                    icon: const Icon(
-                      Icons.fullscreen,
-                      color: Colors.white,
-                    ),
-                    onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
-                  )
+                if (orientation == Orientation.landscape) fullScreenButton
               ],
             ),
           )
