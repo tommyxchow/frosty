@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/api/twitch_api.dart';
@@ -25,6 +26,7 @@ class VideoChat extends StatefulWidget {
 
 class _VideoChatState extends State<VideoChat> {
   final _videoKey = GlobalKey();
+  final _chatKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +90,10 @@ class _VideoChatState extends State<VideoChat> {
       ),
     );
 
-    final chat = Chat(chatStore: chatStore);
+    final chat = Chat(
+      key: _chatKey,
+      chatStore: chatStore,
+    );
 
     final appBar = AppBar(
       title: Text(
@@ -115,7 +120,13 @@ class _VideoChatState extends State<VideoChat> {
       body: OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.landscape) {
+            // Add a post-frame callback to scroll to bottom when rotating.
+            SchedulerBinding.instance?.addPostFrameCallback((_) {
+              if (chatStore.scrollController.hasClients) chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent);
+            });
+
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
             return Observer(
               builder: (context) => ColoredBox(
                 color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
@@ -123,7 +134,16 @@ class _VideoChatState extends State<VideoChat> {
                   bottom: false,
                   child: settingsStore.showVideo
                       ? settingsStore.fullScreen
-                          ? video
+                          ? Stack(
+                              children: [
+                                Visibility(
+                                  visible: false,
+                                  maintainState: true,
+                                  child: chat,
+                                ),
+                                video,
+                              ],
+                            )
                           : Row(
                               children: [
                                 Flexible(

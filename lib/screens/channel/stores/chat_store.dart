@@ -76,7 +76,7 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
-  late final ReactionDisposer disposeEmoteMenuReaction;
+  final reactions = <ReactionDisposer>[];
 
   _ChatStoreBase({
     required this.auth,
@@ -90,11 +90,20 @@ abstract class _ChatStoreBase with Store {
     // Create a reaction where anytime the emote menu is shown or hidden,
     // scroll to the bottom of the list. This will prevent the emote menu
     // from covering the latest messages when summoned.
-    disposeEmoteMenuReaction = reaction((_) => assetsStore.showEmoteMenu, (_) {
-      SchedulerBinding.instance?.addPostFrameCallback((_) {
+    reactions.add(reaction(
+      (_) => assetsStore.showEmoteMenu,
+      (_) => SchedulerBinding.instance?.addPostFrameCallback((_) {
         if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-      });
-    });
+      }),
+    ));
+
+    // Create a reaction for scrolling to bottom when exiting fullscreen.
+    reactions.add(reaction(
+      (_) => settings.fullScreen,
+      (_) => SchedulerBinding.instance?.addPostFrameCallback((_) {
+        if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }),
+    ));
 
     assetsStore.init();
 
@@ -337,7 +346,10 @@ abstract class _ChatStoreBase with Store {
     _channel?.sink.close(1001);
     _channel = null;
 
-    disposeEmoteMenuReaction();
+    for (final reactionDisposer in reactions) {
+      reactionDisposer();
+    }
+
     textController.dispose();
     scrollController.dispose();
     assetsStore.dispose();

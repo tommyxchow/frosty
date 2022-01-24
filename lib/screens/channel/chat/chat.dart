@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
@@ -14,10 +13,6 @@ class Chat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Add a post-frame callback to scroll to bottom when rotating or entering full-screen.
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      if (chatStore.scrollController.hasClients) chatStore.resumeScroll();
-    });
     return Observer(
       builder: (context) => Column(
         children: [
