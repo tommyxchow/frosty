@@ -9,6 +9,31 @@ part of 'video_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$VideoStore on _VideoStoreBase, Store {
+  Computed<String>? _$videoUrlComputed;
+
+  @override
+  String get videoUrl =>
+      (_$videoUrlComputed ??= Computed<String>(() => super.videoUrl,
+              name: '_VideoStoreBase.videoUrl'))
+          .value;
+
+  final _$_pausedAtom = Atom(name: '_VideoStoreBase._paused');
+
+  bool get paused {
+    _$_pausedAtom.reportRead();
+    return super._paused;
+  }
+
+  @override
+  bool get _paused => paused;
+
+  @override
+  set _paused(bool value) {
+    _$_pausedAtom.reportWrite(value, super._paused, () {
+      super._paused = value;
+    });
+  }
+
   final _$_overlayVisibleAtom = Atom(name: '_VideoStoreBase._overlayVisible');
 
   bool get overlayVisible {
@@ -23,21 +48,6 @@ mixin _$VideoStore on _VideoStoreBase, Store {
   set _overlayVisible(bool value) {
     _$_overlayVisibleAtom.reportWrite(value, super._overlayVisible, () {
       super._overlayVisible = value;
-    });
-  }
-
-  final _$pausedAtom = Atom(name: '_VideoStoreBase.paused');
-
-  @override
-  bool get paused {
-    _$pausedAtom.reportRead();
-    return super.paused;
-  }
-
-  @override
-  set paused(bool value) {
-    _$pausedAtom.reportWrite(value, super.paused, () {
-      super.paused = value;
     });
   }
 
@@ -103,9 +113,20 @@ mixin _$VideoStore on _VideoStoreBase, Store {
   }
 
   @override
+  void handleToggleOverlay() {
+    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
+        name: '_VideoStoreBase.handleToggleOverlay');
+    try {
+      return super.handleToggleOverlay();
+    } finally {
+      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-paused: ${paused}
+videoUrl: ${videoUrl}
     ''';
   }
 }

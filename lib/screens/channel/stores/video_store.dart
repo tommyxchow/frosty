@@ -21,13 +21,33 @@ abstract class _VideoStoreBase with Store {
   late Timer updateTimer;
 
   @readonly
-  var _overlayVisible = true;
+  var _paused = true;
 
-  @observable
-  var paused = true;
+  @readonly
+  var _overlayVisible = true;
 
   @readonly
   StreamTwitch? _streamInfo;
+
+  @computed
+  String get videoUrl => settingsStore.showOverlay
+      ? 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty'
+      : 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';
+
+  Set<JavascriptChannel> get javascriptChannels => {
+        JavascriptChannel(
+          name: 'Pause',
+          onMessageReceived: (message) {
+            _paused = true;
+          },
+        ),
+        JavascriptChannel(
+          name: 'Play',
+          onMessageReceived: (message) {
+            _paused = false;
+          },
+        ),
+      };
 
   final String userLogin;
   final AuthStore authStore;
@@ -46,13 +66,13 @@ abstract class _VideoStoreBase with Store {
   @action
   void handlePausePlay() {
     try {
-      if (paused) {
+      if (_paused) {
         controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
       } else {
         controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
       }
 
-      paused = !paused;
+      _paused = !_paused;
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -91,9 +111,24 @@ abstract class _VideoStoreBase with Store {
     overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
   }
 
+  @action
+  void handleToggleOverlay() {
+    if (settingsStore.toggleableOverlay) {
+      settingsStore.showOverlay = !settingsStore.showOverlay;
+      controller?.loadUrl(videoUrl);
+    }
+  }
+
   void handleRefresh() async {
     HapticFeedback.lightImpact();
     controller?.reload();
+  }
+
+  FutureOr<NavigationDecision> handleNavigation(NavigationRequest navigation) {
+    if (navigation.url.startsWith('https://player.twitch.tv')) {
+      return NavigationDecision.navigate;
+    }
+    return NavigationDecision.prevent;
   }
 
   void initVideo() {

@@ -7,19 +7,25 @@ import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
+import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:provider/provider.dart';
 
 class VideoChat extends StatefulWidget {
   final ChatStore chatStore;
 
-  const VideoChat({Key? key, required this.chatStore}) : super(key: key);
+  const VideoChat({
+    Key? key,
+    required this.chatStore,
+  }) : super(key: key);
 
   @override
   _VideoChatState createState() => _VideoChatState();
 }
 
 class _VideoChatState extends State<VideoChat> {
+  final _videoKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     final chatStore = widget.chatStore;
@@ -32,7 +38,13 @@ class _VideoChatState extends State<VideoChat> {
       settingsStore: chatStore.settings,
     );
 
+    final player = Video(
+      key: _videoKey,
+      videoStore: videoStore,
+    );
+
     final video = GestureDetector(
+      onLongPress: videoStore.handleToggleOverlay,
       onTap: () {
         if (chatStore.assetsStore.showEmoteMenu) {
           chatStore.assetsStore.showEmoteMenu = false;
@@ -44,18 +56,39 @@ class _VideoChatState extends State<VideoChat> {
           }
         }
       },
-      child: Video(
-        key: GlobalKey(),
-        userLogin: chatStore.channelName,
-        textFieldFocus: chatStore.textFieldFocusNode,
-        videoStore: videoStore,
+      child: Observer(
+        builder: (context) {
+          if (videoStore.settingsStore.showOverlay) {
+            return Stack(
+              children: [
+                player,
+                Observer(
+                  builder: (_) {
+                    if (videoStore.paused) return VideoOverlay(videoStore: videoStore);
+                    return Observer(
+                      builder: (_) => AnimatedOpacity(
+                        opacity: videoStore.overlayVisible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: ColoredBox(
+                          color: const Color.fromRGBO(0, 0, 0, 0.5),
+                          child: IgnorePointer(
+                            ignoring: !videoStore.overlayVisible,
+                            child: VideoOverlay(videoStore: videoStore),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              ],
+            );
+          }
+          return player;
+        },
       ),
     );
 
-    final chat = Chat(
-      key: GlobalKey(),
-      chatStore: chatStore,
-    );
+    final chat = Chat(chatStore: chatStore);
 
     final appBar = AppBar(
       title: Text(
@@ -90,16 +123,7 @@ class _VideoChatState extends State<VideoChat> {
                   bottom: false,
                   child: settingsStore.showVideo
                       ? settingsStore.fullScreen
-                          ? Stack(
-                              children: [
-                                Visibility(
-                                  visible: false,
-                                  maintainState: true,
-                                  child: chat,
-                                ),
-                                Center(child: video),
-                              ],
-                            )
+                          ? video
                           : Row(
                               children: [
                                 Flexible(
@@ -136,14 +160,15 @@ class _VideoChatState extends State<VideoChat> {
                 Observer(
                   builder: (_) {
                     if (settingsStore.showVideo) {
-                      return video;
+                      return AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: video,
+                      );
                     }
                     return appBar;
                   },
                 ),
-                Expanded(
-                  child: chat,
-                ),
+                Expanded(child: chat),
               ],
             ),
           );
