@@ -12,6 +12,7 @@ import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -36,9 +37,13 @@ class StreamCard extends StatelessWidget {
     final time = DateTime.now();
     final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
 
-    final thumbnail = CachedNetworkImage(
-      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${width}x$height') + cacheUrlExtension,
-      useOldImageOnUrlChange: true,
+    final thumbnail = AspectRatio(
+      aspectRatio: 16 / 9,
+      child: CachedNetworkImage(
+        imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${width}x$height') + cacheUrlExtension,
+        placeholder: (context, url) => const LoadingIndicator(),
+        useOldImageOnUrlChange: true,
+      ),
     );
 
     final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})';

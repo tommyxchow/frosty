@@ -5,6 +5,7 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/top/category_streams.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a category's box art and name.
@@ -43,6 +44,7 @@ class CategoryCard extends StatelessWidget {
             Expanded(
               child: CachedNetworkImage(
                 imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${width}x$height.jpg'),
+                placeholder: (context, url) => const LoadingIndicator(),
               ),
             ),
             const SizedBox(height: 5.0),
