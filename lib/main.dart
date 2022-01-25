@@ -25,22 +25,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Get the shared preferences instance and obtain the existing user settings if it exists.
-  // If default settings don't exist, use an empty JSON string to use the default values.
   final prefs = await SharedPreferences.getInstance();
-  final userSettings = prefs.getString('settings') ?? '{}';
 
   // Workaround for clearing stored tokens on uninstall.
   // If first time running app, will clear all tokens in the secure storage.
-  if (prefs.getBool('FIRST_RUN') ?? true) {
+  if (prefs.getBool('first_run') ?? true) {
     debugPrint('Clearing secure storage...');
     const storage = FlutterSecureStorage();
 
     await storage.deleteAll();
 
-    prefs.setBool('FIRST_RUN', false);
+    prefs.setBool('first_run', false);
   }
 
+  // With the shared preferences instance, obtain the existing user settings if it exists.
+  // If default settings don't exist, use an empty JSON string to use the default values.
+  final userSettings = prefs.getString('settings') ?? '{}';
   // Initialize a settings store from the settings JSON string.
   final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
 
