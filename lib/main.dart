@@ -11,10 +11,6 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
-import 'package:frosty/screens/home/stores/categories_store.dart';
-import 'package:frosty/screens/home/stores/home_store.dart';
-import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
@@ -154,9 +150,7 @@ class MyApp extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final authStore = context.read<AuthStore>();
         final settingsStore = context.read<SettingsStore>();
-        final twitchApi = context.read<TwitchApi>();
 
         return MaterialApp(
           title: 'Frosty',
@@ -167,29 +161,7 @@ class MyApp extends StatelessWidget {
               : settingsStore.themeType == ThemeType.light
                   ? ThemeMode.light
                   : ThemeMode.dark,
-          home: Home(
-            homeStore: HomeStore(),
-            followedStreamsStore: authStore.isLoggedIn
-                ? ListStore(
-                    authStore: authStore,
-                    twitchApi: twitchApi,
-                    listType: ListType.followed,
-                  )
-                : null,
-            topSectionStore: ListStore(
-              authStore: authStore,
-              twitchApi: twitchApi,
-              listType: ListType.top,
-            ),
-            categoriesSectionStore: CategoriesStore(
-              authStore: authStore,
-              twitchApi: twitchApi,
-            ),
-            searchStore: SearchStore(
-              authStore: authStore,
-              twitchApi: twitchApi,
-            ),
-          ),
+          home: const Home(),
         );
       },
     );

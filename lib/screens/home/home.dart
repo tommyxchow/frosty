@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/search/search.dart';
-import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/stores/home_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/home/top/top_section.dart';
 import 'package:frosty/screens/home/widgets/streams_list.dart';
 import 'package:frosty/screens/settings/settings.dart';
@@ -13,23 +11,11 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatelessWidget {
-  final HomeStore homeStore;
-  final ListStore? followedStreamsStore;
-  final ListStore topSectionStore;
-  final CategoriesStore categoriesSectionStore;
-  final SearchStore searchStore;
-
-  const Home({
-    Key? key,
-    required this.homeStore,
-    required this.followedStreamsStore,
-    required this.topSectionStore,
-    required this.categoriesSectionStore,
-    required this.searchStore,
-  }) : super(key: key);
+  const Home({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final homeStore = HomeStore();
     final authStore = context.read<AuthStore>();
 
     return GestureDetector(
@@ -66,12 +52,9 @@ class Home extends StatelessWidget {
             builder: (_) => IndexedStack(
               index: homeStore.selectedIndex,
               children: [
-                if (authStore.isLoggedIn) StreamsList(store: followedStreamsStore!),
-                TopSection(
-                  topSectionStore: topSectionStore,
-                  categoriesSectionStore: categoriesSectionStore,
-                ),
-                Search(searchStore: searchStore),
+                if (authStore.isLoggedIn) const StreamsList(listType: ListType.followed),
+                const TopSection(),
+                const Search(),
               ],
             ),
           ),
