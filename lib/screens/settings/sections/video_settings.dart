@@ -33,8 +33,8 @@ class VideoSettings extends StatelessWidget {
             if (Platform.isIOS)
               SwitchListTile.adaptive(
                 isThreeLine: true,
-                title: const Text('Picture-in-picture button'),
-                subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay.'),
+                title: const Text('Picture-in-picture button (experimental)'),
+                subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay. May cause freezes/crashes.'),
                 value: settingsStore.pictureInPicture,
                 onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
               ),

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/seventv_api.dart';
@@ -26,18 +27,27 @@ Future<void> main() async {
 
   // Get the shared preferences instance and obtain the existing user settings if it exists.
   // If default settings don't exist, use an empty JSON string to use the default values.
-  final preferences = await SharedPreferences.getInstance();
-  final userSettings = preferences.getString('settings') ?? '{}';
+  final prefs = await SharedPreferences.getInstance();
+  final userSettings = prefs.getString('settings') ?? '{}';
+
+  // Workaround for clearing stored tokens on uninstall.
+  // If first time running app, will clear all tokens in the secure storage.
+  if (prefs.getBool('FIRST_RUN') ?? true) {
+    debugPrint('Clearing secure storage...');
+    const storage = FlutterSecureStorage();
+
+    await storage.deleteAll();
+
+    prefs.setBool('FIRST_RUN', false);
+  }
 
   // Initialize a settings store from the settings JSON string.
   final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
 
   // Create a MobX reaction that will save the settings on disk every time they are changed.
-  autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
+  autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
-  if (settingsStore.sendCrashLogs) {
-    await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
-  }
+  if (settingsStore.sendCrashLogs) await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
 
   /// Initialize API services with a common client.
   /// This will prevent every request from creating a new client instance.

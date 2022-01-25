@@ -12,7 +12,7 @@ class AuthStore = _AuthBase with _$AuthStore;
 
 abstract class _AuthBase with Store {
   /// Secure storage to store tokens.
-  final _storage = const FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage();
 
   final TwitchApi twitchApi;
 
@@ -68,10 +68,7 @@ abstract class _AuthBase with Store {
       _tokenIsValid = await twitchApi.validateToken(token: _token!);
 
       // If the token is invalid, logout.
-      if (!_tokenIsValid) {
-        logout();
-        return;
-      }
+      if (!_tokenIsValid) await logout();
 
       _error = null;
     } catch (e) {
@@ -160,6 +157,7 @@ abstract class _AuthBase with Store {
           _tokenIsValid = await twitchApi.validateToken(token: _token!);
         }
       }
+
       // Set the login status to logged out.
       _isLoggedIn = false;
 
