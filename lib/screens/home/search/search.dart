@@ -16,7 +16,7 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
-  final textEditingController = TextEditingController();
+  final _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class _SearchState extends State<Search> {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
           child: TextField(
-            controller: textEditingController,
+            controller: _textEditingController,
             autocorrect: false,
             decoration: InputDecoration(
               isDense: true,
@@ -42,7 +42,7 @@ class _SearchState extends State<Search> {
                 onPressed: () {
                   FocusScope.of(context).unfocus();
                   setState(() {
-                    textEditingController.clear();
+                    _textEditingController.clear();
                   });
                 },
                 icon: const Icon(Icons.clear),
@@ -54,7 +54,7 @@ class _SearchState extends State<Search> {
         Expanded(
           child: Observer(
             builder: (context) {
-              if (textEditingController.text.isEmpty || searchStore.channelFuture == null || searchStore.categoryFuture == null) {
+              if (_textEditingController.text.isEmpty || searchStore.channelFuture == null || searchStore.categoryFuture == null) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -82,7 +82,7 @@ class _SearchState extends State<Search> {
                                 ),
                                 onTap: () {
                                   setState(() {
-                                    textEditingController.text = searchTerm;
+                                    _textEditingController.text = searchTerm;
                                     searchStore.handleQuery(searchTerm);
                                   });
                                 },
@@ -104,7 +104,7 @@ class _SearchState extends State<Search> {
                   ),
                   SearchResultsChannels(
                     searchStore: searchStore,
-                    query: textEditingController.text,
+                    query: _textEditingController.text,
                   ),
                   const SliverToBoxAdapter(
                     child: SectionHeader(
@@ -124,7 +124,7 @@ class _SearchState extends State<Search> {
 
   @override
   void dispose() {
-    textEditingController.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 }

@@ -20,13 +20,7 @@ class EmoteMenu extends StatefulWidget {
 }
 
 class _EmoteMenuState extends State<EmoteMenu> {
-  late final PageController pageContoller;
-
-  @override
-  void initState() {
-    pageContoller = PageController(initialPage: widget.assetsStore.emoteMenuIndex);
-    super.initState();
-  }
+  late final PageController _pageContoller = PageController(initialPage: widget.assetsStore.emoteMenuIndex);
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +42,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
                   (index, section) => Observer(
                     builder: (context) => TextButton(
                       onPressed: () {
-                        pageContoller.animateToPage(
+                        _pageContoller.animateToPage(
                           index,
                           duration: const Duration(milliseconds: 200),
                           curve: Curves.ease,
@@ -66,7 +60,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
         Expanded(
           child: PageView(
             onPageChanged: (index) => widget.assetsStore.emoteMenuIndex = index,
-            controller: pageContoller,
+            controller: _pageContoller,
             children: [
               RecentEmotesPanel(
                 assetsStore: widget.assetsStore,
@@ -109,7 +103,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
 
   @override
   void dispose() {
-    pageContoller.dispose();
+    _pageContoller.dispose();
     super.dispose();
   }
 }
