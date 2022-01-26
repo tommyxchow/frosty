@@ -76,6 +76,15 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
   }
 
+  final _$handleToggleOverlayAsyncAction =
+      AsyncAction('_VideoStoreBase.handleToggleOverlay');
+
+  @override
+  Future<void> handleToggleOverlay() {
+    return _$handleToggleOverlayAsyncAction
+        .run(() => super.handleToggleOverlay());
+  }
+
   final _$_VideoStoreBaseActionController =
       ActionController(name: '_VideoStoreBase');
 
@@ -107,17 +116,6 @@ mixin _$VideoStore on _VideoStoreBase, Store {
         name: '_VideoStoreBase.handleExpand');
     try {
       return super.handleExpand();
-    } finally {
-      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void handleToggleOverlay() {
-    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
-        name: '_VideoStoreBase.handleToggleOverlay');
-    try {
-      return super.handleToggleOverlay();
     } finally {
       _$_VideoStoreBaseActionController.endAction(_$actionInfo);
     }

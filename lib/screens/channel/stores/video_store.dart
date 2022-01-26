@@ -17,8 +17,7 @@ abstract class _VideoStoreBase with Store {
 
   WebViewController? controller;
 
-  late Timer overlayTimer;
-  late Timer updateTimer;
+  late Timer _overlayTimer;
 
   @readonly
   var _paused = true;
@@ -34,32 +33,28 @@ abstract class _VideoStoreBase with Store {
       ? 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty'
       : 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';
 
-  Set<JavascriptChannel> get javascriptChannels => {
-        JavascriptChannel(
-          name: 'Pause',
-          onMessageReceived: (message) {
-            _paused = true;
-          },
-        ),
-        JavascriptChannel(
-          name: 'Play',
-          onMessageReceived: (message) {
-            _paused = false;
-          },
-        ),
-      };
+  late final javascriptChannels = {
+    JavascriptChannel(
+      name: 'Pause',
+      onMessageReceived: (message) => _paused = true,
+    ),
+    JavascriptChannel(
+      name: 'Play',
+      onMessageReceived: (message) => _paused = false,
+    ),
+  };
 
   final String userLogin;
   final AuthStore authStore;
   final SettingsStore settingsStore;
 
   _VideoStoreBase({
-    required this.twitchApi,
     required this.userLogin,
+    required this.twitchApi,
     required this.authStore,
     required this.settingsStore,
   }) {
-    overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+    _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
     updateStreamInfo();
   }
 
@@ -80,25 +75,22 @@ abstract class _VideoStoreBase with Store {
 
   @action
   void handleVideoTap() {
-    if (_overlayVisible) {
-      overlayTimer.cancel();
+    _overlayTimer.cancel();
 
+    if (_overlayVisible) {
       _overlayVisible = false;
     } else {
-      overlayTimer.cancel();
-      overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+      updateStreamInfo();
 
       _overlayVisible = true;
-
-      updateStreamInfo();
+      _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
     }
   }
 
   @action
   Future<void> updateStreamInfo() async {
     try {
-      final updatedStreamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
-      _streamInfo = updatedStreamInfo;
+      _streamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -106,20 +98,29 @@ abstract class _VideoStoreBase with Store {
 
   @action
   void handleExpand() {
-    overlayTimer.cancel();
     settingsStore.expandInfo = !settingsStore.expandInfo;
-    overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+
+    _overlayTimer.cancel();
+    _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
   }
 
   @action
-  void handleToggleOverlay() {
+  Future<void> handleToggleOverlay() async {
     if (settingsStore.toggleableOverlay) {
       settingsStore.showOverlay = !settingsStore.showOverlay;
-      controller?.loadUrl(videoUrl);
+
+      await controller?.loadUrl(videoUrl);
+
+      if (settingsStore.showOverlay) {
+        _overlayVisible = true;
+
+        _overlayTimer.cancel();
+        _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+      }
     }
   }
 
-  void handleRefresh() async {
+  void handleRefresh() {
     HapticFeedback.lightImpact();
     controller?.reload();
   }

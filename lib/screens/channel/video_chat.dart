@@ -57,8 +57,8 @@ class _VideoChatState extends State<VideoChat> {
   );
 
   late final VideoStore _videoStore = VideoStore(
-    twitchApi: context.read<TwitchApi>(),
     userLogin: widget.userLogin,
+    twitchApi: context.read<TwitchApi>(),
     authStore: context.read<AuthStore>(),
     settingsStore: context.read<SettingsStore>(),
   );
