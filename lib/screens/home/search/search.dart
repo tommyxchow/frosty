@@ -1,34 +1,39 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/search/search_results_categories.dart';
 import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:provider/provider.dart';
 
 class Search extends StatefulWidget {
-  final SearchStore searchStore;
-
-  const Search({Key? key, required this.searchStore}) : super(key: key);
+  const Search({Key? key}) : super(key: key);
 
   @override
   _SearchState createState() => _SearchState();
 }
 
 class _SearchState extends State<Search> {
-  final textEditingController = TextEditingController();
+  late final _searchStore = SearchStore(
+    authStore: context.read<AuthStore>(),
+    twitchApi: context.read<TwitchApi>(),
+  );
+
+  final _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     const headerPadding = EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 10.0);
 
-    final searchStore = widget.searchStore;
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
           child: TextField(
-            controller: textEditingController,
+            controller: _textEditingController,
             autocorrect: false,
             decoration: InputDecoration(
               isDense: true,
@@ -42,23 +47,23 @@ class _SearchState extends State<Search> {
                 onPressed: () {
                   FocusScope.of(context).unfocus();
                   setState(() {
-                    textEditingController.clear();
+                    _textEditingController.clear();
                   });
                 },
                 icon: const Icon(Icons.clear),
               ),
             ),
-            onSubmitted: searchStore.handleQuery,
+            onSubmitted: _searchStore.handleQuery,
           ),
         ),
         Expanded(
           child: Observer(
             builder: (context) {
-              if (textEditingController.text.isEmpty || searchStore.channelFuture == null || searchStore.categoryFuture == null) {
+              if (_textEditingController.text.isEmpty || _searchStore.channelFuture == null || _searchStore.categoryFuture == null) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (searchStore.searchHistory.isNotEmpty)
+                    if (_searchStore.searchHistory.isNotEmpty)
                       const Padding(
                         padding: EdgeInsets.all(15.0),
                         child: Text(
@@ -68,7 +73,7 @@ class _SearchState extends State<Search> {
                       ),
                     Expanded(
                       child: ListView(
-                        children: searchStore.searchHistory
+                        children: _searchStore.searchHistory
                             .mapIndexed(
                               (index, searchTerm) => ListTile(
                                 leading: const Icon(Icons.history),
@@ -77,13 +82,13 @@ class _SearchState extends State<Search> {
                                   tooltip: 'Remove',
                                   icon: const Icon(Icons.cancel),
                                   onPressed: () => setState(() {
-                                    searchStore.searchHistory.removeAt(index);
+                                    _searchStore.searchHistory.removeAt(index);
                                   }),
                                 ),
                                 onTap: () {
                                   setState(() {
-                                    textEditingController.text = searchTerm;
-                                    searchStore.handleQuery(searchTerm);
+                                    _textEditingController.text = searchTerm;
+                                    _searchStore.handleQuery(searchTerm);
                                   });
                                 },
                               ),
@@ -103,8 +108,8 @@ class _SearchState extends State<Search> {
                     ),
                   ),
                   SearchResultsChannels(
-                    searchStore: searchStore,
-                    query: textEditingController.text,
+                    searchStore: _searchStore,
+                    query: _textEditingController.text,
                   ),
                   const SliverToBoxAdapter(
                     child: SectionHeader(
@@ -112,7 +117,7 @@ class _SearchState extends State<Search> {
                       padding: headerPadding,
                     ),
                   ),
-                  SearchResultsCategories(searchStore: searchStore),
+                  SearchResultsCategories(searchStore: _searchStore),
                 ],
               );
             },
@@ -124,7 +129,7 @@ class _SearchState extends State<Search> {
 
   @override
   void dispose() {
-    textEditingController.dispose();
+    _textEditingController.dispose();
     super.dispose();
   }
 }

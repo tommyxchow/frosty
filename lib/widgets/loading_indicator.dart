@@ -8,13 +8,16 @@ class LoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (subtitle == null) {
+      return const Center(child: CircularProgressIndicator.adaptive());
+    }
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const CircularProgressIndicator.adaptive(),
           SizedBox(height: spacing),
-          if (subtitle != null) subtitle!,
+          subtitle!,
         ],
       ),
     );

@@ -23,6 +23,7 @@ class ScrollToTopButton extends StatelessWidget {
         },
         child: const FaIcon(Icons.arrow_drop_up),
         mini: true,
+        heroTag: null,
       ),
     );
   }

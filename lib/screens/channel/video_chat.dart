@@ -1,65 +1,130 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/bttv_api.dart';
+import 'package:frosty/api/ffz_api.dart';
+import 'package:frosty/api/seventv_api.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
+import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
+import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 class VideoChat extends StatefulWidget {
-  final ChatStore chatStore;
+  final String userId;
+  final String userName;
+  final String userLogin;
 
-  const VideoChat({Key? key, required this.chatStore}) : super(key: key);
+  const VideoChat({
+    Key? key,
+    required this.userId,
+    required this.userName,
+    required this.userLogin,
+  }) : super(key: key);
 
   @override
   _VideoChatState createState() => _VideoChatState();
 }
 
 class _VideoChatState extends State<VideoChat> {
+  final _videoKey = GlobalKey();
+  final _chatKey = GlobalKey();
+
+  late final ChatStore _chatStore = ChatStore(
+    channelName: widget.userLogin,
+    channelId: widget.userId,
+    displayName: widget.userName,
+    auth: context.read<AuthStore>(),
+    settings: context.read<SettingsStore>(),
+    chatDetailsStore: ChatDetailsStore(
+      twitchApi: context.read<TwitchApi>(),
+    ),
+    assetsStore: ChatAssetsStore(
+      twitchApi: context.read<TwitchApi>(),
+      ffzApi: context.read<FFZApi>(),
+      bttvApi: context.read<BTTVApi>(),
+      sevenTVApi: context.read<SevenTVApi>(),
+    ),
+  );
+
+  late final VideoStore _videoStore = VideoStore(
+    userLogin: widget.userLogin,
+    twitchApi: context.read<TwitchApi>(),
+    authStore: context.read<AuthStore>(),
+    settingsStore: context.read<SettingsStore>(),
+  );
+
   @override
   Widget build(BuildContext context) {
-    final chatStore = widget.chatStore;
-    final settingsStore = chatStore.settings;
+    final settingsStore = _chatStore.settings;
 
-    final videoStore = VideoStore(
-      twitchApi: context.read<TwitchApi>(),
-      userLogin: chatStore.channelName,
-      authStore: chatStore.auth,
-      settingsStore: chatStore.settings,
+    final player = Video(
+      key: _videoKey,
+      videoStore: _videoStore,
     );
 
     final video = GestureDetector(
+      onLongPress: _videoStore.handleToggleOverlay,
       onTap: () {
-        if (chatStore.assetsStore.showEmoteMenu) {
-          chatStore.assetsStore.showEmoteMenu = false;
+        if (_chatStore.assetsStore.showEmoteMenu) {
+          _chatStore.assetsStore.showEmoteMenu = false;
         } else {
-          if (chatStore.textFieldFocusNode.hasFocus) {
-            chatStore.textFieldFocusNode.unfocus();
+          if (_chatStore.textFieldFocusNode.hasFocus) {
+            _chatStore.textFieldFocusNode.unfocus();
           } else {
-            videoStore.handleVideoTap();
+            _videoStore.handleVideoTap();
           }
         }
       },
-      child: Video(
-        key: GlobalKey(),
-        userLogin: chatStore.channelName,
-        textFieldFocus: chatStore.textFieldFocusNode,
-        videoStore: videoStore,
+      child: Observer(
+        builder: (context) {
+          if (_videoStore.settingsStore.showOverlay) {
+            return Stack(
+              children: [
+                player,
+                Observer(
+                  builder: (_) {
+                    if (_videoStore.paused) return VideoOverlay(videoStore: _videoStore);
+                    return Observer(
+                      builder: (_) => AnimatedOpacity(
+                        opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: ColoredBox(
+                          color: const Color.fromRGBO(0, 0, 0, 0.5),
+                          child: IgnorePointer(
+                            ignoring: !_videoStore.overlayVisible,
+                            child: VideoOverlay(videoStore: _videoStore),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+              ],
+            );
+          }
+          return player;
+        },
       ),
     );
 
     final chat = Chat(
-      key: GlobalKey(),
-      chatStore: chatStore,
+      key: _chatKey,
+      chatStore: _chatStore,
     );
 
     final appBar = AppBar(
       title: Text(
-        regexEnglish.hasMatch(chatStore.displayName) ? chatStore.displayName : chatStore.displayName + ' (${chatStore.channelName})',
+        regexEnglish.hasMatch(_chatStore.displayName) ? _chatStore.displayName : _chatStore.displayName + ' (${_chatStore.channelName})',
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       actions: [
@@ -82,7 +147,13 @@ class _VideoChatState extends State<VideoChat> {
       body: OrientationBuilder(
         builder: (context, orientation) {
           if (orientation == Orientation.landscape) {
+            // Add a post-frame callback to scroll to bottom when rotating.
+            SchedulerBinding.instance?.addPostFrameCallback((_) {
+              if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(_chatStore.scrollController.position.maxScrollExtent);
+            });
+
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
             return Observer(
               builder: (context) => ColoredBox(
                 color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
@@ -97,7 +168,7 @@ class _VideoChatState extends State<VideoChat> {
                                   maintainState: true,
                                   child: chat,
                                 ),
-                                Center(child: video),
+                                video,
                               ],
                             )
                           : Row(
@@ -136,14 +207,15 @@ class _VideoChatState extends State<VideoChat> {
                 Observer(
                   builder: (_) {
                     if (settingsStore.showVideo) {
-                      return video;
+                      return AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: video,
+                      );
                     }
                     return appBar;
                   },
                 ),
-                Expanded(
-                  child: chat,
-                ),
+                Expanded(child: chat),
               ],
             ),
           );
@@ -154,7 +226,7 @@ class _VideoChatState extends State<VideoChat> {
 
   @override
   void dispose() {
-    widget.chatStore.dispose();
+    _chatStore.dispose();
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,

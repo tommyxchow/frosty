@@ -19,6 +19,7 @@ part 'chat_store.g.dart';
 class ChatStore = _ChatStoreBase with _$ChatStore;
 
 abstract class _ChatStoreBase with Store {
+  static const _messageUpperLimit = 7500;
   static const _messageLimit = 5000;
 
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
@@ -75,7 +76,7 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
-  late final ReactionDisposer disposeEmoteMenuReaction;
+  final reactions = <ReactionDisposer>[];
 
   _ChatStoreBase({
     required this.auth,
@@ -89,17 +90,33 @@ abstract class _ChatStoreBase with Store {
     // Create a reaction where anytime the emote menu is shown or hidden,
     // scroll to the bottom of the list. This will prevent the emote menu
     // from covering the latest messages when summoned.
-    disposeEmoteMenuReaction = reaction((_) => assetsStore.showEmoteMenu, (_) {
-      SchedulerBinding.instance?.addPostFrameCallback((_) {
+    reactions.add(reaction(
+      (_) => assetsStore.showEmoteMenu,
+      (_) => SchedulerBinding.instance?.addPostFrameCallback((_) {
         if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-      });
-    });
+      }),
+    ));
+
+    // Create a reaction for scrolling to bottom when exiting fullscreen.
+    reactions.add(reaction(
+      (_) => settings.fullScreen,
+      (_) => SchedulerBinding.instance?.addPostFrameCallback((_) {
+        if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      }),
+    ));
+
+    // Create a reaction that will reconnect to chat when logging in or out.
+    // Closing the channel will trigger a reconnect with the new credentials.
+    reactions.add(reaction(
+      (_) => auth.isLoggedIn,
+      (_) => _channel?.sink.close(1001),
+    ));
 
     assetsStore.init();
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
-    reconnect();
+    connectToChat();
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -109,6 +126,20 @@ abstract class _ChatStoreBase with Store {
         if (_autoScroll == true) _autoScroll = false;
       } else if (scrollController.position.atEdge || scrollController.position.pixels > scrollController.position.maxScrollExtent) {
         if (_autoScroll == false) _autoScroll = true;
+      }
+    });
+
+    // Add a listener to the textfield that will do the following when focused:
+    // 1. Hide the emote menu if it is currently shown
+    // 2. Scroll to the latest message (after a brief delay)
+    textFieldFocusNode.addListener(() {
+      if (textFieldFocusNode.hasFocus) {
+        if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
+
+        Future.delayed(
+          const Duration(milliseconds: 500),
+          () => scrollController.jumpTo(scrollController.position.maxScrollExtent),
+        );
       }
     });
   }
@@ -181,6 +212,10 @@ abstract class _ChatStoreBase with Store {
           });
         }
 
+        // Remove messages when an upper limit is reached.
+        // This will prevent an infinite amount of messages when autoscroll is off.
+        if (_messages.length >= _messageUpperLimit) _messages.removeRange(0, 500);
+
         // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
@@ -221,21 +256,18 @@ abstract class _ChatStoreBase with Store {
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
 
     // Schedule a postFrameCallback in the event a new message is added at the same time.
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
+    SchedulerBinding.instance?.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
   }
 
-  void reconnect() async {
+  @action
+  void connectToChat() {
     _channel?.sink.close(1001);
     _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
     // Listen for new messages and forward them to the handler.
     _channel?.stream.listen(
       (data) => _handleIRCData(data.toString()),
-      onError: (error) {
-        debugPrint('Chat error: ${error.toString()}');
-      },
+      onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_channel == null) return;
 
@@ -253,7 +285,7 @@ abstract class _ChatStoreBase with Store {
         // Increment the retry count and attempt the reconnect.
         _retries++;
         _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
-        reconnect();
+        connectToChat();
       },
     );
 
@@ -280,6 +312,7 @@ abstract class _ChatStoreBase with Store {
   }
 
   /// Sends the given string message by the logged-in user and adds it to [_messages].
+  @action
   void sendMessage(String message) {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) return;
@@ -316,7 +349,11 @@ abstract class _ChatStoreBase with Store {
     _channel?.sink.close(1001);
     _channel = null;
 
-    disposeEmoteMenuReaction();
+    for (final reactionDisposer in reactions) {
+      reactionDisposer();
+    }
+
+    textFieldFocusNode.dispose();
     textController.dispose();
     scrollController.dispose();
     assetsStore.dispose();

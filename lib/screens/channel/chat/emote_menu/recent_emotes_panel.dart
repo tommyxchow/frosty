@@ -63,6 +63,8 @@ class RecentEmotesPanel extends StatelessWidget {
                 );
               },
               childCount: assetsStore.recentEmotes.length,
+              addAutomaticKeepAlives: false,
+              addRepaintBoundaries: false,
             ),
           ),
         ),

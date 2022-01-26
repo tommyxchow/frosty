@@ -39,6 +39,10 @@ abstract class _SettingsStoreBase with Store {
   var pictureInPicture = false;
 
   // Chat Settings
+  @JsonKey(defaultValue: true)
+  @observable
+  var showBottomBar = true;
+
   @JsonKey(defaultValue: false)
   @observable
   var showDeletedMessages = false;

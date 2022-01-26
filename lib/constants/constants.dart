@@ -5,7 +5,7 @@ const clientId = String.fromEnvironment('CLIENT_ID');
 const secret = String.fromEnvironment('SECRET');
 
 /// The current version of the app.
-const appVersion = '1.0.0-beta+9';
+const appVersion = '1.0.0-beta+10';
 
 /// The tracesSampleRate for sentry crash reporting.
 const sampleRate = 1.0;

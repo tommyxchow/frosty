@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frosty/api/bttv_api.dart';
 import 'package:frosty/api/ffz_api.dart';
 import 'package:frosty/api/seventv_api.dart';
@@ -10,10 +11,6 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
-import 'package:frosty/screens/home/stores/categories_store.dart';
-import 'package:frosty/screens/home/stores/home_store.dart';
-import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
@@ -21,23 +18,34 @@ import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Get the shared preferences instance and obtain the existing user settings if it exists.
+  final prefs = await SharedPreferences.getInstance();
+
+  // Workaround for clearing stored tokens on uninstall.
+  // If first time running app, will clear all tokens in the secure storage.
+  if (prefs.getBool('first_run') ?? true) {
+    debugPrint('Clearing secure storage...');
+    const storage = FlutterSecureStorage();
+
+    await storage.deleteAll();
+
+    prefs.setBool('first_run', false);
+  }
+
+  // With the shared preferences instance, obtain the existing user settings if it exists.
   // If default settings don't exist, use an empty JSON string to use the default values.
-  final preferences = await SharedPreferences.getInstance();
-  final userSettings = preferences.getString('settings') ?? '{}';
+  final userSettings = prefs.getString('settings') ?? '{}';
 
   // Initialize a settings store from the settings JSON string.
   final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
 
   // Create a MobX reaction that will save the settings on disk every time they are changed.
-  autorun((_) => preferences.setString('settings', jsonEncode(settingsStore)));
+  autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
-  if (settingsStore.sendCrashLogs) {
-    await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
-  }
+  // Initialize Sentry for crash reporting if enabled.
+  if (settingsStore.sendCrashLogs) await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
 
   /// Initialize API services with a common client.
   /// This will prevent every request from creating a new client instance.
@@ -144,9 +152,7 @@ class MyApp extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final authStore = context.read<AuthStore>();
         final settingsStore = context.read<SettingsStore>();
-        final twitchApi = context.read<TwitchApi>();
 
         return MaterialApp(
           title: 'Frosty',
@@ -157,29 +163,7 @@ class MyApp extends StatelessWidget {
               : settingsStore.themeType == ThemeType.light
                   ? ThemeMode.light
                   : ThemeMode.dark,
-          home: Home(
-            homeStore: HomeStore(),
-            followedStreamsStore: authStore.isLoggedIn
-                ? ListStore(
-                    authStore: authStore,
-                    twitchApi: twitchApi,
-                    listType: ListType.followed,
-                  )
-                : null,
-            topSectionStore: ListStore(
-              authStore: authStore,
-              twitchApi: twitchApi,
-              listType: ListType.top,
-            ),
-            categoriesSectionStore: CategoriesStore(
-              authStore: authStore,
-              twitchApi: twitchApi,
-            ),
-            searchStore: SearchStore(
-              authStore: authStore,
-              twitchApi: twitchApi,
-            ),
-          ),
+          home: const Home(),
         );
       },
     );

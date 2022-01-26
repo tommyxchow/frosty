@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/widgets/category_card.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
+import 'package:provider/provider.dart';
 
 class Categories extends StatefulWidget {
-  final CategoriesStore store;
-
-  const Categories({
-    Key? key,
-    required this.store,
-  }) : super(key: key);
+  const Categories({Key? key}) : super(key: key);
 
   @override
   _CategoriesState createState() => _CategoriesState();
 }
 
 class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMixin {
+  late final _categoriesStore = CategoriesStore(
+    authStore: context.read<AuthStore>(),
+    twitchApi: context.read<TwitchApi>(),
+  );
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final store = widget.store;
 
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
@@ -33,11 +35,11 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
-        await store.refreshCategories();
+        await _categoriesStore.refreshCategories();
 
-        if (store.error != null) {
+        if (_categoriesStore.error != null) {
           final snackBar = SnackBar(
-            content: Text(store.error!),
+            content: Text(_categoriesStore.error!),
             behavior: SnackBarBehavior.floating,
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -45,7 +47,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
       },
       child: Observer(
         builder: (_) {
-          if (store.categories.isEmpty && store.isLoading && store.error == null) {
+          if (_categoriesStore.categories.isEmpty && _categoriesStore.isLoading && _categoriesStore.error == null) {
             return const LoadingIndicator(subtitle: Text('Loading categories...'));
           }
           return Stack(
@@ -53,17 +55,17 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
             children: [
               GridView.builder(
                 physics: const AlwaysScrollableScrollPhysics(),
-                controller: store.scrollController,
+                controller: _categoriesStore.scrollController,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                 ),
-                itemCount: store.categories.length,
+                itemCount: _categoriesStore.categories.length,
                 itemBuilder: (context, index) {
-                  if (index > store.categories.length / 2 && store.hasMore) {
-                    store.getCategories();
+                  if (index > _categoriesStore.categories.length / 2 && _categoriesStore.hasMore) {
+                    _categoriesStore.getCategories();
                   }
                   return CategoryCard(
-                    category: store.categories[index],
+                    category: _categoriesStore.categories[index],
                     width: artWidth,
                     height: artHeight,
                   );
@@ -72,7 +74,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
               Observer(
                 builder: (context) => AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
-                  child: store.showJumpButton ? ScrollToTopButton(scrollController: store.scrollController) : null,
+                  child: _categoriesStore.showJumpButton ? ScrollToTopButton(scrollController: _categoriesStore.scrollController) : null,
                 ),
               ),
             ],
@@ -87,7 +89,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
 
   @override
   void dispose() {
-    widget.store.dispose();
+    _categoriesStore.dispose();
     super.dispose();
   }
 }

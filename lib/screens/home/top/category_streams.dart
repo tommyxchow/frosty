@@ -73,6 +73,7 @@ class CategoryStreams extends StatelessWidget {
                             null,
                             '${artWidth}x$artHeight.jpg',
                           ),
+                          placeholder: (context, url) => const LoadingIndicator(),
                           color: const Color.fromRGBO(255, 255, 255, 0.5),
                           colorBlendMode: BlendMode.modulate,
                           fit: BoxFit.cover,

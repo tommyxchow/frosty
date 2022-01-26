@@ -1,20 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:frosty/api/bttv_api.dart';
-import 'package:frosty/api/ffz_api.dart';
-import 'package:frosty/api/seventv_api.dart';
-import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
-import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
-import 'package:frosty/screens/channel/stores/chat_details_store.dart';
-import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
@@ -36,9 +27,13 @@ class StreamCard extends StatelessWidget {
     final time = DateTime.now();
     final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
 
-    final thumbnail = CachedNetworkImage(
-      imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${width}x$height') + cacheUrlExtension,
-      useOldImageOnUrlChange: true,
+    final thumbnail = AspectRatio(
+      aspectRatio: 16 / 9,
+      child: CachedNetworkImage(
+        imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${width}x$height') + cacheUrlExtension,
+        placeholder: (context, url) => const LoadingIndicator(),
+        useOldImageOnUrlChange: true,
+      ),
     );
 
     final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})';
@@ -48,22 +43,9 @@ class StreamCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => VideoChat(
-            chatStore: ChatStore(
-              channelName: streamInfo.userLogin,
-              channelId: streamInfo.userId,
-              displayName: streamInfo.userName,
-              auth: context.read<AuthStore>(),
-              settings: context.read<SettingsStore>(),
-              chatDetailsStore: ChatDetailsStore(
-                twitchApi: context.read<TwitchApi>(),
-              ),
-              assetsStore: ChatAssetsStore(
-                twitchApi: context.read<TwitchApi>(),
-                ffzApi: context.read<FFZApi>(),
-                bttvApi: context.read<BTTVApi>(),
-                sevenTVApi: context.read<SevenTVApi>(),
-              ),
-            ),
+            userId: streamInfo.userId,
+            userName: streamInfo.userName,
+            userLogin: streamInfo.userLogin,
           ),
         ),
       ),
