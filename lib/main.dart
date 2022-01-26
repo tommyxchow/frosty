@@ -18,7 +18,7 @@ import 'package:provider/provider.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final prefs = await SharedPreferences.getInstance();
@@ -37,12 +37,14 @@ Future<void> main() async {
   // With the shared preferences instance, obtain the existing user settings if it exists.
   // If default settings don't exist, use an empty JSON string to use the default values.
   final userSettings = prefs.getString('settings') ?? '{}';
+
   // Initialize a settings store from the settings JSON string.
   final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
 
   // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
+  // Initialize Sentry for crash reporting if enabled.
   if (settingsStore.sendCrashLogs) await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
 
   /// Initialize API services with a common client.

@@ -10,14 +10,20 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final homeStore = HomeStore();
-    final authStore = context.read<AuthStore>();
+  State<Home> createState() => _HomeState();
+}
 
+class _HomeState extends State<Home> {
+  late final _authStore = context.read<AuthStore>();
+
+  late final _homeStore = HomeStore(authStore: _authStore);
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
@@ -26,12 +32,12 @@ class Home extends StatelessWidget {
           title: Observer(
             builder: (_) {
               final titles = [
-                if (authStore.isLoggedIn) 'Followed Streams',
+                if (_authStore.isLoggedIn) 'Followed Streams',
                 'Top',
                 'Search',
               ];
 
-              return Text(titles[homeStore.selectedIndex]);
+              return Text(titles[_homeStore.selectedIndex]);
             },
           ),
           actions: [
@@ -50,9 +56,9 @@ class Home extends StatelessWidget {
         body: SafeArea(
           child: Observer(
             builder: (_) => IndexedStack(
-              index: homeStore.selectedIndex,
+              index: _homeStore.selectedIndex,
               children: [
-                if (authStore.isLoggedIn) const StreamsList(listType: ListType.followed),
+                if (_authStore.isLoggedIn) const StreamsList(listType: ListType.followed),
                 const TopSection(),
                 const Search(),
               ],
@@ -62,7 +68,7 @@ class Home extends StatelessWidget {
         bottomNavigationBar: Observer(
           builder: (_) => BottomNavigationBar(
             items: [
-              if (authStore.isLoggedIn)
+              if (_authStore.isLoggedIn)
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
                   label: 'Followed',
@@ -76,11 +82,17 @@ class Home extends StatelessWidget {
                 label: 'Search',
               ),
             ],
-            currentIndex: homeStore.selectedIndex,
-            onTap: homeStore.handleTap,
+            currentIndex: _homeStore.selectedIndex,
+            onTap: _homeStore.handleTap,
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _homeStore.dispose();
+    super.dispose();
   }
 }
