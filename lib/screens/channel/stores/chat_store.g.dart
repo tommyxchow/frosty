@@ -86,11 +86,11 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   }
 
   @override
-  void reconnect() {
+  void connectToChat() {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.reconnect');
+        name: '_ChatStoreBase.connectToChat');
     try {
-      return super.reconnect();
+      return super.connectToChat();
     } finally {
       _$_ChatStoreBaseActionController.endAction(_$actionInfo);
     }

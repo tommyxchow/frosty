@@ -57,7 +57,7 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final fullScreenButton = IconButton(
-      tooltip: 'Fullscreen',
+      tooltip: videoStore.settingsStore.fullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
       icon: videoStore.settingsStore.fullScreen
           ? const Icon(
               Icons.fullscreen_exit,

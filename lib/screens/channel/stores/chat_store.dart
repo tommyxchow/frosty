@@ -105,11 +105,18 @@ abstract class _ChatStoreBase with Store {
       }),
     ));
 
+    // Create a reaction that will reconnect to chat when logging in or out.
+    // Closing the channel will trigger a reconnect with the new credentials.
+    reactions.add(reaction(
+      (_) => auth.isLoggedIn,
+      (_) => _channel?.sink.close(1001),
+    ));
+
     assetsStore.init();
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
-    reconnect();
+    connectToChat();
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -249,22 +256,18 @@ abstract class _ChatStoreBase with Store {
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
 
     // Schedule a postFrameCallback in the event a new message is added at the same time.
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
+    SchedulerBinding.instance?.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
   }
 
   @action
-  void reconnect() {
+  void connectToChat() {
     _channel?.sink.close(1001);
     _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
     // Listen for new messages and forward them to the handler.
     _channel?.stream.listen(
       (data) => _handleIRCData(data.toString()),
-      onError: (error) {
-        debugPrint('Chat error: ${error.toString()}');
-      },
+      onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_channel == null) return;
 
@@ -282,7 +285,7 @@ abstract class _ChatStoreBase with Store {
         // Increment the retry count and attempt the reconnect.
         _retries++;
         _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
-        reconnect();
+        connectToChat();
       },
     );
 
@@ -350,6 +353,7 @@ abstract class _ChatStoreBase with Store {
       reactionDisposer();
     }
 
+    textFieldFocusNode.dispose();
     textController.dispose();
     scrollController.dispose();
     assetsStore.dispose();
