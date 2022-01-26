@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/blocked_users.dart';
@@ -18,51 +19,53 @@ class AccountSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SectionHeader(
-          'Account',
-          padding: EdgeInsets.all(10.0),
-        ),
-        ProfileCard(authStore: authStore),
-        if (authStore.isLoggedIn) ...[
-          ListTile(
-            title: const Text('Blocked Users'),
-            trailing: Icon(Icons.adaptive.arrow_forward),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlockedUsers(
-                  authStore: authStore,
+    return Observer(
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SectionHeader(
+            'Account',
+            padding: EdgeInsets.all(10.0),
+          ),
+          ProfileCard(authStore: authStore),
+          if (authStore.isLoggedIn) ...[
+            ListTile(
+              title: const Text('Blocked Users'),
+              trailing: Icon(Icons.adaptive.arrow_forward),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlockedUsers(
+                    authStore: authStore,
+                  ),
                 ),
               ),
             ),
-          ),
-          ListTile(
-            isThreeLine: true,
-            title: const Text('Log in to WebView'),
-            subtitle: const Text('Lets you avoid ads on your subscribed streamers or if you have Turbo.'),
-            trailing: Icon(Icons.adaptive.arrow_forward),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return Scaffold(
-                    appBar: AppBar(
-                      title: const Text('Log In to WebView'),
-                    ),
-                    body: const WebView(
-                      initialUrl: 'https://www.twitch.tv/login',
-                      javascriptMode: JavascriptMode.unrestricted,
-                    ),
-                  );
-                },
+            ListTile(
+              isThreeLine: true,
+              title: const Text('Log in to WebView'),
+              subtitle: const Text('Lets you avoid ads on your subscribed streamers or if you have Turbo.'),
+              trailing: Icon(Icons.adaptive.arrow_forward),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: const Text('Log In to WebView'),
+                      ),
+                      body: const WebView(
+                        initialUrl: 'https://www.twitch.tv/login',
+                        javascriptMode: JavascriptMode.unrestricted,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
