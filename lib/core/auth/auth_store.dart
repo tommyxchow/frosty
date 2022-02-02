@@ -112,11 +112,13 @@ abstract class _AuthBase with Store {
         final url = Uri.parse(result.replaceFirst('#', '?'));
         _token = url.queryParameters['access_token'];
       } else {
+        // Validate the custom token.
+        _tokenIsValid = await twitchApi.validateToken(token: customToken);
+        if (!_tokenIsValid) return;
+
+        // Replace the current default token with the new custom token.
         _token = customToken;
       }
-
-      _tokenIsValid = await twitchApi.validateToken(token: _token!);
-      if (!_tokenIsValid) return;
 
       // Store the user token.
       await _storage.write(key: _userTokenKey, value: customToken ?? _token);
@@ -135,8 +137,7 @@ abstract class _AuthBase with Store {
   @action
   Future<void> logout() async {
     try {
-      // Revoke the existing user token and delete it.
-      await twitchApi.revokeToken(token: _token!);
+      // Delete the existing user token.
       await _storage.delete(key: _userTokenKey);
       _token = null;
 
@@ -151,7 +152,6 @@ abstract class _AuthBase with Store {
       if (_token == null) {
         _token = await twitchApi.getDefaultToken();
         await _storage.write(key: _defaultTokenKey, value: _token);
-        _tokenIsValid = await twitchApi.validateToken(token: _token!);
       } else {
         // Validate the stored token.
         _tokenIsValid = await twitchApi.validateToken(token: _token!);
@@ -160,7 +160,6 @@ abstract class _AuthBase with Store {
         if (!_tokenIsValid) {
           _token = await twitchApi.getDefaultToken();
           await _storage.write(key: _defaultTokenKey, value: _token);
-          _tokenIsValid = await twitchApi.validateToken(token: _token!);
         }
       }
 
