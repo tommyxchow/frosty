@@ -228,12 +228,9 @@ class _VideoChatState extends State<VideoChat> {
   void dispose() {
     _chatStore.dispose();
 
-    Future.delayed(
-      const Duration(milliseconds: 500),
-      () => SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
-        overlays: SystemUiOverlay.values,
-      ),
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: SystemUiOverlay.values,
     );
 
     super.dispose();
