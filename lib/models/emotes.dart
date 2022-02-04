@@ -181,7 +181,6 @@ class OwnerFFZ {
 }
 
 // * 7TV Emotes *
-
 @JsonSerializable(createToJson: false)
 class Role7TV {
   final String id;
@@ -310,6 +309,8 @@ class Emote {
 }
 
 enum EmoteType {
+  twitchBits,
+  twitchFollower,
   twitchSub,
   twitchGlobal,
   twitchUnlocked,
