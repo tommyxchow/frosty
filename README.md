@@ -7,10 +7,10 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 
 <p>
     <a href="https://testflight.apple.com/join/UZLoznpr">
-        <img align="center" alt="Get it on iOS (Apple TestFlight)" src="assets/badges/testflight.png" width="40%">
+        <img align="center" alt="Get it on iOS (Apple TestFlight)" src="assets/badges/testflight.png" style="width:44%; max-width: 250px;">
     </a>
     <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty">
-        <img align="center" alt="Get it on Android (Google Play Store)" src="assets/badges/google-play-badge.png" width="50%">
+        <img align="center" alt="Get it on Android (Google Play Store)" src="assets/badges/google-play-badge.png" style="width:54%; max-width: 300px;">
     </a>
 </p>
 
