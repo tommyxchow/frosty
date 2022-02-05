@@ -14,6 +14,8 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
     </a>
 </p>
 
+<a href="https://www.buymeacoffee.com/tommychow" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 ## Features
 
 - Browse followed streams, top streams, and top categories
