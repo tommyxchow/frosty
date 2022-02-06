@@ -18,7 +18,10 @@ class OtherSettings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionHeader('Other'),
+        const SectionHeader(
+          'Other',
+          padding: EdgeInsets.all(10.0),
+        ),
         ListTile(
           leading: const Icon(Icons.info),
           title: const Text('About'),

@@ -45,8 +45,6 @@ class EmoteMenuSection extends StatelessWidget {
             ),
           ),
           childCount: emotes.length,
-          addAutomaticKeepAlives: false,
-          addRepaintBoundaries: false,
         ),
       ),
     );

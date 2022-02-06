@@ -27,7 +27,10 @@ class _ChatSettingsState extends State<ChatSettings> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionHeader('Chat'),
+            const SectionHeader(
+              'Chat',
+              padding: EdgeInsets.all(10.0),
+            ),
             SwitchListTile.adaptive(
               title: const Text('Show bottom bar'),
               value: settingsStore.showBottomBar,

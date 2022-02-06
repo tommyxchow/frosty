@@ -17,7 +17,10 @@ class VideoSettings extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionHeader('Video'),
+            const SectionHeader(
+              'Video',
+              padding: EdgeInsets.all(10.0),
+            ),
             SwitchListTile.adaptive(
               title: const Text('Show video'),
               value: settingsStore.showVideo,
