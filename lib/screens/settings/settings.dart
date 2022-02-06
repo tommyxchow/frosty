@@ -28,11 +28,6 @@ class Settings extends StatelessWidget {
         title: const Text('Settings'),
         actions: [
           IconButton(
-            tooltip: 'Support the app',
-            onPressed: () => launch('https://www.buymeacoffee.com/tommychow'),
-            icon: const FaIcon(FontAwesomeIcons.donate),
-          ),
-          IconButton(
             tooltip: 'View source on GitHub',
             onPressed: () => launch('https://github.com/tommyxchow/frosty'),
             icon: const FaIcon(FontAwesomeIcons.github),
