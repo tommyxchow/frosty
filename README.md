@@ -15,7 +15,7 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 </p>
 
 <a href="https://www.buymeacoffee.com/tommychow" target="_blank">
-    <img alt="Buy Me A Coffee" src="assets/badges/buymeacoffee.svg" width="200">
+    <img alt="Buy Me A Coffee" src="assets/badges/bmc-button.svg" width="200">
 </a>
 
 ## Features
