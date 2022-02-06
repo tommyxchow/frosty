@@ -6,15 +6,17 @@
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
 
 <p>
-    <a href="https://testflight.apple.com/join/UZLoznpr">
-        <img align="center" alt="Get it on iOS (Apple TestFlight)" src="assets/badges/testflight.png" width="200">
+    <a href="https://testflight.apple.com/join/UZLoznpr" target="_blank">
+        <img align="center" alt="Get it on iOS (Apple TestFlight)" src="assets/badges/apple_app_store_badge.svg" width="200">
     </a>
-    <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty">
-        <img align="center" alt="Get it on Android (Google Play Store)" src="assets/badges/google-play-badge.png" width="250">
+    <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty" target="_blank">
+        <img align="center" alt="Get it on Android (Google Play Store)" src="assets/badges/google_play_store_badge.svg" width="225">
     </a>
 </p>
 
-<a href="https://www.buymeacoffee.com/tommychow" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+<a href="https://www.buymeacoffee.com/tommychow" target="_blank">
+    <img alt="Buy Me A Coffee" src="assets/badges/buymeacoffee.svg" width="200">
+</a>
 
 ## Features
 
