@@ -43,7 +43,13 @@ abstract class _ListStoreBase with Store {
 
   /// The list of the fetched streams.
   @readonly
-  var _streams = ObservableList<StreamTwitch>();
+  var _allStreams = ObservableList<StreamTwitch>();
+
+  @computed
+  ObservableList<StreamTwitch> get streams => _allStreams
+      .where((streamInfo) => !authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(streamInfo.userId))
+      .toList()
+      .asObservable();
 
   /// The error message to show if any. Will be non-null if there is an error.
   @readonly
@@ -105,9 +111,9 @@ abstract class _ListStoreBase with Store {
       }
 
       if (_streamsCursor == null) {
-        _streams = newStreams.data.asObservable();
+        _allStreams = newStreams.data.asObservable();
       } else {
-        _streams.addAll(newStreams.data);
+        _allStreams.addAll(newStreams.data);
       }
       _streamsCursor = newStreams.pagination['cursor'];
 
@@ -129,9 +135,7 @@ abstract class _ListStoreBase with Store {
     return getStreams();
   }
 
-  void dispose() {
-    scrollController.dispose();
-  }
+  void dispose() => scrollController.dispose();
 }
 
 enum ListType {

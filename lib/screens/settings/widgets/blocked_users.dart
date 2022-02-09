@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/widgets/block_button.dart';
 
 class BlockedUsers extends StatelessWidget {
   final AuthStore authStore;
+
   const BlockedUsers({
     Key? key,
     required this.authStore,
@@ -30,18 +32,19 @@ class BlockedUsers extends StatelessWidget {
               );
             }
             return ListView(
-              children: authStore.user.blockedUsers
-                  .map(
-                    (user) => ListTile(
-                      title: Text(user.displayName),
-                      trailing: BlockButton(
-                        authStore: authStore,
-                        targetUser: user.displayName,
-                        targetUserId: user.userId,
-                      ),
+              children: authStore.user.blockedUsers.map(
+                (user) {
+                  final displayName = regexEnglish.hasMatch(user.displayName) ? user.displayName : user.displayName + ' (${user.userLogin})';
+                  return ListTile(
+                    title: Text(displayName),
+                    trailing: BlockButton(
+                      authStore: authStore,
+                      targetUser: displayName,
+                      targetUserId: user.userId,
                     ),
-                  )
-                  .toList(),
+                  );
+                },
+              ).toList(),
             );
           },
         ),

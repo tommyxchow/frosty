@@ -9,6 +9,14 @@ part of 'list_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ListStore on _ListStoreBase, Store {
+  Computed<ObservableList<StreamTwitch>>? _$streamsComputed;
+
+  @override
+  ObservableList<StreamTwitch> get streams => (_$streamsComputed ??=
+          Computed<ObservableList<StreamTwitch>>(() => super.streams,
+              name: '_ListStoreBase.streams'))
+      .value;
+
   final _$showJumpButtonAtom = Atom(name: '_ListStoreBase.showJumpButton');
 
   @override
@@ -24,20 +32,20 @@ mixin _$ListStore on _ListStoreBase, Store {
     });
   }
 
-  final _$_streamsAtom = Atom(name: '_ListStoreBase._streams');
+  final _$_allStreamsAtom = Atom(name: '_ListStoreBase._allStreams');
 
-  ObservableList<StreamTwitch> get streams {
-    _$_streamsAtom.reportRead();
-    return super._streams;
+  ObservableList<StreamTwitch> get allStreams {
+    _$_allStreamsAtom.reportRead();
+    return super._allStreams;
   }
 
   @override
-  ObservableList<StreamTwitch> get _streams => streams;
+  ObservableList<StreamTwitch> get _allStreams => allStreams;
 
   @override
-  set _streams(ObservableList<StreamTwitch> value) {
-    _$_streamsAtom.reportWrite(value, super._streams, () {
-      super._streams = value;
+  set _allStreams(ObservableList<StreamTwitch> value) {
+    _$_allStreamsAtom.reportWrite(value, super._allStreams, () {
+      super._allStreams = value;
     });
   }
 
@@ -82,7 +90,8 @@ mixin _$ListStore on _ListStoreBase, Store {
   @override
   String toString() {
     return '''
-showJumpButton: ${showJumpButton}
+showJumpButton: ${showJumpButton},
+streams: ${streams}
     ''';
   }
 }

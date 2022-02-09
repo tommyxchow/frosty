@@ -28,7 +28,7 @@ class CategoryCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => CategoryStreams(
-            store: ListStore(
+            listStore: ListStore(
               twitchApi: context.read<TwitchApi>(),
               authStore: context.read<AuthStore>(),
               listType: ListType.category,
