@@ -38,7 +38,11 @@ class BlockButton extends StatelessWidget {
               if (isBlocked) {
                 authStore.user.unblock(targetId: targetUserId, headers: authStore.headersTwitch);
               } else {
-                authStore.user.block(targetId: targetUserId, headers: authStore.headersTwitch);
+                authStore.user.block(
+                  targetId: targetUserId,
+                  displayName: targetUser,
+                  headers: authStore.headersTwitch,
+                );
               }
               Navigator.pop(context);
             },

@@ -54,9 +54,11 @@ mixin _$UserStore on _UserStoreBase, Store {
 
   @override
   Future<void> block(
-      {required String targetId, required Map<String, String> headers}) {
-    return _$blockAsyncAction
-        .run(() => super.block(targetId: targetId, headers: headers));
+      {required String targetId,
+      required String displayName,
+      required Map<String, String> headers}) {
+    return _$blockAsyncAction.run(() => super
+        .block(targetId: targetId, displayName: displayName, headers: headers));
   }
 
   final _$unblockAsyncAction = AsyncAction('_UserStoreBase.unblock');

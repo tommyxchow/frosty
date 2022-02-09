@@ -19,28 +19,30 @@ class BlockReportModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          width: double.infinity,
-          child: BlockButton(
-            authStore: authStore,
-            targetUser: name,
-            targetUserId: userId,
-            simple: false,
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            width: double.infinity,
+            child: BlockButton(
+              authStore: authStore,
+              targetUser: name,
+              targetUserId: userId,
+              simple: false,
+            ),
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          width: double.infinity,
-          child: ReportButton(
-            userLogin: userLogin,
-            name: name,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            width: double.infinity,
+            child: ReportButton(
+              userLogin: userLogin,
+              name: name,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
