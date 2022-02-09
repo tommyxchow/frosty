@@ -16,6 +16,7 @@ class ReportButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: () => launch('https://www.twitch.tv/$userLogin/report'),
       child: Text(name == null ? 'Report' : 'Report $name'),
+      style: OutlinedButton.styleFrom(primary: Colors.red),
     );
   }
 }

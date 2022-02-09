@@ -4,6 +4,7 @@ import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/block_button.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/report_button.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class ChatUserModal extends StatelessWidget {
@@ -44,20 +45,13 @@ class ChatUserModal extends StatelessWidget {
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          OutlinedButton(
-                            onPressed: () {
-                              chatStore.textController.text = '@$username ';
-                              Navigator.pop(context);
-                              chatStore.textFieldFocusNode.requestFocus();
-                            },
-                            child: const Text('Reply'),
-                          ),
+                          ReportButton(userLogin: username),
                           const SizedBox(width: 10.0),
                           BlockButton(
                             authStore: chatStore.auth,
                             targetUser: username,
                             targetUserId: userId,
-                          )
+                          ),
                         ],
                       )
                     : null,
@@ -94,7 +88,22 @@ class ChatUserModal extends StatelessWidget {
                   itemCount: userMessages.length,
                 ),
               ),
-            )
+            ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10.0,
+                vertical: 5.0,
+              ),
+              child: OutlinedButton(
+                onPressed: () {
+                  chatStore.textController.text = '@$username ';
+                  Navigator.pop(context);
+                  chatStore.textFieldFocusNode.requestFocus();
+                },
+                child: const Text('Reply'),
+              ),
+            ),
           ],
         ),
       ),
