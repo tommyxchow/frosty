@@ -31,7 +31,7 @@ class ChatDetails extends StatelessWidget {
                   chatDetails: chatDetails,
                   userLogin: userLogin,
                 ),
-              )
+              ),
             ],
           ),
         ),

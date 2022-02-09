@@ -4,10 +4,9 @@ import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/widgets/block_button.dart';
+import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
-import 'package:frosty/widgets/report_button.dart';
 import 'package:intl/intl.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
@@ -56,28 +55,11 @@ class StreamCard extends StatelessWidget {
       ),
       onLongPress: () => showModalBottomSheet(
         context: context,
-        builder: (context) => Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              width: double.infinity,
-              child: BlockButton(
-                authStore: listStore.authStore,
-                targetUser: streamerName,
-                targetUserId: streamInfo.userId,
-                simple: false,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              width: double.infinity,
-              child: ReportButton(
-                userLogin: streamInfo.userLogin,
-                name: streamerName,
-              ),
-            ),
-          ],
+        builder: (context) => BlockReportModal(
+          authStore: listStore.authStore,
+          name: streamerName,
+          userLogin: streamInfo.userLogin,
+          userId: streamInfo.userId,
         ),
       ),
       child: Padding(

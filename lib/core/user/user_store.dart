@@ -37,7 +37,7 @@ abstract class _UserStoreBase with Store {
     final success = await twitchApi.blockUser(userId: targetId, headers: headers);
     // Add a slight delay between requests, otherwise the blocked list won't properly update.
     // Weird behavior, might be something to do with PUT request and time to create and update resource?
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 300));
     if (success) await refreshBlockedUsers(headers: headers);
   }
 

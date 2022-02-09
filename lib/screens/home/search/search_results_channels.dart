@@ -4,6 +4,7 @@ import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
+import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:mobx/mobx.dart';
@@ -60,42 +61,56 @@ class SearchResultsChannels extends StatelessWidget {
               ),
             );
           case FutureStatus.fulfilled:
-            final List<ChannelQuery> results = future.result;
+            final results = (future.result as List<ChannelQuery>)
+                .where((channel) => !searchStore.authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(channel.id));
 
             return SliverList(
               delegate: SliverChildListDelegate.fixed([
                 ...results.map(
-                  (channel) => ListTile(
-                    title: Text(
-                        regexEnglish.hasMatch(channel.displayName) ? channel.displayName : channel.displayName + ' (${channel.broadcasterLogin})'),
-                    leading: ProfilePicture(userLogin: channel.broadcasterLogin),
-                    trailing: channel.isLive
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(5.0),
-                            child: Container(
-                              color: const Color(0xFFF44336),
-                              padding: const EdgeInsets.all(10.0),
-                              child: const Text(
-                                'LIVE',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                  (channel) {
+                    final displayName =
+                        regexEnglish.hasMatch(channel.displayName) ? channel.displayName : channel.displayName + ' (${channel.broadcasterLogin})';
+
+                    return ListTile(
+                      title: Text(displayName),
+                      leading: ProfilePicture(userLogin: channel.broadcasterLogin),
+                      trailing: channel.isLive
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(5.0),
+                              child: Container(
+                                color: const Color(0xFFF44336),
+                                padding: const EdgeInsets.all(10.0),
+                                child: const Text(
+                                  'LIVE',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                          )
-                        : null,
-                    subtitle: channel.isLive
-                        ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}')
-                        : null,
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => VideoChat(
-                          userId: channel.id,
-                          userName: channel.displayName,
-                          userLogin: channel.broadcasterLogin,
+                            )
+                          : null,
+                      subtitle: channel.isLive
+                          ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}')
+                          : null,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VideoChat(
+                            userId: channel.id,
+                            userName: channel.displayName,
+                            userLogin: channel.broadcasterLogin,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
+                      onLongPress: () => showModalBottomSheet(
+                        context: context,
+                        builder: (context) => BlockReportModal(
+                          authStore: searchStore.authStore,
+                          name: displayName,
+                          userLogin: channel.broadcasterLogin,
+                          userId: channel.id,
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 ListTile(
                   title: Text('Go to channel "$query"'),

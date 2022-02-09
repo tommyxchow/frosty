@@ -27,7 +27,7 @@ class BlockButton extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: isBlocked ? const Text('Unblock') : const Text('Block'),
         content: Text(
-            'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will hide them from channel lists and chat messages.'}'),
+            'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}'),
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
