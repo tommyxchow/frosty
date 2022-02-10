@@ -4,9 +4,6 @@ const clientId = String.fromEnvironment('CLIENT_ID');
 /// Twitch API client secret.
 const secret = String.fromEnvironment('SECRET');
 
-/// The current version of the app.
-const appVersion = '1.0.0';
-
 /// The tracesSampleRate for sentry crash reporting.
 const sampleRate = 1.0;
 

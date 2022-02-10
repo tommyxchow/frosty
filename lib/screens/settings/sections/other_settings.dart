@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class OtherSettings extends StatelessWidget {
@@ -25,12 +26,16 @@ class OtherSettings extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.info),
           title: const Text('About'),
-          onTap: () => showAboutDialog(
-            context: context,
-            applicationName: 'Frosty',
-            applicationVersion: appVersion,
-            applicationLegalese: '\u{a9} 2022 Tommy Chow',
-          ),
+          onTap: () async {
+            final packageInfo = await PackageInfo.fromPlatform();
+
+            showAboutDialog(
+              context: context,
+              applicationName: packageInfo.appName,
+              applicationVersion: 'Version ${packageInfo.version} build ${packageInfo.buildNumber}',
+              applicationLegalese: '\u{a9} 2022 Tommy Chow',
+            );
+          },
         ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
