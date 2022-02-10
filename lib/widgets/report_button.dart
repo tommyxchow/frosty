@@ -13,9 +13,10 @@ class ReportButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
+    return OutlinedButton.icon(
+      icon: const Icon(Icons.report),
       onPressed: () => launch('https://www.twitch.tv/$userLogin/report'),
-      child: Text(name == null ? 'Report' : 'Report $name'),
+      label: Text(name == null ? 'Report' : 'Report $name'),
       style: OutlinedButton.styleFrom(primary: Colors.red),
     );
   }

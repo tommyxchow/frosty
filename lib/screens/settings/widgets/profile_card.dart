@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:intl/intl.dart';
 
 class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
@@ -95,7 +94,6 @@ class ProfileCard extends StatelessWidget {
                 foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
               ),
               title: Text(authStore.user.details!.displayName),
-              subtitle: Text('Joined on ${DateFormat.yMMMd().format(DateTime.parse(authStore.user.details!.createdAt))}'),
               trailing: OutlinedButton(
                 onPressed: () => _showLogoutDialog(context),
                 child: const Text('Log Out'),

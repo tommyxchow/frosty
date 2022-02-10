@@ -60,8 +60,9 @@ class BlockButton extends StatelessWidget {
       builder: (context) {
         final isBlocked = authStore.user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
 
-        return OutlinedButton(
-          child: isBlocked ? Text(simple ? 'Unblock' : 'Unblock $targetUser') : Text(simple ? 'Block' : 'Block $targetUser'),
+        return OutlinedButton.icon(
+          icon: const Icon(Icons.block),
+          label: isBlocked ? Text(simple ? 'Unblock' : 'Unblock $targetUser') : Text(simple ? 'Block' : 'Block $targetUser'),
           onPressed: () => _showDialog(
             context,
             isBlocked: isBlocked,

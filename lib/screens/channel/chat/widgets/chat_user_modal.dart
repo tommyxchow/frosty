@@ -53,7 +53,7 @@ class ChatUserModal extends StatelessWidget {
                           userId: userId,
                         ),
                       ),
-                      icon: const Icon(Icons.report),
+                      icon: Icon(Icons.adaptive.more),
                     ),
                   ],
                 ),

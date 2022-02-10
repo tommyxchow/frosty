@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/widgets/block_button.dart';
 import 'package:frosty/widgets/report_button.dart';
@@ -23,6 +23,13 @@ class BlockReportModal extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(
+            width: 50.0,
+            child: Divider(
+              height: 25.0,
+              thickness: 3.0,
+            ),
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             width: double.infinity,

@@ -99,15 +99,13 @@ class StreamCard extends StatelessWidget {
                           radius: 10.0,
                         ),
                         const SizedBox(width: 5.0),
-                        Expanded(
-                          child: Tooltip(
-                            message: streamerName,
-                            preferBelow: false,
-                            child: Text(
-                              streamerName,
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                        Tooltip(
+                          message: streamerName,
+                          preferBelow: false,
+                          child: Text(
+                            streamerName,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
