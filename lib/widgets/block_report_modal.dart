@@ -46,7 +46,7 @@ class BlockReportModal extends StatelessWidget {
             width: double.infinity,
             child: ReportButton(
               userLogin: userLogin,
-              name: name,
+              displayName: name,
             ),
           ),
         ],
