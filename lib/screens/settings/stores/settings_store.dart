@@ -22,9 +22,9 @@ abstract class _SettingsStoreBase with Store {
   var showThumbnailUptime = false;
 
   // Video Settings
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: true)
   @observable
-  var showVideo = false;
+  var showVideo = true;
 
   @JsonKey(defaultValue: true)
   @observable
