@@ -12,7 +12,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               unknownValue: ThemeType.system) ??
           ThemeType.system
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
-      ..showVideo = json['showVideo'] as bool? ?? true
+      ..showVideo = json['showVideo'] as bool? ?? false
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false

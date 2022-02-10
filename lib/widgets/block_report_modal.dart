@@ -30,16 +30,17 @@ class BlockReportModal extends StatelessWidget {
               thickness: 3.0,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            width: double.infinity,
-            child: BlockButton(
-              authStore: authStore,
-              targetUser: name,
-              targetUserId: userId,
-              simple: false,
+          if (authStore.isLoggedIn)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              width: double.infinity,
+              child: BlockButton(
+                authStore: authStore,
+                targetUser: name,
+                targetUserId: userId,
+                simple: false,
+              ),
             ),
-          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             width: double.infinity,
