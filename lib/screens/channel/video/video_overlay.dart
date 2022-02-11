@@ -154,11 +154,11 @@ class VideoOverlay extends StatelessWidget {
                                 streamer,
                                 const SizedBox(height: 5.0),
                                 Tooltip(
-                                  message: videoStore.streamInfo!.title,
+                                  message: videoStore.streamInfo!.title.trim(),
                                   preferBelow: false,
                                   padding: const EdgeInsets.all(10.0),
                                   child: Text(
-                                    videoStore.streamInfo!.title,
+                                    videoStore.streamInfo!.title.trim(),
                                     maxLines: orientation == Orientation.portrait ? 1 : 5,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(

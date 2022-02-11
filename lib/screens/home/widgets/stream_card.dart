@@ -114,11 +114,11 @@ class StreamCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5.0),
                     Tooltip(
-                      message: streamInfo.title,
+                      message: streamInfo.title.trim(),
                       preferBelow: false,
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
-                        streamInfo.title,
+                        streamInfo.title.trim(),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
