@@ -17,7 +17,7 @@ abstract class _UserStoreBase with Store {
   @readonly
   var _blockedUsers = ObservableList<UserBlockedTwitch>();
 
-  late final ReactionDisposer disposeReaction;
+  late ReactionDisposer disposeReaction;
 
   _UserStoreBase({required this.twitchApi});
 
