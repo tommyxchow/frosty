@@ -65,7 +65,7 @@ class EmoteMenuPanel extends StatelessWidget {
         ],
         if (subEmotes.isNotEmpty) ...[
           const SliverToBoxAdapter(
-            child: SectionHeader('Subbed Emotes'),
+            child: SectionHeader('Subscribed Emotes'),
           ),
           EmoteMenuSection(
             assetsStore: assetsStore,

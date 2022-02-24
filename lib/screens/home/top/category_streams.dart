@@ -10,9 +10,9 @@ import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
 class CategoryStreams extends StatelessWidget {
-  final ListStore store;
+  final ListStore listStore;
 
-  const CategoryStreams({Key? key, required this.store}) : super(key: key);
+  const CategoryStreams({Key? key, required this.listStore}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +29,11 @@ class CategoryStreams extends StatelessWidget {
       body: RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.lightImpact();
-          await store.refreshStreams();
+          await listStore.refreshStreams();
 
-          if (store.error != null) {
+          if (listStore.error != null) {
             final snackBar = SnackBar(
-              content: Text(store.error!),
+              content: Text(listStore.error!),
               behavior: SnackBarBehavior.floating,
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -41,7 +41,7 @@ class CategoryStreams extends StatelessWidget {
         },
         child: Observer(
           builder: (context) {
-            if (store.streams.isEmpty && store.isLoading && store.error == null) {
+            if (listStore.streams.isEmpty && listStore.isLoading && listStore.error == null) {
               return const LoadingIndicator(subtitle: Text('Loading streams...'));
             }
             return Stack(
@@ -49,7 +49,7 @@ class CategoryStreams extends StatelessWidget {
               children: [
                 CustomScrollView(
                   physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                  controller: store.scrollController,
+                  controller: listStore.scrollController,
                   slivers: [
                     SliverAppBar(
                       stretch: true,
@@ -62,14 +62,14 @@ class CategoryStreams extends StatelessWidget {
                         ],
                         centerTitle: true,
                         title: Text(
-                          store.categoryInfo!.name,
+                          listStore.categoryInfo!.name,
                           style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         background: CachedNetworkImage(
-                          imageUrl: store.categoryInfo!.boxArtUrl.replaceRange(
-                            store.categoryInfo!.boxArtUrl.lastIndexOf('-') + 1,
+                          imageUrl: listStore.categoryInfo!.boxArtUrl.replaceRange(
+                            listStore.categoryInfo!.boxArtUrl.lastIndexOf('-') + 1,
                             null,
                             '${artWidth}x$artHeight.jpg',
                           ),
@@ -85,19 +85,20 @@ class CategoryStreams extends StatelessWidget {
                       sliver: SliverList(
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
-                            if (index > store.streams.length / 2 && store.hasMore) {
-                              store.getStreams();
+                            if (index > listStore.streams.length / 2 && listStore.hasMore) {
+                              listStore.getStreams();
                             }
                             return Observer(
                               builder: (context) => StreamCard(
-                                streamInfo: store.streams[index],
+                                listStore: listStore,
+                                streamInfo: listStore.streams[index],
                                 width: thumbnailWidth,
                                 height: thumbnailHeight,
                                 showUptime: context.read<SettingsStore>().showThumbnailUptime,
                               ),
                             );
                           },
-                          childCount: store.streams.length,
+                          childCount: listStore.streams.length,
                         ),
                       ),
                     ),
@@ -107,7 +108,7 @@ class CategoryStreams extends StatelessWidget {
                   child: Observer(
                     builder: (context) => AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
-                      child: store.showJumpButton ? ScrollToTopButton(scrollController: store.scrollController) : null,
+                      child: listStore.showJumpButton ? ScrollToTopButton(scrollController: listStore.scrollController) : null,
                     ),
                   ),
                 ),

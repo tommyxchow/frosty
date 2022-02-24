@@ -44,7 +44,18 @@ class TwitchApi {
       final decoded = jsonDecode(response.body)['data'] as List;
       final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
 
-      return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchChannel)).toList();
+      return emotes.map((emote) {
+        switch (emote.emoteType) {
+          case 'bitstier':
+            return Emote.fromTwitch(emote, EmoteType.twitchBits);
+          case 'follower':
+            return Emote.fromTwitch(emote, EmoteType.twitchFollower);
+          case 'subscriptions':
+            return Emote.fromTwitch(emote, EmoteType.twitchChannel);
+          default:
+            return Emote.fromTwitch(emote, EmoteType.twitchChannel);
+        }
+      }).toList();
     } else {
       return Future.error('Failed to get Twitch channel emotes.');
     }
@@ -157,20 +168,6 @@ class TwitchApi {
       return true;
     } else {
       debugPrint('Token invalidated :(');
-      return false;
-    }
-  }
-
-  /// Revokes the given [token] and returns a bool indicating success.
-  Future<bool> revokeToken({required String token}) async {
-    final url = Uri.parse('https://id.twitch.tv/oauth2/revoke');
-
-    final response = await _client.post(url, body: {'client_id': clientId, 'token': token});
-    if (response.statusCode == 200) {
-      debugPrint('Token revoked!');
-      return true;
-    } else {
-      debugPrint('Failed to revoke token :(');
       return false;
     }
   }

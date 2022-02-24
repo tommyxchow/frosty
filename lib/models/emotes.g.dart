@@ -143,6 +143,8 @@ Map<String, dynamic> _$EmoteToJson(Emote instance) => <String, dynamic>{
     };
 
 const _$EmoteTypeEnumMap = {
+  EmoteType.twitchBits: 'twitchBits',
+  EmoteType.twitchFollower: 'twitchFollower',
   EmoteType.twitchSub: 'twitchSub',
   EmoteType.twitchGlobal: 'twitchGlobal',
   EmoteType.twitchUnlocked: 'twitchUnlocked',

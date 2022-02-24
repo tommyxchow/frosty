@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
-import 'package:frosty/widgets/block_button.dart';
+import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/section_header.dart';
 
@@ -36,29 +36,35 @@ class ChatUserModal extends StatelessWidget {
                 leading: ProfilePicture(
                   userLogin: username,
                 ),
-                title: Text(
-                  displayName,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                title: Row(
+                  children: [
+                    Text(
+                      displayName,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      tooltip: 'Block or Report User',
+                      onPressed: () => showModalBottomSheet(
+                        context: context,
+                        builder: (context) => BlockReportModal(
+                          authStore: chatStore.auth,
+                          name: displayName,
+                          userLogin: username,
+                          userId: userId,
+                        ),
+                      ),
+                      icon: Icon(Icons.adaptive.more),
+                    ),
+                  ],
                 ),
                 trailing: chatStore.auth.isLoggedIn
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          OutlinedButton(
-                            onPressed: () {
-                              chatStore.textController.text = '@$username ';
-                              Navigator.pop(context);
-                              chatStore.textFieldFocusNode.requestFocus();
-                            },
-                            child: const Text('Reply'),
-                          ),
-                          const SizedBox(width: 10.0),
-                          BlockButton(
-                            authStore: chatStore.auth,
-                            targetUser: username,
-                            targetUserId: userId,
-                          )
-                        ],
+                    ? OutlinedButton(
+                        onPressed: () {
+                          chatStore.textController.text = '@$username ';
+                          Navigator.pop(context);
+                          chatStore.textFieldFocusNode.requestFocus();
+                        },
+                        child: const Text('Reply'),
                       )
                     : null,
               ),
@@ -94,7 +100,7 @@ class ChatUserModal extends StatelessWidget {
                   itemCount: userMessages.length,
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

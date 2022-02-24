@@ -522,7 +522,9 @@ class IRCMessage {
     required double height,
   }) {
     const emoteType = [
-      'Twitch (Sub)',
+      'Twitch (Bits Tier)',
+      'Twitch (Follower)',
+      'Twitch (Subscriber)',
       'Twitch (Global)',
       'Twitch (Unlocked)',
       'Twitch (Channel)',
@@ -677,7 +679,7 @@ class IRCMessage {
           name: emoteWord,
           zeroWidth: false,
           url: 'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0',
-          type: EmoteType.bttvChannel,
+          type: EmoteType.twitchSub,
         );
       }
     }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frosty/core/auth/auth_store.dart';
@@ -17,12 +19,24 @@ class Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const divider = Divider(
+      thickness: 1.0,
+      indent: 10.0,
+      endIndent: 10.0,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
         actions: [
+          if (Platform.isAndroid)
+            IconButton(
+              tooltip: 'Support the App',
+              onPressed: () => launch('https://www.buymeacoffee.com/tommychow'),
+              icon: const FaIcon(FontAwesomeIcons.donate),
+            ),
           IconButton(
-            tooltip: 'View source on GitHub',
+            tooltip: 'View Source on GitHub',
             onPressed: () => launch('https://github.com/tommyxchow/frosty'),
             icon: const FaIcon(FontAwesomeIcons.github),
           ),
@@ -36,9 +50,13 @@ class Settings extends StatelessWidget {
               settingsStore: settingsStore,
               authStore: context.read<AuthStore>(),
             ),
+            divider,
             GeneralSettings(settingsStore: settingsStore),
+            divider,
             VideoSettings(settingsStore: settingsStore),
+            divider,
             ChatSettings(settingsStore: settingsStore),
+            divider,
             OtherSettings(settingsStore: settingsStore),
           ],
         ),

@@ -5,7 +5,18 @@
 
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
 
-**Beta now available on [TestFlight (iOS)](https://testflight.apple.com/join/UZLoznpr) and [Play Store (Android)](https://play.google.com/store/apps/details?id=com.tommychow.frosty)!**
+<p>
+    <a href="https://testflight.apple.com/join/UZLoznpr" target="_blank">
+        <img align="center" alt="Get it on iOS (Apple TestFlight)" src="assets/badges/apple_app_store_badge.svg" width="200">
+    </a>
+    <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty" target="_blank">
+        <img align="center" alt="Get it on Android (Google Play Store)" src="assets/badges/google_play_store_badge.svg" width="225">
+    </a>
+</p>
+
+<a href="https://www.buymeacoffee.com/tommychow" target="_blank">
+    <img alt="Buy Me A Coffee" src="assets/badges/bmc-button.svg" width="200">
+</a>
 
 ## Features
 
@@ -23,15 +34,15 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 ## Screenshots
 
 <p>
-    <img src="screenshots/../assets/screenshots/followed.png" width="32%">
-    <img src="screenshots/../assets/screenshots/categories.png" width="32%">
-    <img src="screenshots/../assets/screenshots/search.png" width="32%">
+    <img alt="Followed Streams" src="screenshots/../assets/screenshots/followed.png" width="32%">
+    <img alt="Categories Section" src="screenshots/../assets/screenshots/categories.png" width="32%">
+    <img alt="Search Section" src="screenshots/../assets/screenshots/search.png" width="32%">
 </p>
 
 <p>
-    <img src="screenshots/../assets/screenshots/lirik.png" width="32%">
-    <img src="screenshots/../assets/screenshots/soda.png" width="32%">
-    <img src="screenshots/../assets/screenshots/settings.png" width="32%">
+    <img alt="Channel (Video/Chat) View" src="screenshots/../assets/screenshots/lirik.png" width="32%">
+    <img alt="Emote Menu" src="screenshots/../assets/screenshots/soda.png" width="32%">
+    <img alt="Settings Section" src="screenshots/../assets/screenshots/settings.png" width="32%">
 </p>
 
 ## Motivation

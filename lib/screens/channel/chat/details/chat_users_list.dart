@@ -126,8 +126,8 @@ class _ChattersListState extends State<ChattersList> {
                           ),
                         ),
                         ...chatDetailStore.filteredUsers.expandIndexed(
-                          (index, type) => [
-                            if (type.isNotEmpty) ...[
+                          (index, users) => [
+                            if (users.isNotEmpty) ...[
                               SliverPadding(
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                                 sliver: SliverToBoxAdapter(
@@ -141,8 +141,8 @@ class _ChattersListState extends State<ChattersList> {
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
                                 sliver: SliverList(
                                   delegate: SliverChildBuilderDelegate(
-                                    (context, index) => Text(type[index]),
-                                    childCount: type.length,
+                                    (context, index) => Text(users[index]),
+                                    childCount: users.length,
                                   ),
                                 ),
                               ),

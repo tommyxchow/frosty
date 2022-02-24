@@ -73,6 +73,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
                   }
                   return Observer(
                     builder: (context) => StreamCard(
+                      listStore: _listStore,
                       streamInfo: _listStore.streams[index],
                       width: thumbnailWidth,
                       height: thumbnailHeight,

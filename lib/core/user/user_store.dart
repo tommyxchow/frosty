@@ -17,7 +17,7 @@ abstract class _UserStoreBase with Store {
   @readonly
   var _blockedUsers = ObservableList<UserBlockedTwitch>();
 
-  ReactionDisposer? disposeReaction;
+  late ReactionDisposer disposeReaction;
 
   _UserStoreBase({required this.twitchApi});
 
@@ -33,12 +33,14 @@ abstract class _UserStoreBase with Store {
   }
 
   @action
-  Future<void> block({required String targetId, required Map<String, String> headers}) async {
+  Future<void> block({
+    required String targetId,
+    required String displayName,
+    required Map<String, String> headers,
+  }) async {
     final success = await twitchApi.blockUser(userId: targetId, headers: headers);
-    // Add a slight delay between requests, otherwise the blocked list won't properly update.
-    // Weird behavior, might be something to do with PUT request and time to create and update resource?
-    await Future.delayed(const Duration(milliseconds: 200));
-    if (success) await refreshBlockedUsers(headers: headers);
+
+    if (success) _blockedUsers.add(UserBlockedTwitch(targetId, displayName, displayName));
   }
 
   @action
@@ -55,6 +57,6 @@ abstract class _UserStoreBase with Store {
   void dispose() {
     _details = null;
     _blockedUsers.clear();
-    if (disposeReaction != null) disposeReaction!();
+    disposeReaction();
   }
 }

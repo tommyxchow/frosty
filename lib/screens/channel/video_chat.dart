@@ -199,7 +199,7 @@ class _VideoChatState extends State<VideoChat> {
 
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.manual,
-            overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+            overlays: SystemUiOverlay.values,
           );
           return SafeArea(
             child: Column(
@@ -230,7 +230,7 @@ class _VideoChatState extends State<VideoChat> {
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
-      overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top],
+      overlays: SystemUiOverlay.values,
     );
 
     super.dispose();

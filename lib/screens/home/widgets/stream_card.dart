@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
+import 'package:frosty/screens/home/stores/list_store.dart';
+import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
+  final ListStore listStore;
   final StreamTwitch streamInfo;
   final int width;
   final int height;
@@ -16,6 +19,7 @@ class StreamCard extends StatelessWidget {
 
   const StreamCard({
     Key? key,
+    required this.listStore,
     required this.streamInfo,
     required this.width,
     required this.height,
@@ -47,6 +51,15 @@ class StreamCard extends StatelessWidget {
             userName: streamInfo.userName,
             userLogin: streamInfo.userLogin,
           ),
+        ),
+      ),
+      onLongPress: () => showModalBottomSheet(
+        context: context,
+        builder: (context) => BlockReportModal(
+          authStore: listStore.authStore,
+          name: streamerName,
+          userLogin: streamInfo.userLogin,
+          userId: streamInfo.userId,
         ),
       ),
       child: Padding(
@@ -86,7 +99,7 @@ class StreamCard extends StatelessWidget {
                           radius: 10.0,
                         ),
                         const SizedBox(width: 5.0),
-                        Expanded(
+                        Flexible(
                           child: Tooltip(
                             message: streamerName,
                             preferBelow: false,
@@ -101,11 +114,11 @@ class StreamCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5.0),
                     Tooltip(
-                      message: streamInfo.title,
+                      message: streamInfo.title.trim(),
                       preferBelow: false,
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
-                        streamInfo.title,
+                        streamInfo.title.trim(),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
