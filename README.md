@@ -15,7 +15,7 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 </p>
 
 <a href="https://www.buymeacoffee.com/tommychow" target="_blank">
-    <img alt="Buy Me A Coffee" src="assets/badges/bmc-button.svg" width="200">
+    <img title="Support the App!" alt="Buy Me A Coffee" src="assets/badges/bmc-button.svg" width="200">
 </a>
 
 ## Features
@@ -29,20 +29,21 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 - Theater and full-screen mode
 - Block and unblock users
 - Light, dark, and black (OLED) themes
+- Picture-in-picture mode (iOS only)
 - Customizable settings
 
 ## Screenshots
 
 <p>
-    <img alt="Followed Streams" src="screenshots/../assets/screenshots/followed.png" width="32%">
-    <img alt="Categories Section" src="screenshots/../assets/screenshots/categories.png" width="32%">
-    <img alt="Search Section" src="screenshots/../assets/screenshots/search.png" width="32%">
+    <img title="Followed Streams" alt="Followed Streams" src="screenshots/../assets/screenshots/followed.png" width="32%">
+    <img title="Categories Section" alt="Categories Section" src="screenshots/../assets/screenshots/categories.png" width="32%">
+    <img title="Search Section" alt="Search Section" src="screenshots/../assets/screenshots/search.png" width="32%">
 </p>
 
 <p>
-    <img alt="Channel (Video/Chat) View" src="screenshots/../assets/screenshots/lirik.png" width="32%">
-    <img alt="Emote Menu" src="screenshots/../assets/screenshots/soda.png" width="32%">
-    <img alt="Settings Section" src="screenshots/../assets/screenshots/settings.png" width="32%">
+    <img title="Channel (Video/Chat) View" alt="Channel (Video/Chat) View" src="screenshots/../assets/screenshots/lirik.png" width="32%">
+    <img title="Emote Menu" alt="Emote Menu" src="screenshots/../assets/screenshots/soda.png" width="32%">
+    <img title="Settings Section" alt="Settings Section" src="screenshots/../assets/screenshots/settings.png" width="32%">
 </p>
 
 ## Motivation
@@ -92,6 +93,20 @@ On iOS, there seems to be delays up to 15 seconds due to the native player so un
 ### Why are some GIFs either slow or very fast?
 
 This seems to be caused by the Flutter framework itself (see [here](https://github.com/flutter/flutter/issues/24804) and [here](https://github.com/flutter/flutter/issues/29130)).
+
+### Why is ProMotion (120hz) not working?
+
+This is caused by the Flutter framework and is being worked on (see [here](https://github.com/flutter/flutter/issues/90675)).
+
+### Why is feature "X" from Twitch not in the app as well?
+
+I'm limited to what is available in the [Twitch API](https://dev.twitch.tv/docs/api/reference), so certain features from the Twitch web or mobile app (e.g., voting on predictions) are sadly not available at the moment.
+
+I'll try to add as many features as possible but occasionally I may take a break or be limited in time due to studies and personal reasons.
+
+### I'd like to report a bug or request a new feature. Where can I do that?
+
+You can open a new issue [here](https://github.com/tommyxchow/frosty/issues) with the appropriate labels and I'll take a look at it.
 
 ## License
 
