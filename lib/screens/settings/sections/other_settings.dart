@@ -25,7 +25,7 @@ class OtherSettings extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.info),
-          title: const Text('About'),
+          title: const Text('About Frosty'),
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
