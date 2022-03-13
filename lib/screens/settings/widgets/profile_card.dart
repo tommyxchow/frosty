@@ -94,10 +94,11 @@ class ProfileCard extends StatelessWidget {
                 foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
               ),
               title: Text(authStore.user.details!.displayName),
-              trailing: OutlinedButton(
+              trailing: ElevatedButton.icon(
                 onPressed: () => _showLogoutDialog(context),
-                child: const Text('Log Out'),
-                style: OutlinedButton.styleFrom(primary: Colors.red),
+                icon: const Icon(Icons.logout_outlined),
+                label: const Text('Log Out'),
+                style: ElevatedButton.styleFrom(primary: Colors.red),
               ),
             );
           }

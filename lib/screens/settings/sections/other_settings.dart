@@ -54,8 +54,9 @@ class OtherSettings extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10.0),
           width: double.infinity,
-          child: OutlinedButton(
-            child: const Text('Clear Image Cache'),
+          child: ElevatedButton.icon(
+            icon: const Icon(Icons.delete_sweep),
+            label: const Text('Clear Image Cache'),
             onPressed: () async {
               await DefaultCacheManager().emptyCache();
               ScaffoldMessenger.of(context).showSnackBar(

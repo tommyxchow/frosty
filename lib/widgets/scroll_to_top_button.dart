@@ -10,7 +10,7 @@ class ScrollToTopButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: 'Scroll to top',
+      message: 'Scroll to Top',
       preferBelow: false,
       child: FloatingActionButton(
         onPressed: () {
