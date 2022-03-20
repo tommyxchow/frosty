@@ -319,7 +319,7 @@ class IRCMessage {
                   if (nextWordIsEmoji)
                     Text(
                       words[index],
-                      style: textStyle?.copyWith(fontSize: emoteHeight),
+                      style: textStyle?.copyWith(fontSize: emoteHeight - 5),
                     ),
                   ...emoteStack.reversed.map(
                     (emote) => CachedNetworkImage(
@@ -344,11 +344,12 @@ class IRCMessage {
                           child: Column(
                             children: [
                               Stack(
+                                alignment: AlignmentDirectional.center,
                                 children: [
                                   if (nextWordIsEmoji)
                                     Text(
                                       words[index],
-                                      style: textStyle?.copyWith(fontSize: emoteHeight),
+                                      style: textStyle?.copyWith(fontSize: 75),
                                     ),
                                   ...emoteStack.reversed.map(
                                     (emote) => CachedNetworkImage(
@@ -393,7 +394,7 @@ class IRCMessage {
               }
             } else {
               if (regexEmoji.hasMatch(word)) {
-                localSpan.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
+                localSpan.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteHeight - 5)));
               } else {
                 localSpan.add(_createTextSpan(text: word, style: textStyle));
               }
@@ -419,7 +420,7 @@ class IRCMessage {
               );
             } else {
               if (regexEmoji.hasMatch(word)) {
-                span.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteHeight)));
+                span.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteHeight - 5)));
               } else {
                 span.add(_createTextSpan(text: word, style: textStyle));
               }
