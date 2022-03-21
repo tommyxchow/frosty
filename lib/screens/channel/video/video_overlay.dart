@@ -78,8 +78,14 @@ class VideoOverlay extends StatelessWidget {
     if (streamInfo == null) {
       return Stack(
         children: [
-          backButton,
-          settingsButton,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              backButton,
+              const Spacer(),
+              settingsButton,
+            ],
+          ),
           Align(
             alignment: Alignment.bottomRight,
             child: Row(
