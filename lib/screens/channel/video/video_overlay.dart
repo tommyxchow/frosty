@@ -28,21 +28,18 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
-    final settingsButton = Align(
-      alignment: Alignment.topRight,
-      child: IconButton(
-        tooltip: 'Settings',
-        icon: const Icon(
-          Icons.settings,
-          color: Colors.white,
-        ),
-        onPressed: () => showModalBottomSheet(
-          isScrollControlled: true,
-          context: context,
-          builder: (context) => SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: Settings(settingsStore: videoStore.settingsStore),
-          ),
+    final settingsButton = IconButton(
+      tooltip: 'Settings',
+      icon: const Icon(
+        Icons.settings,
+        color: Colors.white,
+      ),
+      onPressed: () => showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) => SizedBox(
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: Settings(settingsStore: videoStore.settingsStore),
         ),
       ),
     );
@@ -68,6 +65,12 @@ class VideoOverlay extends StatelessWidget {
               color: Colors.white,
             ),
       onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
+    );
+
+    final sleepTimerButton = IconButton(
+      tooltip: 'Sleep Timer',
+      icon: const Icon(Icons.timer),
+      onPressed: () {},
     );
 
     final streamInfo = videoStore.streamInfo;
@@ -103,8 +106,15 @@ class VideoOverlay extends StatelessWidget {
     return Observer(
       builder: (context) => Stack(
         children: [
-          backButton,
-          settingsButton,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              backButton,
+              const Spacer(),
+              sleepTimerButton,
+              settingsButton,
+            ],
+          ),
           // Add a play button when paused for Android
           // When an ad is paused on Android there is no way to unpause, so a play button is necessary.
           if (Platform.isAndroid)
