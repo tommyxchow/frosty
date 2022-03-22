@@ -17,6 +17,51 @@ mixin _$VideoStore on _VideoStoreBase, Store {
               name: '_VideoStoreBase.videoUrl'))
           .value;
 
+  final _$sleepHoursAtom = Atom(name: '_VideoStoreBase.sleepHours');
+
+  @override
+  int get sleepHours {
+    _$sleepHoursAtom.reportRead();
+    return super.sleepHours;
+  }
+
+  @override
+  set sleepHours(int value) {
+    _$sleepHoursAtom.reportWrite(value, super.sleepHours, () {
+      super.sleepHours = value;
+    });
+  }
+
+  final _$sleepMinutesAtom = Atom(name: '_VideoStoreBase.sleepMinutes');
+
+  @override
+  int get sleepMinutes {
+    _$sleepMinutesAtom.reportRead();
+    return super.sleepMinutes;
+  }
+
+  @override
+  set sleepMinutes(int value) {
+    _$sleepMinutesAtom.reportWrite(value, super.sleepMinutes, () {
+      super.sleepMinutes = value;
+    });
+  }
+
+  final _$timeRemainingAtom = Atom(name: '_VideoStoreBase.timeRemaining');
+
+  @override
+  Duration get timeRemaining {
+    _$timeRemainingAtom.reportRead();
+    return super.timeRemaining;
+  }
+
+  @override
+  set timeRemaining(Duration value) {
+    _$timeRemainingAtom.reportWrite(value, super.timeRemaining, () {
+      super.timeRemaining = value;
+    });
+  }
+
   final _$_pausedAtom = Atom(name: '_VideoStoreBase._paused');
 
   bool get paused {
@@ -124,6 +169,9 @@ mixin _$VideoStore on _VideoStoreBase, Store {
   @override
   String toString() {
     return '''
+sleepHours: ${sleepHours},
+sleepMinutes: ${sleepMinutes},
+timeRemaining: ${timeRemaining},
 videoUrl: ${videoUrl}
     ''';
   }
