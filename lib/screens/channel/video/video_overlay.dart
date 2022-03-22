@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,69 @@ class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
 
   const VideoOverlay({Key? key, required this.videoStore}) : super(key: key);
+
+  Future<void> _showSleepTimerDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sleep Timer'),
+        content: Observer(
+          builder: (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  DropdownButton(
+                    value: videoStore.sleepHours,
+                    items: List.generate(24, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
+                    onChanged: (int? hours) => videoStore.sleepHours = hours!,
+                    menuMaxHeight: 200,
+                  ),
+                  const SizedBox(width: 10.0),
+                  const Text('Hours'),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  DropdownButton(
+                    value: videoStore.sleepMinutes,
+                    items: List.generate(60, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
+                    onChanged: (int? minutes) => videoStore.sleepMinutes = minutes!,
+                    menuMaxHeight: 200,
+                  ),
+                  const SizedBox(width: 10.0),
+                  const Text('Minutes'),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('Timer: ${videoStore.timeRemaining.toString().split('.')[0]}'),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: videoStore.cancelSleepTimer,
+                    icon: const Icon(Icons.cancel),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: videoStore.updateSleepTimer,
+            child: const Text('Set Timer'),
+            style: TextButton.styleFrom(primary: Colors.green),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +134,7 @@ class VideoOverlay extends StatelessWidget {
     final sleepTimerButton = IconButton(
       tooltip: 'Sleep Timer',
       icon: const Icon(Icons.timer),
-      onPressed: () {},
+      onPressed: () => _showSleepTimerDialog(context),
     );
 
     final streamInfo = videoStore.streamInfo;

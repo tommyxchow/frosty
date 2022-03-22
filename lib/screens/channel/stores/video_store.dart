@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/api/twitch_api.dart';
@@ -18,6 +20,17 @@ abstract class _VideoStoreBase with Store {
   WebViewController? controller;
 
   late Timer _overlayTimer;
+
+  Timer? sleepTimer;
+
+  @observable
+  var sleepHours = 0;
+
+  @observable
+  var sleepMinutes = 0;
+
+  @observable
+  var timeRemaining = const Duration();
 
   @readonly
   var _paused = true;
@@ -148,5 +161,43 @@ abstract class _VideoStoreBase with Store {
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  /// Updates the sleep timer with [sleepHours] and [sleepMinutes].
+  void updateSleepTimer() {
+    // If hours and minutes are 0, do nothing.
+    if (sleepHours == 0 && sleepMinutes == 0) return;
+
+    // If there is an ongoing timer, cancel it since it'll be replaced.
+    if (sleepTimer != null) cancelSleepTimer();
+
+    // Update the new time remaining
+    timeRemaining = Duration(hours: sleepHours, minutes: sleepMinutes);
+
+    // Reset the hours and minutes in the dropdown buttons.
+    sleepHours = 0;
+    sleepMinutes = 0;
+
+    // Set a periodic timer that will update the time remaining every second.
+    sleepTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        // If the timer is up, cancel the timer and exit the app.
+        if (timeRemaining.inSeconds == 0) {
+          timer.cancel();
+          Platform.isIOS ? exit(0) : SystemNavigator.pop();
+          return;
+        }
+
+        // Decrement the time remaining.
+        timeRemaining = Duration(seconds: timeRemaining.inSeconds - 1);
+      },
+    );
+  }
+
+  /// Cancels the sleep timer and resets the time remaining.
+  void cancelSleepTimer() {
+    sleepTimer?.cancel();
+    timeRemaining = const Duration();
   }
 }
