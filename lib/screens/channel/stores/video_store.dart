@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -164,7 +163,8 @@ abstract class _VideoStoreBase with Store {
   }
 
   /// Updates the sleep timer with [sleepHours] and [sleepMinutes].
-  void updateSleepTimer() {
+  /// Calls [onTimerFinished] when the sleep timer completes.
+  void updateSleepTimer({required void Function() onTimerFinished}) {
     // If hours and minutes are 0, do nothing.
     if (sleepHours == 0 && sleepMinutes == 0) return;
 
@@ -185,7 +185,7 @@ abstract class _VideoStoreBase with Store {
         // If the timer is up, cancel the timer and exit the app.
         if (timeRemaining.inSeconds == 0) {
           timer.cancel();
-          Platform.isIOS ? exit(0) : SystemNavigator.pop();
+          onTimerFinished();
           return;
         }
 

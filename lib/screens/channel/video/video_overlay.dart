@@ -18,7 +18,7 @@ class VideoOverlay extends StatefulWidget {
 }
 
 class _VideoOverlayState extends State<VideoOverlay> {
-  Future<void> _showSleepTimerDialog(BuildContext context) {
+  Future<void> _showSleepTimerDialog(BuildContext oldContext) {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -69,11 +69,18 @@ class _VideoOverlayState extends State<VideoOverlay> {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: const Text('Close'),
+            child: const Text('Dismiss'),
           ),
           Observer(
             builder: (context) => TextButton(
-              onPressed: widget.videoStore.sleepHours == 0 && widget.videoStore.sleepMinutes == 0 ? null : widget.videoStore.updateSleepTimer,
+              onPressed: widget.videoStore.sleepHours == 0 && widget.videoStore.sleepMinutes == 0
+                  ? null
+                  : () => widget.videoStore.updateSleepTimer(
+                        onTimerFinished: () => Navigator.popUntil(
+                          oldContext,
+                          (route) => route.isFirst,
+                        ),
+                      ),
               child: const Text('Set Timer'),
               style: TextButton.styleFrom(primary: Colors.green),
             ),
@@ -140,7 +147,10 @@ class _VideoOverlayState extends State<VideoOverlay> {
 
     final sleepTimerButton = IconButton(
       tooltip: 'Sleep Timer',
-      icon: const Icon(Icons.timer),
+      icon: const Icon(
+        Icons.timer,
+        color: Colors.white,
+      ),
       onPressed: () => _showSleepTimerDialog(context),
     );
 
