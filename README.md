@@ -6,7 +6,7 @@
 A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
 
 <p>
-    <a href="https://testflight.apple.com/join/UZLoznpr" target="_blank">
+    <a href="https://apps.apple.com/us/app/frosty-for-twitch/id1603987585" target="_blank">
         <img align="center" alt="Get it on iOS (Apple TestFlight)" src="assets/badges/apple_app_store_badge.svg" width="200">
     </a>
     <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty" target="_blank">
