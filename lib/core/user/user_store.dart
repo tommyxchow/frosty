@@ -17,7 +17,7 @@ abstract class _UserStoreBase with Store {
   @readonly
   var _blockedUsers = ObservableList<UserBlockedTwitch>();
 
-  late ReactionDisposer disposeReaction;
+  ReactionDisposer? _disposeReaction;
 
   _UserStoreBase({required this.twitchApi});
 
@@ -29,7 +29,7 @@ abstract class _UserStoreBase with Store {
     // Get and update the current user's list of blocked users.
     if (_details?.id != null) _blockedUsers = (await twitchApi.getUserBlockedList(id: _details!.id, headers: headers)).asObservable();
 
-    disposeReaction = autorun((_) => _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)));
+    _disposeReaction = autorun((_) => _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)));
   }
 
   @action
@@ -57,6 +57,6 @@ abstract class _UserStoreBase with Store {
   void dispose() {
     _details = null;
     _blockedUsers.clear();
-    disposeReaction();
+    if (_disposeReaction != null) _disposeReaction!();
   }
 }
