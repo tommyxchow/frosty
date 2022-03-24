@@ -42,7 +42,7 @@ void main() {
     expect(stream.startedAt, '2021-09-23T20:06:22Z');
     expect(stream.language, 'en');
     expect(stream.thumbnailUrl, 'https://static-cdn.jtvnw.net/previews-ttv/live_user_xqcow-{width}x{height}.jpg');
-    expect(stream.tagIds, ["e6bb8b34-4c28-4b5f-94ed-12c1ebf2d0e4", "6ea6bca4-4712-4ab9-a906-e3336a9d8039", "6606e54c-f92d-40f6-8257-74977889ccdd"]);
+    expect(stream.tagIds, ['e6bb8b34-4c28-4b5f-94ed-12c1ebf2d0e4', '6ea6bca4-4712-4ab9-a906-e3336a9d8039', '6606e54c-f92d-40f6-8257-74977889ccdd']);
     expect(stream.isMature, false);
   });
 }

@@ -32,7 +32,7 @@ class OtherSettings extends StatelessWidget {
             showAboutDialog(
               context: context,
               applicationName: packageInfo.appName,
-              applicationVersion: 'Version ${packageInfo.version} build ${packageInfo.buildNumber}',
+              applicationVersion: 'Version ${packageInfo.version} (${packageInfo.buildNumber})',
               applicationLegalese: '\u{a9} 2022 Tommy Chow',
             );
           },
@@ -54,8 +54,9 @@ class OtherSettings extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10.0),
           width: double.infinity,
-          child: OutlinedButton(
-            child: const Text('Clear Image Cache'),
+          child: ElevatedButton.icon(
+            icon: const Icon(Icons.delete_sweep),
+            label: const Text('Clear Image Cache'),
             onPressed: () async {
               await DefaultCacheManager().emptyCache();
               ScaffoldMessenger.of(context).showSnackBar(

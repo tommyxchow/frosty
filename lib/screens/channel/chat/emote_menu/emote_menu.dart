@@ -25,11 +25,11 @@ class _EmoteMenuState extends State<EmoteMenu> {
   @override
   Widget build(BuildContext context) {
     const sections = [
-      "Recent",
-      "Twitch",
-      "BTTV",
-      "FFZ",
-      "7TV",
+      'Recent',
+      'Twitch',
+      'BTTV',
+      'FFZ',
+      '7TV',
     ];
 
     return Column(

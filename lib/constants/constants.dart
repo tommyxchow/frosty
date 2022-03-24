@@ -9,14 +9,14 @@ const sampleRate = 1.0;
 
 /// BTTV emotes with zero width to allow for overlaying other emotes.
 const zeroWidthEmotes = [
-  "SoSnowy",
-  "IceCold",
-  "SantaHat",
-  "TopHat",
-  "ReinDeer",
-  "CandyCane",
-  "cvMask",
-  "cvHazmat",
+  'SoSnowy',
+  'IceCold',
+  'SantaHat',
+  'TopHat',
+  'ReinDeer',
+  'CandyCane',
+  'cvMask',
+  'cvHazmat',
 ];
 
 // Regex for matching strings that contain lower or upper case English characters.
