@@ -33,7 +33,7 @@ class Settings extends StatelessWidget {
             IconButton(
               tooltip: 'Support the App',
               onPressed: () => launch('https://www.buymeacoffee.com/tommychow'),
-              icon: const FaIcon(FontAwesomeIcons.donate),
+              icon: const FaIcon(FontAwesomeIcons.circleDollarToSlot),
             ),
           IconButton(
             tooltip: 'View Source on GitHub',
