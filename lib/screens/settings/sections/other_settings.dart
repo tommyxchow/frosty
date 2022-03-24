@@ -32,7 +32,7 @@ class OtherSettings extends StatelessWidget {
             showAboutDialog(
               context: context,
               applicationName: packageInfo.appName,
-              applicationVersion: 'Version ${packageInfo.version} build ${packageInfo.buildNumber}',
+              applicationVersion: 'Version ${packageInfo.version} (${packageInfo.buildNumber})',
               applicationLegalese: '\u{a9} 2022 Tommy Chow',
             );
           },
