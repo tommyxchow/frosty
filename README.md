@@ -1,22 +1,112 @@
-# Frosty
-
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
-![CI](https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg)
-
-A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutter](https://flutter.dev/).
-
-<p>
-    <a href="https://apps.apple.com/us/app/frosty-for-twitch/id1603987585" target="_blank">
-        <img align="center" alt="Get it on iOS (Apple TestFlight)" src="assets/badges/apple_app_store_badge.svg" width="200">
-    </a>
-    <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty" target="_blank">
-        <img align="center" alt="Get it on Android (Google Play Store)" src="assets/badges/google_play_store_badge.svg" width="225">
-    </a>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/54859075/160067655-f96b7e62-67f7-43d6-96ea-19ac85418bf6.svg" width="180px" alt="Frosty Logo" />
+  <h1 align="center">Frosty</h1>
 </p>
 
-<a href="https://www.buymeacoffee.com/tommychow" target="_blank">
-    <img title="Support the App!" alt="Buy Me A Coffee" src="assets/badges/bmc-button.svg" width="200">
-</a>
+<p align="center">
+  A <a href="https://www.twitch.tv/">Twitch</a> client for iOS and Android with
+  <a href="https://betterttv.com/">BTTV</a>,
+  <a href="https://www.frankerfacez.com/">FFZ</a>, and
+  <a href="https://7tv.app/">7TV</a> support. Built with
+  <a href="https://flutter.dev/">Flutter</a>.
+</p>
+
+
+<p align="center">
+  <a href="https://github.com/tommyxchow/frosty/actions/workflows/main.yml">
+    <img
+      alt="CI"
+      src="https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg"
+    />
+  </a>
+  <a href="https://github.com/tommyxchow/frosty/blob/main/LICENSE">
+    <img
+      alt="License"
+      src="https://img.shields.io/github/license/tommyxchow/frosty"
+    />
+  </a>
+  <a href="https://github.com/tommyxchow/frosty/releases/latest">
+    <img
+      alt="Release"
+      src="https://img.shields.io/github/v/release/tommyxchow/frosty"
+    />
+  </a>
+</p>
+
+<p align="center">
+  <a
+    href="https://apps.apple.com/us/app/frosty-for-twitch/id1603987585"
+    target="_blank"
+  >
+    <img
+      title="Get it on iOS (Apple App Store)"
+      alt="Apple App Store Badge"
+      src="https://user-images.githubusercontent.com/54859075/160051843-1d8b2186-97e9-4edd-a957-bb4797b71b4a.svg"
+      width="200px"
+    />
+  </a>
+  <a
+    href="https://play.google.com/store/apps/details?id=com.tommychow.frosty"
+    target="_blank"
+  >
+    <img
+      title="Get it on Android (Google Play Store)"
+      alt="Google Play Store Badge"
+      src="https://user-images.githubusercontent.com/54859075/160051854-21a57556-6b5a-41e9-8127-334daf1fac47.svg"
+      width="225px"
+    />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.buymeacoffee.com/tommychow" target="_blank">
+    <img
+      title="Support the App!"
+      alt="Buy Me A Coffee"
+      src="https://user-images.githubusercontent.com/54859075/160051848-2e581476-a6c6-4de6-9af7-773d96632de1.svg"
+      width="200px"
+    />
+  </a>
+</p>
+
+<p align="center">
+  <img
+    title="Followed Streams"
+    alt="Followed Streams"
+    src="https://user-images.githubusercontent.com/54859075/160052219-efd07a9d-491b-430e-88d0-6a9146ebaf69.png"
+    width="32%"
+  />
+  <img
+    title="Categories Section"
+    alt="Categories Section"
+    src="https://user-images.githubusercontent.com/54859075/160052212-9e0c74c4-658c-43b8-8d88-d6c9ae647acb.png"
+    width="32%"
+  />
+  <img
+    title="Search Section"
+    alt="Search Section"
+    src="https://user-images.githubusercontent.com/54859075/160052221-4c256c11-4c19-4b18-a6bd-d1b1d39e4b69.png"
+    width="32%"
+  />
+  <img
+    title="Channel (Video/Chat) View"
+    alt="Channel (Video/Chat) View"
+    src="https://user-images.githubusercontent.com/54859075/160052220-31e7575a-6140-430b-8c0a-b1f22919d637.png"
+    width="32%"
+  />
+  <img
+    title="Emote Menu"
+    alt="Emote Menu"
+    src="https://user-images.githubusercontent.com/54859075/160052223-742b2fc0-6ef2-4f47-a343-3e5b6e288ad1.png"
+    width="32%"
+  />
+  <img
+    title="Settings Section"
+    alt="Settings Section"
+    src="https://user-images.githubusercontent.com/54859075/160052222-91fd8b7a-f057-421e-97f6-1553e738fbbd.png"
+    width="32%"
+  />
+</p>
 
 ## Features
 
@@ -31,20 +121,6 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android, built with [Flutt
 - Light, dark, and black (OLED) themes
 - Picture-in-picture mode (iOS only)
 - Customizable settings
-
-## Screenshots
-
-<p>
-    <img title="Followed Streams" alt="Followed Streams" src="screenshots/../assets/screenshots/followed.png" width="32%">
-    <img title="Categories Section" alt="Categories Section" src="screenshots/../assets/screenshots/categories.png" width="32%">
-    <img title="Search Section" alt="Search Section" src="screenshots/../assets/screenshots/search.png" width="32%">
-</p>
-
-<p>
-    <img title="Channel (Video/Chat) View" alt="Channel (Video/Chat) View" src="screenshots/../assets/screenshots/lirik.png" width="32%">
-    <img title="Emote Menu" alt="Emote Menu" src="screenshots/../assets/screenshots/soda.png" width="32%">
-    <img title="Settings Section" alt="Settings Section" src="screenshots/../assets/screenshots/settings.png" width="32%">
-</p>
 
 ## Motivation
 
@@ -100,7 +176,7 @@ This is caused by the Flutter framework and is being worked on (see [here](https
 
 ### Why is feature "X" from Twitch not in the app as well?
 
-I'm limited to what is available in the [Twitch API](https://dev.twitch.tv/docs/api/reference), so certain features from the Twitch web or mobile app (e.g., voting on predictions) are sadly not available at the moment.
+I'm limited to what is available in the [Twitch API](https://dev.twitch.tv/docs/api/reference), so certain features from the Twitch web or mobile app (e.g., voting on predictions and category viewer count) are sadly not available at the moment.
 
 I'll try to add as many features as possible but occasionally I may take a break or be limited in time due to studies and personal reasons.
 
@@ -110,4 +186,4 @@ You can open a new issue [here](https://github.com/tommyxchow/frosty/issues) wit
 
 ## License
 
-Frosty is licensed under AGPLv3. See the [LICENSE](LICENSE) for more details.
+Frosty is licensed under [AGPL-3.0-or-later](LICENSE).
