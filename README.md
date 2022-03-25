@@ -1,19 +1,47 @@
-# Frosty
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/54859075/160044149-92512b51-46d0-4171-b562-1655e8a343b0.svg" width="200px" alt="Plausible Analytics" />
+  <h1 align="center">Frosty</h1>
+</p>
 
-[![License: AGPL v3](https://img.shields.io/github/license/tommyxchow/frosty)](LICENSE)
-[![CI](https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg)](https://github.com/tommyxchow/frosty/actions/workflows/main.yml)
-[![Version](https://img.shields.io/github/v/release/tommyxchow/frosty)](https://github.com/tommyxchow/frosty/releases/latest)
+<p align="center">
+  A <a href="https://www.twitch.tv/">Twitch</a> client for iOS and Android with
+  <a href="https://betterttv.com/">BTTV</a>,
+  <a href="https://www.frankerfacez.com/">FFZ</a>, and
+  <a href="https://7tv.app/">7TV</a> support. Built with
+  <a href="https://flutter.dev/">Flutter</a>.
+</p>
 
-A [Twitch](https://www.twitch.tv/) client for iOS and Android with [BTTV](https://betterttv.com/), [FFZ](https://www.frankerfacez.com/), and [7TV](https://7tv.app/) support. Built with [Flutter](https://flutter.dev/).
 
-<p>
+<p align="center">
+  <a href="https://github.com/tommyxchow/frosty/blob/main/LICENSE">
+    <img
+      alt="License"
+      src="https://img.shields.io/github/license/tommyxchow/frosty"
+    />
+  </a>
+  <a href="https://github.com/tommyxchow/frosty/actions/workflows/main.yml">
+    <img
+      alt="CI"
+      src="https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg"
+    />
+  </a>
+  <a href="https://github.com/tommyxchow/frosty/releases/latest">
+    <img
+      alt="Release"
+      src="https://img.shields.io/github/v/release/tommyxchow/frosty"
+    />
+  </a>
+</p>
+
+<p align="center">
   <a
     href="https://apps.apple.com/us/app/frosty-for-twitch/id1603987585"
     target="_blank"
   >
     <img
       align="center"
-      alt="Get it on iOS (Apple TestFlight)"
+      title="Get it on iOS (Apple App Store)"
+      alt="Apple App Store Badge"
       src="https://user-images.githubusercontent.com/54859075/160051843-1d8b2186-97e9-4edd-a957-bb4797b71b4a.svg"
       width="200"
     />
@@ -24,25 +52,26 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android with [BTTV](https:
   >
     <img
       align="center"
-      alt="Get it on Android (Google Play Store)"
+      title="Get it on Android (Google Play Store)"
+      alt="Google Play Store Badge"
       src="https://user-images.githubusercontent.com/54859075/160051854-21a57556-6b5a-41e9-8127-334daf1fac47.svg"
       width="225"
     />
   </a>
 </p>
 
-<a href="https://www.buymeacoffee.com/tommychow" target="_blank">
-  <img
-    title="Support the App!"
-    alt="Buy Me A Coffee"
-    src="https://user-images.githubusercontent.com/54859075/160051848-2e581476-a6c6-4de6-9af7-773d96632de1.svg"
-    width="200"
-  />
-</a>
+<p align="center">
+  <a href="https://www.buymeacoffee.com/tommychow" target="_blank">
+    <img
+      title="Support the App!"
+      alt="Buy Me A Coffee"
+      src="https://user-images.githubusercontent.com/54859075/160051848-2e581476-a6c6-4de6-9af7-773d96632de1.svg"
+      width="200"
+    />
+  </a>
+</p>
 
-## Screenshots
-
-<p>
+<p align="center">
   <img
     title="Followed Streams"
     alt="Followed Streams"
@@ -61,9 +90,6 @@ A [Twitch](https://www.twitch.tv/) client for iOS and Android with [BTTV](https:
     src="https://user-images.githubusercontent.com/54859075/160052221-4c256c11-4c19-4b18-a6bd-d1b1d39e4b69.png"
     width="32%"
   />
-</p>
-
-<p>
   <img
     title="Channel (Video/Chat) View"
     alt="Channel (Video/Chat) View"
