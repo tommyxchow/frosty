@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/54859075/160044149-92512b51-46d0-4171-b562-1655e8a343b0.svg" width="200px" alt="Plausible Analytics" />
+  <img src="https://user-images.githubusercontent.com/54859075/160067655-f96b7e62-67f7-43d6-96ea-19ac85418bf6.svg" width="180px" alt="Frosty Logo" />
   <h1 align="center">Frosty</h1>
 </p>
 
@@ -13,16 +13,16 @@
 
 
 <p align="center">
-  <a href="https://github.com/tommyxchow/frosty/blob/main/LICENSE">
-    <img
-      alt="License"
-      src="https://img.shields.io/github/license/tommyxchow/frosty"
-    />
-  </a>
   <a href="https://github.com/tommyxchow/frosty/actions/workflows/main.yml">
     <img
       alt="CI"
       src="https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg"
+    />
+  </a>
+  <a href="https://github.com/tommyxchow/frosty/blob/main/LICENSE">
+    <img
+      alt="License"
+      src="https://img.shields.io/github/license/tommyxchow/frosty"
     />
   </a>
   <a href="https://github.com/tommyxchow/frosty/releases/latest">
@@ -39,11 +39,10 @@
     target="_blank"
   >
     <img
-      align="center"
       title="Get it on iOS (Apple App Store)"
       alt="Apple App Store Badge"
       src="https://user-images.githubusercontent.com/54859075/160051843-1d8b2186-97e9-4edd-a957-bb4797b71b4a.svg"
-      width="200"
+      width="200px"
     />
   </a>
   <a
@@ -51,11 +50,10 @@
     target="_blank"
   >
     <img
-      align="center"
       title="Get it on Android (Google Play Store)"
       alt="Google Play Store Badge"
       src="https://user-images.githubusercontent.com/54859075/160051854-21a57556-6b5a-41e9-8127-334daf1fac47.svg"
-      width="225"
+      width="225px"
     />
   </a>
 </p>
@@ -66,7 +64,7 @@
       title="Support the App!"
       alt="Buy Me A Coffee"
       src="https://user-images.githubusercontent.com/54859075/160051848-2e581476-a6c6-4de6-9af7-773d96632de1.svg"
-      width="200"
+      width="200px"
     />
   </a>
 </p>
