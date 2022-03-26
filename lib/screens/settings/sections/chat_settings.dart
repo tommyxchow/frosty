@@ -79,7 +79,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                   padding: const EdgeInsets.all(20.0),
                   margin: const EdgeInsets.all(10.0),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.deepPurple),
+                    border: Border.all(color: const Color(0xff9146ff)),
                     borderRadius: BorderRadius.circular(15.0),
                   ),
                   child: DefaultTextStyle(
@@ -127,7 +127,13 @@ class _ChatSettingsState extends State<ChatSettings> {
                 ),
                 ListTile(
                   isThreeLine: true,
-                  title: Text('Message scale: ${settingsStore.messageScale.toStringAsFixed(1)}x'),
+                  title: Row(
+                    children: [
+                      const Text('Message scale'),
+                      const Spacer(),
+                      Text('${settingsStore.messageScale.toStringAsFixed(1)}x'),
+                    ],
+                  ),
                   subtitle: Slider.adaptive(
                     value: settingsStore.messageScale,
                     min: 0.5,
@@ -137,7 +143,13 @@ class _ChatSettingsState extends State<ChatSettings> {
                   ),
                 ),
                 ListTile(
-                  title: Text('Message spacing: ${settingsStore.messageSpacing.toStringAsFixed(0)}'),
+                  title: Row(
+                    children: [
+                      const Text('Message spacing'),
+                      const Spacer(),
+                      Text(settingsStore.messageSpacing.toStringAsFixed(0)),
+                    ],
+                  ),
                   subtitle: Slider.adaptive(
                     value: settingsStore.messageSpacing,
                     min: 0.0,
@@ -148,7 +160,13 @@ class _ChatSettingsState extends State<ChatSettings> {
                 ),
                 ListTile(
                   isThreeLine: true,
-                  title: Text('Font size: ${settingsStore.fontSize.toInt()}'),
+                  title: Row(
+                    children: [
+                      const Text('Font size'),
+                      const Spacer(),
+                      Text(settingsStore.fontSize.toStringAsFixed(0)),
+                    ],
+                  ),
                   subtitle: Slider.adaptive(
                     value: settingsStore.fontSize,
                     min: 5,
@@ -158,7 +176,13 @@ class _ChatSettingsState extends State<ChatSettings> {
                   ),
                 ),
                 ListTile(
-                  title: Text('Badge height: ${settingsStore.badgeHeight.toStringAsFixed(0)}'),
+                  title: Row(
+                    children: [
+                      const Text('Badge height'),
+                      const Spacer(),
+                      Text(settingsStore.badgeHeight.toStringAsFixed(0)),
+                    ],
+                  ),
                   subtitle: Slider.adaptive(
                     value: settingsStore.badgeHeight,
                     min: 10.0,
@@ -168,7 +192,13 @@ class _ChatSettingsState extends State<ChatSettings> {
                   ),
                 ),
                 ListTile(
-                  title: Text('Emote height: ${settingsStore.emoteHeight.toStringAsFixed(0)}'),
+                  title: Row(
+                    children: [
+                      const Text('Emote height'),
+                      const Spacer(),
+                      Text(settingsStore.emoteHeight.toStringAsFixed(0)),
+                    ],
+                  ),
                   subtitle: Slider.adaptive(
                     value: settingsStore.emoteHeight,
                     min: 10.0,

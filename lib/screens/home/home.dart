@@ -37,7 +37,12 @@ class _HomeState extends State<Home> {
                 'Search',
               ];
 
-              return Text(titles[_homeStore.selectedIndex]);
+              return Text(
+                titles[_homeStore.selectedIndex],
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                ),
+              );
             },
           ),
           actions: [
