@@ -135,11 +135,16 @@ class StreamCard extends StatelessWidget {
                     const SizedBox(height: 5.0),
                     if (showCategory) ...[
                       InkWell(
-                        child: Text(
-                          streamInfo.gameName,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w300,
-                            color: DefaultTextStyle.of(context).style.color?.withOpacity(0.8),
+                        child: Tooltip(
+                          message: streamInfo.gameName,
+                          preferBelow: false,
+                          child: Text(
+                            streamInfo.gameName,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontWeight: FontWeight.w300,
+                              color: DefaultTextStyle.of(context).style.color?.withOpacity(0.8),
+                            ),
                           ),
                         ),
                         onTap: () async {
