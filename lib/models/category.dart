@@ -20,7 +20,7 @@ class CategoryTwitch {
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class CategoriesTwitch {
   final List<CategoryTwitch> data;
-  final Map<String, String> pagination;
+  final Map<String, String>? pagination;
 
   const CategoriesTwitch(
     this.data,

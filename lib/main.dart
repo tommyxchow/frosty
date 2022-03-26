@@ -96,9 +96,9 @@ class MyApp extends StatelessWidget {
       ),
       colorScheme: ColorScheme.fromSwatch(
         primarySwatch: Colors.deepPurple,
-        accentColor: Colors.deepPurpleAccent,
+        accentColor: const Color(0xff9146ff),
       ),
-      toggleableActiveColor: Colors.deepPurpleAccent,
+      toggleableActiveColor: const Color(0xff9146ff),
       tabBarTheme: const TabBarTheme(
         labelColor: Colors.black,
         unselectedLabelColor: Colors.grey,
@@ -122,10 +122,10 @@ class MyApp extends StatelessWidget {
       colorScheme: ColorScheme.fromSwatch(
         brightness: Brightness.dark,
         primarySwatch: Colors.deepPurple,
-        accentColor: Colors.deepPurpleAccent,
+        accentColor: const Color(0xff9146ff),
       ),
       dialogBackgroundColor: Colors.grey.shade900,
-      toggleableActiveColor: Colors.deepPurpleAccent,
+      toggleableActiveColor: const Color(0xff9146ff),
     );
 
     final oledTheme = ThemeData(
@@ -144,10 +144,10 @@ class MyApp extends StatelessWidget {
       colorScheme: ColorScheme.fromSwatch(
         brightness: Brightness.dark,
         primarySwatch: Colors.deepPurple,
-        accentColor: Colors.deepPurpleAccent,
+        accentColor: const Color(0xff9146ff),
       ),
       dialogBackgroundColor: Colors.black,
-      toggleableActiveColor: Colors.deepPurpleAccent,
+      toggleableActiveColor: const Color(0xff9146ff),
     );
 
     return Observer(

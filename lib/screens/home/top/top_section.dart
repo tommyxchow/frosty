@@ -13,10 +13,19 @@ class TopSection extends StatelessWidget {
       child: Column(
         children: const [
           TabBar(
-            indicatorColor: Colors.deepPurpleAccent,
+            indicatorColor: Color(0xff9146ff),
             tabs: [
-              Tab(text: 'Streams'),
-              Tab(text: 'Categories'),
+              Tab(
+                child: Text(
+                  'Streams',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Tab(
+                  child: Text(
+                'Categories',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )),
             ],
           ),
           Expanded(

@@ -326,6 +326,22 @@ class TwitchApi {
     }
   }
 
+  /// Returns a [CategoriesTwitch] object containing the category info corresponding to the provided [gameId].
+  Future<CategoriesTwitch> getCategory({
+    required Map<String, String> headers,
+    required String gameId,
+  }) async {
+    final url = Uri.parse('https://api.twitch.tv/helix/games?id=$gameId');
+
+    final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return CategoriesTwitch.fromJson(decoded);
+    } else {
+      return Future.error('Failed to get category: ${decoded['message']}');
+    }
+  }
+
   /// Returns a [CategoriesTwitch] containing up to 20 categories/games closest matching the [query] and a cursor for further requests.
   Future<CategoriesTwitch> searchCategories({
     required Map<String, String> headers,

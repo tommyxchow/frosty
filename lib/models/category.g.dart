@@ -18,5 +18,7 @@ CategoriesTwitch _$CategoriesTwitchFromJson(Map<String, dynamic> json) =>
       (json['data'] as List<dynamic>)
           .map((e) => CategoryTwitch.fromJson(e as Map<String, dynamic>))
           .toList(),
-      Map<String, String>.from(json['pagination'] as Map),
+      (json['pagination'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
     );
