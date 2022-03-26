@@ -23,10 +23,7 @@ class AccountSettings extends StatelessWidget {
       builder: (context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SectionHeader(
-            'Account',
-            padding: EdgeInsets.all(10.0),
-          ),
+          const SectionHeader('ACCOUNT'),
           ProfileCard(authStore: authStore),
           if (authStore.isLoggedIn) ...[
             ListTile(

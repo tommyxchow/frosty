@@ -17,10 +17,7 @@ class GeneralSettings extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionHeader(
-              'General',
-              padding: EdgeInsets.all(10.0),
-            ),
+            const SectionHeader('GENERAL'),
             ListTile(
               title: const Text('Theme'),
               trailing: DropdownButton(

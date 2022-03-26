@@ -19,15 +19,12 @@ class Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const divider = Divider(
-      thickness: 1.0,
-      indent: 10.0,
-      endIndent: 10.0,
-    );
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text(
+          'Settings',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         actions: [
           if (Platform.isAndroid)
             IconButton(
@@ -50,13 +47,9 @@ class Settings extends StatelessWidget {
               settingsStore: settingsStore,
               authStore: context.read<AuthStore>(),
             ),
-            divider,
             GeneralSettings(settingsStore: settingsStore),
-            divider,
             VideoSettings(settingsStore: settingsStore),
-            divider,
             ChatSettings(settingsStore: settingsStore),
-            divider,
             OtherSettings(settingsStore: settingsStore),
           ],
         ),
