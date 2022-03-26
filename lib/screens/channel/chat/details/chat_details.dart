@@ -3,14 +3,17 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 
 class ChatDetails extends StatelessWidget {
   final ChatDetailsStore chatDetails;
+  final ChatStore chatStore;
   final String userLogin;
 
   const ChatDetails({
     Key? key,
     required this.chatDetails,
+    required this.chatStore,
     required this.userLogin,
   }) : super(key: key);
 
@@ -29,6 +32,7 @@ class ChatDetails extends StatelessWidget {
               Expanded(
                 child: ChattersList(
                   chatDetails: chatDetails,
+                  chatStore: chatStore,
                   userLogin: userLogin,
                 ),
               ),

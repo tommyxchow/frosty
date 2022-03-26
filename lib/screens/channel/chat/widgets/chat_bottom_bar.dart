@@ -23,6 +23,7 @@ class ChatBottomBar extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.8,
                 child: ChatDetails(
                   chatDetails: chatStore.chatDetailsStore,
+                  chatStore: chatStore,
                   userLogin: chatStore.channelName,
                 ),
               ),

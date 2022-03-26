@@ -2,18 +2,25 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class ChattersList extends StatefulWidget {
   final ChatDetailsStore chatDetails;
+  final ChatStore chatStore;
   final String userLogin;
 
   const ChattersList({
     Key? key,
     required this.chatDetails,
+    required this.chatStore,
     required this.userLogin,
   }) : super(key: key);
 
@@ -141,7 +148,24 @@ class _ChattersListState extends State<ChattersList> {
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
                                 sliver: SliverList(
                                   delegate: SliverChildBuilderDelegate(
-                                    (context, index) => Text(users[index]),
+                                    (context, index) => InkWell(
+                                      child: Text(users[index]),
+                                      onLongPress: () async {
+                                        final userInfo = await context
+                                            .read<TwitchApi>()
+                                            .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
+
+                                        showModalBottomSheet(
+                                          context: context,
+                                          builder: (context) => ChatUserModal(
+                                            chatStore: widget.chatStore,
+                                            username: userInfo.login,
+                                            userId: userInfo.id,
+                                            displayName: userInfo.displayName,
+                                          ),
+                                        );
+                                      },
+                                    ),
                                     childCount: users.length,
                                   ),
                                 ),

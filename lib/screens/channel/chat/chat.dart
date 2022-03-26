@@ -53,8 +53,8 @@ class Chat extends StatelessWidget {
                                   onLongPress: () => showModalBottomSheet(
                                     context: context,
                                     builder: (context) => ChatUserModal(
-                                      username: message.user!,
                                       chatStore: chatStore,
+                                      username: message.user!,
                                       userId: message.tags['user-id']!,
                                       displayName: message.tags['display-name']!,
                                     ),
