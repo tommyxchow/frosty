@@ -51,6 +51,13 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
+            title: const Text('Show message dividers'),
+            subtitle: const Text('Displays a subtle divider between each chat message.'),
+            value: settingsStore.showChatMessageDividers,
+            onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
             title: const Text('Use readable colors for chat names'),
             subtitle: const Text('Adjusts the lightness value of overly bright/dark names in chat.'),
             value: settingsStore.useReadableColors,

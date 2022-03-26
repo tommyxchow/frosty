@@ -51,6 +51,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showZeroWidth = false;
 
+  @JsonKey(defaultValue: false)
+  @observable
+  var showChatMessageDividers = false;
+
   @JsonKey(defaultValue: TimestampType.disabled, unknownEnumValue: TimestampType.disabled)
   @observable
   var timestampType = TimestampType.disabled;

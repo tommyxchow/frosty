@@ -19,6 +19,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
+      ..showChatMessageDividers =
+          json['showChatMessageDividers'] as bool? ?? false
       ..timestampType = $enumDecodeNullable(
               _$TimestampTypeEnumMap, json['timestampType'],
               unknownValue: TimestampType.disabled) ??
@@ -44,6 +46,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showBottomBar': instance.showBottomBar,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
+      'showChatMessageDividers': instance.showChatMessageDividers,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
       'useReadableColors': instance.useReadableColors,
       'messageScale': instance.messageScale,
@@ -215,6 +218,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$showChatMessageDividersAtom =
+      Atom(name: '_SettingsStoreBase.showChatMessageDividers');
+
+  @override
+  bool get showChatMessageDividers {
+    _$showChatMessageDividersAtom.reportRead();
+    return super.showChatMessageDividers;
+  }
+
+  @override
+  set showChatMessageDividers(bool value) {
+    _$showChatMessageDividersAtom
+        .reportWrite(value, super.showChatMessageDividers, () {
+      super.showChatMessageDividers = value;
+    });
+  }
+
   final _$timestampTypeAtom = Atom(name: '_SettingsStoreBase.timestampType');
 
   @override
@@ -378,6 +398,7 @@ pictureInPicture: ${pictureInPicture},
 showBottomBar: ${showBottomBar},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
+showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
 useReadableColors: ${useReadableColors},
 messageScale: ${messageScale},
