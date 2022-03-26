@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/widgets/section_header.dart';
 
 class GeneralSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -13,32 +12,36 @@ class GeneralSettings extends StatelessWidget {
     const themes = ['System', 'Light', 'Dark', 'Black'];
 
     return Observer(
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SectionHeader('GENERAL'),
-            ListTile(
-              title: const Text('Theme'),
-              trailing: DropdownButton(
-                value: settingsStore.themeType,
-                onChanged: (ThemeType? newTheme) => settingsStore.themeType = newTheme!,
-                items: ThemeType.values
-                    .map((ThemeType value) => DropdownMenuItem(
-                          value: value,
-                          child: Text(themes[value.index]),
-                        ))
-                    .toList(),
-              ),
+      builder: (context) => ExpansionTile(
+        leading: const Icon(Icons.app_settings_alt),
+        title: const Text(
+          'General',
+          style: TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        children: [
+          ListTile(
+            title: const Text('Theme'),
+            trailing: DropdownButton(
+              value: settingsStore.themeType,
+              onChanged: (ThemeType? newTheme) => settingsStore.themeType = newTheme!,
+              items: ThemeType.values
+                  .map((ThemeType value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(themes[value.index]),
+                      ))
+                  .toList(),
             ),
-            SwitchListTile.adaptive(
-              title: const Text('Show stream uptime on thumbnails'),
-              value: settingsStore.showThumbnailUptime,
-              onChanged: (newValue) => settingsStore.showThumbnailUptime = newValue,
-            ),
-          ],
-        );
-      },
+          ),
+          SwitchListTile.adaptive(
+            title: const Text('Show stream uptime on thumbnails'),
+            value: settingsStore.showThumbnailUptime,
+            onChanged: (newValue) => settingsStore.showThumbnailUptime = newValue,
+          ),
+        ],
+      ),
     );
   }
 }

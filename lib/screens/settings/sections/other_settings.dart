@@ -3,7 +3,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/widgets/section_header.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -16,10 +15,16 @@ class OtherSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ExpansionTile(
+      leading: const Icon(Icons.miscellaneous_services),
+      title: const Text(
+        'Other',
+        style: TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       children: [
-        const SectionHeader('OTHER'),
         ListTile(
           leading: const Icon(Icons.info),
           title: const Text('About Frosty'),

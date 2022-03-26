@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/widgets/section_header.dart';
 
 class VideoSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -13,39 +12,43 @@ class VideoSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder: (context) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SectionHeader('VIDEO'),
-            SwitchListTile.adaptive(
-              title: const Text('Show video'),
-              value: settingsStore.showVideo,
-              onChanged: (newValue) => settingsStore.showVideo = newValue,
-            ),
+      builder: (context) => ExpansionTile(
+        leading: const Icon(Icons.video_settings),
+        title: const Text(
+          'Video',
+          style: TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        children: [
+          SwitchListTile.adaptive(
+            title: const Text('Show video'),
+            value: settingsStore.showVideo,
+            onChanged: (newValue) => settingsStore.showVideo = newValue,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Use custom video overlay'),
+            subtitle: const Text('Replaces the default video overlay with a mobile-friendly version.'),
+            value: settingsStore.showOverlay,
+            onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
+          ),
+          if (Platform.isIOS)
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Use custom video overlay'),
-              subtitle: const Text('Replaces the default video overlay with a mobile-friendly version.'),
-              value: settingsStore.showOverlay,
-              onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
+              title: const Text('Picture-in-picture button (experimental)'),
+              subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay. May cause freezes/crashes.'),
+              value: settingsStore.pictureInPicture,
+              onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
             ),
-            if (Platform.isIOS)
-              SwitchListTile.adaptive(
-                isThreeLine: true,
-                title: const Text('Picture-in-picture button (experimental)'),
-                subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay. May cause freezes/crashes.'),
-                value: settingsStore.pictureInPicture,
-                onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
-              ),
-            SwitchListTile.adaptive(
-              title: const Text('Long-press player to toggle overlay'),
-              value: settingsStore.toggleableOverlay,
-              onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
-            ),
-          ],
-        );
-      },
+          SwitchListTile.adaptive(
+            title: const Text('Long-press player to toggle overlay'),
+            value: settingsStore.toggleableOverlay,
+            onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
+          ),
+        ],
+      ),
     );
   }
 }
