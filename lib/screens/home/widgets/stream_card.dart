@@ -129,10 +129,7 @@ class StreamCard extends StatelessWidget {
                       child: Text(
                         streamInfo.title.trim(),
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: DefaultTextStyle.of(context).style.color?.withOpacity(0.8),
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(height: 5.0),
@@ -149,6 +146,7 @@ class StreamCard extends StatelessWidget {
                           final category = await context
                               .read<TwitchApi>()
                               .getCategory(headers: context.read<AuthStore>().headersTwitch, gameId: streamInfo.gameId);
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
