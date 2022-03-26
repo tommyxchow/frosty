@@ -4,7 +4,6 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/blocked_users.dart';
 import 'package:frosty/screens/settings/widgets/profile_card.dart';
-import 'package:frosty/widgets/section_header.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class AccountSettings extends StatelessWidget {
@@ -20,13 +19,16 @@ class AccountSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder: (context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SectionHeader(
-            'Account',
-            padding: EdgeInsets.all(10.0),
+      builder: (context) => ExpansionTile(
+        leading: const Icon(Icons.manage_accounts),
+        title: const Text(
+          'Account',
+          style: TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
           ),
+        ),
+        children: [
           ProfileCard(authStore: authStore),
           if (authStore.isLoggedIn) ...[
             ListTile(

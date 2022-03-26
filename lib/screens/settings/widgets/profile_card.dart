@@ -105,7 +105,7 @@ class ProfileCard extends StatelessWidget {
           return ListTile(
             isThreeLine: true,
             leading: const Icon(
-              Icons.account_circle_outlined,
+              Icons.no_accounts,
               size: 40,
             ),
             title: const Text('Anonymous User'),
