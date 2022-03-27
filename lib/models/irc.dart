@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
@@ -81,8 +82,8 @@ class IRCMessage {
   List<InlineSpan> generateSpan({
     required TextStyle? style,
     required ChatAssetsStore assetsStore,
-    required double badgeHeight,
-    required double emoteHeight,
+    required double badgeScale,
+    required double emoteScale,
     required bool isLightTheme,
     bool showMessage = true,
     bool useZeroWidth = false,
@@ -95,6 +96,8 @@ class IRCMessage {
     final sevenTVUserToBadges = assetsStore.userTo7TVBadges;
     final bttvUserToBadge = assetsStore.userToBTTVBadges;
     final ffzRoomInfo = assetsStore.ffzRoomInfo;
+    final badgeHeight = defaultBadgeHeight * badgeScale;
+    final emoteHeight = defaultEmoteHeight * emoteScale;
 
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
@@ -326,7 +329,7 @@ class IRCMessage {
                       imageUrl: emote.url,
                       placeholder: (context, url) => const SizedBox(),
                       fadeInDuration: const Duration(seconds: 0),
-                      height: emoteHeight,
+                      height: emote.height != null ? emote.height! * emoteScale : emoteHeight,
                     ),
                   )
                 ];
@@ -388,7 +391,7 @@ class IRCMessage {
                 localSpan.add(
                   _createEmoteSpan(
                     emote: emote,
-                    height: emoteHeight,
+                    height: emote.height != null ? emote.height! * emoteScale : emoteHeight,
                   ),
                 );
               }
@@ -415,7 +418,7 @@ class IRCMessage {
               span.add(
                 _createEmoteSpan(
                   emote: emote,
-                  height: emoteHeight,
+                  height: emote.height != null ? emote.height! * emoteScale : emoteHeight,
                 ),
               );
             } else {
