@@ -5,6 +5,7 @@ import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OtherSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -38,6 +39,11 @@ class OtherSettings extends StatelessWidget {
               applicationLegalese: '\u{a9} 2022 Tommy Chow',
             );
           },
+        ),
+        ListTile(
+          leading: const Icon(Icons.launch),
+          title: const Text('FAQ'),
+          onTap: () => launch('https://github.com/tommyxchow/frosty#faq'),
         ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
