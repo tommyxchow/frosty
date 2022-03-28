@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
@@ -51,20 +52,22 @@ class RecentEmotesPanel extends StatelessWidget {
                           assetsStore.recentEmotes.insert(0, matchingEmotes.first);
                         }
                       : null,
-                  child: Tooltip(
-                    message: emote.name,
-                    preferBelow: false,
-                    child: CachedNetworkImage(
-                      imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
-                      color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
-                      colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
+                  child: Center(
+                    child: Tooltip(
+                      message: emote.name,
+                      preferBelow: false,
+                      child: CachedNetworkImage(
+                        imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
+                        color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
+                        colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
+                        height: emote.height?.toDouble() ?? defaultEmoteSize,
+                        width: emote.width?.toDouble() ?? defaultEmoteSize,
+                      ),
                     ),
                   ),
                 );
               },
               childCount: assetsStore.recentEmotes.length,
-              addAutomaticKeepAlives: false,
-              addRepaintBoundaries: false,
             ),
           ),
         ),

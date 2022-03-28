@@ -327,7 +327,7 @@ class IRCMessage {
                   ...emoteStack.reversed.map(
                     (emote) => CachedNetworkImage(
                       imageUrl: emote.url,
-                      fadeInDuration: const Duration(seconds: 0),
+                      fadeInDuration: const Duration(),
                       height: emote.height != null ? emote.height! * emoteScale : emoteSize,
                       width: emote.width != null ? emote.width! * emoteScale : emoteSize,
                     ),
@@ -357,7 +357,7 @@ class IRCMessage {
                                   ...emoteStack.reversed.map(
                                     (emote) => CachedNetworkImage(
                                       imageUrl: emote.url,
-                                      fadeInDuration: const Duration(seconds: 0),
+                                      fadeInDuration: const Duration(),
                                       height: 80,
                                     ),
                                   )
@@ -461,7 +461,7 @@ class IRCMessage {
         color: backgroundColor,
         child: CachedNetworkImage(
           imageUrl: badge.url,
-          fadeInDuration: const Duration(seconds: 0),
+          fadeInDuration: const Duration(),
           height: size,
           width: size,
         ),
@@ -475,7 +475,7 @@ class IRCMessage {
     } else {
       return CachedNetworkImage(
         imageUrl: badge.url,
-        fadeInDuration: const Duration(seconds: 0),
+        fadeInDuration: const Duration(),
         height: size,
         width: size,
       );
@@ -553,7 +553,7 @@ class IRCMessage {
               children: [
                 CachedNetworkImage(
                   imageUrl: emote.url,
-                  fadeInDuration: const Duration(seconds: 0),
+                  fadeInDuration: const Duration(),
                   height: 80,
                 ),
                 const SizedBox(height: 5.0),
@@ -572,7 +572,7 @@ class IRCMessage {
         preferBelow: false,
         child: CachedNetworkImage(
           imageUrl: emote.url,
-          fadeInDuration: const Duration(seconds: 0),
+          fadeInDuration: const Duration(),
           height: height,
           width: width,
         ),

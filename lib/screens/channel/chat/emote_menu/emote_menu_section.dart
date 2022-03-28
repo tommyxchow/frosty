@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -38,10 +39,16 @@ class EmoteMenuSection extends StatelessWidget {
               assetsStore.recentEmotes.remove(emotes[index]);
               assetsStore.recentEmotes.insert(0, emotes[index]);
             },
-            child: Tooltip(
-              message: emotes[index].name,
-              preferBelow: false,
-              child: CachedNetworkImage(imageUrl: emotes[index].url),
+            child: Center(
+              child: Tooltip(
+                message: emotes[index].name,
+                preferBelow: false,
+                child: CachedNetworkImage(
+                  imageUrl: emotes[index].url,
+                  height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
+                  width: emotes[index].width?.toDouble() ?? defaultEmoteSize,
+                ),
+              ),
             ),
           ),
           childCount: emotes.length,
