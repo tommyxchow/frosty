@@ -391,7 +391,7 @@ class IRCMessage {
                   _createEmoteSpan(
                     emote: emote,
                     height: emote.height != null ? emote.height! * emoteScale : emoteSize,
-                    width: emote.width != null ? emote.width! * emoteScale : emoteSize,
+                    width: emote.width != null ? emote.width! * emoteScale : null,
                   ),
                 );
               }
@@ -419,7 +419,7 @@ class IRCMessage {
                 _createEmoteSpan(
                   emote: emote,
                   height: emote.height != null ? emote.height! * emoteScale : emoteSize,
-                  width: emote.width != null ? emote.width! * emoteScale : emoteSize,
+                  width: emote.width != null ? emote.width! * emoteScale : null,
                 ),
               );
             } else {
@@ -525,7 +525,7 @@ class IRCMessage {
   static WidgetSpan _createEmoteSpan({
     required Emote emote,
     required double height,
-    required double width,
+    required double? width,
   }) {
     const emoteType = [
       'Twitch (Bits Tier)',
@@ -572,6 +572,7 @@ class IRCMessage {
         preferBelow: false,
         child: CachedNetworkImage(
           imageUrl: emote.url,
+          placeholder: (context, url) => const SizedBox(),
           fadeInDuration: const Duration(),
           height: height,
           width: width,

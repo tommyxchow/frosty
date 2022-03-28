@@ -61,7 +61,7 @@ class RecentEmotesPanel extends StatelessWidget {
                         color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
                         colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
                         height: emote.height?.toDouble() ?? defaultEmoteSize,
-                        width: emote.width?.toDouble() ?? defaultEmoteSize,
+                        width: emote.width?.toDouble(),
                       ),
                     ),
                   ),

@@ -46,7 +46,7 @@ class EmoteMenuSection extends StatelessWidget {
                 child: CachedNetworkImage(
                   imageUrl: emotes[index].url,
                   height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
-                  width: emotes[index].width?.toDouble() ?? defaultEmoteSize,
+                  width: emotes[index].width?.toDouble(),
                 ),
               ),
             ),
