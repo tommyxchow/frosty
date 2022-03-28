@@ -33,47 +33,53 @@ class Chat extends StatelessWidget {
                     child: DefaultTextStyle(
                       style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
                       child: Observer(
-                        builder: (context) => ListView.separated(
-                          padding: const EdgeInsets.symmetric(vertical: 5.0),
-                          addAutomaticKeepAlives: false,
-                          addRepaintBoundaries: false,
-                          itemCount: chatStore.messages.length,
-                          controller: chatStore.scrollController,
-                          separatorBuilder: (context, index) => SizedBox(height: chatStore.settings.messageSpacing),
-                          itemBuilder: (context, index) => Observer(
-                            builder: (context) {
-                              final message = chatStore.messages[index];
+                        builder: (context) {
+                          final showDividers = chatStore.settings.showChatMessageDividers;
 
-                              if (message.user != null && message.user != chatStore.auth.user.details?.login) {
-                                return InkWell(
-                                  onTap: () {
-                                    FocusScope.of(context).unfocus();
-                                    if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
-                                  },
-                                  onLongPress: () => showModalBottomSheet(
-                                    context: context,
-                                    builder: (context) => ChatUserModal(
-                                      chatStore: chatStore,
-                                      username: message.user!,
-                                      userId: message.tags['user-id']!,
-                                      displayName: message.tags['display-name']!,
-                                    ),
-                                  ),
-                                  child: ChatMessage(
-                                    ircMessage: message,
-                                    assetsStore: chatStore.assetsStore,
-                                    settingsStore: chatStore.settings,
-                                  ),
+                          return ListView.separated(
+                            padding: const EdgeInsets.symmetric(vertical: 5.0),
+                            addAutomaticKeepAlives: false,
+                            addRepaintBoundaries: false,
+                            itemCount: chatStore.messages.length,
+                            controller: chatStore.scrollController,
+                            separatorBuilder: (context, index) => showDividers
+                                ? Divider(
+                                    height: chatStore.settings.messageSpacing,
+                                    thickness: 1.0,
+                                  )
+                                : SizedBox(height: chatStore.settings.messageSpacing),
+                            itemBuilder: (context, index) => Observer(
+                              builder: (context) {
+                                final message = chatStore.messages[index];
+                                final chatMessage = ChatMessage(
+                                  ircMessage: message,
+                                  assetsStore: chatStore.assetsStore,
+                                  settingsStore: chatStore.settings,
                                 );
-                              }
-                              return ChatMessage(
-                                ircMessage: message,
-                                assetsStore: chatStore.assetsStore,
-                                settingsStore: chatStore.settings,
-                              );
-                            },
-                          ),
-                        ),
+
+                                if (message.user != null && message.user != chatStore.auth.user.details?.login) {
+                                  return InkWell(
+                                    onTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
+                                    },
+                                    onLongPress: () => showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) => ChatUserModal(
+                                        chatStore: chatStore,
+                                        username: message.user!,
+                                        userId: message.tags['user-id']!,
+                                        displayName: message.tags['display-name']!,
+                                      ),
+                                    ),
+                                    child: chatMessage,
+                                  );
+                                }
+                                return chatMessage;
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),

@@ -51,6 +51,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showZeroWidth = false;
 
+  @JsonKey(defaultValue: false)
+  @observable
+  var showChatMessageDividers = false;
+
   @JsonKey(defaultValue: TimestampType.disabled, unknownEnumValue: TimestampType.disabled)
   @observable
   var timestampType = TimestampType.disabled;
@@ -71,13 +75,13 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var messageSpacing = 10.0;
 
-  @JsonKey(defaultValue: 20.0)
+  @JsonKey(defaultValue: 1.0)
   @observable
-  var badgeHeight = 20.0;
+  var badgeScale = 1.0;
 
-  @JsonKey(defaultValue: 30.0)
+  @JsonKey(defaultValue: 1.0)
   @observable
-  var emoteHeight = 30.0;
+  var emoteScale = 1.0;
 
   // Other settings
   @JsonKey(defaultValue: true)

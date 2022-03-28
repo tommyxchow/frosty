@@ -82,7 +82,10 @@ class SearchResultsChannels extends StatelessWidget {
                                 padding: const EdgeInsets.all(10.0),
                                 child: const Text(
                                   'LIVE',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             )

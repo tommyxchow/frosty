@@ -5,6 +5,7 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
 import 'package:mobx/mobx.dart';
+
 part 'categories_store.g.dart';
 
 class CategoriesStore = _CategoriesStoreBase with _$CategoriesStore;
@@ -68,7 +69,7 @@ abstract class _CategoriesStoreBase with Store {
       } else {
         _categories.addAll(result.data);
       }
-      _categoriesCursor = result.pagination['cursor'];
+      _categoriesCursor = result.pagination?['cursor'];
 
       _error = null;
     } on SocketException {

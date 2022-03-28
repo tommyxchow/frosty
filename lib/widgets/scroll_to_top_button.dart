@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ScrollToTopButton extends StatelessWidget {
   final ScrollController scrollController;
@@ -21,7 +20,7 @@ class ScrollToTopButton extends StatelessWidget {
             duration: const Duration(milliseconds: 500),
           );
         },
-        child: const FaIcon(Icons.arrow_drop_up),
+        child: const Icon(Icons.keyboard_arrow_up),
         mini: true,
         heroTag: null,
       ),

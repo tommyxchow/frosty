@@ -94,9 +94,12 @@ class ChatUserModal extends StatelessWidget {
                       settingsStore: chatStore.settings,
                     ),
                   ),
-                  separatorBuilder: (context, index) => SizedBox(
-                    height: chatStore.settings.messageSpacing,
-                  ),
+                  separatorBuilder: (context, index) => chatStore.settings.showChatMessageDividers
+                      ? Divider(
+                          height: chatStore.settings.messageSpacing,
+                          thickness: 1.0,
+                        )
+                      : SizedBox(height: chatStore.settings.messageSpacing),
                   itemCount: userMessages.length,
                 ),
               ),

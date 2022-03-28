@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class ChatSettings extends StatefulWidget {
   final SettingsStore settingsStore;
@@ -51,6 +53,13 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
+            title: const Text('Show message dividers'),
+            subtitle: const Text('Displays a subtle divider between each chat message.'),
+            value: settingsStore.showChatMessageDividers,
+            onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
             title: const Text('Use readable colors for chat names'),
             subtitle: const Text('Adjusts the lightness value of overly bright/dark names in chat.'),
             value: settingsStore.useReadableColors,
@@ -72,113 +81,137 @@ class _ChatSettingsState extends State<ChatSettings> {
             ),
           ),
           const SizedBox(height: 10.0),
-          ExpansionTile(
-            title: const Text('Message appearance'),
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20.0),
-                margin: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context).style.copyWith(fontSize: settingsStore.fontSize),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: CachedNetworkImage(
-                                imageUrl: 'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
-                                placeholder: (context, url) => const SizedBox(),
-                                height: settingsStore.badgeHeight,
-                              ),
-                            ),
-                            const TextSpan(text: ' Badge and emote preview '),
-                            WidgetSpan(
-                              alignment: PlaceholderAlignment.middle,
-                              child: CachedNetworkImage(
-                                imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
-                                placeholder: (context, url) => const SizedBox(),
-                                height: settingsStore.emoteHeight,
-                              ),
-                            ),
-                          ],
+          const SectionHeader('Message Appearance'),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20.0),
+            margin: const EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.deepPurple),
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            child: DefaultTextStyle(
+              style: DefaultTextStyle.of(context).style.copyWith(fontSize: settingsStore.fontSize),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: CachedNetworkImage(
+                            imageUrl: 'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
+                            height: defaultBadgeSize * settingsStore.badgeScale,
+                            width: defaultBadgeSize * settingsStore.badgeScale,
+                          ),
                         ),
-                        textScaleFactor: settingsStore.messageScale,
-                      ),
-                      SizedBox(height: settingsStore.messageSpacing),
-                      Text(
-                        'Hello! Here\'s a text preview.',
-                        textScaleFactor: settingsStore.messageScale,
-                      ),
-                      SizedBox(height: settingsStore.messageSpacing),
-                      Text(
-                        'And another for spacing without an emote!',
-                        textScaleFactor: settingsStore.messageScale,
-                      ),
-                    ],
+                        const TextSpan(text: ' Badge and emote preview '),
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: CachedNetworkImage(
+                            imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
+                            height: defaultEmoteSize * settingsStore.emoteScale,
+                            width: defaultEmoteSize * settingsStore.emoteScale,
+                          ),
+                        ),
+                      ],
+                    ),
+                    textScaleFactor: settingsStore.messageScale,
                   ),
-                ),
+                  SizedBox(height: settingsStore.messageSpacing),
+                  Text(
+                    'Hello! Here\'s a text preview.',
+                    textScaleFactor: settingsStore.messageScale,
+                  ),
+                  SizedBox(height: settingsStore.messageSpacing),
+                  Text(
+                    'And another for spacing without an emote!',
+                    textScaleFactor: settingsStore.messageScale,
+                  ),
+                ],
               ),
-              ListTile(
-                isThreeLine: true,
-                title: Text('Message scale: ${settingsStore.messageScale.toStringAsFixed(1)}x'),
-                subtitle: Slider.adaptive(
-                  value: settingsStore.messageScale,
-                  min: 0.5,
-                  max: 2.0,
-                  divisions: 15,
-                  onChanged: (newValue) => settingsStore.messageScale = newValue,
-                ),
-              ),
-              ListTile(
-                title: Text('Message spacing: ${settingsStore.messageSpacing.toStringAsFixed(0)}'),
-                subtitle: Slider.adaptive(
-                  value: settingsStore.messageSpacing,
-                  min: 0.0,
-                  max: 30.0,
-                  divisions: 30,
-                  onChanged: (newValue) => settingsStore.messageSpacing = newValue,
-                ),
-              ),
-              ListTile(
-                isThreeLine: true,
-                title: Text('Font size: ${settingsStore.fontSize.toInt()}'),
-                subtitle: Slider.adaptive(
-                  value: settingsStore.fontSize,
-                  min: 5,
-                  max: 20,
-                  divisions: 15,
-                  onChanged: (newValue) => settingsStore.fontSize = newValue,
-                ),
-              ),
-              ListTile(
-                title: Text('Badge height: ${settingsStore.badgeHeight.toStringAsFixed(0)}'),
-                subtitle: Slider.adaptive(
-                  value: settingsStore.badgeHeight,
-                  min: 10.0,
-                  max: 50.0,
-                  divisions: 8,
-                  onChanged: (newValue) => settingsStore.badgeHeight = newValue,
-                ),
-              ),
-              ListTile(
-                title: Text('Emote height: ${settingsStore.emoteHeight.toStringAsFixed(0)}'),
-                subtitle: Slider.adaptive(
-                  value: settingsStore.emoteHeight,
-                  min: 10.0,
-                  max: 50.0,
-                  divisions: 8,
-                  onChanged: (newValue) => settingsStore.emoteHeight = newValue,
-                ),
-              ),
-            ],
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Message scale'),
+                const Spacer(),
+                Text('${settingsStore.messageScale.toStringAsFixed(2)}x'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.messageScale,
+              min: 0.5,
+              max: 2.0,
+              divisions: 6,
+              onChanged: (newValue) => settingsStore.messageScale = newValue,
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Message spacing'),
+                const Spacer(),
+                Text(settingsStore.messageSpacing.toStringAsFixed(0).toString()),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.messageSpacing,
+              min: 0.0,
+              max: 30.0,
+              divisions: 6,
+              onChanged: (newValue) => settingsStore.messageSpacing = newValue,
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Font size'),
+                const Spacer(),
+                Text(settingsStore.fontSize.toInt().toString()),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.fontSize,
+              min: 5,
+              max: 20,
+              divisions: 15,
+              onChanged: (newValue) => settingsStore.fontSize = newValue,
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Badge scale'),
+                const Spacer(),
+                Text('${settingsStore.badgeScale.toStringAsFixed(2)}x'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.badgeScale,
+              min: 0.25,
+              max: 3.0,
+              divisions: 11,
+              onChanged: (newValue) => settingsStore.badgeScale = newValue,
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Emote scale'),
+                const Spacer(),
+                Text('${settingsStore.emoteScale.toStringAsFixed(2)}x'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.emoteScale,
+              min: 0.25,
+              max: 3.0,
+              divisions: 11,
+              onChanged: (newValue) => settingsStore.emoteScale = newValue,
+            ),
           ),
         ],
       ),

@@ -260,14 +260,16 @@ class _VideoOverlayState extends State<VideoOverlay> {
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.white,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                                 const SizedBox(height: 5.0),
                                 Text(
-                                  '${widget.videoStore.streamInfo?.gameName} for ${NumberFormat().format(widget.videoStore.streamInfo?.viewerCount)} viewers',
+                                  '${widget.videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(widget.videoStore.streamInfo?.viewerCount)} viewers',
                                   style: const TextStyle(
                                     color: Colors.white,
+                                    fontWeight: FontWeight.w300,
                                   ),
                                 ),
                               ],

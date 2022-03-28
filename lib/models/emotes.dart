@@ -291,6 +291,8 @@ class Emote {
   factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
         name: emote.name,
         zeroWidth: false,
+        width: emote.width,
+        height: emote.height,
         url: 'https:' + (emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x),
         type: type,
       );
