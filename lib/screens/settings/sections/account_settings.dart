@@ -20,7 +20,7 @@ class AccountSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) => ExpansionTile(
-        leading: const Icon(Icons.manage_accounts),
+        leading: const Icon(Icons.account_circle),
         title: const Text(
           'Account',
           style: TextStyle(

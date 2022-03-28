@@ -13,7 +13,7 @@ class GeneralSettings extends StatelessWidget {
 
     return Observer(
       builder: (context) => ExpansionTile(
-        leading: const Icon(Icons.app_settings_alt),
+        leading: const Icon(Icons.settings),
         title: const Text(
           'General',
           style: TextStyle(

@@ -386,6 +386,20 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$_SettingsStoreBaseActionController =
+      ActionController(name: '_SettingsStoreBase');
+
+  @override
+  void reset() {
+    final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
+        name: '_SettingsStoreBase.reset');
+    try {
+      return super.reset();
+    } finally {
+      _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''

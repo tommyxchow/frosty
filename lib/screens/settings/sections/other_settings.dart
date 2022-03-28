@@ -17,7 +17,7 @@ class OtherSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      leading: const Icon(Icons.miscellaneous_services),
+      leading: const Icon(Icons.help),
       title: const Text(
         'Other',
         style: TextStyle(
@@ -60,7 +60,7 @@ class OtherSettings extends StatelessWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
           width: double.infinity,
           child: ElevatedButton.icon(
             icon: const Icon(Icons.delete_sweep),
@@ -74,6 +74,15 @@ class OtherSettings extends StatelessWidget {
                 ),
               );
             },
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            icon: const Icon(Icons.restore),
+            label: const Text('Reset All Settings'),
+            onPressed: settingsStore.reset,
           ),
         ),
       ],

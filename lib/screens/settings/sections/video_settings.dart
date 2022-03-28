@@ -13,7 +13,7 @@ class VideoSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) => ExpansionTile(
-        leading: const Icon(Icons.video_settings),
+        leading: const Icon(Icons.ondemand_video),
         title: const Text(
           'Video',
           style: TextStyle(
