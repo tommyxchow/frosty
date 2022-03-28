@@ -29,8 +29,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
       ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 14.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
-      ..badgeHeight = (json['badgeHeight'] as num?)?.toDouble() ?? 20.0
-      ..emoteHeight = (json['emoteHeight'] as num?)?.toDouble() ?? 30.0
+      ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
+      ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true;
@@ -52,8 +52,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'messageScale': instance.messageScale,
       'fontSize': instance.fontSize,
       'messageSpacing': instance.messageSpacing,
-      'badgeHeight': instance.badgeHeight,
-      'emoteHeight': instance.emoteHeight,
+      'badgeScale': instance.badgeScale,
+      'emoteScale': instance.emoteScale,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
@@ -311,33 +311,33 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$badgeHeightAtom = Atom(name: '_SettingsStoreBase.badgeHeight');
+  final _$badgeScaleAtom = Atom(name: '_SettingsStoreBase.badgeScale');
 
   @override
-  double get badgeHeight {
-    _$badgeHeightAtom.reportRead();
-    return super.badgeHeight;
+  double get badgeScale {
+    _$badgeScaleAtom.reportRead();
+    return super.badgeScale;
   }
 
   @override
-  set badgeHeight(double value) {
-    _$badgeHeightAtom.reportWrite(value, super.badgeHeight, () {
-      super.badgeHeight = value;
+  set badgeScale(double value) {
+    _$badgeScaleAtom.reportWrite(value, super.badgeScale, () {
+      super.badgeScale = value;
     });
   }
 
-  final _$emoteHeightAtom = Atom(name: '_SettingsStoreBase.emoteHeight');
+  final _$emoteScaleAtom = Atom(name: '_SettingsStoreBase.emoteScale');
 
   @override
-  double get emoteHeight {
-    _$emoteHeightAtom.reportRead();
-    return super.emoteHeight;
+  double get emoteScale {
+    _$emoteScaleAtom.reportRead();
+    return super.emoteScale;
   }
 
   @override
-  set emoteHeight(double value) {
-    _$emoteHeightAtom.reportWrite(value, super.emoteHeight, () {
-      super.emoteHeight = value;
+  set emoteScale(double value) {
+    _$emoteScaleAtom.reportWrite(value, super.emoteScale, () {
+      super.emoteScale = value;
     });
   }
 
@@ -404,8 +404,8 @@ useReadableColors: ${useReadableColors},
 messageScale: ${messageScale},
 fontSize: ${fontSize},
 messageSpacing: ${messageSpacing},
-badgeHeight: ${badgeHeight},
-emoteHeight: ${emoteHeight},
+badgeScale: ${badgeScale},
+emoteScale: ${emoteScale},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}
