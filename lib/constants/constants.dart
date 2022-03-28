@@ -22,6 +22,8 @@ const zeroWidthEmotes = [
 /// Regex for matching strings that contain lower or upper case English characters.
 final regexEnglish = RegExp(r'[a-zA-Z]');
 
-const defaultBadgeHeight = 18.0;
+/// The default badge width and height.
+const defaultBadgeSize = 18.0;
 
-const defaultEmoteHeight = 28.0;
+/// The default emote width and height when none are provided.
+const defaultEmoteSize = 28.0;

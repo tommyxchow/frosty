@@ -102,8 +102,8 @@ class _ChatSettingsState extends State<ChatSettings> {
                           alignment: PlaceholderAlignment.middle,
                           child: CachedNetworkImage(
                             imageUrl: 'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
-                            placeholder: (context, url) => const SizedBox(),
-                            height: defaultBadgeHeight * settingsStore.badgeScale,
+                            height: defaultBadgeSize * settingsStore.badgeScale,
+                            width: defaultBadgeSize * settingsStore.badgeScale,
                           ),
                         ),
                         const TextSpan(text: ' Badge and emote preview '),
@@ -111,8 +111,8 @@ class _ChatSettingsState extends State<ChatSettings> {
                           alignment: PlaceholderAlignment.middle,
                           child: CachedNetworkImage(
                             imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
-                            placeholder: (context, url) => const SizedBox(),
-                            height: defaultEmoteHeight * settingsStore.emoteScale,
+                            height: defaultEmoteSize * settingsStore.emoteScale,
+                            width: defaultEmoteSize * settingsStore.emoteScale,
                           ),
                         ),
                       ],
