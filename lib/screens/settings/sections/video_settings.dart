@@ -29,8 +29,8 @@ class VideoSettings extends StatelessWidget {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Custom Video Overlay'),
-            subtitle: const Text('Replaces the default video overlay with a mobile-friendly version.'),
+            title: const Text('Custom Overlay'),
+            subtitle: const Text('Replaces Twitch\'s default overlay with a mobile-friendly version.'),
             value: settingsStore.showOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
           ),
@@ -45,7 +45,7 @@ class VideoSettings extends StatelessWidget {
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Long-Press Player to Toggle Overlay'),
-            subtitle: const Text('Allows switching between Twitch\'s default overlay and the custom video overlay.'),
+            subtitle: const Text('Allows switching between Twitch\'s default overlay and the custom overlay.'),
             value: settingsStore.toggleableOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
           ),

@@ -20,7 +20,7 @@ class OtherSettings extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Reset All Settings'),
-        content: const Text('Are you reset all settings?'),
+        content: const Text('Are you sure you want to reset all settings?'),
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,

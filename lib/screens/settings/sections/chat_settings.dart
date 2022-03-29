@@ -41,32 +41,17 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Message Dividers'),
-            subtitle: const Text('Displays a subtle divider between each chat message.'),
-            value: settingsStore.showChatMessageDividers,
-            onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
-          ),
-          ListTile(
-            isThreeLine: true,
-            title: const Text('Message Timestamps'),
-            subtitle: const Text('Displays timestamps for when a chat message was sent.'),
-            trailing: DropdownButton(
-              value: settingsStore.timestampType,
-              onChanged: (TimestampType? newTimestamp) => settingsStore.timestampType = newTimestamp!,
-              items: TimestampType.values
-                  .map((TimestampType value) => DropdownMenuItem(
-                        value: value,
-                        child: Text(timestamps[value.index]),
-                      ))
-                  .toList(),
-            ),
+            title: const Text('Readable Name Colors'),
+            subtitle: const Text('Adjusts the lightness value of overly bright/dark names.'),
+            value: settingsStore.useReadableColors,
+            onChanged: (newValue) => settingsStore.useReadableColors = newValue,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Readable Chat Name Colors'),
-            subtitle: const Text('Adjusts the lightness value of overly bright/dark names in chat.'),
-            value: settingsStore.useReadableColors,
-            onChanged: (newValue) => settingsStore.useReadableColors = newValue,
+            title: const Text('Zero-Width Emotes'),
+            subtitle: const Text('Displays "stacked" emotes from BetterTTV and 7TV.'),
+            value: settingsStore.showZeroWidth,
+            onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
@@ -77,10 +62,25 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Zero-Width Emotes'),
-            subtitle: const Text('Displays "stacked" emotes from BetterTTV and 7TV.'),
-            value: settingsStore.showZeroWidth,
-            onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
+            title: const Text('Message Dividers'),
+            subtitle: const Text('Displays a subtle divider between each message.'),
+            value: settingsStore.showChatMessageDividers,
+            onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
+          ),
+          ListTile(
+            isThreeLine: true,
+            title: const Text('Message Timestamps'),
+            subtitle: const Text('Displays timestamps for when a message was sent.'),
+            trailing: DropdownButton(
+              value: settingsStore.timestampType,
+              onChanged: (TimestampType? newTimestamp) => settingsStore.timestampType = newTimestamp!,
+              items: TimestampType.values
+                  .map((TimestampType value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(timestamps[value.index]),
+                      ))
+                  .toList(),
+            ),
           ),
           const SizedBox(height: 10.0),
           const Padding(
@@ -144,54 +144,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Font Size'),
-                const Spacer(),
-                Text(settingsStore.fontSize.toInt().toString()),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.fontSize,
-              min: 5,
-              max: 20,
-              divisions: 15,
-              onChanged: (newValue) => settingsStore.fontSize = newValue,
-            ),
-          ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Message Spacing'),
-                const Spacer(),
-                Text(settingsStore.messageSpacing.toStringAsFixed(0).toString()),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.messageSpacing,
-              min: 0.0,
-              max: 30.0,
-              divisions: 6,
-              onChanged: (newValue) => settingsStore.messageSpacing = newValue,
-            ),
-          ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Message Scale'),
-                const Spacer(),
-                Text('${settingsStore.messageScale.toStringAsFixed(2)}x'),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.messageScale,
-              min: 0.5,
-              max: 2.0,
-              divisions: 6,
-              onChanged: (newValue) => settingsStore.messageScale = newValue,
-            ),
-          ),
-          ListTile(
-            title: Row(
-              children: [
                 const Text('Badge Scale'),
                 const Spacer(),
                 Text('${settingsStore.badgeScale.toStringAsFixed(2)}x'),
@@ -219,6 +171,54 @@ class _ChatSettingsState extends State<ChatSettings> {
               max: 3.0,
               divisions: 11,
               onChanged: (newValue) => settingsStore.emoteScale = newValue,
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Message Scale'),
+                const Spacer(),
+                Text('${settingsStore.messageScale.toStringAsFixed(2)}x'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.messageScale,
+              min: 0.5,
+              max: 2.0,
+              divisions: 6,
+              onChanged: (newValue) => settingsStore.messageScale = newValue,
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Message Spacing'),
+                const Spacer(),
+                Text(settingsStore.messageSpacing.toStringAsFixed(0).toString()),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.messageSpacing,
+              min: 0.0,
+              max: 30.0,
+              divisions: 6,
+              onChanged: (newValue) => settingsStore.messageSpacing = newValue,
+            ),
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Font Size'),
+                const Spacer(),
+                Text(settingsStore.fontSize.toInt().toString()),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.fontSize,
+              min: 5,
+              max: 20,
+              divisions: 15,
+              onChanged: (newValue) => settingsStore.fontSize = newValue,
             ),
           ),
         ],
