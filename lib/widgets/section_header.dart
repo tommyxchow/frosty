@@ -8,7 +8,7 @@ class SectionHeader extends StatelessWidget {
   const SectionHeader(
     this.text, {
     Key? key,
-    this.padding = const EdgeInsets.fromLTRB(10.0, 30.0, 10.0, 5.0),
+    this.padding = const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 5.0),
     this.fontSize = 18.0,
   }) : super(key: key);
 

@@ -26,9 +26,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               unknownValue: TimestampType.disabled) ??
           TimestampType.disabled
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
-      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
-      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 14.0
+      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
+      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
       ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
@@ -49,9 +49,9 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showChatMessageDividers': instance.showChatMessageDividers,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
       'useReadableColors': instance.useReadableColors,
-      'messageScale': instance.messageScale,
       'fontSize': instance.fontSize,
       'messageSpacing': instance.messageSpacing,
+      'messageScale': instance.messageScale,
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'sendCrashLogs': instance.sendCrashLogs,
@@ -266,21 +266,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$messageScaleAtom = Atom(name: '_SettingsStoreBase.messageScale');
-
-  @override
-  double get messageScale {
-    _$messageScaleAtom.reportRead();
-    return super.messageScale;
-  }
-
-  @override
-  set messageScale(double value) {
-    _$messageScaleAtom.reportWrite(value, super.messageScale, () {
-      super.messageScale = value;
-    });
-  }
-
   final _$fontSizeAtom = Atom(name: '_SettingsStoreBase.fontSize');
 
   @override
@@ -308,6 +293,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set messageSpacing(double value) {
     _$messageSpacingAtom.reportWrite(value, super.messageSpacing, () {
       super.messageSpacing = value;
+    });
+  }
+
+  final _$messageScaleAtom = Atom(name: '_SettingsStoreBase.messageScale');
+
+  @override
+  double get messageScale {
+    _$messageScaleAtom.reportRead();
+    return super.messageScale;
+  }
+
+  @override
+  set messageScale(double value) {
+    _$messageScaleAtom.reportWrite(value, super.messageScale, () {
+      super.messageScale = value;
     });
   }
 
@@ -386,6 +386,20 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$_SettingsStoreBaseActionController =
+      ActionController(name: '_SettingsStoreBase');
+
+  @override
+  void reset() {
+    final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
+        name: '_SettingsStoreBase.reset');
+    try {
+      return super.reset();
+    } finally {
+      _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
@@ -401,9 +415,9 @@ showZeroWidth: ${showZeroWidth},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
 useReadableColors: ${useReadableColors},
-messageScale: ${messageScale},
 fontSize: ${fontSize},
 messageSpacing: ${messageSpacing},
+messageScale: ${messageScale},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 sendCrashLogs: ${sendCrashLogs},

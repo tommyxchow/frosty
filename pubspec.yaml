@@ -99,7 +99,8 @@ flutter:
   #   - images/a_dot_ham.jpeg
 
   assets:
-    - assets/icons/logo.png
+    - assets/icons/logo.svg
+    - assets/icons/TwitchGlitchWhite.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

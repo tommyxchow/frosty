@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OtherSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -13,10 +15,40 @@ class OtherSettings extends StatelessWidget {
     required this.settingsStore,
   }) : super(key: key);
 
+  Future<void> _showConfirmDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset All Settings'),
+        content: const Text('Are you sure you want to reset all settings?'),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              settingsStore.reset();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Settings reset!'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: const Text('Yes'),
+            style: TextButton.styleFrom(primary: Colors.red),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
-      leading: const Icon(Icons.miscellaneous_services),
+      leading: const Icon(Icons.help),
       title: const Text(
         'Other',
         style: TextStyle(
@@ -33,15 +65,24 @@ class OtherSettings extends StatelessWidget {
 
             showAboutDialog(
               context: context,
+              applicationIcon: SvgPicture.asset(
+                'assets/icons/logo.svg',
+                height: 80,
+              ),
               applicationName: packageInfo.appName,
               applicationVersion: 'Version ${packageInfo.version} (${packageInfo.buildNumber})',
               applicationLegalese: '\u{a9} 2022 Tommy Chow',
             );
           },
         ),
+        ListTile(
+          leading: const Icon(Icons.launch),
+          title: const Text('FAQ'),
+          onTap: () => launch('https://github.com/tommyxchow/frosty#faq'),
+        ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
-            title: const Text('Send anonymous crash logs'),
+            title: const Text('Send Anonymous Crash Logs'),
             value: settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
@@ -54,7 +95,7 @@ class OtherSettings extends StatelessWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
           width: double.infinity,
           child: ElevatedButton.icon(
             icon: const Icon(Icons.delete_sweep),
@@ -68,6 +109,15 @@ class OtherSettings extends StatelessWidget {
                 ),
               );
             },
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            icon: const Icon(Icons.restore),
+            label: const Text('Reset All Settings'),
+            onPressed: () => _showConfirmDialog(context),
           ),
         ),
       ],

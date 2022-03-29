@@ -12,90 +12,163 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
 }
 
 abstract class _SettingsStoreBase with Store {
-  //General Settings
-  @JsonKey(defaultValue: ThemeType.system, unknownEnumValue: ThemeType.system)
-  @observable
-  var themeType = ThemeType.system;
+  // * General Settings
+  static const defaultThemeType = ThemeType.system;
 
-  @JsonKey(defaultValue: false)
-  @observable
-  var showThumbnailUptime = false;
+  static const defaultShowThumbnailUptime = false;
 
-  // Video Settings
-  @JsonKey(defaultValue: true)
+  @JsonKey(defaultValue: defaultThemeType, unknownEnumValue: ThemeType.system)
   @observable
-  var showVideo = true;
+  var themeType = defaultThemeType;
 
-  @JsonKey(defaultValue: true)
+  @JsonKey(defaultValue: defaultShowThumbnailUptime)
   @observable
-  var showOverlay = true;
+  var showThumbnailUptime = defaultShowThumbnailUptime;
 
-  @JsonKey(defaultValue: false)
-  @observable
-  var toggleableOverlay = false;
+  // * Video Settings
+  static const defaultShowVideo = true;
 
-  @JsonKey(defaultValue: false)
-  @observable
-  var pictureInPicture = false;
+  static const defaultShowOverlay = true;
 
-  // Chat Settings
-  @JsonKey(defaultValue: true)
-  @observable
-  var showBottomBar = true;
+  static const defaultToggleableOverlay = false;
 
-  @JsonKey(defaultValue: false)
-  @observable
-  var showDeletedMessages = false;
+  static const defaultPictureInPicture = false;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: defaultShowVideo)
   @observable
-  var showZeroWidth = false;
+  var showVideo = defaultShowVideo;
 
-  @JsonKey(defaultValue: false)
+  @JsonKey(defaultValue: defaultShowOverlay)
   @observable
-  var showChatMessageDividers = false;
+  var showOverlay = defaultShowOverlay;
 
-  @JsonKey(defaultValue: TimestampType.disabled, unknownEnumValue: TimestampType.disabled)
+  @JsonKey(defaultValue: defaultToggleableOverlay)
   @observable
-  var timestampType = TimestampType.disabled;
+  var toggleableOverlay = defaultToggleableOverlay;
 
-  @JsonKey(defaultValue: true)
+  @JsonKey(defaultValue: defaultPictureInPicture)
   @observable
-  var useReadableColors = true;
+  var pictureInPicture = defaultPictureInPicture;
 
-  @JsonKey(defaultValue: 1.0)
-  @observable
-  var messageScale = 1.0;
+  // * Chat Settings
+  static const defaultShowBottomBar = true;
 
-  @JsonKey(defaultValue: 14.0)
-  @observable
-  var fontSize = 14.0;
+  static const defaultShowDeletedMessages = false;
 
-  @JsonKey(defaultValue: 10.0)
-  @observable
-  var messageSpacing = 10.0;
+  static const defaultShowZeroWidth = false;
 
-  @JsonKey(defaultValue: 1.0)
-  @observable
-  var badgeScale = 1.0;
+  static const defaultShowChatMessageDividers = false;
 
-  @JsonKey(defaultValue: 1.0)
-  @observable
-  var emoteScale = 1.0;
+  static const defaultTimestampType = TimestampType.disabled;
 
-  // Other settings
-  @JsonKey(defaultValue: true)
-  @observable
-  var sendCrashLogs = true;
+  static const defaultUseReadableColors = true;
 
-  // Global configs
-  @JsonKey(defaultValue: false)
-  @observable
-  var fullScreen = false;
+  static const defaultMessageScale = 1.0;
 
-  @JsonKey(defaultValue: true)
+  static const defaultFontSize = 12.0;
+
+  static const defaultMessageSpacing = 10.0;
+
+  static const defaultBadgeScale = 1.0;
+
+  static const defaultEmoteScale = 1.0;
+
+  @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
-  var expandInfo = true;
+  var showBottomBar = defaultShowBottomBar;
+
+  @JsonKey(defaultValue: defaultShowDeletedMessages)
+  @observable
+  var showDeletedMessages = defaultShowDeletedMessages;
+
+  @JsonKey(defaultValue: defaultShowZeroWidth)
+  @observable
+  var showZeroWidth = defaultShowZeroWidth;
+
+  @JsonKey(defaultValue: defaultShowChatMessageDividers)
+  @observable
+  var showChatMessageDividers = defaultShowChatMessageDividers;
+
+  @JsonKey(defaultValue: defaultTimestampType, unknownEnumValue: TimestampType.disabled)
+  @observable
+  var timestampType = defaultTimestampType;
+
+  @JsonKey(defaultValue: defaultUseReadableColors)
+  @observable
+  var useReadableColors = defaultUseReadableColors;
+
+  @JsonKey(defaultValue: defaultFontSize)
+  @observable
+  var fontSize = defaultFontSize;
+
+  @JsonKey(defaultValue: defaultMessageSpacing)
+  @observable
+  var messageSpacing = defaultMessageSpacing;
+
+  @JsonKey(defaultValue: defaultMessageScale)
+  @observable
+  var messageScale = defaultMessageScale;
+
+  @JsonKey(defaultValue: defaultBadgeScale)
+  @observable
+  var badgeScale = defaultBadgeScale;
+
+  @JsonKey(defaultValue: defaultEmoteScale)
+  @observable
+  var emoteScale = defaultEmoteScale;
+
+  // * Other settings
+  static const defaultSendCrashLogs = true;
+
+  @JsonKey(defaultValue: defaultSendCrashLogs)
+  @observable
+  var sendCrashLogs = defaultSendCrashLogs;
+
+  // * Global configs
+  static const defaultFullScreen = false;
+
+  static const defaultExpandInfo = true;
+
+  @JsonKey(defaultValue: defaultFullScreen)
+  @observable
+  var fullScreen = defaultFullScreen;
+
+  @JsonKey(defaultValue: defaultExpandInfo)
+  @observable
+  var expandInfo = defaultExpandInfo;
+
+  @action
+  void reset() {
+    // * General Settings
+    themeType = defaultThemeType;
+    showThumbnailUptime = defaultShowThumbnailUptime;
+
+    // * Video Settings
+    showVideo = defaultShowVideo;
+    showOverlay = defaultShowOverlay;
+    toggleableOverlay = defaultToggleableOverlay;
+    pictureInPicture = defaultPictureInPicture;
+
+    // * Chat Settings
+    showBottomBar = defaultShowBottomBar;
+    showDeletedMessages = defaultShowDeletedMessages;
+    showZeroWidth = defaultShowZeroWidth;
+    showChatMessageDividers = defaultShowChatMessageDividers;
+    timestampType = defaultTimestampType;
+    useReadableColors = defaultUseReadableColors;
+    messageScale = defaultMessageScale;
+    fontSize = defaultFontSize;
+    messageSpacing = defaultMessageSpacing;
+    badgeScale = defaultBadgeScale;
+    emoteScale = defaultEmoteScale;
+
+    // * Other settings
+    sendCrashLogs = defaultSendCrashLogs;
+
+    // * Global configs
+    fullScreen = defaultFullScreen;
+    expandInfo = defaultExpandInfo;
+  }
 }
 
 enum ThemeType {

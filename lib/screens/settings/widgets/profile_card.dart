@@ -12,18 +12,28 @@ class ProfileCard extends StatelessWidget {
     return showDialog(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Log In With'),
         children: [
           ColoredBox(
             color: const Color.fromRGBO(145, 70, 255, 0.8),
             child: SimpleDialogOption(
               padding: const EdgeInsets.all(24.0),
-              child: const Text(
-                'Twitch Account',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/icons/TwitchGlitchWhite.png',
+                    height: 30,
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Connect with Twitch',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
               onPressed: () {
                 authStore.login();
@@ -32,9 +42,16 @@ class ProfileCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20.0),
-          const Center(child: Text('Or')),
+          const Center(
+            child: Text(
+              'Or',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+          const SizedBox(height: 5.0),
           SimpleDialogOption(
             child: TextField(
+              textAlign: TextAlign.center,
               decoration: const InputDecoration(
                 hintText: 'Token',
               ),
@@ -80,7 +97,7 @@ class ProfileCard extends StatelessWidget {
         builder: (context) {
           if (authStore.error != null) {
             return ListTile(
-              title: const Text('Failed to connect'),
+              title: const Text('Failed to Connect'),
               trailing: OutlinedButton(
                 onPressed: authStore.init,
                 child: const Text('Try Again'),
@@ -90,7 +107,6 @@ class ProfileCard extends StatelessWidget {
           if (authStore.isLoggedIn && authStore.user.details != null) {
             return ListTile(
               leading: CircleAvatar(
-                backgroundColor: const Color(0xFFFFFFFF),
                 foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
               ),
               title: Text(authStore.user.details!.displayName),
@@ -109,7 +125,7 @@ class ProfileCard extends StatelessWidget {
               size: 40,
             ),
             title: const Text('Anonymous User'),
-            subtitle: const Text('Log in to view your followed streams, send chat messages, and more.'),
+            subtitle: const Text('Log in to chat, view followed streams, and more.'),
             trailing: OutlinedButton(
               onPressed: () => _showLoginDialog(context),
               child: const Text('Log In'),
