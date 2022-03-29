@@ -61,13 +61,13 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultTimestampType = TimestampType.disabled;
 
-  static const defaulUseReadableColors = true;
+  static const defaultUseReadableColors = true;
 
   static const defaultMessageScale = 1.0;
 
-  static const defaultFontSize = 14.0;
+  static const defaultFontSize = 12.0;
 
-  static const defaultMssageSpacing = 10.0;
+  static const defaultMessageSpacing = 10.0;
 
   static const defaultBadgeScale = 1.0;
 
@@ -93,21 +93,21 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var timestampType = defaultTimestampType;
 
-  @JsonKey(defaultValue: defaulUseReadableColors)
+  @JsonKey(defaultValue: defaultUseReadableColors)
   @observable
-  var useReadableColors = defaulUseReadableColors;
-
-  @JsonKey(defaultValue: defaultMessageScale)
-  @observable
-  var messageScale = defaultMessageScale;
+  var useReadableColors = defaultUseReadableColors;
 
   @JsonKey(defaultValue: defaultFontSize)
   @observable
   var fontSize = defaultFontSize;
 
-  @JsonKey(defaultValue: defaultMssageSpacing)
+  @JsonKey(defaultValue: defaultMessageSpacing)
   @observable
-  var messageSpacing = defaultMssageSpacing;
+  var messageSpacing = defaultMessageSpacing;
+
+  @JsonKey(defaultValue: defaultMessageScale)
+  @observable
+  var messageScale = defaultMessageScale;
 
   @JsonKey(defaultValue: defaultBadgeScale)
   @observable
@@ -155,10 +155,10 @@ abstract class _SettingsStoreBase with Store {
     showZeroWidth = defaultShowZeroWidth;
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
-    useReadableColors = defaulUseReadableColors;
+    useReadableColors = defaultUseReadableColors;
     messageScale = defaultMessageScale;
     fontSize = defaultFontSize;
-    messageSpacing = defaultMssageSpacing;
+    messageSpacing = defaultMessageSpacing;
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
 

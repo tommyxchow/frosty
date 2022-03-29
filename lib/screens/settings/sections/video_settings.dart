@@ -23,13 +23,13 @@ class VideoSettings extends StatelessWidget {
         ),
         children: [
           SwitchListTile.adaptive(
-            title: const Text('Show video'),
+            title: const Text('Video'),
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Use custom video overlay'),
+            title: const Text('Custom Video Overlay'),
             subtitle: const Text('Replaces the default video overlay with a mobile-friendly version.'),
             value: settingsStore.showOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
@@ -37,13 +37,15 @@ class VideoSettings extends StatelessWidget {
           if (Platform.isIOS)
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Picture-in-picture button (experimental)'),
-              subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay. May cause freezes/crashes.'),
+              title: const Text('Picture-in-Picture Button (experimental)'),
+              subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay. MAY CAUSE freezes/crashes.'),
               value: settingsStore.pictureInPicture,
               onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
             ),
           SwitchListTile.adaptive(
-            title: const Text('Long-press player to toggle overlay'),
+            isThreeLine: true,
+            title: const Text('Long-Press Player to Toggle Overlay'),
+            subtitle: const Text('Allows switching between Twitch\'s default overlay and the custom video overlay.'),
             value: settingsStore.toggleableOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
           ),
