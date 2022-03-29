@@ -43,6 +43,7 @@ class Settings extends StatelessWidget {
         bottom: false,
         child: ListView(
           children: [
+            const SizedBox(height: 10.0),
             AccountSettings(
               settingsStore: settingsStore,
               authStore: context.read<AuthStore>(),

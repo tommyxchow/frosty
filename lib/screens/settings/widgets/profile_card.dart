@@ -109,7 +109,7 @@ class ProfileCard extends StatelessWidget {
               size: 40,
             ),
             title: const Text('Anonymous User'),
-            subtitle: const Text('Log in to view your followed streams, send chat messages, and more.'),
+            subtitle: const Text('Log in to view followed streams, send chat messages, and more.'),
             trailing: OutlinedButton(
               onPressed: () => _showLoginDialog(context),
               child: const Text('Log In'),

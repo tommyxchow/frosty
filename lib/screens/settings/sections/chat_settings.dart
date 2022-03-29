@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/widgets/section_header.dart';
 
 class ChatSettings extends StatefulWidget {
   final SettingsStore settingsStore;
@@ -84,7 +83,13 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
           ),
           const SizedBox(height: 10.0),
-          const SectionHeader('Message Appearance'),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 5.0),
+            child: Text(
+              'Message Appearance',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18.0),
+            ),
+          ),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20.0),
