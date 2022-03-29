@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -13,6 +14,36 @@ class OtherSettings extends StatelessWidget {
     Key? key,
     required this.settingsStore,
   }) : super(key: key);
+
+  Future<void> _showConfirmDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset All Settings'),
+        content: const Text('Are you reset all settings?'),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              settingsStore.reset();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Settings reset!'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            child: const Text('Yes'),
+            style: TextButton.styleFrom(primary: Colors.red),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +65,10 @@ class OtherSettings extends StatelessWidget {
 
             showAboutDialog(
               context: context,
+              applicationIcon: SvgPicture.asset(
+                'assets/icons/logo.svg',
+                height: 80,
+              ),
               applicationName: packageInfo.appName,
               applicationVersion: 'Version ${packageInfo.version} (${packageInfo.buildNumber})',
               applicationLegalese: '\u{a9} 2022 Tommy Chow',
@@ -47,7 +82,7 @@ class OtherSettings extends StatelessWidget {
         ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
-            title: const Text('Send anonymous crash logs'),
+            title: const Text('Send Anonymous Crash Logs'),
             value: settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
@@ -82,7 +117,7 @@ class OtherSettings extends StatelessWidget {
           child: ElevatedButton.icon(
             icon: const Icon(Icons.restore),
             label: const Text('Reset All Settings'),
-            onPressed: settingsStore.reset,
+            onPressed: () => _showConfirmDialog(context),
           ),
         ),
       ],
