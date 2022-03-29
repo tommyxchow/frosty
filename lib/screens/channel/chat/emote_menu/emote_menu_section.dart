@@ -39,10 +39,10 @@ class EmoteMenuSection extends StatelessWidget {
               assetsStore.recentEmotes.remove(emotes[index]);
               assetsStore.recentEmotes.insert(0, emotes[index]);
             },
-            child: Center(
-              child: Tooltip(
-                message: emotes[index].name,
-                preferBelow: false,
+            child: Tooltip(
+              message: emotes[index].name,
+              preferBelow: false,
+              child: Center(
                 child: CachedNetworkImage(
                   imageUrl: emotes[index].url,
                   height: emotes[index].height?.toDouble() ?? defaultEmoteSize,

@@ -52,10 +52,10 @@ class RecentEmotesPanel extends StatelessWidget {
                           assetsStore.recentEmotes.insert(0, matchingEmotes.first);
                         }
                       : null,
-                  child: Center(
-                    child: Tooltip(
-                      message: emote.name,
-                      preferBelow: false,
+                  child: Tooltip(
+                    message: emote.name,
+                    preferBelow: false,
+                    child: Center(
                       child: CachedNetworkImage(
                         imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
                         color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
