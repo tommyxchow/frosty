@@ -42,7 +42,7 @@ class RecentEmotesPanel extends StatelessWidget {
               (context, index) {
                 final emote = assetsStore.recentEmotes[index];
                 final validEmotes = [...assetsStore.emoteToObject.values, ...assetsStore.userEmoteToObject.values];
-                final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name);
+                final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name && existingEmote.type == emote.type);
 
                 return GestureDetector(
                   onTap: matchingEmotes.isNotEmpty
