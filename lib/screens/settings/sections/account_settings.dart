@@ -145,14 +145,14 @@ class ProfileCard extends StatelessWidget {
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
+            style: TextButton.styleFrom(primary: Colors.red),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               authStore.logout();
               Navigator.pop(context);
             },
             child: const Text('Yes'),
-            style: TextButton.styleFrom(primary: Colors.red),
           ),
         ],
       ),
@@ -179,11 +179,11 @@ class ProfileCard extends StatelessWidget {
                 foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
               ),
               title: Text(authStore.user.details!.displayName),
-              trailing: ElevatedButton.icon(
+              trailing: OutlinedButton.icon(
                 onPressed: () => _showLogoutDialog(context),
                 icon: const Icon(Icons.logout_outlined),
                 label: const Text('Log Out'),
-                style: ElevatedButton.styleFrom(primary: Colors.red),
+                style: OutlinedButton.styleFrom(primary: Colors.red),
               ),
             );
           }
@@ -195,9 +195,10 @@ class ProfileCard extends StatelessWidget {
             ),
             title: const Text('Anonymous User'),
             subtitle: const Text('Log in to chat, view followed streams, and more.'),
-            trailing: OutlinedButton(
+            trailing: ElevatedButton.icon(
               onPressed: () => _showLoginDialog(context),
-              child: const Text('Log In'),
+              icon: const Icon(Icons.login),
+              label: const Text('Log In'),
             ),
           );
         },

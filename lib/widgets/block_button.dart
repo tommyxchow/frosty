@@ -32,8 +32,9 @@ class BlockButton extends StatelessWidget {
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
+            style: TextButton.styleFrom(primary: Colors.red),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               if (isBlocked) {
                 authStore.user.unblock(targetId: targetUserId, headers: authStore.headersTwitch);
@@ -47,7 +48,6 @@ class BlockButton extends StatelessWidget {
               Navigator.pop(context);
             },
             child: const Text('Yes'),
-            style: TextButton.styleFrom(primary: Colors.red),
           ),
         ],
       ),

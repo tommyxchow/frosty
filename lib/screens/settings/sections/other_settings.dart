@@ -25,8 +25,9 @@ class OtherSettings extends StatelessWidget {
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
+            style: TextButton.styleFrom(primary: Colors.red),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               settingsStore.reset();
               Navigator.pop(context);
@@ -38,7 +39,6 @@ class OtherSettings extends StatelessWidget {
               );
             },
             child: const Text('Yes'),
-            style: TextButton.styleFrom(primary: Colors.red),
           ),
         ],
       ),
@@ -97,7 +97,7 @@ class OtherSettings extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           width: double.infinity,
-          child: ElevatedButton.icon(
+          child: OutlinedButton.icon(
             icon: const Icon(Icons.delete_sweep),
             label: const Text('Clear Image Cache'),
             onPressed: () async {
@@ -114,7 +114,7 @@ class OtherSettings extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           width: double.infinity,
-          child: ElevatedButton.icon(
+          child: OutlinedButton.icon(
             icon: const Icon(Icons.restore),
             label: const Text('Reset All Settings'),
             onPressed: () => _showConfirmDialog(context),
