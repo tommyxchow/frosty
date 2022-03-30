@@ -335,8 +335,7 @@ class IRCMessage {
                 ];
 
                 // Create the message for the tooltip
-                final message = emoteStack.reversed.map((emote) => emote.name).join(', ');
-                final tooltip = nextWordIsEmoji ? words[index] + ', ' + message : message;
+                final message = emoteStack.reversed.map((emote) => '${emote.name} - ${emoteType[emote.type.index]}');
                 localSpan.add(
                   WidgetSpan(
                     alignment: PlaceholderAlignment.middle,
@@ -364,9 +363,19 @@ class IRCMessage {
                                 ],
                               ),
                               const SizedBox(height: 5.0),
-                              Text(
-                                tooltip,
-                                style: const TextStyle(color: Colors.black),
+                              Column(
+                                children: [
+                                  Text(
+                                    nextWordIsEmoji
+                                        ? '${words[index]} - Emoji'
+                                        : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                  Text(
+                                    nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
+                                    style: const TextStyle(color: Colors.black),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -527,22 +536,6 @@ class IRCMessage {
     required double height,
     required double? width,
   }) {
-    const emoteType = [
-      'Twitch (Bits Tier)',
-      'Twitch (Follower)',
-      'Twitch (Subscriber)',
-      'Twitch (Global)',
-      'Twitch (Unlocked)',
-      'Twitch (Channel)',
-      'FFZ (Global)',
-      'FFZ (Channel)',
-      'BTTV (Global)',
-      'BTTV (Channel)',
-      'BTTV (Shared)',
-      '7TV (Global)',
-      '7TV (Channel)',
-    ];
-
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(

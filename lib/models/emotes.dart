@@ -310,6 +310,22 @@ class Emote {
   Map<String, dynamic> toJson() => _$EmoteToJson(this);
 }
 
+const emoteType = [
+  'Twitch (Bits Tier)',
+  'Twitch (Follower)',
+  'Twitch (Subscriber)',
+  'Twitch (Global)',
+  'Twitch (Unlocked)',
+  'Twitch (Channel)',
+  'FFZ (Global)',
+  'FFZ (Channel)',
+  'BTTV (Global)',
+  'BTTV (Channel)',
+  'BTTV (Shared)',
+  '7TV (Global)',
+  '7TV (Channel)',
+];
+
 enum EmoteType {
   twitchBits,
   twitchFollower,
