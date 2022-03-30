@@ -264,7 +264,7 @@ class TwitchApi {
       if (userData.isNotEmpty) {
         return UserTwitch.fromJson(userData.first);
       } else {
-        return Future.error('User does not exist');
+        return Future.error('User does not exist!');
       }
     } else {
       return Future.error('Failed to get user: ${decoded['message']}');
@@ -422,7 +422,7 @@ class TwitchApi {
         return [];
       }
     } else {
-      return Future.error('User does not exist');
+      return Future.error('User does not exist!');
     }
   }
 

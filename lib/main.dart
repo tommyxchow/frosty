@@ -89,7 +89,7 @@ class MyApp extends StatelessWidget {
         titleTextStyle: TextStyle(
           fontFamily: 'Inter',
           fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w800,
           color: Colors.black,
         ),
         iconTheme: IconThemeData(color: Colors.black),
@@ -116,7 +116,7 @@ class MyApp extends StatelessWidget {
         titleTextStyle: const TextStyle(
           fontFamily: 'Inter',
           fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w800,
         ),
       ),
       colorScheme: ColorScheme.fromSwatch(
@@ -138,7 +138,7 @@ class MyApp extends StatelessWidget {
         titleTextStyle: TextStyle(
           fontFamily: 'Inter',
           fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w800,
         ),
       ),
       colorScheme: ColorScheme.fromSwatch(

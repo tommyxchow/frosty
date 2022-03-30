@@ -125,7 +125,7 @@ class _VideoChatState extends State<VideoChat> {
     final appBar = AppBar(
       title: Text(
         regexEnglish.hasMatch(_chatStore.displayName) ? _chatStore.displayName : _chatStore.displayName + ' (${_chatStore.channelName})',
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 20),
       ),
       actions: [
         IconButton(

@@ -21,10 +21,7 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
+        title: const Text('Settings'),
         actions: [
           if (Platform.isAndroid)
             IconButton(
