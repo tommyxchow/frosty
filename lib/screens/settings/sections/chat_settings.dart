@@ -114,7 +114,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                             width: defaultBadgeSize * settingsStore.badgeScale,
                           ),
                         ),
-                        const TextSpan(text: ' Badge and emote preview '),
+                        const TextSpan(text: ' Badge and emote preview. '),
                         WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
                           child: CachedNetworkImage(
