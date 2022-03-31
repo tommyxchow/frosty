@@ -17,6 +17,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultShowThumbnailUptime = false;
 
+  static const defaultShowThumbnails = true;
+
   @JsonKey(defaultValue: defaultThemeType, unknownEnumValue: ThemeType.system)
   @observable
   var themeType = defaultThemeType;
@@ -24,6 +26,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultShowThumbnailUptime)
   @observable
   var showThumbnailUptime = defaultShowThumbnailUptime;
+
+  @JsonKey(defaultValue: defaultShowThumbnails)
+  @observable
+  var showThumbnails = defaultShowThumbnails;
 
   // * Video Settings
   static const defaultShowVideo = true;
@@ -142,6 +148,7 @@ abstract class _SettingsStoreBase with Store {
     // * General Settings
     themeType = defaultThemeType;
     showThumbnailUptime = defaultShowThumbnailUptime;
+    showThumbnails = defaultShowThumbnails;
 
     // * Video Settings
     showVideo = defaultShowVideo;

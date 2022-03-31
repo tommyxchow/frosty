@@ -20,6 +20,7 @@ class StreamCard extends StatelessWidget {
   final int width;
   final int height;
   final bool showUptime;
+  final bool showThumbnail;
   final bool showCategory;
 
   const StreamCard({
@@ -29,6 +30,7 @@ class StreamCard extends StatelessWidget {
     required this.width,
     required this.height,
     required this.showUptime,
+    required this.showThumbnail,
     this.showCategory = true,
   }) : super(key: key);
 
@@ -69,28 +71,29 @@ class StreamCard extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: showThumbnail ? 15.0 : 5.0),
         child: Row(
           children: [
-            Flexible(
-              flex: 1,
-              child: showUptime
-                  ? Stack(
-                      alignment: AlignmentDirectional.bottomEnd,
-                      children: [
-                        thumbnail,
-                        Container(
-                          color: const Color.fromRGBO(0, 0, 0, 0.5),
-                          padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                          child: Text(
-                            DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
-                            style: const TextStyle(fontSize: 12, color: Colors.white),
-                          ),
-                        )
-                      ],
-                    )
-                  : thumbnail,
-            ),
+            if (showThumbnail)
+              Flexible(
+                flex: 1,
+                child: showUptime
+                    ? Stack(
+                        alignment: AlignmentDirectional.bottomEnd,
+                        children: [
+                          thumbnail,
+                          Container(
+                            color: const Color.fromRGBO(0, 0, 0, 0.5),
+                            padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                            child: Text(
+                              DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
+                              style: const TextStyle(fontSize: 12, color: Colors.white),
+                            ),
+                          )
+                        ],
+                      )
+                    : thumbnail,
+              ),
             Flexible(
               flex: 2,
               child: Padding(

@@ -12,6 +12,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               unknownValue: ThemeType.system) ??
           ThemeType.system
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
+      ..showThumbnails = json['showThumbnails'] as bool? ?? true
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
@@ -39,6 +40,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
       'themeType': _$ThemeTypeEnumMap[instance.themeType],
       'showThumbnailUptime': instance.showThumbnailUptime,
+      'showThumbnails': instance.showThumbnails,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
@@ -107,6 +109,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showThumbnailUptime(bool value) {
     _$showThumbnailUptimeAtom.reportWrite(value, super.showThumbnailUptime, () {
       super.showThumbnailUptime = value;
+    });
+  }
+
+  final _$showThumbnailsAtom = Atom(name: '_SettingsStoreBase.showThumbnails');
+
+  @override
+  bool get showThumbnails {
+    _$showThumbnailsAtom.reportRead();
+    return super.showThumbnails;
+  }
+
+  @override
+  set showThumbnails(bool value) {
+    _$showThumbnailsAtom.reportWrite(value, super.showThumbnails, () {
+      super.showThumbnails = value;
     });
   }
 
@@ -405,6 +422,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     return '''
 themeType: ${themeType},
 showThumbnailUptime: ${showThumbnailUptime},
+showThumbnails: ${showThumbnails},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},

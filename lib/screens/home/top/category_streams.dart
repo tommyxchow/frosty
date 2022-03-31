@@ -95,6 +95,7 @@ class CategoryStreams extends StatelessWidget {
                                 width: thumbnailWidth,
                                 height: thumbnailHeight,
                                 showUptime: context.read<SettingsStore>().showThumbnailUptime,
+                                showThumbnail: context.read<SettingsStore>().showThumbnails,
                                 showCategory: false,
                               ),
                             );
