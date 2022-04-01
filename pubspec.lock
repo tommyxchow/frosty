@@ -986,7 +986,7 @@ packages:
       name: webview_flutter_android
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.8.3"
+    version: "2.8.4"
   webview_flutter_platform_interface:
     dependency: transitive
     description:
@@ -1007,7 +1007,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.5.0"
+    version: "2.5.1"
   xdg_directories:
     dependency: transitive
     description:
