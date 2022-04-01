@@ -72,6 +72,9 @@ abstract class _ChatStoreBase with Store {
   @readonly
   var _autoScroll = true;
 
+  @readonly
+  var _showAutocomplete = false;
+
   /// The logged-in user's appearance in chat.
   @readonly
   var _userState = const USERSTATE();
@@ -129,7 +132,7 @@ abstract class _ChatStoreBase with Store {
       }
     });
 
-    // Add a listener to the textfield that will do the following when focused:
+    // Add a listener to the textfield focus that will do the following when focused:
     // 1. Hide the emote menu if it is currently shown
     // 2. Scroll to the latest message (after a brief delay)
     textFieldFocusNode.addListener(() {
@@ -142,6 +145,11 @@ abstract class _ChatStoreBase with Store {
         );
       }
     });
+
+    // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
+    // Will also rebuild the autocomplete bar when typing, refreshing the results as the user types.
+    textController
+        .addListener(() => _showAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty ? true : false);
   }
 
   /// Handle and process the provided string-representation of the IRC data.
@@ -342,6 +350,28 @@ abstract class _ChatStoreBase with Store {
 
     // Clear the previous input in the TextField.
     textController.clear();
+  }
+
+  /// Adds the given [emote] to the chat textfield.
+  @action
+  void addEmote(Emote emote, {bool autocompleteMode = false}) {
+    if (textController.text.isEmpty || textController.text.endsWith(' ')) {
+      textController.text += emote.name + ' ';
+    } else if (autocompleteMode && _showAutocomplete && textController.text.endsWith('')) {
+      final split = textController.text.split(' ')
+        ..removeLast()
+        ..add(emote.name + ' ');
+
+      textController.text = split.join(' ');
+    } else {
+      textController.text += ' ' + emote.name + ' ';
+    }
+
+    assetsStore.recentEmotes
+      ..removeWhere((recentEmote) => recentEmote.name == emote.name && recentEmote.type == emote.type)
+      ..insert(0, emote);
+
+    textController.selection = TextSelection.fromPosition(TextPosition(offset: textController.text.length));
   }
 
   /// Closes and disposes all the channels and controllers used by the store.

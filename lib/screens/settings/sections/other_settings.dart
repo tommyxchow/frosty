@@ -95,7 +95,7 @@ class OtherSettings extends StatelessWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
           width: double.infinity,
           child: OutlinedButton.icon(
             icon: const Icon(Icons.delete_sweep),
@@ -112,7 +112,7 @@ class OtherSettings extends StatelessWidget {
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
           width: double.infinity,
           child: OutlinedButton.icon(
             icon: const Icon(Icons.restore),

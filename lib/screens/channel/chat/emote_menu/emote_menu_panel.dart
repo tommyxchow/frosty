@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_section.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class EmoteMenuPanel extends StatelessWidget {
-  final ChatAssetsStore assetsStore;
-  final TextEditingController textController;
+  final ChatStore chatStore;
   final List<Emote> emotes;
 
   const EmoteMenuPanel({
     Key? key,
-    required this.assetsStore,
-    required this.textController,
+    required this.chatStore,
     required this.emotes,
   }) : super(key: key);
 
@@ -48,8 +46,7 @@ class EmoteMenuPanel extends StatelessWidget {
             ),
           ),
           EmoteMenuSection(
-            assetsStore: assetsStore,
-            textController: textController,
+            chatStore: chatStore,
             emotes: globalEmotes,
           ),
         ],
@@ -58,8 +55,7 @@ class EmoteMenuPanel extends StatelessWidget {
             child: SectionHeader('Channel Emotes'),
           ),
           EmoteMenuSection(
-            assetsStore: assetsStore,
-            textController: textController,
+            chatStore: chatStore,
             emotes: channelEmotes,
           ),
         ],
@@ -68,8 +64,7 @@ class EmoteMenuPanel extends StatelessWidget {
             child: SectionHeader('Subscribed Emotes'),
           ),
           EmoteMenuSection(
-            assetsStore: assetsStore,
-            textController: textController,
+            chatStore: chatStore,
             emotes: subEmotes,
           ),
         ],
@@ -78,8 +73,7 @@ class EmoteMenuPanel extends StatelessWidget {
             child: SectionHeader('Unlocked Emotes'),
           ),
           EmoteMenuSection(
-            assetsStore: assetsStore,
-            textController: textController,
+            chatStore: chatStore,
             emotes: miscEmotes,
           ),
         ],
