@@ -29,23 +29,25 @@ class ChatBottomBar extends StatelessWidget {
                 thickness: 1.0,
               ),
               SizedBox(
-                height: 40,
+                height: 50,
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   itemCount: emotes.length,
                   scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) => GestureDetector(
+                  itemBuilder: (context, index) => InkWell(
                     onTap: () => chatStore.addEmote(emotes[index], autocompleteMode: true),
                     child: Tooltip(
                       message: emotes[index].name,
                       preferBelow: false,
                       child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: CachedNetworkImage(
-                          imageUrl: emotes[index].url,
-                          fadeInDuration: const Duration(),
-                          height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
-                          width: emotes[index].width?.toDouble(),
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Center(
+                          child: CachedNetworkImage(
+                            imageUrl: emotes[index].url,
+                            fadeInDuration: const Duration(),
+                            height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
+                            width: emotes[index].width?.toDouble(),
+                          ),
                         ),
                       ),
                     ),
