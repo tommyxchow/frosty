@@ -65,29 +65,27 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
             ],
           ),
         ),
-        SliverPadding(
-          padding: const EdgeInsets.all(10.0),
-          sliver: SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
-                  ? 8
-                  : context.read<SettingsStore>().showVideo
-                      ? 6
-                      : 16,
-              mainAxisSpacing: 10.0,
-              crossAxisSpacing: 10.0,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final emote = widget.chatStore.assetsStore.recentEmotes[index];
-                final validEmotes = [...widget.chatStore.assetsStore.emoteToObject.values, ...widget.chatStore.assetsStore.userEmoteToObject.values];
-                final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name && existingEmote.type == emote.type);
+        SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
+                ? 8
+                : context.read<SettingsStore>().showVideo
+                    ? 6
+                    : 16,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final emote = widget.chatStore.assetsStore.recentEmotes[index];
+              final validEmotes = [...widget.chatStore.assetsStore.emoteToObject.values, ...widget.chatStore.assetsStore.userEmoteToObject.values];
+              final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name && existingEmote.type == emote.type);
 
-                return GestureDetector(
-                  onTap: matchingEmotes.isNotEmpty ? () => widget.chatStore.addEmote(emote) : null,
-                  child: Tooltip(
-                    message: emote.name,
-                    preferBelow: false,
+              return InkWell(
+                onTap: matchingEmotes.isNotEmpty ? () => widget.chatStore.addEmote(emote) : null,
+                child: Tooltip(
+                  message: emote.name,
+                  preferBelow: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
                     child: Center(
                       child: CachedNetworkImage(
                         imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
@@ -98,10 +96,10 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
                       ),
                     ),
                   ),
-                );
-              },
-              childCount: widget.chatStore.assetsStore.recentEmotes.length,
-            ),
+                ),
+              );
+            },
+            childCount: widget.chatStore.assetsStore.recentEmotes.length,
           ),
         ),
       ],

@@ -18,24 +18,22 @@ class EmoteMenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.all(10.0),
-      sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
-              ? 8
-              : context.read<SettingsStore>().showVideo
-                  ? 6
-                  : 16,
-          mainAxisSpacing: 10.0,
-          crossAxisSpacing: 10.0,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, index) => GestureDetector(
-            onTap: () => chatStore.addEmote(emotes[index]),
-            child: Tooltip(
-              message: emotes[index].name,
-              preferBelow: false,
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
+            ? 8
+            : context.read<SettingsStore>().showVideo
+                ? 6
+                : 16,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => InkWell(
+          onTap: () => chatStore.addEmote(emotes[index]),
+          child: Tooltip(
+            message: emotes[index].name,
+            preferBelow: false,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
               child: Center(
                 child: CachedNetworkImage(
                   imageUrl: emotes[index].url,
@@ -45,8 +43,8 @@ class EmoteMenuSection extends StatelessWidget {
               ),
             ),
           ),
-          childCount: emotes.length,
         ),
+        childCount: emotes.length,
       ),
     );
   }
