@@ -35,7 +35,7 @@ class ChatBottomBar extends StatelessWidget {
                   itemCount: emotes.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => GestureDetector(
-                    onTap: () => chatStore.addEmote(emotes[index]),
+                    onTap: () => chatStore.addEmote(emotes[index], autocompleteMode: true),
                     child: Tooltip(
                       message: emotes[index].name,
                       preferBelow: false,

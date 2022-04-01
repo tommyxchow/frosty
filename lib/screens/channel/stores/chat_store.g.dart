@@ -126,11 +126,11 @@ mixin _$ChatStore on _ChatStoreBase, Store {
   }
 
   @override
-  void addEmote(Emote emote) {
+  void addEmote(Emote emote, {bool autocompleteMode = false}) {
     final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
         name: '_ChatStoreBase.addEmote');
     try {
-      return super.addEmote(emote);
+      return super.addEmote(emote, autocompleteMode: autocompleteMode);
     } finally {
       _$_ChatStoreBaseActionController.endAction(_$actionInfo);
     }

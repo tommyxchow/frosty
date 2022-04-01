@@ -354,10 +354,10 @@ abstract class _ChatStoreBase with Store {
 
   /// Adds the given [emote] to the chat textfield.
   @action
-  void addEmote(Emote emote) {
+  void addEmote(Emote emote, {bool autocompleteMode = false}) {
     if (textController.text.isEmpty || textController.text.endsWith(' ')) {
       textController.text += emote.name + ' ';
-    } else if (_showAutocomplete && textController.text.endsWith('')) {
+    } else if (autocompleteMode && _showAutocomplete && textController.text.endsWith('')) {
       final split = textController.text.split(' ')
         ..removeLast()
         ..add(emote.name + ' ');
@@ -367,8 +367,10 @@ abstract class _ChatStoreBase with Store {
       textController.text += ' ' + emote.name + ' ';
     }
 
-    assetsStore.recentEmotes.removeWhere((recentEmote) => recentEmote.name == emote.name && recentEmote.type == emote.type);
-    assetsStore.recentEmotes.insert(0, emote);
+    assetsStore.recentEmotes
+      ..removeWhere((recentEmote) => recentEmote.name == emote.name && recentEmote.type == emote.type)
+      ..insert(0, emote);
+
     textController.selection = TextSelection.fromPosition(TextPosition(offset: textController.text.length));
   }
 
