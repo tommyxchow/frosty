@@ -43,6 +43,24 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
+  final _$_showAutocompleteAtom =
+      Atom(name: '_ChatStoreBase._showAutocomplete');
+
+  bool get showAutocomplete {
+    _$_showAutocompleteAtom.reportRead();
+    return super._showAutocomplete;
+  }
+
+  @override
+  bool get _showAutocomplete => showAutocomplete;
+
+  @override
+  set _showAutocomplete(bool value) {
+    _$_showAutocompleteAtom.reportWrite(value, super._showAutocomplete, () {
+      super._showAutocomplete = value;
+    });
+  }
+
   final _$_userStateAtom = Atom(name: '_ChatStoreBase._userState');
 
   USERSTATE get userState {
@@ -102,6 +120,17 @@ mixin _$ChatStore on _ChatStoreBase, Store {
         name: '_ChatStoreBase.sendMessage');
     try {
       return super.sendMessage(message);
+    } finally {
+      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void addEmote(Emote emote, {bool autocompleteMode = false}) {
+    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
+        name: '_ChatStoreBase.addEmote');
+    try {
+      return super.addEmote(emote, autocompleteMode: autocompleteMode);
     } finally {
       _$_ChatStoreBaseActionController.endAction(_$actionInfo);
     }

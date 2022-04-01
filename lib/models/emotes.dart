@@ -291,6 +291,8 @@ class Emote {
   factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
         name: emote.name,
         zeroWidth: false,
+        width: emote.width,
+        height: emote.height,
         url: 'https:' + (emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x),
         type: type,
       );
@@ -307,6 +309,22 @@ class Emote {
   factory Emote.fromJson(Map<String, dynamic> json) => _$EmoteFromJson(json);
   Map<String, dynamic> toJson() => _$EmoteToJson(this);
 }
+
+const emoteType = [
+  'Twitch (Bits Tier)',
+  'Twitch (Follower)',
+  'Twitch (Subscriber)',
+  'Twitch (Global)',
+  'Twitch (Unlocked)',
+  'Twitch (Channel)',
+  'FFZ (Global)',
+  'FFZ (Channel)',
+  'BTTV (Global)',
+  'BTTV (Channel)',
+  'BTTV (Shared)',
+  '7TV (Global)',
+  '7TV (Channel)',
+];
 
 enum EmoteType {
   twitchBits,

@@ -19,12 +19,6 @@ class Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const divider = Divider(
-      thickness: 1.0,
-      indent: 10.0,
-      endIndent: 10.0,
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -46,17 +40,14 @@ class Settings extends StatelessWidget {
         bottom: false,
         child: ListView(
           children: [
+            const SizedBox(height: 10.0),
             AccountSettings(
               settingsStore: settingsStore,
               authStore: context.read<AuthStore>(),
             ),
-            divider,
             GeneralSettings(settingsStore: settingsStore),
-            divider,
             VideoSettings(settingsStore: settingsStore),
-            divider,
             ChatSettings(settingsStore: settingsStore),
-            divider,
             OtherSettings(settingsStore: settingsStore),
           ],
         ),

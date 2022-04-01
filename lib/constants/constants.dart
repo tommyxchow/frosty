@@ -19,5 +19,11 @@ const zeroWidthEmotes = [
   'cvHazmat',
 ];
 
-// Regex for matching strings that contain lower or upper case English characters.
+/// Regex for matching strings that contain lower or upper case English characters.
 final regexEnglish = RegExp(r'[a-zA-Z]');
+
+/// The default badge width and height.
+const defaultBadgeSize = 18.0;
+
+/// The default emote width and height when none are provided.
+const defaultEmoteSize = 28.0;

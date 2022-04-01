@@ -77,6 +77,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
                       streamInfo: _listStore.streams[index],
                       width: thumbnailWidth,
                       height: thumbnailHeight,
+                      showThumbnail: context.read<SettingsStore>().showThumbnails,
                       showUptime: context.read<SettingsStore>().showThumbnailUptime,
                     ),
                   );

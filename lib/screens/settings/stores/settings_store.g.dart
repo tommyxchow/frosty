@@ -12,6 +12,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               unknownValue: ThemeType.system) ??
           ThemeType.system
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
+      ..showThumbnails = json['showThumbnails'] as bool? ?? true
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
@@ -19,16 +20,19 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
+      ..showChatMessageDividers =
+          json['showChatMessageDividers'] as bool? ?? false
       ..timestampType = $enumDecodeNullable(
               _$TimestampTypeEnumMap, json['timestampType'],
               unknownValue: TimestampType.disabled) ??
           TimestampType.disabled
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
-      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
-      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 14.0
+      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
-      ..badgeHeight = (json['badgeHeight'] as num?)?.toDouble() ?? 20.0
-      ..emoteHeight = (json['emoteHeight'] as num?)?.toDouble() ?? 30.0
+      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
+      ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
+      ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
+      ..emoteAutocomplete = json['emoteAutocomplete'] as bool? ?? true
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true;
@@ -37,6 +41,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
       'themeType': _$ThemeTypeEnumMap[instance.themeType],
       'showThumbnailUptime': instance.showThumbnailUptime,
+      'showThumbnails': instance.showThumbnails,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
@@ -44,13 +49,15 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showBottomBar': instance.showBottomBar,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
+      'showChatMessageDividers': instance.showChatMessageDividers,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
       'useReadableColors': instance.useReadableColors,
-      'messageScale': instance.messageScale,
       'fontSize': instance.fontSize,
       'messageSpacing': instance.messageSpacing,
-      'badgeHeight': instance.badgeHeight,
-      'emoteHeight': instance.emoteHeight,
+      'messageScale': instance.messageScale,
+      'badgeScale': instance.badgeScale,
+      'emoteScale': instance.emoteScale,
+      'emoteAutocomplete': instance.emoteAutocomplete,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
@@ -104,6 +111,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showThumbnailUptime(bool value) {
     _$showThumbnailUptimeAtom.reportWrite(value, super.showThumbnailUptime, () {
       super.showThumbnailUptime = value;
+    });
+  }
+
+  final _$showThumbnailsAtom = Atom(name: '_SettingsStoreBase.showThumbnails');
+
+  @override
+  bool get showThumbnails {
+    _$showThumbnailsAtom.reportRead();
+    return super.showThumbnails;
+  }
+
+  @override
+  set showThumbnails(bool value) {
+    _$showThumbnailsAtom.reportWrite(value, super.showThumbnails, () {
+      super.showThumbnails = value;
     });
   }
 
@@ -215,6 +237,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$showChatMessageDividersAtom =
+      Atom(name: '_SettingsStoreBase.showChatMessageDividers');
+
+  @override
+  bool get showChatMessageDividers {
+    _$showChatMessageDividersAtom.reportRead();
+    return super.showChatMessageDividers;
+  }
+
+  @override
+  set showChatMessageDividers(bool value) {
+    _$showChatMessageDividersAtom
+        .reportWrite(value, super.showChatMessageDividers, () {
+      super.showChatMessageDividers = value;
+    });
+  }
+
   final _$timestampTypeAtom = Atom(name: '_SettingsStoreBase.timestampType');
 
   @override
@@ -243,21 +282,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set useReadableColors(bool value) {
     _$useReadableColorsAtom.reportWrite(value, super.useReadableColors, () {
       super.useReadableColors = value;
-    });
-  }
-
-  final _$messageScaleAtom = Atom(name: '_SettingsStoreBase.messageScale');
-
-  @override
-  double get messageScale {
-    _$messageScaleAtom.reportRead();
-    return super.messageScale;
-  }
-
-  @override
-  set messageScale(double value) {
-    _$messageScaleAtom.reportWrite(value, super.messageScale, () {
-      super.messageScale = value;
     });
   }
 
@@ -291,33 +315,64 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$badgeHeightAtom = Atom(name: '_SettingsStoreBase.badgeHeight');
+  final _$messageScaleAtom = Atom(name: '_SettingsStoreBase.messageScale');
 
   @override
-  double get badgeHeight {
-    _$badgeHeightAtom.reportRead();
-    return super.badgeHeight;
+  double get messageScale {
+    _$messageScaleAtom.reportRead();
+    return super.messageScale;
   }
 
   @override
-  set badgeHeight(double value) {
-    _$badgeHeightAtom.reportWrite(value, super.badgeHeight, () {
-      super.badgeHeight = value;
+  set messageScale(double value) {
+    _$messageScaleAtom.reportWrite(value, super.messageScale, () {
+      super.messageScale = value;
     });
   }
 
-  final _$emoteHeightAtom = Atom(name: '_SettingsStoreBase.emoteHeight');
+  final _$badgeScaleAtom = Atom(name: '_SettingsStoreBase.badgeScale');
 
   @override
-  double get emoteHeight {
-    _$emoteHeightAtom.reportRead();
-    return super.emoteHeight;
+  double get badgeScale {
+    _$badgeScaleAtom.reportRead();
+    return super.badgeScale;
   }
 
   @override
-  set emoteHeight(double value) {
-    _$emoteHeightAtom.reportWrite(value, super.emoteHeight, () {
-      super.emoteHeight = value;
+  set badgeScale(double value) {
+    _$badgeScaleAtom.reportWrite(value, super.badgeScale, () {
+      super.badgeScale = value;
+    });
+  }
+
+  final _$emoteScaleAtom = Atom(name: '_SettingsStoreBase.emoteScale');
+
+  @override
+  double get emoteScale {
+    _$emoteScaleAtom.reportRead();
+    return super.emoteScale;
+  }
+
+  @override
+  set emoteScale(double value) {
+    _$emoteScaleAtom.reportWrite(value, super.emoteScale, () {
+      super.emoteScale = value;
+    });
+  }
+
+  final _$emoteAutocompleteAtom =
+      Atom(name: '_SettingsStoreBase.emoteAutocomplete');
+
+  @override
+  bool get emoteAutocomplete {
+    _$emoteAutocompleteAtom.reportRead();
+    return super.emoteAutocomplete;
+  }
+
+  @override
+  set emoteAutocomplete(bool value) {
+    _$emoteAutocompleteAtom.reportWrite(value, super.emoteAutocomplete, () {
+      super.emoteAutocomplete = value;
     });
   }
 
@@ -366,11 +421,26 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  final _$_SettingsStoreBaseActionController =
+      ActionController(name: '_SettingsStoreBase');
+
+  @override
+  void reset() {
+    final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
+        name: '_SettingsStoreBase.reset');
+    try {
+      return super.reset();
+    } finally {
+      _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''
 themeType: ${themeType},
 showThumbnailUptime: ${showThumbnailUptime},
+showThumbnails: ${showThumbnails},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
@@ -378,13 +448,15 @@ pictureInPicture: ${pictureInPicture},
 showBottomBar: ${showBottomBar},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
+showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
 useReadableColors: ${useReadableColors},
-messageScale: ${messageScale},
 fontSize: ${fontSize},
 messageSpacing: ${messageSpacing},
-badgeHeight: ${badgeHeight},
-emoteHeight: ${emoteHeight},
+messageScale: ${messageScale},
+badgeScale: ${badgeScale},
+emoteScale: ${emoteScale},
+emoteAutocomplete: ${emoteAutocomplete},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}

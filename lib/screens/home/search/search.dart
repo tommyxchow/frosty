@@ -37,7 +37,7 @@ class _SearchState extends State<Search> {
             autocorrect: false,
             decoration: InputDecoration(
               isDense: true,
-              hintText: 'Search for a channel or category',
+              hintText: 'Find a channel or category',
               contentPadding: const EdgeInsets.all(10.0),
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -64,12 +64,10 @@ class _SearchState extends State<Search> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (_searchStore.searchHistory.isNotEmpty)
-                      const Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: Text(
-                          'HISTORY',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+                      const SectionHeader(
+                        'History',
+                        padding: headerPadding,
+                        fontWeight: FontWeight.bold,
                       ),
                     Expanded(
                       child: ListView(
@@ -105,6 +103,7 @@ class _SearchState extends State<Search> {
                     child: SectionHeader(
                       'Channels',
                       padding: headerPadding,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SearchResultsChannels(
@@ -115,6 +114,7 @@ class _SearchState extends State<Search> {
                     child: SectionHeader(
                       'Categories',
                       padding: headerPadding,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SearchResultsCategories(searchStore: _searchStore),

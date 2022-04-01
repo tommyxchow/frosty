@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 
 class EmoteMenu extends StatefulWidget {
-  final ChatAssetsStore assetsStore;
-  final TextEditingController textController;
+  final ChatStore chatStore;
 
   const EmoteMenu({
     Key? key,
-    required this.assetsStore,
-    required this.textController,
+    required this.chatStore,
   }) : super(key: key);
 
   @override
@@ -20,7 +18,7 @@ class EmoteMenu extends StatefulWidget {
 }
 
 class _EmoteMenuState extends State<EmoteMenu> {
-  late final PageController _pageContoller = PageController(initialPage: widget.assetsStore.emoteMenuIndex);
+  late final PageController _pageContoller = PageController(initialPage: widget.chatStore.assetsStore.emoteMenuIndex);
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +45,9 @@ class _EmoteMenuState extends State<EmoteMenu> {
                           duration: const Duration(milliseconds: 200),
                           curve: Curves.ease,
                         );
-                        widget.assetsStore.emoteMenuIndex = index;
+                        widget.chatStore.assetsStore.emoteMenuIndex = index;
                       },
-                      style: index == widget.assetsStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
+                      style: index == widget.chatStore.assetsStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
                       child: Text(section),
                     ),
                   ),
@@ -59,39 +57,34 @@ class _EmoteMenuState extends State<EmoteMenu> {
         ),
         Expanded(
           child: PageView(
-            onPageChanged: (index) => widget.assetsStore.emoteMenuIndex = index,
+            onPageChanged: (index) => widget.chatStore.assetsStore.emoteMenuIndex = index,
             controller: _pageContoller,
             children: [
               RecentEmotesPanel(
-                assetsStore: widget.assetsStore,
-                textController: widget.textController,
+                chatStore: widget.chatStore,
               ),
               Observer(
                 builder: (_) => EmoteMenuPanel(
-                  assetsStore: widget.assetsStore,
-                  textController: widget.textController,
-                  emotes: widget.assetsStore.userEmoteToObject.values.toList(),
+                  chatStore: widget.chatStore,
+                  emotes: widget.chatStore.assetsStore.userEmoteToObject.values.toList(),
                 ),
               ),
               Observer(
                 builder: (_) => EmoteMenuPanel(
-                  assetsStore: widget.assetsStore,
-                  textController: widget.textController,
-                  emotes: widget.assetsStore.bttvEmotes,
+                  chatStore: widget.chatStore,
+                  emotes: widget.chatStore.assetsStore.bttvEmotes,
                 ),
               ),
               Observer(
                 builder: (_) => EmoteMenuPanel(
-                  assetsStore: widget.assetsStore,
-                  textController: widget.textController,
-                  emotes: widget.assetsStore.ffzEmotes,
+                  chatStore: widget.chatStore,
+                  emotes: widget.chatStore.assetsStore.ffzEmotes,
                 ),
               ),
               Observer(
                 builder: (_) => EmoteMenuPanel(
-                  assetsStore: widget.assetsStore,
-                  textController: widget.textController,
-                  emotes: widget.assetsStore.sevenTVEmotes,
+                  chatStore: widget.chatStore,
+                  emotes: widget.chatStore.assetsStore.sevenTVEmotes,
                 ),
               ),
             ],

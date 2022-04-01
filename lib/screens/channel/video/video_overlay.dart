@@ -54,7 +54,8 @@ class _VideoOverlayState extends State<VideoOverlay> {
               if (widget.videoStore.sleepTimer != null && widget.videoStore.sleepTimer!.isActive)
                 Row(
                   children: [
-                    Text('Timer: ${widget.videoStore.timeRemaining.toString().split('.')[0]}'),
+                    const Icon(Icons.timer),
+                    Text(' ${widget.videoStore.timeRemaining.toString().split('.')[0]}'),
                     const Spacer(),
                     IconButton(
                       tooltip: 'Cancel Timer',
@@ -70,9 +71,10 @@ class _VideoOverlayState extends State<VideoOverlay> {
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Dismiss'),
+            style: TextButton.styleFrom(primary: Colors.red),
           ),
           Observer(
-            builder: (context) => TextButton(
+            builder: (context) => ElevatedButton(
               onPressed: widget.videoStore.sleepHours == 0 && widget.videoStore.sleepMinutes == 0
                   ? null
                   : () => widget.videoStore.updateSleepTimer(
@@ -82,7 +84,6 @@ class _VideoOverlayState extends State<VideoOverlay> {
                         ),
                       ),
               child: const Text('Set Timer'),
-              style: TextButton.styleFrom(primary: Colors.green),
             ),
           ),
         ],
@@ -260,14 +261,16 @@ class _VideoOverlayState extends State<VideoOverlay> {
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.white,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                                 const SizedBox(height: 5.0),
                                 Text(
-                                  '${widget.videoStore.streamInfo?.gameName} for ${NumberFormat().format(widget.videoStore.streamInfo?.viewerCount)} viewers',
+                                  '${widget.videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(widget.videoStore.streamInfo?.viewerCount)} viewers',
                                   style: const TextStyle(
                                     color: Colors.white,
+                                    fontWeight: FontWeight.w300,
                                   ),
                                 ),
                               ],

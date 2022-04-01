@@ -264,7 +264,7 @@ class TwitchApi {
       if (userData.isNotEmpty) {
         return UserTwitch.fromJson(userData.first);
       } else {
-        return Future.error('User does not exist');
+        return Future.error('User does not exist!');
       }
     } else {
       return Future.error('Failed to get user: ${decoded['message']}');
@@ -323,6 +323,22 @@ class TwitchApi {
       return CategoriesTwitch.fromJson(decoded);
     } else {
       return Future.error('Failed to get top categories: ${decoded['message']}');
+    }
+  }
+
+  /// Returns a [CategoriesTwitch] object containing the category info corresponding to the provided [gameId].
+  Future<CategoriesTwitch> getCategory({
+    required Map<String, String> headers,
+    required String gameId,
+  }) async {
+    final url = Uri.parse('https://api.twitch.tv/helix/games?id=$gameId');
+
+    final response = await _client.get(url, headers: headers);
+    final decoded = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return CategoriesTwitch.fromJson(decoded);
+    } else {
+      return Future.error('Failed to get category: ${decoded['message']}');
     }
   }
 
@@ -406,7 +422,7 @@ class TwitchApi {
         return [];
       }
     } else {
-      return Future.error('User does not exist');
+      return Future.error('User does not exist!');
     }
   }
 

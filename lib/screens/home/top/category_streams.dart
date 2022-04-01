@@ -63,7 +63,7 @@ class CategoryStreams extends StatelessWidget {
                         centerTitle: true,
                         title: Text(
                           listStore.categoryInfo!.name,
-                          style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.w800),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -95,6 +95,8 @@ class CategoryStreams extends StatelessWidget {
                                 width: thumbnailWidth,
                                 height: thumbnailHeight,
                                 showUptime: context.read<SettingsStore>().showThumbnailUptime,
+                                showThumbnail: context.read<SettingsStore>().showThumbnails,
+                                showCategory: false,
                               ),
                             );
                           },
