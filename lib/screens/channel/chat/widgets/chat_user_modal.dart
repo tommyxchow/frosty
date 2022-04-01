@@ -76,31 +76,34 @@ class ChatUserModal extends StatelessWidget {
             Expanded(
               child: MediaQuery(
                 data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.messageScale),
-                child: ListView.separated(
-                  reverse: true,
-                  itemBuilder: (context, index) => InkWell(
-                    onLongPress: () async {
-                      await Clipboard.setData(ClipboardData(text: userMessages[index].message));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Message copied!'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
-                    child: ChatMessage(
-                      ircMessage: userMessages[index],
-                      assetsStore: chatStore.assetsStore,
-                      settingsStore: chatStore.settings,
+                child: DefaultTextStyle(
+                  style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
+                  child: ListView.separated(
+                    reverse: true,
+                    itemBuilder: (context, index) => InkWell(
+                      onLongPress: () async {
+                        await Clipboard.setData(ClipboardData(text: userMessages[index].message));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Message copied!'),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                      },
+                      child: ChatMessage(
+                        ircMessage: userMessages[index],
+                        assetsStore: chatStore.assetsStore,
+                        settingsStore: chatStore.settings,
+                      ),
                     ),
+                    separatorBuilder: (context, index) => chatStore.settings.showChatMessageDividers
+                        ? Divider(
+                            height: chatStore.settings.messageSpacing,
+                            thickness: 1.0,
+                          )
+                        : SizedBox(height: chatStore.settings.messageSpacing),
+                    itemCount: userMessages.length,
                   ),
-                  separatorBuilder: (context, index) => chatStore.settings.showChatMessageDividers
-                      ? Divider(
-                          height: chatStore.settings.messageSpacing,
-                          thickness: 1.0,
-                        )
-                      : SizedBox(height: chatStore.settings.messageSpacing),
-                  itemCount: userMessages.length,
                 ),
               ),
             ),
