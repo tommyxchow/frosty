@@ -23,7 +23,7 @@ class ChatBottomBar extends StatelessWidget {
 
         return Column(
           children: [
-            if (chatStore.settings.emoteAutocomplete && chatStore.showAutocomplete && chatStore.textController.text.split(' ').last.isNotEmpty) ...[
+            if (chatStore.settings.emoteAutocomplete && chatStore.showAutocomplete && emotes.isNotEmpty) ...[
               const Divider(
                 height: 1.0,
                 thickness: 1.0,

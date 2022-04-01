@@ -148,7 +148,8 @@ abstract class _ChatStoreBase with Store {
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
     // Will also rebuild the autocomplete bar when typing, refreshing the results as the user types.
-    textController.addListener(() => _showAutocomplete = textFieldFocusNode.hasFocus ? true : false);
+    textController
+        .addListener(() => _showAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty ? true : false);
   }
 
   /// Handle and process the provided string-representation of the IRC data.
@@ -357,9 +358,10 @@ abstract class _ChatStoreBase with Store {
     if (textController.text.isEmpty || textController.text.endsWith(' ')) {
       textController.text += emote.name + ' ';
     } else if (_showAutocomplete && textController.text.endsWith('')) {
-      final split = textController.text.split(' ');
-      split.removeLast();
-      split.add(emote.name + ' ');
+      final split = textController.text.split(' ')
+        ..removeLast()
+        ..add(emote.name + ' ');
+
       textController.text = split.join(' ');
     } else {
       textController.text += ' ' + emote.name + ' ';

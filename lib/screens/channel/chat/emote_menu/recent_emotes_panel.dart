@@ -19,6 +19,30 @@ class RecentEmotesPanel extends StatefulWidget {
 }
 
 class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
+  Future<void> _showClearDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cler Recent Emotes'),
+        content: const Text('Are you sure you want to clear your recent emotes?'),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+            style: TextButton.styleFrom(primary: Colors.red),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              setState(widget.chatStore.assetsStore.recentEmotes.clear);
+              Navigator.pop(context);
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -34,8 +58,7 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
               SizedBox(
                 height: 30,
                 child: TextButton(
-                  onPressed:
-                      widget.chatStore.assetsStore.recentEmotes.isEmpty ? null : () => setState(widget.chatStore.assetsStore.recentEmotes.clear),
+                  onPressed: widget.chatStore.assetsStore.recentEmotes.isEmpty ? null : _showClearDialog,
                   child: const Text('Clear'),
                 ),
               ),
