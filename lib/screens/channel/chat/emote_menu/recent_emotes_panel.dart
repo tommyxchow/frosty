@@ -23,7 +23,7 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cler Recent Emotes'),
+        title: const Text('Clear Recent Emotes'),
         content: const Text('Are you sure you want to clear your recent emotes?'),
         actions: [
           TextButton(
