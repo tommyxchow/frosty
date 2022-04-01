@@ -79,6 +79,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultEmoteScale = 1.0;
 
+  static const defaultEmoteAutocomplete = true;
+
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
   var showBottomBar = defaultShowBottomBar;
@@ -122,6 +124,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultEmoteScale)
   @observable
   var emoteScale = defaultEmoteScale;
+
+  @JsonKey(defaultValue: defaultEmoteAutocomplete)
+  @observable
+  var emoteAutocomplete = defaultEmoteAutocomplete;
 
   // * Other settings
   static const defaultSendCrashLogs = true;
@@ -168,6 +174,7 @@ abstract class _SettingsStoreBase with Store {
     messageSpacing = defaultMessageSpacing;
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
+    emoteAutocomplete = defaultEmoteAutocomplete;
 
     // * Other settings
     sendCrashLogs = defaultSendCrashLogs;

@@ -15,7 +15,7 @@ class ChatBottomBar extends StatelessWidget {
     return Observer(
       builder: (context) => Column(
         children: [
-          if (chatStore.showAutocomplete && chatStore.textController.text.split(' ').last.isNotEmpty)
+          if (chatStore.settings.emoteAutocomplete && chatStore.showAutocomplete && chatStore.textController.text.split(' ').last.isNotEmpty)
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -36,6 +36,7 @@ class ChatBottomBar extends StatelessWidget {
                             padding: const EdgeInsets.all(5.0),
                             child: CachedNetworkImage(
                               imageUrl: emote.url,
+                              fadeInDuration: const Duration(),
                               height: emote.height?.toDouble() ?? defaultEmoteSize,
                               width: emote.width?.toDouble(),
                             ),

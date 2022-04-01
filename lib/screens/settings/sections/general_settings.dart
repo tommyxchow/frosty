@@ -43,7 +43,7 @@ class GeneralSettings extends StatelessWidget {
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Stream Uptime on Thumbnails'),
-            subtitle: const Text('Displays the uptime of the stream in the HH:MM:SS format.'),
+            subtitle: const Text('Shows the uptime of the stream in the HH:MM:SS format.'),
             value: settingsStore.showThumbnailUptime,
             onChanged: settingsStore.showThumbnails ? (newValue) => settingsStore.showThumbnailUptime = newValue : null,
           ),

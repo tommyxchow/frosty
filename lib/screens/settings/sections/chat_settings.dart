@@ -36,9 +36,23 @@ class _ChatSettingsState extends State<ChatSettings> {
         children: [
           SwitchListTile.adaptive(
             title: const Text('Bottom Bar'),
-            subtitle: const Text('Displays the bottom text field bar.'),
+            subtitle: const Text('Shows the bottom text field bar.'),
             value: settingsStore.showBottomBar,
             onChanged: (newValue) => settingsStore.showBottomBar = newValue,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Emote Autocomplete'),
+            subtitle: const Text('Shows a bar that suggests matching emotes when typing.'),
+            value: settingsStore.emoteAutocomplete,
+            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.emoteAutocomplete = newValue : null,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Zero-Width Emotes'),
+            subtitle: const Text('Shows "stacked" emotes from BetterTTV and 7TV.'),
+            value: settingsStore.showZeroWidth,
+            onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
@@ -46,13 +60,6 @@ class _ChatSettingsState extends State<ChatSettings> {
             subtitle: const Text('Adjusts the lightness value of overly bright/dark names.'),
             value: settingsStore.useReadableColors,
             onChanged: (newValue) => settingsStore.useReadableColors = newValue,
-          ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Zero-Width Emotes'),
-            subtitle: const Text('Displays "stacked" emotes from BetterTTV and 7TV.'),
-            value: settingsStore.showZeroWidth,
-            onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
@@ -64,14 +71,14 @@ class _ChatSettingsState extends State<ChatSettings> {
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Message Dividers'),
-            subtitle: const Text('Displays a subtle divider between each message.'),
+            subtitle: const Text('Shows a subtle divider between each message.'),
             value: settingsStore.showChatMessageDividers,
             onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
           ),
           ListTile(
             isThreeLine: true,
             title: const Text('Message Timestamps'),
-            subtitle: const Text('Displays timestamps for when a message was sent.'),
+            subtitle: const Text('Shows timestamps for when a message was sent.'),
             trailing: DropdownButton(
               value: settingsStore.timestampType,
               onChanged: (TimestampType? newTimestamp) => settingsStore.timestampType = newTimestamp!,
