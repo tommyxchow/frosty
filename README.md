@@ -114,13 +114,17 @@
 - Search for channels and categories
 - Watch live streams with chat
 - Support for BTTV, FFZ, and 7TV emotes/badges
-- View local chat user message history
-- See the list of users in chat and filter them
+- Emote menu
+- Local chat user message history
+- Chatters list with filter
 - Theater and full-screen mode
+- Picture-in-picture mode (iOS only)
+- Sleep timer
 - Block and unblock users
 - Light, dark, and black (OLED) themes
-- Picture-in-picture mode (iOS only)
 - Customizable settings
+
+And more!
 
 ## Motivation
 
@@ -146,19 +150,19 @@ Frosty aims to bring these emotes and other general quality of life features to 
 
 ## FAQ
 
-### Why do certain animations and scrolling appear to be janky?
-
-Due to Flutter, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes usually resolves it for me.
-
-### Why am I getting ads even though I'm subscribed to the channel or have Turbo?
-
-Even if you've logged in to the app, you'll still have to log in to the WebView so that you can be identified when the stream plays. You can do so by going to the settings and then under the "Account" section tap the "Log in to WebView" button.
-
-### How can I change the quality of the stream?
+### Can I change the quality of the stream?
 
 On Android, you can change the stream quality by turning off the custom stream overlay in the settings and tapping the gear icon on the bottom right.
 
 On iOS, sadly quality options aren't available through the native player and rely on an "auto" setting. There is no official API for getting the live stream URLs so specific quality options are not possible at this time.
+
+### Why do certain animations and scrolling appear to be janky?
+
+Due to the Flutter framework, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes usually resolves it.
+
+### Why am I getting ads even though I'm subscribed to the channel or have Turbo?
+
+Even if you've logged in to the app, you'll still have to log in to the WebView so that you can be identified when the stream plays. You can do so by going to the settings and then under the "Account" section tap the "Log in to WebView" button.
 
 ### Why is there a delay between the stream and chat?
 
@@ -178,11 +182,13 @@ This is caused by the Flutter framework and is being worked on (see [here](https
 
 I'm limited to what is available in the [Twitch API](https://dev.twitch.tv/docs/api/reference), so certain features from the Twitch web or mobile app (e.g., voting on predictions and category viewer count) are sadly not available at the moment.
 
+Other features related to ad-blocking or utilizing private APIs will likely not be implemented officially because they would violate Twitch's terms of service. My highest priority currently is staying on the app stores and focusing on making features for those builds.
+
 I'll try to add as many features as possible but occasionally I may take a break or be limited in time due to studies and personal reasons.
 
-### I'd like to report a bug or request a new feature. Where can I do that?
+### Where can I report a bug or request a new feature?
 
-You can open a new issue [here](https://github.com/tommyxchow/frosty/issues) with the appropriate labels and I'll take a look at it.
+You can open a new issue [here](https://github.com/tommyxchow/frosty/issues) with the appropriate labels (e.g., "bug" or "feature request") and I'll take a look at it.
 
 ## License
 
