@@ -2,19 +2,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/emotes.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:provider/provider.dart';
 
 class EmoteMenuSection extends StatelessWidget {
-  final ChatAssetsStore assetsStore;
-  final TextEditingController textController;
+  final ChatStore chatStore;
   final List<Emote> emotes;
 
   const EmoteMenuSection({
     Key? key,
-    required this.assetsStore,
-    required this.textController,
+    required this.chatStore,
     required this.emotes,
   }) : super(key: key);
 
@@ -34,11 +32,7 @@ class EmoteMenuSection extends StatelessWidget {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) => GestureDetector(
-            onTap: () {
-              textController.text += ' ' + emotes[index].name;
-              assetsStore.recentEmotes.remove(emotes[index]);
-              assetsStore.recentEmotes.insert(0, emotes[index]);
-            },
+            onTap: () => chatStore.addEmote(emotes[index]),
             child: Tooltip(
               message: emotes[index].name,
               preferBelow: false,

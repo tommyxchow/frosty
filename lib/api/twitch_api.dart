@@ -17,21 +17,6 @@ class TwitchApi {
 
   const TwitchApi(this._client);
 
-  /// Returns a list of all Twitch global emotes.
-  Future<List<Emote>> getEmotesGlobal({required Map<String, String> headers}) async {
-    final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
-    final response = await _client.get(url, headers: headers);
-
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body)['data'] as List;
-      final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
-
-      return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchGlobal)).toList();
-    } else {
-      return Future.error('Failed to get Twitch global emotes.');
-    }
-  }
-
   /// Returns a list of a channel's Twitch emotes given their [id].
   Future<List<Emote>> getEmotesChannel({
     required String id,

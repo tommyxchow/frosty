@@ -107,10 +107,7 @@ class Chat extends StatelessWidget {
           if (chatStore.assetsStore.showEmoteMenu)
             SizedBox(
               height: MediaQuery.of(context).size.height / 3,
-              child: EmoteMenu(
-                assetsStore: chatStore.assetsStore,
-                textController: chatStore.textController,
-              ),
+              child: EmoteMenu(chatStore: chatStore),
             ),
         ],
       ),

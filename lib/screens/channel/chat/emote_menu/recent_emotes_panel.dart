@@ -1,29 +1,45 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/constants/constants.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
-class RecentEmotesPanel extends StatelessWidget {
-  final ChatAssetsStore assetsStore;
-  final TextEditingController textController;
+class RecentEmotesPanel extends StatefulWidget {
+  final ChatStore chatStore;
 
   const RecentEmotesPanel({
     Key? key,
-    required this.assetsStore,
-    required this.textController,
+    required this.chatStore,
   }) : super(key: key);
 
+  @override
+  State<RecentEmotesPanel> createState() => _RecentEmotesPanelState();
+}
+
+class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        const SliverToBoxAdapter(
-          child: SectionHeader(
-            'Recent Emotes',
-            padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+        SliverToBoxAdapter(
+          child: Row(
+            children: [
+              const SectionHeader(
+                'Recent Emotes',
+                padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+              ),
+              const Spacer(),
+              SizedBox(
+                height: 30,
+                child: TextButton(
+                  onPressed:
+                      widget.chatStore.assetsStore.recentEmotes.isEmpty ? null : () => setState(widget.chatStore.assetsStore.recentEmotes.clear),
+                  child: const Text('Clear'),
+                ),
+              ),
+            ],
           ),
         ),
         SliverPadding(
@@ -40,18 +56,12 @@ class RecentEmotesPanel extends StatelessWidget {
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final emote = assetsStore.recentEmotes[index];
-                final validEmotes = [...assetsStore.emoteToObject.values, ...assetsStore.userEmoteToObject.values];
+                final emote = widget.chatStore.assetsStore.recentEmotes[index];
+                final validEmotes = [...widget.chatStore.assetsStore.emoteToObject.values, ...widget.chatStore.assetsStore.userEmoteToObject.values];
                 final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name && existingEmote.type == emote.type);
 
                 return GestureDetector(
-                  onTap: matchingEmotes.isNotEmpty
-                      ? () {
-                          textController.text += ' ' + emote.name;
-                          assetsStore.recentEmotes.removeWhere((recentEmote) => recentEmote.name == matchingEmotes.first.name);
-                          assetsStore.recentEmotes.insert(0, matchingEmotes.first);
-                        }
-                      : null,
+                  onTap: matchingEmotes.isNotEmpty ? () => widget.chatStore.addEmote(emote) : null,
                   child: Tooltip(
                     message: emote.name,
                     preferBelow: false,
@@ -67,7 +77,7 @@ class RecentEmotesPanel extends StatelessWidget {
                   ),
                 );
               },
-              childCount: assetsStore.recentEmotes.length,
+              childCount: widget.chatStore.assetsStore.recentEmotes.length,
             ),
           ),
         ),
