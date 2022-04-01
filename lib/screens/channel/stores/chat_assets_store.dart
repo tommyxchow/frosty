@@ -139,6 +139,7 @@ abstract class _ChatAssetsStoreBase with Store {
         ffzApi.getEmotesGlobal().catchError(onError),
         bttvApi.getEmotesGlobal().catchError(onError),
         bttvApi.getEmotesChannel(id: channelId).catchError(onError),
+        twitchApi.getEmotesGlobal(headers: headers).catchError(onError),
         twitchApi.getEmotesChannel(id: channelId, headers: headers).catchError(onError),
         sevenTVApi.getEmotesGlobal().catchError(onError),
         sevenTVApi.getEmotesChannel(user: channelName).catchError(onError),

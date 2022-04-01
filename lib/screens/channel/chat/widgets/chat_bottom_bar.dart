@@ -19,7 +19,12 @@ class ChatBottomBar extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: [...chatStore.assetsStore.userEmoteToObject.values, ...chatStore.assetsStore.emoteToObject.values]
+                children: [
+                  ...chatStore.assetsStore.userEmoteToObject.values,
+                  ...chatStore.assetsStore.bttvEmotes,
+                  ...chatStore.assetsStore.ffzEmotes,
+                  ...chatStore.assetsStore.sevenTVEmotes
+                ]
                     .where((element) => element.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase()))
                     .map(
                       (emote) => GestureDetector(
