@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://user-images.githubusercontent.com/54859075/160067655-f96b7e62-67f7-43d6-96ea-19ac85418bf6.svg" width="180px" alt="Frosty Logo" />
-  <h1 align="center">Frosty</h1>
+  <h1 align="center">Frosty for Twitch</h1>
 </p>
 
 <p align="center">
@@ -114,7 +114,7 @@
 - Search for channels and categories
 - Watch live streams with chat
 - Support for BTTV, FFZ, and 7TV emotes/badges
-- Emote menu
+- Emote menu and autocomplete
 - Local chat user message history
 - Chatters list with filter
 - Theater and full-screen mode
