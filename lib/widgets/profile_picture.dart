@@ -23,7 +23,7 @@ class ProfilePicture extends StatelessWidget {
         return CircleAvatar(
           radius: radius,
           backgroundColor: Colors.transparent,
-          foregroundImage: snapshot.hasData && snapshot.data != null ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl) : null,
+          foregroundImage: !snapshot.hasError && snapshot.hasData ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl) : null,
         );
       },
     );
