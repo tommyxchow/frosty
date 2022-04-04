@@ -117,7 +117,18 @@ class ChatMessage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(ircMessage.tags['system-msg']!),
+              if (ircMessage.tags.containsKey('system-msg')) Text(ircMessage.tags['system-msg']!),
+              if (ircMessage.tags.containsKey('msg-id') && ircMessage.tags['msg-id'] == 'announcement')
+                Row(
+                  children: const [
+                    Icon(Icons.announcement),
+                    SizedBox(width: 5.0),
+                    Text(
+                      'Announcement',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 5.0),
               if (ircMessage.message != null)
                 Observer(
