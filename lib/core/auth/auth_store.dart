@@ -64,17 +64,17 @@ abstract class _AuthBase with Store {
           await _storage.write(key: _defaultTokenKey, value: _token);
         }
       } else {
+        // Validate the existing token.
+        _tokenIsValid = await twitchApi.validateToken(token: _token!);
+
+        // If the token is invalid, logout.
+        if (!_tokenIsValid) return await logout();
+
         // Initialize the user store.
         await user.init(headers: headersTwitch);
 
         if (user.details != null) _isLoggedIn = true;
       }
-
-      // Validate the token.
-      _tokenIsValid = await twitchApi.validateToken(token: _token!);
-
-      // If the token is invalid, logout.
-      if (!_tokenIsValid) await logout();
 
       _error = null;
     } catch (e) {
