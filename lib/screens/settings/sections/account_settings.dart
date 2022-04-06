@@ -124,7 +124,7 @@ class ProfileCard extends StatelessWidget {
             child: TextField(
               textAlign: TextAlign.center,
               decoration: const InputDecoration(
-                hintText: 'Token',
+                labelText: 'Token',
               ),
               onSubmitted: (token) {
                 authStore.login(customToken: token);

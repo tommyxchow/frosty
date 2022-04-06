@@ -95,7 +95,7 @@ class ChatBottomBar extends StatelessWidget {
                         border: const OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(15.0)),
                         ),
-                        hintText: chatStore.auth.isLoggedIn ? 'Send a message' : 'Log in to chat',
+                        labelText: chatStore.auth.isLoggedIn ? 'Send a message' : 'Log in to chat',
                       ),
                       controller: chatStore.textController,
                       onSubmitted: chatStore.sendMessage,

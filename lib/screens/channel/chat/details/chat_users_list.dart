@@ -71,7 +71,7 @@ class _ChattersListState extends State<ChattersList> {
             onChanged: (text) => chatDetailStore.filterText = text,
             decoration: InputDecoration(
               isDense: true,
-              hintText: 'Filter',
+              labelText: 'Filter',
               contentPadding: const EdgeInsets.all(10.0),
               suffixIcon: IconButton(
                 tooltip: 'Clear Filter',
