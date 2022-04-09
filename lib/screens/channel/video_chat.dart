@@ -146,12 +146,12 @@ class _VideoChatState extends State<VideoChat> {
     return Scaffold(
       body: OrientationBuilder(
         builder: (context, orientation) {
-          if (orientation == Orientation.landscape) {
-            // Add a post-frame callback to scroll to bottom when rotating.
-            SchedulerBinding.instance?.addPostFrameCallback((_) {
-              if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(_chatStore.scrollController.position.maxScrollExtent);
-            });
+          // Scroll to bottom when summoning keyboard or rotating.
+          SchedulerBinding.instance?.addPostFrameCallback((_) {
+            if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(_chatStore.scrollController.position.maxScrollExtent);
+          });
 
+          if (orientation == Orientation.landscape) {
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
             return Observer(
@@ -227,6 +227,8 @@ class _VideoChatState extends State<VideoChat> {
   @override
   void dispose() {
     _chatStore.dispose();
+
+    _videoStore.cancelSleepTimer();
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,

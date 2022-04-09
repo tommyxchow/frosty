@@ -37,7 +37,7 @@ class _SearchState extends State<Search> {
             autocorrect: false,
             decoration: InputDecoration(
               isDense: true,
-              hintText: 'Find a channel or category',
+              labelText: 'Find a channel or category',
               contentPadding: const EdgeInsets.all(10.0),
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),

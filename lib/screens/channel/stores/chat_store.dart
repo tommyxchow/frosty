@@ -90,24 +90,6 @@ abstract class _ChatStoreBase with Store {
     required this.channelId,
     required this.displayName,
   }) {
-    // Create a reaction where anytime the emote menu is shown or hidden,
-    // scroll to the bottom of the list. This will prevent the emote menu
-    // from covering the latest messages when summoned.
-    reactions.add(reaction(
-      (_) => assetsStore.showEmoteMenu,
-      (_) => SchedulerBinding.instance?.addPostFrameCallback((_) {
-        if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-      }),
-    ));
-
-    // Create a reaction for scrolling to bottom when exiting fullscreen.
-    reactions.add(reaction(
-      (_) => settings.fullScreen,
-      (_) => SchedulerBinding.instance?.addPostFrameCallback((_) {
-        if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-      }),
-    ));
-
     // Create a reaction that will reconnect to chat when logging in or out.
     // Closing the channel will trigger a reconnect with the new credentials.
     reactions.add(reaction(
@@ -132,18 +114,9 @@ abstract class _ChatStoreBase with Store {
       }
     });
 
-    // Add a listener to the textfield focus that will do the following when focused:
-    // 1. Hide the emote menu if it is currently shown
-    // 2. Scroll to the latest message (after a brief delay)
+    // Add a listener to the textfield focus that will hide the emote menu if it is currently shown.
     textFieldFocusNode.addListener(() {
-      if (textFieldFocusNode.hasFocus) {
-        if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
-
-        Future.delayed(
-          const Duration(milliseconds: 500),
-          () => scrollController.jumpTo(scrollController.position.maxScrollExtent),
-        );
-      }
+      if (textFieldFocusNode.hasFocus && assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
     });
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
@@ -327,29 +300,33 @@ abstract class _ChatStoreBase with Store {
 
     if (_channel == null || _channel?.closeCode != null) {
       _messages.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
-      return;
-    }
+    } else {
+      // Send the message to the IRC chat room.
+      _channel?.sink.add('PRIVMSG #$channelName :$message');
 
-    // Send the message to the IRC chat room.
-    _channel?.sink.add('PRIVMSG #$channelName :$message');
+      // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
+      var userStateString = _userState.raw;
+      if (userStateString != null) {
+        if (message.length > 3 && message.substring(0, 3) == '/me') {
+          userStateString += ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
+        } else {
+          userStateString += ' :' + message.trim();
+        }
 
-    // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
-    var userStateString = _userState.raw;
-    if (userStateString != null) {
-      if (message.length > 3 && message.substring(0, 3) == '/me') {
-        userStateString += ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
-      } else {
-        userStateString += ' :' + message.trim();
+        final userChatMessage = IRCMessage.fromString(userStateString);
+        userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
+
+        toSend = userChatMessage;
       }
 
-      final userChatMessage = IRCMessage.fromString(userStateString);
-      userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
-
-      toSend = userChatMessage;
+      // Clear the previous input in the TextField.
+      textController.clear();
     }
 
-    // Clear the previous input in the TextField.
-    textController.clear();
+    // Scroll to the latest message after sending.
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
   }
 
   /// Adds the given [emote] to the chat textfield.
