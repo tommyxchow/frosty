@@ -581,10 +581,7 @@ class IRCMessage {
       return TextSpan(
         text: text,
         style: style?.copyWith(color: Colors.blue),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () async {
-            if (await canLaunch(text)) launch(text);
-          },
+        recognizer: TapGestureRecognizer()..onTap = () => launch(text),
       );
     } else {
       return TextSpan(text: text, style: style);
