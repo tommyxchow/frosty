@@ -74,6 +74,9 @@ void main() async {
   );
 }
 
+// Navigator key for sleep timer. Allows navigation popping without context.
+final navigatorKey = GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -164,6 +167,7 @@ class MyApp extends StatelessWidget {
                   ? ThemeMode.light
                   : ThemeMode.dark,
           home: const Home(),
+          navigatorKey: navigatorKey,
         );
       },
     );

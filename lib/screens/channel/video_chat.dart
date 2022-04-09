@@ -228,6 +228,8 @@ class _VideoChatState extends State<VideoChat> {
   void dispose() {
     _chatStore.dispose();
 
+    _videoStore.cancelSleepTimer();
+
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,

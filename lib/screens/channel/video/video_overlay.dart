@@ -4,21 +4,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
+import 'package:frosty/main.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:intl/intl.dart';
 
-class VideoOverlay extends StatefulWidget {
+class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
 
   const VideoOverlay({Key? key, required this.videoStore}) : super(key: key);
 
-  @override
-  State<VideoOverlay> createState() => _VideoOverlayState();
-}
-
-class _VideoOverlayState extends State<VideoOverlay> {
-  Future<void> _showSleepTimerDialog(BuildContext oldContext) {
+  Future<void> _showSleepTimerDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -30,9 +26,9 @@ class _VideoOverlayState extends State<VideoOverlay> {
               Row(
                 children: [
                   DropdownButton(
-                    value: widget.videoStore.sleepHours,
+                    value: videoStore.sleepHours,
                     items: List.generate(24, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
-                    onChanged: (int? hours) => widget.videoStore.sleepHours = hours!,
+                    onChanged: (int? hours) => videoStore.sleepHours = hours!,
                     menuMaxHeight: 200,
                   ),
                   const SizedBox(width: 10.0),
@@ -42,24 +38,24 @@ class _VideoOverlayState extends State<VideoOverlay> {
               Row(
                 children: [
                   DropdownButton(
-                    value: widget.videoStore.sleepMinutes,
+                    value: videoStore.sleepMinutes,
                     items: List.generate(60, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
-                    onChanged: (int? minutes) => widget.videoStore.sleepMinutes = minutes!,
+                    onChanged: (int? minutes) => videoStore.sleepMinutes = minutes!,
                     menuMaxHeight: 200,
                   ),
                   const SizedBox(width: 10.0),
                   const Text('Minutes'),
                 ],
               ),
-              if (widget.videoStore.sleepTimer != null && widget.videoStore.sleepTimer!.isActive)
+              if (videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive)
                 Row(
                   children: [
                     const Icon(Icons.timer),
-                    Text(' ${widget.videoStore.timeRemaining.toString().split('.')[0]}'),
+                    Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
                     const Spacer(),
                     IconButton(
                       tooltip: 'Cancel Timer',
-                      onPressed: widget.videoStore.cancelSleepTimer,
+                      onPressed: videoStore.cancelSleepTimer,
                       icon: const Icon(Icons.cancel),
                     ),
                   ],
@@ -75,13 +71,10 @@ class _VideoOverlayState extends State<VideoOverlay> {
           ),
           Observer(
             builder: (context) => ElevatedButton(
-              onPressed: widget.videoStore.sleepHours == 0 && widget.videoStore.sleepMinutes == 0
+              onPressed: videoStore.sleepHours == 0 && videoStore.sleepMinutes == 0
                   ? null
-                  : () => widget.videoStore.updateSleepTimer(
-                        onTimerFinished: () => Navigator.popUntil(
-                          oldContext,
-                          (route) => route.isFirst,
-                        ),
+                  : () => videoStore.updateSleepTimer(
+                        onTimerFinished: () => navigatorKey.currentState?.popUntil((route) => route.isFirst),
                       ),
               child: const Text('Set Timer'),
             ),
@@ -118,7 +111,7 @@ class _VideoOverlayState extends State<VideoOverlay> {
         context: context,
         builder: (context) => SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
-          child: Settings(settingsStore: widget.videoStore.settingsStore),
+          child: Settings(settingsStore: videoStore.settingsStore),
         ),
       ),
     );
@@ -129,12 +122,12 @@ class _VideoOverlayState extends State<VideoOverlay> {
         Icons.refresh,
         color: Colors.white,
       ),
-      onPressed: widget.videoStore.handleRefresh,
+      onPressed: videoStore.handleRefresh,
     );
 
     final fullScreenButton = IconButton(
-      tooltip: widget.videoStore.settingsStore.fullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
-      icon: widget.videoStore.settingsStore.fullScreen
+      tooltip: videoStore.settingsStore.fullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
+      icon: videoStore.settingsStore.fullScreen
           ? const Icon(
               Icons.fullscreen_exit,
               color: Colors.white,
@@ -143,7 +136,7 @@ class _VideoOverlayState extends State<VideoOverlay> {
               Icons.fullscreen,
               color: Colors.white,
             ),
-      onPressed: () => widget.videoStore.settingsStore.fullScreen = !widget.videoStore.settingsStore.fullScreen,
+      onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
     );
 
     final sleepTimerButton = IconButton(
@@ -155,7 +148,7 @@ class _VideoOverlayState extends State<VideoOverlay> {
       onPressed: () => _showSleepTimerDialog(context),
     );
 
-    final streamInfo = widget.videoStore.streamInfo;
+    final streamInfo = videoStore.streamInfo;
 
     if (streamInfo == null) {
       return Stack(
@@ -208,9 +201,9 @@ class _VideoOverlayState extends State<VideoOverlay> {
           if (Platform.isAndroid)
             Center(
               child: IconButton(
-                tooltip: widget.videoStore.paused ? 'Play' : 'Pause',
+                tooltip: videoStore.paused ? 'Play' : 'Pause',
                 iconSize: 50.0,
-                icon: widget.videoStore.paused
+                icon: videoStore.paused
                     ? const Icon(
                         Icons.play_arrow,
                         color: Colors.white,
@@ -219,10 +212,10 @@ class _VideoOverlayState extends State<VideoOverlay> {
                         Icons.pause,
                         color: Colors.white,
                       ),
-                onPressed: widget.videoStore.handlePausePlay,
+                onPressed: videoStore.handlePausePlay,
               ),
             )
-          else if (!widget.videoStore.paused)
+          else if (!videoStore.paused)
             Center(
               child: IconButton(
                 tooltip: 'Pause',
@@ -231,7 +224,7 @@ class _VideoOverlayState extends State<VideoOverlay> {
                   Icons.pause,
                   color: Colors.white,
                 ),
-                onPressed: widget.videoStore.handlePausePlay,
+                onPressed: videoStore.handlePausePlay,
               ),
             ),
           Align(
@@ -241,10 +234,10 @@ class _VideoOverlayState extends State<VideoOverlay> {
               children: [
                 Expanded(
                   child: GestureDetector(
-                    onTap: widget.videoStore.handleExpand,
+                    onTap: videoStore.handleExpand,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: widget.videoStore.settingsStore.expandInfo
+                      child: videoStore.settingsStore.expandInfo
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -252,11 +245,11 @@ class _VideoOverlayState extends State<VideoOverlay> {
                                 streamer,
                                 const SizedBox(height: 5.0),
                                 Tooltip(
-                                  message: widget.videoStore.streamInfo!.title.trim(),
+                                  message: videoStore.streamInfo!.title.trim(),
                                   preferBelow: false,
                                   padding: const EdgeInsets.all(10.0),
                                   child: Text(
-                                    widget.videoStore.streamInfo!.title.trim(),
+                                    videoStore.streamInfo!.title.trim(),
                                     maxLines: orientation == Orientation.portrait ? 1 : 5,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -267,7 +260,7 @@ class _VideoOverlayState extends State<VideoOverlay> {
                                 ),
                                 const SizedBox(height: 5.0),
                                 Text(
-                                  '${widget.videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(widget.videoStore.streamInfo?.viewerCount)} viewers',
+                                  '${videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w300,
@@ -280,14 +273,14 @@ class _VideoOverlayState extends State<VideoOverlay> {
                   ),
                 ),
                 refreshButton,
-                if (Platform.isIOS && widget.videoStore.settingsStore.pictureInPicture)
+                if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                   IconButton(
                     tooltip: 'Picture-in-Picture',
                     icon: const Icon(
                       Icons.picture_in_picture_alt_rounded,
                       color: Colors.white,
                     ),
-                    onPressed: widget.videoStore.requestPictureInPicture,
+                    onPressed: videoStore.requestPictureInPicture,
                   ),
                 if (orientation == Orientation.landscape) fullScreenButton
               ],
@@ -296,11 +289,5 @@ class _VideoOverlayState extends State<VideoOverlay> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    widget.videoStore.cancelSleepTimer();
-    super.dispose();
   }
 }
