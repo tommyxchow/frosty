@@ -19,6 +19,18 @@
       src="https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg"
     />
   </a>
+  <a href="https://github.com/tommyxchow/frosty/issues">
+    <img
+      alt="Issues"
+      src="https://img.shields.io/github/issues/tommyxchow/frosty"
+    />
+  </a>
+  <a href="https://github.com/tommyxchow/frosty/commits">
+    <img
+      alt="Last Commit"
+      src="https://img.shields.io/github/last-commit/tommyxchow/frosty"
+    />
+  </a>
   <a href="https://github.com/tommyxchow/frosty/blob/main/LICENSE">
     <img
       alt="License"
@@ -123,8 +135,6 @@
 - Block and unblock users
 - Light, dark, and black (OLED) themes
 - Customizable settings
-
-And more!
 
 ## Motivation
 
