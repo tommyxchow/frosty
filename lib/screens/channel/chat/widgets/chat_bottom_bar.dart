@@ -83,6 +83,7 @@ class ChatBottomBar extends StatelessWidget {
                       enabled: chatStore.auth.isLoggedIn ? true : false,
                       decoration: InputDecoration(
                         suffixIcon: IconButton(
+                          color: chatStore.assetsStore.showEmoteMenu ? Colors.deepPurple : null,
                           tooltip: 'Emote Menu',
                           icon: const Icon(Icons.emoji_emotions_outlined),
                           onPressed: () {
