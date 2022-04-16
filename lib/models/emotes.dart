@@ -301,7 +301,7 @@ class Emote {
         name: emote.name,
         width: emote.width.first,
         height: emote.height.first,
-        zeroWidth: emote.visibilitySimple.isNotEmpty ? emote.visibilitySimple.first == 'ZERO_WIDTH' : false,
+        zeroWidth: emote.visibilitySimple.contains('ZERO_WIDTH'),
         url: emote.urls[3][1],
         type: type,
       );
