@@ -85,37 +85,37 @@
   <img
     title="Followed Streams"
     alt="Followed Streams"
-    src="https://user-images.githubusercontent.com/54859075/160052219-efd07a9d-491b-430e-88d0-6a9146ebaf69.png"
+    src="https://user-images.githubusercontent.com/54859075/163772719-3afe999d-49ad-46fd-9e4f-6aa4802d431b.png"
     width="32%"
   />
   <img
     title="Categories Section"
     alt="Categories Section"
-    src="https://user-images.githubusercontent.com/54859075/160052212-9e0c74c4-658c-43b8-8d88-d6c9ae647acb.png"
+    src="https://user-images.githubusercontent.com/54859075/163772670-af09ad0e-cdb9-4c1f-aed5-495e868da015.png"
     width="32%"
   />
   <img
     title="Search Section"
     alt="Search Section"
-    src="https://user-images.githubusercontent.com/54859075/160052221-4c256c11-4c19-4b18-a6bd-d1b1d39e4b69.png"
+    src="https://user-images.githubusercontent.com/54859075/163772588-f526031d-cec3-43fd-8259-f7d20461a4c9.png"
     width="32%"
   />
   <img
     title="Channel (Video/Chat) View"
     alt="Channel (Video/Chat) View"
-    src="https://user-images.githubusercontent.com/54859075/160052220-31e7575a-6140-430b-8c0a-b1f22919d637.png"
+    src="https://user-images.githubusercontent.com/54859075/163775107-f5d5aeab-de4b-4434-8223-611d25c6532a.png"
     width="32%"
   />
   <img
     title="Emote Menu"
     alt="Emote Menu"
-    src="https://user-images.githubusercontent.com/54859075/160052223-742b2fc0-6ef2-4f47-a343-3e5b6e288ad1.png"
+    src="https://user-images.githubusercontent.com/54859075/163774539-290aabb7-8486-41b7-8b24-12ba84d9cd98.png"
     width="32%"
   />
   <img
     title="Settings Section"
     alt="Settings Section"
-    src="https://user-images.githubusercontent.com/54859075/160052222-91fd8b7a-f057-421e-97f6-1553e738fbbd.png"
+    src="https://user-images.githubusercontent.com/54859075/163775249-b5b0809c-cd2e-47e1-abe3-fb6a03e661ae.png"
     width="32%"
   />
 </p>
