@@ -145,6 +145,7 @@ class StreamCard extends StatelessWidget {
                             streamInfo.gameName,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
+                              fontSize: 12.0,
                               fontWeight: FontWeight.w300,
                               color: DefaultTextStyle.of(context).style.color?.withOpacity(0.8),
                             ),
