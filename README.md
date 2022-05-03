@@ -1,6 +1,8 @@
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/54859075/160067655-f96b7e62-67f7-43d6-96ea-19ac85418bf6.svg" width="180px" alt="Frosty Logo" />
-  <h1 align="center">Frosty</h1>
+  <a align="center" href='https://frostyapp.io'/>
+    <img src="https://user-images.githubusercontent.com/54859075/160067655-f96b7e62-67f7-43d6-96ea-19ac85418bf6.svg" width="180px" alt="Frosty Logo" />
+    <h1 align="center">Frosty</h1>
+  </a>
 </p>
 
 <p align="center">
@@ -10,7 +12,6 @@
   <a href="https://7tv.app/">7TV</a> support. Built with
   <a href="https://flutter.dev/">Flutter</a>.
 </p>
-
 
 <p align="center">
   <a href="https://github.com/tommyxchow/frosty/actions/workflows/main.yml">
@@ -120,7 +121,7 @@
 - Theater and full-screen mode
 - Picture-in-picture mode (iOS only)
 - Sleep timer
-- Block and unblock users
+- Block and report users
 - Light, dark, and black (OLED) themes
 - Customizable settings
 
