@@ -58,19 +58,10 @@ abstract class _AuthBase with Store {
       if (_token == null) {
         // Retrieve the currently stored default token if it exists.
         _token = await _storage.read(key: _defaultTokenKey);
-        // If the token does not exist, get a new token and store it.
-        if (_token == null) {
+        // If the token does not exist or is invalid, get a new token and store it.
+        if (_token == null || !await twitchApi.validateToken(token: _token!)) {
           _token = await twitchApi.getDefaultToken();
           await _storage.write(key: _defaultTokenKey, value: _token);
-        } else {
-          // Validate the existing default token.
-          _tokenIsValid = await twitchApi.validateToken(token: _token!);
-
-          // If the existing default token is invalid, get and store a new one.
-          if (!_tokenIsValid) {
-            _token = await twitchApi.getDefaultToken();
-            await _storage.write(key: _defaultTokenKey, value: _token);
-          }
         }
       } else {
         // Validate the existing token.
@@ -136,7 +127,7 @@ abstract class _AuthBase with Store {
       await user.init(headers: headersTwitch);
 
       // Set the login status to logged in.
-      _isLoggedIn = true;
+      if (user.details != null) _isLoggedIn = true;
     } catch (error) {
       debugPrint('Login failed due to $error');
     }
@@ -156,20 +147,10 @@ abstract class _AuthBase with Store {
       // If the default token already exists, set it.
       _token = await _storage.read(key: _defaultTokenKey);
 
-      // If the default token does not already exist, get the new default token and store it.
-      // Else, validate the existing token.
-      if (_token == null) {
+      // If the default token does not already exist or it's invalid, get the new default token and store it.
+      if (_token == null || !await twitchApi.validateToken(token: _token!)) {
         _token = await twitchApi.getDefaultToken();
         await _storage.write(key: _defaultTokenKey, value: _token);
-      } else {
-        // Validate the stored token.
-        _tokenIsValid = await twitchApi.validateToken(token: _token!);
-
-        // If the stored token is invalid, get a new default token and store it.
-        if (!_tokenIsValid) {
-          _token = await twitchApi.getDefaultToken();
-          await _storage.write(key: _defaultTokenKey, value: _token);
-        }
       }
 
       // Set the login status to logged out.
