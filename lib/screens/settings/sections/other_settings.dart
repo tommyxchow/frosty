@@ -8,13 +8,18 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class OtherSettings extends StatelessWidget {
+class OtherSettings extends StatefulWidget {
   final SettingsStore settingsStore;
   const OtherSettings({
     Key? key,
     required this.settingsStore,
   }) : super(key: key);
 
+  @override
+  State<OtherSettings> createState() => _OtherSettingsState();
+}
+
+class _OtherSettingsState extends State<OtherSettings> {
   Future<void> _showConfirmDialog(BuildContext context) {
     return showDialog(
       context: context,
@@ -24,12 +29,12 @@ class OtherSettings extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: const Text('Cancel'),
             style: TextButton.styleFrom(primary: Colors.red),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              settingsStore.reset();
+              widget.settingsStore.reset();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -78,19 +83,19 @@ class OtherSettings extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.launch),
           title: const Text('FAQ'),
-          onTap: () => launch('https://github.com/tommyxchow/frosty#faq'),
+          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty#faq')),
         ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
             title: const Text('Send Anonymous Crash Logs'),
-            value: settingsStore.sendCrashLogs,
+            value: widget.settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
                 SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
               } else {
                 Sentry.close();
               }
-              settingsStore.sendCrashLogs = newValue;
+              widget.settingsStore.sendCrashLogs = newValue;
             },
           ),
         ),
@@ -102,6 +107,8 @@ class OtherSettings extends StatelessWidget {
             label: const Text('Clear Image Cache'),
             onPressed: () async {
               await DefaultCacheManager().emptyCache();
+
+              if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Image cache cleared!'),

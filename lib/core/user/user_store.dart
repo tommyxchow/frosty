@@ -4,9 +4,9 @@ import 'package:mobx/mobx.dart';
 
 part 'user_store.g.dart';
 
-class UserStore = _UserStoreBase with _$UserStore;
+class UserStore = UserStoreBase with _$UserStore;
 
-abstract class _UserStoreBase with Store {
+abstract class UserStoreBase with Store {
   final TwitchApi twitchApi;
 
   /// The current user's info.
@@ -19,7 +19,7 @@ abstract class _UserStoreBase with Store {
 
   ReactionDisposer? _disposeReaction;
 
-  _UserStoreBase({required this.twitchApi});
+  UserStoreBase({required this.twitchApi});
 
   @action
   Future<void> init({required Map<String, String> headers}) async {

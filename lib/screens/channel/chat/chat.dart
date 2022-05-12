@@ -16,7 +16,7 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        SchedulerBinding.instance?.addPostFrameCallback((_) {
+        SchedulerBinding.instance.addPostFrameCallback((_) {
           if (chatStore.scrollController.hasClients) chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent);
         });
 

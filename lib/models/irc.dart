@@ -147,7 +147,7 @@ class IRCMessage {
               badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
-              badgeUrl = 'https:' + (ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
+              badgeUrl = 'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
             }
 
             final newBadge = Badge(
@@ -169,7 +169,7 @@ class IRCMessage {
 
           // Add custom FFZ vip badge if it exists
           if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
-            badgeUrl = 'https:' + (ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
+            badgeUrl = 'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
           }
 
           final newBadge = Badge(
@@ -581,7 +581,7 @@ class IRCMessage {
       return TextSpan(
         text: text,
         style: style?.copyWith(color: Colors.blue),
-        recognizer: TapGestureRecognizer()..onTap = () => launch(text),
+        recognizer: TapGestureRecognizer()..onTap = () => launchUrl(Uri.parse(text)),
       );
     } else {
       return TextSpan(text: text, style: style);

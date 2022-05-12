@@ -11,9 +11,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'chat_assets_store.g.dart';
 
-class ChatAssetsStore = _ChatAssetsStoreBase with _$ChatAssetsStore;
+class ChatAssetsStore = ChatAssetsStoreBase with _$ChatAssetsStore;
 
-abstract class _ChatAssetsStoreBase with Store {
+abstract class ChatAssetsStoreBase with Store {
   final TwitchApi twitchApi;
   final BTTVApi bttvApi;
   final FFZApi ffzApi;
@@ -79,7 +79,7 @@ abstract class _ChatAssetsStoreBase with Store {
 
   late final ReactionDisposer _disposeReaction;
 
-  _ChatAssetsStoreBase({
+  ChatAssetsStoreBase({
     required this.twitchApi,
     required this.bttvApi,
     required this.ffzApi,

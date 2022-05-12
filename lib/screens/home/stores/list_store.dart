@@ -9,9 +9,9 @@ import 'package:mobx/mobx.dart';
 
 part 'list_store.g.dart';
 
-class ListStore = _ListStoreBase with _$ListStore;
+class ListStore = ListStoreBase with _$ListStore;
 
-abstract class _ListStoreBase with Store {
+abstract class ListStoreBase with Store {
   /// The authentication store.
   final AuthStore authStore;
 
@@ -55,7 +55,7 @@ abstract class _ListStoreBase with Store {
   @readonly
   String? _error;
 
-  _ListStoreBase({
+  ListStoreBase({
     required this.authStore,
     required this.twitchApi,
     required this.listType,

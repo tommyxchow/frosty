@@ -28,8 +28,8 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: const Text('Cancel'),
             style: TextButton.styleFrom(primary: Colors.red),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {

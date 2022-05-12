@@ -11,9 +11,9 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 part 'video_store.g.dart';
 
-class VideoStore = _VideoStoreBase with _$VideoStore;
+class VideoStore = VideoStoreBase with _$VideoStore;
 
-abstract class _VideoStoreBase with Store {
+abstract class VideoStoreBase with Store {
   final TwitchApi twitchApi;
 
   WebViewController? controller;
@@ -60,7 +60,7 @@ abstract class _VideoStoreBase with Store {
   final AuthStore authStore;
   final SettingsStore settingsStore;
 
-  _VideoStoreBase({
+  VideoStoreBase({
     required this.userLogin,
     required this.twitchApi,
     required this.authStore,

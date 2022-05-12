@@ -8,16 +8,17 @@ part of 'video_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$VideoStore on _VideoStoreBase, Store {
+mixin _$VideoStore on VideoStoreBase, Store {
   Computed<String>? _$videoUrlComputed;
 
   @override
   String get videoUrl =>
       (_$videoUrlComputed ??= Computed<String>(() => super.videoUrl,
-              name: '_VideoStoreBase.videoUrl'))
+              name: 'VideoStoreBase.videoUrl'))
           .value;
 
-  final _$sleepHoursAtom = Atom(name: '_VideoStoreBase.sleepHours');
+  late final _$sleepHoursAtom =
+      Atom(name: 'VideoStoreBase.sleepHours', context: context);
 
   @override
   int get sleepHours {
@@ -32,7 +33,8 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$sleepMinutesAtom = Atom(name: '_VideoStoreBase.sleepMinutes');
+  late final _$sleepMinutesAtom =
+      Atom(name: 'VideoStoreBase.sleepMinutes', context: context);
 
   @override
   int get sleepMinutes {
@@ -47,7 +49,8 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$timeRemainingAtom = Atom(name: '_VideoStoreBase.timeRemaining');
+  late final _$timeRemainingAtom =
+      Atom(name: 'VideoStoreBase.timeRemaining', context: context);
 
   @override
   Duration get timeRemaining {
@@ -62,7 +65,8 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$_pausedAtom = Atom(name: '_VideoStoreBase._paused');
+  late final _$_pausedAtom =
+      Atom(name: 'VideoStoreBase._paused', context: context);
 
   bool get paused {
     _$_pausedAtom.reportRead();
@@ -79,7 +83,8 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$_overlayVisibleAtom = Atom(name: '_VideoStoreBase._overlayVisible');
+  late final _$_overlayVisibleAtom =
+      Atom(name: 'VideoStoreBase._overlayVisible', context: context);
 
   bool get overlayVisible {
     _$_overlayVisibleAtom.reportRead();
@@ -96,7 +101,8 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$_streamInfoAtom = Atom(name: '_VideoStoreBase._streamInfo');
+  late final _$_streamInfoAtom =
+      Atom(name: 'VideoStoreBase._streamInfo', context: context);
 
   StreamTwitch? get streamInfo {
     _$_streamInfoAtom.reportRead();
@@ -113,16 +119,16 @@ mixin _$VideoStore on _VideoStoreBase, Store {
     });
   }
 
-  final _$updateStreamInfoAsyncAction =
-      AsyncAction('_VideoStoreBase.updateStreamInfo');
+  late final _$updateStreamInfoAsyncAction =
+      AsyncAction('VideoStoreBase.updateStreamInfo', context: context);
 
   @override
   Future<void> updateStreamInfo() {
     return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
   }
 
-  final _$handleToggleOverlayAsyncAction =
-      AsyncAction('_VideoStoreBase.handleToggleOverlay');
+  late final _$handleToggleOverlayAsyncAction =
+      AsyncAction('VideoStoreBase.handleToggleOverlay', context: context);
 
   @override
   Future<void> handleToggleOverlay() {
@@ -130,39 +136,39 @@ mixin _$VideoStore on _VideoStoreBase, Store {
         .run(() => super.handleToggleOverlay());
   }
 
-  final _$_VideoStoreBaseActionController =
-      ActionController(name: '_VideoStoreBase');
+  late final _$VideoStoreBaseActionController =
+      ActionController(name: 'VideoStoreBase', context: context);
 
   @override
   void handlePausePlay() {
-    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
-        name: '_VideoStoreBase.handlePausePlay');
+    final $actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.handlePausePlay');
     try {
       return super.handlePausePlay();
     } finally {
-      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
+      _$VideoStoreBaseActionController.endAction($actionInfo);
     }
   }
 
   @override
   void handleVideoTap() {
-    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
-        name: '_VideoStoreBase.handleVideoTap');
+    final $actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.handleVideoTap');
     try {
       return super.handleVideoTap();
     } finally {
-      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
+      _$VideoStoreBaseActionController.endAction($actionInfo);
     }
   }
 
   @override
   void handleExpand() {
-    final _$actionInfo = _$_VideoStoreBaseActionController.startAction(
-        name: '_VideoStoreBase.handleExpand');
+    final $actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.handleExpand');
     try {
       return super.handleExpand();
     } finally {
-      _$_VideoStoreBaseActionController.endAction(_$actionInfo);
+      _$VideoStoreBaseActionController.endAction($actionInfo);
     }
   }
 

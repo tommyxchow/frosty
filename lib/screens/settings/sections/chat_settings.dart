@@ -11,7 +11,7 @@ class ChatSettings extends StatefulWidget {
   const ChatSettings({Key? key, required this.settingsStore}) : super(key: key);
 
   @override
-  _ChatSettingsState createState() => _ChatSettingsState();
+  State<ChatSettings> createState() => _ChatSettingsState();
 }
 
 class _ChatSettingsState extends State<ChatSettings> {

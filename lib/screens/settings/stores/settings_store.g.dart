@@ -83,7 +83,8 @@ const _$TimestampTypeEnumMap = {
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$SettingsStore on _SettingsStoreBase, Store {
-  final _$themeTypeAtom = Atom(name: '_SettingsStoreBase.themeType');
+  late final _$themeTypeAtom =
+      Atom(name: '_SettingsStoreBase.themeType', context: context);
 
   @override
   ThemeType get themeType {
@@ -98,8 +99,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showThumbnailUptimeAtom =
-      Atom(name: '_SettingsStoreBase.showThumbnailUptime');
+  late final _$showThumbnailUptimeAtom =
+      Atom(name: '_SettingsStoreBase.showThumbnailUptime', context: context);
 
   @override
   bool get showThumbnailUptime {
@@ -114,7 +115,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showThumbnailsAtom = Atom(name: '_SettingsStoreBase.showThumbnails');
+  late final _$showThumbnailsAtom =
+      Atom(name: '_SettingsStoreBase.showThumbnails', context: context);
 
   @override
   bool get showThumbnails {
@@ -129,7 +131,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showVideoAtom = Atom(name: '_SettingsStoreBase.showVideo');
+  late final _$showVideoAtom =
+      Atom(name: '_SettingsStoreBase.showVideo', context: context);
 
   @override
   bool get showVideo {
@@ -144,7 +147,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showOverlayAtom = Atom(name: '_SettingsStoreBase.showOverlay');
+  late final _$showOverlayAtom =
+      Atom(name: '_SettingsStoreBase.showOverlay', context: context);
 
   @override
   bool get showOverlay {
@@ -159,8 +163,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$toggleableOverlayAtom =
-      Atom(name: '_SettingsStoreBase.toggleableOverlay');
+  late final _$toggleableOverlayAtom =
+      Atom(name: '_SettingsStoreBase.toggleableOverlay', context: context);
 
   @override
   bool get toggleableOverlay {
@@ -175,8 +179,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$pictureInPictureAtom =
-      Atom(name: '_SettingsStoreBase.pictureInPicture');
+  late final _$pictureInPictureAtom =
+      Atom(name: '_SettingsStoreBase.pictureInPicture', context: context);
 
   @override
   bool get pictureInPicture {
@@ -191,7 +195,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showBottomBarAtom = Atom(name: '_SettingsStoreBase.showBottomBar');
+  late final _$showBottomBarAtom =
+      Atom(name: '_SettingsStoreBase.showBottomBar', context: context);
 
   @override
   bool get showBottomBar {
@@ -206,8 +211,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showDeletedMessagesAtom =
-      Atom(name: '_SettingsStoreBase.showDeletedMessages');
+  late final _$showDeletedMessagesAtom =
+      Atom(name: '_SettingsStoreBase.showDeletedMessages', context: context);
 
   @override
   bool get showDeletedMessages {
@@ -222,7 +227,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showZeroWidthAtom = Atom(name: '_SettingsStoreBase.showZeroWidth');
+  late final _$showZeroWidthAtom =
+      Atom(name: '_SettingsStoreBase.showZeroWidth', context: context);
 
   @override
   bool get showZeroWidth {
@@ -237,8 +243,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$showChatMessageDividersAtom =
-      Atom(name: '_SettingsStoreBase.showChatMessageDividers');
+  late final _$showChatMessageDividersAtom = Atom(
+      name: '_SettingsStoreBase.showChatMessageDividers', context: context);
 
   @override
   bool get showChatMessageDividers {
@@ -254,7 +260,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$timestampTypeAtom = Atom(name: '_SettingsStoreBase.timestampType');
+  late final _$timestampTypeAtom =
+      Atom(name: '_SettingsStoreBase.timestampType', context: context);
 
   @override
   TimestampType get timestampType {
@@ -269,8 +276,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$useReadableColorsAtom =
-      Atom(name: '_SettingsStoreBase.useReadableColors');
+  late final _$useReadableColorsAtom =
+      Atom(name: '_SettingsStoreBase.useReadableColors', context: context);
 
   @override
   bool get useReadableColors {
@@ -285,7 +292,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$fontSizeAtom = Atom(name: '_SettingsStoreBase.fontSize');
+  late final _$fontSizeAtom =
+      Atom(name: '_SettingsStoreBase.fontSize', context: context);
 
   @override
   double get fontSize {
@@ -300,7 +308,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$messageSpacingAtom = Atom(name: '_SettingsStoreBase.messageSpacing');
+  late final _$messageSpacingAtom =
+      Atom(name: '_SettingsStoreBase.messageSpacing', context: context);
 
   @override
   double get messageSpacing {
@@ -315,7 +324,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$messageScaleAtom = Atom(name: '_SettingsStoreBase.messageScale');
+  late final _$messageScaleAtom =
+      Atom(name: '_SettingsStoreBase.messageScale', context: context);
 
   @override
   double get messageScale {
@@ -330,7 +340,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$badgeScaleAtom = Atom(name: '_SettingsStoreBase.badgeScale');
+  late final _$badgeScaleAtom =
+      Atom(name: '_SettingsStoreBase.badgeScale', context: context);
 
   @override
   double get badgeScale {
@@ -345,7 +356,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$emoteScaleAtom = Atom(name: '_SettingsStoreBase.emoteScale');
+  late final _$emoteScaleAtom =
+      Atom(name: '_SettingsStoreBase.emoteScale', context: context);
 
   @override
   double get emoteScale {
@@ -360,8 +372,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$emoteAutocompleteAtom =
-      Atom(name: '_SettingsStoreBase.emoteAutocomplete');
+  late final _$emoteAutocompleteAtom =
+      Atom(name: '_SettingsStoreBase.emoteAutocomplete', context: context);
 
   @override
   bool get emoteAutocomplete {
@@ -376,7 +388,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$sendCrashLogsAtom = Atom(name: '_SettingsStoreBase.sendCrashLogs');
+  late final _$sendCrashLogsAtom =
+      Atom(name: '_SettingsStoreBase.sendCrashLogs', context: context);
 
   @override
   bool get sendCrashLogs {
@@ -391,7 +404,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$fullScreenAtom = Atom(name: '_SettingsStoreBase.fullScreen');
+  late final _$fullScreenAtom =
+      Atom(name: '_SettingsStoreBase.fullScreen', context: context);
 
   @override
   bool get fullScreen {
@@ -406,7 +420,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$expandInfoAtom = Atom(name: '_SettingsStoreBase.expandInfo');
+  late final _$expandInfoAtom =
+      Atom(name: '_SettingsStoreBase.expandInfo', context: context);
 
   @override
   bool get expandInfo {
@@ -421,17 +436,17 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  final _$_SettingsStoreBaseActionController =
-      ActionController(name: '_SettingsStoreBase');
+  late final _$_SettingsStoreBaseActionController =
+      ActionController(name: '_SettingsStoreBase', context: context);
 
   @override
   void reset() {
-    final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
+    final $actionInfo = _$_SettingsStoreBaseActionController.startAction(
         name: '_SettingsStoreBase.reset');
     try {
       return super.reset();
     } finally {
-      _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
+      _$_SettingsStoreBaseActionController.endAction($actionInfo);
     }
   }
 

@@ -8,16 +8,17 @@ part of 'chat_details_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
+mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
   Computed<Iterable<List<String>>>? _$filteredUsersComputed;
 
   @override
   Iterable<List<String>> get filteredUsers => (_$filteredUsersComputed ??=
           Computed<Iterable<List<String>>>(() => super.filteredUsers,
-              name: '_ChatDetailsStoreBase.filteredUsers'))
+              name: 'ChatDetailsStoreBase.filteredUsers'))
       .value;
 
-  final _$roomStateAtom = Atom(name: '_ChatDetailsStoreBase.roomState');
+  late final _$roomStateAtom =
+      Atom(name: 'ChatDetailsStoreBase.roomState', context: context);
 
   @override
   ROOMSTATE get roomState {
@@ -32,8 +33,8 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$showJumpButtonAtom =
-      Atom(name: '_ChatDetailsStoreBase.showJumpButton');
+  late final _$showJumpButtonAtom =
+      Atom(name: 'ChatDetailsStoreBase.showJumpButton', context: context);
 
   @override
   bool get showJumpButton {
@@ -48,7 +49,8 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$filterTextAtom = Atom(name: '_ChatDetailsStoreBase.filterText');
+  late final _$filterTextAtom =
+      Atom(name: 'ChatDetailsStoreBase.filterText', context: context);
 
   @override
   String get filterText {
@@ -63,7 +65,8 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$_chatUsersAtom = Atom(name: '_ChatDetailsStoreBase._chatUsers');
+  late final _$_chatUsersAtom =
+      Atom(name: 'ChatDetailsStoreBase._chatUsers', context: context);
 
   ChatUsers? get chatUsers {
     _$_chatUsersAtom.reportRead();
@@ -80,7 +83,8 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$_errorAtom = Atom(name: '_ChatDetailsStoreBase._error');
+  late final _$_errorAtom =
+      Atom(name: 'ChatDetailsStoreBase._error', context: context);
 
   String? get error {
     _$_errorAtom.reportRead();
@@ -97,8 +101,8 @@ mixin _$ChatDetailsStore on _ChatDetailsStoreBase, Store {
     });
   }
 
-  final _$updateChattersAsyncAction =
-      AsyncAction('_ChatDetailsStoreBase.updateChatters');
+  late final _$updateChattersAsyncAction =
+      AsyncAction('ChatDetailsStoreBase.updateChatters', context: context);
 
   @override
   Future<void> updateChatters(String userLogin) {

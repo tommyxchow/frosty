@@ -8,30 +8,31 @@ part of 'chat_assets_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
+mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
   Computed<List<Emote>>? _$bttvEmotesComputed;
 
   @override
   List<Emote> get bttvEmotes =>
       (_$bttvEmotesComputed ??= Computed<List<Emote>>(() => super.bttvEmotes,
-              name: '_ChatAssetsStoreBase.bttvEmotes'))
+              name: 'ChatAssetsStoreBase.bttvEmotes'))
           .value;
   Computed<List<Emote>>? _$ffzEmotesComputed;
 
   @override
   List<Emote> get ffzEmotes =>
       (_$ffzEmotesComputed ??= Computed<List<Emote>>(() => super.ffzEmotes,
-              name: '_ChatAssetsStoreBase.ffzEmotes'))
+              name: 'ChatAssetsStoreBase.ffzEmotes'))
           .value;
   Computed<List<Emote>>? _$sevenTVEmotesComputed;
 
   @override
   List<Emote> get sevenTVEmotes => (_$sevenTVEmotesComputed ??=
           Computed<List<Emote>>(() => super.sevenTVEmotes,
-              name: '_ChatAssetsStoreBase.sevenTVEmotes'))
+              name: 'ChatAssetsStoreBase.sevenTVEmotes'))
       .value;
 
-  final _$_recentEmotesAtom = Atom(name: '_ChatAssetsStoreBase._recentEmotes');
+  late final _$_recentEmotesAtom =
+      Atom(name: 'ChatAssetsStoreBase._recentEmotes', context: context);
 
   ObservableList<Emote> get recentEmotes {
     _$_recentEmotesAtom.reportRead();
@@ -48,8 +49,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_emoteToObjectAtom =
-      Atom(name: '_ChatAssetsStoreBase._emoteToObject');
+  late final _$_emoteToObjectAtom =
+      Atom(name: 'ChatAssetsStoreBase._emoteToObject', context: context);
 
   Map<String, Emote> get emoteToObject {
     _$_emoteToObjectAtom.reportRead();
@@ -66,8 +67,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userEmoteToObjectAtom =
-      Atom(name: '_ChatAssetsStoreBase._userEmoteToObject');
+  late final _$_userEmoteToObjectAtom =
+      Atom(name: 'ChatAssetsStoreBase._userEmoteToObject', context: context);
 
   Map<String, Emote> get userEmoteToObject {
     _$_userEmoteToObjectAtom.reportRead();
@@ -84,8 +85,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userToFFZBadgesAtom =
-      Atom(name: '_ChatAssetsStoreBase._userToFFZBadges');
+  late final _$_userToFFZBadgesAtom =
+      Atom(name: 'ChatAssetsStoreBase._userToFFZBadges', context: context);
 
   Map<String, List<Badge>> get userToFFZBadges {
     _$_userToFFZBadgesAtom.reportRead();
@@ -102,8 +103,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userTo7TVBadgesAtom =
-      Atom(name: '_ChatAssetsStoreBase._userTo7TVBadges');
+  late final _$_userTo7TVBadgesAtom =
+      Atom(name: 'ChatAssetsStoreBase._userTo7TVBadges', context: context);
 
   Map<String, List<Badge>> get userTo7TVBadges {
     _$_userTo7TVBadgesAtom.reportRead();
@@ -120,8 +121,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$_userToBTTVBadgesAtom =
-      Atom(name: '_ChatAssetsStoreBase._userToBTTVBadges');
+  late final _$_userToBTTVBadgesAtom =
+      Atom(name: 'ChatAssetsStoreBase._userToBTTVBadges', context: context);
 
   Map<String, Badge> get userToBTTVBadges {
     _$_userToBTTVBadgesAtom.reportRead();
@@ -138,8 +139,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$emoteMenuIndexAtom =
-      Atom(name: '_ChatAssetsStoreBase.emoteMenuIndex');
+  late final _$emoteMenuIndexAtom =
+      Atom(name: 'ChatAssetsStoreBase.emoteMenuIndex', context: context);
 
   @override
   int get emoteMenuIndex {
@@ -154,7 +155,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$showEmoteMenuAtom = Atom(name: '_ChatAssetsStoreBase.showEmoteMenu');
+  late final _$showEmoteMenuAtom =
+      Atom(name: 'ChatAssetsStoreBase.showEmoteMenu', context: context);
 
   @override
   bool get showEmoteMenu {
@@ -169,15 +171,16 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
     });
   }
 
-  final _$initAsyncAction = AsyncAction('_ChatAssetsStoreBase.init');
+  late final _$initAsyncAction =
+      AsyncAction('ChatAssetsStoreBase.init', context: context);
 
   @override
   Future<void> init() {
     return _$initAsyncAction.run(() => super.init());
   }
 
-  final _$_ChatAssetsStoreBaseActionController =
-      ActionController(name: '_ChatAssetsStoreBase');
+  late final _$ChatAssetsStoreBaseActionController =
+      ActionController(name: 'ChatAssetsStoreBase', context: context);
 
   @override
   Future<void> assetsFuture(
@@ -186,8 +189,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
       required Map<String, String> headers,
       required Function onEmoteError,
       required Function onBadgeError}) {
-    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
-        name: '_ChatAssetsStoreBase.assetsFuture');
+    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+        name: 'ChatAssetsStoreBase.assetsFuture');
     try {
       return super.assetsFuture(
           channelName: channelName,
@@ -196,7 +199,7 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
           onEmoteError: onEmoteError,
           onBadgeError: onBadgeError);
     } finally {
-      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
     }
   }
 
@@ -206,8 +209,8 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
       required String channelName,
       required Map<String, String> headers,
       required Function onError}) {
-    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
-        name: '_ChatAssetsStoreBase.emotesFuture');
+    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+        name: 'ChatAssetsStoreBase.emotesFuture');
     try {
       return super.emotesFuture(
           channelId: channelId,
@@ -215,7 +218,7 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
           headers: headers,
           onError: onError);
     } finally {
-      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
     }
   }
 
@@ -224,13 +227,13 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
       {required String channelId,
       required Map<String, String> headers,
       required Function onError}) {
-    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
-        name: '_ChatAssetsStoreBase.badgesFuture');
+    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+        name: 'ChatAssetsStoreBase.badgesFuture');
     try {
       return super.badgesFuture(
           channelId: channelId, headers: headers, onError: onError);
     } finally {
-      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
     }
   }
 
@@ -239,13 +242,13 @@ mixin _$ChatAssetsStore on _ChatAssetsStoreBase, Store {
       {required List<String> emoteSets,
       required Map<String, String> headers,
       required Function onError}) {
-    final _$actionInfo = _$_ChatAssetsStoreBaseActionController.startAction(
-        name: '_ChatAssetsStoreBase.userEmotesFuture');
+    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+        name: 'ChatAssetsStoreBase.userEmotesFuture');
     try {
       return super.userEmotesFuture(
           emoteSets: emoteSets, headers: headers, onError: onError);
     } finally {
-      _$_ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
     }
   }
 

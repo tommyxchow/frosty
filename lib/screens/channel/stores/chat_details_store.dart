@@ -8,9 +8,9 @@ import 'package:mobx/mobx.dart';
 
 part 'chat_details_store.g.dart';
 
-class ChatDetailsStore = _ChatDetailsStoreBase with _$ChatDetailsStore;
+class ChatDetailsStore = ChatDetailsStoreBase with _$ChatDetailsStore;
 
-abstract class _ChatDetailsStoreBase with Store {
+abstract class ChatDetailsStoreBase with Store {
   final TwitchApi twitchApi;
 
   /// The rules and modes being used in the chat.
@@ -41,7 +41,7 @@ abstract class _ChatDetailsStoreBase with Store {
   @readonly
   String? _error;
 
-  _ChatDetailsStoreBase({required this.twitchApi});
+  ChatDetailsStoreBase({required this.twitchApi});
 
   @action
   Future<void> updateChatters(String userLogin) async {

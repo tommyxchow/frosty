@@ -13,7 +13,7 @@ class Categories extends StatefulWidget {
   const Categories({Key? key}) : super(key: key);
 
   @override
-  _CategoriesState createState() => _CategoriesState();
+  State<Categories> createState() => _CategoriesState();
 }
 
 class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMixin {
@@ -42,6 +42,8 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
             content: Text(_categoriesStore.error!),
             behavior: SnackBarBehavior.floating,
           );
+
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       },

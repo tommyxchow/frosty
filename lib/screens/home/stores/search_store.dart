@@ -7,9 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'search_store.g.dart';
 
-class SearchStore = _SearchStoreBase with _$SearchStore;
+class SearchStore = SearchStoreBase with _$SearchStore;
 
-abstract class _SearchStoreBase with Store {
+abstract class SearchStoreBase with Store {
   final AuthStore authStore;
 
   final TwitchApi twitchApi;
@@ -23,7 +23,7 @@ abstract class _SearchStoreBase with Store {
   @readonly
   ObservableFuture<CategoriesTwitch?>? _categoryFuture;
 
-  _SearchStoreBase({required this.authStore, required this.twitchApi}) {
+  SearchStoreBase({required this.authStore, required this.twitchApi}) {
     init();
   }
 

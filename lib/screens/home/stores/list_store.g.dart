@@ -8,16 +8,17 @@ part of 'list_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$ListStore on _ListStoreBase, Store {
+mixin _$ListStore on ListStoreBase, Store {
   Computed<ObservableList<StreamTwitch>>? _$streamsComputed;
 
   @override
   ObservableList<StreamTwitch> get streams => (_$streamsComputed ??=
           Computed<ObservableList<StreamTwitch>>(() => super.streams,
-              name: '_ListStoreBase.streams'))
+              name: 'ListStoreBase.streams'))
       .value;
 
-  final _$showJumpButtonAtom = Atom(name: '_ListStoreBase.showJumpButton');
+  late final _$showJumpButtonAtom =
+      Atom(name: 'ListStoreBase.showJumpButton', context: context);
 
   @override
   bool get showJumpButton {
@@ -32,7 +33,8 @@ mixin _$ListStore on _ListStoreBase, Store {
     });
   }
 
-  final _$_allStreamsAtom = Atom(name: '_ListStoreBase._allStreams');
+  late final _$_allStreamsAtom =
+      Atom(name: 'ListStoreBase._allStreams', context: context);
 
   ObservableList<StreamTwitch> get allStreams {
     _$_allStreamsAtom.reportRead();
@@ -49,7 +51,8 @@ mixin _$ListStore on _ListStoreBase, Store {
     });
   }
 
-  final _$_errorAtom = Atom(name: '_ListStoreBase._error');
+  late final _$_errorAtom =
+      Atom(name: 'ListStoreBase._error', context: context);
 
   String? get error {
     _$_errorAtom.reportRead();
@@ -66,24 +69,25 @@ mixin _$ListStore on _ListStoreBase, Store {
     });
   }
 
-  final _$getStreamsAsyncAction = AsyncAction('_ListStoreBase.getStreams');
+  late final _$getStreamsAsyncAction =
+      AsyncAction('ListStoreBase.getStreams', context: context);
 
   @override
   Future<void> getStreams() {
     return _$getStreamsAsyncAction.run(() => super.getStreams());
   }
 
-  final _$_ListStoreBaseActionController =
-      ActionController(name: '_ListStoreBase');
+  late final _$ListStoreBaseActionController =
+      ActionController(name: 'ListStoreBase', context: context);
 
   @override
   Future<void> refreshStreams() {
-    final _$actionInfo = _$_ListStoreBaseActionController.startAction(
-        name: '_ListStoreBase.refreshStreams');
+    final $actionInfo = _$ListStoreBaseActionController.startAction(
+        name: 'ListStoreBase.refreshStreams');
     try {
       return super.refreshStreams();
     } finally {
-      _$_ListStoreBaseActionController.endAction(_$actionInfo);
+      _$ListStoreBaseActionController.endAction($actionInfo);
     }
   }
 

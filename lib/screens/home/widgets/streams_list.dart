@@ -22,7 +22,7 @@ class StreamsList extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StreamsListState createState() => _StreamsListState();
+  State<StreamsList> createState() => _StreamsListState();
 }
 
 class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClientMixin {
@@ -52,6 +52,8 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
             content: Text(_listStore.error!),
             behavior: SnackBarBehavior.floating,
           );
+
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       },

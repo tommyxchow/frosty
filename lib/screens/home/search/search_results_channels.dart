@@ -9,7 +9,7 @@ import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:mobx/mobx.dart';
 
-class SearchResultsChannels extends StatelessWidget {
+class SearchResultsChannels extends StatefulWidget {
   final SearchStore searchStore;
   final String query;
 
@@ -19,9 +19,16 @@ class SearchResultsChannels extends StatelessWidget {
     required this.query,
   }) : super(key: key);
 
+  @override
+  State<SearchResultsChannels> createState() => _SearchResultsChannelsState();
+}
+
+class _SearchResultsChannelsState extends State<SearchResultsChannels> {
   Future<void> _handleSearch(BuildContext context, String search) async {
     try {
-      final channelInfo = await searchStore.searchChannel(search);
+      final channelInfo = await widget.searchStore.searchChannel(search);
+
+      if (!mounted) return;
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -45,7 +52,7 @@ class SearchResultsChannels extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        final future = searchStore.channelFuture;
+        final future = widget.searchStore.channelFuture;
 
         switch (future!.status) {
           case FutureStatus.pending:
@@ -62,14 +69,14 @@ class SearchResultsChannels extends StatelessWidget {
             );
           case FutureStatus.fulfilled:
             final results = (future.result as List<ChannelQuery>)
-                .where((channel) => !searchStore.authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(channel.id));
+                .where((channel) => !widget.searchStore.authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(channel.id));
 
             return SliverList(
               delegate: SliverChildListDelegate.fixed([
                 ...results.map(
                   (channel) {
                     final displayName =
-                        regexEnglish.hasMatch(channel.displayName) ? channel.displayName : channel.displayName + ' (${channel.broadcasterLogin})';
+                        regexEnglish.hasMatch(channel.displayName) ? channel.displayName : '${channel.displayName} (${channel.broadcasterLogin})';
 
                     return ListTile(
                       title: Text(displayName),
@@ -106,7 +113,7 @@ class SearchResultsChannels extends StatelessWidget {
                       onLongPress: () => showModalBottomSheet(
                         context: context,
                         builder: (context) => BlockReportModal(
-                          authStore: searchStore.authStore,
+                          authStore: widget.searchStore.authStore,
                           name: displayName,
                           userLogin: channel.broadcasterLogin,
                           userId: channel.id,
@@ -116,8 +123,8 @@ class SearchResultsChannels extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  title: Text('Go to channel "$query"'),
-                  onTap: () => _handleSearch(context, query),
+                  title: Text('Go to channel "${widget.query}"'),
+                  onTap: () => _handleSearch(context, widget.query),
                   trailing: Icon(Icons.adaptive.arrow_forward),
                 )
               ]),

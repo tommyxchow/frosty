@@ -8,8 +8,9 @@ part of 'search_store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
-mixin _$SearchStore on _SearchStoreBase, Store {
-  final _$_searchHistoryAtom = Atom(name: '_SearchStoreBase._searchHistory');
+mixin _$SearchStore on SearchStoreBase, Store {
+  late final _$_searchHistoryAtom =
+      Atom(name: 'SearchStoreBase._searchHistory', context: context);
 
   ObservableList<String> get searchHistory {
     _$_searchHistoryAtom.reportRead();
@@ -26,7 +27,8 @@ mixin _$SearchStore on _SearchStoreBase, Store {
     });
   }
 
-  final _$_channelFutureAtom = Atom(name: '_SearchStoreBase._channelFuture');
+  late final _$_channelFutureAtom =
+      Atom(name: 'SearchStoreBase._channelFuture', context: context);
 
   ObservableFuture<List<ChannelQuery>>? get channelFuture {
     _$_channelFutureAtom.reportRead();
@@ -43,7 +45,8 @@ mixin _$SearchStore on _SearchStoreBase, Store {
     });
   }
 
-  final _$_categoryFutureAtom = Atom(name: '_SearchStoreBase._categoryFuture');
+  late final _$_categoryFutureAtom =
+      Atom(name: 'SearchStoreBase._categoryFuture', context: context);
 
   ObservableFuture<CategoriesTwitch?>? get categoryFuture {
     _$_categoryFutureAtom.reportRead();
@@ -60,14 +63,16 @@ mixin _$SearchStore on _SearchStoreBase, Store {
     });
   }
 
-  final _$initAsyncAction = AsyncAction('_SearchStoreBase.init');
+  late final _$initAsyncAction =
+      AsyncAction('SearchStoreBase.init', context: context);
 
   @override
   Future<void> init() {
     return _$initAsyncAction.run(() => super.init());
   }
 
-  final _$handleQueryAsyncAction = AsyncAction('_SearchStoreBase.handleQuery');
+  late final _$handleQueryAsyncAction =
+      AsyncAction('SearchStoreBase.handleQuery', context: context);
 
   @override
   Future<void> handleQuery(String query) {
