@@ -6,7 +6,7 @@ part of 'chat_assets_store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
   Computed<List<Emote>>? _$bttvEmotesComputed;
@@ -189,7 +189,7 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
       required Map<String, String> headers,
       required Function onEmoteError,
       required Function onBadgeError}) {
-    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
         name: 'ChatAssetsStoreBase.assetsFuture');
     try {
       return super.assetsFuture(
@@ -199,7 +199,7 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
           onEmoteError: onEmoteError,
           onBadgeError: onBadgeError);
     } finally {
-      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
@@ -209,7 +209,7 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
       required String channelName,
       required Map<String, String> headers,
       required Function onError}) {
-    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
         name: 'ChatAssetsStoreBase.emotesFuture');
     try {
       return super.emotesFuture(
@@ -218,7 +218,7 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
           headers: headers,
           onError: onError);
     } finally {
-      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
@@ -227,13 +227,13 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
       {required String channelId,
       required Map<String, String> headers,
       required Function onError}) {
-    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
         name: 'ChatAssetsStoreBase.badgesFuture');
     try {
       return super.badgesFuture(
           channelId: channelId, headers: headers, onError: onError);
     } finally {
-      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
@@ -242,13 +242,13 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
       {required List<String> emoteSets,
       required Map<String, String> headers,
       required Function onError}) {
-    final $actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
         name: 'ChatAssetsStoreBase.userEmotesFuture');
     try {
       return super.userEmotesFuture(
           emoteSets: emoteSets, headers: headers, onError: onError);
     } finally {
-      _$ChatAssetsStoreBaseActionController.endAction($actionInfo);
+      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
