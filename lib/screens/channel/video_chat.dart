@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/api/bttv_api.dart';
@@ -147,7 +146,7 @@ class _VideoChatState extends State<VideoChat> {
       body: OrientationBuilder(
         builder: (context, orientation) {
           // Scroll to bottom when summoning keyboard or rotating.
-          SchedulerBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(_chatStore.scrollController.position.maxScrollExtent);
           });
 

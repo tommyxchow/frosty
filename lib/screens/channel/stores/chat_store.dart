@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/badges.dart';
@@ -188,7 +187,7 @@ abstract class ChatStoreBase with Store {
         if (_autoScroll) {
           if (_messages.length >= _messageLimit) _messages.removeAt(0);
 
-          SchedulerBinding.instance.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
           });
         }
@@ -237,7 +236,7 @@ abstract class ChatStoreBase with Store {
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
 
     // Schedule a postFrameCallback in the event a new message is added at the same time.
-    SchedulerBinding.instance.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
   }
 
   @action
@@ -324,7 +323,7 @@ abstract class ChatStoreBase with Store {
     }
 
     // Scroll to the latest message after sending.
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
   }
