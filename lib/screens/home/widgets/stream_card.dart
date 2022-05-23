@@ -14,7 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
-class StreamCard extends StatelessWidget {
+class StreamCard extends StatefulWidget {
   final ListStore listStore;
   final StreamTwitch streamInfo;
   final int width;
@@ -35,6 +35,11 @@ class StreamCard extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<StreamCard> createState() => _StreamCardState();
+}
+
+class _StreamCardState extends State<StreamCard> {
+  @override
   Widget build(BuildContext context) {
     final time = DateTime.now();
     final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
@@ -42,42 +47,44 @@ class StreamCard extends StatelessWidget {
     final thumbnail = AspectRatio(
       aspectRatio: 16 / 9,
       child: CachedNetworkImage(
-        imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${width}x$height') + cacheUrlExtension,
+        imageUrl: widget.streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${widget.width}x${widget.height}') + cacheUrlExtension,
         placeholder: (context, url) => const LoadingIndicator(),
         useOldImageOnUrlChange: true,
       ),
     );
 
-    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})';
+    final streamerName = regexEnglish.hasMatch(widget.streamInfo.userName)
+        ? widget.streamInfo.userName
+        : '${widget.streamInfo.userName} (${widget.streamInfo.userLogin})';
 
     return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => VideoChat(
-            userId: streamInfo.userId,
-            userName: streamInfo.userName,
-            userLogin: streamInfo.userLogin,
+            userId: widget.streamInfo.userId,
+            userName: widget.streamInfo.userName,
+            userLogin: widget.streamInfo.userLogin,
           ),
         ),
       ),
       onLongPress: () => showModalBottomSheet(
         context: context,
         builder: (context) => BlockReportModal(
-          authStore: listStore.authStore,
+          authStore: widget.listStore.authStore,
           name: streamerName,
-          userLogin: streamInfo.userLogin,
-          userId: streamInfo.userId,
+          userLogin: widget.streamInfo.userLogin,
+          userId: widget.streamInfo.userId,
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: showThumbnail ? 15.0 : 5.0),
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: widget.showThumbnail ? 15.0 : 5.0),
         child: Row(
           children: [
-            if (showThumbnail)
+            if (widget.showThumbnail)
               Flexible(
                 flex: 1,
-                child: showUptime
+                child: widget.showUptime
                     ? Stack(
                         alignment: AlignmentDirectional.bottomEnd,
                         children: [
@@ -86,7 +93,7 @@ class StreamCard extends StatelessWidget {
                             color: const Color.fromRGBO(0, 0, 0, 0.5),
                             padding: const EdgeInsets.symmetric(horizontal: 2.0),
                             child: Text(
-                              DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
+                              DateTime.now().difference(DateTime.parse(widget.streamInfo.startedAt)).toString().split('.')[0],
                               style: const TextStyle(fontSize: 12, color: Colors.white),
                             ),
                           )
@@ -104,7 +111,7 @@ class StreamCard extends StatelessWidget {
                     Row(
                       children: [
                         ProfilePicture(
-                          userLogin: streamInfo.userLogin,
+                          userLogin: widget.streamInfo.userLogin,
                           radius: 10.0,
                         ),
                         const SizedBox(width: 5.0),
@@ -126,23 +133,23 @@ class StreamCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 5.0),
                     Tooltip(
-                      message: streamInfo.title.trim(),
+                      message: widget.streamInfo.title.trim(),
                       preferBelow: false,
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
-                        streamInfo.title.trim(),
+                        widget.streamInfo.title.trim(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(height: 5.0),
-                    if (showCategory) ...[
+                    if (widget.showCategory) ...[
                       InkWell(
                         child: Tooltip(
-                          message: streamInfo.gameName,
+                          message: widget.streamInfo.gameName,
                           preferBelow: false,
                           child: Text(
-                            streamInfo.gameName,
+                            widget.streamInfo.gameName,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 12.0,
@@ -154,8 +161,9 @@ class StreamCard extends StatelessWidget {
                         onTap: () async {
                           final category = await context
                               .read<TwitchApi>()
-                              .getCategory(headers: context.read<AuthStore>().headersTwitch, gameId: streamInfo.gameId);
+                              .getCategory(headers: context.read<AuthStore>().headersTwitch, gameId: widget.streamInfo.gameId);
 
+                          if (!mounted) return;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -174,7 +182,7 @@ class StreamCard extends StatelessWidget {
                       const SizedBox(height: 5.0),
                     ],
                     Text(
-                      '${NumberFormat().format(streamInfo.viewerCount)} viewers',
+                      '${NumberFormat().format(widget.streamInfo.viewerCount)} viewers',
                       style: TextStyle(
                         fontSize: 12.0,
                         fontWeight: FontWeight.w300,

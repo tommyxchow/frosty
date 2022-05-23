@@ -67,8 +67,8 @@ class VideoOverlay extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: const Text('Dismiss'),
             style: TextButton.styleFrom(primary: Colors.red),
+            child: const Text('Dismiss'),
           ),
           Observer(
             builder: (context) => ElevatedButton(
@@ -176,7 +176,7 @@ class VideoOverlay extends StatelessWidget {
       );
     }
 
-    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})';
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
 
     final streamer = Row(
       children: [

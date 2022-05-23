@@ -26,12 +26,14 @@ class Settings extends StatelessWidget {
           if (Platform.isAndroid)
             IconButton(
               tooltip: 'Support the App',
-              onPressed: () => launch('https://www.buymeacoffee.com/tommychow'),
+              onPressed: () => launchUrl(Uri.parse('https://www.buymeacoffee.com/tommychow'),
+                  mode: settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
               icon: const FaIcon(FontAwesomeIcons.circleDollarToSlot),
             ),
           IconButton(
             tooltip: 'View Source on GitHub',
-            onPressed: () => launch('https://github.com/tommyxchow/frosty'),
+            onPressed: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty'),
+                mode: settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
             icon: const FaIcon(FontAwesomeIcons.github),
           ),
         ],

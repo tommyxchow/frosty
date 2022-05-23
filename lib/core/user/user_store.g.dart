@@ -6,10 +6,11 @@ part of 'user_store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
-mixin _$UserStore on _UserStoreBase, Store {
-  final _$_detailsAtom = Atom(name: '_UserStoreBase._details');
+mixin _$UserStore on UserStoreBase, Store {
+  late final _$_detailsAtom =
+      Atom(name: 'UserStoreBase._details', context: context);
 
   UserTwitch? get details {
     _$_detailsAtom.reportRead();
@@ -26,7 +27,8 @@ mixin _$UserStore on _UserStoreBase, Store {
     });
   }
 
-  final _$_blockedUsersAtom = Atom(name: '_UserStoreBase._blockedUsers');
+  late final _$_blockedUsersAtom =
+      Atom(name: 'UserStoreBase._blockedUsers', context: context);
 
   ObservableList<UserBlockedTwitch> get blockedUsers {
     _$_blockedUsersAtom.reportRead();
@@ -43,14 +45,16 @@ mixin _$UserStore on _UserStoreBase, Store {
     });
   }
 
-  final _$initAsyncAction = AsyncAction('_UserStoreBase.init');
+  late final _$initAsyncAction =
+      AsyncAction('UserStoreBase.init', context: context);
 
   @override
   Future<void> init({required Map<String, String> headers}) {
     return _$initAsyncAction.run(() => super.init(headers: headers));
   }
 
-  final _$blockAsyncAction = AsyncAction('_UserStoreBase.block');
+  late final _$blockAsyncAction =
+      AsyncAction('UserStoreBase.block', context: context);
 
   @override
   Future<void> block(
@@ -61,7 +65,8 @@ mixin _$UserStore on _UserStoreBase, Store {
         .block(targetId: targetId, displayName: displayName, headers: headers));
   }
 
-  final _$unblockAsyncAction = AsyncAction('_UserStoreBase.unblock');
+  late final _$unblockAsyncAction =
+      AsyncAction('UserStoreBase.unblock', context: context);
 
   @override
   Future<void> unblock(
@@ -70,8 +75,8 @@ mixin _$UserStore on _UserStoreBase, Store {
         .run(() => super.unblock(targetId: targetId, headers: headers));
   }
 
-  final _$refreshBlockedUsersAsyncAction =
-      AsyncAction('_UserStoreBase.refreshBlockedUsers');
+  late final _$refreshBlockedUsersAsyncAction =
+      AsyncAction('UserStoreBase.refreshBlockedUsers', context: context);
 
   @override
   Future<void> refreshBlockedUsers({required Map<String, String> headers}) {
@@ -79,17 +84,17 @@ mixin _$UserStore on _UserStoreBase, Store {
         .run(() => super.refreshBlockedUsers(headers: headers));
   }
 
-  final _$_UserStoreBaseActionController =
-      ActionController(name: '_UserStoreBase');
+  late final _$UserStoreBaseActionController =
+      ActionController(name: 'UserStoreBase', context: context);
 
   @override
   void dispose() {
-    final _$actionInfo = _$_UserStoreBaseActionController.startAction(
-        name: '_UserStoreBase.dispose');
+    final _$actionInfo = _$UserStoreBaseActionController.startAction(
+        name: 'UserStoreBase.dispose');
     try {
       return super.dispose();
     } finally {
-      _$_UserStoreBaseActionController.endAction(_$actionInfo);
+      _$UserStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 

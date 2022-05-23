@@ -6,10 +6,11 @@ part of 'chat_store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
-mixin _$ChatStore on _ChatStoreBase, Store {
-  final _$_messagesAtom = Atom(name: '_ChatStoreBase._messages');
+mixin _$ChatStore on ChatStoreBase, Store {
+  late final _$_messagesAtom =
+      Atom(name: 'ChatStoreBase._messages', context: context);
 
   ObservableList<IRCMessage> get messages {
     _$_messagesAtom.reportRead();
@@ -26,7 +27,8 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_autoScrollAtom = Atom(name: '_ChatStoreBase._autoScroll');
+  late final _$_autoScrollAtom =
+      Atom(name: 'ChatStoreBase._autoScroll', context: context);
 
   bool get autoScroll {
     _$_autoScrollAtom.reportRead();
@@ -43,8 +45,8 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_showAutocompleteAtom =
-      Atom(name: '_ChatStoreBase._showAutocomplete');
+  late final _$_showAutocompleteAtom =
+      Atom(name: 'ChatStoreBase._showAutocomplete', context: context);
 
   bool get showAutocomplete {
     _$_showAutocompleteAtom.reportRead();
@@ -61,7 +63,8 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_userStateAtom = Atom(name: '_ChatStoreBase._userState');
+  late final _$_userStateAtom =
+      Atom(name: 'ChatStoreBase._userState', context: context);
 
   USERSTATE get userState {
     _$_userStateAtom.reportRead();
@@ -78,61 +81,61 @@ mixin _$ChatStore on _ChatStoreBase, Store {
     });
   }
 
-  final _$_ChatStoreBaseActionController =
-      ActionController(name: '_ChatStoreBase');
+  late final _$ChatStoreBaseActionController =
+      ActionController(name: 'ChatStoreBase', context: context);
 
   @override
   void _handleIRCData(String data) {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase._handleIRCData');
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase._handleIRCData');
     try {
       return super._handleIRCData(data);
     } finally {
-      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void resumeScroll() {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.resumeScroll');
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.resumeScroll');
     try {
       return super.resumeScroll();
     } finally {
-      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void connectToChat() {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.connectToChat');
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.connectToChat');
     try {
       return super.connectToChat();
     } finally {
-      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void sendMessage(String message) {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.sendMessage');
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.sendMessage');
     try {
       return super.sendMessage(message);
     } finally {
-      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void addEmote(Emote emote, {bool autocompleteMode = false}) {
-    final _$actionInfo = _$_ChatStoreBaseActionController.startAction(
-        name: '_ChatStoreBase.addEmote');
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.addEmote');
     try {
       return super.addEmote(emote, autocompleteMode: autocompleteMode);
     } finally {
-      _$_ChatStoreBaseActionController.endAction(_$actionInfo);
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 

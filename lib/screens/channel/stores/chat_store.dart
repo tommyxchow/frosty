@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/badges.dart';
@@ -16,9 +15,9 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 part 'chat_store.g.dart';
 
 /// The store and view-model for chat-related activities.
-class ChatStore = _ChatStoreBase with _$ChatStore;
+class ChatStore = ChatStoreBase with _$ChatStore;
 
-abstract class _ChatStoreBase with Store {
+abstract class ChatStoreBase with Store {
   static const _messageUpperLimit = 7500;
   static const _messageLimit = 5000;
 
@@ -81,7 +80,7 @@ abstract class _ChatStoreBase with Store {
 
   final reactions = <ReactionDisposer>[];
 
-  _ChatStoreBase({
+  ChatStoreBase({
     required this.auth,
     required this.chatDetailsStore,
     required this.assetsStore,
@@ -188,7 +187,7 @@ abstract class _ChatStoreBase with Store {
         if (_autoScroll) {
           if (_messages.length >= _messageLimit) _messages.removeAt(0);
 
-          SchedulerBinding.instance?.addPostFrameCallback((_) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
             if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
           });
         }
@@ -237,7 +236,7 @@ abstract class _ChatStoreBase with Store {
     scrollController.jumpTo(scrollController.position.maxScrollExtent);
 
     // Schedule a postFrameCallback in the event a new message is added at the same time.
-    SchedulerBinding.instance?.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
   }
 
   @action
@@ -310,7 +309,7 @@ abstract class _ChatStoreBase with Store {
         if (message.length > 3 && message.substring(0, 3) == '/me') {
           userStateString += ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
         } else {
-          userStateString += ' :' + message.trim();
+          userStateString += ' :${message.trim()}';
         }
 
         final userChatMessage = IRCMessage.fromString(userStateString);
@@ -324,7 +323,7 @@ abstract class _ChatStoreBase with Store {
     }
 
     // Scroll to the latest message after sending.
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
     });
   }
@@ -333,15 +332,15 @@ abstract class _ChatStoreBase with Store {
   @action
   void addEmote(Emote emote, {bool autocompleteMode = false}) {
     if (textController.text.isEmpty || textController.text.endsWith(' ')) {
-      textController.text += emote.name + ' ';
+      textController.text += '${emote.name} ';
     } else if (autocompleteMode && _showAutocomplete && textController.text.endsWith('')) {
       final split = textController.text.split(' ')
         ..removeLast()
-        ..add(emote.name + ' ');
+        ..add('${emote.name} ');
 
       textController.text = split.join(' ');
     } else {
-      textController.text += ' ' + emote.name + ' ';
+      textController.text += ' ${emote.name} ';
     }
 
     assetsStore.recentEmotes

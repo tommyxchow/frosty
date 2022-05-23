@@ -8,9 +8,9 @@ import 'package:mobx/mobx.dart';
 
 part 'auth_store.g.dart';
 
-class AuthStore = _AuthBase with _$AuthStore;
+class AuthStore = AuthBase with _$AuthStore;
 
-abstract class _AuthBase with Store {
+abstract class AuthBase with Store {
   /// Secure storage to store tokens.
   static const _storage = FlutterSecureStorage();
 
@@ -44,7 +44,7 @@ abstract class _AuthBase with Store {
   @readonly
   String? _error;
 
-  _AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
+  AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
 
   /// Initialize by retrieving a token if it does not already exist.
   @action
