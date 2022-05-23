@@ -36,13 +36,6 @@ class GeneralSettings extends StatelessWidget {
             ),
           ),
           SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Launch URLs in External Browser'),
-            subtitle: const Text('Opens links in the default external browser.'),
-            value: settingsStore.launchUrlExternal,
-            onChanged: (newValue) => settingsStore.launchUrlExternal = newValue,
-          ),
-          SwitchListTile.adaptive(
             title: const Text('Stream Card Thumbnails'),
             value: settingsStore.showThumbnails,
             onChanged: (newValue) => settingsStore.showThumbnails = newValue,
@@ -53,6 +46,13 @@ class GeneralSettings extends StatelessWidget {
             subtitle: const Text('Shows the uptime of the stream in the HH:MM:SS format.'),
             value: settingsStore.showThumbnailUptime,
             onChanged: settingsStore.showThumbnails ? (newValue) => settingsStore.showThumbnailUptime = newValue : null,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Launch URLs in External Browser'),
+            subtitle: const Text('Opens links in the default external browser.'),
+            value: settingsStore.launchUrlExternal,
+            onChanged: (newValue) => settingsStore.launchUrlExternal = newValue,
           ),
         ],
       ),
