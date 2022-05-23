@@ -184,8 +184,7 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
 
   @override
   Future<void> assetsFuture(
-      {required String channelName,
-      required String channelId,
+      {required String channelId,
       required Map<String, String> headers,
       required Function onEmoteError,
       required Function onBadgeError}) {
@@ -193,7 +192,6 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
         name: 'ChatAssetsStoreBase.assetsFuture');
     try {
       return super.assetsFuture(
-          channelName: channelName,
           channelId: channelId,
           headers: headers,
           onEmoteError: onEmoteError,
@@ -206,17 +204,13 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
   @override
   Future<void> emotesFuture(
       {required String channelId,
-      required String channelName,
       required Map<String, String> headers,
       required Function onError}) {
     final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
         name: 'ChatAssetsStoreBase.emotesFuture');
     try {
       return super.emotesFuture(
-          channelId: channelId,
-          channelName: channelName,
-          headers: headers,
-          onError: onError);
+          channelId: channelId, headers: headers, onError: onError);
     } finally {
       _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
     }
