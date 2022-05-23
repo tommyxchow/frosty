@@ -13,6 +13,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           ThemeType.system
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
       ..showThumbnails = json['showThumbnails'] as bool? ?? true
+      ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
@@ -42,6 +43,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'themeType': _$ThemeTypeEnumMap[instance.themeType],
       'showThumbnailUptime': instance.showThumbnailUptime,
       'showThumbnails': instance.showThumbnails,
+      'launchUrlExternal': instance.launchUrlExternal,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
@@ -128,6 +130,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showThumbnails(bool value) {
     _$showThumbnailsAtom.reportWrite(value, super.showThumbnails, () {
       super.showThumbnails = value;
+    });
+  }
+
+  late final _$launchUrlExternalAtom =
+      Atom(name: '_SettingsStoreBase.launchUrlExternal', context: context);
+
+  @override
+  bool get launchUrlExternal {
+    _$launchUrlExternalAtom.reportRead();
+    return super.launchUrlExternal;
+  }
+
+  @override
+  set launchUrlExternal(bool value) {
+    _$launchUrlExternalAtom.reportWrite(value, super.launchUrlExternal, () {
+      super.launchUrlExternal = value;
     });
   }
 
@@ -456,6 +474,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 themeType: ${themeType},
 showThumbnailUptime: ${showThumbnailUptime},
 showThumbnails: ${showThumbnails},
+launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},

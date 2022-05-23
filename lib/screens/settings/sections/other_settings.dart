@@ -10,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class OtherSettings extends StatefulWidget {
   final SettingsStore settingsStore;
+
   const OtherSettings({
     Key? key,
     required this.settingsStore,
@@ -83,7 +84,8 @@ class _OtherSettingsState extends State<OtherSettings> {
         ListTile(
           leading: const Icon(Icons.launch),
           title: const Text('FAQ'),
-          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty#faq')),
+          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty#faq'),
+              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
