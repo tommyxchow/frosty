@@ -206,7 +206,6 @@ abstract class ChatStoreBase with Store {
 
         // Fetch the assets used in chat including badges and emotes.
         assetsStore.assetsFuture(
-          channelName: channelName,
           channelId: channelId,
           headers: auth.headersTwitch,
           onEmoteError: (error) {

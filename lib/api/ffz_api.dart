@@ -33,8 +33,8 @@ class FFZApi {
   }
 
   /// Returns a channel's FFZ room info including custom badges and emote used.
-  Future<Tuple2<RoomFFZ, List<Emote>>> getRoomInfo({required String name}) async {
-    final url = Uri.parse('https://api.frankerfacez.com/v1/room/$name');
+  Future<Tuple2<RoomFFZ, List<Emote>>> getRoomInfo({required String id}) async {
+    final url = Uri.parse('https://api.frankerfacez.com/v1/room/id/$id');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {
