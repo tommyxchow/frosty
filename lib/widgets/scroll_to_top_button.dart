@@ -20,9 +20,9 @@ class ScrollToTopButton extends StatelessWidget {
             duration: const Duration(milliseconds: 500),
           );
         },
-        child: const Icon(Icons.keyboard_arrow_up),
         mini: true,
         heroTag: null,
+        child: const Icon(Icons.keyboard_arrow_up),
       ),
     );
   }

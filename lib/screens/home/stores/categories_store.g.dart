@@ -6,11 +6,11 @@ part of 'categories_store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
-mixin _$CategoriesStore on _CategoriesStoreBase, Store {
-  final _$showJumpButtonAtom =
-      Atom(name: '_CategoriesStoreBase.showJumpButton');
+mixin _$CategoriesStore on CategoriesStoreBase, Store {
+  late final _$showJumpButtonAtom =
+      Atom(name: 'CategoriesStoreBase.showJumpButton', context: context);
 
   @override
   bool get showJumpButton {
@@ -25,7 +25,8 @@ mixin _$CategoriesStore on _CategoriesStoreBase, Store {
     });
   }
 
-  final _$_categoriesAtom = Atom(name: '_CategoriesStoreBase._categories');
+  late final _$_categoriesAtom =
+      Atom(name: 'CategoriesStoreBase._categories', context: context);
 
   ObservableList<CategoryTwitch> get categories {
     _$_categoriesAtom.reportRead();
@@ -42,7 +43,8 @@ mixin _$CategoriesStore on _CategoriesStoreBase, Store {
     });
   }
 
-  final _$_errorAtom = Atom(name: '_CategoriesStoreBase._error');
+  late final _$_errorAtom =
+      Atom(name: 'CategoriesStoreBase._error', context: context);
 
   String? get error {
     _$_errorAtom.reportRead();
@@ -59,25 +61,25 @@ mixin _$CategoriesStore on _CategoriesStoreBase, Store {
     });
   }
 
-  final _$getCategoriesAsyncAction =
-      AsyncAction('_CategoriesStoreBase.getCategories');
+  late final _$getCategoriesAsyncAction =
+      AsyncAction('CategoriesStoreBase.getCategories', context: context);
 
   @override
   Future<void> getCategories() {
     return _$getCategoriesAsyncAction.run(() => super.getCategories());
   }
 
-  final _$_CategoriesStoreBaseActionController =
-      ActionController(name: '_CategoriesStoreBase');
+  late final _$CategoriesStoreBaseActionController =
+      ActionController(name: 'CategoriesStoreBase', context: context);
 
   @override
   Future<void> refreshCategories() {
-    final _$actionInfo = _$_CategoriesStoreBaseActionController.startAction(
-        name: '_CategoriesStoreBase.refreshCategories');
+    final _$actionInfo = _$CategoriesStoreBaseActionController.startAction(
+        name: 'CategoriesStoreBase.refreshCategories');
     try {
       return super.refreshCategories();
     } finally {
-      _$_CategoriesStoreBaseActionController.endAction(_$actionInfo);
+      _$CategoriesStoreBaseActionController.endAction(_$actionInfo);
     }
   }
 

@@ -26,8 +26,8 @@ class SevenTVApi {
   }
 
   /// Returns a map of a channel's 7TV emotes to their URL.
-  Future<List<Emote>> getEmotesChannel({required String user}) async {
-    final url = Uri.parse('https://api.7tv.app/v2/users/$user/emotes');
+  Future<List<Emote>> getEmotesChannel({required String id}) async {
+    final url = Uri.parse('https://api.7tv.app/v2/users/$id/emotes');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {

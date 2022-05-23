@@ -293,7 +293,7 @@ class Emote {
         zeroWidth: false,
         width: emote.width,
         height: emote.height,
-        url: 'https:' + (emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x),
+        url: 'https:${emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x}',
         type: type,
       );
 
@@ -301,7 +301,7 @@ class Emote {
         name: emote.name,
         width: emote.width.first,
         height: emote.height.first,
-        zeroWidth: emote.visibilitySimple.isNotEmpty ? emote.visibilitySimple.first == 'ZERO_WIDTH' : false,
+        zeroWidth: emote.visibilitySimple.contains('ZERO_WIDTH'),
         url: emote.urls[3][1],
         type: type,
       );

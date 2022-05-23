@@ -11,9 +11,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 part 'chat_assets_store.g.dart';
 
-class ChatAssetsStore = _ChatAssetsStoreBase with _$ChatAssetsStore;
+class ChatAssetsStore = ChatAssetsStoreBase with _$ChatAssetsStore;
 
-abstract class _ChatAssetsStoreBase with Store {
+abstract class ChatAssetsStoreBase with Store {
   final TwitchApi twitchApi;
   final BTTVApi bttvApi;
   final FFZApi ffzApi;
@@ -79,7 +79,7 @@ abstract class _ChatAssetsStoreBase with Store {
 
   late final ReactionDisposer _disposeReaction;
 
-  _ChatAssetsStoreBase({
+  ChatAssetsStoreBase({
     required this.twitchApi,
     required this.bttvApi,
     required this.ffzApi,
@@ -103,7 +103,6 @@ abstract class _ChatAssetsStoreBase with Store {
   /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
   @action
   Future<void> assetsFuture({
-    required String channelName,
     required String channelId,
     required Map<String, String> headers,
     required Function onEmoteError,
@@ -113,7 +112,6 @@ abstract class _ChatAssetsStoreBase with Store {
       // Async awaits are placed in a list so they are performed in parallel.
       Future.wait([
         emotesFuture(
-          channelName: channelName,
           channelId: channelId,
           headers: headers,
           onError: onEmoteError,
@@ -128,7 +126,6 @@ abstract class _ChatAssetsStoreBase with Store {
   @action
   Future<void> emotesFuture({
     required String channelId,
-    required String channelName,
     required Map<String, String> headers,
     required Function onError,
   }) =>
@@ -142,8 +139,8 @@ abstract class _ChatAssetsStoreBase with Store {
         twitchApi.getEmotesGlobal(headers: headers).catchError(onError),
         twitchApi.getEmotesChannel(id: channelId, headers: headers).catchError(onError),
         sevenTVApi.getEmotesGlobal().catchError(onError),
-        sevenTVApi.getEmotesChannel(user: channelName).catchError(onError),
-        ffzApi.getRoomInfo(name: channelName).then((ffzRoom) {
+        sevenTVApi.getEmotesChannel(id: channelId).catchError(onError),
+        ffzApi.getRoomInfo(id: channelId).then((ffzRoom) {
           ffzRoomInfo = ffzRoom.item1;
           return ffzRoom.item2;
         }).catchError(onError),

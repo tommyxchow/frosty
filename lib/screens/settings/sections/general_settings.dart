@@ -47,6 +47,13 @@ class GeneralSettings extends StatelessWidget {
             value: settingsStore.showThumbnailUptime,
             onChanged: settingsStore.showThumbnails ? (newValue) => settingsStore.showThumbnailUptime = newValue : null,
           ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Launch URLs in External Browser'),
+            subtitle: const Text('Opens links in the default external browser.'),
+            value: settingsStore.launchUrlExternal,
+            onChanged: (newValue) => settingsStore.launchUrlExternal = newValue,
+          ),
         ],
       ),
     );

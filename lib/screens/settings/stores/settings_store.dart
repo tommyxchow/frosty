@@ -19,6 +19,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultShowThumbnails = true;
 
+  static const defaultLaunchUrlExternal = false;
+
   @JsonKey(defaultValue: defaultThemeType, unknownEnumValue: ThemeType.system)
   @observable
   var themeType = defaultThemeType;
@@ -30,6 +32,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultShowThumbnails)
   @observable
   var showThumbnails = defaultShowThumbnails;
+
+  @JsonKey(defaultValue: defaultLaunchUrlExternal)
+  @observable
+  var launchUrlExternal = defaultLaunchUrlExternal;
 
   // * Video Settings
   static const defaultShowVideo = true;
@@ -155,6 +161,7 @@ abstract class _SettingsStoreBase with Store {
     themeType = defaultThemeType;
     showThumbnailUptime = defaultShowThumbnailUptime;
     showThumbnails = defaultShowThumbnails;
+    launchUrlExternal = defaultLaunchUrlExternal;
 
     // * Video Settings
     showVideo = defaultShowVideo;

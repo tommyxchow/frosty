@@ -146,8 +146,8 @@ class ProfileCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: const Text('Cancel'),
             style: TextButton.styleFrom(primary: Colors.red),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -241,7 +241,7 @@ class BlockedUsers extends StatelessWidget {
             return ListView(
               children: authStore.user.blockedUsers.map(
                 (user) {
-                  final displayName = regexEnglish.hasMatch(user.displayName) ? user.displayName : user.displayName + ' (${user.userLogin})';
+                  final displayName = regexEnglish.hasMatch(user.displayName) ? user.displayName : '${user.displayName} (${user.userLogin})';
                   return ListTile(
                     title: Text(displayName),
                     trailing: BlockButton(

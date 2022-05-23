@@ -85,6 +85,7 @@ class IRCMessage {
     required double badgeScale,
     required double emoteScale,
     required bool isLightTheme,
+    required bool launchExternal,
     bool showMessage = true,
     bool useZeroWidth = false,
     bool useReadableColors = false,
@@ -147,7 +148,7 @@ class IRCMessage {
               badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
-              badgeUrl = 'https:' + (ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x);
+              badgeUrl = 'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
             }
 
             final newBadge = Badge(
@@ -169,7 +170,7 @@ class IRCMessage {
 
           // Add custom FFZ vip badge if it exists
           if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
-            badgeUrl = 'https:' + (ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x);
+            badgeUrl = 'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
           }
 
           final newBadge = Badge(
@@ -393,7 +394,7 @@ class IRCMessage {
                 // If the next word is neither an emote or emoji, add it as a text span.
                 if (nextEmote == null && !nextWordIsEmoji) {
                   localSpan.add(const TextSpan(text: ' '));
-                  localSpan.add(_createTextSpan(text: words[index], style: textStyle));
+                  localSpan.add(_createTextSpan(text: words[index], style: textStyle, launchExternal: launchExternal));
                 }
               } else {
                 localSpan.add(
@@ -408,7 +409,7 @@ class IRCMessage {
               if (regexEmoji.hasMatch(word)) {
                 localSpan.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteSize - 5)));
               } else {
-                localSpan.add(_createTextSpan(text: word, style: textStyle));
+                localSpan.add(_createTextSpan(text: word, style: textStyle, launchExternal: launchExternal));
               }
             }
             localSpan.add(const TextSpan(text: ' '));
@@ -435,7 +436,7 @@ class IRCMessage {
               if (regexEmoji.hasMatch(word)) {
                 span.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteSize - 5)));
               } else {
-                span.add(_createTextSpan(text: word, style: textStyle));
+                span.add(_createTextSpan(text: word, style: textStyle, launchExternal: launchExternal));
               }
             }
           }
@@ -574,14 +575,15 @@ class IRCMessage {
     );
   }
 
-  static TextSpan _createTextSpan({required String text, TextStyle? style}) {
+  static TextSpan _createTextSpan({required String text, required bool launchExternal, TextStyle? style}) {
     if (text.startsWith('@')) {
       return TextSpan(text: text, style: style?.copyWith(fontWeight: FontWeight.bold));
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
         text: text,
         style: style?.copyWith(color: Colors.blue),
-        recognizer: TapGestureRecognizer()..onTap = () => launch(text),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () => launchUrl(Uri.parse(text), mode: launchExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
       );
     } else {
       return TextSpan(text: text, style: style);

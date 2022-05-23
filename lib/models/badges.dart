@@ -151,7 +151,7 @@ class Badge {
 
   factory Badge.fromFFZ(BadgeInfoFFZ badge) => Badge(
         name: badge.title,
-        url: 'https:' + badge.urls.url4x,
+        url: 'https:${badge.urls.url4x}',
         color: badge.color,
         type: BadgeType.ffz,
       );

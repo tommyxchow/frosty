@@ -25,7 +25,7 @@ class ChattersList extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ChattersListState createState() => _ChattersListState();
+  State<ChattersList> createState() => _ChattersListState();
 }
 
 class _ChattersListState extends State<ChattersList> {

@@ -8,9 +8,9 @@ import 'package:mobx/mobx.dart';
 
 part 'categories_store.g.dart';
 
-class CategoriesStore = _CategoriesStoreBase with _$CategoriesStore;
+class CategoriesStore = CategoriesStoreBase with _$CategoriesStore;
 
-abstract class _CategoriesStoreBase with Store {
+abstract class CategoriesStoreBase with Store {
   /// The authentication store.
   final AuthStore authStore;
 
@@ -42,7 +42,7 @@ abstract class _CategoriesStoreBase with Store {
   @readonly
   String? _error;
 
-  _CategoriesStoreBase({required this.authStore, required this.twitchApi}) {
+  CategoriesStoreBase({required this.authStore, required this.twitchApi}) {
     scrollController.addListener(() {
       if (scrollController.position.atEdge || scrollController.position.outOfRange) {
         showJumpButton = false;

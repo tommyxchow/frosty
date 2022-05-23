@@ -8,9 +8,9 @@ import 'package:mobx/mobx.dart';
 
 part 'auth_store.g.dart';
 
-class AuthStore = _AuthBase with _$AuthStore;
+class AuthStore = AuthBase with _$AuthStore;
 
-abstract class _AuthBase with Store {
+abstract class AuthBase with Store {
   /// Secure storage to store tokens.
   static const _storage = FlutterSecureStorage();
 
@@ -44,7 +44,7 @@ abstract class _AuthBase with Store {
   @readonly
   String? _error;
 
-  _AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
+  AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
 
   /// Initialize by retrieving a token if it does not already exist.
   @action
@@ -58,8 +58,8 @@ abstract class _AuthBase with Store {
       if (_token == null) {
         // Retrieve the currently stored default token if it exists.
         _token = await _storage.read(key: _defaultTokenKey);
-        // If the token does not exist, get a new token and store it.
-        if (_token == null) {
+        // If the token does not exist or is invalid, get a new token and store it.
+        if (_token == null || !await twitchApi.validateToken(token: _token!)) {
           _token = await twitchApi.getDefaultToken();
           await _storage.write(key: _defaultTokenKey, value: _token);
         }
@@ -127,7 +127,7 @@ abstract class _AuthBase with Store {
       await user.init(headers: headersTwitch);
 
       // Set the login status to logged in.
-      _isLoggedIn = true;
+      if (user.details != null) _isLoggedIn = true;
     } catch (error) {
       debugPrint('Login failed due to $error');
     }
@@ -147,20 +147,10 @@ abstract class _AuthBase with Store {
       // If the default token already exists, set it.
       _token = await _storage.read(key: _defaultTokenKey);
 
-      // If the default token does not already exist, get the new default token and store it.
-      // Else, validate the existing token.
-      if (_token == null) {
+      // If the default token does not already exist or it's invalid, get the new default token and store it.
+      if (_token == null || !await twitchApi.validateToken(token: _token!)) {
         _token = await twitchApi.getDefaultToken();
         await _storage.write(key: _defaultTokenKey, value: _token);
-      } else {
-        // Validate the stored token.
-        _tokenIsValid = await twitchApi.validateToken(token: _token!);
-
-        // If the stored token is invalid, get a new default token and store it.
-        if (!_tokenIsValid) {
-          _token = await twitchApi.getDefaultToken();
-          await _storage.write(key: _defaultTokenKey, value: _token);
-        }
       }
 
       // Set the login status to logged out.

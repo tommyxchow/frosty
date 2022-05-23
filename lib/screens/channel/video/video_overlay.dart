@@ -7,6 +7,7 @@ import 'package:frosty/constants/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 
 class VideoOverlay extends StatelessWidget {
@@ -66,8 +67,8 @@ class VideoOverlay extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: const Text('Dismiss'),
             style: TextButton.styleFrom(primary: Colors.red),
+            child: const Text('Dismiss'),
           ),
           Observer(
             builder: (context) => ElevatedButton(
@@ -175,13 +176,31 @@ class VideoOverlay extends StatelessWidget {
       );
     }
 
-    final streamer = Text(
-      regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : streamInfo.userName + ' (${streamInfo.userLogin})',
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-      ),
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
+
+    final streamer = Row(
+      children: [
+        ProfilePicture(
+          userLogin: streamInfo.userLogin,
+          radius: 10.0,
+        ),
+        const SizedBox(width: 5.0),
+        Flexible(
+          child: Tooltip(
+            message: streamerName,
+            preferBelow: false,
+            child: Text(
+              streamerName,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ],
     );
 
     return Observer(
@@ -262,6 +281,7 @@ class VideoOverlay extends StatelessWidget {
                                 Text(
                                   '${videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
                                   style: const TextStyle(
+                                    fontSize: 12.0,
                                     color: Colors.white,
                                     fontWeight: FontWeight.w300,
                                   ),

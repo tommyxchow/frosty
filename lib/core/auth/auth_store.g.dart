@@ -6,18 +6,18 @@ part of 'auth_store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
-mixin _$AuthStore on _AuthBase, Store {
+mixin _$AuthStore on AuthBase, Store {
   Computed<Map<String, String>>? _$headersTwitchComputed;
 
   @override
   Map<String, String> get headersTwitch => (_$headersTwitchComputed ??=
           Computed<Map<String, String>>(() => super.headersTwitch,
-              name: '_AuthBase.headersTwitch'))
+              name: 'AuthBase.headersTwitch'))
       .value;
 
-  final _$_tokenAtom = Atom(name: '_AuthBase._token');
+  late final _$_tokenAtom = Atom(name: 'AuthBase._token', context: context);
 
   String? get token {
     _$_tokenAtom.reportRead();
@@ -34,7 +34,8 @@ mixin _$AuthStore on _AuthBase, Store {
     });
   }
 
-  final _$_isLoggedInAtom = Atom(name: '_AuthBase._isLoggedIn');
+  late final _$_isLoggedInAtom =
+      Atom(name: 'AuthBase._isLoggedIn', context: context);
 
   bool get isLoggedIn {
     _$_isLoggedInAtom.reportRead();
@@ -51,7 +52,7 @@ mixin _$AuthStore on _AuthBase, Store {
     });
   }
 
-  final _$_errorAtom = Atom(name: '_AuthBase._error');
+  late final _$_errorAtom = Atom(name: 'AuthBase._error', context: context);
 
   String? get error {
     _$_errorAtom.reportRead();
@@ -68,21 +69,23 @@ mixin _$AuthStore on _AuthBase, Store {
     });
   }
 
-  final _$initAsyncAction = AsyncAction('_AuthBase.init');
+  late final _$initAsyncAction = AsyncAction('AuthBase.init', context: context);
 
   @override
   Future<void> init() {
     return _$initAsyncAction.run(() => super.init());
   }
 
-  final _$loginAsyncAction = AsyncAction('_AuthBase.login');
+  late final _$loginAsyncAction =
+      AsyncAction('AuthBase.login', context: context);
 
   @override
   Future<void> login({String? customToken}) {
     return _$loginAsyncAction.run(() => super.login(customToken: customToken));
   }
 
-  final _$logoutAsyncAction = AsyncAction('_AuthBase.logout');
+  late final _$logoutAsyncAction =
+      AsyncAction('AuthBase.logout', context: context);
 
   @override
   Future<void> logout() {
