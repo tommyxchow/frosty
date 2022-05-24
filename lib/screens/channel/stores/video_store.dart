@@ -108,7 +108,6 @@ abstract class VideoStoreBase with Store {
 
       _streamInfo = null;
       _overlayTimer.cancel();
-      _overlayVisible = true;
     }
   }
 
