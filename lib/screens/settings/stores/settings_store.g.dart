@@ -36,6 +36,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..emoteAutocomplete = json['emoteAutocomplete'] as bool? ?? true
       ..landscapeChatWidth =
           (json['landscapeChatWidth'] as num?)?.toDouble() ?? 0.35
+      ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true
@@ -64,6 +65,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'emoteScale': instance.emoteScale,
       'emoteAutocomplete': instance.emoteAutocomplete,
       'landscapeChatWidth': instance.landscapeChatWidth,
+      'landscapeChatLeftSide': instance.landscapeChatLeftSide,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
@@ -427,6 +429,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$landscapeChatLeftSideAtom =
+      Atom(name: '_SettingsStoreBase.landscapeChatLeftSide', context: context);
+
+  @override
+  bool get landscapeChatLeftSide {
+    _$landscapeChatLeftSideAtom.reportRead();
+    return super.landscapeChatLeftSide;
+  }
+
+  @override
+  set landscapeChatLeftSide(bool value) {
+    _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
+        () {
+      super.landscapeChatLeftSide = value;
+    });
+  }
+
   late final _$sendCrashLogsAtom =
       Atom(name: '_SettingsStoreBase.sendCrashLogs', context: context);
 
@@ -530,6 +549,7 @@ badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 emoteAutocomplete: ${emoteAutocomplete},
 landscapeChatWidth: ${landscapeChatWidth},
+landscapeChatLeftSide: ${landscapeChatLeftSide},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo},

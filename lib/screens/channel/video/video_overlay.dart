@@ -172,7 +172,7 @@ class VideoOverlay extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (videoStore.settingsStore.fullScreen) chatOverlayButton,
+                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                 refreshButton,
                 if (orientation == Orientation.landscape) fullScreenButton,
               ],

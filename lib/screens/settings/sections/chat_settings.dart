@@ -90,6 +90,11 @@ class _ChatSettingsState extends State<ChatSettings> {
                   .toList(),
             ),
           ),
+          SwitchListTile.adaptive(
+            title: const Text('Landscape Chat on Left Side'),
+            value: settingsStore.landscapeChatLeftSide,
+            onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
+          ),
           ListTile(
             title: Row(
               children: [

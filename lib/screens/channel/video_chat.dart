@@ -172,7 +172,7 @@ class _VideoChatState extends State<VideoChat> {
                     child: settingsStore.showVideo
                         ? settingsStore.fullScreen
                             ? Stack(
-                                alignment: Alignment.topRight,
+                                alignment: settingsStore.landscapeChatLeftSide ? Alignment.topLeft : Alignment.topRight,
                                 children: [
                                   video,
                                   IgnorePointer(
@@ -186,10 +186,15 @@ class _VideoChatState extends State<VideoChat> {
                                 ],
                               )
                             : Row(
-                                children: [
-                                  Expanded(child: video),
-                                  landscapeChat,
-                                ],
+                                children: settingsStore.landscapeChatLeftSide
+                                    ? [
+                                        landscapeChat,
+                                        Expanded(child: video),
+                                      ]
+                                    : [
+                                        Expanded(child: video),
+                                        landscapeChat,
+                                      ],
                               )
                         : Column(
                             children: [
