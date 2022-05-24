@@ -300,7 +300,7 @@ class VideoOverlay extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (videoStore.settingsStore.fullScreen) chatOverlayButton,
+                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                 refreshButton,
                 if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                   IconButton(
