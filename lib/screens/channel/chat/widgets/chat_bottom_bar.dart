@@ -77,6 +77,7 @@ class ChatBottomBar extends StatelessWidget {
                     chatStore.settings.landscapeChatWidth < 0.3 &&
                     MediaQuery.of(context).orientation == Orientation.landscape)
                   IconButton(
+                      tooltip: 'Send a Message',
                       onPressed: () {
                         chatStore.expandChat = true;
                         chatStore.textFieldFocusNode.requestFocus();

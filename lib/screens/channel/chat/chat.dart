@@ -108,7 +108,7 @@ class Chat extends StatelessWidget {
                 ),
               ),
             ),
-            if (chatStore.settings.showBottomBar) ChatBottomBar(chatStore: chatStore),
+            if (chatStore.settings.showBottomBar && !chatStore.settings.fullScreen) ChatBottomBar(chatStore: chatStore),
             if (chatStore.assetsStore.showEmoteMenu)
               SizedBox(
                 height: MediaQuery.of(context).size.height / 3,

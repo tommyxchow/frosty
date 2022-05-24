@@ -154,44 +154,52 @@ class _VideoChatState extends State<VideoChat> {
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
             return Observer(
-              builder: (context) => ColoredBox(
-                color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
-                child: SafeArea(
-                  bottom: false,
-                  child: settingsStore.showVideo
-                      ? settingsStore.fullScreen
-                          ? Stack(
-                              children: [
-                                Visibility(
-                                  visible: false,
-                                  maintainState: true,
-                                  child: chat,
-                                ),
-                                video,
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Expanded(child: video),
-                                AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: _chatStore.expandChat
-                                      ? MediaQuery.of(context).size.width / 2
-                                      : MediaQuery.of(context).size.width * _chatStore.settings.landscapeChatWidth,
-                                  curve: Curves.ease,
-                                  color: Theme.of(context).scaffoldBackgroundColor,
-                                  child: chat,
-                                ),
-                              ],
-                            )
-                      : Column(
-                          children: [
-                            appBar,
-                            Expanded(child: chat),
-                          ],
-                        ),
-                ),
-              ),
+              builder: (context) {
+                final landscapeChat = AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: _chatStore.expandChat
+                      ? MediaQuery.of(context).size.width / 2
+                      : MediaQuery.of(context).size.width * _chatStore.settings.landscapeChatWidth,
+                  curve: Curves.ease,
+                  color: _chatStore.settings.fullScreen ? null : Theme.of(context).scaffoldBackgroundColor,
+                  child: chat,
+                );
+
+                return ColoredBox(
+                  color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
+                  child: SafeArea(
+                    bottom: false,
+                    child: settingsStore.showVideo
+                        ? settingsStore.fullScreen
+                            ? Stack(
+                                alignment: Alignment.topRight,
+                                children: [
+                                  video,
+                                  IgnorePointer(
+                                    ignoring: _videoStore.overlayVisible,
+                                    child: Visibility(
+                                      visible: settingsStore.fullScreenChatOverlay,
+                                      maintainState: true,
+                                      child: landscapeChat,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Row(
+                                children: [
+                                  Expanded(child: video),
+                                  landscapeChat,
+                                ],
+                              )
+                        : Column(
+                            children: [
+                              appBar,
+                              Expanded(child: chat),
+                            ],
+                          ),
+                  ),
+                );
+              },
             );
           }
 

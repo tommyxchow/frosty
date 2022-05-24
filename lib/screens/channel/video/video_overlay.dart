@@ -117,6 +117,11 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
+    final chatOverlayButton = IconButton(
+        tooltip: 'Toggle Chat Overlay',
+        onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
+        icon: const Icon(Icons.chat_bubble_outline));
+
     final refreshButton = IconButton(
       tooltip: 'Refresh',
       icon: const Icon(
@@ -167,6 +172,7 @@ class VideoOverlay extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                if (videoStore.settingsStore.fullScreen) chatOverlayButton,
                 refreshButton,
                 if (orientation == Orientation.landscape) fullScreenButton,
               ],
@@ -292,6 +298,7 @@ class VideoOverlay extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (videoStore.settingsStore.fullScreen) chatOverlayButton,
                 refreshButton,
                 if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                   IconButton(

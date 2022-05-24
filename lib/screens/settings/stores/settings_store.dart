@@ -153,6 +153,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultExpandInfo = true;
 
+  static const defaultFullScreenChatOverlay = false;
+
   @JsonKey(defaultValue: defaultFullScreen)
   @observable
   var fullScreen = defaultFullScreen;
@@ -160,6 +162,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultExpandInfo)
   @observable
   var expandInfo = defaultExpandInfo;
+
+  @JsonKey(defaultValue: defaultFullScreenChatOverlay)
+  @observable
+  var fullScreenChatOverlay = defaultFullScreenChatOverlay;
 
   @action
   void reset() {
