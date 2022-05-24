@@ -78,6 +78,9 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
+  @observable
+  var expandChat = false;
+
   final reactions = <ReactionDisposer>[];
 
   ChatStoreBase({
@@ -116,6 +119,8 @@ abstract class ChatStoreBase with Store {
     // Add a listener to the textfield focus that will hide the emote menu if it is currently shown.
     textFieldFocusNode.addListener(() {
       if (textFieldFocusNode.hasFocus && assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
+
+      if (!textFieldFocusNode.hasFocus) expandChat = false;
     });
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.

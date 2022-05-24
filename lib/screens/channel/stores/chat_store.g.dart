@@ -81,6 +81,22 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$expandChatAtom =
+      Atom(name: 'ChatStoreBase.expandChat', context: context);
+
+  @override
+  bool get expandChat {
+    _$expandChatAtom.reportRead();
+    return super.expandChat;
+  }
+
+  @override
+  set expandChat(bool value) {
+    _$expandChatAtom.reportWrite(value, super.expandChat, () {
+      super.expandChat = value;
+    });
+  }
+
   late final _$ChatStoreBaseActionController =
       ActionController(name: 'ChatStoreBase', context: context);
 
@@ -142,7 +158,7 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   String toString() {
     return '''
-
+expandChat: ${expandChat}
     ''';
   }
 }

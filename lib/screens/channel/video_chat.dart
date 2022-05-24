@@ -172,16 +172,15 @@ class _VideoChatState extends State<VideoChat> {
                             )
                           : Row(
                               children: [
-                                Flexible(
-                                  flex: 2,
-                                  child: video,
-                                ),
-                                Flexible(
-                                  flex: 1,
-                                  child: ColoredBox(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
-                                    child: chat,
-                                  ),
+                                Expanded(child: video),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: _chatStore.expandChat
+                                      ? MediaQuery.of(context).size.width / 2
+                                      : MediaQuery.of(context).size.width * _chatStore.settings.landscapeChatWidth,
+                                  curve: Curves.ease,
+                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  child: chat,
                                 ),
                               ],
                             )

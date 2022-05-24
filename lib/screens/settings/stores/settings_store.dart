@@ -87,6 +87,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultEmoteAutocomplete = true;
 
+  static const defaultLandscapeChatWidth = 0.35;
+
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
   var showBottomBar = defaultShowBottomBar;
@@ -135,6 +137,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteAutocomplete = defaultEmoteAutocomplete;
 
+  @JsonKey(defaultValue: defaultLandscapeChatWidth)
+  @observable
+  var landscapeChatWidth = defaultLandscapeChatWidth;
+
   // * Other settings
   static const defaultSendCrashLogs = true;
 
@@ -182,6 +188,7 @@ abstract class _SettingsStoreBase with Store {
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
     emoteAutocomplete = defaultEmoteAutocomplete;
+    landscapeChatWidth = defaultLandscapeChatWidth;
 
     // * Other settings
     sendCrashLogs = defaultSendCrashLogs;

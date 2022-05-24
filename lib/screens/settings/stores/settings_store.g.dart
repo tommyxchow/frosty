@@ -34,6 +34,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..emoteAutocomplete = json['emoteAutocomplete'] as bool? ?? true
+      ..landscapeChatWidth =
+          (json['landscapeChatWidth'] as num?)?.toDouble() ?? 0.35
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true;
@@ -60,6 +62,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'emoteAutocomplete': instance.emoteAutocomplete,
+      'landscapeChatWidth': instance.landscapeChatWidth,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
@@ -406,6 +409,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$landscapeChatWidthAtom =
+      Atom(name: '_SettingsStoreBase.landscapeChatWidth', context: context);
+
+  @override
+  double get landscapeChatWidth {
+    _$landscapeChatWidthAtom.reportRead();
+    return super.landscapeChatWidth;
+  }
+
+  @override
+  set landscapeChatWidth(double value) {
+    _$landscapeChatWidthAtom.reportWrite(value, super.landscapeChatWidth, () {
+      super.landscapeChatWidth = value;
+    });
+  }
+
   late final _$sendCrashLogsAtom =
       Atom(name: '_SettingsStoreBase.sendCrashLogs', context: context);
 
@@ -491,6 +510,7 @@ messageScale: ${messageScale},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 emoteAutocomplete: ${emoteAutocomplete},
+landscapeChatWidth: ${landscapeChatWidth},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo}
