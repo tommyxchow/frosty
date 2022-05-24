@@ -90,6 +90,27 @@ class _ChatSettingsState extends State<ChatSettings> {
                   .toList(),
             ),
           ),
+          SwitchListTile.adaptive(
+            title: const Text('Landscape Chat on Left Side'),
+            value: settingsStore.landscapeChatLeftSide,
+            onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
+          ),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Landscape Chat Width'),
+                const Spacer(),
+                Text('${(settingsStore.landscapeChatWidth * 100).toInt()}%'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.landscapeChatWidth,
+              min: 0.2,
+              max: 0.8,
+              divisions: 12,
+              onChanged: (newValue) => settingsStore.landscapeChatWidth = newValue,
+            ),
+          ),
           const SizedBox(height: 10.0),
           const SectionHeader('Message Appearance'),
           ExpansionTile(

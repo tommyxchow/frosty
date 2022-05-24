@@ -87,6 +87,10 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultEmoteAutocomplete = true;
 
+  static const defaultLandscapeChatWidth = 0.35;
+
+  static const defaultLandscapeChatLeftSide = false;
+
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
   var showBottomBar = defaultShowBottomBar;
@@ -135,6 +139,14 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteAutocomplete = defaultEmoteAutocomplete;
 
+  @JsonKey(defaultValue: defaultLandscapeChatWidth)
+  @observable
+  var landscapeChatWidth = defaultLandscapeChatWidth;
+
+  @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
+  @observable
+  var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+
   // * Other settings
   static const defaultSendCrashLogs = true;
 
@@ -147,6 +159,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultExpandInfo = true;
 
+  static const defaultFullScreenChatOverlay = false;
+
   @JsonKey(defaultValue: defaultFullScreen)
   @observable
   var fullScreen = defaultFullScreen;
@@ -154,6 +168,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultExpandInfo)
   @observable
   var expandInfo = defaultExpandInfo;
+
+  @JsonKey(defaultValue: defaultFullScreenChatOverlay)
+  @observable
+  var fullScreenChatOverlay = defaultFullScreenChatOverlay;
 
   @action
   void reset() {
@@ -182,6 +200,8 @@ abstract class _SettingsStoreBase with Store {
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
     emoteAutocomplete = defaultEmoteAutocomplete;
+    landscapeChatWidth = defaultLandscapeChatWidth;
+    landscapeChatLeftSide = false;
 
     // * Other settings
     sendCrashLogs = defaultSendCrashLogs;

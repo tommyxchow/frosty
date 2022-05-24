@@ -105,6 +105,10 @@ abstract class VideoStoreBase with Store {
       _streamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
     } catch (e) {
       debugPrint(e.toString());
+
+      _streamInfo = null;
+      _overlayTimer.cancel();
+      _overlayVisible = true;
     }
   }
 
