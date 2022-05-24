@@ -118,9 +118,11 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final chatOverlayButton = IconButton(
-        tooltip: 'Toggle Chat Overlay',
-        onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
-        icon: const Icon(Icons.chat_bubble_outline));
+      tooltip: 'Toggle Chat Overlay',
+      onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
+      icon: const Icon(Icons.chat_bubble_outline),
+      color: Colors.white,
+    );
 
     final refreshButton = IconButton(
       tooltip: 'Refresh',
