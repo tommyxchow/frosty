@@ -40,7 +40,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true
-      ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false;
+      ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false
+      ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -70,6 +71,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
+      'chatDelay': instance.chatDelay,
     };
 
 const _$ThemeTypeEnumMap = {
@@ -511,6 +513,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$chatDelayAtom =
+      Atom(name: '_SettingsStoreBase.chatDelay', context: context);
+
+  @override
+  double get chatDelay {
+    _$chatDelayAtom.reportRead();
+    return super.chatDelay;
+  }
+
+  @override
+  set chatDelay(double value) {
+    _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
+      super.chatDelay = value;
+    });
+  }
+
   late final _$_SettingsStoreBaseActionController =
       ActionController(name: '_SettingsStoreBase', context: context);
 
@@ -553,7 +571,8 @@ landscapeChatLeftSide: ${landscapeChatLeftSide},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo},
-fullScreenChatOverlay: ${fullScreenChatOverlay}
+fullScreenChatOverlay: ${fullScreenChatOverlay},
+chatDelay: ${chatDelay}
     ''';
   }
 }

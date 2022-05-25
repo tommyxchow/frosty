@@ -103,6 +103,10 @@ abstract class ChatStoreBase with Store {
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
+    if (settings.chatDelay > 0) {
+      _messages.add(IRCMessage.createNotice(message: 'Waiting ${settings.chatDelay.toInt()} seconds due to chat delay setting...'));
+    }
+
     connectToChat();
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
@@ -250,7 +254,7 @@ abstract class ChatStoreBase with Store {
 
     // Listen for new messages and forward them to the handler.
     _channel?.stream.listen(
-      (data) => _handleIRCData(data.toString()),
+      (data) => Future.delayed(Duration(seconds: settings.chatDelay.toInt()), () => _handleIRCData(data.toString())),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_channel == null) return;

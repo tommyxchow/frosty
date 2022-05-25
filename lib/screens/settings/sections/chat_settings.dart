@@ -37,9 +37,25 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
         ),
         children: [
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Message Delay'),
+                const Spacer(),
+                Text('${settingsStore.chatDelay.toInt()} seconds'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.chatDelay,
+              min: 0.0,
+              max: 30.0,
+              divisions: 30,
+              onChanged: (newValue) => settingsStore.chatDelay = newValue,
+            ),
+          ),
           const SectionHeader(
             'Layout',
-            padding: EdgeInsets.only(left: 15.0, bottom: 5.0, top: 20.0),
+            padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
             title: const Text('Bottom Bar'),
