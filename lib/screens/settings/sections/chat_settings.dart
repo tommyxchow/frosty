@@ -21,7 +21,7 @@ class _ChatSettingsState extends State<ChatSettings> {
   Widget build(BuildContext context) {
     const timestamps = ['Disabled', '12-Hour', '24-Hour'];
 
-    const sectionPadding = EdgeInsets.only(left: 15.0, bottom: 5.0, top: 20.0);
+    const sectionPadding = EdgeInsets.only(left: 15.0, bottom: 5.0, top: 30.0);
 
     final settingsStore = widget.settingsStore;
 
@@ -39,7 +39,7 @@ class _ChatSettingsState extends State<ChatSettings> {
         children: [
           const SectionHeader(
             'Layout',
-            padding: sectionPadding,
+            padding: EdgeInsets.only(left: 15.0, bottom: 5.0, top: 20.0),
           ),
           SwitchListTile.adaptive(
             title: const Text('Bottom Bar'),

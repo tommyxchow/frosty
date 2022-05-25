@@ -22,10 +22,11 @@ class TopSection extends StatelessWidget {
                 ),
               ),
               Tab(
-                  child: Text(
-                'Categories',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )),
+                child: Text(
+                  'Categories',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
             ],
           ),
           Expanded(

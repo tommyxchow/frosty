@@ -281,7 +281,6 @@ class VideoOverlay extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
@@ -291,7 +290,6 @@ class VideoOverlay extends StatelessWidget {
                                     style: const TextStyle(
                                       fontSize: 12.0,
                                       color: Colors.white,
-                                      fontWeight: FontWeight.w300,
                                     ),
                                   ),
                                 ],
