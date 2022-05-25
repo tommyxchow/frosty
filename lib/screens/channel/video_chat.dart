@@ -71,6 +71,8 @@ class _VideoChatState extends State<VideoChat> {
       videoStore: _videoStore,
     );
 
+    final overlay = VideoOverlay(videoStore: _videoStore);
+
     final video = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
       onTap: () {
@@ -90,24 +92,20 @@ class _VideoChatState extends State<VideoChat> {
             return Stack(
               children: [
                 player,
-                Observer(
-                  builder: (_) {
-                    if (_videoStore.paused) return VideoOverlay(videoStore: _videoStore);
-                    return Observer(
-                      builder: (_) => AnimatedOpacity(
-                        opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: ColoredBox(
-                          color: const Color.fromRGBO(0, 0, 0, 0.5),
-                          child: IgnorePointer(
-                            ignoring: !_videoStore.overlayVisible,
-                            child: VideoOverlay(videoStore: _videoStore),
-                          ),
-                        ),
+                if (_videoStore.paused || _videoStore.streamInfo == null)
+                  overlay
+                else
+                  AnimatedOpacity(
+                    opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: ColoredBox(
+                      color: const Color.fromRGBO(0, 0, 0, 0.5),
+                      child: IgnorePointer(
+                        ignoring: !_videoStore.overlayVisible,
+                        child: overlay,
                       ),
-                    );
-                  },
-                )
+                    ),
+                  ),
               ],
             );
           }

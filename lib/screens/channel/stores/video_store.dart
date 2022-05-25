@@ -32,7 +32,7 @@ abstract class VideoStoreBase with Store {
   var timeRemaining = const Duration();
 
   @readonly
-  var _paused = true;
+  var _paused = false;
 
   @readonly
   var _overlayVisible = true;
@@ -52,7 +52,10 @@ abstract class VideoStoreBase with Store {
     ),
     JavascriptChannel(
       name: 'Play',
-      onMessageReceived: (message) => _paused = false,
+      onMessageReceived: (message) {
+        _paused = false;
+        controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
+      },
     ),
   };
 
@@ -75,6 +78,7 @@ abstract class VideoStoreBase with Store {
     try {
       if (_paused) {
         controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
+        controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
       } else {
         controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
       }
@@ -106,8 +110,9 @@ abstract class VideoStoreBase with Store {
     } catch (e) {
       debugPrint(e.toString());
 
-      _streamInfo = null;
       _overlayTimer.cancel();
+      _streamInfo = null;
+      _paused = true;
     }
   }
 
@@ -151,7 +156,6 @@ abstract class VideoStoreBase with Store {
     try {
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => Pause.postMessage("video paused"));');
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("play", () => Play.postMessage("video playing"));');
-      controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
     } catch (e) {
       debugPrint(e.toString());
     }

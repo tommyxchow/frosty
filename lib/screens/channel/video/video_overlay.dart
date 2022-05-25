@@ -156,61 +156,61 @@ class VideoOverlay extends StatelessWidget {
       onPressed: () => _showSleepTimerDialog(context),
     );
 
+    final streamInfo = videoStore.streamInfo;
+    if (streamInfo == null) {
+      return Stack(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              backButton,
+              const Spacer(),
+              settingsButton,
+            ],
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
+                refreshButton,
+                if (orientation == Orientation.landscape) fullScreenButton,
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
+    final streamer = Row(
+      children: [
+        ProfilePicture(
+          userLogin: streamInfo.userLogin,
+          radius: 10.0,
+        ),
+        const SizedBox(width: 5.0),
+        Flexible(
+          child: Tooltip(
+            message: streamerName,
+            preferBelow: false,
+            child: Text(
+              streamerName,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+      ],
+    );
+
     return Observer(
       builder: (context) {
-        final streamInfo = videoStore.streamInfo;
-        if (streamInfo == null) {
-          return Stack(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  backButton,
-                  const Spacer(),
-                  settingsButton,
-                ],
-              ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-                    refreshButton,
-                    if (orientation == Orientation.landscape) fullScreenButton,
-                  ],
-                ),
-              ),
-            ],
-          );
-        }
-
-        final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
-        final streamer = Row(
-          children: [
-            ProfilePicture(
-              userLogin: streamInfo.userLogin,
-              radius: 10.0,
-            ),
-            const SizedBox(width: 5.0),
-            Flexible(
-              child: Tooltip(
-                message: streamerName,
-                preferBelow: false,
-                child: Text(
-                  streamerName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          ],
-        );
-
         return Stack(
           children: [
             Row(
