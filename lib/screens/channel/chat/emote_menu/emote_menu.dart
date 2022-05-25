@@ -23,8 +23,8 @@ class _EmoteMenuState extends State<EmoteMenu> {
   @override
   Widget build(BuildContext context) {
     const sections = [
-      'Recent',
-      'Twitch',
+      'RECENT',
+      'TWITCH',
       'BTTV',
       'FFZ',
       '7TV',
@@ -48,7 +48,13 @@ class _EmoteMenuState extends State<EmoteMenu> {
                         widget.chatStore.assetsStore.emoteMenuIndex = index;
                       },
                       style: index == widget.chatStore.assetsStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
-                      child: Text(section),
+                      child: Text(
+                        section,
+                        style: const TextStyle(
+                          letterSpacing: 0.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ),
                 )

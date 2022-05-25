@@ -21,10 +21,13 @@ class _ChatSettingsState extends State<ChatSettings> {
   Widget build(BuildContext context) {
     const timestamps = ['Disabled', '12-Hour', '24-Hour'];
 
+    const sectionPadding = EdgeInsets.only(left: 15.0, bottom: 5.0, top: 30.0);
+
     final settingsStore = widget.settingsStore;
 
     return Observer(
       builder: (context) => ExpansionTile(
+        expandedCrossAxisAlignment: CrossAxisAlignment.start,
         leading: const Icon(Icons.chat),
         title: const Text(
           'Chat',
@@ -34,11 +37,56 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
         ),
         children: [
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Message Delay'),
+                const Spacer(),
+                Text('${settingsStore.chatDelay.toInt()} seconds'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.chatDelay,
+              min: 0.0,
+              max: 30.0,
+              divisions: 30,
+              onChanged: (newValue) => settingsStore.chatDelay = newValue,
+            ),
+          ),
+          const SectionHeader(
+            'Layout',
+            padding: sectionPadding,
+          ),
           SwitchListTile.adaptive(
             title: const Text('Bottom Bar'),
-            subtitle: const Text('Shows the bottom text field bar.'),
             value: settingsStore.showBottomBar,
             onChanged: (newValue) => settingsStore.showBottomBar = newValue,
+          ),
+          SwitchListTile.adaptive(
+            title: const Text('Landscape Chat on Left Side'),
+            value: settingsStore.landscapeChatLeftSide,
+            onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
+          ),
+          const SizedBox(height: 15.0),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Landscape Chat Width'),
+                const Spacer(),
+                Text('${(settingsStore.landscapeChatWidth * 100).toInt()}%'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.landscapeChatWidth,
+              min: 0.2,
+              max: 0.8,
+              divisions: 12,
+              onChanged: (newValue) => settingsStore.landscapeChatWidth = newValue,
+            ),
+          ),
+          const SectionHeader(
+            'Emotes',
+            padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
@@ -53,6 +101,10 @@ class _ChatSettingsState extends State<ChatSettings> {
             subtitle: const Text('Shows "stacked" emotes from BetterTTV and 7TV.'),
             value: settingsStore.showZeroWidth,
             onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
+          ),
+          const SectionHeader(
+            'Message Appearance',
+            padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
@@ -90,34 +142,12 @@ class _ChatSettingsState extends State<ChatSettings> {
                   .toList(),
             ),
           ),
-          SwitchListTile.adaptive(
-            title: const Text('Landscape Chat on Left Side'),
-            value: settingsStore.landscapeChatLeftSide,
-            onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
+          const SectionHeader(
+            'Message Sizing',
+            padding: sectionPadding,
           ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Landscape Chat Width'),
-                const Spacer(),
-                Text('${(settingsStore.landscapeChatWidth * 100).toInt()}%'),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.landscapeChatWidth,
-              min: 0.2,
-              max: 0.8,
-              divisions: 12,
-              onChanged: (newValue) => settingsStore.landscapeChatWidth = newValue,
-            ),
-          ),
-          const SizedBox(height: 10.0),
-          const SectionHeader('Message Appearance'),
           ExpansionTile(
-            title: const Text(
-              'Preview',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
+            title: const Text('Preview'),
             children: [
               Container(
                 width: double.infinity,
@@ -232,7 +262,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             subtitle: Slider.adaptive(
               value: settingsStore.messageSpacing,
               min: 0.0,
-              max: 30.0,
+              max: 20.0,
               divisions: 6,
               onChanged: (newValue) => settingsStore.messageSpacing = newValue,
             ),

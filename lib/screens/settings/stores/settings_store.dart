@@ -91,6 +91,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultLandscapeChatLeftSide = false;
 
+  static const defaultChatDelay = 0.0;
+
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
   var showBottomBar = defaultShowBottomBar;
@@ -173,6 +175,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var fullScreenChatOverlay = defaultFullScreenChatOverlay;
 
+  @JsonKey(defaultValue: defaultChatDelay)
+  @observable
+  var chatDelay = defaultChatDelay;
+
   @action
   void reset() {
     // * General Settings
@@ -202,6 +208,7 @@ abstract class _SettingsStoreBase with Store {
     emoteAutocomplete = defaultEmoteAutocomplete;
     landscapeChatWidth = defaultLandscapeChatWidth;
     landscapeChatLeftSide = false;
+    chatDelay = defaultChatDelay;
 
     // * Other settings
     sendCrashLogs = defaultSendCrashLogs;

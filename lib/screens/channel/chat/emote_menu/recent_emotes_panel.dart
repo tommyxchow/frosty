@@ -59,7 +59,14 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
                 height: 30,
                 child: TextButton(
                   onPressed: widget.chatStore.assetsStore.recentEmotes.isEmpty ? null : _showClearDialog,
-                  child: const Text('Clear'),
+                  child: const Text(
+                    'CLEAR',
+                    style: TextStyle(
+                      letterSpacing: 0.5,
+                      fontSize: 12.0,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
               ),
             ],

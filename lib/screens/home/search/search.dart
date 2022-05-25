@@ -67,7 +67,6 @@ class _SearchState extends State<Search> {
                       const SectionHeader(
                         'History',
                         padding: headerPadding,
-                        fontWeight: FontWeight.bold,
                       ),
                     Expanded(
                       child: ListView(
@@ -103,7 +102,6 @@ class _SearchState extends State<Search> {
                     child: SectionHeader(
                       'Channels',
                       padding: headerPadding,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SearchResultsChannels(
@@ -114,7 +112,6 @@ class _SearchState extends State<Search> {
                     child: SectionHeader(
                       'Categories',
                       padding: headerPadding,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SearchResultsCategories(searchStore: _searchStore),
