@@ -125,7 +125,7 @@ class _StreamCardState extends State<StreamCard> {
                             child: Text(
                               streamerName,
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 16.0,
                                 fontWeight: FontWeight.bold,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -142,6 +142,9 @@ class _StreamCardState extends State<StreamCard> {
                       child: Text(
                         widget.streamInfo.title.trim(),
                         overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 5.0),
@@ -154,7 +157,6 @@ class _StreamCardState extends State<StreamCard> {
                             widget.streamInfo.gameName,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 12.0,
                               color: DefaultTextStyle.of(context).style.color?.withOpacity(0.8),
                             ),
                           ),
@@ -185,7 +187,6 @@ class _StreamCardState extends State<StreamCard> {
                     Text(
                       '${NumberFormat().format(widget.streamInfo.viewerCount)} viewers',
                       style: TextStyle(
-                        fontSize: 12.0,
                         color: DefaultTextStyle.of(context).style.color?.withOpacity(0.8),
                       ),
                     ),

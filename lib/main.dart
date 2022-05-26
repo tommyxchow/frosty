@@ -82,6 +82,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const gray = Color.fromRGBO(22, 22, 22, 1.0);
+    const purple = Color(0xff9146ff);
+
     final lightTheme = ThemeData(
       scaffoldBackgroundColor: Colors.white,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
@@ -92,16 +95,16 @@ class MyApp extends StatelessWidget {
         titleTextStyle: TextStyle(
           fontFamily: 'Inter',
           fontSize: 24,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
         iconTheme: IconThemeData(color: Colors.black),
       ),
       colorScheme: ColorScheme.fromSwatch(
         primarySwatch: Colors.deepPurple,
-        accentColor: const Color(0xff9146ff),
+        accentColor: purple,
       ),
-      toggleableActiveColor: const Color(0xff9146ff),
+      toggleableActiveColor: purple,
       tabBarTheme: const TabBarTheme(
         labelColor: Colors.black,
         unselectedLabelColor: Colors.grey,
@@ -109,26 +112,27 @@ class MyApp extends StatelessWidget {
     );
 
     final darkTheme = ThemeData(
-      scaffoldBackgroundColor: Colors.grey.shade900,
+      scaffoldBackgroundColor: gray,
       brightness: Brightness.dark,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       fontFamily: 'Inter',
-      appBarTheme: AppBarTheme(
-        color: Colors.grey.shade900,
+      appBarTheme: const AppBarTheme(
+        color: gray,
         elevation: 0.0,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           fontFamily: 'Inter',
           fontSize: 24,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.bold,
         ),
       ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: gray),
       colorScheme: ColorScheme.fromSwatch(
         brightness: Brightness.dark,
         primarySwatch: Colors.deepPurple,
-        accentColor: const Color(0xff9146ff),
+        accentColor: purple,
       ),
       dialogBackgroundColor: Colors.grey.shade900,
-      toggleableActiveColor: const Color(0xff9146ff),
+      toggleableActiveColor: purple,
     );
 
     final oledTheme = ThemeData(
@@ -141,16 +145,16 @@ class MyApp extends StatelessWidget {
         titleTextStyle: TextStyle(
           fontFamily: 'Inter',
           fontSize: 24,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.bold,
         ),
       ),
       colorScheme: ColorScheme.fromSwatch(
         brightness: Brightness.dark,
         primarySwatch: Colors.deepPurple,
-        accentColor: const Color(0xff9146ff),
+        accentColor: purple,
       ),
       dialogBackgroundColor: Colors.black,
-      toggleableActiveColor: const Color(0xff9146ff),
+      toggleableActiveColor: purple,
     );
 
     return Observer(

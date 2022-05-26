@@ -198,7 +198,7 @@ class VideoOverlay extends StatelessWidget {
             child: Text(
               streamerName,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 16.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -281,6 +281,7 @@ class VideoOverlay extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         color: Colors.white,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),
@@ -288,7 +289,6 @@ class VideoOverlay extends StatelessWidget {
                                   Text(
                                     '${videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
                                     style: const TextStyle(
-                                      fontSize: 12.0,
                                       color: Colors.white,
                                     ),
                                   ),
