@@ -9,6 +9,7 @@ import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
+import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -71,7 +72,7 @@ class _ChattersListState extends State<ChattersList> {
             onChanged: (text) => chatDetailStore.filterText = text,
             decoration: InputDecoration(
               isDense: true,
-              labelText: 'Filter',
+              labelText: 'Filter chatters',
               contentPadding: const EdgeInsets.all(10.0),
               suffixIcon: IconButton(
                 tooltip: 'Clear Filter',
@@ -120,15 +121,14 @@ class _ChattersListState extends State<ChattersList> {
                       controller: _scrollController,
                       slivers: [
                         SliverPadding(
-                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                           sliver: SliverToBoxAdapter(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Chatters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                                const SizedBox(height: 5.0),
-                                Text('${NumberFormat().format(chatDetailStore.chatUsers?.chatterCount)} in chat'),
-                              ],
+                            child: Text(
+                              '${NumberFormat().format(chatDetailStore.chatUsers?.chatterCount)} Chatters',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
                             ),
                           ),
                         ),
@@ -138,9 +138,10 @@ class _ChattersListState extends State<ChattersList> {
                               SliverPadding(
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                                 sliver: SliverToBoxAdapter(
-                                  child: Text(
+                                  child: SectionHeader(
                                     headers[index],
-                                    style: textStyle,
+                                    fontSize: 12.0,
+                                    padding: const EdgeInsets.all(0.0),
                                   ),
                                 ),
                               ),
