@@ -84,22 +84,25 @@ class _StreamCardState extends State<StreamCard> {
             if (widget.showThumbnail)
               Flexible(
                 flex: 1,
-                child: widget.showUptime
-                    ? Stack(
-                        alignment: AlignmentDirectional.bottomEnd,
-                        children: [
-                          thumbnail,
-                          Container(
-                            color: const Color.fromRGBO(0, 0, 0, 0.5),
-                            padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                            child: Text(
-                              DateTime.now().difference(DateTime.parse(widget.streamInfo.startedAt)).toString().split('.')[0],
-                              style: const TextStyle(fontSize: 12, color: Colors.white),
-                            ),
-                          )
-                        ],
-                      )
-                    : thumbnail,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                  child: widget.showUptime
+                      ? Stack(
+                          alignment: AlignmentDirectional.bottomEnd,
+                          children: [
+                            thumbnail,
+                            Container(
+                              color: const Color.fromRGBO(0, 0, 0, 0.5),
+                              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                              child: Text(
+                                DateTime.now().difference(DateTime.parse(widget.streamInfo.startedAt)).toString().split('.')[0],
+                                style: const TextStyle(fontSize: 12, color: Colors.white),
+                              ),
+                            )
+                          ],
+                        )
+                      : thumbnail,
+                ),
               ),
             Flexible(
               flex: 2,
