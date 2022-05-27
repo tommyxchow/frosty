@@ -15,8 +15,18 @@ class TopSection extends StatelessWidget {
           TabBar(
             indicatorColor: Color(0xff9146ff),
             tabs: [
-              Tab(child: Text('Streams')),
-              Tab(child: Text('Categories')),
+              Tab(
+                child: Text(
+                  'Streams',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+              Tab(
+                child: Text(
+                  'Categories',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
             ],
           ),
           Expanded(
