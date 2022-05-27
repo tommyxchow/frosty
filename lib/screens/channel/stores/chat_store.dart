@@ -104,7 +104,8 @@ abstract class ChatStoreBase with Store {
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.chatDelay > 0) {
-      _messages.add(IRCMessage.createNotice(message: 'Waiting ${settings.chatDelay.toInt()} seconds due to chat delay setting...'));
+      _messages.add(IRCMessage.createNotice(
+          message: 'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
     }
 
     connectToChat();

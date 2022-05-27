@@ -47,8 +47,6 @@ class _ChattersListState extends State<ChattersList> {
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontWeight: FontWeight.bold);
-
     const headers = [
       'Broadcaster',
       'Staff',

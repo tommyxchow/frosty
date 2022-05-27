@@ -63,7 +63,6 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
                     'CLEAR',
                     style: TextStyle(
                       letterSpacing: 0.5,
-                      fontSize: 12.0,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
