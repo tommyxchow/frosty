@@ -66,6 +66,7 @@ class _SearchState extends State<Search> {
                     if (_searchStore.searchHistory.isNotEmpty)
                       const SectionHeader(
                         'History',
+                        fontSize: 12.0,
                         padding: headerPadding,
                       ),
                     Expanded(
@@ -101,6 +102,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Channels',
+                      fontSize: 12.0,
                       padding: headerPadding,
                     ),
                   ),
@@ -111,6 +113,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Categories',
+                      fontSize: 12.0,
                       padding: headerPadding,
                     ),
                   ),

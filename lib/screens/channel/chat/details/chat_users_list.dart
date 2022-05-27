@@ -9,6 +9,7 @@ import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
+import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -46,8 +47,6 @@ class _ChattersListState extends State<ChattersList> {
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontWeight: FontWeight.bold);
-
     const headers = [
       'Broadcaster',
       'Staff',
@@ -58,8 +57,8 @@ class _ChattersListState extends State<ChattersList> {
       'Viewers',
     ];
 
-    final chatDetailStore = widget.chatDetails;
-    chatDetailStore.updateChatters(widget.userLogin);
+    final chatDetailsStore = widget.chatDetails;
+    chatDetailsStore.updateChatters(widget.userLogin);
 
     return Column(
       children: [
@@ -68,16 +67,16 @@ class _ChattersListState extends State<ChattersList> {
           child: TextField(
             controller: _textController,
             autocorrect: false,
-            onChanged: (text) => chatDetailStore.filterText = text,
+            onChanged: (text) => chatDetailsStore.filterText = text,
             decoration: InputDecoration(
               isDense: true,
-              labelText: 'Filter',
+              labelText: 'Filter chatters',
               contentPadding: const EdgeInsets.all(10.0),
               suffixIcon: IconButton(
                 tooltip: 'Clear Filter',
                 onPressed: () {
                   FocusScope.of(context).unfocus();
-                  chatDetailStore.filterText = '';
+                  chatDetailsStore.filterText = '';
                   _textController.clear();
                 },
                 icon: const Icon(Icons.clear),
@@ -92,27 +91,27 @@ class _ChattersListState extends State<ChattersList> {
           child: RefreshIndicator(
             onRefresh: () async {
               HapticFeedback.lightImpact();
-              await chatDetailStore.updateChatters(widget.userLogin);
+              await chatDetailsStore.updateChatters(widget.userLogin);
             },
             child: Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: [
                 Observer(
                   builder: (context) {
-                    if (chatDetailStore.error != null) {
+                    if (chatDetailsStore.error != null) {
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text('Failed to get chatters'),
                           TextButton(
-                            onPressed: () => chatDetailStore.updateChatters(widget.userLogin),
+                            onPressed: () => chatDetailsStore.updateChatters(widget.userLogin),
                             child: const Text('Try Again'),
                           )
                         ],
                       );
                     }
 
-                    if (chatDetailStore.chatUsers == null) {
+                    if (chatDetailsStore.chatUsers == null) {
                       return const LoadingIndicator(subtitle: Text('Getting chatters...'));
                     }
 
@@ -120,27 +119,27 @@ class _ChattersListState extends State<ChattersList> {
                       controller: _scrollController,
                       slivers: [
                         SliverPadding(
-                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                           sliver: SliverToBoxAdapter(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('Chatters', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                                const SizedBox(height: 5.0),
-                                Text('${NumberFormat().format(chatDetailStore.chatUsers?.chatterCount)} in chat'),
-                              ],
+                            child: Text(
+                              '${NumberFormat().format(chatDetailsStore.chatUsers?.chatterCount)} ${chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
                             ),
                           ),
                         ),
-                        ...chatDetailStore.filteredUsers.expandIndexed(
+                        ...chatDetailsStore.filteredUsers.expandIndexed(
                           (index, users) => [
                             if (users.isNotEmpty) ...[
                               SliverPadding(
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                                 sliver: SliverToBoxAdapter(
-                                  child: Text(
+                                  child: SectionHeader(
                                     headers[index],
-                                    style: textStyle,
+                                    fontSize: 12.0,
+                                    padding: const EdgeInsets.all(0.0),
                                   ),
                                 ),
                               ),
@@ -181,7 +180,7 @@ class _ChattersListState extends State<ChattersList> {
                   child: Observer(
                     builder: (context) => AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
-                      child: chatDetailStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
+                      child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
                     ),
                   ),
                 ),

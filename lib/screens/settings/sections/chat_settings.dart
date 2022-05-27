@@ -21,13 +21,14 @@ class _ChatSettingsState extends State<ChatSettings> {
   Widget build(BuildContext context) {
     const timestamps = ['Disabled', '12-Hour', '24-Hour'];
 
-    const sectionPadding = EdgeInsets.only(left: 15.0, bottom: 5.0, top: 30.0);
+    const sectionPadding = EdgeInsets.only(left: 16.0, bottom: 5.0, top: 30.0);
 
     final settingsStore = widget.settingsStore;
 
     return Observer(
       builder: (context) => ExpansionTile(
         expandedCrossAxisAlignment: CrossAxisAlignment.start,
+        childrenPadding: const EdgeInsets.symmetric(vertical: 10.0),
         leading: const Icon(Icons.chat),
         title: const Text(
           'Chat',
@@ -42,7 +43,7 @@ class _ChatSettingsState extends State<ChatSettings> {
               children: [
                 const Text('Message Delay'),
                 const Spacer(),
-                Text('${settingsStore.chatDelay.toInt()} seconds'),
+                Text('${settingsStore.chatDelay.toInt()} ${settingsStore.chatDelay == 1.0 ? 'second' : 'seconds'}'),
               ],
             ),
             subtitle: Slider.adaptive(
@@ -55,6 +56,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Layout',
+            fontSize: 12.0,
             padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
@@ -86,6 +88,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Emotes',
+            fontSize: 12.0,
             padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
@@ -104,6 +107,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Message Appearance',
+            fontSize: 12.0,
             padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
@@ -144,6 +148,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Message Sizing',
+            fontSize: 12.0,
             padding: sectionPadding,
           ),
           ExpansionTile(

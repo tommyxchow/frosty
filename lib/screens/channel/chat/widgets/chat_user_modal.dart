@@ -35,44 +35,42 @@ class _ChatUserModalState extends State<ChatUserModal> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: ListTile(
-                leading: ProfilePicture(
-                  userLogin: widget.username,
-                ),
-                title: Row(
-                  children: [
-                    Text(
-                      widget.displayName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      tooltip: 'Block or Report User',
-                      onPressed: () => showModalBottomSheet(
-                        context: context,
-                        builder: (context) => BlockReportModal(
-                          authStore: widget.chatStore.auth,
-                          name: widget.displayName,
-                          userLogin: widget.username,
-                          userId: widget.userId,
-                        ),
-                      ),
-                      icon: Icon(Icons.adaptive.more),
-                    ),
-                  ],
-                ),
-                trailing: widget.chatStore.auth.isLoggedIn
-                    ? OutlinedButton(
-                        onPressed: () {
-                          widget.chatStore.textController.text = '@${widget.username} ';
-                          Navigator.pop(context);
-                          widget.chatStore.textFieldFocusNode.requestFocus();
-                        },
-                        child: const Text('Reply'),
-                      )
-                    : null,
+            ListTile(
+              contentPadding: const EdgeInsets.all(10.0),
+              leading: ProfilePicture(
+                userLogin: widget.username,
               ),
+              title: Row(
+                children: [
+                  Text(
+                    widget.displayName,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    tooltip: 'Block or Report User',
+                    onPressed: () => showModalBottomSheet(
+                      context: context,
+                      builder: (context) => BlockReportModal(
+                        authStore: widget.chatStore.auth,
+                        name: widget.displayName,
+                        userLogin: widget.username,
+                        userId: widget.userId,
+                      ),
+                    ),
+                    icon: Icon(Icons.adaptive.more),
+                  ),
+                ],
+              ),
+              trailing: widget.chatStore.auth.isLoggedIn
+                  ? OutlinedButton(
+                      onPressed: () {
+                        widget.chatStore.textController.text = '@${widget.username} ';
+                        Navigator.pop(context);
+                        widget.chatStore.textFieldFocusNode.requestFocus();
+                      },
+                      child: const Text('Reply'),
+                    )
+                  : null,
             ),
             const SectionHeader(
               'Recent Messages',
