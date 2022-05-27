@@ -298,8 +298,6 @@ class VideoOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-                  refreshButton,
                   if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                     IconButton(
                       tooltip: 'Picture-in-Picture',
@@ -309,6 +307,8 @@ class VideoOverlay extends StatelessWidget {
                       ),
                       onPressed: videoStore.requestPictureInPicture,
                     ),
+                  if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
+                  refreshButton,
                   if (orientation == Orientation.landscape) fullScreenButton
                 ],
               ),
