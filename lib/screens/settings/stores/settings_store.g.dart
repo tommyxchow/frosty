@@ -35,7 +35,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..emoteAutocomplete = json['emoteAutocomplete'] as bool? ?? true
       ..landscapeChatWidth =
-          (json['landscapeChatWidth'] as num?)?.toDouble() ?? 0.35
+          (json['landscapeChatWidth'] as num?)?.toDouble() ?? 0.3
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false

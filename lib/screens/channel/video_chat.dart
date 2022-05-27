@@ -179,7 +179,7 @@ class _VideoChatState extends State<VideoChat> {
                                       visible: settingsStore.fullScreenChatOverlay,
                                       maintainState: true,
                                       child: DefaultTextStyle(
-                                        style: const TextStyle(color: Colors.white),
+                                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
                                         child: landscapeChat,
                                       ),
                                     ),
