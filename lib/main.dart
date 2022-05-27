@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
     const purple = Color(0xff9146ff);
 
     final lightTheme = ThemeData(
-      scaffoldBackgroundColor: Colors.white,
+      canvasColor: Colors.white,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       fontFamily: 'Inter',
       appBarTheme: const AppBarTheme(
@@ -112,7 +112,7 @@ class MyApp extends StatelessWidget {
     );
 
     final darkTheme = ThemeData(
-      scaffoldBackgroundColor: gray,
+      canvasColor: gray,
       brightness: Brightness.dark,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       fontFamily: 'Inter',
