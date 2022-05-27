@@ -87,7 +87,7 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultEmoteAutocomplete = true;
 
-  static const defaultLandscapeChatWidth = 0.35;
+  static const defaultLandscapeChatWidth = 0.3;
 
   static const defaultLandscapeChatLeftSide = false;
 
