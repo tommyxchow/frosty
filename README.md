@@ -181,6 +181,8 @@ On Android, the delay should be minimal. Try refreshing the player if you have a
 
 On iOS, there seems to be delays up to 15 seconds due to the native player so unfortunately it's out of my control. The best you can do for now is refreshing or pausing/playing the stream until the delay is minimized.
 
+**UPDATE**: Starting with version 1.4.0, there is a new message delay option that lets you set the delay (in seconds) before each message is rendered.
+
 ### Why are some GIFs either slow or very fast?
 
 This seems to be caused by the Flutter framework itself (see [here](https://github.com/flutter/flutter/issues/24804) and [here](https://github.com/flutter/flutter/issues/29130)).
@@ -188,6 +190,8 @@ This seems to be caused by the Flutter framework itself (see [here](https://gith
 ### Why is ProMotion (120hz) not working?
 
 This is caused by the Flutter framework and is being worked on (see [here](https://github.com/flutter/flutter/issues/90675)).
+
+**UPDATE**: With Flutter 3 and version 1.3.0 of the app, ProMotion *should* be working.
 
 ### Why is feature "X" from Twitch not in the app as well?
 
