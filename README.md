@@ -104,19 +104,19 @@
   <img
     title="Channel (Video/Chat) View"
     alt="Channel (Video/Chat) View"
-    src="https://user-images.githubusercontent.com/54859075/170803238-3d7354e7-d26f-4781-b83b-58708873f150.png"
+    src="https://user-images.githubusercontent.com/54859075/170807736-f3fc4447-2d98-4a19-89d8-8d1b3f17c446.png"
     width="32%"
   />
   <img
     title="Emote Menu"
     alt="Emote Menu"
-    src="https://user-images.githubusercontent.com/54859075/170803200-56ac912c-25ce-43ba-b768-695d7c2f197a.png"
+    src="https://user-images.githubusercontent.com/54859075/170807753-f3ae4eb4-a6ce-4261-901d-2e9ac5f147f7.png"
     width="32%"
   />
   <img
     title="Settings Section"
     alt="Settings Section"
-    src="https://user-images.githubusercontent.com/54859075/170803224-f7925d66-b954-4d1a-bc55-292152ba0806.png"
+    src="https://user-images.githubusercontent.com/54859075/170807760-7ffdd3a5-ce3a-43c3-85ae-24ae0b0874a4.png"
     width="32%"
   />
 </p>
