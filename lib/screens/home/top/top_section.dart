@@ -18,14 +18,15 @@ class TopSection extends StatelessWidget {
               Tab(
                 child: Text(
                   'Streams',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
               Tab(
-                  child: Text(
-                'Categories',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )),
+                child: Text(
+                  'Categories',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
             ],
           ),
           Expanded(

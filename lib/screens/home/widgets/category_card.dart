@@ -38,13 +38,19 @@ class CategoryCard extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         child: Column(
           children: [
             Expanded(
-              child: CachedNetworkImage(
-                imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${width}x$height.jpg'),
-                placeholder: (context, url) => const LoadingIndicator(),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                child: AspectRatio(
+                  aspectRatio: 3 / 4,
+                  child: CachedNetworkImage(
+                    imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${width}x$height.jpg'),
+                    placeholder: (context, url) => const LoadingIndicator(),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 5.0),

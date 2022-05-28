@@ -71,6 +71,8 @@ class _VideoChatState extends State<VideoChat> {
       videoStore: _videoStore,
     );
 
+    final overlay = VideoOverlay(videoStore: _videoStore);
+
     final video = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
       onTap: () {
@@ -90,24 +92,20 @@ class _VideoChatState extends State<VideoChat> {
             return Stack(
               children: [
                 player,
-                Observer(
-                  builder: (_) {
-                    if (_videoStore.paused) return VideoOverlay(videoStore: _videoStore);
-                    return Observer(
-                      builder: (_) => AnimatedOpacity(
-                        opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 200),
-                        child: ColoredBox(
-                          color: const Color.fromRGBO(0, 0, 0, 0.5),
-                          child: IgnorePointer(
-                            ignoring: !_videoStore.overlayVisible,
-                            child: VideoOverlay(videoStore: _videoStore),
-                          ),
-                        ),
+                if (_videoStore.paused || _videoStore.streamInfo == null)
+                  overlay
+                else
+                  AnimatedOpacity(
+                    opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: ColoredBox(
+                      color: const Color.fromRGBO(0, 0, 0, 0.5),
+                      child: IgnorePointer(
+                        ignoring: !_videoStore.overlayVisible,
+                        child: overlay,
                       ),
-                    );
-                  },
-                )
+                    ),
+                  ),
               ],
             );
           }
@@ -154,45 +152,60 @@ class _VideoChatState extends State<VideoChat> {
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
             return Observer(
-              builder: (context) => ColoredBox(
-                color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
-                child: SafeArea(
-                  bottom: false,
-                  child: settingsStore.showVideo
-                      ? settingsStore.fullScreen
-                          ? Stack(
-                              children: [
-                                Visibility(
-                                  visible: false,
-                                  maintainState: true,
-                                  child: chat,
-                                ),
-                                video,
-                              ],
-                            )
-                          : Row(
-                              children: [
-                                Flexible(
-                                  flex: 2,
-                                  child: video,
-                                ),
-                                Flexible(
-                                  flex: 1,
-                                  child: ColoredBox(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
-                                    child: chat,
+              builder: (context) {
+                final landscapeChat = AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: _chatStore.expandChat
+                      ? MediaQuery.of(context).size.width / 2
+                      : MediaQuery.of(context).size.width * _chatStore.settings.landscapeChatWidth,
+                  curve: Curves.ease,
+                  color: _chatStore.settings.fullScreen ? null : Theme.of(context).scaffoldBackgroundColor,
+                  child: chat,
+                );
+
+                return ColoredBox(
+                  color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
+                  child: SafeArea(
+                    bottom: false,
+                    child: settingsStore.showVideo
+                        ? settingsStore.fullScreen
+                            ? Stack(
+                                alignment: settingsStore.landscapeChatLeftSide ? Alignment.topLeft : Alignment.topRight,
+                                children: [
+                                  video,
+                                  IgnorePointer(
+                                    ignoring: _videoStore.overlayVisible,
+                                    child: Visibility(
+                                      visible: settingsStore.fullScreenChatOverlay,
+                                      maintainState: true,
+                                      child: DefaultTextStyle(
+                                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
+                                        child: landscapeChat,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )
-                      : Column(
-                          children: [
-                            appBar,
-                            Expanded(child: chat),
-                          ],
-                        ),
-                ),
-              ),
+                                ],
+                              )
+                            : Row(
+                                children: settingsStore.landscapeChatLeftSide
+                                    ? [
+                                        landscapeChat,
+                                        Expanded(child: video),
+                                      ]
+                                    : [
+                                        Expanded(child: video),
+                                        landscapeChat,
+                                      ],
+                              )
+                        : Column(
+                            children: [
+                              appBar,
+                              Expanded(child: chat),
+                            ],
+                          ),
+                  ),
+                );
+              },
             );
           }
 

@@ -78,6 +78,9 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _userState = const USERSTATE();
 
+  @observable
+  var expandChat = false;
+
   final reactions = <ReactionDisposer>[];
 
   ChatStoreBase({
@@ -100,6 +103,11 @@ abstract class ChatStoreBase with Store {
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
+    if (settings.chatDelay > 0) {
+      _messages.add(IRCMessage.createNotice(
+          message: 'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
+    }
+
     connectToChat();
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
@@ -116,6 +124,8 @@ abstract class ChatStoreBase with Store {
     // Add a listener to the textfield focus that will hide the emote menu if it is currently shown.
     textFieldFocusNode.addListener(() {
       if (textFieldFocusNode.hasFocus && assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
+
+      if (!textFieldFocusNode.hasFocus) expandChat = false;
     });
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
@@ -245,7 +255,7 @@ abstract class ChatStoreBase with Store {
 
     // Listen for new messages and forward them to the handler.
     _channel?.stream.listen(
-      (data) => _handleIRCData(data.toString()),
+      (data) => Future.delayed(Duration(seconds: settings.chatDelay.toInt()), () => _handleIRCData(data.toString())),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_channel == null) return;

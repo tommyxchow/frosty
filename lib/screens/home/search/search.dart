@@ -66,8 +66,8 @@ class _SearchState extends State<Search> {
                     if (_searchStore.searchHistory.isNotEmpty)
                       const SectionHeader(
                         'History',
+                        fontSize: 12.0,
                         padding: headerPadding,
-                        fontWeight: FontWeight.bold,
                       ),
                     Expanded(
                       child: ListView(
@@ -102,8 +102,8 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Channels',
+                      fontSize: 12.0,
                       padding: headerPadding,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SearchResultsChannels(
@@ -113,8 +113,8 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Categories',
+                      fontSize: 12.0,
                       padding: headerPadding,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SearchResultsCategories(searchStore: _searchStore),

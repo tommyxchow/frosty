@@ -117,6 +117,13 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
+    final chatOverlayButton = IconButton(
+      tooltip: 'Toggle Chat Overlay',
+      onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
+      icon: const Icon(Icons.chat_bubble_outline),
+      color: Colors.white,
+    );
+
     final refreshButton = IconButton(
       tooltip: 'Refresh',
       icon: const Icon(
@@ -150,7 +157,6 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final streamInfo = videoStore.streamInfo;
-
     if (streamInfo == null) {
       return Stack(
         children: [
@@ -167,6 +173,7 @@ class VideoOverlay extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                 refreshButton,
                 if (orientation == Orientation.landscape) fullScreenButton,
               ],
@@ -177,7 +184,6 @@ class VideoOverlay extends StatelessWidget {
     }
 
     final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
-
     final streamer = Row(
       children: [
         ProfilePicture(
@@ -192,7 +198,7 @@ class VideoOverlay extends StatelessWidget {
             child: Text(
               streamerName,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 16.0,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
@@ -204,110 +210,112 @@ class VideoOverlay extends StatelessWidget {
     );
 
     return Observer(
-      builder: (context) => Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              backButton,
-              const Spacer(),
-              sleepTimerButton,
-              settingsButton,
-            ],
-          ),
-          // Add a play button when paused for Android
-          // When an ad is paused on Android there is no way to unpause, so a play button is necessary.
-          if (Platform.isAndroid)
-            Center(
-              child: IconButton(
-                tooltip: videoStore.paused ? 'Play' : 'Pause',
-                iconSize: 50.0,
-                icon: videoStore.paused
-                    ? const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                      )
-                    : const Icon(
-                        Icons.pause,
-                        color: Colors.white,
-                      ),
-                onPressed: videoStore.handlePausePlay,
-              ),
-            )
-          else if (!videoStore.paused)
-            Center(
-              child: IconButton(
-                tooltip: 'Pause',
-                iconSize: 50.0,
-                icon: const Icon(
-                  Icons.pause,
-                  color: Colors.white,
-                ),
-                onPressed: videoStore.handlePausePlay,
-              ),
-            ),
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+      builder: (context) {
+        return Stack(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: videoStore.handleExpand,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: videoStore.settingsStore.expandInfo
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                streamer,
-                                const SizedBox(height: 5.0),
-                                Tooltip(
-                                  message: videoStore.streamInfo!.title.trim(),
-                                  preferBelow: false,
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Text(
-                                    videoStore.streamInfo!.title.trim(),
-                                    maxLines: orientation == Orientation.portrait ? 1 : 5,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 5.0),
-                                Text(
-                                  '${videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
-                                  style: const TextStyle(
-                                    fontSize: 12.0,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w300,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : streamer,
-                    ),
-                  ),
-                ),
-                refreshButton,
-                if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
-                  IconButton(
-                    tooltip: 'Picture-in-Picture',
-                    icon: const Icon(
-                      Icons.picture_in_picture_alt_rounded,
-                      color: Colors.white,
-                    ),
-                    onPressed: videoStore.requestPictureInPicture,
-                  ),
-                if (orientation == Orientation.landscape) fullScreenButton
+                backButton,
+                const Spacer(),
+                sleepTimerButton,
+                settingsButton,
               ],
             ),
-          )
-        ],
-      ),
+
+            // Add a play button when paused for Android
+            // When an ad is paused on Android there is no way to unpause, so a play button is necessary.
+            if (Platform.isAndroid)
+              Center(
+                child: IconButton(
+                  tooltip: videoStore.paused ? 'Play' : 'Pause',
+                  iconSize: 50.0,
+                  icon: videoStore.paused
+                      ? const Icon(
+                          Icons.play_arrow,
+                          color: Colors.white,
+                        )
+                      : const Icon(
+                          Icons.pause,
+                          color: Colors.white,
+                        ),
+                  onPressed: videoStore.handlePausePlay,
+                ),
+              )
+            else if (!videoStore.paused)
+              Center(
+                child: IconButton(
+                  tooltip: 'Pause',
+                  iconSize: 50.0,
+                  icon: const Icon(
+                    Icons.pause,
+                    color: Colors.white,
+                  ),
+                  onPressed: videoStore.handlePausePlay,
+                ),
+              ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: videoStore.handleExpand,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: videoStore.settingsStore.expandInfo
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  streamer,
+                                  const SizedBox(height: 5.0),
+                                  Tooltip(
+                                    message: videoStore.streamInfo!.title.trim(),
+                                    preferBelow: false,
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Text(
+                                      videoStore.streamInfo!.title.trim(),
+                                      maxLines: orientation == Orientation.portrait ? 1 : 5,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5.0),
+                                  Text(
+                                    '${videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : streamer,
+                      ),
+                    ),
+                  ),
+                  if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
+                    IconButton(
+                      tooltip: 'Picture-in-Picture',
+                      icon: const Icon(
+                        Icons.picture_in_picture_alt_rounded,
+                        color: Colors.white,
+                      ),
+                      onPressed: videoStore.requestPictureInPicture,
+                    ),
+                  if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
+                  refreshButton,
+                  if (orientation == Orientation.landscape) fullScreenButton
+                ],
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 }

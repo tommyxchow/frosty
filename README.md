@@ -86,37 +86,37 @@
   <img
     title="Followed Streams"
     alt="Followed Streams"
-    src="https://user-images.githubusercontent.com/54859075/163772719-3afe999d-49ad-46fd-9e4f-6aa4802d431b.png"
+    src="https://user-images.githubusercontent.com/54859075/170803307-57c16834-1a4b-4c9d-b7e3-9dd8f1a13c33.png"
     width="32%"
   />
   <img
     title="Categories Section"
     alt="Categories Section"
-    src="https://user-images.githubusercontent.com/54859075/163772670-af09ad0e-cdb9-4c1f-aed5-495e868da015.png"
+    src="https://user-images.githubusercontent.com/54859075/170803313-a7b122f4-36ac-480d-a138-dd8383c21bbe.png"
     width="32%"
   />
   <img
     title="Search Section"
     alt="Search Section"
-    src="https://user-images.githubusercontent.com/54859075/163772588-f526031d-cec3-43fd-8259-f7d20461a4c9.png"
+    src="https://user-images.githubusercontent.com/54859075/170803326-5338aec5-f201-4b0a-aa60-9dc44d76ea67.png"
     width="32%"
   />
   <img
     title="Channel (Video/Chat) View"
     alt="Channel (Video/Chat) View"
-    src="https://user-images.githubusercontent.com/54859075/163775107-f5d5aeab-de4b-4434-8223-611d25c6532a.png"
+    src="https://user-images.githubusercontent.com/54859075/170803238-3d7354e7-d26f-4781-b83b-58708873f150.png"
     width="32%"
   />
   <img
     title="Emote Menu"
     alt="Emote Menu"
-    src="https://user-images.githubusercontent.com/54859075/163774539-290aabb7-8486-41b7-8b24-12ba84d9cd98.png"
+    src="https://user-images.githubusercontent.com/54859075/170803200-56ac912c-25ce-43ba-b768-695d7c2f197a.png"
     width="32%"
   />
   <img
     title="Settings Section"
     alt="Settings Section"
-    src="https://user-images.githubusercontent.com/54859075/163775249-b5b0809c-cd2e-47e1-abe3-fb6a03e661ae.png"
+    src="https://user-images.githubusercontent.com/54859075/170803224-f7925d66-b954-4d1a-bc55-292152ba0806.png"
     width="32%"
   />
 </p>
@@ -181,6 +181,8 @@ On Android, the delay should be minimal. Try refreshing the player if you have a
 
 On iOS, there seems to be delays up to 15 seconds due to the native player so unfortunately it's out of my control. The best you can do for now is refreshing or pausing/playing the stream until the delay is minimized.
 
+**UPDATE**: Starting with version 1.4.0, there is a new message delay option that lets you set the delay (in seconds) before each message is rendered.
+
 ### Why are some GIFs either slow or very fast?
 
 This seems to be caused by the Flutter framework itself (see [here](https://github.com/flutter/flutter/issues/24804) and [here](https://github.com/flutter/flutter/issues/29130)).
@@ -188,6 +190,8 @@ This seems to be caused by the Flutter framework itself (see [here](https://gith
 ### Why is ProMotion (120hz) not working?
 
 This is caused by the Flutter framework and is being worked on (see [here](https://github.com/flutter/flutter/issues/90675)).
+
+**UPDATE**: With Flutter 3 and version 1.3.0 of the app, ProMotion *should* be working.
 
 ### Why is feature "X" from Twitch not in the app as well?
 
