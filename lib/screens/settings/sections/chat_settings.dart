@@ -267,7 +267,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             subtitle: Slider.adaptive(
               value: settingsStore.messageSpacing,
               min: 0.0,
-              max: 20.0,
+              max: 30.0,
               divisions: 6,
               onChanged: (newValue) => settingsStore.messageSpacing = newValue,
             ),
