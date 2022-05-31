@@ -25,13 +25,11 @@ void main() async {
 
   // Workaround for clearing stored tokens on uninstall.
   // If first time running app, will clear all tokens in the secure storage.
-  if (prefs.getBool('first_run') ?? true) {
+  if (prefs.getBool('first_run') != false) {
     debugPrint('Clearing secure storage...');
     const storage = FlutterSecureStorage();
 
     await storage.deleteAll();
-
-    prefs.setBool('first_run', false);
   }
 
   // With the shared preferences instance, obtain the existing user settings if it exists.
