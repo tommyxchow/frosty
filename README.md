@@ -167,9 +167,17 @@ On Android, you can change the stream quality by turning off the custom stream o
 
 On iOS, sadly quality options aren't available through the native player and rely on an "auto" setting. There is no official API for getting the live stream URLs so specific quality options are not possible at this time.
 
+### Why is there no picture-in-picture (PiP) on Android?
+
+I've looked into implementing it for Android a while back but web browsers on Android don't support the [web Picture-in-Picture API](https://developer.mozilla.org/en-US/docs/Web/API/Picture-in-Picture_API). The reason I'm using the web PiP API is due to limitations in the Twitch API (the stream is just the Twitch channel website in fullscreen rather than an actual video player). I *might* be able to figure something out by working with the native Android code but I'll have to learn that first.
+
 ### Why do certain animations and scrolling appear to be janky?
 
 Due to the Flutter framework, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes usually resolves it.
+
+### Why isn't the video stream playing on Android?
+
+If you're on an older version of Android (below 7.1.1), the video stream will not play properly due to the reliance on Twitch's web player. Older Android versions use an older version of the native web browser (WebView), resulting in many compatibility issues with newer websites.
 
 ### Why am I getting ads even though I'm subscribed to the channel or have Turbo?
 
