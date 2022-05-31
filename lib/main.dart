@@ -129,7 +129,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.deepPurple,
         accentColor: purple,
       ),
-      dialogBackgroundColor: Colors.grey.shade900,
+      dialogBackgroundColor: gray,
       toggleableActiveColor: purple,
     );
 
