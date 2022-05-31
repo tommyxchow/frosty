@@ -32,7 +32,7 @@ abstract class VideoStoreBase with Store {
   var timeRemaining = const Duration();
 
   @readonly
-  var _paused = false;
+  var _paused = true;
 
   @readonly
   var _overlayVisible = true;
