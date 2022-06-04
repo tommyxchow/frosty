@@ -34,8 +34,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..emoteAutocomplete = json['emoteAutocomplete'] as bool? ?? true
-      ..landscapeChatWidth =
-          (json['landscapeChatWidth'] as num?)?.toDouble() ?? 0.3
+      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
@@ -67,7 +66,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'emoteAutocomplete': instance.emoteAutocomplete,
-      'landscapeChatWidth': instance.landscapeChatWidth,
+      'chatWidth': instance.chatWidth,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
       'sendCrashLogs': instance.sendCrashLogs,
@@ -418,19 +417,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$landscapeChatWidthAtom =
-      Atom(name: '_SettingsStoreBase.landscapeChatWidth', context: context);
+  late final _$chatWidthAtom =
+      Atom(name: '_SettingsStoreBase.chatWidth', context: context);
 
   @override
-  double get landscapeChatWidth {
-    _$landscapeChatWidthAtom.reportRead();
-    return super.landscapeChatWidth;
+  double get chatWidth {
+    _$chatWidthAtom.reportRead();
+    return super.chatWidth;
   }
 
   @override
-  set landscapeChatWidth(double value) {
-    _$landscapeChatWidthAtom.reportWrite(value, super.landscapeChatWidth, () {
-      super.landscapeChatWidth = value;
+  set chatWidth(double value) {
+    _$chatWidthAtom.reportWrite(value, super.chatWidth, () {
+      super.chatWidth = value;
     });
   }
 
@@ -587,7 +586,7 @@ messageScale: ${messageScale},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 emoteAutocomplete: ${emoteAutocomplete},
-landscapeChatWidth: ${landscapeChatWidth},
+chatWidth: ${chatWidth},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 sendCrashLogs: ${sendCrashLogs},

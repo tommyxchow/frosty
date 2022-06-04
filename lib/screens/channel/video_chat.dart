@@ -167,7 +167,7 @@ class _VideoChatState extends State<VideoChat> {
                   duration: const Duration(milliseconds: 200),
                   width: _chatStore.expandChat
                       ? MediaQuery.of(context).size.width / 2
-                      : MediaQuery.of(context).size.width * _chatStore.settings.landscapeChatWidth,
+                      : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
                   curve: Curves.ease,
                   color: _chatStore.settings.fullScreen
                       ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
