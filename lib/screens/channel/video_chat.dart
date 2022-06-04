@@ -77,9 +77,9 @@ class _VideoChatState extends State<VideoChat> {
       videoStore: _videoStore,
     );
 
-    final overlay = VideoOverlay(videoStore: _videoStore);
+    final videoOverlay = VideoOverlay(videoStore: _videoStore);
 
-    final video = GestureDetector(
+    final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
       onTap: () {
         if (_chatStore.assetsStore.showEmoteMenu) {
@@ -93,31 +93,35 @@ class _VideoChatState extends State<VideoChat> {
         }
       },
       child: Observer(
-        builder: (context) {
-          if (_videoStore.settingsStore.showOverlay) {
-            return Stack(
-              children: [
-                player,
-                if (_videoStore.paused || _videoStore.streamInfo == null)
-                  overlay
-                else
-                  AnimatedOpacity(
-                    opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: ColoredBox(
-                      color: const Color.fromRGBO(0, 0, 0, 0.5),
-                      child: IgnorePointer(
-                        ignoring: !_videoStore.overlayVisible,
-                        child: overlay,
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          }
-          return player;
+        builder: (_) {
+          if (_videoStore.paused || _videoStore.streamInfo == null) return videoOverlay;
+
+          return AnimatedOpacity(
+            opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 200),
+            child: ColoredBox(
+              color: const Color.fromRGBO(0, 0, 0, 0.5),
+              child: IgnorePointer(
+                ignoring: !_videoStore.overlayVisible,
+                child: videoOverlay,
+              ),
+            ),
+          );
         },
       ),
+    );
+
+    final video = Observer(
+      builder: (context) {
+        if (!_videoStore.settingsStore.showOverlay) return player;
+
+        return Stack(
+          children: [
+            player,
+            overlay,
+          ],
+        );
+      },
     );
 
     final chat = Chat(
@@ -165,8 +169,22 @@ class _VideoChatState extends State<VideoChat> {
                       ? MediaQuery.of(context).size.width / 2
                       : MediaQuery.of(context).size.width * _chatStore.settings.landscapeChatWidth,
                   curve: Curves.ease,
-                  color: _chatStore.settings.fullScreen ? null : Theme.of(context).scaffoldBackgroundColor,
+                  color: _chatStore.settings.fullScreen
+                      ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
+                      : Theme.of(context).scaffoldBackgroundColor,
                   child: chat,
+                );
+
+                final overlayChat = Visibility(
+                  visible: settingsStore.fullScreenChatOverlay,
+                  maintainState: true,
+                  child: Theme(
+                    data: darkTheme,
+                    child: DefaultTextStyle(
+                      style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
+                      child: landscapeChat,
+                    ),
+                  ),
                 );
 
                 return ColoredBox(
@@ -176,38 +194,22 @@ class _VideoChatState extends State<VideoChat> {
                     child: settingsStore.showVideo
                         ? settingsStore.fullScreen
                             ? Stack(
-                                alignment: settingsStore.landscapeChatLeftSide ? Alignment.topLeft : Alignment.topRight,
                                 children: [
-                                  video,
-                                  IgnorePointer(
-                                    ignoring: _videoStore.overlayVisible,
-                                    child: Visibility(
-                                      visible: settingsStore.fullScreenChatOverlay,
-                                      maintainState: true,
-                                      child: DefaultTextStyle(
-                                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
-                                        child: landscapeChat,
-                                      ),
-                                    ),
-                                  ),
+                                  player,
+                                  Row(
+                                    children: settingsStore.landscapeChatLeftSide
+                                        ? [overlayChat, Expanded(child: overlay)]
+                                        : [Expanded(child: overlay), overlayChat],
+                                  )
                                 ],
                               )
                             : Row(
                                 children: settingsStore.landscapeChatLeftSide
-                                    ? [
-                                        landscapeChat,
-                                        Expanded(child: video),
-                                      ]
-                                    : [
-                                        Expanded(child: video),
-                                        landscapeChat,
-                                      ],
+                                    ? [landscapeChat, Expanded(child: video)]
+                                    : [Expanded(child: video), landscapeChat],
                               )
                         : Column(
-                            children: [
-                              appBar,
-                              Expanded(child: chat),
-                            ],
+                            children: [appBar, Expanded(child: chat)],
                           ),
                   ),
                 );
@@ -224,13 +226,9 @@ class _VideoChatState extends State<VideoChat> {
               children: [
                 Observer(
                   builder: (_) {
-                    if (settingsStore.showVideo) {
-                      return AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: video,
-                      );
-                    }
-                    return appBar;
+                    if (!settingsStore.showVideo) return appBar;
+
+                    return AspectRatio(aspectRatio: 16 / 9, child: video);
                   },
                 ),
                 Expanded(child: chat),

@@ -37,6 +37,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..landscapeChatWidth =
           (json['landscapeChatWidth'] as num?)?.toDouble() ?? 0.3
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+      ..fullScreenChatOverlayOpacity =
+          (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true
@@ -67,6 +69,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'emoteAutocomplete': instance.emoteAutocomplete,
       'landscapeChatWidth': instance.landscapeChatWidth,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
@@ -448,6 +451,24 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$fullScreenChatOverlayOpacityAtom = Atom(
+      name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
+      context: context);
+
+  @override
+  double get fullScreenChatOverlayOpacity {
+    _$fullScreenChatOverlayOpacityAtom.reportRead();
+    return super.fullScreenChatOverlayOpacity;
+  }
+
+  @override
+  set fullScreenChatOverlayOpacity(double value) {
+    _$fullScreenChatOverlayOpacityAtom
+        .reportWrite(value, super.fullScreenChatOverlayOpacity, () {
+      super.fullScreenChatOverlayOpacity = value;
+    });
+  }
+
   late final _$sendCrashLogsAtom =
       Atom(name: '_SettingsStoreBase.sendCrashLogs', context: context);
 
@@ -568,6 +589,7 @@ emoteScale: ${emoteScale},
 emoteAutocomplete: ${emoteAutocomplete},
 landscapeChatWidth: ${landscapeChatWidth},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
+fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo},

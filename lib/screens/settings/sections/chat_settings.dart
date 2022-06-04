@@ -86,6 +86,23 @@ class _ChatSettingsState extends State<ChatSettings> {
               onChanged: (newValue) => settingsStore.landscapeChatWidth = newValue,
             ),
           ),
+          const SizedBox(height: 15.0),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Landscape Chat Overlay Opacity'),
+                const Spacer(),
+                Text('${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.fullScreenChatOverlayOpacity,
+              min: 0.0,
+              max: 1.0,
+              divisions: 10,
+              onChanged: (newValue) => settingsStore.fullScreenChatOverlayOpacity = newValue,
+            ),
+          ),
           const SectionHeader(
             'Emotes',
             fontSize: 12.0,

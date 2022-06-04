@@ -93,6 +93,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultChatDelay = 0.0;
 
+  static const defaultFullScreenChatOverlayOpacity = 0.5;
+
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
   var showBottomBar = defaultShowBottomBar;
@@ -148,6 +150,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
   @observable
   var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+
+  @JsonKey(defaultValue: defaultFullScreenChatOverlayOpacity)
+  @observable
+  var fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
   // * Other settings
   static const defaultSendCrashLogs = true;
@@ -209,6 +215,7 @@ abstract class _SettingsStoreBase with Store {
     landscapeChatWidth = defaultLandscapeChatWidth;
     landscapeChatLeftSide = false;
     chatDelay = defaultChatDelay;
+    fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
     // * Other settings
     sendCrashLogs = defaultSendCrashLogs;
