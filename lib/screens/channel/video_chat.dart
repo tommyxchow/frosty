@@ -196,11 +196,12 @@ class _VideoChatState extends State<VideoChat> {
                             ? Stack(
                                 children: [
                                   player,
-                                  Row(
-                                    children: settingsStore.landscapeChatLeftSide
-                                        ? [overlayChat, Expanded(child: overlay)]
-                                        : [Expanded(child: overlay), overlayChat],
-                                  )
+                                  if (settingsStore.showOverlay)
+                                    Row(
+                                      children: settingsStore.landscapeChatLeftSide
+                                          ? [overlayChat, Expanded(child: overlay)]
+                                          : [Expanded(child: overlay), overlayChat],
+                                    )
                                 ],
                               )
                             : Row(
