@@ -18,6 +18,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
+      ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
@@ -54,6 +55,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
       'pictureInPicture': instance.pictureInPicture,
+      'overlayOpacity': instance.overlayOpacity,
       'showBottomBar': instance.showBottomBar,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
@@ -221,6 +223,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set pictureInPicture(bool value) {
     _$pictureInPictureAtom.reportWrite(value, super.pictureInPicture, () {
       super.pictureInPicture = value;
+    });
+  }
+
+  late final _$overlayOpacityAtom =
+      Atom(name: '_SettingsStoreBase.overlayOpacity', context: context);
+
+  @override
+  double get overlayOpacity {
+    _$overlayOpacityAtom.reportRead();
+    return super.overlayOpacity;
+  }
+
+  @override
+  set overlayOpacity(double value) {
+    _$overlayOpacityAtom.reportWrite(value, super.overlayOpacity, () {
+      super.overlayOpacity = value;
     });
   }
 
@@ -574,6 +592,7 @@ showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
+overlayOpacity: ${overlayOpacity},
 showBottomBar: ${showBottomBar},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},

@@ -46,6 +46,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultPictureInPicture = false;
 
+  static const defaultOverlayOpacity = 0.5;
+
   @JsonKey(defaultValue: defaultShowVideo)
   @observable
   var showVideo = defaultShowVideo;
@@ -61,6 +63,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultPictureInPicture)
   @observable
   var pictureInPicture = defaultPictureInPicture;
+
+  @JsonKey(defaultValue: defaultOverlayOpacity)
+  @observable
+  var overlayOpacity = defaultOverlayOpacity;
 
   // * Chat Settings
   static const defaultShowBottomBar = true;
@@ -198,6 +204,7 @@ abstract class _SettingsStoreBase with Store {
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
     pictureInPicture = defaultPictureInPicture;
+    overlayOpacity = defaultOverlayOpacity;
 
     // * Chat Settings
     showBottomBar = defaultShowBottomBar;

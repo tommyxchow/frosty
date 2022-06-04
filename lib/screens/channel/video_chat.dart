@@ -100,7 +100,7 @@ class _VideoChatState extends State<VideoChat> {
             opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 200),
             child: ColoredBox(
-              color: const Color.fromRGBO(0, 0, 0, 0.5),
+              color: Colors.black.withOpacity(settingsStore.overlayOpacity),
               child: IgnorePointer(
                 ignoring: !_videoStore.overlayVisible,
                 child: videoOverlay,
