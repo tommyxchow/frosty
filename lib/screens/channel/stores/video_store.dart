@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -168,12 +169,14 @@ abstract class VideoStoreBase with Store {
     // Determine whether the device is an iPad or not.
     // Used to show or hide the rotate button on the overlay.
     // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
-    final deviceInfo = DeviceInfoPlugin();
-    final info = await deviceInfo.iosInfo;
-    if (info.model?.toLowerCase().contains('ipad') == true) {
-      _isIPad = true;
-    } else {
-      _isIPad = false;
+    if (Platform.isIOS) {
+      final deviceInfo = DeviceInfoPlugin();
+      final info = await deviceInfo.iosInfo;
+      if (info.model?.toLowerCase().contains('ipad') == true) {
+        _isIPad = true;
+      } else {
+        _isIPad = false;
+      }
     }
   }
 
