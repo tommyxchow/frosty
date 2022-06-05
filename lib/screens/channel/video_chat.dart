@@ -72,12 +72,12 @@ class _VideoChatState extends State<VideoChat> {
   Widget build(BuildContext context) {
     final settingsStore = _chatStore.settings;
 
-    final player = Video(
+    final player = _Video(
       key: _videoKey,
       videoStore: _videoStore,
     );
 
-    final videoOverlay = VideoOverlay(videoStore: _videoStore);
+    final videoOverlay = _VideoOverlay(videoStore: _videoStore);
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
@@ -257,10 +257,10 @@ class _VideoChatState extends State<VideoChat> {
 }
 
 /// Creates a [WebView] widget that shows a channel's video stream.
-class Video extends StatelessWidget {
+class _Video extends StatelessWidget {
   final VideoStore videoStore;
 
-  const Video({
+  const _Video({
     Key? key,
     required this.videoStore,
   }) : super(key: key);
@@ -281,11 +281,11 @@ class Video extends StatelessWidget {
   }
 }
 
-/// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
-class VideoOverlay extends StatelessWidget {
+/// Creates a widget containing controls which enable interactions with an underlying [_Video] widget.
+class _VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
 
-  const VideoOverlay({Key? key, required this.videoStore}) : super(key: key);
+  const _VideoOverlay({Key? key, required this.videoStore}) : super(key: key);
 
   Future<void> _showSleepTimerDialog(BuildContext context) {
     return showDialog(
@@ -389,11 +389,13 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
-    final chatOverlayButton = IconButton(
-      tooltip: 'Toggle Chat Overlay',
-      onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
-      icon: const Icon(Icons.chat_bubble_outline),
-      color: Colors.white,
+    final chatOverlayButton = Observer(
+      builder: (_) => IconButton(
+        tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide Chat Overlay' : 'Show Chat Overlay',
+        onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
+        icon: videoStore.settingsStore.fullScreenChatOverlay ? const Icon(Icons.chat_bubble_outline) : const Icon(Icons.chat_bubble),
+        color: Colors.white,
+      ),
     );
 
     final refreshButton = IconButton(
