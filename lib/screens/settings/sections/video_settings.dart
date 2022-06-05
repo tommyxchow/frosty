@@ -49,6 +49,23 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.toggleableOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
           ),
+          const SizedBox(height: 15.0),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Custom Overlay Opacity'),
+                const Spacer(),
+                Text('${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.overlayOpacity,
+              min: 0.0,
+              max: 1.0,
+              divisions: 10,
+              onChanged: (newValue) => settingsStore.overlayOpacity = newValue,
+            ),
+          ),
         ],
       ),
     );

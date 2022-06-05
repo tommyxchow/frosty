@@ -75,15 +75,32 @@ class _ChatSettingsState extends State<ChatSettings> {
               children: [
                 const Text('Landscape Chat Width'),
                 const Spacer(),
-                Text('${(settingsStore.landscapeChatWidth * 100).toInt()}%'),
+                Text('${(settingsStore.chatWidth * 100).toStringAsFixed(0)}%'),
               ],
             ),
             subtitle: Slider.adaptive(
-              value: settingsStore.landscapeChatWidth,
+              value: settingsStore.chatWidth,
               min: 0.2,
-              max: 0.8,
-              divisions: 12,
-              onChanged: (newValue) => settingsStore.landscapeChatWidth = newValue,
+              max: 0.6,
+              divisions: 8,
+              onChanged: (newValue) => settingsStore.chatWidth = newValue,
+            ),
+          ),
+          const SizedBox(height: 15.0),
+          ListTile(
+            title: Row(
+              children: [
+                const Text('Landscape Chat Overlay Opacity'),
+                const Spacer(),
+                Text('${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%'),
+              ],
+            ),
+            subtitle: Slider.adaptive(
+              value: settingsStore.fullScreenChatOverlayOpacity,
+              min: 0.0,
+              max: 1.0,
+              divisions: 10,
+              onChanged: (newValue) => settingsStore.fullScreenChatOverlayOpacity = newValue,
             ),
           ),
           const SectionHeader(

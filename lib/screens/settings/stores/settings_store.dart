@@ -46,6 +46,8 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultPictureInPicture = false;
 
+  static const defaultOverlayOpacity = 0.5;
+
   @JsonKey(defaultValue: defaultShowVideo)
   @observable
   var showVideo = defaultShowVideo;
@@ -61,6 +63,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultPictureInPicture)
   @observable
   var pictureInPicture = defaultPictureInPicture;
+
+  @JsonKey(defaultValue: defaultOverlayOpacity)
+  @observable
+  var overlayOpacity = defaultOverlayOpacity;
 
   // * Chat Settings
   static const defaultShowBottomBar = true;
@@ -87,11 +93,13 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultEmoteAutocomplete = true;
 
-  static const defaultLandscapeChatWidth = 0.3;
+  static const defaultChatWidth = 0.3;
 
   static const defaultLandscapeChatLeftSide = false;
 
   static const defaultChatDelay = 0.0;
+
+  static const defaultFullScreenChatOverlayOpacity = 0.5;
 
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
@@ -141,13 +149,17 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteAutocomplete = defaultEmoteAutocomplete;
 
-  @JsonKey(defaultValue: defaultLandscapeChatWidth)
+  @JsonKey(defaultValue: defaultChatWidth)
   @observable
-  var landscapeChatWidth = defaultLandscapeChatWidth;
+  var chatWidth = defaultChatWidth;
 
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
   @observable
   var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+
+  @JsonKey(defaultValue: defaultFullScreenChatOverlayOpacity)
+  @observable
+  var fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
   // * Other settings
   static const defaultSendCrashLogs = true;
@@ -192,6 +204,7 @@ abstract class _SettingsStoreBase with Store {
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
     pictureInPicture = defaultPictureInPicture;
+    overlayOpacity = defaultOverlayOpacity;
 
     // * Chat Settings
     showBottomBar = defaultShowBottomBar;
@@ -206,9 +219,10 @@ abstract class _SettingsStoreBase with Store {
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
     emoteAutocomplete = defaultEmoteAutocomplete;
-    landscapeChatWidth = defaultLandscapeChatWidth;
+    chatWidth = defaultChatWidth;
     landscapeChatLeftSide = false;
     chatDelay = defaultChatDelay;
+    fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
     // * Other settings
     sendCrashLogs = defaultSendCrashLogs;

@@ -18,6 +18,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
+      ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
@@ -34,9 +35,10 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..emoteAutocomplete = json['emoteAutocomplete'] as bool? ?? true
-      ..landscapeChatWidth =
-          (json['landscapeChatWidth'] as num?)?.toDouble() ?? 0.3
+      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+      ..fullScreenChatOverlayOpacity =
+          (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..expandInfo = json['expandInfo'] as bool? ?? true
@@ -53,6 +55,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
       'pictureInPicture': instance.pictureInPicture,
+      'overlayOpacity': instance.overlayOpacity,
       'showBottomBar': instance.showBottomBar,
       'showDeletedMessages': instance.showDeletedMessages,
       'showZeroWidth': instance.showZeroWidth,
@@ -65,8 +68,9 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'emoteAutocomplete': instance.emoteAutocomplete,
-      'landscapeChatWidth': instance.landscapeChatWidth,
+      'chatWidth': instance.chatWidth,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'expandInfo': instance.expandInfo,
@@ -219,6 +223,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set pictureInPicture(bool value) {
     _$pictureInPictureAtom.reportWrite(value, super.pictureInPicture, () {
       super.pictureInPicture = value;
+    });
+  }
+
+  late final _$overlayOpacityAtom =
+      Atom(name: '_SettingsStoreBase.overlayOpacity', context: context);
+
+  @override
+  double get overlayOpacity {
+    _$overlayOpacityAtom.reportRead();
+    return super.overlayOpacity;
+  }
+
+  @override
+  set overlayOpacity(double value) {
+    _$overlayOpacityAtom.reportWrite(value, super.overlayOpacity, () {
+      super.overlayOpacity = value;
     });
   }
 
@@ -415,19 +435,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$landscapeChatWidthAtom =
-      Atom(name: '_SettingsStoreBase.landscapeChatWidth', context: context);
+  late final _$chatWidthAtom =
+      Atom(name: '_SettingsStoreBase.chatWidth', context: context);
 
   @override
-  double get landscapeChatWidth {
-    _$landscapeChatWidthAtom.reportRead();
-    return super.landscapeChatWidth;
+  double get chatWidth {
+    _$chatWidthAtom.reportRead();
+    return super.chatWidth;
   }
 
   @override
-  set landscapeChatWidth(double value) {
-    _$landscapeChatWidthAtom.reportWrite(value, super.landscapeChatWidth, () {
-      super.landscapeChatWidth = value;
+  set chatWidth(double value) {
+    _$chatWidthAtom.reportWrite(value, super.chatWidth, () {
+      super.chatWidth = value;
     });
   }
 
@@ -445,6 +465,24 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
         () {
       super.landscapeChatLeftSide = value;
+    });
+  }
+
+  late final _$fullScreenChatOverlayOpacityAtom = Atom(
+      name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
+      context: context);
+
+  @override
+  double get fullScreenChatOverlayOpacity {
+    _$fullScreenChatOverlayOpacityAtom.reportRead();
+    return super.fullScreenChatOverlayOpacity;
+  }
+
+  @override
+  set fullScreenChatOverlayOpacity(double value) {
+    _$fullScreenChatOverlayOpacityAtom
+        .reportWrite(value, super.fullScreenChatOverlayOpacity, () {
+      super.fullScreenChatOverlayOpacity = value;
     });
   }
 
@@ -554,6 +592,7 @@ showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
+overlayOpacity: ${overlayOpacity},
 showBottomBar: ${showBottomBar},
 showDeletedMessages: ${showDeletedMessages},
 showZeroWidth: ${showZeroWidth},
@@ -566,8 +605,9 @@ messageScale: ${messageScale},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 emoteAutocomplete: ${emoteAutocomplete},
-landscapeChatWidth: ${landscapeChatWidth},
+chatWidth: ${chatWidth},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
+fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 expandInfo: ${expandInfo},

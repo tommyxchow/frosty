@@ -73,9 +73,7 @@ class ChatBottomBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (!chatStore.expandChat &&
-                    chatStore.settings.landscapeChatWidth < 0.3 &&
-                    MediaQuery.of(context).orientation == Orientation.landscape)
+                if (!chatStore.expandChat && chatStore.settings.chatWidth < 0.3 && MediaQuery.of(context).orientation == Orientation.landscape)
                   IconButton(
                       tooltip: 'Send a Message',
                       onPressed: () {
@@ -115,7 +113,7 @@ class ChatBottomBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (chatStore.settings.landscapeChatWidth > 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait)
+                if (chatStore.settings.chatWidth > 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait)
                   IconButton(
                     tooltip: 'Send',
                     icon: const Icon(Icons.send),
