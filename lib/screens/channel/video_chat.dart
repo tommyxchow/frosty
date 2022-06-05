@@ -252,6 +252,8 @@ class _VideoChatState extends State<VideoChat> {
       overlays: SystemUiOverlay.values,
     );
 
+    SystemChrome.setPreferredOrientations([]);
+
     super.dispose();
   }
 }
@@ -430,6 +432,21 @@ class _VideoOverlay extends StatelessWidget {
       onPressed: () => _showSleepTimerDialog(context),
     );
 
+    final rotateButton = IconButton(
+      tooltip: orientation == Orientation.portrait ? 'Enter Landscape Mode (Lock)' : 'Exit Landscape Mode',
+      onPressed: () {
+        if (orientation == Orientation.portrait) {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.landscapeRight,
+            DeviceOrientation.landscapeLeft,
+          ]);
+        } else {
+          SystemChrome.setPreferredOrientations([]);
+        }
+      },
+      icon: orientation == Orientation.portrait ? const Icon(Icons.screen_lock_rotation) : const Icon(Icons.screen_rotation),
+    );
+
     final streamInfo = videoStore.streamInfo;
     if (streamInfo == null) {
       return Stack(
@@ -583,7 +600,8 @@ class _VideoOverlay extends StatelessWidget {
                     ),
                   if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                   refreshButton,
-                  if (orientation == Orientation.landscape) fullScreenButton
+                  rotateButton,
+                  if (orientation == Orientation.landscape) fullScreenButton,
                 ],
               ),
             )
