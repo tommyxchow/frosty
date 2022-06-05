@@ -433,18 +433,35 @@ class _VideoOverlay extends StatelessWidget {
     );
 
     final rotateButton = IconButton(
-      tooltip: orientation == Orientation.portrait ? 'Enter Landscape Mode (Lock)' : 'Exit Landscape Mode',
+      tooltip: orientation == Orientation.portrait ? 'Enter Landscape Mode' : 'Exit Landscape Mode',
+      icon: const Icon(
+        Icons.screen_rotation,
+        color: Colors.white,
+      ),
       onPressed: () {
-        if (orientation == Orientation.portrait) {
-          SystemChrome.setPreferredOrientations([
-            DeviceOrientation.landscapeRight,
-            DeviceOrientation.landscapeLeft,
-          ]);
+        if (Platform.isIOS) {
+          if (orientation == Orientation.portrait) {
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.landscapeRight,
+            ]);
+            SystemChrome.setPreferredOrientations([]);
+          } else {
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+            ]);
+            SystemChrome.setPreferredOrientations([]);
+          }
         } else {
-          SystemChrome.setPreferredOrientations([]);
+          if (orientation == Orientation.portrait) {
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.landscapeRight,
+              DeviceOrientation.landscapeLeft,
+            ]);
+          } else {
+            SystemChrome.setPreferredOrientations([]);
+          }
         }
       },
-      icon: orientation == Orientation.portrait ? const Icon(Icons.screen_lock_rotation) : const Icon(Icons.screen_rotation),
     );
 
     final streamInfo = videoStore.streamInfo;
@@ -600,7 +617,7 @@ class _VideoOverlay extends StatelessWidget {
                     ),
                   if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                   refreshButton,
-                  rotateButton,
+                  if (!videoStore.isIPad) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
               ),

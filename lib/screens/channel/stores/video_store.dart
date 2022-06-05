@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/api/twitch_api.dart';
@@ -36,6 +37,9 @@ abstract class VideoStoreBase with Store {
 
   @readonly
   var _overlayVisible = true;
+
+  @readonly
+  var _isIPad = false;
 
   @readonly
   StreamTwitch? _streamInfo;
@@ -152,12 +156,24 @@ abstract class VideoStoreBase with Store {
     return NavigationDecision.prevent;
   }
 
-  void initVideo() {
+  @action
+  Future<void> initVideo() async {
     try {
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => Pause.postMessage("video paused"));');
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("play", () => Play.postMessage("video playing"));');
     } catch (e) {
       debugPrint(e.toString());
+    }
+
+    // Determine whether the device is an iPad or not.
+    // Used to show or hide the rotate button on the overlay.
+    // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
+    final deviceInfo = DeviceInfoPlugin();
+    final info = await deviceInfo.iosInfo;
+    if (info.model?.toLowerCase().contains('ipad') == true) {
+      _isIPad = true;
+    } else {
+      _isIPad = false;
     }
   }
 
