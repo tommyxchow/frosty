@@ -522,6 +522,7 @@ class _VideoOverlay extends StatelessWidget {
               children: [
                 backButton,
                 const Spacer(),
+                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                 sleepTimerButton,
                 settingsButton,
               ],
@@ -611,7 +612,6 @@ class _VideoOverlay extends StatelessWidget {
                       ),
                       onPressed: videoStore.requestPictureInPicture,
                     ),
-                  if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                   refreshButton,
                   if (!videoStore.isIPad) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,
