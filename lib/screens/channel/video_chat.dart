@@ -72,9 +72,12 @@ class _VideoChatState extends State<VideoChat> {
   Widget build(BuildContext context) {
     final settingsStore = _chatStore.settings;
 
-    final player = _Video(
-      key: _videoKey,
-      videoStore: _videoStore,
+    final player = GestureDetector(
+      onLongPress: _videoStore.handleToggleOverlay,
+      child: _Video(
+        key: _videoKey,
+        videoStore: _videoStore,
+      ),
     );
 
     final videoOverlay = _VideoOverlay(videoStore: _videoStore);
@@ -251,6 +254,8 @@ class _VideoChatState extends State<VideoChat> {
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,
     );
+
+    SystemChrome.setPreferredOrientations([]);
 
     super.dispose();
   }
@@ -430,6 +435,34 @@ class _VideoOverlay extends StatelessWidget {
       onPressed: () => _showSleepTimerDialog(context),
     );
 
+    final rotateButton = IconButton(
+      tooltip: orientation == Orientation.portrait ? 'Enter Landscape Mode' : 'Exit Landscape Mode',
+      icon: const Icon(
+        Icons.screen_rotation,
+        color: Colors.white,
+      ),
+      onPressed: () {
+        if (orientation == Orientation.portrait) {
+          if (Platform.isIOS) {
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.landscapeRight,
+            ]);
+            SystemChrome.setPreferredOrientations([]);
+          } else {
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.landscapeRight,
+              DeviceOrientation.landscapeLeft,
+            ]);
+          }
+        } else {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+          ]);
+          SystemChrome.setPreferredOrientations([]);
+        }
+      },
+    );
+
     final streamInfo = videoStore.streamInfo;
     if (streamInfo == null) {
       return Stack(
@@ -439,6 +472,7 @@ class _VideoOverlay extends StatelessWidget {
             children: [
               backButton,
               const Spacer(),
+              if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
               settingsButton,
             ],
           ),
@@ -447,8 +481,8 @@ class _VideoOverlay extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                 refreshButton,
+                if (!videoStore.isIPad) rotateButton,
                 if (orientation == Orientation.landscape) fullScreenButton,
               ],
             ),
@@ -492,6 +526,7 @@ class _VideoOverlay extends StatelessWidget {
               children: [
                 backButton,
                 const Spacer(),
+                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                 sleepTimerButton,
                 settingsButton,
               ],
@@ -581,9 +616,9 @@ class _VideoOverlay extends StatelessWidget {
                       ),
                       onPressed: videoStore.requestPictureInPicture,
                     ),
-                  if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                   refreshButton,
-                  if (orientation == Orientation.landscape) fullScreenButton
+                  if (!videoStore.isIPad) rotateButton,
+                  if (orientation == Orientation.landscape) fullScreenButton,
                 ],
               ),
             )
