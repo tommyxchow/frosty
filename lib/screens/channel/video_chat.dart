@@ -439,27 +439,23 @@ class _VideoOverlay extends StatelessWidget {
         color: Colors.white,
       ),
       onPressed: () {
-        if (Platform.isIOS) {
-          if (orientation == Orientation.portrait) {
+        if (orientation == Orientation.portrait) {
+          if (Platform.isIOS) {
             SystemChrome.setPreferredOrientations([
               DeviceOrientation.landscapeRight,
             ]);
             SystemChrome.setPreferredOrientations([]);
           } else {
-            SystemChrome.setPreferredOrientations([
-              DeviceOrientation.portraitUp,
-            ]);
-            SystemChrome.setPreferredOrientations([]);
-          }
-        } else {
-          if (orientation == Orientation.portrait) {
             SystemChrome.setPreferredOrientations([
               DeviceOrientation.landscapeRight,
               DeviceOrientation.landscapeLeft,
             ]);
-          } else {
-            SystemChrome.setPreferredOrientations([]);
           }
+        } else {
+          SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+          ]);
+          SystemChrome.setPreferredOrientations([]);
         }
       },
     );
