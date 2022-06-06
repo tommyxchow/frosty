@@ -72,9 +72,12 @@ class _VideoChatState extends State<VideoChat> {
   Widget build(BuildContext context) {
     final settingsStore = _chatStore.settings;
 
-    final player = _Video(
-      key: _videoKey,
-      videoStore: _videoStore,
+    final player = GestureDetector(
+      onLongPress: _videoStore.handleToggleOverlay,
+      child: _Video(
+        key: _videoKey,
+        videoStore: _videoStore,
+      ),
     );
 
     final videoOverlay = _VideoOverlay(videoStore: _videoStore);
