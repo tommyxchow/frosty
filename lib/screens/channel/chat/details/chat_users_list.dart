@@ -117,6 +117,7 @@ class _ChattersListState extends State<ChattersList> {
                     }
 
                     return CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
                       slivers: [
                         SliverPadding(
