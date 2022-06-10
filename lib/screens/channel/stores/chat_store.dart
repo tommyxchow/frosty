@@ -125,10 +125,16 @@ abstract class ChatStoreBase with Store {
       }
     });
 
-    // Add a listener to the textfield focus that will hide the emote menu if it is currently shown.
     textFieldFocusNode.addListener(() {
-      if (textFieldFocusNode.hasFocus && assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
+      if (textFieldFocusNode.hasFocus) {
+        // Hide the emote menu if it is currently shown.
+        if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
 
+        // Refresh the chatters list to keep autocomplete mentions updated.
+        if (settings.autocomplete) chatDetailsStore.updateChatters(channelName);
+      }
+
+      // Un-expand the chat when unfocusing.
       if (!textFieldFocusNode.hasFocus) expandChat = false;
     });
 
