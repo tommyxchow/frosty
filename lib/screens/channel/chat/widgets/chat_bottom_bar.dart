@@ -27,58 +27,62 @@ class ChatBottomBar extends StatelessWidget {
 
         return Column(
           children: [
-            if (chatStore.settings.autocomplete && (chatStore.showEmoteAutocomplete || chatStore.showMentionAutocomplete)) ...[
+            if (chatStore.settings.autocomplete && chatStore.showEmoteAutocomplete && matchingEmotes.isNotEmpty) ...[
               const Divider(
                 height: 1.0,
                 thickness: 1.0,
               ),
-              if (chatStore.showEmoteAutocomplete && matchingEmotes.isNotEmpty)
-                SizedBox(
-                  height: 50,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    itemCount: matchingEmotes.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => InkWell(
-                      onTap: () => chatStore.addEmote(matchingEmotes[index], autocompleteMode: true),
-                      child: Tooltip(
-                        message: matchingEmotes[index].name,
-                        preferBelow: false,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                          child: Center(
-                            child: CachedNetworkImage(
-                              imageUrl: matchingEmotes[index].url,
-                              fadeInDuration: const Duration(),
-                              height: matchingEmotes[index].height?.toDouble() ?? defaultEmoteSize,
-                              width: matchingEmotes[index].width?.toDouble(),
-                            ),
+              SizedBox(
+                height: 50,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  itemCount: matchingEmotes.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) => InkWell(
+                    onTap: () => chatStore.addEmote(matchingEmotes[index], autocompleteMode: true),
+                    child: Tooltip(
+                      message: matchingEmotes[index].name,
+                      preferBelow: false,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        child: Center(
+                          child: CachedNetworkImage(
+                            imageUrl: matchingEmotes[index].url,
+                            fadeInDuration: const Duration(),
+                            height: matchingEmotes[index].height?.toDouble() ?? defaultEmoteSize,
+                            width: matchingEmotes[index].width?.toDouble(),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              if (chatStore.showMentionAutocomplete && matchingChatters.isNotEmpty)
-                SizedBox(
-                  height: 50,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    itemCount: matchingChatters.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) => TextButton(
-                      onPressed: () {
-                        final split = chatStore.textController.text.split(' ')
-                          ..removeLast()
-                          ..add('@${matchingChatters[index]} ');
+              ),
+            ],
+            if (chatStore.settings.autocomplete && chatStore.showMentionAutocomplete && matchingChatters.isNotEmpty) ...[
+              const Divider(
+                height: 1.0,
+                thickness: 1.0,
+              ),
+              SizedBox(
+                height: 50,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  itemCount: matchingChatters.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) => TextButton(
+                    onPressed: () {
+                      final split = chatStore.textController.text.split(' ')
+                        ..removeLast()
+                        ..add('@${matchingChatters[index]} ');
 
-                        chatStore.textController.text = split.join(' ');
-                        chatStore.textController.selection = TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
-                      },
-                      child: Text(matchingChatters[index]),
-                    ),
+                      chatStore.textController.text = split.join(' ');
+                      chatStore.textController.selection = TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
+                    },
+                    child: Text(matchingChatters[index]),
                   ),
-                )
+                ),
+              )
             ],
             Row(
               children: [
