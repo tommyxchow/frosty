@@ -91,7 +91,7 @@ abstract class _SettingsStoreBase with Store {
 
   static const defaultEmoteScale = 1.0;
 
-  static const defaultEmoteAutocomplete = true;
+  static const defaultAutocomplete = true;
 
   static const defaultChatWidth = 0.3;
 
@@ -145,9 +145,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteScale = defaultEmoteScale;
 
-  @JsonKey(defaultValue: defaultEmoteAutocomplete)
+  @JsonKey(defaultValue: defaultAutocomplete)
   @observable
-  var emoteAutocomplete = defaultEmoteAutocomplete;
+  var autocomplete = defaultAutocomplete;
 
   @JsonKey(defaultValue: defaultChatWidth)
   @observable
@@ -218,7 +218,7 @@ abstract class _SettingsStoreBase with Store {
     messageSpacing = defaultMessageSpacing;
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
-    emoteAutocomplete = defaultEmoteAutocomplete;
+    autocomplete = defaultAutocomplete;
     chatWidth = defaultChatWidth;
     landscapeChatLeftSide = false;
     chatDelay = defaultChatDelay;
