@@ -34,7 +34,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
       ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
-      ..emoteAutocomplete = json['emoteAutocomplete'] as bool? ?? true
+      ..autocomplete = json['autocomplete'] as bool? ?? true
       ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
       ..fullScreenChatOverlayOpacity =
@@ -67,7 +67,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'messageScale': instance.messageScale,
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
-      'emoteAutocomplete': instance.emoteAutocomplete,
+      'autocomplete': instance.autocomplete,
       'chatWidth': instance.chatWidth,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
@@ -419,19 +419,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$emoteAutocompleteAtom =
-      Atom(name: '_SettingsStoreBase.emoteAutocomplete', context: context);
+  late final _$autocompleteAtom =
+      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
 
   @override
-  bool get emoteAutocomplete {
-    _$emoteAutocompleteAtom.reportRead();
-    return super.emoteAutocomplete;
+  bool get autocomplete {
+    _$autocompleteAtom.reportRead();
+    return super.autocomplete;
   }
 
   @override
-  set emoteAutocomplete(bool value) {
-    _$emoteAutocompleteAtom.reportWrite(value, super.emoteAutocomplete, () {
-      super.emoteAutocomplete = value;
+  set autocomplete(bool value) {
+    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
+      super.autocomplete = value;
     });
   }
 
@@ -604,7 +604,7 @@ messageSpacing: ${messageSpacing},
 messageScale: ${messageScale},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
-emoteAutocomplete: ${emoteAutocomplete},
+autocomplete: ${autocomplete},
 chatWidth: ${chatWidth},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},

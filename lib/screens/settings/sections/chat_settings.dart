@@ -38,6 +38,14 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
         ),
         children: [
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Autocomplete'),
+            subtitle: const Text('Shows a bar that suggests matching emotes and mentions when typing.'),
+            value: settingsStore.autocomplete,
+            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
+          ),
+          const SizedBox(height: 15.0),
           ListTile(
             title: Row(
               children: [
@@ -107,13 +115,6 @@ class _ChatSettingsState extends State<ChatSettings> {
             'Emotes',
             fontSize: 12.0,
             padding: sectionPadding,
-          ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Emote Autocomplete'),
-            subtitle: const Text('Shows a bar that suggests matching emotes when typing.'),
-            value: settingsStore.emoteAutocomplete,
-            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.emoteAutocomplete = newValue : null,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,

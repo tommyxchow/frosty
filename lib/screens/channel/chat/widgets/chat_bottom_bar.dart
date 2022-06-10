@@ -14,16 +14,20 @@ class ChatBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        final emotes = [
+        final matchingEmotes = [
           ...chatStore.assetsStore.userEmoteToObject.values,
           ...chatStore.assetsStore.bttvEmotes,
           ...chatStore.assetsStore.ffzEmotes,
           ...chatStore.assetsStore.sevenTVEmotes
         ].where((emote) => emote.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase())).toList();
 
+        final matchingChatters = chatStore.chatDetailsStore.allChatters
+            .where((chatter) => chatter.contains(chatStore.textController.text.split(' ').last.replaceFirst('@', '').toLowerCase()))
+            .toList();
+
         return Column(
           children: [
-            if (chatStore.settings.emoteAutocomplete && chatStore.showAutocomplete && emotes.isNotEmpty) ...[
+            if (chatStore.settings.autocomplete && chatStore.showEmoteAutocomplete && matchingEmotes.isNotEmpty) ...[
               const Divider(
                 height: 1.0,
                 thickness: 1.0,
@@ -32,25 +36,50 @@ class ChatBottomBar extends StatelessWidget {
                 height: 50,
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  itemCount: emotes.length,
+                  itemCount: matchingEmotes.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => InkWell(
-                    onTap: () => chatStore.addEmote(emotes[index], autocompleteMode: true),
+                    onTap: () => chatStore.addEmote(matchingEmotes[index], autocompleteMode: true),
                     child: Tooltip(
-                      message: emotes[index].name,
+                      message: matchingEmotes[index].name,
                       preferBelow: false,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: Center(
                           child: CachedNetworkImage(
-                            imageUrl: emotes[index].url,
+                            imageUrl: matchingEmotes[index].url,
                             fadeInDuration: const Duration(),
-                            height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
-                            width: emotes[index].width?.toDouble(),
+                            height: matchingEmotes[index].height?.toDouble() ?? defaultEmoteSize,
+                            width: matchingEmotes[index].width?.toDouble(),
                           ),
                         ),
                       ),
                     ),
+                  ),
+                ),
+              ),
+            ],
+            if (chatStore.settings.autocomplete && chatStore.showMentionAutocomplete && matchingChatters.isNotEmpty) ...[
+              const Divider(
+                height: 1.0,
+                thickness: 1.0,
+              ),
+              SizedBox(
+                height: 50,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  itemCount: matchingChatters.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) => TextButton(
+                    onPressed: () {
+                      final split = chatStore.textController.text.split(' ')
+                        ..removeLast()
+                        ..add('@${matchingChatters[index]} ');
+
+                      chatStore.textController.text = split.join(' ');
+                      chatStore.textController.selection = TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
+                    },
+                    child: Text(matchingChatters[index]),
                   ),
                 ),
               )
