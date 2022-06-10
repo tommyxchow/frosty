@@ -72,7 +72,10 @@ abstract class ChatStoreBase with Store {
   var _autoScroll = true;
 
   @readonly
-  var _showAutocomplete = false;
+  var _showEmoteAutocomplete = false;
+
+  @readonly
+  var _showMentionAutocomplete = false;
 
   /// The logged-in user's appearance in chat.
   @readonly
@@ -100,6 +103,7 @@ abstract class ChatStoreBase with Store {
     ));
 
     assetsStore.init();
+    chatDetailsStore.updateChatters(channelName);
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
@@ -130,8 +134,10 @@ abstract class ChatStoreBase with Store {
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
     // Will also rebuild the autocomplete bar when typing, refreshing the results as the user types.
-    textController
-        .addListener(() => _showAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty ? true : false);
+    textController.addListener(
+        () => _showEmoteAutocomplete = !_showMentionAutocomplete && textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty);
+
+    textController.addListener(() => _showMentionAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.startsWith('@'));
   }
 
   /// Handle and process the provided string-representation of the IRC data.
@@ -342,7 +348,7 @@ abstract class ChatStoreBase with Store {
   void addEmote(Emote emote, {bool autocompleteMode = false}) {
     if (textController.text.isEmpty || textController.text.endsWith(' ')) {
       textController.text += '${emote.name} ';
-    } else if (autocompleteMode && _showAutocomplete && textController.text.endsWith('')) {
+    } else if (autocompleteMode && _showEmoteAutocomplete && textController.text.endsWith('')) {
       final split = textController.text.split(' ')
         ..removeLast()
         ..add('${emote.name} ');

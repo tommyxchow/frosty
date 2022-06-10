@@ -43,6 +43,8 @@ class _ChattersListState extends State<ChattersList> {
         widget.chatDetails.showJumpButton = true;
       }
     });
+
+    widget.chatDetails.updateChatters(widget.userLogin);
   }
 
   @override
@@ -58,7 +60,6 @@ class _ChattersListState extends State<ChattersList> {
     ];
 
     final chatDetailsStore = widget.chatDetails;
-    chatDetailsStore.updateChatters(widget.userLogin);
 
     return Column(
       children: [

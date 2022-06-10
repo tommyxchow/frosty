@@ -23,6 +23,10 @@ abstract class ChatDetailsStoreBase with Store {
   @observable
   var filterText = '';
 
+  /// The list and types of chatters in the chat room.
+  @readonly
+  ChatUsers? _chatUsers;
+
   @computed
   Iterable<List<String>> get filteredUsers => [
         _chatUsers!.chatters.broadcaster,
@@ -34,9 +38,16 @@ abstract class ChatDetailsStoreBase with Store {
         _chatUsers!.chatters.viewers,
       ].map((e) => e.where((user) => user.contains(filterText)).toList());
 
-  /// The list and types of chatters in the chat room.
-  @readonly
-  ChatUsers? _chatUsers;
+  @computed
+  List<String> get allChatters => [
+        ...?_chatUsers?.chatters.broadcaster,
+        ...?_chatUsers?.chatters.staff,
+        ...?_chatUsers?.chatters.admins,
+        ...?_chatUsers?.chatters.globalMods,
+        ...?_chatUsers?.chatters.moderators,
+        ...?_chatUsers?.chatters.vips,
+        ...?_chatUsers?.chatters.viewers,
+      ];
 
   @readonly
   String? _error;

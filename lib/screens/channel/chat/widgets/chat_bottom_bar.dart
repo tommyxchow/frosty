@@ -21,9 +21,13 @@ class ChatBottomBar extends StatelessWidget {
           ...chatStore.assetsStore.sevenTVEmotes
         ].where((emote) => emote.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase())).toList();
 
+        final filteredMentionedChatters = chatStore.chatDetailsStore.allChatters
+            .where((chatter) => chatter.contains(chatStore.textController.text.split(' ').last.replaceFirst('@', '').toLowerCase()))
+            .toList();
+
         return Column(
           children: [
-            if (chatStore.settings.emoteAutocomplete && chatStore.showAutocomplete && emotes.isNotEmpty) ...[
+            if (chatStore.settings.emoteAutocomplete && chatStore.showEmoteAutocomplete && emotes.isNotEmpty) ...[
               const Divider(
                 height: 1.0,
                 thickness: 1.0,
@@ -31,7 +35,7 @@ class ChatBottomBar extends StatelessWidget {
               SizedBox(
                 height: 50,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   itemCount: emotes.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => InkWell(
@@ -51,6 +55,31 @@ class ChatBottomBar extends StatelessWidget {
                         ),
                       ),
                     ),
+                  ),
+                ),
+              )
+            ],
+            if (chatStore.showMentionAutocomplete && filteredMentionedChatters.isNotEmpty) ...[
+              const Divider(
+                height: 1.0,
+                thickness: 1.0,
+              ),
+              SizedBox(
+                height: 50,
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  itemCount: filteredMentionedChatters.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) => TextButton(
+                    onPressed: () {
+                      final split = chatStore.textController.text.split(' ')
+                        ..removeLast()
+                        ..add('@${filteredMentionedChatters[index]} ');
+
+                      chatStore.textController.text = split.join(' ');
+                      chatStore.textController.selection = TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
+                    },
+                    child: Text(filteredMentionedChatters[index]),
                   ),
                 ),
               )
