@@ -198,6 +198,8 @@ class _ChattersListState extends State<ChattersList> {
   void dispose() {
     _scrollController.dispose();
     _textController.dispose();
+    widget.chatDetails.filterText = '';
+
     super.dispose();
   }
 }
