@@ -35,7 +35,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           ),
           ElevatedButton(
             onPressed: () {
-              widget.settingsStore.reset();
+              widget.settingsStore.resetAllSettings();
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
