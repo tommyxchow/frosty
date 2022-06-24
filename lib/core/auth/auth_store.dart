@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/user/user_store.dart';
+import 'package:frosty/main.dart';
 import 'package:mobx/mobx.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 part 'auth_store.g.dart';
 
@@ -20,15 +23,16 @@ abstract class AuthBase with Store {
   /// The shared_preferences key for the user token.
   static const _userTokenKey = 'user_token';
 
+  /// The Twitch API service for making requests.
   final TwitchApi twitchApi;
 
   /// Whether the token is valid or not.
   var _tokenIsValid = false;
 
-  /// The store containing information relevant to the current user.
+  /// The MobX store containing information relevant to the current user.
   final UserStore user;
 
-  /// The current token.
+  /// The user token used to authenticate with the Twitch API.
   @readonly
   String? _token;
 
@@ -40,9 +44,48 @@ abstract class AuthBase with Store {
   @computed
   Map<String, String> get headersTwitch => {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
 
-  /// Error flag that will be non-null if login failed.
+  /// Error flag that will be non-null and contain an error message if login failed.
   @readonly
   String? _error;
+
+  /// OAuth URI for the user to login.
+  final loginUri = Uri(
+    scheme: 'https',
+    host: 'id.twitch.tv',
+    path: '/oauth2/authorize',
+    queryParameters: {
+      'client_id': clientId,
+      'redirect_uri': 'https://twitch.tv/login',
+      'response_type': 'token',
+      'scope': 'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
+      'force_verify': 'true',
+    },
+  );
+
+  /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
+  FutureOr<NavigationDecision> handleNavigation(NavigationRequest navigation) {
+    // Check if the URL is the redirect URI.
+    if (navigation.url.startsWith('https://twitch.tv/login')) {
+      // Extract the token from the query parameters.
+      final uri = Uri.parse(navigation.url.replaceFirst('#', '?'));
+      final token = uri.queryParameters['access_token'];
+
+      // Login with the provided token.
+      if (token != null) login(token: token);
+    }
+
+    // Check if the the URL has been redirected to "https://www.twitch.tv/?no-reload=true".
+    // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
+    // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
+    if (navigation.url == 'https://www.twitch.tv/?no-reload=true') {
+      // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
+      navigatorKey.currentState?.pop();
+      navigatorKey.currentState?.pop();
+    }
+
+    // Always allow navigation to the next URL.
+    return NavigationDecision.navigate;
+  }
 
   AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
 
@@ -83,45 +126,19 @@ abstract class AuthBase with Store {
     }
   }
 
-  /// Initiates the OAuth sign-in process and updates fields accordingly upon successful login.
+  /// Logs in the user with the provided [token] and updates fields accordingly upon successful login.
   @action
-  Future<void> login({String? customToken}) async {
+  Future<void> login({required String token}) async {
     try {
-      if (customToken == null) {
-        // Create the OAuth sign-in URI.
-        final loginUrl = Uri(
-          scheme: 'https',
-          host: 'id.twitch.tv',
-          path: '/oauth2/authorize',
-          queryParameters: {
-            'client_id': clientId,
-            'redirect_uri': 'auth://',
-            'response_type': 'token',
-            'scope': 'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
-            'force_verify': 'true',
-          },
-        );
+      // Validate the custom token.
+      _tokenIsValid = await twitchApi.validateToken(token: token);
+      if (!_tokenIsValid) return;
 
-        // Retrieve the OAuth redirect URI.
-        final result = await FlutterWebAuth.authenticate(
-          url: loginUrl.toString(),
-          callbackUrlScheme: 'auth',
-        );
-
-        // Parse the user token from the redirect URI fragment.
-        final url = Uri.parse(result.replaceFirst('#', '?'));
-        _token = url.queryParameters['access_token'];
-      } else {
-        // Validate the custom token.
-        _tokenIsValid = await twitchApi.validateToken(token: customToken);
-        if (!_tokenIsValid) return;
-
-        // Replace the current default token with the new custom token.
-        _token = customToken;
-      }
+      // Replace the current default token with the new custom token.
+      _token = token;
 
       // Store the user token.
-      await _storage.write(key: _userTokenKey, value: customToken ?? _token);
+      await _storage.write(key: _userTokenKey, value: token);
 
       // Initialize the user with the new token.
       await user.init(headers: headersTwitch);
