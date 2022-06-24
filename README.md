@@ -147,17 +147,15 @@ Frosty aims to bring these emotes and other general quality of life features to 
 
 ## Development Setup
 
-1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **client ID** and **client secret** and add a **OAuth redirect URL**.
+1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **Client ID** and **Client Secret**.
 
-2. Clone the repo to a directory.
+2. Clone the repo to a directory with (e.g., `git clone https://github.com/tommyxchow/frosty.git`).
 
-3. Navigate to `lib/constants/constants.dart` and replace the `clientId` and `secret` constants with your **client ID** and **client secret** (or better yet, if using VSCode use `--dart-define` to [define them as environment variables](https://dartcode.org/docs/using-dart-define-in-flutter/)).
+3. Navigate to `lib/constants/constants.dart` and replace the `clientId` and `secret` constants with your **client ID** and **client secret** from step 1 (if using VSCode, use `--dart-define` to [define them as environment variables](https://dartcode.org/docs/using-dart-define-in-flutter/)).
 
-4. Navigate to `android/app/src/main/AndroidManifest.xml` and under the `flutter_web_auth` intent filter replace the value of `android:scheme` to the scheme in your **OAuth redirect URL**.
+4. Run `flutter pub get` to fetch all the dependencies.
 
-5. Run `flutter pub get` to fetch all the dependencies.
-
-6. Choose an emulator or device and run the app!
+5. Choose an emulator or device and run the app!
 
 ## FAQ
 
@@ -178,10 +176,6 @@ Due to the Flutter framework, there may be some stutter and jank on the first in
 ### Why isn't the video stream playing on Android?
 
 If you're on an older version of Android (below 7.1.1), the video stream will not play properly due to the reliance on Twitch's web player. Older Android versions use an older version of the native web browser (WebView), resulting in many compatibility issues with newer websites.
-
-### Why am I getting ads even though I'm subscribed to the channel or have Turbo?
-
-Even if you've logged in to the app, you'll still have to log in to the WebView so that you can be identified when the stream plays. You can do so by going to the settings and then under the "Account" section tap the "Log in to WebView" button.
 
 ### Why is there a delay between the stream and chat?
 
