@@ -142,7 +142,7 @@ class ChatBottomBar extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (chatStore.settings.chatWidth > 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait)
+                if (chatStore.settings.chatWidth >= 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait)
                   IconButton(
                     tooltip: 'Send',
                     icon: const Icon(Icons.send),
