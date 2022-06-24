@@ -60,6 +60,7 @@ abstract class VideoStoreBase with Store {
       onMessageReceived: (message) {
         _paused = false;
         controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
+        controller?.runJavascript('document.getElementsByTagName("video")[0].volume = 1.0;');
       },
     ),
   };
@@ -83,7 +84,6 @@ abstract class VideoStoreBase with Store {
     try {
       if (_paused) {
         controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
-        controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
       } else {
         controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
       }
