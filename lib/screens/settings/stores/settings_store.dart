@@ -14,37 +14,40 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
 abstract class _SettingsStoreBase with Store {
   // * General Settings
   static const defaultThemeType = ThemeType.system;
-
-  static const defaultShowThumbnailUptime = false;
-
   static const defaultShowThumbnails = true;
-
+  static const defaultShowThumbnailUptime = false;
   static const defaultLaunchUrlExternal = false;
 
   @JsonKey(defaultValue: defaultThemeType, unknownEnumValue: ThemeType.system)
   @observable
   var themeType = defaultThemeType;
 
-  @JsonKey(defaultValue: defaultShowThumbnailUptime)
-  @observable
-  var showThumbnailUptime = defaultShowThumbnailUptime;
-
   @JsonKey(defaultValue: defaultShowThumbnails)
   @observable
   var showThumbnails = defaultShowThumbnails;
+
+  @JsonKey(defaultValue: defaultShowThumbnailUptime)
+  @observable
+  var showThumbnailUptime = defaultShowThumbnailUptime;
 
   @JsonKey(defaultValue: defaultLaunchUrlExternal)
   @observable
   var launchUrlExternal = defaultLaunchUrlExternal;
 
+  @action
+  void resetGeneralSettings() {
+    themeType = defaultThemeType;
+    showThumbnailUptime = defaultShowThumbnailUptime;
+    showThumbnails = defaultShowThumbnails;
+    launchUrlExternal = defaultLaunchUrlExternal;
+  }
+
   // * Video Settings
   static const defaultShowVideo = true;
-
   static const defaultShowOverlay = true;
-
   static const defaultToggleableOverlay = false;
-
   static const defaultPictureInPicture = false;
+  static const defaultOverlayOpacity = 0.5;
 
   @JsonKey(defaultValue: defaultShowVideo)
   @observable
@@ -62,48 +65,76 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var pictureInPicture = defaultPictureInPicture;
 
-  // * Chat Settings
-  static const defaultShowBottomBar = true;
+  @JsonKey(defaultValue: defaultOverlayOpacity)
+  @observable
+  var overlayOpacity = defaultOverlayOpacity;
 
-  static const defaultShowDeletedMessages = false;
+  @action
+  void resetVideoSettings() {
+    showVideo = defaultShowVideo;
+    showOverlay = defaultShowOverlay;
+    toggleableOverlay = defaultToggleableOverlay;
+    pictureInPicture = defaultPictureInPicture;
+    overlayOpacity = defaultOverlayOpacity;
+  }
+
+  // * Chat Settings
+  static const defaultAutocomplete = true;
+  static const defaultChatDelay = 0.0;
+
+  static const defaultShowBottomBar = true;
+  static const defaultLandscapeChatLeftSide = false;
+  static const defaultChatWidth = 0.3;
+  static const defaultFullScreenChatOverlayOpacity = 0.5;
 
   static const defaultShowZeroWidth = false;
 
+  static const defaultUseReadableColors = true;
+  static const defaultShowDeletedMessages = false;
   static const defaultShowChatMessageDividers = false;
-
   static const defaultTimestampType = TimestampType.disabled;
 
-  static const defaultUseReadableColors = true;
-
+  static const defaultBadgeScale = 1.0;
+  static const defaultEmoteScale = 1.0;
   static const defaultMessageScale = 1.0;
-
+  static const defaultMessageSpacing = 10.0;
   static const defaultFontSize = 12.0;
 
-  static const defaultMessageSpacing = 10.0;
+  @JsonKey(defaultValue: defaultAutocomplete)
+  @observable
+  var autocomplete = defaultAutocomplete;
 
-  static const defaultBadgeScale = 1.0;
-
-  static const defaultEmoteScale = 1.0;
-
-  static const defaultEmoteAutocomplete = true;
-
-  static const defaultLandscapeChatWidth = 0.35;
-
-  static const defaultLandscapeChatLeftSide = false;
-
-  static const defaultChatDelay = 0.0;
+  @JsonKey(defaultValue: defaultChatDelay)
+  @observable
+  var chatDelay = defaultChatDelay;
 
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
   var showBottomBar = defaultShowBottomBar;
 
-  @JsonKey(defaultValue: defaultShowDeletedMessages)
+  @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
   @observable
-  var showDeletedMessages = defaultShowDeletedMessages;
+  var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+
+  @JsonKey(defaultValue: defaultChatWidth)
+  @observable
+  var chatWidth = defaultChatWidth;
+
+  @JsonKey(defaultValue: defaultFullScreenChatOverlayOpacity)
+  @observable
+  var fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
   @JsonKey(defaultValue: defaultShowZeroWidth)
   @observable
   var showZeroWidth = defaultShowZeroWidth;
+
+  @JsonKey(defaultValue: defaultUseReadableColors)
+  @observable
+  var useReadableColors = defaultUseReadableColors;
+
+  @JsonKey(defaultValue: defaultShowDeletedMessages)
+  @observable
+  var showDeletedMessages = defaultShowDeletedMessages;
 
   @JsonKey(defaultValue: defaultShowChatMessageDividers)
   @observable
@@ -113,22 +144,6 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var timestampType = defaultTimestampType;
 
-  @JsonKey(defaultValue: defaultUseReadableColors)
-  @observable
-  var useReadableColors = defaultUseReadableColors;
-
-  @JsonKey(defaultValue: defaultFontSize)
-  @observable
-  var fontSize = defaultFontSize;
-
-  @JsonKey(defaultValue: defaultMessageSpacing)
-  @observable
-  var messageSpacing = defaultMessageSpacing;
-
-  @JsonKey(defaultValue: defaultMessageScale)
-  @observable
-  var messageScale = defaultMessageScale;
-
   @JsonKey(defaultValue: defaultBadgeScale)
   @observable
   var badgeScale = defaultBadgeScale;
@@ -137,17 +152,37 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteScale = defaultEmoteScale;
 
-  @JsonKey(defaultValue: defaultEmoteAutocomplete)
+  @JsonKey(defaultValue: defaultMessageScale)
   @observable
-  var emoteAutocomplete = defaultEmoteAutocomplete;
+  var messageScale = defaultMessageScale;
 
-  @JsonKey(defaultValue: defaultLandscapeChatWidth)
+  @JsonKey(defaultValue: defaultMessageSpacing)
   @observable
-  var landscapeChatWidth = defaultLandscapeChatWidth;
+  var messageSpacing = defaultMessageSpacing;
 
-  @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
+  @JsonKey(defaultValue: defaultFontSize)
   @observable
-  var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+  var fontSize = defaultFontSize;
+
+  @action
+  void resetChatSettings() {
+    autocomplete = defaultAutocomplete;
+    chatDelay = defaultChatDelay;
+    showBottomBar = defaultShowBottomBar;
+    landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+    chatWidth = defaultChatWidth;
+    fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
+    showZeroWidth = defaultShowZeroWidth;
+    useReadableColors = defaultUseReadableColors;
+    showDeletedMessages = defaultShowDeletedMessages;
+    showChatMessageDividers = defaultShowChatMessageDividers;
+    timestampType = defaultTimestampType;
+    badgeScale = defaultBadgeScale;
+    emoteScale = defaultEmoteScale;
+    messageScale = defaultMessageScale;
+    messageSpacing = defaultMessageSpacing;
+    fontSize = defaultFontSize;
+  }
 
   // * Other settings
   static const defaultSendCrashLogs = true;
@@ -156,11 +191,14 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var sendCrashLogs = defaultSendCrashLogs;
 
+  @action
+  void resetOtherSettings() {
+    sendCrashLogs = defaultSendCrashLogs;
+  }
+
   // * Global configs
   static const defaultFullScreen = false;
-
   static const defaultExpandInfo = true;
-
   static const defaultFullScreenChatOverlay = false;
 
   @JsonKey(defaultValue: defaultFullScreen)
@@ -175,47 +213,19 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var fullScreenChatOverlay = defaultFullScreenChatOverlay;
 
-  @JsonKey(defaultValue: defaultChatDelay)
-  @observable
-  var chatDelay = defaultChatDelay;
-
   @action
-  void reset() {
-    // * General Settings
-    themeType = defaultThemeType;
-    showThumbnailUptime = defaultShowThumbnailUptime;
-    showThumbnails = defaultShowThumbnails;
-    launchUrlExternal = defaultLaunchUrlExternal;
-
-    // * Video Settings
-    showVideo = defaultShowVideo;
-    showOverlay = defaultShowOverlay;
-    toggleableOverlay = defaultToggleableOverlay;
-    pictureInPicture = defaultPictureInPicture;
-
-    // * Chat Settings
-    showBottomBar = defaultShowBottomBar;
-    showDeletedMessages = defaultShowDeletedMessages;
-    showZeroWidth = defaultShowZeroWidth;
-    showChatMessageDividers = defaultShowChatMessageDividers;
-    timestampType = defaultTimestampType;
-    useReadableColors = defaultUseReadableColors;
-    messageScale = defaultMessageScale;
-    fontSize = defaultFontSize;
-    messageSpacing = defaultMessageSpacing;
-    badgeScale = defaultBadgeScale;
-    emoteScale = defaultEmoteScale;
-    emoteAutocomplete = defaultEmoteAutocomplete;
-    landscapeChatWidth = defaultLandscapeChatWidth;
-    landscapeChatLeftSide = false;
-    chatDelay = defaultChatDelay;
-
-    // * Other settings
-    sendCrashLogs = defaultSendCrashLogs;
-
-    // * Global configs
+  void resetGlobalConfigs() {
     fullScreen = defaultFullScreen;
     expandInfo = defaultExpandInfo;
+    fullScreenChatOverlay = defaultFullScreenChatOverlay;
+  }
+
+  @action
+  void resetAllSettings() {
+    resetVideoSettings();
+    resetChatSettings();
+    resetOtherSettings();
+    resetGlobalConfigs();
   }
 }
 

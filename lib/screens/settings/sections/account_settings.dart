@@ -45,28 +45,6 @@ class AccountSettings extends StatelessWidget {
                 ),
               ),
             ),
-            ListTile(
-              isThreeLine: true,
-              title: const Text('Log in to WebView'),
-              subtitle: const Text('Lets you avoid ads on your subscribed streamers or if you have Turbo.'),
-              trailing: Icon(Icons.adaptive.arrow_forward),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        title: const Text('Log in to WebView'),
-                      ),
-                      body: const WebView(
-                        initialUrl: 'https://www.twitch.tv/login',
-                        javascriptMode: JavascriptMode.unrestricted,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
           ],
         ],
       ),
@@ -106,10 +84,23 @@ class ProfileCard extends StatelessWidget {
                   ),
                 ],
               ),
-              onPressed: () {
-                authStore.login();
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: const Text('Connect with Twitch'),
+                      ),
+                      body: WebView(
+                        initialUrl: authStore.loginUri.toString(),
+                        navigationDelegate: authStore.handleNavigation,
+                        javascriptMode: JavascriptMode.unrestricted,
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 20.0),
@@ -127,7 +118,7 @@ class ProfileCard extends StatelessWidget {
                 labelText: 'Token',
               ),
               onSubmitted: (token) {
-                authStore.login(customToken: token);
+                authStore.login(token: token);
                 Navigator.pop(context);
               },
             ),

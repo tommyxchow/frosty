@@ -16,6 +16,13 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
           Computed<Iterable<List<String>>>(() => super.filteredUsers,
               name: 'ChatDetailsStoreBase.filteredUsers'))
       .value;
+  Computed<List<String>>? _$allChattersComputed;
+
+  @override
+  List<String> get allChatters =>
+      (_$allChattersComputed ??= Computed<List<String>>(() => super.allChatters,
+              name: 'ChatDetailsStoreBase.allChatters'))
+          .value;
 
   late final _$roomStateAtom =
       Atom(name: 'ChatDetailsStoreBase.roomState', context: context);
@@ -116,7 +123,8 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
 roomState: ${roomState},
 showJumpButton: ${showJumpButton},
 filterText: ${filterText},
-filteredUsers: ${filteredUsers}
+filteredUsers: ${filteredUsers},
+allChatters: ${allChatters}
     ''';
   }
 }

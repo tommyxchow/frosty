@@ -43,6 +43,8 @@ class _ChattersListState extends State<ChattersList> {
         widget.chatDetails.showJumpButton = true;
       }
     });
+
+    widget.chatDetails.updateChatters(widget.userLogin);
   }
 
   @override
@@ -58,7 +60,6 @@ class _ChattersListState extends State<ChattersList> {
     ];
 
     final chatDetailsStore = widget.chatDetails;
-    chatDetailsStore.updateChatters(widget.userLogin);
 
     return Column(
       children: [
@@ -116,6 +117,7 @@ class _ChattersListState extends State<ChattersList> {
                     }
 
                     return CustomScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       controller: _scrollController,
                       slivers: [
                         SliverPadding(
@@ -196,6 +198,8 @@ class _ChattersListState extends State<ChattersList> {
   void dispose() {
     _scrollController.dispose();
     _textController.dispose();
+    widget.chatDetails.filterText = '';
+
     super.dispose();
   }
 }

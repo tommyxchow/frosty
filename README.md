@@ -86,37 +86,37 @@
   <img
     title="Followed Streams"
     alt="Followed Streams"
-    src="https://user-images.githubusercontent.com/54859075/163772719-3afe999d-49ad-46fd-9e4f-6aa4802d431b.png"
+    src="https://user-images.githubusercontent.com/54859075/170803307-57c16834-1a4b-4c9d-b7e3-9dd8f1a13c33.png"
     width="32%"
   />
   <img
     title="Categories Section"
     alt="Categories Section"
-    src="https://user-images.githubusercontent.com/54859075/163772670-af09ad0e-cdb9-4c1f-aed5-495e868da015.png"
+    src="https://user-images.githubusercontent.com/54859075/170803313-a7b122f4-36ac-480d-a138-dd8383c21bbe.png"
     width="32%"
   />
   <img
     title="Search Section"
     alt="Search Section"
-    src="https://user-images.githubusercontent.com/54859075/163772588-f526031d-cec3-43fd-8259-f7d20461a4c9.png"
+    src="https://user-images.githubusercontent.com/54859075/170803326-5338aec5-f201-4b0a-aa60-9dc44d76ea67.png"
     width="32%"
   />
   <img
     title="Channel (Video/Chat) View"
     alt="Channel (Video/Chat) View"
-    src="https://user-images.githubusercontent.com/54859075/163775107-f5d5aeab-de4b-4434-8223-611d25c6532a.png"
+    src="https://user-images.githubusercontent.com/54859075/170807736-f3fc4447-2d98-4a19-89d8-8d1b3f17c446.png"
     width="32%"
   />
   <img
     title="Emote Menu"
     alt="Emote Menu"
-    src="https://user-images.githubusercontent.com/54859075/163774539-290aabb7-8486-41b7-8b24-12ba84d9cd98.png"
+    src="https://user-images.githubusercontent.com/54859075/170807753-f3ae4eb4-a6ce-4261-901d-2e9ac5f147f7.png"
     width="32%"
   />
   <img
     title="Settings Section"
     alt="Settings Section"
-    src="https://user-images.githubusercontent.com/54859075/163775249-b5b0809c-cd2e-47e1-abe3-fb6a03e661ae.png"
+    src="https://user-images.githubusercontent.com/54859075/170807760-7ffdd3a5-ce3a-43c3-85ae-24ae0b0874a4.png"
     width="32%"
   />
 </p>
@@ -147,17 +147,15 @@ Frosty aims to bring these emotes and other general quality of life features to 
 
 ## Development Setup
 
-1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **client ID** and **client secret** and add a **OAuth redirect URL**.
+1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **Client ID** and **Client Secret**.
 
-2. Clone the repo to a directory.
+2. Clone the repo to a directory with (e.g., `git clone https://github.com/tommyxchow/frosty.git`).
 
-3. Navigate to `lib/constants/constants.dart` and replace the `clientId` and `secret` constants with your **client ID** and **client secret** (or better yet, if using VSCode use `--dart-define` to [define them as environment variables](https://dartcode.org/docs/using-dart-define-in-flutter/)).
+3. Navigate to `lib/constants/constants.dart` and replace the `clientId` and `secret` constants with your **client ID** and **client secret** from step 1 (if using VSCode, use `--dart-define` to [define them as environment variables](https://dartcode.org/docs/using-dart-define-in-flutter/)).
 
-4. Navigate to `android/app/src/main/AndroidManifest.xml` and under the `flutter_web_auth` intent filter replace the value of `android:scheme` to the scheme in your **OAuth redirect URL**.
+4. Run `flutter pub get` to fetch all the dependencies.
 
-5. Run `flutter pub get` to fetch all the dependencies.
-
-6. Choose an emulator or device and run the app!
+5. Choose an emulator or device and run the app!
 
 ## FAQ
 
@@ -167,19 +165,25 @@ On Android, you can change the stream quality by turning off the custom stream o
 
 On iOS, sadly quality options aren't available through the native player and rely on an "auto" setting. There is no official API for getting the live stream URLs so specific quality options are not possible at this time.
 
+### Why is there no picture-in-picture (PiP) on Android?
+
+I've looked into implementing it for Android a while back but web browsers on Android don't support the [web Picture-in-Picture API](https://developer.mozilla.org/en-US/docs/Web/API/Picture-in-Picture_API). The reason I'm using the web PiP API is due to limitations in the Twitch API (the stream is just the Twitch channel website in fullscreen rather than an actual video player). I *might* be able to figure something out by working with the native Android code but I'll have to learn that first.
+
 ### Why do certain animations and scrolling appear to be janky?
 
 Due to the Flutter framework, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes usually resolves it.
 
-### Why am I getting ads even though I'm subscribed to the channel or have Turbo?
+### Why isn't the video stream playing on Android?
 
-Even if you've logged in to the app, you'll still have to log in to the WebView so that you can be identified when the stream plays. You can do so by going to the settings and then under the "Account" section tap the "Log in to WebView" button.
+If you're on an older version of Android (below 7.1.1), the video stream will not play properly due to the reliance on Twitch's web player. Older Android versions use an older version of the native web browser (WebView), resulting in many compatibility issues with newer websites.
 
 ### Why is there a delay between the stream and chat?
 
 On Android, the delay should be minimal. Try refreshing the player if you have a delay.
 
 On iOS, there seems to be delays up to 15 seconds due to the native player so unfortunately it's out of my control. The best you can do for now is refreshing or pausing/playing the stream until the delay is minimized.
+
+**UPDATE**: Starting with version 1.4.0, there is a new message delay option that lets you set the delay (in seconds) before each message is rendered.
 
 ### Why are some GIFs either slow or very fast?
 
@@ -188,6 +192,8 @@ This seems to be caused by the Flutter framework itself (see [here](https://gith
 ### Why is ProMotion (120hz) not working?
 
 This is caused by the Flutter framework and is being worked on (see [here](https://github.com/flutter/flutter/issues/90675)).
+
+**UPDATE**: With Flutter 3 and version 1.3.0 of the app, ProMotion *should* be working.
 
 ### Why is feature "X" from Twitch not in the app as well?
 

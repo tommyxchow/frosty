@@ -25,13 +25,11 @@ void main() async {
 
   // Workaround for clearing stored tokens on uninstall.
   // If first time running app, will clear all tokens in the secure storage.
-  if (prefs.getBool('first_run') ?? true) {
+  if (prefs.getBool('first_run') != false) {
     debugPrint('Clearing secure storage...');
     const storage = FlutterSecureStorage();
 
     await storage.deleteAll();
-
-    prefs.setBool('first_run', false);
   }
 
   // With the shared preferences instance, obtain the existing user settings if it exists.
@@ -77,86 +75,86 @@ void main() async {
 // Navigator key for sleep timer. Allows navigation popping without context.
 final navigatorKey = GlobalKey<NavigatorState>();
 
+const gray = Color.fromRGBO(22, 22, 22, 1.0);
+const purple = Color(0xff9146ff);
+
+final lightTheme = ThemeData(
+  canvasColor: Colors.white,
+  splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+  fontFamily: 'Inter',
+  appBarTheme: const AppBarTheme(
+    color: Colors.white,
+    elevation: 0.0,
+    titleTextStyle: TextStyle(
+      fontFamily: 'Inter',
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+    iconTheme: IconThemeData(color: Colors.black),
+  ),
+  colorScheme: ColorScheme.fromSwatch(
+    primarySwatch: Colors.deepPurple,
+    accentColor: purple,
+  ),
+  toggleableActiveColor: purple,
+  tabBarTheme: const TabBarTheme(
+    labelColor: Colors.black,
+    unselectedLabelColor: Colors.grey,
+  ),
+);
+
+final darkTheme = ThemeData(
+  canvasColor: gray,
+  brightness: Brightness.dark,
+  splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+  fontFamily: 'Inter',
+  appBarTheme: const AppBarTheme(
+    color: gray,
+    elevation: 0.0,
+    titleTextStyle: TextStyle(
+      fontFamily: 'Inter',
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: gray),
+  colorScheme: ColorScheme.fromSwatch(
+    brightness: Brightness.dark,
+    primarySwatch: Colors.deepPurple,
+    accentColor: purple,
+  ),
+  dialogBackgroundColor: gray,
+  toggleableActiveColor: purple,
+);
+
+final oledTheme = ThemeData(
+  canvasColor: Colors.black,
+  splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+  fontFamily: 'Inter',
+  appBarTheme: const AppBarTheme(
+    color: Colors.black,
+    elevation: 0.0,
+    titleTextStyle: TextStyle(
+      fontFamily: 'Inter',
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  colorScheme: ColorScheme.fromSwatch(
+    brightness: Brightness.dark,
+    primarySwatch: Colors.deepPurple,
+    accentColor: purple,
+  ),
+  dialogBackgroundColor: Colors.black,
+  toggleableActiveColor: purple,
+);
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const gray = Color.fromRGBO(22, 22, 22, 1.0);
-    const purple = Color(0xff9146ff);
-
-    final lightTheme = ThemeData(
-      canvasColor: Colors.white,
-      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      fontFamily: 'Inter',
-      appBarTheme: const AppBarTheme(
-        color: Colors.white,
-        elevation: 0.0,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-        iconTheme: IconThemeData(color: Colors.black),
-      ),
-      colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: Colors.deepPurple,
-        accentColor: purple,
-      ),
-      toggleableActiveColor: purple,
-      tabBarTheme: const TabBarTheme(
-        labelColor: Colors.black,
-        unselectedLabelColor: Colors.grey,
-      ),
-    );
-
-    final darkTheme = ThemeData(
-      canvasColor: gray,
-      brightness: Brightness.dark,
-      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      fontFamily: 'Inter',
-      appBarTheme: const AppBarTheme(
-        color: gray,
-        elevation: 0.0,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: gray),
-      colorScheme: ColorScheme.fromSwatch(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.deepPurple,
-        accentColor: purple,
-      ),
-      dialogBackgroundColor: Colors.grey.shade900,
-      toggleableActiveColor: purple,
-    );
-
-    final oledTheme = ThemeData(
-      canvasColor: Colors.black,
-      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      fontFamily: 'Inter',
-      appBarTheme: const AppBarTheme(
-        color: Colors.black,
-        elevation: 0.0,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      colorScheme: ColorScheme.fromSwatch(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.deepPurple,
-        accentColor: purple,
-      ),
-      dialogBackgroundColor: Colors.black,
-      toggleableActiveColor: purple,
-    );
-
     return Observer(
       builder: (context) {
         final settingsStore = context.read<SettingsStore>();

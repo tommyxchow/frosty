@@ -22,11 +22,13 @@ class ProfilePicture extends StatelessWidget {
       builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
         return AnimatedOpacity(
           duration: const Duration(milliseconds: 500),
-          opacity: snapshot.data == null ? 0.0 : 1.0,
+          opacity: snapshot.connectionState == ConnectionState.done && snapshot.hasData ? 1.0 : 0.0,
           child: CircleAvatar(
             radius: radius,
             backgroundColor: Colors.transparent,
-            foregroundImage: snapshot.data != null ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl) : null,
+            foregroundImage: snapshot.connectionState == ConnectionState.done && snapshot.hasData
+                ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl)
+                : null,
           ),
         );
       },
