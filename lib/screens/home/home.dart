@@ -10,6 +10,7 @@ import 'package:frosty/screens/home/top/top_section.dart';
 import 'package:frosty/screens/home/widgets/streams_list.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,7 +64,7 @@ class _HomeState extends State<Home> {
           ],
         ),
         actions: [
-          TextButton(
+          Button(
             onPressed: () {
               prefs.setBool('first_run', false);
 

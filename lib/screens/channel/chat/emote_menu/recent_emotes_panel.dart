@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -26,12 +27,12 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
         title: const Text('Clear Recent Emotes'),
         content: const Text('Are you sure you want to clear your recent emotes?'),
         actions: [
-          TextButton(
+          Button(
             onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
+            color: Colors.red,
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          Button(
             onPressed: () {
               setState(widget.chatStore.assetsStore.recentEmotes.clear);
               Navigator.pop(context);
@@ -56,9 +57,10 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
               ),
               const Spacer(),
               SizedBox(
-                height: 30,
-                child: TextButton(
+                height: 25,
+                child: Button(
                   onPressed: widget.chatStore.assetsStore.recentEmotes.isEmpty ? null : _showClearDialog,
+                  color: Theme.of(context).colorScheme.secondary,
                   child: const Text(
                     'CLEAR',
                     style: TextStyle(

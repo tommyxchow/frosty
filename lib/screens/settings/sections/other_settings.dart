@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -28,12 +29,12 @@ class _OtherSettingsState extends State<OtherSettings> {
         title: const Text('Reset All Settings'),
         content: const Text('Are you sure you want to reset all settings?'),
         actions: [
-          TextButton(
+          Button(
             onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
+            color: Colors.red,
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          Button(
             onPressed: () {
               widget.settingsStore.resetAllSettings();
               Navigator.pop(context);
@@ -104,9 +105,9 @@ class _OtherSettingsState extends State<OtherSettings> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           width: double.infinity,
-          child: OutlinedButton.icon(
+          child: Button(
             icon: const Icon(Icons.delete_sweep),
-            label: const Text('Clear Image Cache'),
+            child: const Text('Clear Image Cache'),
             onPressed: () async {
               await DefaultCacheManager().emptyCache();
 
@@ -123,10 +124,10 @@ class _OtherSettingsState extends State<OtherSettings> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           width: double.infinity,
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.restore),
-            label: const Text('Reset All Settings'),
+          child: Button(
             onPressed: () => _showConfirmDialog(context),
+            icon: const Icon(Icons.restore),
+            child: const Text('Reset All Settings'),
           ),
         ),
       ],

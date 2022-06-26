@@ -143,7 +143,7 @@ class _StreamCardState extends State<StreamCard> {
                         widget.streamInfo.title.trim(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

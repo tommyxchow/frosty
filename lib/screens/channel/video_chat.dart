@@ -18,6 +18,7 @@ import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -342,13 +343,13 @@ class _VideoOverlay extends StatelessWidget {
           ),
         ),
         actions: [
-          TextButton(
+          Button(
             onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
+            color: Colors.red,
             child: const Text('Dismiss'),
           ),
           Observer(
-            builder: (context) => ElevatedButton(
+            builder: (context) => Button(
               onPressed: videoStore.sleepHours == 0 && videoStore.sleepMinutes == 0
                   ? null
                   : () => videoStore.updateSleepTimer(
@@ -590,7 +591,7 @@ class _VideoOverlay extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),

@@ -5,6 +5,7 @@ import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/button.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -15,10 +16,6 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (chatStore.scrollController.hasClients) chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent);
-        });
-
         return Column(
           children: [
             Expanded(
@@ -93,14 +90,11 @@ class Chat extends StatelessWidget {
                         duration: const Duration(milliseconds: 200),
                         child: chatStore.autoScroll
                             ? null
-                            : Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                width: double.infinity,
-                                child: ElevatedButton.icon(
-                                  onPressed: chatStore.resumeScroll,
-                                  label: const Text('Resume Scroll'),
-                                  icon: const Icon(Icons.arrow_circle_down),
-                                ),
+                            : Button(
+                                padding: const EdgeInsets.all(10.0),
+                                onPressed: chatStore.resumeScroll,
+                                icon: const Icon(Icons.arrow_circle_down),
+                                child: const Text('Resume Scroll'),
                               ),
                       ),
                     ),
@@ -109,11 +103,13 @@ class Chat extends StatelessWidget {
               ),
             ),
             if (chatStore.settings.showBottomBar) ChatBottomBar(chatStore: chatStore),
-            if (chatStore.assetsStore.showEmoteMenu)
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 3,
-                child: EmoteMenu(chatStore: chatStore),
-              ),
+            AnimatedContainer(
+              curve: Curves.ease,
+              duration: const Duration(milliseconds: 200),
+              height: chatStore.assetsStore.showEmoteMenu ? MediaQuery.of(context).size.height / 3 : 0,
+              child: EmoteMenu(chatStore: chatStore),
+              onEnd: () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
+            ),
           ],
         );
       },

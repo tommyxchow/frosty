@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/section_header.dart';
 
@@ -62,7 +63,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                 ],
               ),
               trailing: widget.chatStore.auth.isLoggedIn
-                  ? OutlinedButton(
+                  ? Button(
                       onPressed: () {
                         widget.chatStore.textController.text = '@${widget.username} ';
                         Navigator.pop(context);

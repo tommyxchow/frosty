@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ReportButton extends StatelessWidget {
@@ -13,7 +14,7 @@ class ReportButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
+    return Button(
       icon: const Icon(Icons.report),
       onPressed: () => Navigator.push(
         context,
@@ -31,8 +32,8 @@ class ReportButton extends StatelessWidget {
           },
         ),
       ),
-      label: Text('Report $displayName'),
-      style: OutlinedButton.styleFrom(primary: Colors.red),
+      color: Colors.red,
+      child: Text('Report $displayName'),
     );
   }
 }

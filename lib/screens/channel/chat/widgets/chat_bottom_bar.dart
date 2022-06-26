@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/button.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -70,7 +71,7 @@ class ChatBottomBar extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   itemCount: matchingChatters.length,
                   scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) => TextButton(
+                  itemBuilder: (context, index) => Button(
                     onPressed: () {
                       final split = chatStore.textController.text.split(' ')
                         ..removeLast()
@@ -104,12 +105,13 @@ class ChatBottomBar extends StatelessWidget {
                 ),
                 if (!chatStore.expandChat && chatStore.settings.chatWidth < 0.3 && MediaQuery.of(context).orientation == Orientation.landscape)
                   IconButton(
-                      tooltip: 'Send a Message',
-                      onPressed: () {
-                        chatStore.expandChat = true;
-                        chatStore.textFieldFocusNode.requestFocus();
-                      },
-                      icon: const Icon(Icons.chat))
+                    tooltip: 'Send a Message',
+                    onPressed: () {
+                      chatStore.expandChat = true;
+                      chatStore.textFieldFocusNode.requestFocus();
+                    },
+                    icon: const Icon(Icons.chat),
+                  )
                 else
                   Expanded(
                     child: Padding(
@@ -122,7 +124,7 @@ class ChatBottomBar extends StatelessWidget {
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                            color: chatStore.assetsStore.showEmoteMenu ? Colors.deepPurple : null,
+                            color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
                             tooltip: 'Emote Menu',
                             icon: const Icon(Icons.emoji_emotions_outlined),
                             onPressed: () {

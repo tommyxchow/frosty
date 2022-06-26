@@ -6,6 +6,7 @@ import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/block_button.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class AccountSettings extends StatelessWidget {
@@ -132,22 +133,44 @@ class ProfileCard extends StatelessWidget {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
-            child: const Text('Cancel'),
+        title: const Text(
+          'Log Out',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
           ),
-          ElevatedButton(
-            onPressed: () {
-              authStore.logout();
-              Navigator.pop(context);
-            },
-            child: const Text('Yes'),
-          ),
-        ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Are you sure you want to log out?'),
+            const SizedBox(height: 50.0),
+            Column(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Button(
+                    fontSize: 16.0,
+                    onPressed: () {
+                      authStore.logout();
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Yes'),
+                  ),
+                ),
+                const SizedBox(height: 10.0),
+                SizedBox(
+                  width: double.infinity,
+                  child: Button(
+                    fontSize: 16.0,
+                    onPressed: Navigator.of(context).pop,
+                    color: Colors.red.withOpacity(0.8),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -160,7 +183,7 @@ class ProfileCard extends StatelessWidget {
           if (authStore.error != null) {
             return ListTile(
               title: const Text('Failed to Connect'),
-              trailing: OutlinedButton(
+              trailing: Button(
                 onPressed: authStore.init,
                 child: const Text('Try Again'),
               ),
@@ -175,11 +198,12 @@ class ProfileCard extends StatelessWidget {
                 authStore.user.details!.displayName,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              trailing: OutlinedButton.icon(
+              trailing: Button(
                 onPressed: () => _showLogoutDialog(context),
                 icon: const Icon(Icons.logout_outlined),
-                label: const Text('Log Out'),
-                style: OutlinedButton.styleFrom(primary: Colors.red),
+                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+                color: Colors.red,
+                child: const Text('Log Out'),
               ),
             );
           }
@@ -191,10 +215,10 @@ class ProfileCard extends StatelessWidget {
             ),
             title: const Text('Anonymous User'),
             subtitle: const Text('Log in to chat, view followed streams, and more.'),
-            trailing: ElevatedButton.icon(
+            trailing: Button(
               onPressed: () => _showLoginDialog(context),
               icon: const Icon(Icons.login),
-              label: const Text('Log In'),
+              child: const Text('Log In'),
             ),
           );
         },

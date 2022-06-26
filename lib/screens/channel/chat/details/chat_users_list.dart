@@ -7,6 +7,7 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
@@ -104,7 +105,7 @@ class _ChattersListState extends State<ChattersList> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text('Failed to get chatters'),
-                          TextButton(
+                          Button(
                             onPressed: () => chatDetailsStore.updateChatters(widget.userLogin),
                             child: const Text('Try Again'),
                           )

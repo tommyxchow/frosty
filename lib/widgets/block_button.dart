@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/widgets/button.dart';
 
 class BlockButton extends StatelessWidget {
   final AuthStore authStore;
@@ -29,12 +30,12 @@ class BlockButton extends StatelessWidget {
         content: Text(
             'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}'),
         actions: [
-          TextButton(
+          Button(
             onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
+            color: Colors.red,
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          Button(
             onPressed: () {
               if (isBlocked) {
                 authStore.user.unblock(targetId: targetUserId, headers: authStore.headersTwitch);
@@ -60,16 +61,16 @@ class BlockButton extends StatelessWidget {
       builder: (context) {
         final isBlocked = authStore.user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
 
-        return OutlinedButton.icon(
+        return Button(
           icon: const Icon(Icons.block),
-          label: isBlocked ? Text(simple ? 'Unblock' : 'Unblock $targetUser') : Text(simple ? 'Block' : 'Block $targetUser'),
+          color: Colors.red,
           onPressed: () => _showDialog(
             context,
             isBlocked: isBlocked,
             targetUser: targetUser,
             targetUserId: targetUserId,
           ),
-          style: OutlinedButton.styleFrom(primary: Colors.red),
+          child: isBlocked ? Text(simple ? 'Unblock' : 'Unblock $targetUser') : Text(simple ? 'Block' : 'Block $targetUser'),
         );
       },
     );

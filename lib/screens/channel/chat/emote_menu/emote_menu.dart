@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/button.dart';
 
 class EmoteMenu extends StatefulWidget {
   final ChatStore chatStore;
@@ -31,14 +32,19 @@ class _EmoteMenuState extends State<EmoteMenu> {
     ];
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const Divider(
+          height: 5.0,
+          thickness: 1.0,
+        ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: sections
                 .mapIndexed(
                   (index, section) => Observer(
-                    builder: (context) => TextButton(
+                    builder: (context) => Button(
                       onPressed: () {
                         _pageContoller.animateToPage(
                           index,
@@ -47,7 +53,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
                         );
                         widget.chatStore.assetsStore.emoteMenuIndex = index;
                       },
-                      style: index == widget.chatStore.assetsStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
+                      color: index == widget.chatStore.assetsStore.emoteMenuIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,
                       child: Text(
                         section,
                         style: const TextStyle(
