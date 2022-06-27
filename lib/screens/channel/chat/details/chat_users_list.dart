@@ -105,7 +105,9 @@ class _ChattersListState extends State<ChattersList> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text('Failed to get chatters'),
+                          const SizedBox(height: 10.0),
                           Button(
+                            padding: const EdgeInsets.symmetric(horizontal: 15.0),
                             onPressed: () => chatDetailsStore.updateChatters(widget.userLogin),
                             child: const Text('Try Again'),
                           )

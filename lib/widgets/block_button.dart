@@ -66,6 +66,7 @@ class BlockButton extends StatelessWidget {
         return Button(
           icon: const Icon(Icons.block),
           color: Colors.red,
+          fill: true,
           onPressed: () => _showDialog(
             context,
             isBlocked: isBlocked,

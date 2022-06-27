@@ -43,22 +43,25 @@ class _EmoteMenuState extends State<EmoteMenu> {
           child: Row(
             children: sections
                 .mapIndexed(
-                  (index, section) => Observer(
-                    builder: (context) => Button(
-                      onPressed: () {
-                        _pageContoller.animateToPage(
-                          index,
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.ease,
-                        );
-                        widget.chatStore.assetsStore.emoteMenuIndex = index;
-                      },
-                      color: index == widget.chatStore.assetsStore.emoteMenuIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,
-                      child: Text(
-                        section,
-                        style: const TextStyle(
-                          letterSpacing: 0.5,
-                          fontWeight: FontWeight.w600,
+                  (index, section) => Padding(
+                    padding: const EdgeInsets.only(right: 5.0),
+                    child: Observer(
+                      builder: (context) => Button(
+                        onPressed: () {
+                          _pageContoller.animateToPage(
+                            index,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.ease,
+                          );
+                          widget.chatStore.assetsStore.emoteMenuIndex = index;
+                        },
+                        color: index == widget.chatStore.assetsStore.emoteMenuIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,
+                        child: Text(
+                          section,
+                          style: const TextStyle(
+                            letterSpacing: 0.5,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),

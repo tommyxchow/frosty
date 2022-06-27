@@ -72,6 +72,7 @@ class ChatBottomBar extends StatelessWidget {
                   itemCount: matchingChatters.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => Button(
+                    color: Theme.of(context).colorScheme.secondary,
                     onPressed: () {
                       final split = chatStore.textController.text.split(' ')
                         ..removeLast()

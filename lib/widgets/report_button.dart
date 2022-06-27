@@ -33,6 +33,7 @@ class ReportButton extends StatelessWidget {
         ),
       ),
       color: Colors.red,
+      fill: true,
       child: Text('Report $displayName'),
     );
   }

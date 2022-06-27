@@ -157,52 +157,55 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Observer(
-        builder: (context) {
-          if (authStore.error != null) {
-            return ListTile(
-              title: const Text('Failed to Connect'),
-              trailing: Button(
-                onPressed: authStore.init,
-                child: const Text('Try Again'),
-              ),
-            );
-          }
-          if (authStore.isLoggedIn && authStore.user.details != null) {
-            return ListTile(
-              leading: CircleAvatar(
-                foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
-              ),
-              title: Text(
-                authStore.user.details!.displayName,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              trailing: Button(
-                onPressed: () => _showLogoutDialog(context),
-                icon: const Icon(Icons.logout_outlined),
-                padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
-                color: Colors.red,
-                child: const Text('Log Out'),
-              ),
-            );
-          }
+    return Observer(
+      builder: (context) {
+        if (authStore.error != null) {
           return ListTile(
-            isThreeLine: true,
-            leading: const Icon(
-              Icons.no_accounts,
-              size: 40,
-            ),
-            title: const Text('Anonymous User'),
-            subtitle: const Text('Log in to chat, view followed streams, and more.'),
+            title: const Text('Failed to Connect'),
             trailing: Button(
-              onPressed: () => _showLoginDialog(context),
-              icon: const Icon(Icons.login),
-              child: const Text('Log In'),
+              onPressed: authStore.init,
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: const Text('Try Again'),
             ),
           );
-        },
-      ),
+        }
+        if (authStore.isLoggedIn && authStore.user.details != null) {
+          return ListTile(
+            leading: CircleAvatar(
+              foregroundImage: CachedNetworkImageProvider(authStore.user.details!.profileImageUrl),
+            ),
+            title: Text(
+              authStore.user.details!.displayName,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            trailing: Button(
+              onPressed: () => _showLogoutDialog(context),
+              icon: const Icon(Icons.logout_outlined),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              fill: true,
+              color: Colors.red,
+              child: const Text('Log Out'),
+            ),
+          );
+        }
+        return ListTile(
+          isThreeLine: true,
+          leading: const Icon(
+            Icons.no_accounts,
+            size: 40,
+          ),
+          title: const Text('Anonymous User'),
+          subtitle: const Text('Log in to chat, view followed streams, and more.'),
+          trailing: Button(
+            color: Theme.of(context).colorScheme.secondary,
+            onPressed: () => _showLoginDialog(context),
+            fill: true,
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            icon: const Icon(Icons.login),
+            child: const Text('Log In'),
+          ),
+        );
+      },
     );
   }
 }

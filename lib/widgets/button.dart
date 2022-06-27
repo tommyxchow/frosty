@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// A custom button that scales down when tapped/held on (sorta like a real button).
 class Button extends StatefulWidget {
   final Color? color;
+  final bool fill;
   final EdgeInsets padding;
   final double? fontSize;
   final Widget? icon;
@@ -12,7 +13,8 @@ class Button extends StatefulWidget {
   const Button({
     Key? key,
     this.color,
-    this.padding = const EdgeInsets.symmetric(horizontal: 10.0),
+    this.fill = false,
+    this.padding = const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
     this.fontSize,
     this.icon,
     required this.onPressed,
@@ -32,21 +34,21 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final buttonStyle = ElevatedButton.styleFrom(
-      primary: widget.color == null ? widget.color : Colors.transparent,
-      onPrimary: widget.color,
+      primary: widget.color == null || widget.fill ? widget.color : Colors.transparent,
+      onPrimary: widget.fill ? null : widget.color,
       padding: widget.padding,
       splashFactory: NoSplash.splashFactory,
-      textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: widget.fontSize),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+      textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       elevation: widget.color == null ? 10.0 : 0.0,
     ).copyWith(
-      elevation: widget.color == null
+      elevation: (widget.color == null || widget.fill) && widget.onPressed != null
           ? MaterialStateProperty.resolveWith(
               (states) {
                 if (states.contains(MaterialState.pressed)) {
                   return 0.0;
                 } else {
-                  return 10.0;
+                  return 5.0;
                 }
               },
             )
@@ -68,11 +70,21 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
 
     return AnimatedBuilder(
       animation: _animationController,
-      child: Listener(
-        onPointerDown: (_) => _animationController.animateTo(0.05, curve: Curves.easeOutBack, duration: const Duration(milliseconds: 200)),
-        onPointerUp: (_) => _animationController.animateTo(0, curve: Curves.easeOutBack, duration: const Duration(milliseconds: 300)),
-        child: button,
-      ),
+      child: widget.onPressed == null
+          ? button
+          : Listener(
+              onPointerDown: (_) => _animationController.animateTo(
+                _animationController.upperBound,
+                curve: Curves.easeOutBack,
+                duration: const Duration(milliseconds: 200),
+              ),
+              onPointerUp: (_) => _animationController.animateTo(
+                _animationController.lowerBound,
+                curve: Curves.easeOutBack,
+                duration: const Duration(milliseconds: 300),
+              ),
+              child: button,
+            ),
       builder: (context, child) {
         return Transform.scale(
           scale: 1 - _animationController.value,

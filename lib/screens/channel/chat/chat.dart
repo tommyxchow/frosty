@@ -107,7 +107,7 @@ class Chat extends StatelessWidget {
               curve: Curves.ease,
               duration: const Duration(milliseconds: 200),
               height: chatStore.assetsStore.showEmoteMenu ? MediaQuery.of(context).size.height / 3 : 0,
-              child: EmoteMenu(chatStore: chatStore),
+              child: chatStore.assetsStore.showEmoteMenu ? EmoteMenu(chatStore: chatStore) : null,
               onEnd: () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
             ),
           ],
