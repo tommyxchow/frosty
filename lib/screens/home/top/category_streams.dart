@@ -103,6 +103,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                 height: thumbnailHeight,
                                 showUptime: context.read<SettingsStore>().showThumbnailUptime,
                                 showThumbnail: context.read<SettingsStore>().showThumbnails,
+                                large: context.read<SettingsStore>().largeStreamCard,
                                 showCategory: false,
                               ),
                             );

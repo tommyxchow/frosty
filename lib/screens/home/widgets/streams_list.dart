@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -39,9 +41,6 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
-    final thumbnailWidth = (size.width * pixelRatio) ~/ 3;
-    final thumbnailHeight = (thumbnailWidth * (9 / 16)).toInt();
-
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
@@ -59,6 +58,11 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
       },
       child: Observer(
         builder: (_) {
+          // Calculate the width and height of the thumbnail based on the device width and the stream card size setting.
+          // Constraint the resolution to 1920x1080 since that's the max resolution of the Twitch API.
+          final thumbnailWidth = min((size.width * pixelRatio) ~/ (context.read<SettingsStore>().largeStreamCard ? 1 : 3), 1920);
+          final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
+
           if (_listStore.streams.isEmpty && _listStore.isLoading && _listStore.error == null) {
             return const LoadingIndicator(subtitle: Text('Loading streams...'));
           }
@@ -80,6 +84,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
                       width: thumbnailWidth,
                       height: thumbnailHeight,
                       showThumbnail: context.read<SettingsStore>().showThumbnails,
+                      large: context.read<SettingsStore>().largeStreamCard,
                       showUptime: context.read<SettingsStore>().showThumbnailUptime,
                     ),
                   );

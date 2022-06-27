@@ -15,6 +15,7 @@ abstract class _SettingsStoreBase with Store {
   // * General Settings
   static const defaultThemeType = ThemeType.system;
   static const defaultShowThumbnails = true;
+  static const defaultLargeStreamCard = false;
   static const defaultShowThumbnailUptime = false;
   static const defaultLaunchUrlExternal = false;
 
@@ -25,6 +26,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultShowThumbnails)
   @observable
   var showThumbnails = defaultShowThumbnails;
+
+  @JsonKey(defaultValue: defaultLargeStreamCard)
+  @observable
+  var largeStreamCard = defaultLargeStreamCard;
 
   @JsonKey(defaultValue: defaultShowThumbnailUptime)
   @observable
@@ -37,8 +42,9 @@ abstract class _SettingsStoreBase with Store {
   @action
   void resetGeneralSettings() {
     themeType = defaultThemeType;
-    showThumbnailUptime = defaultShowThumbnailUptime;
     showThumbnails = defaultShowThumbnails;
+    largeStreamCard = defaultLargeStreamCard;
+    showThumbnailUptime = defaultShowThumbnailUptime;
     launchUrlExternal = defaultLaunchUrlExternal;
   }
 

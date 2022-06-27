@@ -147,7 +147,7 @@ class ProfileCard extends StatelessWidget {
           Button(
             fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red.withOpacity(0.8),
+            color: Colors.red,
             child: const Text('Cancel'),
           )
         ],

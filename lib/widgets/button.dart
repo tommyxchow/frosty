@@ -38,7 +38,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
       onPrimary: widget.fill ? null : widget.color,
       padding: widget.padding,
       splashFactory: NoSplash.splashFactory,
-      textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
+      textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: widget.fontSize),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       elevation: widget.color == null ? 10.0 : 0.0,
     ).copyWith(
