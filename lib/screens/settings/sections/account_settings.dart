@@ -7,6 +7,7 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/block_button.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class AccountSettings extends StatelessWidget {
@@ -132,45 +133,24 @@ class ProfileCard extends StatelessWidget {
   Future<void> _showLogoutDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'Log Out',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
+      builder: (context) => FrostyDialog(
+        title: 'Log Out',
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          Button(
+            onPressed: () {
+              authStore.logout();
+              Navigator.pop(context);
+            },
+            child: const Text('Yes'),
           ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Are you sure you want to log out?'),
-            const SizedBox(height: 50.0),
-            Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: Button(
-                    fontSize: 16.0,
-                    onPressed: () {
-                      authStore.logout();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Yes'),
-                  ),
-                ),
-                const SizedBox(height: 10.0),
-                SizedBox(
-                  width: double.infinity,
-                  child: Button(
-                    fontSize: 16.0,
-                    onPressed: Navigator.of(context).pop,
-                    color: Colors.red.withOpacity(0.8),
-                    child: const Text('Cancel'),
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
+          Button(
+            fill: true,
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red.withOpacity(0.8),
+            child: const Text('Cancel'),
+          )
+        ],
       ),
     );
   }
@@ -257,8 +237,16 @@ class BlockedUsers extends StatelessWidget {
               children: authStore.user.blockedUsers.map(
                 (user) {
                   final displayName = regexEnglish.hasMatch(user.displayName) ? user.displayName : '${user.displayName} (${user.userLogin})';
+
                   return ListTile(
-                    title: Text(displayName),
+                    title: Tooltip(
+                      preferBelow: false,
+                      message: displayName,
+                      child: Text(
+                        displayName,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     trailing: BlockButton(
                       authStore: authStore,
                       targetUser: displayName,

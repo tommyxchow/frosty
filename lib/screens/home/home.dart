@@ -11,6 +11,7 @@ import 'package:frosty/screens/home/widgets/streams_list.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,14 +37,8 @@ class _HomeState extends State<Home> {
     return showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context) => AlertDialog(
-        scrollable: true,
-        title: Text(
-          'Frosty v${packageInfo.version} (${packageInfo.buildNumber})',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      builder: (context) => FrostyDialog(
+        title: 'Frosty v${packageInfo.version} (${packageInfo.buildNumber})',
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

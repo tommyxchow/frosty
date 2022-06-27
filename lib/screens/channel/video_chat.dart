@@ -19,6 +19,7 @@ import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -296,8 +297,8 @@ class _VideoOverlay extends StatelessWidget {
   Future<void> _showSleepTimerDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sleep Timer'),
+      builder: (context) => FrostyDialog(
+        title: 'Sleep Timer',
         content: Observer(
           builder: (context) => Column(
             mainAxisSize: MainAxisSize.min,
@@ -343,11 +344,6 @@ class _VideoOverlay extends StatelessWidget {
           ),
         ),
         actions: [
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.red,
-            child: const Text('Dismiss'),
-          ),
           Observer(
             builder: (context) => Button(
               onPressed: videoStore.sleepHours == 0 && videoStore.sleepMinutes == 0
@@ -357,6 +353,11 @@ class _VideoOverlay extends StatelessWidget {
                       ),
               child: const Text('Set Timer'),
             ),
+          ),
+          Button(
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red,
+            child: const Text('Cancel'),
           ),
         ],
       ),
@@ -591,7 +592,7 @@ class _VideoOverlay extends StatelessWidget {
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w600,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ),

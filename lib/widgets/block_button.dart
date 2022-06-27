@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 
 class BlockButton extends StatelessWidget {
   final AuthStore authStore;
@@ -25,16 +26,11 @@ class BlockButton extends StatelessWidget {
   }) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: isBlocked ? const Text('Unblock') : const Text('Block'),
+      builder: (context) => FrostyDialog(
+        title: isBlocked ? 'Unblock' : 'Block',
         content: Text(
             'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}'),
         actions: [
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.red,
-            child: const Text('Cancel'),
-          ),
           Button(
             onPressed: () {
               if (isBlocked) {
@@ -49,6 +45,12 @@ class BlockButton extends StatelessWidget {
               Navigator.pop(context);
             },
             child: const Text('Yes'),
+          ),
+          Button(
+            fill: true,
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red,
+            child: const Text('Cancel'),
           ),
         ],
       ),

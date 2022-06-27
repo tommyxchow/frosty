@@ -4,6 +4,7 @@ import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -23,21 +24,22 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
   Future<void> _showClearDialog() {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear Recent Emotes'),
+      builder: (context) => FrostyDialog(
+        title: 'Clear Recent Emotes',
         content: const Text('Are you sure you want to clear your recent emotes?'),
         actions: [
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.red,
-            child: const Text('Cancel'),
-          ),
           Button(
             onPressed: () {
               setState(widget.chatStore.assetsStore.recentEmotes.clear);
               Navigator.pop(context);
             },
             child: const Text('Yes'),
+          ),
+          Button(
+            fill: true,
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red,
+            child: const Text('Cancel'),
           ),
         ],
       ),
@@ -59,6 +61,7 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
               SizedBox(
                 height: 25,
                 child: Button(
+                  padding: const EdgeInsets.all(0.0),
                   onPressed: widget.chatStore.assetsStore.recentEmotes.isEmpty ? null : _showClearDialog,
                   color: Theme.of(context).colorScheme.secondary,
                   child: const Text(

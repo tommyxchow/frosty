@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -25,15 +26,10 @@ class _OtherSettingsState extends State<OtherSettings> {
   Future<void> _showConfirmDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset All Settings'),
+      builder: (context) => FrostyDialog(
+        title: 'Reset All Settings',
         content: const Text('Are you sure you want to reset all settings?'),
         actions: [
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.red,
-            child: const Text('Cancel'),
-          ),
           Button(
             onPressed: () {
               widget.settingsStore.resetAllSettings();
@@ -47,6 +43,12 @@ class _OtherSettingsState extends State<OtherSettings> {
             },
             child: const Text('Yes'),
           ),
+          Button(
+            fill: true,
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red,
+            child: const Text('Cancel'),
+          ),
         ],
       ),
     );
@@ -55,6 +57,7 @@ class _OtherSettingsState extends State<OtherSettings> {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
+      childrenPadding: const EdgeInsets.only(bottom: 10.0),
       leading: const Icon(Icons.help),
       title: const Text(
         'Other',
@@ -102,10 +105,8 @@ class _OtherSettingsState extends State<OtherSettings> {
             },
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          width: double.infinity,
-          child: Button(
+        ...[
+          Button(
             icon: const Icon(Icons.delete_sweep),
             child: const Text('Clear Image Cache'),
             onPressed: () async {
@@ -120,14 +121,19 @@ class _OtherSettingsState extends State<OtherSettings> {
               );
             },
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          width: double.infinity,
-          child: Button(
+          Button(
             onPressed: () => _showConfirmDialog(context),
             icon: const Icon(Icons.restore),
             child: const Text('Reset All Settings'),
+          )
+        ].map(
+          (button) => Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 15.0,
+              vertical: 5.0,
+            ),
+            width: double.infinity,
+            child: button,
           ),
         ),
       ],
