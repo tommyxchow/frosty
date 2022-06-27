@@ -64,6 +64,7 @@ class BlockButton extends StatelessWidget {
         final isBlocked = authStore.user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
 
         return Button(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
           icon: const Icon(Icons.block),
           color: Colors.red,
           fill: true,

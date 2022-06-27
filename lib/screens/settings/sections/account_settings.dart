@@ -181,7 +181,7 @@ class ProfileCard extends StatelessWidget {
             trailing: Button(
               onPressed: () => _showLogoutDialog(context),
               icon: const Icon(Icons.logout_outlined),
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
               fill: true,
               color: Colors.red,
               child: const Text('Log Out'),
@@ -200,7 +200,7 @@ class ProfileCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary,
             onPressed: () => _showLoginDialog(context),
             fill: true,
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
             icon: const Icon(Icons.login),
             child: const Text('Log In'),
           ),

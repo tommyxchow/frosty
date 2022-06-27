@@ -107,6 +107,7 @@ class _OtherSettingsState extends State<OtherSettings> {
         ),
         ...[
           Button(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
             icon: const Icon(Icons.delete_sweep),
             child: const Text('Clear Image Cache'),
             onPressed: () async {
@@ -122,6 +123,7 @@ class _OtherSettingsState extends State<OtherSettings> {
             },
           ),
           Button(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
             onPressed: () => _showConfirmDialog(context),
             icon: const Icon(Icons.restore),
             child: const Text('Reset All Settings'),

@@ -16,13 +16,9 @@ class FrostyDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      titlePadding: const EdgeInsets.all(30.0),
+      titlePadding: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 20.0),
       contentPadding: const EdgeInsets.fromLTRB(30.0, 0.0, 30.0, 30.0),
       shape: RoundedRectangleBorder(
-        side: BorderSide(
-          color: Colors.deepPurpleAccent.withOpacity(0.3),
-          width: 3.0,
-        ),
         borderRadius: BorderRadius.circular(20.0),
       ),
       title: Text(
