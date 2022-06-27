@@ -160,6 +160,8 @@ class _ChattersListState extends State<ChattersList> {
                                             .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
 
                                         showModalBottomSheet(
+                                          backgroundColor: Colors.transparent,
+                                          isScrollControlled: true,
                                           context: context,
                                           builder: (context) => ChatUserModal(
                                             chatStore: widget.chatStore,
@@ -181,12 +183,10 @@ class _ChattersListState extends State<ChattersList> {
                     );
                   },
                 ),
-                SafeArea(
-                  child: Observer(
-                    builder: (context) => AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
-                    ),
+                Observer(
+                  builder: (context) => AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
                   ),
                 ),
               ],

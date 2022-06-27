@@ -111,6 +111,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                         ),
                       ),
                       onLongPress: () => showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
                         context: context,
                         builder: (context) => BlockReportModal(
                           authStore: widget.searchStore.authStore,

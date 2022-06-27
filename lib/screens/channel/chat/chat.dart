@@ -66,6 +66,8 @@ class Chat extends StatelessWidget {
                                         if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                                       },
                                       onLongPress: () => showModalBottomSheet(
+                                        backgroundColor: Colors.transparent,
+                                        isScrollControlled: true,
                                         context: context,
                                         builder: (context) => ChatUserModal(
                                           chatStore: chatStore,

@@ -92,15 +92,13 @@ class ChatBottomBar extends StatelessWidget {
                   icon: Icon(Icons.adaptive.more),
                   tooltip: 'Chat Details',
                   onPressed: () => showModalBottomSheet(
+                    backgroundColor: Colors.transparent,
                     isScrollControlled: true,
                     context: context,
-                    builder: (_) => SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.8,
-                      child: ChatDetails(
-                        chatDetails: chatStore.chatDetailsStore,
-                        chatStore: chatStore,
-                        userLogin: chatStore.channelName,
-                      ),
+                    builder: (_) => ChatDetails(
+                      chatDetails: chatStore.chatDetailsStore,
+                      chatStore: chatStore,
+                      userLogin: chatStore.channelName,
                     ),
                   ),
                 ),

@@ -4,6 +4,7 @@ import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/section_header.dart';
 
@@ -30,9 +31,9 @@ class _ChatUserModalState extends State<ChatUserModal> {
   Widget build(BuildContext context) {
     final userMessages = widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
 
-    return Scaffold(
-      body: SafeArea(
-        bottom: false,
+    return FrostyModal(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.5,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -43,27 +44,22 @@ class _ChatUserModalState extends State<ChatUserModal> {
               ),
               title: Row(
                 children: [
-                  Text(
-                    widget.displayName,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    tooltip: 'Block or Report User',
-                    onPressed: () => showModalBottomSheet(
-                      context: context,
-                      builder: (context) => BlockReportModal(
-                        authStore: widget.chatStore.auth,
-                        name: widget.displayName,
-                        userLogin: widget.username,
-                        userId: widget.userId,
+                  Expanded(
+                    child: Tooltip(
+                      preferBelow: false,
+                      message: widget.displayName,
+                      child: Text(
+                        widget.displayName,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    icon: Icon(Icons.adaptive.more),
                   ),
                 ],
               ),
               trailing: widget.chatStore.auth.isLoggedIn
                   ? Button(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       onPressed: () {
                         widget.chatStore.textController.text = '@${widget.username} ';
                         Navigator.pop(context);
@@ -72,6 +68,16 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       child: const Text('Reply'),
                     )
                   : null,
+              onTap: () => showModalBottomSheet(
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (context) => BlockReportModal(
+                  authStore: widget.chatStore.auth,
+                  name: widget.displayName,
+                  userLogin: widget.username,
+                  userId: widget.userId,
+                ),
+              ),
             ),
             const SectionHeader(
               'Recent Messages',
@@ -83,6 +89,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                 child: DefaultTextStyle(
                   style: DefaultTextStyle.of(context).style.copyWith(fontSize: widget.chatStore.settings.fontSize),
                   child: ListView.separated(
+                    padding: const EdgeInsets.all(0.0),
                     reverse: true,
                     itemBuilder: (context, index) => InkWell(
                       onLongPress: () async {

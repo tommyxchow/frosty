@@ -69,6 +69,7 @@ class _StreamCardState extends State<StreamCard> {
         ),
       ),
       onLongPress: () => showModalBottomSheet(
+        backgroundColor: Colors.transparent,
         context: context,
         builder: (context) => BlockReportModal(
           authStore: widget.listStore.authStore,

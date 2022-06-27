@@ -20,6 +20,7 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -144,11 +145,14 @@ class _VideoChatState extends State<VideoChat> {
           tooltip: 'Settings',
           icon: const Icon(Icons.settings),
           onPressed: () => showModalBottomSheet(
+            backgroundColor: Colors.transparent,
             isScrollControlled: true,
             context: context,
-            builder: (context) => SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: Settings(settingsStore: settingsStore),
+            builder: (context) => FrostyModal(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8,
+                child: Settings(settingsStore: settingsStore),
+              ),
             ),
           ),
         ),
@@ -305,6 +309,18 @@ class _VideoOverlay extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  const Icon(Icons.timer),
+                  Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: 'Cancel Timer',
+                    onPressed: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive ? videoStore.cancelSleepTimer : null,
+                    icon: const Icon(Icons.cancel),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
                   DropdownButton(
                     value: videoStore.sleepHours,
                     items: List.generate(24, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
@@ -327,19 +343,6 @@ class _VideoOverlay extends StatelessWidget {
                   const Text('Minutes'),
                 ],
               ),
-              if (videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive)
-                Row(
-                  children: [
-                    const Icon(Icons.timer),
-                    Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
-                    const Spacer(),
-                    IconButton(
-                      tooltip: 'Cancel Timer',
-                      onPressed: videoStore.cancelSleepTimer,
-                      icon: const Icon(Icons.cancel),
-                    ),
-                  ],
-                ),
             ],
           ),
         ),
@@ -356,8 +359,9 @@ class _VideoOverlay extends StatelessWidget {
           ),
           Button(
             onPressed: Navigator.of(context).pop,
+            fill: true,
             color: Colors.red,
-            child: const Text('Cancel'),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -387,11 +391,14 @@ class _VideoOverlay extends StatelessWidget {
         color: Colors.white,
       ),
       onPressed: () => showModalBottomSheet(
+        backgroundColor: Colors.transparent,
         isScrollControlled: true,
         context: context,
-        builder: (context) => SizedBox(
-          height: MediaQuery.of(context).size.height * 0.8,
-          child: Settings(settingsStore: videoStore.settingsStore),
+        builder: (context) => FrostyModal(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: Settings(settingsStore: videoStore.settingsStore),
+          ),
         ),
       ),
     );

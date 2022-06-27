@@ -4,6 +4,7 @@ import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/modal.dart';
 
 class ChatDetails extends StatelessWidget {
   final ChatDetailsStore chatDetails;
@@ -19,24 +20,27 @@ class ChatDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: FocusScope.of(context).unfocus,
-      child: SafeArea(
-        child: Observer(
-          builder: (_) => Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15.0),
-                child: ChatModes(roomState: chatDetails.roomState),
-              ),
-              Expanded(
-                child: ChattersList(
-                  chatDetails: chatDetails,
-                  chatStore: chatStore,
-                  userLogin: userLogin,
+    return FrostyModal(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: GestureDetector(
+          onTap: FocusScope.of(context).unfocus,
+          child: Observer(
+            builder: (_) => Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  child: ChatModes(roomState: chatDetails.roomState),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: ChattersList(
+                    chatDetails: chatDetails,
+                    chatStore: chatStore,
+                    userLogin: userLogin,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
