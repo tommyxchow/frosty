@@ -11,14 +11,10 @@ import 'package:provider/provider.dart';
 /// A tappable card widget that displays a category's box art and name.
 class CategoryCard extends StatefulWidget {
   final CategoryTwitch category;
-  final int width;
-  final int height;
 
   const CategoryCard({
     Key? key,
     required this.category,
-    required this.width,
-    required this.height,
   }) : super(key: key);
 
   @override
@@ -33,37 +29,43 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => CategoryStreams(
-              listStore: ListStore(
-                twitchApi: context.read<TwitchApi>(),
-                authStore: context.read<AuthStore>(),
-                listType: ListType.category,
-                categoryInfo: widget.category,
-              ),
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    final artWidth = (size.width * pixelRatio) ~/ 3;
+    final artHeight = (artWidth * (4 / 3)).toInt();
+
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CategoryStreams(
+            listStore: ListStore(
+              twitchApi: context.read<TwitchApi>(),
+              authStore: context.read<AuthStore>(),
+              listType: ListType.category,
+              categoryInfo: widget.category,
             ),
           ),
         ),
-        onTapDown: (_) => _animationController.animateTo(
-          _animationController.upperBound,
-          curve: Curves.easeOutBack,
-          duration: const Duration(milliseconds: 200),
-        ),
-        onTapUp: (_) => _animationController.animateTo(
-          _animationController.lowerBound,
-          curve: Curves.easeOutBack,
-          duration: const Duration(milliseconds: 300),
-        ),
-        onTapCancel: () => _animationController.animateTo(
-          _animationController.lowerBound,
-          curve: Curves.easeOutBack,
-          duration: const Duration(milliseconds: 300),
-        ),
+      ),
+      onTapDown: (_) => _animationController.animateTo(
+        _animationController.upperBound,
+        curve: Curves.easeOutBack,
+        duration: const Duration(milliseconds: 200),
+      ),
+      onTapUp: (_) => _animationController.animateTo(
+        _animationController.lowerBound,
+        curve: Curves.easeOutBack,
+        duration: const Duration(milliseconds: 300),
+      ),
+      onTapCancel: () => _animationController.animateTo(
+        _animationController.lowerBound,
+        curve: Curves.easeOutBack,
+        duration: const Duration(milliseconds: 300),
+      ),
+      child: AnimatedBuilder(
+        animation: _animationController,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
           child: Column(
@@ -74,8 +76,8 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
                   child: AspectRatio(
                     aspectRatio: 3 / 4,
                     child: CachedNetworkImage(
-                      imageUrl: widget.category.boxArtUrl
-                          .replaceRange(widget.category.boxArtUrl.lastIndexOf('-') + 1, null, '${widget.width}x${widget.height}.jpg'),
+                      imageUrl:
+                          widget.category.boxArtUrl.replaceRange(widget.category.boxArtUrl.lastIndexOf('-') + 1, null, '${artWidth}x$artHeight.jpg'),
                       placeholder: (context, url) => const LoadingIndicator(),
                     ),
                   ),
@@ -95,10 +97,10 @@ class _CategoryCardState extends State<CategoryCard> with SingleTickerProviderSt
             ],
           ),
         ),
-      ),
-      builder: (context, child) => Transform.scale(
-        scale: 1 - _animationController.value,
-        child: child,
+        builder: (context, child) => Transform.scale(
+          scale: 1 - _animationController.value,
+          child: child,
+        ),
       ),
     );
   }

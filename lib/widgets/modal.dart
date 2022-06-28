@@ -16,20 +16,22 @@ class FrostyModal extends StatelessWidget {
           topRight: Radius.circular(20.0),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const FractionallySizedBox(
-            widthFactor: 0.25,
-            child: SizedBox(
-              child: Divider(
-                height: 25.0,
-                thickness: 3.0,
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const FractionallySizedBox(
+              widthFactor: 0.25,
+              child: SizedBox(
+                child: Divider(
+                  height: 25.0,
+                  thickness: 3.0,
+                ),
               ),
             ),
-          ),
-          SafeArea(child: child),
-        ],
+            Material(child: child),
+          ],
+        ),
       ),
     );
   }

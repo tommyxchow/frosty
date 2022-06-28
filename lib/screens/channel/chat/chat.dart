@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
@@ -65,17 +66,21 @@ class Chat extends StatelessWidget {
                                         FocusScope.of(context).unfocus();
                                         if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                                       },
-                                      onLongPress: () => showModalBottomSheet(
-                                        backgroundColor: Colors.transparent,
-                                        isScrollControlled: true,
-                                        context: context,
-                                        builder: (context) => ChatUserModal(
-                                          chatStore: chatStore,
-                                          username: message.user!,
-                                          userId: message.tags['user-id']!,
-                                          displayName: message.tags['display-name']!,
-                                        ),
-                                      ),
+                                      onLongPress: () {
+                                        HapticFeedback.lightImpact();
+
+                                        showModalBottomSheet(
+                                          backgroundColor: Colors.transparent,
+                                          isScrollControlled: true,
+                                          context: context,
+                                          builder: (context) => ChatUserModal(
+                                            chatStore: chatStore,
+                                            username: message.user!,
+                                            userId: message.tags['user-id']!,
+                                            displayName: message.tags['display-name']!,
+                                          ),
+                                        );
+                                      },
                                       child: chatMessage,
                                     );
                                   }
@@ -87,17 +92,20 @@ class Chat extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Observer(
-                      builder: (_) => AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: chatStore.autoScroll
-                            ? null
-                            : Button(
-                                padding: const EdgeInsets.all(10.0),
-                                onPressed: chatStore.resumeScroll,
-                                icon: const Icon(Icons.arrow_circle_down),
-                                child: const Text('Resume Scroll'),
-                              ),
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Observer(
+                        builder: (_) => AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: chatStore.autoScroll
+                              ? null
+                              : Button(
+                                  padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                                  onPressed: chatStore.resumeScroll,
+                                  icon: const Icon(Icons.arrow_circle_down),
+                                  child: const Text('Resume Scroll'),
+                                ),
+                        ),
                       ),
                     ),
                   ],

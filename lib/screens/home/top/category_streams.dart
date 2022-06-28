@@ -27,9 +27,6 @@ class _CategoryStreamsState extends State<CategoryStreams> {
     final artWidth = (size.width * pixelRatio).toInt();
     final artHeight = (artWidth * (4 / 3)).toInt();
 
-    final thumbnailWidth = (size.width * pixelRatio) ~/ 3;
-    final thumbnailHeight = (thumbnailWidth * (9 / 16)).toInt();
-
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
@@ -99,8 +96,6 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                               builder: (context) => StreamCard(
                                 listStore: widget.listStore,
                                 streamInfo: widget.listStore.streams[index],
-                                width: thumbnailWidth,
-                                height: thumbnailHeight,
                                 showUptime: context.read<SettingsStore>().showThumbnailUptime,
                                 showThumbnail: context.read<SettingsStore>().showThumbnails,
                                 large: context.read<SettingsStore>().largeStreamCard,

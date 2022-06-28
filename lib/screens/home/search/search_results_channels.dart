@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/channel.dart';
@@ -110,16 +111,20 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                           ),
                         ),
                       ),
-                      onLongPress: () => showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
-                        context: context,
-                        builder: (context) => BlockReportModal(
-                          authStore: widget.searchStore.authStore,
-                          name: displayName,
-                          userLogin: channel.broadcasterLogin,
-                          userId: channel.id,
-                        ),
-                      ),
+                      onLongPress: () {
+                        HapticFeedback.lightImpact();
+
+                        showModalBottomSheet(
+                          backgroundColor: Colors.transparent,
+                          context: context,
+                          builder: (context) => BlockReportModal(
+                            authStore: widget.searchStore.authStore,
+                            name: displayName,
+                            userLogin: channel.broadcasterLogin,
+                            userId: channel.id,
+                          ),
+                        );
+                      },
                     );
                   },
                 ),

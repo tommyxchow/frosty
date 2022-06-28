@@ -93,6 +93,7 @@ class _ChattersListState extends State<ChattersList> {
           child: RefreshIndicator(
             onRefresh: () async {
               HapticFeedback.lightImpact();
+
               await chatDetailsStore.updateChatters(widget.userLogin);
             },
             child: Stack(
@@ -148,32 +149,34 @@ class _ChattersListState extends State<ChattersList> {
                                   ),
                                 ),
                               ),
-                              SliverPadding(
-                                padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
-                                sliver: SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) => InkWell(
+                              SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) => InkWell(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                                       child: Text(users[index]),
-                                      onLongPress: () async {
-                                        final userInfo = await context
-                                            .read<TwitchApi>()
-                                            .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
-
-                                        showModalBottomSheet(
-                                          backgroundColor: Colors.transparent,
-                                          isScrollControlled: true,
-                                          context: context,
-                                          builder: (context) => ChatUserModal(
-                                            chatStore: widget.chatStore,
-                                            username: userInfo.login,
-                                            userId: userInfo.id,
-                                            displayName: userInfo.displayName,
-                                          ),
-                                        );
-                                      },
                                     ),
-                                    childCount: users.length,
+                                    onLongPress: () async {
+                                      HapticFeedback.lightImpact();
+
+                                      final userInfo = await context
+                                          .read<TwitchApi>()
+                                          .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
+
+                                      showModalBottomSheet(
+                                        backgroundColor: Colors.transparent,
+                                        isScrollControlled: true,
+                                        context: context,
+                                        builder: (context) => ChatUserModal(
+                                          chatStore: widget.chatStore,
+                                          username: userInfo.login,
+                                          userId: userInfo.id,
+                                          displayName: userInfo.displayName,
+                                        ),
+                                      );
+                                    },
                                   ),
+                                  childCount: users.length,
                                 ),
                               ),
                             ]

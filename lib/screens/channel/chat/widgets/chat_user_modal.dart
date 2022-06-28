@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
@@ -30,6 +31,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
   @override
   Widget build(BuildContext context) {
     final userMessages = widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
+    final name = regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
 
     return FrostyModal(
       child: SizedBox(
@@ -44,12 +46,12 @@ class _ChatUserModalState extends State<ChatUserModal> {
               ),
               title: Row(
                 children: [
-                  Expanded(
+                  Flexible(
                     child: Tooltip(
                       preferBelow: false,
-                      message: widget.displayName,
+                      message: name,
                       child: Text(
-                        widget.displayName,
+                        name,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
@@ -68,16 +70,20 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       child: const Text('Reply'),
                     )
                   : null,
-              onTap: () => showModalBottomSheet(
-                backgroundColor: Colors.transparent,
-                context: context,
-                builder: (context) => BlockReportModal(
-                  authStore: widget.chatStore.auth,
-                  name: widget.displayName,
-                  userLogin: widget.username,
-                  userId: widget.userId,
-                ),
-              ),
+              onLongPress: () {
+                HapticFeedback.mediumImpact();
+
+                showModalBottomSheet(
+                  backgroundColor: Colors.transparent,
+                  context: context,
+                  builder: (context) => BlockReportModal(
+                    authStore: widget.chatStore.auth,
+                    name: name,
+                    userLogin: widget.username,
+                    userId: widget.userId,
+                  ),
+                );
+              },
             ),
             const SectionHeader(
               'Recent Messages',
@@ -93,6 +99,8 @@ class _ChatUserModalState extends State<ChatUserModal> {
                     reverse: true,
                     itemBuilder: (context, index) => InkWell(
                       onLongPress: () async {
+                        HapticFeedback.lightImpact();
+
                         await Clipboard.setData(ClipboardData(text: userMessages[index].message));
 
                         if (!mounted) return;

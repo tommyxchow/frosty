@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
@@ -17,8 +20,6 @@ import 'package:provider/provider.dart';
 class StreamCard extends StatefulWidget {
   final ListStore listStore;
   final StreamTwitch streamInfo;
-  final int width;
-  final int height;
   final bool showUptime;
   final bool showThumbnail;
   final bool large;
@@ -28,8 +29,6 @@ class StreamCard extends StatefulWidget {
     Key? key,
     required this.listStore,
     required this.streamInfo,
-    required this.width,
-    required this.height,
     required this.showUptime,
     required this.showThumbnail,
     required this.large,
@@ -51,10 +50,18 @@ class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateM
     final time = DateTime.now();
     final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
 
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    // Calculate the width and height of the thumbnail based on the device width and the stream card size setting.
+    // Constraint the resolution to 1920x1080 since that's the max resolution of the Twitch API.
+    final thumbnailWidth = min((size.width * pixelRatio) ~/ (widget.large ? 1 : 3), 1920);
+    final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
+
     final image = AspectRatio(
       aspectRatio: 16 / 9,
       child: CachedNetworkImage(
-        imageUrl: widget.streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${widget.width}x${widget.height}') + cacheUrlExtension,
+        imageUrl: widget.streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') + cacheUrlExtension,
         placeholder: (context, url) => const LoadingIndicator(),
         useOldImageOnUrlChange: true,
       ),
@@ -208,20 +215,21 @@ class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateM
       ),
     );
 
-    return AnimatedBuilder(
-      animation: _animationController,
-      child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VideoChat(
-              userId: widget.streamInfo.userId,
-              userName: widget.streamInfo.userName,
-              userLogin: widget.streamInfo.userLogin,
-            ),
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoChat(
+            userId: widget.streamInfo.userId,
+            userName: widget.streamInfo.userName,
+            userLogin: widget.streamInfo.userLogin,
           ),
         ),
-        onLongPress: () => showModalBottomSheet(
+      ),
+      onLongPress: () {
+        HapticFeedback.mediumImpact();
+
+        showModalBottomSheet(
           backgroundColor: Colors.transparent,
           context: context,
           builder: (context) => BlockReportModal(
@@ -230,22 +238,25 @@ class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateM
             userLogin: widget.streamInfo.userLogin,
             userId: widget.streamInfo.userId,
           ),
-        ),
-        onTapDown: (_) => _animationController.animateTo(
-          _animationController.upperBound,
-          curve: Curves.easeOutBack,
-          duration: const Duration(milliseconds: 200),
-        ),
-        onTapUp: (_) => _animationController.animateTo(
-          _animationController.lowerBound,
-          curve: Curves.easeOutBack,
-          duration: const Duration(milliseconds: 300),
-        ),
-        onTapCancel: () => _animationController.animateTo(
-          _animationController.lowerBound,
-          curve: Curves.easeOutBack,
-          duration: const Duration(milliseconds: 300),
-        ),
+        );
+      },
+      onTapDown: (_) => _animationController.animateTo(
+        _animationController.upperBound,
+        curve: Curves.easeOutBack,
+        duration: const Duration(milliseconds: 200),
+      ),
+      onTapUp: (_) => _animationController.animateTo(
+        _animationController.lowerBound,
+        curve: Curves.easeOutBack,
+        duration: const Duration(milliseconds: 300),
+      ),
+      onTapCancel: () => _animationController.animateTo(
+        _animationController.lowerBound,
+        curve: Curves.easeOutBack,
+        duration: const Duration(milliseconds: 300),
+      ),
+      child: AnimatedBuilder(
+        animation: _animationController,
         child: Padding(
           padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: widget.showThumbnail ? 15.0 : 5.0),
           child: widget.large
@@ -267,13 +278,11 @@ class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateM
                   ],
                 ),
         ),
-      ),
-      builder: (context, child) {
-        return Transform.scale(
+        builder: (context, child) => Transform.scale(
           scale: 1 - _animationController.value,
           child: child,
-        );
-      },
+        ),
+      ),
     );
   }
 

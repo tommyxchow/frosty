@@ -26,12 +26,6 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
 
-    final size = MediaQuery.of(context).size;
-    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
-    final artWidth = (size.width * pixelRatio) ~/ 3;
-    final artHeight = (artWidth * (4 / 3)).toInt();
-
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
@@ -68,8 +62,6 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
                   }
                   return CategoryCard(
                     category: _categoriesStore.categories[index],
-                    width: artWidth,
-                    height: artHeight,
                   );
                 },
               ),

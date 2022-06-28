@@ -132,6 +132,8 @@ abstract class VideoStoreBase with Store {
   @action
   Future<void> handleToggleOverlay() async {
     if (settingsStore.toggleableOverlay) {
+      HapticFeedback.mediumImpact();
+
       settingsStore.showOverlay = !settingsStore.showOverlay;
 
       await controller?.loadUrl(videoUrl);
