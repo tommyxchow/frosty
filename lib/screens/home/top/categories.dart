@@ -5,6 +5,7 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/widgets/category_card.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,10 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
 
         if (_categoriesStore.error != null) {
           final snackBar = SnackBar(
-            content: Text(_categoriesStore.error!),
+            content: AlertMessage(
+              message: _categoriesStore.error!,
+              icon: Icons.error,
+            ),
             behavior: SnackBarBehavior.floating,
           );
 
@@ -44,7 +48,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
       child: Observer(
         builder: (_) {
           if (_categoriesStore.categories.isEmpty && _categoriesStore.isLoading && _categoriesStore.error == null) {
-            return const LoadingIndicator(subtitle: Text('Loading categories...'));
+            return const LoadingIndicator(subtitle: 'Loading categories...');
           }
           return Stack(
             alignment: AlignmentDirectional.bottomCenter,

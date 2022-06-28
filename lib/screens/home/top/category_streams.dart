@@ -8,6 +8,7 @@ import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,10 @@ class _CategoryStreamsState extends State<CategoryStreams> {
 
           if (widget.listStore.error != null) {
             final snackBar = SnackBar(
-              content: Text(widget.listStore.error!),
+              content: AlertMessage(
+                message: widget.listStore.error!,
+                icon: Icons.error,
+              ),
               behavior: SnackBarBehavior.floating,
             );
 
@@ -103,10 +107,8 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                     ),
                     if (widget.listStore.streams.isEmpty && widget.listStore.isLoading && widget.listStore.error == null)
                       const SliverFillRemaining(
-                        child: Center(
-                          child: LoadingIndicator(
-                            subtitle: Text('Loading streams...'),
-                          ),
+                        child: LoadingIndicator(
+                          subtitle: 'Loading streams...',
                         ),
                       )
                     else

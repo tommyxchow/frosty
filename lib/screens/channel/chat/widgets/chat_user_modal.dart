@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/modal.dart';
@@ -89,45 +90,48 @@ class _ChatUserModalState extends State<ChatUserModal> {
               'Recent Messages',
               padding: EdgeInsets.all(10.0),
             ),
-            Expanded(
-              child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: widget.chatStore.settings.messageScale),
-                child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context).style.copyWith(fontSize: widget.chatStore.settings.fontSize),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(0.0),
-                    reverse: true,
-                    itemBuilder: (context, index) => InkWell(
-                      onLongPress: () async {
-                        HapticFeedback.lightImpact();
+            if (userMessages.isEmpty)
+              const Expanded(child: AlertMessage(message: 'No recent messages'))
+            else
+              Expanded(
+                child: MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaleFactor: widget.chatStore.settings.messageScale),
+                  child: DefaultTextStyle(
+                    style: DefaultTextStyle.of(context).style.copyWith(fontSize: widget.chatStore.settings.fontSize),
+                    child: ListView.separated(
+                      padding: const EdgeInsets.all(0.0),
+                      reverse: true,
+                      itemBuilder: (context, index) => InkWell(
+                        onLongPress: () async {
+                          HapticFeedback.lightImpact();
 
-                        await Clipboard.setData(ClipboardData(text: userMessages[index].message));
+                          await Clipboard.setData(ClipboardData(text: userMessages[index].message));
 
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Message copied!'),
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                      },
-                      child: ChatMessage(
-                        ircMessage: userMessages[index],
-                        assetsStore: widget.chatStore.assetsStore,
-                        settingsStore: widget.chatStore.settings,
+                          if (!mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: AlertMessage(message: 'Message copied to clipboard'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: ChatMessage(
+                          ircMessage: userMessages[index],
+                          assetsStore: widget.chatStore.assetsStore,
+                          settingsStore: widget.chatStore.settings,
+                        ),
                       ),
+                      separatorBuilder: (context, index) => widget.chatStore.settings.showChatMessageDividers
+                          ? Divider(
+                              height: widget.chatStore.settings.messageSpacing,
+                              thickness: 1.0,
+                            )
+                          : SizedBox(height: widget.chatStore.settings.messageSpacing),
+                      itemCount: userMessages.length,
                     ),
-                    separatorBuilder: (context, index) => widget.chatStore.settings.showChatMessageDividers
-                        ? Divider(
-                            height: widget.chatStore.settings.messageSpacing,
-                            thickness: 1.0,
-                          )
-                        : SizedBox(height: widget.chatStore.settings.messageSpacing),
-                    itemCount: userMessages.length,
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

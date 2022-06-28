@@ -119,7 +119,7 @@ abstract class ListStoreBase with Store {
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect :(';
+      _error = 'Failed to connect';
     } catch (e) {
       _error = e.toString();
     }

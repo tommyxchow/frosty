@@ -6,6 +6,7 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/search/search_results_categories.dart';
 import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -60,15 +61,21 @@ class _SearchState extends State<Search> {
           child: Observer(
             builder: (context) {
               if (_textEditingController.text.isEmpty || _searchStore.channelFuture == null || _searchStore.categoryFuture == null) {
+                if (_searchStore.searchHistory.isEmpty) {
+                  return const AlertMessage(
+                    message: 'No recent searches',
+                    icon: Icons.search_off,
+                  );
+                }
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (_searchStore.searchHistory.isNotEmpty)
-                      const SectionHeader(
-                        'History',
-                        fontSize: 12.0,
-                        padding: headerPadding,
-                      ),
+                    const SectionHeader(
+                      'History',
+                      fontSize: 12.0,
+                      padding: headerPadding,
+                    ),
                     Expanded(
                       child: ListView(
                         children: _searchStore.searchHistory

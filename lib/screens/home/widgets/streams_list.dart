@@ -6,6 +6,7 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +50,10 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
 
         if (_listStore.error != null) {
           final snackBar = SnackBar(
-            content: Text(_listStore.error!),
+            content: AlertMessage(
+              message: _listStore.error!,
+              icon: Icons.error,
+            ),
             behavior: SnackBarBehavior.floating,
           );
 
@@ -59,9 +63,18 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
       },
       child: Observer(
         builder: (_) {
-          if (_listStore.streams.isEmpty && _listStore.isLoading && _listStore.error == null) {
-            return const LoadingIndicator(subtitle: Text('Loading streams...'));
+          if (_listStore.isLoading && _listStore.error == null) {
+            return const Center(
+              child: LoadingIndicator(subtitle: 'Loading streams...'),
+            );
           }
+
+          if (_listStore.streams.isEmpty) {
+            return const Center(
+              child: AlertMessage(message: 'No followed streams'),
+            );
+          }
+
           return Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: [

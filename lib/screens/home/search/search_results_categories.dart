@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/screens/home/widgets/category_card.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:mobx/mobx.dart';
 
@@ -20,14 +21,21 @@ class SearchResultsCategories extends StatelessWidget {
         switch (future!.status) {
           case FutureStatus.pending:
             return const SliverToBoxAdapter(
-              child: LoadingIndicator(
-                subtitle: Text('Loading categories...'),
+              child: SizedBox(
+                height: 100.0,
+                child: LoadingIndicator(
+                  subtitle: 'Loading categories...',
+                ),
               ),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
-              child: Center(
-                child: Text('Failed to get categories'),
+              child: SizedBox(
+                height: 100.0,
+                child: AlertMessage(
+                  message: 'Failed to get categories',
+                  icon: Icons.error,
+                ),
               ),
             );
           case FutureStatus.fulfilled:
@@ -35,8 +43,12 @@ class SearchResultsCategories extends StatelessWidget {
 
             if (categories == null) {
               return const SliverToBoxAdapter(
-                child: Center(
-                  child: Text('Failed to get categories'),
+                child: SizedBox(
+                  height: 100.0,
+                  child: AlertMessage(
+                    message: 'Failed to get categories',
+                    icon: Icons.error,
+                  ),
                 ),
               );
             }
@@ -45,7 +57,7 @@ class SearchResultsCategories extends StatelessWidget {
               return const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 100.0,
-                  child: Center(child: Text('No matching categories')),
+                  child: AlertMessage(message: 'No matching categories'),
                 ),
               );
             }

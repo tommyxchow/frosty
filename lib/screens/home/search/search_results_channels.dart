@@ -5,6 +5,7 @@ import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -40,11 +41,15 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
           ),
         ),
       );
-    } catch (e) {
+    } catch (error) {
       final snackBar = SnackBar(
-        content: Text(e.toString()),
+        content: AlertMessage(
+          message: error.toString(),
+          icon: Icons.error,
+        ),
         behavior: SnackBarBehavior.floating,
       );
+
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
@@ -59,13 +64,17 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
           case FutureStatus.pending:
             return const SliverToBoxAdapter(
               child: LoadingIndicator(
-                subtitle: Text('Loading channels...'),
+                subtitle: 'Loading channels...',
               ),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
-              child: Center(
-                child: Text('Failed to get channels'),
+              child: SizedBox(
+                height: 100.0,
+                child: AlertMessage(
+                  message: 'Failed to get channels',
+                  icon: Icons.error,
+                ),
               ),
             );
           case FutureStatus.fulfilled:
@@ -98,9 +107,8 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                               ),
                             )
                           : null,
-                      subtitle: channel.isLive
-                          ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}')
-                          : null,
+                      subtitle:
+                          channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(

@@ -21,7 +21,7 @@ class BTTVApi {
 
       return emotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvGlobal)).toList();
     } else {
-      return Future.error('Failed to get BTTV global emotes.');
+      return Future.error('Failed to get BTTV global emotes');
     }
   }
 
@@ -40,7 +40,7 @@ class BTTVApi {
 
       return emoteToUrl;
     } else {
-      return Future.error('Failed to get BTTV channel emotes.');
+      return Future.error('Failed to get BTTV channel emotes');
     }
   }
 

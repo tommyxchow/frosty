@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -32,11 +34,15 @@ class _OtherSettingsState extends State<OtherSettings> {
         actions: [
           Button(
             onPressed: () {
+              HapticFeedback.heavyImpact();
+
               widget.settingsStore.resetAllSettings();
+
               Navigator.pop(context);
+
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Settings reset!'),
+                  content: AlertMessage(message: 'All settings reset'),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -111,12 +117,14 @@ class _OtherSettingsState extends State<OtherSettings> {
             icon: const Icon(Icons.delete_sweep),
             child: const Text('Clear Image Cache'),
             onPressed: () async {
+              HapticFeedback.mediumImpact();
+
               await DefaultCacheManager().emptyCache();
 
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Image cache cleared!'),
+                  content: AlertMessage(message: 'Image cache cleared'),
                   behavior: SnackBarBehavior.floating,
                 ),
               );

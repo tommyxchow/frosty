@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/block_button.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
@@ -161,7 +162,8 @@ class ProfileCard extends StatelessWidget {
       builder: (context) {
         if (authStore.error != null) {
           return ListTile(
-            title: const Text('Failed to Connect'),
+            leading: const Icon(Icons.error),
+            title: const Text('Failed to connect'),
             trailing: Button(
               onPressed: authStore.init,
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -234,7 +236,9 @@ class BlockedUsers extends StatelessWidget {
           builder: (context) {
             if (authStore.user.blockedUsers.isEmpty) {
               return const Center(
-                child: Text('You don\'t have any blocked users.'),
+                child: AlertMessage(
+                  message: 'No blocked users',
+                ),
               );
             }
             return ListView(

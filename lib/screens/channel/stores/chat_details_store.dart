@@ -60,7 +60,7 @@ abstract class ChatDetailsStoreBase with Store {
       _chatUsers = await twitchApi.getChatters(userLogin: userLogin);
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect :(';
+      _error = 'Failed to connect';
     } catch (e) {
       debugPrint(e.toString());
       _error = e.toString();

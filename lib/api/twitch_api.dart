@@ -28,7 +28,7 @@ class TwitchApi {
 
       return emotes.map((emote) => Emote.fromTwitch(emote, EmoteType.twitchGlobal)).toList();
     } else {
-      return Future.error('Failed to get Twitch global emotes.');
+      return Future.error('Failed to get Twitch global emotes');
     }
   }
 
@@ -57,7 +57,7 @@ class TwitchApi {
         }
       }).toList();
     } else {
-      return Future.error('Failed to get Twitch channel emotes.');
+      return Future.error('Failed to get Twitch channel emotes');
     }
   }
 
@@ -85,7 +85,7 @@ class TwitchApi {
         }
       }).toList();
     } else {
-      return Future.error('Failed to get Twitch emotes set.');
+      return Future.error('Failed to get Twitch emotes set');
     }
   }
 
@@ -97,12 +97,12 @@ class TwitchApi {
     if (response.statusCode == 200) {
       final result = <String, Badge>{};
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
-      decoded.forEach((id, versions) => (versions['versions'] as Map)
-          .forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+      decoded.forEach((id, versions) =>
+          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {
-      return Future.error('Failed to get Twitch global badges.');
+      return Future.error('Failed to get Twitch global badges');
     }
   }
 
@@ -114,12 +114,12 @@ class TwitchApi {
     if (response.statusCode == 200) {
       final result = <String, Badge>{};
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
-      decoded.forEach((id, versions) => (versions['versions'] as Map)
-          .forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+      decoded.forEach((id, versions) =>
+          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {
-      return Future.error('Failed to get Twitch channel badges.');
+      return Future.error('Failed to get Twitch channel badges');
     }
   }
 
@@ -154,7 +154,7 @@ class TwitchApi {
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['access_token'];
     } else {
-      return Future.error('Failed to get default token.');
+      return Future.error('Failed to get default token');
     }
   }
 
@@ -164,10 +164,8 @@ class TwitchApi {
 
     final response = await _client.get(url, headers: {'Authorization': 'Bearer $token'});
     if (response.statusCode == 200) {
-      debugPrint('Token validated!');
       return true;
     } else {
-      debugPrint('Token invalidated :(');
       return false;
     }
   }
@@ -194,9 +192,8 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null
-        ? 'https://api.twitch.tv/helix/streams/followed?user_id=$id'
-        : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
+    final url = Uri.parse(
+        cursor == null ? 'https://api.twitch.tv/helix/streams/followed?user_id=$id' : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -213,8 +210,8 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(
-        cursor == null ? 'https://api.twitch.tv/helix/streams?game_id=$gameId' : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
+    final url =
+        Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/streams?game_id=$gameId' : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -243,7 +240,7 @@ class TwitchApi {
         return Future.error('$userLogin is offline');
       }
     } else {
-      return Future.error('Failed to get stream info.');
+      return Future.error('Failed to get stream info');
     }
   }
 
@@ -264,7 +261,7 @@ class TwitchApi {
       if (userData.isNotEmpty) {
         return UserTwitch.fromJson(userData.first);
       } else {
-        return Future.error('User does not exist!');
+        return Future.error('User does not exist');
       }
     } else {
       return Future.error('Failed to get user: ${decoded['message']}');
@@ -306,7 +303,7 @@ class TwitchApi {
 
       return channelData.map((e) => ChannelQuery.fromJson(e)).toList();
     } else {
-      return Future.error('Failed to get channels.');
+      return Future.error('Failed to get channels');
     }
   }
 
@@ -358,7 +355,7 @@ class TwitchApi {
 
       return CategoriesTwitch.fromJson(decoded);
     } else {
-      return Future.error('Failed to get categories.');
+      return Future.error('Failed to get categories');
     }
   }
 
@@ -375,7 +372,7 @@ class TwitchApi {
 
       return decoded['total'] as int;
     } else {
-      return Future.error('Failed to get sub count.');
+      return Future.error('Failed to get sub count');
     }
   }
 
@@ -389,7 +386,7 @@ class TwitchApi {
 
       return ChatUsers.fromJson(decoded);
     } else {
-      return Future.error('Failed to get chatters.');
+      return Future.error('Failed to get chatters');
     }
   }
 
@@ -422,7 +419,7 @@ class TwitchApi {
         return [];
       }
     } else {
-      return Future.error('User does not exist!');
+      return Future.error('User does not exist');
     }
   }
 
