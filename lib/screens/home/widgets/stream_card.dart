@@ -10,6 +10,7 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/top/category_streams.dart';
+import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -39,12 +40,7 @@ class StreamCard extends StatefulWidget {
   State<StreamCard> createState() => _StreamCardState();
 }
 
-class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateMixin {
-  late final _animationController = AnimationController(
-    vsync: this,
-    upperBound: 0.05,
-  );
-
+class _StreamCardState extends State<StreamCard> {
   @override
   Widget build(BuildContext context) {
     final time = DateTime.now();
@@ -183,8 +179,10 @@ class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateM
                 ),
               ),
               onTap: () async {
-                final category =
-                    await context.read<TwitchApi>().getCategory(headers: context.read<AuthStore>().headersTwitch, gameId: widget.streamInfo.gameId);
+                final category = await context.read<TwitchApi>().getCategory(
+                      headers: context.read<AuthStore>().headersTwitch,
+                      gameId: widget.streamInfo.gameId,
+                    );
 
                 if (!mounted) return;
                 Navigator.push(
@@ -215,7 +213,7 @@ class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateM
       ),
     );
 
-    return InkWell(
+    return AnimateScale(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
@@ -240,55 +238,27 @@ class _StreamCardState extends State<StreamCard> with SingleTickerProviderStateM
           ),
         );
       },
-      onTapDown: (_) => _animationController.animateTo(
-        _animationController.upperBound,
-        curve: Curves.easeOutBack,
-        duration: const Duration(milliseconds: 200),
-      ),
-      onTapUp: (_) => _animationController.animateTo(
-        _animationController.lowerBound,
-        curve: Curves.easeOutBack,
-        duration: const Duration(milliseconds: 300),
-      ),
-      onTapCancel: () => _animationController.animateTo(
-        _animationController.lowerBound,
-        curve: Curves.easeOutBack,
-        duration: const Duration(milliseconds: 300),
-      ),
-      child: AnimatedBuilder(
-        animation: _animationController,
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: widget.showThumbnail ? 15.0 : 5.0),
-          child: widget.large
-              ? Stack(
-                  alignment: AlignmentDirectional.bottomStart,
-                  children: [imageSection, streamInfoSection],
-                )
-              : Row(
-                  children: [
-                    if (widget.showThumbnail)
-                      Flexible(
-                        flex: 1,
-                        child: imageSection,
-                      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: widget.showThumbnail ? 15.0 : 5.0),
+        child: widget.large
+            ? Stack(
+                alignment: AlignmentDirectional.bottomStart,
+                children: [imageSection, streamInfoSection],
+              )
+            : Row(
+                children: [
+                  if (widget.showThumbnail)
                     Flexible(
-                      flex: 2,
-                      child: streamInfoSection,
+                      flex: 1,
+                      child: imageSection,
                     ),
-                  ],
-                ),
-        ),
-        builder: (context, child) => Transform.scale(
-          scale: 1 - _animationController.value,
-          child: child,
-        ),
+                  Flexible(
+                    flex: 2,
+                    child: streamInfoSection,
+                  ),
+                ],
+              ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
   }
 }

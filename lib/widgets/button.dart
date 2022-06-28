@@ -70,6 +70,8 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
             label: widget.child,
           );
 
+    const duration = Duration(milliseconds: 200);
+
     return AnimatedBuilder(
       animation: _animationController,
       child: widget.onPressed == null
@@ -77,18 +79,18 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
           : Listener(
               onPointerDown: (_) => _animationController.animateTo(
                 _animationController.upperBound,
-                curve: Curves.easeOutBack,
-                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInCubic,
+                duration: duration,
               ),
               onPointerUp: (_) => _animationController.animateTo(
                 _animationController.lowerBound,
-                curve: Curves.easeOutBack,
-                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                duration: duration,
               ),
               onPointerCancel: (_) => _animationController.animateTo(
                 _animationController.lowerBound,
-                curve: Curves.easeOutBack,
-                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                duration: duration,
               ),
               child: button,
             ),
