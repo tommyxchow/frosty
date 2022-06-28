@@ -147,7 +147,7 @@ class ProfileCard extends StatelessWidget {
           Button(
             fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red,
+            color: Colors.red.shade700,
             child: const Text('Cancel'),
           )
         ],
@@ -183,7 +183,7 @@ class ProfileCard extends StatelessWidget {
               icon: const Icon(Icons.logout_outlined),
               padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
               fill: true,
-              color: Colors.red,
+              color: Colors.red.shade700,
               child: const Text('Log Out'),
             ),
           );
@@ -227,6 +227,7 @@ class BlockedUsers extends StatelessWidget {
       body: RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.lightImpact();
+
           await authStore.user.refreshBlockedUsers(headers: authStore.headersTwitch);
         },
         child: Observer(

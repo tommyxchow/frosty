@@ -33,7 +33,7 @@ class ReportButton extends StatelessWidget {
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-      color: Colors.red,
+      color: Colors.red.shade700,
       fill: true,
       child: Text('Report $displayName'),
     );

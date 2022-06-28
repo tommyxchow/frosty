@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 /// A custom button that scales down when tapped/held on (sorta like a real button).
@@ -37,7 +39,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
       primary: widget.color == null || widget.fill ? widget.color : Colors.transparent,
       onPrimary: widget.fill ? null : widget.color,
       padding: widget.padding,
-      splashFactory: NoSplash.splashFactory,
+      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: widget.fontSize),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       elevation: widget.color == null ? 10.0 : 0.0,
@@ -83,14 +85,17 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                 curve: Curves.easeOutBack,
                 duration: const Duration(milliseconds: 300),
               ),
+              onPointerCancel: (_) => _animationController.animateTo(
+                _animationController.lowerBound,
+                curve: Curves.easeOutBack,
+                duration: const Duration(milliseconds: 300),
+              ),
               child: button,
             ),
-      builder: (context, child) {
-        return Transform.scale(
-          scale: 1 - _animationController.value,
-          child: child,
-        );
-      },
+      builder: (context, child) => Transform.scale(
+        scale: 1 - _animationController.value,
+        child: child,
+      ),
     );
   }
 

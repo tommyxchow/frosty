@@ -38,7 +38,7 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
           Button(
             fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red,
+            color: Colors.red.shade700,
             child: const Text('Cancel'),
           ),
         ],

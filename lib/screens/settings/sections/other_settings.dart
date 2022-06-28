@@ -46,7 +46,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           Button(
             fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red,
+            color: Colors.red.shade700,
             child: const Text('Cancel'),
           ),
         ],

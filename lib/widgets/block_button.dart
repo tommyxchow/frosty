@@ -49,7 +49,7 @@ class BlockButton extends StatelessWidget {
           Button(
             fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red,
+            color: Colors.red.shade700,
             child: const Text('Cancel'),
           ),
         ],
@@ -66,7 +66,7 @@ class BlockButton extends StatelessWidget {
         return Button(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
           icon: const Icon(Icons.block),
-          color: Colors.red,
+          color: Colors.red.shade700,
           fill: true,
           onPressed: () => _showDialog(
             context,

@@ -360,7 +360,7 @@ class _VideoOverlay extends StatelessWidget {
           Button(
             onPressed: Navigator.of(context).pop,
             fill: true,
-            color: Colors.red,
+            color: Colors.red.shade700,
             child: const Text('Close'),
           ),
         ],
