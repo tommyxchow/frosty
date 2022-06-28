@@ -9,7 +9,7 @@ import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
-/// A tappable card widget that displays a category's box art and name.
+/// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
   final CategoryTwitch category;
 
@@ -20,9 +20,9 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate the dimmensions of the box art based on the current dimmensions of the screen.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
     final artWidth = (size.width * pixelRatio) ~/ 3;
     final artHeight = (artWidth * (4 / 3)).toInt();
 
@@ -31,11 +31,12 @@ class CategoryCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => CategoryStreams(
+            categoryName: category.name,
             listStore: ListStore(
               twitchApi: context.read<TwitchApi>(),
               authStore: context.read<AuthStore>(),
               listType: ListType.category,
-              categoryInfo: widget.category,
+              categoryId: category.id,
             ),
           ),
         ),

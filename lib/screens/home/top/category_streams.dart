@@ -2,6 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -9,10 +12,17 @@ import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
+/// A widget that displays a list of streams depending on the provided [listType].
+/// This differs from the normal [StreamsList] in that it uses Slivers to display the box art on top.
 class CategoryStreams extends StatefulWidget {
   final ListStore listStore;
+  final String categoryName;
 
-  const CategoryStreams({Key? key, required this.listStore}) : super(key: key);
+  const CategoryStreams({
+    Key? key,
+    required this.listStore,
+    required this.categoryName,
+  }) : super(key: key);
 
   @override
   State<CategoryStreams> createState() => _CategoryStreamsState();
@@ -21,9 +31,9 @@ class CategoryStreams extends StatefulWidget {
 class _CategoryStreamsState extends State<CategoryStreams> {
   @override
   Widget build(BuildContext context) {
+    // Calculate the dimmensions of the box art based on the screen width.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
     final artWidth = (size.width * pixelRatio).toInt();
     final artHeight = (artWidth * (4 / 3)).toInt();
 
@@ -66,21 +76,31 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         ],
                         centerTitle: true,
                         title: Text(
-                          widget.listStore.categoryInfo!.name,
+                          widget.categoryName,
                           style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        background: CachedNetworkImage(
-                          imageUrl: widget.listStore.categoryInfo!.boxArtUrl.replaceRange(
-                            widget.listStore.categoryInfo!.boxArtUrl.lastIndexOf('-') + 1,
-                            null,
-                            '${artWidth}x$artHeight.jpg',
-                          ),
-                          placeholder: (context, url) => const LoadingIndicator(),
-                          color: const Color.fromRGBO(255, 255, 255, 0.5),
-                          colorBlendMode: BlendMode.modulate,
-                          fit: BoxFit.cover,
+                        background: FutureBuilder(
+                          future: context.read<TwitchApi>().getCategory(
+                                headers: context.read<AuthStore>().headersTwitch,
+                                gameId: widget.listStore.categoryId!,
+                              ),
+                          builder: (context, AsyncSnapshot<CategoriesTwitch> snapshot) {
+                            return snapshot.hasData
+                                ? CachedNetworkImage(
+                                    imageUrl: snapshot.data!.data.first.boxArtUrl.replaceRange(
+                                      snapshot.data!.data.first.boxArtUrl.lastIndexOf('-') + 1,
+                                      null,
+                                      '${artWidth}x$artHeight.jpg',
+                                    ),
+                                    placeholder: (context, url) => const LoadingIndicator(),
+                                    color: const Color.fromRGBO(255, 255, 255, 0.5),
+                                    colorBlendMode: BlendMode.modulate,
+                                    fit: BoxFit.cover,
+                                  )
+                                : const SizedBox();
+                          },
                         ),
                       ),
                     ),

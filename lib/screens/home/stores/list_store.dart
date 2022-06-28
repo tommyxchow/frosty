@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/models/category.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:mobx/mobx.dart';
 
@@ -21,8 +20,8 @@ abstract class ListStoreBase with Store {
   /// The type of list that this store is handling.
   final ListType listType;
 
-  /// The category to use if the [listType] is category streams.
-  final CategoryTwitch? categoryInfo;
+  /// The category id to use if the [listType] is [ListType.category].
+  final String? categoryId;
 
   /// The pagination cursor for the streams.
   String? _streamsCursor;
@@ -45,6 +44,7 @@ abstract class ListStoreBase with Store {
   @readonly
   var _allStreams = ObservableList<StreamTwitch>();
 
+  /// The list of the fetched streams with blocked users filtered out.
   @computed
   ObservableList<StreamTwitch> get streams => _allStreams
       .where((streamInfo) => !authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(streamInfo.userId))
@@ -59,7 +59,7 @@ abstract class ListStoreBase with Store {
     required this.authStore,
     required this.twitchApi,
     required this.listType,
-    this.categoryInfo,
+    this.categoryId,
   }) {
     scrollController.addListener(() {
       if (scrollController.position.atEdge || scrollController.position.outOfRange) {
@@ -103,7 +103,7 @@ abstract class ListStoreBase with Store {
           break;
         case ListType.category:
           newStreams = await twitchApi.getStreamsUnderCategory(
-            gameId: categoryInfo!.id,
+            gameId: categoryId!,
             headers: authStore.headersTwitch,
             cursor: _streamsCursor,
           );
@@ -138,6 +138,11 @@ abstract class ListStoreBase with Store {
   void dispose() => scrollController.dispose();
 }
 
+/// The possible types of lists that can be displayed.
+///
+/// [ListType.followed] is the list of streams that the user is following.
+/// [ListType.top] is the list of top streams.
+/// [ListType.category] is the list of streams under a category.
 enum ListType {
   followed,
   top,

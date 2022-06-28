@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -11,14 +10,19 @@ import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
+/// A widget that displays a list of streams depending on the provided [listType].
+/// If the [listType] is [ListType.category], [categoryId] must be provided.
 class StreamsList extends StatefulWidget {
+  /// The type of list to display.
   final ListType listType;
-  final CategoryTwitch? categoryTwitch;
+
+  /// The category to display streams from if the [listType] is [ListType.category].
+  final String? categoryId;
 
   const StreamsList({
     Key? key,
     required this.listType,
-    this.categoryTwitch,
+    this.categoryId,
   }) : super(key: key);
 
   @override
@@ -30,7 +34,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
     authStore: context.read<AuthStore>(),
     twitchApi: context.read<TwitchApi>(),
     listType: widget.listType,
-    categoryInfo: widget.categoryTwitch,
+    categoryId: widget.categoryId,
   );
 
   @override

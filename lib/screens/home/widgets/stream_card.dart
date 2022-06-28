@@ -18,7 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
-class StreamCard extends StatefulWidget {
+class StreamCard extends StatelessWidget {
   final ListStore listStore;
   final StreamTwitch streamInfo;
   final bool showUptime;
@@ -37,33 +37,29 @@ class StreamCard extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StreamCard> createState() => _StreamCardState();
-}
-
-class _StreamCardState extends State<StreamCard> {
-  @override
   Widget build(BuildContext context) {
+    // Get a new URL for the thumbnail every 5 minutes so that the image is updated on refresh.
+    // This method adds a random value to the end of the URL to override the cached image.
     final time = DateTime.now();
     final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
 
-    final size = MediaQuery.of(context).size;
-    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
     // Calculate the width and height of the thumbnail based on the device width and the stream card size setting.
     // Constraint the resolution to 1920x1080 since that's the max resolution of the Twitch API.
-    final thumbnailWidth = min((size.width * pixelRatio) ~/ (widget.large ? 1 : 3), 1920);
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final thumbnailWidth = min((size.width * pixelRatio) ~/ (large ? 1 : 3), 1920);
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
 
     final image = AspectRatio(
       aspectRatio: 16 / 9,
       child: CachedNetworkImage(
-        imageUrl: widget.streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') + cacheUrlExtension,
+        imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') + cacheUrlExtension,
         placeholder: (context, url) => const LoadingIndicator(),
         useOldImageOnUrlChange: true,
       ),
     );
 
-    final thumbnail = widget.large
+    final thumbnail = large
         ? Container(
             foregroundDecoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -79,26 +75,24 @@ class _StreamCardState extends State<StreamCard> {
           )
         : image;
 
-    final streamerName = regexEnglish.hasMatch(widget.streamInfo.userName)
-        ? widget.streamInfo.userName
-        : '${widget.streamInfo.userName} (${widget.streamInfo.userLogin})';
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
 
-    final subFontSize = widget.large ? 16.0 : 14.0;
+    final subFontSize = large ? 16.0 : 14.0;
 
-    final fontColor = widget.large ? Colors.white : DefaultTextStyle.of(context).style.color;
+    final fontColor = large ? Colors.white : DefaultTextStyle.of(context).style.color;
 
     final imageSection = ClipRRect(
-      borderRadius: widget.large ? const BorderRadius.all(Radius.circular(10.0)) : const BorderRadius.all(Radius.circular(5.0)),
-      child: widget.showUptime
+      borderRadius: large ? const BorderRadius.all(Radius.circular(10.0)) : const BorderRadius.all(Radius.circular(5.0)),
+      child: showUptime
           ? Stack(
               alignment: AlignmentDirectional.bottomEnd,
               children: [
                 thumbnail,
-                if (widget.large)
+                if (large)
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Text(
-                      DateTime.now().difference(DateTime.parse(widget.streamInfo.startedAt)).toString().split('.')[0],
+                      DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
                       style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.white.withOpacity(0.8),
@@ -110,7 +104,7 @@ class _StreamCardState extends State<StreamCard> {
                     color: const Color.fromRGBO(0, 0, 0, 0.5),
                     padding: const EdgeInsets.symmetric(horizontal: 2.0),
                     child: Text(
-                      DateTime.now().difference(DateTime.parse(widget.streamInfo.startedAt)).toString().split('.')[0],
+                      DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
                       style: const TextStyle(fontSize: 12, color: Colors.white),
                     ),
                   )
@@ -120,14 +114,14 @@ class _StreamCardState extends State<StreamCard> {
     );
 
     final streamInfoSection = Padding(
-      padding: widget.large ? const EdgeInsets.all(10.0) : const EdgeInsets.only(left: 10.0),
+      padding: large ? const EdgeInsets.all(10.0) : const EdgeInsets.only(left: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               ProfilePicture(
-                userLogin: widget.streamInfo.userLogin,
+                userLogin: streamInfo.userLogin,
                 radius: 10.0,
               ),
               const SizedBox(width: 5.0),
@@ -138,7 +132,7 @@ class _StreamCardState extends State<StreamCard> {
                   child: Text(
                     streamerName,
                     style: TextStyle(
-                      fontSize: widget.large ? 20.0 : 16.0,
+                      fontSize: large ? 20.0 : 16.0,
                       fontWeight: FontWeight.bold,
                       color: fontColor,
                     ),
@@ -150,11 +144,11 @@ class _StreamCardState extends State<StreamCard> {
           ),
           const SizedBox(height: 5.0),
           Tooltip(
-            message: widget.streamInfo.title.trim(),
+            message: streamInfo.title.trim(),
             preferBelow: false,
             padding: const EdgeInsets.all(10.0),
             child: Text(
-              widget.streamInfo.title.trim(),
+              streamInfo.title.trim(),
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontWeight: FontWeight.w500,
@@ -164,13 +158,13 @@ class _StreamCardState extends State<StreamCard> {
             ),
           ),
           const SizedBox(height: 5.0),
-          if (widget.showCategory) ...[
+          if (showCategory) ...[
             InkWell(
               child: Tooltip(
-                message: widget.streamInfo.gameName,
+                message: streamInfo.gameName,
                 preferBelow: false,
                 child: Text(
-                  widget.streamInfo.gameName,
+                  streamInfo.gameName,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: subFontSize,
@@ -178,32 +172,25 @@ class _StreamCardState extends State<StreamCard> {
                   ),
                 ),
               ),
-              onTap: () async {
-                final category = await context.read<TwitchApi>().getCategory(
-                      headers: context.read<AuthStore>().headersTwitch,
-                      gameId: widget.streamInfo.gameId,
-                    );
-
-                if (!mounted) return;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CategoryStreams(
-                      listStore: ListStore(
-                        twitchApi: context.read<TwitchApi>(),
-                        authStore: context.read<AuthStore>(),
-                        listType: ListType.category,
-                        categoryInfo: category.data.first,
-                      ),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryStreams(
+                    categoryName: streamInfo.gameName,
+                    listStore: ListStore(
+                      twitchApi: context.read<TwitchApi>(),
+                      authStore: context.read<AuthStore>(),
+                      listType: ListType.category,
+                      categoryId: streamInfo.gameId,
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             ),
             const SizedBox(height: 5.0),
           ],
           Text(
-            '${NumberFormat().format(widget.streamInfo.viewerCount)} viewers',
+            '${NumberFormat().format(streamInfo.viewerCount)} viewers',
             style: TextStyle(
               fontSize: subFontSize,
               color: fontColor?.withOpacity(0.8),
@@ -218,9 +205,9 @@ class _StreamCardState extends State<StreamCard> {
         context,
         MaterialPageRoute(
           builder: (context) => VideoChat(
-            userId: widget.streamInfo.userId,
-            userName: widget.streamInfo.userName,
-            userLogin: widget.streamInfo.userLogin,
+            userId: streamInfo.userId,
+            userName: streamInfo.userName,
+            userLogin: streamInfo.userLogin,
           ),
         ),
       ),
@@ -231,23 +218,23 @@ class _StreamCardState extends State<StreamCard> {
           backgroundColor: Colors.transparent,
           context: context,
           builder: (context) => BlockReportModal(
-            authStore: widget.listStore.authStore,
+            authStore: listStore.authStore,
             name: streamerName,
-            userLogin: widget.streamInfo.userLogin,
-            userId: widget.streamInfo.userId,
+            userLogin: streamInfo.userLogin,
+            userId: streamInfo.userId,
           ),
         );
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: widget.showThumbnail ? 15.0 : 5.0),
-        child: widget.large
+        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: showThumbnail ? 15.0 : 5.0),
+        child: large
             ? Stack(
                 alignment: AlignmentDirectional.bottomStart,
                 children: [imageSection, streamInfoSection],
               )
             : Row(
                 children: [
-                  if (widget.showThumbnail)
+                  if (showThumbnail)
                     Flexible(
                       flex: 1,
                       child: imageSection,
