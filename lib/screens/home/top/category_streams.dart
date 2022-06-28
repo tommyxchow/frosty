@@ -55,9 +55,6 @@ class _CategoryStreamsState extends State<CategoryStreams> {
         },
         child: Observer(
           builder: (context) {
-            if (widget.listStore.streams.isEmpty && widget.listStore.isLoading && widget.listStore.error == null) {
-              return const LoadingIndicator(subtitle: Text('Loading streams...'));
-            }
             return Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: [
@@ -104,29 +101,38 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         ),
                       ),
                     ),
-                    SliverSafeArea(
-                      top: false,
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            if (index > widget.listStore.streams.length / 2 && widget.listStore.hasMore) {
-                              widget.listStore.getStreams();
-                            }
-                            return Observer(
-                              builder: (context) => StreamCard(
-                                listStore: widget.listStore,
-                                streamInfo: widget.listStore.streams[index],
-                                showUptime: context.read<SettingsStore>().showThumbnailUptime,
-                                showThumbnail: context.read<SettingsStore>().showThumbnails,
-                                large: context.read<SettingsStore>().largeStreamCard,
-                                showCategory: false,
-                              ),
-                            );
-                          },
-                          childCount: widget.listStore.streams.length,
+                    if (widget.listStore.streams.isEmpty && widget.listStore.isLoading && widget.listStore.error == null)
+                      const SliverFillRemaining(
+                        child: Center(
+                          child: LoadingIndicator(
+                            subtitle: Text('Loading streams...'),
+                          ),
+                        ),
+                      )
+                    else
+                      SliverSafeArea(
+                        top: false,
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              if (index > widget.listStore.streams.length - 8 && widget.listStore.hasMore) {
+                                widget.listStore.getStreams();
+                              }
+                              return Observer(
+                                builder: (context) => StreamCard(
+                                  listStore: widget.listStore,
+                                  streamInfo: widget.listStore.streams[index],
+                                  showUptime: context.read<SettingsStore>().showThumbnailUptime,
+                                  showThumbnail: context.read<SettingsStore>().showThumbnails,
+                                  large: context.read<SettingsStore>().largeStreamCard,
+                                  showCategory: false,
+                                ),
+                              );
+                            },
+                            childCount: widget.listStore.streams.length,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
                 SafeArea(

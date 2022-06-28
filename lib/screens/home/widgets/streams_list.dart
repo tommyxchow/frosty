@@ -70,7 +70,9 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
                 controller: _listStore.scrollController,
                 itemCount: _listStore.streams.length,
                 itemBuilder: (context, index) {
-                  if (index > _listStore.streams.length / 2 && _listStore.hasMore) {
+                  if (index > _listStore.streams.length - 8 && _listStore.hasMore) {
+                    debugPrint('$index ${_listStore.streams.length}');
+
                     _listStore.getStreams();
                   }
                   return Observer(
