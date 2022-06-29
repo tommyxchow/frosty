@@ -122,6 +122,7 @@ class ChatBottomBar extends StatelessWidget {
                         maxLines: 5,
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.fromLTRB(20.0, 10.0, 0.0, 10.0),
                           suffixIcon: IconButton(
                             color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
                             tooltip: 'Emote menu',
@@ -132,11 +133,7 @@ class ChatBottomBar extends StatelessWidget {
                             },
                           ),
                           hintMaxLines: 1,
-                          contentPadding: const EdgeInsets.all(10.0),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                          ),
-                          labelText: chatStore.auth.isLoggedIn ? 'Send a message' : 'Log in to chat',
+                          hintText: chatStore.auth.isLoggedIn ? 'Send a message' : 'Log in to chat',
                         ),
                         controller: chatStore.textController,
                         onSubmitted: chatStore.sendMessage,

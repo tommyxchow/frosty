@@ -44,13 +44,11 @@ class _SearchState extends State<Search> {
             controller: _textEditingController,
             autocorrect: false,
             decoration: InputDecoration(
-              isDense: true,
-              labelText: 'Find a channel or category',
-              contentPadding: const EdgeInsets.all(10.0),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0)),
-              ),
+              contentPadding: const EdgeInsets.all(0.0),
+              hintText: 'Find a channel or category',
+              prefixIcon: const Icon(Icons.search),
               suffixIcon: IconButton(
+                icon: const Icon(Icons.clear),
                 tooltip: 'Clear search',
                 onPressed: () {
                   FocusScope.of(context).unfocus();
@@ -58,7 +56,6 @@ class _SearchState extends State<Search> {
                     _textEditingController.clear();
                   });
                 },
-                icon: const Icon(Icons.clear),
               ),
             ),
             onSubmitted: _searchStore.handleQuery,
