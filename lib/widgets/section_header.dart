@@ -19,7 +19,6 @@ class SectionHeader extends StatelessWidget {
       child: Text(
         text.toUpperCase(),
         style: TextStyle(
-          color: DefaultTextStyle.of(context).style.color?.withOpacity(0.8),
           fontSize: fontSize,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.5,

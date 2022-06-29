@@ -21,14 +21,13 @@ class ProfilePicture extends StatelessWidget {
       future: context.read<TwitchApi>().getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
       builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
         return AnimatedOpacity(
+          opacity: snapshot.hasData ? 1 : 0,
           duration: const Duration(milliseconds: 500),
-          opacity: snapshot.connectionState == ConnectionState.done && snapshot.hasData ? 1.0 : 0.0,
+          curve: Curves.easeIn,
           child: CircleAvatar(
             radius: radius,
             backgroundColor: Colors.transparent,
-            foregroundImage: snapshot.connectionState == ConnectionState.done && snapshot.hasData
-                ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl)
-                : null,
+            foregroundImage: snapshot.hasData ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl) : null,
           ),
         );
       },

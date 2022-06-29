@@ -64,7 +64,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Layout',
-            fontSize: 12.0,
             padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
@@ -113,7 +112,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Emotes',
-            fontSize: 12.0,
             padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
@@ -125,7 +123,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Message Appearance',
-            fontSize: 12.0,
             padding: sectionPadding,
           ),
           SwitchListTile.adaptive(
@@ -166,7 +163,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Message Sizing',
-            fontSize: 12.0,
             padding: sectionPadding,
           ),
           ExpansionTile(
