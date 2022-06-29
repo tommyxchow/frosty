@@ -77,21 +77,33 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
       child: widget.onPressed == null
           ? button
           : Listener(
-              onPointerDown: (_) => _animationController.animateTo(
-                _animationController.upperBound,
-                curve: Curves.easeOutCubic,
-                duration: duration,
-              ),
-              onPointerUp: (_) => _animationController.animateTo(
-                _animationController.lowerBound,
-                curve: Curves.easeInCubic,
-                duration: duration,
-              ),
-              onPointerCancel: (_) => _animationController.animateTo(
-                _animationController.lowerBound,
-                curve: Curves.easeInCubic,
-                duration: duration,
-              ),
+              onPointerDown: (_) {
+                if (mounted) {
+                  _animationController.animateTo(
+                    _animationController.upperBound,
+                    curve: Curves.easeOutCubic,
+                    duration: duration,
+                  );
+                }
+              },
+              onPointerUp: (_) {
+                if (mounted) {
+                  _animationController.animateTo(
+                    _animationController.lowerBound,
+                    curve: Curves.easeInCubic,
+                    duration: duration,
+                  );
+                }
+              },
+              onPointerCancel: (_) {
+                if (mounted) {
+                  _animationController.animateTo(
+                    _animationController.lowerBound,
+                    curve: Curves.easeInCubic,
+                    duration: duration,
+                  );
+                }
+              },
               child: button,
             ),
       builder: (context, child) => Transform.scale(
