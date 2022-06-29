@@ -58,7 +58,8 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
                 padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
               ),
               const Spacer(),
-              SizedBox(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 height: 25,
                 child: Button(
                   padding: const EdgeInsets.all(0.0),

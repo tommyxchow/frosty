@@ -123,7 +123,12 @@ class Chat extends StatelessWidget {
               curve: Curves.ease,
               duration: const Duration(milliseconds: 200),
               height: chatStore.assetsStore.showEmoteMenu ? MediaQuery.of(context).size.height / 3 : 0,
-              child: chatStore.assetsStore.showEmoteMenu ? EmoteMenu(chatStore: chatStore) : null,
+              child: AnimatedOpacity(
+                curve: Curves.ease,
+                opacity: chatStore.assetsStore.showEmoteMenu ? 1 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: EmoteMenu(chatStore: chatStore),
+              ),
               onEnd: () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
             ),
           ],
