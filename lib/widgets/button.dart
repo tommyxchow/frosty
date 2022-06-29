@@ -41,7 +41,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
       padding: widget.padding,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: widget.fontSize),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       elevation: widget.color == null ? 10.0 : 0.0,
     ).copyWith(
       elevation: (widget.color == null || widget.fill) && widget.onPressed != null
