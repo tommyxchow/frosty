@@ -40,7 +40,6 @@ abstract class CategoriesStoreBase with Store {
   }
 
   // Fetches the top categories based on the current cursor.
-  @action
   Future<void> getCategories() async {
     _isLoading = true;
 
@@ -49,6 +48,7 @@ abstract class CategoriesStoreBase with Store {
         headers: authStore.headersTwitch,
         cursor: _categoriesCursor,
       );
+
       if (_categoriesCursor == null) {
         _categories = result.data.asObservable();
       } else {

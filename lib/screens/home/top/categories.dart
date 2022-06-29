@@ -51,9 +51,35 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
       },
       child: Observer(
         builder: (_) {
-          if (_categoriesStore.categories.isEmpty && _categoriesStore.isLoading && _categoriesStore.error == null) {
-            return const LoadingIndicator(subtitle: 'Loading categories...');
+          Widget? statusWidget;
+
+          if (_categoriesStore.error != null) {
+            statusWidget = AlertMessage(
+              message: _categoriesStore.error!,
+              icon: Icons.error,
+            );
           }
+
+          if (_categoriesStore.categories.isEmpty) {
+            if (_categoriesStore.isLoading && _categoriesStore.error == null) {
+              statusWidget = const LoadingIndicator(subtitle: 'Loading categories...');
+            } else {
+              statusWidget = const AlertMessage(message: 'No top categories');
+            }
+          }
+
+          if (statusWidget != null) {
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Center(
+                    child: statusWidget,
+                  ),
+                )
+              ],
+            );
+          }
+
           return GridView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
             controller: widget.scrollController,

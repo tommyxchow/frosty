@@ -23,27 +23,28 @@ abstract class ListStoreBase with Store {
   /// The category id to use when fetching streams if the [listType] is [ListType.category].
   final String? categoryId;
 
-  /// The pagination cursor for the streams.
-  String? _streamsCursor;
-
-  /// Returns whether or not there are more streams and loading status for pagination.
-  bool get hasMore => _isLoading == false && _streamsCursor != null;
-
-  /// The loading status for pagination.
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
   /// The scroll controller used for handling scroll to top (if provided).
   /// If provided, will use the [ScrollToTop] widget to scroll to the top of the list instead of the bottom tab bar.
   final ScrollController? scrollController;
 
-  /// Whether or not the scroll to top button is visible.
-  @observable
-  var showJumpButton = false;
+  /// The pagination cursor for the streams.
+  String? _streamsCursor;
+
+  /// Returns whether or not there are more streams and loading status for pagination.
+  @computed
+  bool get hasMore => _isLoading == false && _streamsCursor != null;
+
+  /// The loading status for pagination.
+  @readonly
+  bool _isLoading = false;
 
   /// The list of the fetched streams.
   @readonly
   var _allStreams = ObservableList<StreamTwitch>();
+
+  /// Whether or not the scroll to top button is visible.
+  @observable
+  var showJumpButton = false;
 
   /// The list of the fetched streams with blocked users filtered out.
   @computed
@@ -85,7 +86,6 @@ abstract class ListStoreBase with Store {
   }
 
   /// Fetches the streams based on the type and current cursor.
-  @action
   Future<void> getStreams() async {
     _isLoading = true;
 

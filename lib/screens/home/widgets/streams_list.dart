@@ -61,15 +61,32 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
       },
       child: Observer(
         builder: (_) {
-          if (_listStore.isLoading && _listStore.error == null) {
-            return const Center(
-              child: LoadingIndicator(subtitle: 'Loading streams...'),
+          Widget? statusWidget;
+
+          if (_listStore.error != null) {
+            statusWidget = AlertMessage(
+              message: _listStore.error!,
+              icon: Icons.error,
             );
           }
 
           if (_listStore.streams.isEmpty) {
-            return const Center(
-              child: AlertMessage(message: 'No followed streams'),
+            if (_listStore.isLoading && _listStore.error == null) {
+              statusWidget = const LoadingIndicator(subtitle: 'Loading streams...');
+            } else {
+              statusWidget = AlertMessage(message: widget.listType == ListType.followed ? 'No followed streams' : 'No top streams');
+            }
+          }
+
+          if (statusWidget != null) {
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Center(
+                    child: statusWidget,
+                  ),
+                )
+              ],
             );
           }
 
