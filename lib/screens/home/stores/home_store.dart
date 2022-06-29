@@ -44,7 +44,7 @@ abstract class HomeStoreBase with Store {
     if (index != _selectedIndex) {
       _selectedIndex = index;
     } else {
-      if (index == 0) {
+      if (index == 0 && authStore.isLoggedIn) {
         // If on the followed tab and tapping the followed button, scroll to the top.
         followedScrollController.animateTo(
           0.0,
