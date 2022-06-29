@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:frosty/widgets/button.dart';
 
 class ScrollToTopButton extends StatelessWidget {
@@ -15,15 +14,11 @@ class ScrollToTopButton extends StatelessWidget {
         message: 'Scroll to top',
         preferBelow: false,
         child: Button(
-          onPressed: () {
-            HapticFeedback.lightImpact();
-
-            scrollController.animateTo(
-              0.0,
-              curve: Curves.easeOutCubic,
-              duration: const Duration(milliseconds: 500),
-            );
-          },
+          onPressed: () => scrollController.animateTo(
+            0.0,
+            curve: Curves.easeOutCubic,
+            duration: const Duration(milliseconds: 500),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
           child: const Icon(Icons.keyboard_arrow_up),
         ),
