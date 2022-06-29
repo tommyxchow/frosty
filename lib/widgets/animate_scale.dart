@@ -26,8 +26,8 @@ class _AnimateScaleState extends State<AnimateScale> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     const duration = Duration(milliseconds: 200);
-    const downCurve = Curves.easeInCubic;
-    const upCurve = Curves.easeOutCubic;
+    const downCurve = Curves.easeOutCubic;
+    const upCurve = Curves.easeInCubic;
 
     return InkWell(
       onTap: widget.onTap,

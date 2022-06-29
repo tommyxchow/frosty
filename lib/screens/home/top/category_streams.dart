@@ -141,6 +141,8 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                   child: Observer(
                     builder: (context) => AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
                       child: widget.listStore.showJumpButton ? ScrollToTopButton(scrollController: widget.listStore.scrollController) : null,
                     ),
                   ),

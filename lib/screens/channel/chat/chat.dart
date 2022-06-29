@@ -97,6 +97,8 @@ class Chat extends StatelessWidget {
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
                           child: chatStore.autoScroll
                               ? null
                               : Button(

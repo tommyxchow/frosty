@@ -14,9 +14,10 @@ class ScrollToTopButton extends StatelessWidget {
       child: FloatingActionButton(
         onPressed: () {
           HapticFeedback.lightImpact();
+
           scrollController.animateTo(
             0.0,
-            curve: Curves.fastOutSlowIn,
+            curve: Curves.easeOutCubic,
             duration: const Duration(milliseconds: 500),
           );
         },

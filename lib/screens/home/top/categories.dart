@@ -72,6 +72,8 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
               Observer(
                 builder: (context) => AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
                   child: _categoriesStore.showJumpButton ? ScrollToTopButton(scrollController: _categoriesStore.scrollController) : null,
                 ),
               ),

@@ -79,17 +79,17 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
           : Listener(
               onPointerDown: (_) => _animationController.animateTo(
                 _animationController.upperBound,
-                curve: Curves.easeInCubic,
+                curve: Curves.easeOutCubic,
                 duration: duration,
               ),
               onPointerUp: (_) => _animationController.animateTo(
                 _animationController.lowerBound,
-                curve: Curves.easeOutCubic,
+                curve: Curves.easeInCubic,
                 duration: duration,
               ),
               onPointerCancel: (_) => _animationController.animateTo(
                 _animationController.lowerBound,
-                curve: Curves.easeOutCubic,
+                curve: Curves.easeInCubic,
                 duration: duration,
               ),
               child: button,
