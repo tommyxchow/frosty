@@ -142,7 +142,17 @@ class _ChattersListState extends State<ChattersList> {
                                 ),
                               ),
                             ),
-                            if (chatDetailsStore.filteredUsers.expand((element) => element).isEmpty)
+                            if (chatDetailsStore.chatUsers?.chatterCount == 0)
+                              const SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: Center(
+                                  child: AlertMessage(
+                                    message: 'No chatters found',
+                                    icon: Icons.person_off,
+                                  ),
+                                ),
+                              )
+                            else if (chatDetailsStore.filteredUsers.expand((element) => element).isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: Center(
