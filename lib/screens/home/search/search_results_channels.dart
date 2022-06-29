@@ -6,6 +6,7 @@ import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -88,27 +89,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                     final displayName =
                         regexEnglish.hasMatch(channel.displayName) ? channel.displayName : '${channel.displayName} (${channel.broadcasterLogin})';
 
-                    return ListTile(
-                      title: Text(displayName),
-                      leading: ProfilePicture(userLogin: channel.broadcasterLogin),
-                      trailing: channel.isLive
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(5.0),
-                              child: Container(
-                                color: const Color(0xFFF44336),
-                                padding: const EdgeInsets.all(10.0),
-                                child: const Text(
-                                  'LIVE',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : null,
-                      subtitle:
-                          channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
+                    return AnimateScale(
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -133,6 +114,28 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                           ),
                         );
                       },
+                      child: ListTile(
+                        title: Text(displayName),
+                        leading: ProfilePicture(userLogin: channel.broadcasterLogin),
+                        trailing: channel.isLive
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(5.0),
+                                child: Container(
+                                  color: const Color(0xFFF44336),
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: const Text(
+                                    'LIVE',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : null,
+                        subtitle:
+                            channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
+                      ),
                     );
                   },
                 ),
