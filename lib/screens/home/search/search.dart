@@ -44,7 +44,7 @@ class _SearchState extends State<Search> {
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
               ),
               suffixIcon: IconButton(
-                tooltip: 'Clear Search',
+                tooltip: 'Clear search',
                 onPressed: () {
                   FocusScope.of(context).unfocus();
                   setState(() {

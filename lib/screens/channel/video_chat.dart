@@ -174,9 +174,7 @@ class _VideoChatState extends State<VideoChat> {
               builder: (context) {
                 final landscapeChat = AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  width: _chatStore.expandChat
-                      ? MediaQuery.of(context).size.width / 2
-                      : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
+                  width: _chatStore.expandChat ? MediaQuery.of(context).size.width / 2 : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
                   curve: Curves.ease,
                   color: _chatStore.settings.fullScreen
                       ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
@@ -214,9 +212,8 @@ class _VideoChatState extends State<VideoChat> {
                                 ],
                               )
                             : Row(
-                                children: settingsStore.landscapeChatLeftSide
-                                    ? [landscapeChat, Expanded(child: video)]
-                                    : [Expanded(child: video), landscapeChat],
+                                children:
+                                    settingsStore.landscapeChatLeftSide ? [landscapeChat, Expanded(child: video)] : [Expanded(child: video), landscapeChat],
                               )
                         : Column(
                             children: [appBar, Expanded(child: chat)],
@@ -313,7 +310,7 @@ class _VideoOverlay extends StatelessWidget {
                   Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
                   const Spacer(),
                   IconButton(
-                    tooltip: 'Cancel Timer',
+                    tooltip: 'Cancel sleep timer',
                     onPressed: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive ? videoStore.cancelSleepTimer : null,
                     icon: const Icon(Icons.cancel),
                   ),
@@ -405,7 +402,7 @@ class _VideoOverlay extends StatelessWidget {
 
     final chatOverlayButton = Observer(
       builder: (_) => IconButton(
-        tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide Chat Overlay' : 'Show Chat Overlay',
+        tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
         onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
         icon: videoStore.settingsStore.fullScreenChatOverlay ? const Icon(Icons.chat_bubble_outline) : const Icon(Icons.chat_bubble),
         color: Colors.white,
@@ -422,7 +419,7 @@ class _VideoOverlay extends StatelessWidget {
     );
 
     final fullScreenButton = IconButton(
-      tooltip: videoStore.settingsStore.fullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
+      tooltip: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
       icon: videoStore.settingsStore.fullScreen
           ? const Icon(
               Icons.fullscreen_exit,
@@ -436,7 +433,7 @@ class _VideoOverlay extends StatelessWidget {
     );
 
     final sleepTimerButton = IconButton(
-      tooltip: 'Sleep Timer',
+      tooltip: 'Sleep timer',
       icon: const Icon(
         Icons.timer,
         color: Colors.white,
@@ -445,7 +442,7 @@ class _VideoOverlay extends StatelessWidget {
     );
 
     final rotateButton = IconButton(
-      tooltip: orientation == Orientation.portrait ? 'Enter Landscape Mode' : 'Exit Landscape Mode',
+      tooltip: orientation == Orientation.portrait ? 'Enter landscape mode' : 'Exit landscape mode',
       icon: const Icon(
         Icons.screen_rotation,
         color: Colors.white,
@@ -618,7 +615,7 @@ class _VideoOverlay extends StatelessWidget {
                   ),
                   if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                     IconButton(
-                      tooltip: 'Picture-in-Picture',
+                      tooltip: 'Picture-in-picture',
                       icon: const Icon(
                         Icons.picture_in_picture_alt_rounded,
                         color: Colors.white,

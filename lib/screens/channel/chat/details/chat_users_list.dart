@@ -100,7 +100,7 @@ class _ChattersListState extends State<ChattersList> {
                   labelText: 'Filter chatters',
                   contentPadding: const EdgeInsets.all(10.0),
                   suffixIcon: IconButton(
-                    tooltip: 'Clear Filter',
+                    tooltip: 'Clear filter',
                     onPressed: () {
                       FocusScope.of(context).unfocus();
                       chatDetailsStore.filterText = '';

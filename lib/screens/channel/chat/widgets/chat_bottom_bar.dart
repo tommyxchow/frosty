@@ -90,7 +90,7 @@ class ChatBottomBar extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(Icons.adaptive.more),
-                  tooltip: 'Chat Details',
+                  tooltip: 'Chat details',
                   onPressed: () => showModalBottomSheet(
                     backgroundColor: Colors.transparent,
                     isScrollControlled: true,
@@ -104,7 +104,7 @@ class ChatBottomBar extends StatelessWidget {
                 ),
                 if (!chatStore.expandChat && chatStore.settings.chatWidth < 0.3 && MediaQuery.of(context).orientation == Orientation.landscape)
                   IconButton(
-                    tooltip: 'Send a Message',
+                    tooltip: 'Send a message',
                     onPressed: () {
                       chatStore.expandChat = true;
                       chatStore.textFieldFocusNode.requestFocus();
@@ -124,7 +124,7 @@ class ChatBottomBar extends StatelessWidget {
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
                             color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
-                            tooltip: 'Emote Menu',
+                            tooltip: 'Emote menu',
                             icon: const Icon(Icons.emoji_emotions_outlined),
                             onPressed: () {
                               FocusScope.of(context).unfocus();
