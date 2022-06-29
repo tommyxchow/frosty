@@ -3,12 +3,10 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
-import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/top/category_streams.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
@@ -19,7 +17,6 @@ import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
-  final ListStore listStore;
   final StreamTwitch streamInfo;
   final bool showUptime;
   final bool showThumbnail;
@@ -28,7 +25,6 @@ class StreamCard extends StatelessWidget {
 
   const StreamCard({
     Key? key,
-    required this.listStore,
     required this.streamInfo,
     required this.showUptime,
     required this.showThumbnail,
@@ -177,12 +173,7 @@ class StreamCard extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => CategoryStreams(
                     categoryName: streamInfo.gameName,
-                    listStore: ListStore(
-                      twitchApi: context.read<TwitchApi>(),
-                      authStore: context.read<AuthStore>(),
-                      listType: ListType.category,
-                      categoryId: streamInfo.gameId,
-                    ),
+                    categoryId: streamInfo.gameId,
                   ),
                 ),
               ),
@@ -218,7 +209,7 @@ class StreamCard extends StatelessWidget {
           backgroundColor: Colors.transparent,
           context: context,
           builder: (context) => BlockReportModal(
-            authStore: listStore.authStore,
+            authStore: context.read<AuthStore>(),
             name: streamerName,
             userLogin: streamInfo.userLogin,
             userId: streamInfo.userId,

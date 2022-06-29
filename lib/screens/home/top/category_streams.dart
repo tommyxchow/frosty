@@ -13,16 +13,19 @@ import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
-/// A widget that displays a list of streams depending on the provided [listType].
-/// This differs from the normal [StreamsList] in that it uses Slivers to display the box art on top.
+/// A widget that displays a list of streams under the provided [categoryId].
+/// This differs from the normal [StreamsList] in that it uses slivers to display the box art on top.
 class CategoryStreams extends StatefulWidget {
-  final ListStore listStore;
+  /// The category name, used for the header on the box art sliver.
   final String categoryName;
+
+  /// The category id, used for fetching the relevant streams in the [ListStore].
+  final String categoryId;
 
   const CategoryStreams({
     Key? key,
-    required this.listStore,
     required this.categoryName,
+    required this.categoryId,
   }) : super(key: key);
 
   @override
@@ -30,9 +33,17 @@ class CategoryStreams extends StatefulWidget {
 }
 
 class _CategoryStreamsState extends State<CategoryStreams> {
+  late final _listStore = ListStore(
+    authStore: context.read<AuthStore>(),
+    twitchApi: context.read<TwitchApi>(),
+    listType: ListType.category,
+    categoryId: widget.categoryId,
+    scrollController: ScrollController(),
+  );
+
   @override
   Widget build(BuildContext context) {
-    // Calculate the dimmensions of the box art based on the screen width.
+    // Calculate the dimensions of the box art based on the screen width.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
     final artWidth = (size.width * pixelRatio).toInt();
@@ -42,12 +53,12 @@ class _CategoryStreamsState extends State<CategoryStreams> {
       body: RefreshIndicator(
         onRefresh: () async {
           HapticFeedback.lightImpact();
-          await widget.listStore.refreshStreams();
+          await _listStore.refreshStreams();
 
-          if (widget.listStore.error != null) {
+          if (_listStore.error != null) {
             final snackBar = SnackBar(
               content: AlertMessage(
-                message: widget.listStore.error!,
+                message: _listStore.error!,
                 icon: Icons.error,
               ),
               behavior: SnackBarBehavior.floating,
@@ -64,7 +75,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
               children: [
                 CustomScrollView(
                   physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                  controller: widget.listStore.scrollController,
+                  controller: _listStore.scrollController,
                   slivers: [
                     SliverAppBar(
                       stretch: true,
@@ -85,7 +96,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         background: FutureBuilder(
                           future: context.read<TwitchApi>().getCategory(
                                 headers: context.read<AuthStore>().headersTwitch,
-                                gameId: widget.listStore.categoryId!,
+                                gameId: _listStore.categoryId!,
                               ),
                           builder: (context, AsyncSnapshot<CategoriesTwitch> snapshot) {
                             return snapshot.hasData
@@ -105,7 +116,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         ),
                       ),
                     ),
-                    if (widget.listStore.streams.isEmpty && widget.listStore.isLoading && widget.listStore.error == null)
+                    if (_listStore.streams.isEmpty && _listStore.isLoading && _listStore.error == null)
                       const SliverFillRemaining(
                         child: LoadingIndicator(
                           subtitle: 'Loading streams...',
@@ -117,13 +128,12 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              if (index > widget.listStore.streams.length - 8 && widget.listStore.hasMore) {
-                                widget.listStore.getStreams();
+                              if (index > _listStore.streams.length - 8 && _listStore.hasMore) {
+                                _listStore.getStreams();
                               }
                               return Observer(
                                 builder: (context) => StreamCard(
-                                  listStore: widget.listStore,
-                                  streamInfo: widget.listStore.streams[index],
+                                  streamInfo: _listStore.streams[index],
                                   showUptime: context.read<SettingsStore>().showThumbnailUptime,
                                   showThumbnail: context.read<SettingsStore>().showThumbnails,
                                   large: context.read<SettingsStore>().largeStreamCard,
@@ -131,7 +141,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                 ),
                               );
                             },
-                            childCount: widget.listStore.streams.length,
+                            childCount: _listStore.streams.length,
                           ),
                         ),
                       ),
@@ -143,7 +153,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                       duration: const Duration(milliseconds: 200),
                       switchInCurve: Curves.easeOutCubic,
                       switchOutCurve: Curves.easeInCubic,
-                      child: widget.listStore.showJumpButton ? ScrollToTopButton(scrollController: widget.listStore.scrollController) : null,
+                      child: _listStore.showJumpButton ? ScrollToTopButton(scrollController: _listStore.scrollController!) : null,
                     ),
                   ),
                 ),
@@ -153,5 +163,11 @@ class _CategoryStreamsState extends State<CategoryStreams> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _listStore.dispose();
+    super.dispose();
   }
 }

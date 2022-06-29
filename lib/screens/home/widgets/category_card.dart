@@ -1,13 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
-import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/top/category_streams.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
-import 'package:provider/provider.dart';
 
 /// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
@@ -32,12 +28,7 @@ class CategoryCard extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => CategoryStreams(
             categoryName: category.name,
-            listStore: ListStore(
-              twitchApi: context.read<TwitchApi>(),
-              authStore: context.read<AuthStore>(),
-              listType: ListType.category,
-              categoryId: category.id,
-            ),
+            categoryId: category.id,
           ),
         ),
       ),

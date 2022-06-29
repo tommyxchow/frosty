@@ -114,8 +114,14 @@ class _HomeState extends State<Home> {
             builder: (_) => IndexedStack(
               index: _homeStore.selectedIndex,
               children: [
-                if (_authStore.isLoggedIn) const StreamsList(listType: ListType.followed),
-                const TopSection(),
+                if (_authStore.isLoggedIn)
+                  StreamsList(
+                    listType: ListType.followed,
+                    scrollController: _homeStore.followedScrollController,
+                  ),
+                TopSection(
+                  homeStore: _homeStore,
+                ),
                 const Search(),
               ],
             ),

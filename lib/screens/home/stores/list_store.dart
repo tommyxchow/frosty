@@ -20,7 +20,7 @@ abstract class ListStoreBase with Store {
   /// The type of list that this store is handling.
   final ListType listType;
 
-  /// The category id to use if the [listType] is [ListType.category].
+  /// The category id to use when fetching streams if the [listType] is [ListType.category].
   final String? categoryId;
 
   /// The pagination cursor for the streams.
@@ -33,8 +33,9 @@ abstract class ListStoreBase with Store {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  /// The scroll controller used for handling scroll to top.
-  final scrollController = ScrollController();
+  /// The scroll controller used for handling scroll to top (if provided).
+  /// If provided, will use the [ScrollToTop] widget to scroll to the top of the list instead of the bottom tab bar.
+  final ScrollController? scrollController;
 
   /// Whether or not the scroll to top button is visible.
   @observable
@@ -60,14 +61,17 @@ abstract class ListStoreBase with Store {
     required this.twitchApi,
     required this.listType,
     this.categoryId,
+    this.scrollController,
   }) {
-    scrollController.addListener(() {
-      if (scrollController.position.atEdge || scrollController.position.outOfRange) {
-        showJumpButton = false;
-      } else {
-        showJumpButton = true;
-      }
-    });
+    if (scrollController != null) {
+      scrollController!.addListener(() {
+        if (scrollController!.position.atEdge || scrollController!.position.outOfRange) {
+          showJumpButton = false;
+        } else {
+          showJumpButton = true;
+        }
+      });
+    }
 
     switch (listType) {
       case ListType.followed:
@@ -135,7 +139,7 @@ abstract class ListStoreBase with Store {
     return getStreams();
   }
 
-  void dispose() => scrollController.dispose();
+  void dispose() => scrollController?.dispose();
 }
 
 /// The possible types of lists that can be displayed.
