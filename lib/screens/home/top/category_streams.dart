@@ -116,12 +116,29 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         ),
                       ),
                     ),
-                    if (_listStore.streams.isEmpty && _listStore.isLoading && _listStore.error == null)
-                      const SliverFillRemaining(
-                        child: LoadingIndicator(
-                          subtitle: 'Loading streams...',
+                    if (_listStore.error != null)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: AlertMessage(
+                          message: _listStore.error!,
+                          icon: Icons.error,
                         ),
                       )
+                    else if (_listStore.streams.isEmpty)
+                      if (_listStore.isLoading && _listStore.error == null)
+                        const SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: LoadingIndicator(
+                            subtitle: 'Loading streams...',
+                          ),
+                        )
+                      else
+                        const SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: AlertMessage(
+                            message: 'No streams found',
+                          ),
+                        )
                     else
                       SliverSafeArea(
                         top: false,
