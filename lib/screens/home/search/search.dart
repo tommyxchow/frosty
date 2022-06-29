@@ -10,8 +10,15 @@ import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
+/// The search section that contians search history and search results for channels and categories.
 class Search extends StatefulWidget {
-  const Search({Key? key}) : super(key: key);
+  // The scroll controller for handling scroll to top functionality.
+  final ScrollController scrollController;
+
+  const Search({
+    Key? key,
+    required this.scrollController,
+  }) : super(key: key);
 
   @override
   State<Search> createState() => _SearchState();
@@ -77,6 +84,7 @@ class _SearchState extends State<Search> {
                     ),
                     Expanded(
                       child: ListView(
+                        controller: widget.scrollController,
                         children: _searchStore.searchHistory
                             .mapIndexed(
                               (index, searchTerm) => ListTile(
@@ -104,6 +112,7 @@ class _SearchState extends State<Search> {
                 );
               }
               return CustomScrollView(
+                controller: widget.scrollController,
                 slivers: [
                   const SliverToBoxAdapter(
                     child: SectionHeader(

@@ -122,7 +122,9 @@ class _HomeState extends State<Home> {
                 TopSection(
                   homeStore: _homeStore,
                 ),
-                const Search(),
+                Search(
+                  scrollController: _homeStore.searchScrollController,
+                ),
               ],
             ),
           ),

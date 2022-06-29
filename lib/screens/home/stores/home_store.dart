@@ -21,6 +21,9 @@ abstract class HomeStoreBase with Store {
     ScrollController(),
   ];
 
+  /// The scroll controller for controlling the scroll to top on the search section.
+  final searchScrollController = ScrollController();
+
   /// The current index of the top section tab. Changes when switching between the streams and categories tabs.
   var topSectionCurrentIndex = 0;
 
@@ -44,20 +47,48 @@ abstract class HomeStoreBase with Store {
     if (index != _selectedIndex) {
       _selectedIndex = index;
     } else {
-      if (index == 0 && authStore.isLoggedIn) {
-        // If on the followed tab and tapping the followed button, scroll to the top.
-        followedScrollController.animateTo(
-          0.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-        );
+      const duration = Duration(milliseconds: 500);
+
+      // Use different logic if logged in/out since there will be one less tab when logged out.
+      if (authStore.isLoggedIn) {
+        if (index == 0) {
+          // If on the followed tab and tapping the followed tab, scroll to the top.
+          followedScrollController.animateTo(
+            0.0,
+            duration: duration,
+            curve: Curves.easeOutCubic,
+          );
+        } else if (index == 1) {
+          // If on the top section, scroll to the top of the tab based on the current top tab.
+          topSectionScrollControllers[topSectionCurrentIndex].animateTo(
+            0.0,
+            duration: duration,
+            curve: Curves.easeOutCubic,
+          );
+        } else {
+          // If on the search tab and tapping the search tab, scroll to the top.
+          searchScrollController.animateTo(
+            0.0,
+            duration: duration,
+            curve: Curves.easeOutCubic,
+          );
+        }
       } else {
-        // If on the top section, scroll to the top of the tab based on the current top tab.
-        topSectionScrollControllers[topSectionCurrentIndex].animateTo(
-          0.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOutCubic,
-        );
+        if (index == 0) {
+          // If on the top section, scroll to the top of the tab based on the current top tab.
+          topSectionScrollControllers[topSectionCurrentIndex].animateTo(
+            0.0,
+            duration: duration,
+            curve: Curves.easeOutCubic,
+          );
+        } else {
+          // If on the search tab and tapping the search tab, scroll to the top.
+          searchScrollController.animateTo(
+            0.0,
+            duration: duration,
+            curve: Curves.easeOutCubic,
+          );
+        }
       }
     }
   }
