@@ -63,30 +63,12 @@ class ProfileCard extends StatelessWidget {
   Future<void> _showLoginDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => SimpleDialog(
-        children: [
-          ColoredBox(
-            color: const Color.fromRGBO(145, 70, 255, 0.8),
-            child: SimpleDialogOption(
-              padding: const EdgeInsets.all(24.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/icons/TwitchGlitchWhite.png',
-                    height: 25,
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Connect with Twitch',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+      builder: (context) => FrostyDialog(
+        title: 'Log In',
+        content: Column(
+          children: [
+            Button(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -104,29 +86,40 @@ class ProfileCard extends StatelessWidget {
                   },
                 ),
               ),
+              icon: Image.asset(
+                'assets/icons/TwitchGlitchWhite.png',
+                height: 25,
+              ),
+              child: const Text(
+                'Connect with Twitch',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 20.0),
-          const Center(
-            child: Text(
-              'Or',
-              style: TextStyle(fontStyle: FontStyle.italic),
+            const SizedBox(height: 20.0),
+            const Center(
+              child: Text(
+                'Or',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
-          ),
-          const SizedBox(height: 5.0),
-          SimpleDialogOption(
-            child: TextField(
+            const SizedBox(height: 20.0),
+            TextField(
+              autocorrect: false,
               textAlign: TextAlign.center,
               decoration: const InputDecoration(
-                labelText: 'Token',
+                hintText: 'Token',
               ),
               onSubmitted: (token) {
                 authStore.login(token: token);
                 Navigator.pop(context);
               },
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -183,7 +176,7 @@ class ProfileCard extends StatelessWidget {
             trailing: Button(
               onPressed: () => _showLogoutDialog(context),
               icon: const Icon(Icons.logout_outlined),
-              padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               fill: true,
               color: Colors.red.shade700,
               child: const Text('Log Out'),
@@ -202,7 +195,7 @@ class ProfileCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary,
             onPressed: () => _showLoginDialog(context),
             fill: true,
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
             icon: const Icon(Icons.login),
             child: const Text('Log In'),
           ),
