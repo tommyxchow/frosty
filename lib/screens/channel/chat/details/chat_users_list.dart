@@ -96,9 +96,11 @@ class _ChattersListState extends State<ChattersList> {
                 autocorrect: false,
                 onChanged: (text) => chatDetailsStore.filterText = text,
                 decoration: InputDecoration(
-                  isDense: true,
-                  labelText: 'Filter chatters',
-                  contentPadding: const EdgeInsets.all(10.0),
+                  hintText: 'Filter chatters',
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 10.0,
+                  ),
                   suffixIcon: IconButton(
                     tooltip: 'Clear filter',
                     onPressed: () {
@@ -107,9 +109,6 @@ class _ChattersListState extends State<ChattersList> {
                       _textController.clear();
                     },
                     icon: const Icon(Icons.clear),
-                  ),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
                   ),
                 ),
               ),
