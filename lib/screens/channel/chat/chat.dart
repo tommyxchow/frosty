@@ -114,11 +114,7 @@ class Chat extends StatelessWidget {
                 ),
               ),
             ),
-            if (chatStore.settings.showBottomBar)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5.0),
-                child: ChatBottomBar(chatStore: chatStore),
-              ),
+            if (chatStore.settings.showBottomBar) ChatBottomBar(chatStore: chatStore),
             AnimatedContainer(
               curve: Curves.ease,
               duration: const Duration(milliseconds: 200),
