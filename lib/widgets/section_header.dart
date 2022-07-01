@@ -21,7 +21,7 @@ class SectionHeader extends StatelessWidget {
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
+          letterSpacing: 0.8,
         ),
       ),
     );

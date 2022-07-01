@@ -62,13 +62,13 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
                 padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 height: 25,
                 child: Button(
-                  padding: const EdgeInsets.all(0.0),
+                  padding: EdgeInsets.zero,
                   onPressed: widget.chatStore.assetsStore.recentEmotes.isEmpty ? null : _showClearDialog,
                   color: Theme.of(context).colorScheme.secondary,
                   child: const Text(
                     'CLEAR',
                     style: TextStyle(
-                      letterSpacing: 0.5,
+                      letterSpacing: 0.8,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

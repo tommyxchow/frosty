@@ -59,7 +59,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
                         child: Text(
                           section,
                           style: const TextStyle(
-                            letterSpacing: 0.5,
+                            letterSpacing: 0.8,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
