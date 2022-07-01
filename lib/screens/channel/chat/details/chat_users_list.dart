@@ -15,39 +15,17 @@ import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ChattersList extends StatefulWidget {
-  final ChatDetailsStore chatDetails;
+class ChattersList extends StatelessWidget {
+  final ChatDetailsStore chatDetailsStore;
   final ChatStore chatStore;
   final String userLogin;
 
   const ChattersList({
     Key? key,
-    required this.chatDetails,
+    required this.chatDetailsStore,
     required this.chatStore,
     required this.userLogin,
   }) : super(key: key);
-
-  @override
-  State<ChattersList> createState() => _ChattersListState();
-}
-
-class _ChattersListState extends State<ChattersList> {
-  final _scrollController = ScrollController();
-  final _textController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.position.atEdge || _scrollController.position.outOfRange) {
-        widget.chatDetails.showJumpButton = false;
-      } else {
-        widget.chatDetails.showJumpButton = true;
-      }
-    });
-
-    widget.chatDetails.updateChatters(widget.userLogin);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +38,6 @@ class _ChattersListState extends State<ChattersList> {
       'VIPs',
       'Viewers',
     ];
-
-    final chatDetailsStore = widget.chatDetails;
 
     return Observer(
       builder: (context) {
@@ -76,7 +52,7 @@ class _ChattersListState extends State<ChattersList> {
               const SizedBox(height: 10.0),
               Button(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                onPressed: () => chatDetailsStore.updateChatters(widget.userLogin),
+                onPressed: chatDetailsStore.updateChatters,
                 child: const Text('Try Again'),
               )
             ],
@@ -91,26 +67,29 @@ class _ChattersListState extends State<ChattersList> {
           children: [
             Padding(
               padding: const EdgeInsets.all(10.0),
-              child: TextField(
-                controller: _textController,
-                autocorrect: false,
-                onChanged: (text) => chatDetailsStore.filterText = text,
-                decoration: InputDecoration(
-                  hintText: 'Filter chatters',
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20.0,
-                    vertical: 10.0,
-                  ),
-                  suffixIcon: IconButton(
-                    tooltip: 'Clear filter',
-                    onPressed: () {
-                      FocusScope.of(context).unfocus();
-                      chatDetailsStore.filterText = '';
-                      _textController.clear();
-                    },
-                    icon: const Icon(Icons.clear),
-                  ),
-                ),
+              child: Observer(
+                builder: (context) {
+                  return TextField(
+                    controller: chatDetailsStore.textController,
+                    focusNode: chatDetailsStore.textFieldFocusNode,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      prefixIcon: const Icon(Icons.filter_list),
+                      hintText: 'Filter chatters',
+                      suffixIcon: chatDetailsStore.textFieldFocusNode.hasFocus || chatDetailsStore.filterText.isNotEmpty
+                          ? IconButton(
+                              tooltip: chatDetailsStore.filterText.isEmpty ? 'Cancel' : 'Clear',
+                              onPressed: () {
+                                if (chatDetailsStore.filterText.isEmpty) chatDetailsStore.textFieldFocusNode.unfocus();
+                                chatDetailsStore.textController.clear();
+                              },
+                              icon: const Icon(Icons.clear),
+                            )
+                          : null,
+                    ),
+                  );
+                },
               ),
             ),
             Expanded(
@@ -118,7 +97,7 @@ class _ChattersListState extends State<ChattersList> {
                 onRefresh: () async {
                   HapticFeedback.lightImpact();
 
-                  await chatDetailsStore.updateChatters(widget.userLogin);
+                  chatDetailsStore.updateChatters();
                 },
                 child: Stack(
                   alignment: AlignmentDirectional.bottomCenter,
@@ -127,20 +106,21 @@ class _ChattersListState extends State<ChattersList> {
                       builder: (context) {
                         return CustomScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
-                          controller: _scrollController,
+                          controller: chatDetailsStore.scrollController,
                           slivers: [
-                            SliverPadding(
-                              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
-                              sliver: SliverToBoxAdapter(
-                                child: Text(
-                                  '${NumberFormat().format(chatDetailsStore.chatUsers?.chatterCount)} ${chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18.0,
+                            if (chatDetailsStore.filterText.isEmpty)
+                              SliverPadding(
+                                padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+                                sliver: SliverToBoxAdapter(
+                                  child: Text(
+                                    '${NumberFormat().format(chatDetailsStore.chatUsers?.chatterCount)} ${chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
                             if (chatDetailsStore.chatUsers?.chatterCount == 0)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
@@ -193,7 +173,7 @@ class _ChattersListState extends State<ChattersList> {
                                               isScrollControlled: true,
                                               context: context,
                                               builder: (context) => ChatUserModal(
-                                                chatStore: widget.chatStore,
+                                                chatStore: chatStore,
                                                 username: userInfo.login,
                                                 userId: userInfo.id,
                                                 displayName: userInfo.displayName,
@@ -206,7 +186,7 @@ class _ChattersListState extends State<ChattersList> {
                                     ),
                                   ]
                                 ],
-                              )
+                              ),
                           ],
                         );
                       },
@@ -216,7 +196,7 @@ class _ChattersListState extends State<ChattersList> {
                         duration: const Duration(milliseconds: 200),
                         switchInCurve: Curves.easeOutCubic,
                         switchOutCurve: Curves.easeInCubic,
-                        child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
+                        child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: chatDetailsStore.scrollController) : null,
                       ),
                     ),
                   ],
@@ -227,14 +207,5 @@ class _ChattersListState extends State<ChattersList> {
         );
       },
     );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _textController.dispose();
-    widget.chatDetails.filterText = '';
-
-    super.dispose();
   }
 }

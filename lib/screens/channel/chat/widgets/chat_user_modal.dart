@@ -99,7 +99,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                   child: DefaultTextStyle(
                     style: DefaultTextStyle.of(context).style.copyWith(fontSize: widget.chatStore.settings.fontSize),
                     child: ListView.separated(
-                      padding: const EdgeInsets.all(0.0),
+                      padding: EdgeInsets.zero,
                       reverse: true,
                       itemBuilder: (context, index) => InkWell(
                         onLongPress: () async {

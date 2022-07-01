@@ -55,6 +55,7 @@ class _VideoChatState extends State<VideoChat> {
     settings: context.read<SettingsStore>(),
     chatDetailsStore: ChatDetailsStore(
       twitchApi: context.read<TwitchApi>(),
+      channelName: widget.userLogin,
     ),
     assetsStore: ChatAssetsStore(
       twitchApi: context.read<TwitchApi>(),

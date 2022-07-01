@@ -7,13 +7,13 @@ import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/modal.dart';
 
 class ChatDetails extends StatelessWidget {
-  final ChatDetailsStore chatDetails;
+  final ChatDetailsStore chatDetailsStore;
   final ChatStore chatStore;
   final String userLogin;
 
   const ChatDetails({
     Key? key,
-    required this.chatDetails,
+    required this.chatDetailsStore,
     required this.chatStore,
     required this.userLogin,
   }) : super(key: key);
@@ -30,11 +30,11 @@ class ChatDetails extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  child: ChatModes(roomState: chatDetails.roomState),
+                  child: ChatModes(roomState: chatDetailsStore.roomState),
                 ),
                 Expanded(
                   child: ChattersList(
-                    chatDetails: chatDetails,
+                    chatDetailsStore: chatDetailsStore,
                     chatStore: chatStore,
                     userLogin: userLogin,
                   ),

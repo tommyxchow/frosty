@@ -98,7 +98,7 @@ class ChatBottomBar extends StatelessWidget {
                       isScrollControlled: true,
                       context: context,
                       builder: (_) => ChatDetails(
-                        chatDetails: chatStore.chatDetailsStore,
+                        chatDetailsStore: chatStore.chatDetailsStore,
                         chatStore: chatStore,
                         userLogin: chatStore.channelName,
                       ),
