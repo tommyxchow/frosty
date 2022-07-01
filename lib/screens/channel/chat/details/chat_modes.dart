@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/irc.dart';
+import 'package:intl/intl.dart';
 
 class ChatModes extends StatelessWidget {
   final ROOMSTATE roomState;
 
   const ChatModes({Key? key, required this.roomState}) : super(key: key);
 
+  String pluralize(String str, String count) => count == '1' ? str : '${str}s';
+
   @override
   Widget build(BuildContext context) {
+    final test = Intl.plural(2, other: 'test');
+
+    debugPrint(test);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -25,9 +32,7 @@ class ChatModes extends StatelessWidget {
               ? 'Followers-only mode off'
               : roomState.followersOnly == '0'
                   ? 'Followers-only mode on'
-                  : roomState.followersOnly == '1'
-                      ? 'Followers-only mode on (${roomState.followersOnly} minute)'
-                      : 'Followers-only mode on (${roomState.followersOnly} minutes)',
+                  : 'Followers-only mode on (${roomState.followersOnly} ${pluralize('minute', roomState.followersOnly)})',
           child: Icon(
             Icons.favorite,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
@@ -43,7 +48,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
-          message: 'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} seconds)' : 'off'}',
+          message: 'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
           child: Icon(
             Icons.history_toggle_off,
             color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,
