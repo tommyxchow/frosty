@@ -90,21 +90,10 @@ class ChatBottomBar extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 5.0),
               child: Row(
                 children: [
-                  IconButton(
-                    icon: Icon(Icons.adaptive.more),
-                    tooltip: 'Chat details',
-                    onPressed: () => showModalBottomSheet(
-                      backgroundColor: Colors.transparent,
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (_) => ChatDetails(
-                        chatDetailsStore: chatStore.chatDetailsStore,
-                        chatStore: chatStore,
-                        userLogin: chatStore.channelName,
-                      ),
-                    ),
-                  ),
-                  if (!chatStore.expandChat && chatStore.settings.chatWidth < 0.3 && MediaQuery.of(context).orientation == Orientation.landscape)
+                  if (!chatStore.expandChat &&
+                      chatStore.settings.chatWidth < 0.3 &&
+                      chatStore.settings.showVideo &&
+                      MediaQuery.of(context).orientation == Orientation.landscape)
                     IconButton(
                       tooltip: 'Send a message',
                       onPressed: () {
@@ -142,12 +131,28 @@ class ChatBottomBar extends StatelessWidget {
                         ),
                       ),
                     ),
-                  if (chatStore.settings.chatWidth >= 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait)
+                  if (chatStore.showSendButton &&
+                      (chatStore.settings.chatWidth >= 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait))
                     IconButton(
                       tooltip: 'Send',
                       icon: const Icon(Icons.send),
                       onPressed: chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
                     )
+                  else
+                    IconButton(
+                      icon: Icon(Icons.adaptive.more),
+                      tooltip: 'Chat details',
+                      onPressed: () => showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (_) => ChatDetails(
+                          chatDetailsStore: chatStore.chatDetailsStore,
+                          chatStore: chatStore,
+                          userLogin: chatStore.channelName,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

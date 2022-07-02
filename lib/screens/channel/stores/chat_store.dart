@@ -72,6 +72,9 @@ abstract class ChatStoreBase with Store {
   var _autoScroll = true;
 
   @readonly
+  var _showSendButton = false;
+
+  @readonly
   var _showEmoteAutocomplete = false;
 
   @readonly
@@ -143,7 +146,10 @@ abstract class ChatStoreBase with Store {
     textController
         .addListener(() => _showEmoteAutocomplete = !_showMentionAutocomplete && textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty);
 
-    textController.addListener(() => _showMentionAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.startsWith('@'));
+    textController.addListener(() {
+      _showSendButton = textController.text.isNotEmpty;
+      _showMentionAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.startsWith('@');
+    });
   }
 
   /// Handle and process the provided string-representation of the IRC data.
