@@ -98,6 +98,7 @@ const inputTheme = InputDecorationTheme(
 final lightTheme = ThemeData(
   canvasColor: Colors.white,
   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+  highlightColor: Platform.isIOS ? Colors.transparent : null,
   fontFamily: 'Inter',
   appBarTheme: const AppBarTheme(
     color: Colors.white,
@@ -126,6 +127,7 @@ final darkTheme = ThemeData(
   canvasColor: gray,
   brightness: Brightness.dark,
   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+  highlightColor: Platform.isIOS ? Colors.transparent : null,
   fontFamily: 'Inter',
   appBarTheme: const AppBarTheme(
     color: gray,
@@ -150,6 +152,7 @@ final darkTheme = ThemeData(
 final oledTheme = ThemeData(
   canvasColor: Colors.black,
   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+  highlightColor: Platform.isIOS ? Colors.transparent : null,
   fontFamily: 'Inter',
   appBarTheme: const AppBarTheme(
     color: Colors.black,
