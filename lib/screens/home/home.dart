@@ -110,40 +110,53 @@ class _HomeState extends State<Home> {
           ],
         ),
         body: SafeArea(
-          child: Observer(
-            builder: (_) => IndexedStack(
-              index: _homeStore.selectedIndex,
-              children: [
-                if (_authStore.isLoggedIn)
-                  StreamsList(
-                    listType: ListType.followed,
-                    scrollController: _homeStore.followedScrollController,
+          child: Column(
+            children: [
+              Expanded(
+                child: Observer(
+                  builder: (_) => IndexedStack(
+                    index: _homeStore.selectedIndex,
+                    children: [
+                      if (_authStore.isLoggedIn)
+                        StreamsList(
+                          listType: ListType.followed,
+                          scrollController: _homeStore.followedScrollController,
+                        ),
+                      TopSection(
+                        homeStore: _homeStore,
+                      ),
+                      Search(
+                        scrollController: _homeStore.searchScrollController,
+                      ),
+                    ],
                   ),
-                TopSection(
-                  homeStore: _homeStore,
                 ),
-                Search(
-                  scrollController: _homeStore.searchScrollController,
-                ),
-              ],
-            ),
+              ),
+              const Divider(height: 1.0, thickness: 1.0),
+            ],
           ),
         ),
         bottomNavigationBar: Observer(
           builder: (_) => BottomNavigationBar(
+            unselectedFontSize: 12.0,
+            selectedFontSize: 12.0,
+            type: BottomNavigationBarType.fixed,
             items: [
               if (_authStore.isLoggedIn)
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
                   label: 'Followed',
+                  tooltip: 'Followed streams',
                 ),
               const BottomNavigationBarItem(
                 icon: Icon(Icons.arrow_upward),
                 label: 'Top',
+                tooltip: 'Top streams and categories',
               ),
               const BottomNavigationBarItem(
                 icon: Icon(Icons.search),
                 label: 'Search',
+                tooltip: 'Search for channels and categories',
               ),
             ],
             currentIndex: _homeStore.selectedIndex,
