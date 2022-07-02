@@ -17,20 +17,21 @@ class ProfilePicture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
+    final diameter = radius * 2;
+
+    return ClipOval(
       child: FutureBuilder(
         future: context.read<TwitchApi>().getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
         builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
           return snapshot.hasData
               ? CachedNetworkImage(
-                  width: radius * 2,
-                  height: radius * 2,
+                  width: diameter,
+                  height: diameter,
                   imageUrl: snapshot.data!.profileImageUrl,
                 )
               : SizedBox(
-                  width: radius * 2,
-                  height: radius * 2,
+                  width: diameter,
+                  height: diameter,
                 );
         },
       ),
