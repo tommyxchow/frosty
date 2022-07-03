@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/button.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -70,7 +71,8 @@ class ChatBottomBar extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 5.0),
                   itemCount: matchingChatters.length,
                   scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) => TextButton(
+                  itemBuilder: (context, index) => Button(
+                    color: Theme.of(context).colorScheme.secondary,
                     onPressed: () {
                       final split = chatStore.textController.text.split(' ')
                         ..removeLast()
@@ -84,71 +86,77 @@ class ChatBottomBar extends StatelessWidget {
                 ),
               )
             ],
-            Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.adaptive.more),
-                  tooltip: 'Chat Details',
-                  onPressed: () => showModalBottomSheet(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (_) => SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.8,
-                      child: ChatDetails(
-                        chatDetails: chatStore.chatDetailsStore,
-                        chatStore: chatStore,
-                        userLogin: chatStore.channelName,
-                      ),
-                    ),
-                  ),
-                ),
-                if (!chatStore.expandChat && chatStore.settings.chatWidth < 0.3 && MediaQuery.of(context).orientation == Orientation.landscape)
-                  IconButton(
-                      tooltip: 'Send a Message',
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              child: Row(
+                children: [
+                  if (!chatStore.expandChat &&
+                      chatStore.settings.chatWidth < 0.3 &&
+                      chatStore.settings.showVideo &&
+                      MediaQuery.of(context).orientation == Orientation.landscape)
+                    IconButton(
+                      tooltip: 'Send a message',
                       onPressed: () {
                         chatStore.expandChat = true;
                         chatStore.textFieldFocusNode.requestFocus();
                       },
-                      icon: const Icon(Icons.chat))
-                else
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      child: TextField(
-                        textInputAction: TextInputAction.send,
-                        focusNode: chatStore.textFieldFocusNode,
-                        minLines: 1,
-                        maxLines: 5,
-                        enabled: chatStore.auth.isLoggedIn ? true : false,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                            color: chatStore.assetsStore.showEmoteMenu ? Colors.deepPurple : null,
-                            tooltip: 'Emote Menu',
-                            icon: const Icon(Icons.emoji_emotions_outlined),
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
-                            },
+                      icon: const Icon(Icons.chat),
+                    )
+                  else
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                        child: TextField(
+                          textInputAction: TextInputAction.send,
+                          focusNode: chatStore.textFieldFocusNode,
+                          minLines: 1,
+                          maxLines: 5,
+                          enabled: chatStore.auth.isLoggedIn ? true : false,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 10.0),
+                            suffixIcon: IconButton(
+                              color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
+                              tooltip: 'Emote menu',
+                              icon: const Icon(Icons.emoji_emotions_outlined),
+                              onPressed: () {
+                                FocusScope.of(context).unfocus();
+                                chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
+                              },
+                            ),
+                            hintMaxLines: 1,
+                            hintText: chatStore.auth.isLoggedIn
+                                ? 'Send a message ${chatStore.settings.chatDelay == 0 ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
+                                : 'Log in to chat',
                           ),
-                          hintMaxLines: 1,
-                          contentPadding: const EdgeInsets.all(10.0),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                          ),
-                          labelText: chatStore.auth.isLoggedIn ? 'Send a message' : 'Log in to chat',
+                          controller: chatStore.textController,
+                          onSubmitted: chatStore.sendMessage,
                         ),
-                        controller: chatStore.textController,
-                        onSubmitted: chatStore.sendMessage,
                       ),
                     ),
-                  ),
-                if (chatStore.settings.chatWidth >= 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait)
-                  IconButton(
-                    tooltip: 'Send',
-                    icon: const Icon(Icons.send),
-                    onPressed: chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
-                  )
-              ],
+                  if (chatStore.showSendButton &&
+                      (chatStore.settings.chatWidth >= 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait))
+                    IconButton(
+                      tooltip: 'Send',
+                      icon: const Icon(Icons.send),
+                      onPressed: chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
+                    )
+                  else
+                    IconButton(
+                      icon: Icon(Icons.adaptive.more),
+                      tooltip: 'Chat details',
+                      onPressed: () => showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (_) => ChatDetails(
+                          chatDetailsStore: chatStore.chatDetailsStore,
+                          chatStore: chatStore,
+                          userLogin: chatStore.channelName,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ],
         );

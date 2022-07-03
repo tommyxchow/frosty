@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/button.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -15,10 +17,6 @@ class Chat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (chatStore.scrollController.hasClients) chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent);
-        });
-
         return Column(
           children: [
             Expanded(
@@ -68,15 +66,21 @@ class Chat extends StatelessWidget {
                                         FocusScope.of(context).unfocus();
                                         if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
                                       },
-                                      onLongPress: () => showModalBottomSheet(
-                                        context: context,
-                                        builder: (context) => ChatUserModal(
-                                          chatStore: chatStore,
-                                          username: message.user!,
-                                          userId: message.tags['user-id']!,
-                                          displayName: message.tags['display-name']!,
-                                        ),
-                                      ),
+                                      onLongPress: () {
+                                        HapticFeedback.lightImpact();
+
+                                        showModalBottomSheet(
+                                          backgroundColor: Colors.transparent,
+                                          isScrollControlled: true,
+                                          context: context,
+                                          builder: (context) => ChatUserModal(
+                                            chatStore: chatStore,
+                                            username: message.user!,
+                                            userId: message.tags['user-id']!,
+                                            displayName: message.tags['display-name']!,
+                                          ),
+                                        );
+                                      },
                                       child: chatMessage,
                                     );
                                   }
@@ -88,20 +92,22 @@ class Chat extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Observer(
-                      builder: (_) => AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: chatStore.autoScroll
-                            ? null
-                            : Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                width: double.infinity,
-                                child: ElevatedButton.icon(
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Observer(
+                        builder: (_) => AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          switchInCurve: Curves.easeOutCubic,
+                          switchOutCurve: Curves.easeInCubic,
+                          child: chatStore.autoScroll
+                              ? null
+                              : Button(
+                                  padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                                   onPressed: chatStore.resumeScroll,
-                                  label: const Text('Resume Scroll'),
                                   icon: const Icon(Icons.arrow_circle_down),
+                                  child: const Text('Resume Scroll'),
                                 ),
-                              ),
+                        ),
                       ),
                     ),
                   ],
@@ -109,11 +115,18 @@ class Chat extends StatelessWidget {
               ),
             ),
             if (chatStore.settings.showBottomBar) ChatBottomBar(chatStore: chatStore),
-            if (chatStore.assetsStore.showEmoteMenu)
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 3,
+            AnimatedContainer(
+              curve: Curves.ease,
+              duration: const Duration(milliseconds: 200),
+              height: chatStore.assetsStore.showEmoteMenu ? MediaQuery.of(context).size.height / 3 : 0,
+              child: AnimatedOpacity(
+                curve: Curves.ease,
+                opacity: chatStore.assetsStore.showEmoteMenu ? 1 : 0,
+                duration: const Duration(milliseconds: 200),
                 child: EmoteMenu(chatStore: chatStore),
               ),
+              onEnd: () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
+            ),
           ],
         );
       },

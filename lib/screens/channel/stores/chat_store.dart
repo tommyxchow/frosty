@@ -72,6 +72,9 @@ abstract class ChatStoreBase with Store {
   var _autoScroll = true;
 
   @readonly
+  var _showSendButton = false;
+
+  @readonly
   var _showEmoteAutocomplete = false;
 
   @readonly
@@ -103,7 +106,7 @@ abstract class ChatStoreBase with Store {
     ));
 
     assetsStore.init();
-    chatDetailsStore.updateChatters(channelName);
+    chatDetailsStore.updateChatters();
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
@@ -131,7 +134,7 @@ abstract class ChatStoreBase with Store {
         if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
 
         // Refresh the chatters list to keep autocomplete mentions updated.
-        if (settings.autocomplete) chatDetailsStore.updateChatters(channelName);
+        if (settings.autocomplete) chatDetailsStore.updateChatters();
       }
 
       // Un-expand the chat when unfocusing.
@@ -140,10 +143,13 @@ abstract class ChatStoreBase with Store {
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
     // Will also rebuild the autocomplete bar when typing, refreshing the results as the user types.
-    textController.addListener(
-        () => _showEmoteAutocomplete = !_showMentionAutocomplete && textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty);
+    textController
+        .addListener(() => _showEmoteAutocomplete = !_showMentionAutocomplete && textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty);
 
-    textController.addListener(() => _showMentionAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.startsWith('@'));
+    textController.addListener(() {
+      _showSendButton = textController.text.isNotEmpty;
+      _showMentionAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.startsWith('@');
+    });
   }
 
   /// Handle and process the provided string-representation of the IRC data.
@@ -223,8 +229,7 @@ abstract class ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messages
-            .add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
+        _messages.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
         // Fetch the assets used in chat including badges and emotes.
         assetsStore.assetsFuture(
@@ -383,6 +388,8 @@ abstract class ChatStoreBase with Store {
     textFieldFocusNode.dispose();
     textController.dispose();
     scrollController.dispose();
+
     assetsStore.dispose();
+    chatDetailsStore.dispose();
   }
 }

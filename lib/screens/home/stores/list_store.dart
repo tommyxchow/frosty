@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/models/category.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:mobx/mobx.dart';
 
@@ -21,30 +20,33 @@ abstract class ListStoreBase with Store {
   /// The type of list that this store is handling.
   final ListType listType;
 
-  /// The category to use if the [listType] is category streams.
-  final CategoryTwitch? categoryInfo;
+  /// The category id to use when fetching streams if the [listType] is [ListType.category].
+  final String? categoryId;
+
+  /// The scroll controller used for handling scroll to top (if provided).
+  /// If provided, will use the [ScrollToTop] widget to scroll to the top of the list instead of the bottom tab bar.
+  final ScrollController? scrollController;
 
   /// The pagination cursor for the streams.
   String? _streamsCursor;
 
   /// Returns whether or not there are more streams and loading status for pagination.
+  @computed
   bool get hasMore => _isLoading == false && _streamsCursor != null;
 
   /// The loading status for pagination.
+  @readonly
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  /// The scroll controller used for handling scroll to top.
-  final scrollController = ScrollController();
-
-  /// Whether or not the scroll to top button is visible.
-  @observable
-  var showJumpButton = false;
 
   /// The list of the fetched streams.
   @readonly
   var _allStreams = ObservableList<StreamTwitch>();
 
+  /// Whether or not the scroll to top button is visible.
+  @observable
+  var showJumpButton = false;
+
+  /// The list of the fetched streams with blocked users filtered out.
   @computed
   ObservableList<StreamTwitch> get streams => _allStreams
       .where((streamInfo) => !authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(streamInfo.userId))
@@ -59,15 +61,18 @@ abstract class ListStoreBase with Store {
     required this.authStore,
     required this.twitchApi,
     required this.listType,
-    this.categoryInfo,
+    this.categoryId,
+    this.scrollController,
   }) {
-    scrollController.addListener(() {
-      if (scrollController.position.atEdge || scrollController.position.outOfRange) {
-        showJumpButton = false;
-      } else {
-        showJumpButton = true;
-      }
-    });
+    if (scrollController != null) {
+      scrollController!.addListener(() {
+        if (scrollController!.position.atEdge || scrollController!.position.outOfRange) {
+          showJumpButton = false;
+        } else {
+          showJumpButton = true;
+        }
+      });
+    }
 
     switch (listType) {
       case ListType.followed:
@@ -81,7 +86,6 @@ abstract class ListStoreBase with Store {
   }
 
   /// Fetches the streams based on the type and current cursor.
-  @action
   Future<void> getStreams() async {
     _isLoading = true;
 
@@ -103,7 +107,7 @@ abstract class ListStoreBase with Store {
           break;
         case ListType.category:
           newStreams = await twitchApi.getStreamsUnderCategory(
-            gameId: categoryInfo!.id,
+            gameId: categoryId!,
             headers: authStore.headersTwitch,
             cursor: _streamsCursor,
           );
@@ -119,7 +123,7 @@ abstract class ListStoreBase with Store {
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect :(';
+      _error = 'Failed to connect';
     } catch (e) {
       _error = e.toString();
     }
@@ -135,9 +139,14 @@ abstract class ListStoreBase with Store {
     return getStreams();
   }
 
-  void dispose() => scrollController.dispose();
+  void dispose() => scrollController?.dispose();
 }
 
+/// The possible types of lists that can be displayed.
+///
+/// [ListType.followed] is the list of streams that the user is following.
+/// [ListType.top] is the list of top streams.
+/// [ListType.category] is the list of streams under a category.
 enum ListType {
   followed,
   top,

@@ -7,31 +7,34 @@ import 'package:provider/provider.dart';
 
 class ProfilePicture extends StatelessWidget {
   final String userLogin;
-  final double? radius;
+  final double radius;
 
   const ProfilePicture({
     Key? key,
     required this.userLogin,
-    this.radius,
+    this.radius = 20,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: context.read<TwitchApi>().getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
-      builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
-        return AnimatedOpacity(
-          duration: const Duration(milliseconds: 500),
-          opacity: snapshot.connectionState == ConnectionState.done && snapshot.hasData ? 1.0 : 0.0,
-          child: CircleAvatar(
-            radius: radius,
-            backgroundColor: Colors.transparent,
-            foregroundImage: snapshot.connectionState == ConnectionState.done && snapshot.hasData
-                ? CachedNetworkImageProvider(snapshot.data!.profileImageUrl)
-                : null,
-          ),
-        );
-      },
+    final diameter = radius * 2;
+
+    return ClipOval(
+      child: FutureBuilder(
+        future: context.read<TwitchApi>().getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
+        builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
+          return snapshot.hasData
+              ? CachedNetworkImage(
+                  width: diameter,
+                  height: diameter,
+                  imageUrl: snapshot.data!.profileImageUrl,
+                )
+              : SizedBox(
+                  width: diameter,
+                  height: diameter,
+                );
+        },
+      ),
     );
   }
 }

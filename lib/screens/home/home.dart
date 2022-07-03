@@ -8,6 +8,8 @@ import 'package:frosty/screens/home/top/top_section.dart';
 import 'package:frosty/screens/home/widgets/streams_list.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,14 +35,8 @@ class _HomeState extends State<Home> {
     return showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context) => AlertDialog(
-        scrollable: true,
-        title: Text(
-          'Frosty v${packageInfo.version} (${packageInfo.buildNumber})',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      builder: (context) => FrostyDialog(
+        title: 'Frosty v${packageInfo.version} (${packageInfo.buildNumber})',
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +52,7 @@ class _HomeState extends State<Home> {
           ],
         ),
         actions: [
-          TextButton(
+          Button(
             onPressed: () {
               prefs.setBool('first_run', false);
 
@@ -107,32 +103,53 @@ class _HomeState extends State<Home> {
           ],
         ),
         body: SafeArea(
-          child: Observer(
-            builder: (_) => IndexedStack(
-              index: _homeStore.selectedIndex,
-              children: [
-                if (_authStore.isLoggedIn) const StreamsList(listType: ListType.followed),
-                const TopSection(),
-                const Search(),
-              ],
-            ),
+          child: Column(
+            children: [
+              Expanded(
+                child: Observer(
+                  builder: (_) => IndexedStack(
+                    index: _homeStore.selectedIndex,
+                    children: [
+                      if (_authStore.isLoggedIn)
+                        StreamsList(
+                          listType: ListType.followed,
+                          scrollController: _homeStore.followedScrollController,
+                        ),
+                      TopSection(
+                        homeStore: _homeStore,
+                      ),
+                      Search(
+                        scrollController: _homeStore.searchScrollController,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(height: 1.0, thickness: 1.0),
+            ],
           ),
         ),
         bottomNavigationBar: Observer(
           builder: (_) => BottomNavigationBar(
+            unselectedFontSize: 12.0,
+            selectedFontSize: 12.0,
+            type: BottomNavigationBarType.fixed,
             items: [
               if (_authStore.isLoggedIn)
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
                   label: 'Followed',
+                  tooltip: 'Followed streams',
                 ),
               const BottomNavigationBarItem(
                 icon: Icon(Icons.arrow_upward),
                 label: 'Top',
+                tooltip: 'Top streams and categories',
               ),
               const BottomNavigationBarItem(
                 icon: Icon(Icons.search),
                 label: 'Search',
+                tooltip: 'Search for channels and categories',
               ),
             ],
             currentIndex: _homeStore.selectedIndex,

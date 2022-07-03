@@ -12,6 +12,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               unknownValue: ThemeType.system) ??
           ThemeType.system
       ..showThumbnails = json['showThumbnails'] as bool? ?? true
+      ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
       ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
       ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
@@ -49,6 +50,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
       'themeType': _$ThemeTypeEnumMap[instance.themeType],
       'showThumbnails': instance.showThumbnails,
+      'largeStreamCard': instance.largeStreamCard,
       'showThumbnailUptime': instance.showThumbnailUptime,
       'launchUrlExternal': instance.launchUrlExternal,
       'showVideo': instance.showVideo,
@@ -127,6 +129,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showThumbnails(bool value) {
     _$showThumbnailsAtom.reportWrite(value, super.showThumbnails, () {
       super.showThumbnails = value;
+    });
+  }
+
+  late final _$largeStreamCardAtom =
+      Atom(name: '_SettingsStoreBase.largeStreamCard', context: context);
+
+  @override
+  bool get largeStreamCard {
+    _$largeStreamCardAtom.reportRead();
+    return super.largeStreamCard;
+  }
+
+  @override
+  set largeStreamCard(bool value) {
+    _$largeStreamCardAtom.reportWrite(value, super.largeStreamCard, () {
+      super.largeStreamCard = value;
     });
   }
 
@@ -641,6 +659,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     return '''
 themeType: ${themeType},
 showThumbnails: ${showThumbnails},
+largeStreamCard: ${largeStreamCard},
 showThumbnailUptime: ${showThumbnailUptime},
 launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},

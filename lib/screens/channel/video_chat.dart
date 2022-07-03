@@ -18,6 +18,9 @@ import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +55,7 @@ class _VideoChatState extends State<VideoChat> {
     settings: context.read<SettingsStore>(),
     chatDetailsStore: ChatDetailsStore(
       twitchApi: context.read<TwitchApi>(),
+      channelName: widget.userLogin,
     ),
     assetsStore: ChatAssetsStore(
       twitchApi: context.read<TwitchApi>(),
@@ -142,11 +146,14 @@ class _VideoChatState extends State<VideoChat> {
           tooltip: 'Settings',
           icon: const Icon(Icons.settings),
           onPressed: () => showModalBottomSheet(
+            backgroundColor: Colors.transparent,
             isScrollControlled: true,
             context: context,
-            builder: (context) => SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: Settings(settingsStore: settingsStore),
+            builder: (context) => FrostyModal(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8,
+                child: Settings(settingsStore: settingsStore),
+              ),
             ),
           ),
         ),
@@ -168,9 +175,7 @@ class _VideoChatState extends State<VideoChat> {
               builder: (context) {
                 final landscapeChat = AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  width: _chatStore.expandChat
-                      ? MediaQuery.of(context).size.width / 2
-                      : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
+                  width: _chatStore.expandChat ? MediaQuery.of(context).size.width / 2 : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
                   curve: Curves.ease,
                   color: _chatStore.settings.fullScreen
                       ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
@@ -208,9 +213,8 @@ class _VideoChatState extends State<VideoChat> {
                                 ],
                               )
                             : Row(
-                                children: settingsStore.landscapeChatLeftSide
-                                    ? [landscapeChat, Expanded(child: video)]
-                                    : [Expanded(child: video), landscapeChat],
+                                children:
+                                    settingsStore.landscapeChatLeftSide ? [landscapeChat, Expanded(child: video)] : [Expanded(child: video), landscapeChat],
                               )
                         : Column(
                             children: [appBar, Expanded(child: chat)],
@@ -295,12 +299,24 @@ class _VideoOverlay extends StatelessWidget {
   Future<void> _showSleepTimerDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sleep Timer'),
+      builder: (context) => FrostyDialog(
+        title: 'Sleep Timer',
         content: Observer(
           builder: (context) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Row(
+                children: [
+                  const Icon(Icons.timer),
+                  Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
+                  const Spacer(),
+                  IconButton(
+                    tooltip: 'Cancel sleep timer',
+                    onPressed: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive ? videoStore.cancelSleepTimer : null,
+                    icon: const Icon(Icons.cancel),
+                  ),
+                ],
+              ),
               Row(
                 children: [
                   DropdownButton(
@@ -325,30 +341,12 @@ class _VideoOverlay extends StatelessWidget {
                   const Text('Minutes'),
                 ],
               ),
-              if (videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive)
-                Row(
-                  children: [
-                    const Icon(Icons.timer),
-                    Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
-                    const Spacer(),
-                    IconButton(
-                      tooltip: 'Cancel Timer',
-                      onPressed: videoStore.cancelSleepTimer,
-                      icon: const Icon(Icons.cancel),
-                    ),
-                  ],
-                ),
             ],
           ),
         ),
         actions: [
-          TextButton(
-            onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
-            child: const Text('Dismiss'),
-          ),
           Observer(
-            builder: (context) => ElevatedButton(
+            builder: (context) => Button(
               onPressed: videoStore.sleepHours == 0 && videoStore.sleepMinutes == 0
                   ? null
                   : () => videoStore.updateSleepTimer(
@@ -356,6 +354,12 @@ class _VideoOverlay extends StatelessWidget {
                       ),
               child: const Text('Set Timer'),
             ),
+          ),
+          Button(
+            onPressed: Navigator.of(context).pop,
+            fill: true,
+            color: Colors.red.shade700,
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -385,18 +389,21 @@ class _VideoOverlay extends StatelessWidget {
         color: Colors.white,
       ),
       onPressed: () => showModalBottomSheet(
+        backgroundColor: Colors.transparent,
         isScrollControlled: true,
         context: context,
-        builder: (context) => SizedBox(
-          height: MediaQuery.of(context).size.height * 0.8,
-          child: Settings(settingsStore: videoStore.settingsStore),
+        builder: (context) => FrostyModal(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: Settings(settingsStore: videoStore.settingsStore),
+          ),
         ),
       ),
     );
 
     final chatOverlayButton = Observer(
       builder: (_) => IconButton(
-        tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide Chat Overlay' : 'Show Chat Overlay',
+        tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
         onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
         icon: videoStore.settingsStore.fullScreenChatOverlay ? const Icon(Icons.chat_bubble_outline) : const Icon(Icons.chat_bubble),
         color: Colors.white,
@@ -413,7 +420,7 @@ class _VideoOverlay extends StatelessWidget {
     );
 
     final fullScreenButton = IconButton(
-      tooltip: videoStore.settingsStore.fullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen',
+      tooltip: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
       icon: videoStore.settingsStore.fullScreen
           ? const Icon(
               Icons.fullscreen_exit,
@@ -427,7 +434,7 @@ class _VideoOverlay extends StatelessWidget {
     );
 
     final sleepTimerButton = IconButton(
-      tooltip: 'Sleep Timer',
+      tooltip: 'Sleep timer',
       icon: const Icon(
         Icons.timer,
         color: Colors.white,
@@ -436,7 +443,7 @@ class _VideoOverlay extends StatelessWidget {
     );
 
     final rotateButton = IconButton(
-      tooltip: orientation == Orientation.portrait ? 'Enter Landscape Mode' : 'Exit Landscape Mode',
+      tooltip: orientation == Orientation.portrait ? 'Enter landscape mode' : 'Exit landscape mode',
       icon: const Icon(
         Icons.screen_rotation,
         color: Colors.white,
@@ -609,7 +616,7 @@ class _VideoOverlay extends StatelessWidget {
                   ),
                   if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
                     IconButton(
-                      tooltip: 'Picture-in-Picture',
+                      tooltip: 'Picture-in-picture',
                       icon: const Icon(
                         Icons.picture_in_picture_alt_rounded,
                         color: Colors.white,

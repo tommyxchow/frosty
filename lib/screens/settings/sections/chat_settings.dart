@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -41,7 +43,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Autocomplete'),
-            subtitle: const Text('Shows a bar that suggests matching emotes and mentions when typing.'),
+            subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
             value: settingsStore.autocomplete,
             onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
           ),
@@ -49,31 +51,38 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Message Delay'),
+                const Text('Message delay'),
                 const Spacer(),
                 Text('${settingsStore.chatDelay.toInt()} ${settingsStore.chatDelay == 1.0 ? 'second' : 'seconds'}'),
               ],
             ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.chatDelay,
-              min: 0.0,
-              max: 30.0,
-              divisions: 30,
-              onChanged: (newValue) => settingsStore.chatDelay = newValue,
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider.adaptive(
+                  value: settingsStore.chatDelay,
+                  min: 0.0,
+                  max: 30.0,
+                  divisions: 30,
+                  onChanged: (newValue) => settingsStore.chatDelay = newValue,
+                ),
+                Text('Adds a delay before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}'),
+                const SizedBox(height: 15),
+              ],
             ),
           ),
           const SectionHeader(
             'Layout',
-            fontSize: 12.0,
             padding: sectionPadding,
+            showDivider: true,
           ),
           SwitchListTile.adaptive(
-            title: const Text('Bottom Bar'),
+            title: const Text('Bottom bar'),
             value: settingsStore.showBottomBar,
             onChanged: (newValue) => settingsStore.showBottomBar = newValue,
           ),
           SwitchListTile.adaptive(
-            title: const Text('Landscape Chat on Left Side'),
+            title: const Text('Landscape chat on left side'),
             value: settingsStore.landscapeChatLeftSide,
             onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
           ),
@@ -81,77 +90,90 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Landscape Chat Width'),
+                const Text('Chat width'),
                 const Spacer(),
                 Text('${(settingsStore.chatWidth * 100).toStringAsFixed(0)}%'),
               ],
             ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.chatWidth,
-              min: 0.2,
-              max: 0.6,
-              divisions: 8,
-              onChanged: (newValue) => settingsStore.chatWidth = newValue,
+            subtitle: Column(
+              children: [
+                Slider.adaptive(
+                  value: settingsStore.chatWidth,
+                  min: 0.2,
+                  max: 0.6,
+                  divisions: 8,
+                  onChanged: (newValue) => settingsStore.chatWidth = newValue,
+                ),
+                const Text('Sets the width of the chat in fullscreen and theater mode.'),
+                const SizedBox(height: 15),
+              ],
             ),
           ),
           const SizedBox(height: 15.0),
           ListTile(
             title: Row(
               children: [
-                const Text('Landscape Chat Overlay Opacity'),
+                const Text('Chat overlay opacity'),
                 const Spacer(),
                 Text('${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%'),
               ],
             ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.fullScreenChatOverlayOpacity,
-              min: 0.0,
-              max: 1.0,
-              divisions: 10,
-              onChanged: (newValue) => settingsStore.fullScreenChatOverlayOpacity = newValue,
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider.adaptive(
+                  value: settingsStore.fullScreenChatOverlayOpacity,
+                  min: 0.0,
+                  max: 1.0,
+                  divisions: 10,
+                  onChanged: (newValue) => settingsStore.fullScreenChatOverlayOpacity = newValue,
+                ),
+                const Text('Sets the opacity (transparency) of the overlay chat in fullscreen mode.'),
+                const SizedBox(height: 15),
+              ],
             ),
           ),
           const SectionHeader(
             'Emotes',
-            fontSize: 12.0,
             padding: sectionPadding,
+            showDivider: true,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Zero-Width Emotes'),
+            title: const Text('Zero-width emotes'),
             subtitle: const Text('Shows "stacked" emotes from BetterTTV and 7TV.'),
             value: settingsStore.showZeroWidth,
             onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
           ),
           const SectionHeader(
             'Message Appearance',
-            fontSize: 12.0,
             padding: sectionPadding,
+            showDivider: true,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Readable Name Colors'),
+            title: const Text('Readable name colors'),
             subtitle: const Text('Adjusts the lightness value of overly bright or dark names.'),
             value: settingsStore.useReadableColors,
             onChanged: (newValue) => settingsStore.useReadableColors = newValue,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Show Deleted Messages'),
+            title: const Text('Show deleted messages'),
             subtitle: const Text('Restores the original message of deleted messages.'),
             value: settingsStore.showDeletedMessages,
             onChanged: (newValue) => settingsStore.showDeletedMessages = newValue,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Message Dividers'),
+            title: const Text('Message dividers'),
             subtitle: const Text('Shows a subtle divider between each message.'),
             value: settingsStore.showChatMessageDividers,
             onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
           ),
           ListTile(
             isThreeLine: true,
-            title: const Text('Message Timestamps'),
+            title: const Text('Message timestamps'),
             subtitle: const Text('Shows timestamps for when a message was sent.'),
             trailing: DropdownButton(
               value: settingsStore.timestampType,
@@ -166,8 +188,8 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader(
             'Message Sizing',
-            fontSize: 12.0,
             padding: sectionPadding,
+            showDivider: true,
           ),
           ExpansionTile(
             title: const Text('Preview'),
@@ -229,7 +251,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Badge Scale'),
+                const Text('Badge scale'),
                 const Spacer(),
                 Text('${settingsStore.badgeScale.toStringAsFixed(2)}x'),
               ],
@@ -245,7 +267,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Emote Scale'),
+                const Text('Emote scale'),
                 const Spacer(),
                 Text('${settingsStore.emoteScale.toStringAsFixed(2)}x'),
               ],
@@ -261,7 +283,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Message Scale'),
+                const Text('Message scale'),
                 const Spacer(),
                 Text('${settingsStore.messageScale.toStringAsFixed(2)}x'),
               ],
@@ -277,7 +299,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Message Spacing'),
+                const Text('Message spacing'),
                 const Spacer(),
                 Text(settingsStore.messageSpacing.toStringAsFixed(0).toString()),
               ],
@@ -293,7 +315,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ListTile(
             title: Row(
               children: [
-                const Text('Font Size'),
+                const Text('Font size'),
                 const Spacer(),
                 Text(settingsStore.fontSize.toInt().toString()),
               ],

@@ -1,39 +1,34 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
-import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/top/category_streams.dart';
+import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
-import 'package:provider/provider.dart';
 
-/// A tappable card widget that displays a category's box art and name.
+/// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
   final CategoryTwitch category;
-  final int width;
-  final int height;
 
   const CategoryCard({
     Key? key,
     required this.category,
-    required this.width,
-    required this.height,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    // Calculate the dimmensions of the box art based on the current dimmensions of the screen.
+    final size = MediaQuery.of(context).size;
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final artWidth = (size.width * pixelRatio) ~/ 3;
+    final artHeight = (artWidth * (4 / 3)).toInt();
+
+    return AnimateScale(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => CategoryStreams(
-            listStore: ListStore(
-              twitchApi: context.read<TwitchApi>(),
-              authStore: context.read<AuthStore>(),
-              listType: ListType.category,
-              categoryInfo: category,
-            ),
+            categoryName: category.name,
+            categoryId: category.id,
           ),
         ),
       ),
@@ -47,7 +42,7 @@ class CategoryCard extends StatelessWidget {
                 child: AspectRatio(
                   aspectRatio: 3 / 4,
                   child: CachedNetworkImage(
-                    imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${width}x$height.jpg'),
+                    imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${artWidth}x$artHeight.jpg'),
                     placeholder: (context, url) => const LoadingIndicator(),
                   ),
                 ),

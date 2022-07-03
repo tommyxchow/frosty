@@ -5,12 +5,17 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/stores/categories_store.dart';
 import 'package:frosty/screens/home/widgets/category_card.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
-import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
 class Categories extends StatefulWidget {
-  const Categories({Key? key}) : super(key: key);
+  final ScrollController scrollController;
+
+  const Categories({
+    Key? key,
+    required this.scrollController,
+  }) : super(key: key);
 
   @override
   State<Categories> createState() => _CategoriesState();
@@ -26,12 +31,6 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
 
-    final size = MediaQuery.of(context).size;
-    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
-    final artWidth = (size.width * pixelRatio) ~/ 3;
-    final artHeight = (artWidth * (4 / 3)).toInt();
-
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
@@ -39,7 +38,10 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
 
         if (_categoriesStore.error != null) {
           final snackBar = SnackBar(
-            content: Text(_categoriesStore.error!),
+            content: AlertMessage(
+              message: _categoriesStore.error!,
+              icon: Icons.error,
+            ),
             behavior: SnackBarBehavior.floating,
           );
 
@@ -49,37 +51,50 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
       },
       child: Observer(
         builder: (_) {
-          if (_categoriesStore.categories.isEmpty && _categoriesStore.isLoading && _categoriesStore.error == null) {
-            return const LoadingIndicator(subtitle: Text('Loading categories...'));
+          Widget? statusWidget;
+
+          if (_categoriesStore.error != null) {
+            statusWidget = AlertMessage(
+              message: _categoriesStore.error!,
+              icon: Icons.error,
+            );
           }
-          return Stack(
-            alignment: AlignmentDirectional.bottomCenter,
-            children: [
-              GridView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _categoriesStore.scrollController,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                ),
-                itemCount: _categoriesStore.categories.length,
-                itemBuilder: (context, index) {
-                  if (index > _categoriesStore.categories.length / 2 && _categoriesStore.hasMore) {
-                    _categoriesStore.getCategories();
-                  }
-                  return CategoryCard(
-                    category: _categoriesStore.categories[index],
-                    width: artWidth,
-                    height: artHeight,
-                  );
-                },
-              ),
-              Observer(
-                builder: (context) => AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: _categoriesStore.showJumpButton ? ScrollToTopButton(scrollController: _categoriesStore.scrollController) : null,
-                ),
-              ),
-            ],
+
+          if (_categoriesStore.categories.isEmpty) {
+            if (_categoriesStore.isLoading && _categoriesStore.error == null) {
+              statusWidget = const LoadingIndicator(subtitle: 'Loading categories...');
+            } else {
+              statusWidget = const AlertMessage(message: 'No top categories');
+            }
+          }
+
+          if (statusWidget != null) {
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Center(
+                    child: statusWidget,
+                  ),
+                )
+              ],
+            );
+          }
+
+          return GridView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: widget.scrollController,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+            ),
+            itemCount: _categoriesStore.categories.length,
+            itemBuilder: (context, index) {
+              if (index > _categoriesStore.categories.length - 8 && _categoriesStore.hasMore) {
+                _categoriesStore.getCategories();
+              }
+              return CategoryCard(
+                category: _categoriesStore.categories[index],
+              );
+            },
           );
         },
       ),
@@ -88,10 +103,4 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void dispose() {
-    _categoriesStore.dispose();
-    super.dispose();
-  }
 }

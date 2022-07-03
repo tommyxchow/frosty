@@ -78,6 +78,23 @@ final navigatorKey = GlobalKey<NavigatorState>();
 const gray = Color.fromRGBO(22, 22, 22, 1.0);
 const purple = Color(0xff9146ff);
 
+const inputTheme = InputDecorationTheme(
+  filled: true,
+  contentPadding: EdgeInsets.all(10.0),
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderSide: BorderSide(style: BorderStyle.none),
+  ),
+  enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderSide: BorderSide(style: BorderStyle.none),
+  ),
+  disabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderSide: BorderSide(style: BorderStyle.none),
+  ),
+);
+
 final lightTheme = ThemeData(
   canvasColor: Colors.white,
   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
@@ -102,6 +119,7 @@ final lightTheme = ThemeData(
     labelColor: Colors.black,
     unselectedLabelColor: Colors.grey,
   ),
+  inputDecorationTheme: inputTheme,
 );
 
 final darkTheme = ThemeData(
@@ -126,6 +144,7 @@ final darkTheme = ThemeData(
   ),
   dialogBackgroundColor: gray,
   toggleableActiveColor: purple,
+  inputDecorationTheme: inputTheme,
 );
 
 final oledTheme = ThemeData(
@@ -148,6 +167,7 @@ final oledTheme = ThemeData(
   ),
   dialogBackgroundColor: Colors.black,
   toggleableActiveColor: purple,
+  inputDecorationTheme: inputTheme,
 );
 
 class MyApp extends StatelessWidget {

@@ -87,12 +87,12 @@ class ChatMessage extends StatelessWidget {
                 if (banDuration == null)
                   if (ircMessage.command == Command.clearMessage)
                     const Text(
-                      'Message Deleted',
+                      'Message deleted',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     )
                   else
                     const Text(
-                      'User Permanently Banned',
+                      'User permanently banned',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     )
                 else
