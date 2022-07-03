@@ -221,7 +221,7 @@ class StreamCard extends StatelessWidget {
         child: large
             ? Stack(
                 alignment: AlignmentDirectional.bottomStart,
-                children: [imageSection, streamInfoSection],
+                children: [if (showThumbnail) imageSection, streamInfoSection],
               )
             : Row(
                 children: [
