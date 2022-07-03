@@ -81,7 +81,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
               Observer(
                 builder: (_) => EmoteMenuPanel(
                   chatStore: widget.chatStore,
-                  emotes: widget.chatStore.assetsStore.userEmoteToObject.values.toList(),
+                  twitchEmotes: widget.chatStore.assetsStore.userEmoteSectionToEmotes,
                 ),
               ),
               Observer(

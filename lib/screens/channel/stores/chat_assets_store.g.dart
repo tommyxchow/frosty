@@ -85,6 +85,26 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
     });
   }
 
+  late final _$_userEmoteSectionToEmotesAtom = Atom(
+      name: 'ChatAssetsStoreBase._userEmoteSectionToEmotes', context: context);
+
+  Map<String, List<Emote>> get userEmoteSectionToEmotes {
+    _$_userEmoteSectionToEmotesAtom.reportRead();
+    return super._userEmoteSectionToEmotes;
+  }
+
+  @override
+  Map<String, List<Emote>> get _userEmoteSectionToEmotes =>
+      userEmoteSectionToEmotes;
+
+  @override
+  set _userEmoteSectionToEmotes(Map<String, List<Emote>> value) {
+    _$_userEmoteSectionToEmotesAtom
+        .reportWrite(value, super._userEmoteSectionToEmotes, () {
+      super._userEmoteSectionToEmotes = value;
+    });
+  }
+
   late final _$_userToFFZBadgesAtom =
       Atom(name: 'ChatAssetsStoreBase._userToFFZBadges', context: context);
 
@@ -179,6 +199,18 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
     return _$initAsyncAction.run(() => super.init());
   }
 
+  late final _$userEmotesFutureAsyncAction =
+      AsyncAction('ChatAssetsStoreBase.userEmotesFuture', context: context);
+
+  @override
+  Future<void> userEmotesFuture(
+      {required List<String> emoteSets,
+      required Map<String, String> headers,
+      required Function onError}) {
+    return _$userEmotesFutureAsyncAction.run(() => super.userEmotesFuture(
+        emoteSets: emoteSets, headers: headers, onError: onError));
+  }
+
   late final _$ChatAssetsStoreBaseActionController =
       ActionController(name: 'ChatAssetsStoreBase', context: context);
 
@@ -226,21 +258,6 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
     try {
       return super.badgesFuture(
           channelId: channelId, headers: headers, onError: onError);
-    } finally {
-      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  Future<void> userEmotesFuture(
-      {required List<String> emoteSets,
-      required Map<String, String> headers,
-      required Function onError}) {
-    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
-        name: 'ChatAssetsStoreBase.userEmotesFuture');
-    try {
-      return super.userEmotesFuture(
-          emoteSets: emoteSets, headers: headers, onError: onError);
     } finally {
       _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
     }
