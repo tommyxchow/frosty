@@ -231,25 +231,29 @@ abstract class ChatStoreBase with Store {
       } else if (message.contains('Welcome, GLHF!')) {
         _messages.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
-        // Fetch the assets used in chat including badges and emotes.
-        assetsStore.assetsFuture(
-          channelId: channelId,
-          headers: auth.headersTwitch,
-          onEmoteError: (error) {
-            debugPrint(error.toString());
-            return <Emote>[];
-          },
-          onBadgeError: (error) {
-            debugPrint(error.toString());
-            return <Badge>[];
-          },
-        );
+        getAssets();
+
         // Reset exponential backoff if successfully connected.
         _retries = 0;
         _backoffTime = 0;
       }
     }
   }
+
+  // Fetch the assets used in chat including badges and emotes.
+  @action
+  Future<void> getAssets() async => assetsStore.assetsFuture(
+        channelId: channelId,
+        headers: auth.headersTwitch,
+        onEmoteError: (error) {
+          debugPrint(error.toString());
+          return <Emote>[];
+        },
+        onBadgeError: (error) {
+          debugPrint(error.toString());
+          return <Badge>[];
+        },
+      );
 
   /// Re-enables [_autoScroll] and jumps to the latest message.
   @action

@@ -159,10 +159,8 @@ abstract class ChatAssetsStoreBase with Store {
     required Function onError,
   }) =>
       Future.wait([
-        twitchApi
-            .getBadgesGlobal()
-            .then((badges) => twitchBadgesToObject.addAll(badges))
-            .then((_) => twitchApi.getBadgesChannel(id: channelId).then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError)),
+        twitchApi.getBadgesGlobal().then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError),
+        twitchApi.getBadgesChannel(id: channelId).then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError),
         ffzApi.getBadges().then((badges) => _userToFFZBadges = badges).catchError(onError),
         sevenTVApi.getBadges().then((badges) => _userTo7TVBadges = badges).catchError(onError),
         bttvApi.getBadges().then((badges) => _userToBTTVBadges = badges).catchError(onError),
