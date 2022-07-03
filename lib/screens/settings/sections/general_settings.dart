@@ -36,25 +36,25 @@ class GeneralSettings extends StatelessWidget {
             ),
           ),
           SwitchListTile.adaptive(
-            title: const Text('Stream Card Thumbnails'),
+            title: const Text('Large stream card'),
+            value: settingsStore.largeStreamCard,
+            onChanged: (newValue) => settingsStore.largeStreamCard = newValue,
+          ),
+          SwitchListTile.adaptive(
+            title: const Text('Stream card thumbnails'),
             value: settingsStore.showThumbnails,
             onChanged: (newValue) => settingsStore.showThumbnails = newValue,
           ),
           SwitchListTile.adaptive(
-            title: const Text('Large Stream Card'),
-            value: settingsStore.largeStreamCard,
-            onChanged: settingsStore.showThumbnails ? (newValue) => settingsStore.largeStreamCard = newValue : null,
-          ),
-          SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Stream Uptime on Thumbnails'),
+            title: const Text('Stream uptime on thumbnails'),
             subtitle: const Text('Shows the uptime of the stream in the HH:MM:SS format.'),
             value: settingsStore.showThumbnailUptime,
             onChanged: settingsStore.showThumbnails ? (newValue) => settingsStore.showThumbnailUptime = newValue : null,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Launch URLs in External Browser'),
+            title: const Text('Launch URLs in external browser'),
             subtitle: const Text('Opens links in the default external browser.'),
             value: settingsStore.launchUrlExternal,
             onChanged: (newValue) => settingsStore.launchUrlExternal = newValue,

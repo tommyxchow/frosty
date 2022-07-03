@@ -29,7 +29,7 @@ class VideoSettings extends StatelessWidget {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Custom Overlay'),
+            title: const Text('Custom overlay'),
             subtitle: const Text('Replaces Twitch\'s default overlay with a mobile-friendly version.'),
             value: settingsStore.showOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
@@ -37,14 +37,14 @@ class VideoSettings extends StatelessWidget {
           if (Platform.isIOS)
             SwitchListTile.adaptive(
               isThreeLine: true,
-              title: const Text('Picture-in-Picture Button (experimental)'),
-              subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay. MAY CAUSE freezes/crashes.'),
+              title: const Text('Picture-in-picture Button (experimental)'),
+              subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay (may cause freezes/crashes).'),
               value: settingsStore.pictureInPicture,
               onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
             ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Long-Press Player to Toggle Overlay'),
+            title: const Text('Long-press player to toggle overlay'),
             subtitle: const Text('Allows switching between Twitch\'s default overlay and the custom overlay.'),
             value: settingsStore.toggleableOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
@@ -53,17 +53,24 @@ class VideoSettings extends StatelessWidget {
           ListTile(
             title: Row(
               children: [
-                const Text('Custom Overlay Opacity'),
+                const Text('Custom overlay opacity'),
                 const Spacer(),
                 Text('${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%'),
               ],
             ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.overlayOpacity,
-              min: 0.0,
-              max: 1.0,
-              divisions: 10,
-              onChanged: (newValue) => settingsStore.overlayOpacity = newValue,
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider.adaptive(
+                  value: settingsStore.overlayOpacity,
+                  min: 0.0,
+                  max: 1.0,
+                  divisions: 10,
+                  onChanged: (newValue) => settingsStore.overlayOpacity = newValue,
+                ),
+                const Text('Adjusts the opacity (transparency) of the stream overlay when active.'),
+                const SizedBox(height: 15),
+              ],
             ),
           ),
         ],

@@ -99,7 +99,9 @@ class _OtherSettingsState extends State<OtherSettings> {
         ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
-            title: const Text('Send Anonymous Crash Logs'),
+            title: const Text('Send anonymous crash logs'),
+            isThreeLine: true,
+            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.'),
             value: widget.settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
