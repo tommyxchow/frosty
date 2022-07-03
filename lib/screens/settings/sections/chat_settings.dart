@@ -74,6 +74,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           const SectionHeader(
             'Layout',
             padding: sectionPadding,
+            showDivider: true,
           ),
           SwitchListTile.adaptive(
             title: const Text('Bottom bar'),
@@ -135,6 +136,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           const SectionHeader(
             'Emotes',
             padding: sectionPadding,
+            showDivider: true,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
@@ -146,6 +148,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           const SectionHeader(
             'Message Appearance',
             padding: sectionPadding,
+            showDivider: true,
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
@@ -186,6 +189,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           const SectionHeader(
             'Message Sizing',
             padding: sectionPadding,
+            showDivider: true,
           ),
           ExpansionTile(
             title: const Text('Preview'),
