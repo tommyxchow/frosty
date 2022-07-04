@@ -264,6 +264,7 @@ class Emote {
   final bool zeroWidth;
   final String url;
   final EmoteType type;
+  final String? ownerId;
 
   const Emote({
     required this.name,
@@ -272,6 +273,7 @@ class Emote {
     required this.zeroWidth,
     required this.url,
     required this.type,
+    this.ownerId,
   });
 
   factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) => Emote(
@@ -279,6 +281,7 @@ class Emote {
         zeroWidth: false,
         url: 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
         type: type,
+        ownerId: emote.ownerId,
       );
 
   factory Emote.fromBTTV(EmoteBTTV emote, EmoteType type) => Emote(

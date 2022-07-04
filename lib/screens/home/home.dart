@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
@@ -42,20 +40,15 @@ class _HomeState extends State<Home> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
+          children: const [
+            Text(
                 'Thank you so much for downloading and trying out Frosty! Hopefully it will make your mobile Twitch viewing experience a little more enjoyable.'),
-            const SizedBox(height: 20.0),
-            const Text(
-                'You can see the full changelog on the app store listing or the "Releases" section on the GitHub repo (link on the top right of settings).'),
-            const SizedBox(height: 20.0),
-            const Text('You can also find the FAQ on the GitHub repo (link in Settings -> Other).'),
-            const SizedBox(height: 20.0),
-            const Text('If you have any issues or feature requests for the app, please open an issue on GitHub.'),
-            if (Platform.isAndroid) ...[
-              const SizedBox(height: 20.0),
-              const Text('NOTE: Due to limitations with the Twitch web player, video streams may not work on Android versions below 7.1.1.'),
-            ]
+            SizedBox(height: 20.0),
+            Text('You can see the full changelog on the app store listing or the "Releases" section on the GitHub repo (link on the top right of settings).'),
+            SizedBox(height: 20.0),
+            Text('You can also find the FAQ on the GitHub repo (link in Settings -> Other).'),
+            SizedBox(height: 20.0),
+            Text('If you have any issues or feature requests for the app, please open an issue on GitHub.'),
           ],
         ),
         actions: [

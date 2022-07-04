@@ -43,7 +43,13 @@ abstract class ChatAssetsStoreBase with Store {
 
   /// The emotes that are "owned" and may be used by the current user.
   @readonly
+  // ignore: prefer_final_fields
   var _userEmoteToObject = <String, Emote>{};
+
+  /// The Twitch emote types mapped to their emotes (i.e., global, specific channels, unlocked).
+  @readonly
+  // ignore: prefer_final_fields
+  var _userEmoteSectionToEmotes = <String, List<Emote>>{};
 
   /// The map of user IDs to their FFZ badges.
   @readonly
@@ -91,8 +97,8 @@ abstract class ChatAssetsStoreBase with Store {
     // Retrieve the instance that will allow us to retrieve local search history.
     final prefs = await SharedPreferences.getInstance();
 
-    _recentEmotes = prefs.getStringList('recent_emotes')?.map((emoteJson) => Emote.fromJson(jsonDecode(emoteJson))).toList().asObservable() ??
-        ObservableList<Emote>();
+    _recentEmotes =
+        prefs.getStringList('recent_emotes')?.map((emoteJson) => Emote.fromJson(jsonDecode(emoteJson))).toList().asObservable() ?? ObservableList<Emote>();
 
     _disposeReaction = autorun((_) {
       if (_recentEmotes.length > 48) _recentEmotes.removeLast();
@@ -153,10 +159,8 @@ abstract class ChatAssetsStoreBase with Store {
     required Function onError,
   }) =>
       Future.wait([
-        twitchApi
-            .getBadgesGlobal()
-            .then((badges) => twitchBadgesToObject.addAll(badges))
-            .then((_) => twitchApi.getBadgesChannel(id: channelId).then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError)),
+        twitchApi.getBadgesGlobal().then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError),
+        twitchApi.getBadgesChannel(id: channelId).then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError),
         ffzApi.getBadges().then((badges) => _userToFFZBadges = badges).catchError(onError),
         sevenTVApi.getBadges().then((badges) => _userTo7TVBadges = badges).catchError(onError),
         bttvApi.getBadges().then((badges) => _userToBTTVBadges = badges).catchError(onError),
@@ -167,10 +171,38 @@ abstract class ChatAssetsStoreBase with Store {
     required List<String> emoteSets,
     required Map<String, String> headers,
     required Function onError,
-  }) =>
-      Future.wait(emoteSets.map((setId) => twitchApi.getEmotesSets(setId: setId, headers: headers).catchError(onError)))
-          .then((emotes) => emotes.expand((list) => list).toList())
-          .then((userEmotes) => _userEmoteToObject = {for (final emote in userEmotes) emote.name: emote}.asObservable());
+  }) async {
+    final userEmotes = await Future.wait(emoteSets.map((setId) => twitchApi.getEmotesSets(setId: setId, headers: headers).catchError(onError)));
+
+    for (final emoteSet in userEmotes) {
+      if (emoteSet.isNotEmpty) {
+        if (emoteSet.first.type == EmoteType.twitchSub) {
+          final owner = await twitchApi.getUser(id: emoteSet.first.ownerId, headers: headers);
+          _userEmoteSectionToEmotes.update(
+            owner.displayName,
+            (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
+            ifAbsent: () => emoteSet,
+          );
+        } else if (emoteSet.first.type == EmoteType.twitchGlobal) {
+          _userEmoteSectionToEmotes.update(
+            'Global Emotes',
+            (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
+            ifAbsent: () => emoteSet,
+          );
+        } else if (emoteSet.first.type == EmoteType.twitchUnlocked) {
+          _userEmoteSectionToEmotes.update(
+            'Unlocked Emotes',
+            (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
+            ifAbsent: () => emoteSet,
+          );
+        }
+
+        for (final emote in emoteSet) {
+          _userEmoteToObject[emote.name] = emote;
+        }
+      }
+    }
+  }
 
   void dispose() => _disposeReaction();
 }

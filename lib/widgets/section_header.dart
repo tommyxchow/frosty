@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class SectionHeader extends StatelessWidget {
   final String text;
-  final EdgeInsets padding;
+  final EdgeInsets? padding;
   final double? fontSize;
   final bool showDivider;
 
   const SectionHeader(
     this.text, {
     Key? key,
-    this.padding = const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 5.0),
+    this.padding,
     this.fontSize,
     this.showDivider = false,
   }) : super(key: key);
@@ -17,7 +17,7 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding,
+      padding: padding ?? const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 5.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

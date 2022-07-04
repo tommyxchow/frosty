@@ -6,78 +6,72 @@ import 'package:frosty/widgets/section_header.dart';
 
 class EmoteMenuPanel extends StatelessWidget {
   final ChatStore chatStore;
-  final List<Emote> emotes;
+  final List<Emote>? emotes;
+  final Map<String, List<Emote>>? twitchEmotes;
 
   const EmoteMenuPanel({
     Key? key,
     required this.chatStore,
-    required this.emotes,
+    this.emotes,
+    this.twitchEmotes,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final globalEmotes = emotes
-        .where((emote) =>
-            emote.type == EmoteType.twitchGlobal ||
-            emote.type == EmoteType.bttvGlobal ||
-            emote.type == EmoteType.ffzGlobal ||
-            emote.type == EmoteType.sevenTVGlobal)
-        .toList();
+    if (emotes != null) {
+      final globalEmotes =
+          emotes!.where((emote) => emote.type == EmoteType.bttvGlobal || emote.type == EmoteType.ffzGlobal || emote.type == EmoteType.sevenTVGlobal).toList();
 
-    final channelEmotes = emotes
-        .where((emote) =>
-            emote.type == EmoteType.twitchChannel ||
-            emote.type == EmoteType.bttvChannel ||
-            emote.type == EmoteType.bttvShared ||
-            emote.type == EmoteType.ffzChannel ||
-            emote.type == EmoteType.sevenTVChannel)
-        .toList();
+      final channelEmotes = emotes!
+          .where((emote) =>
+              emote.type == EmoteType.bttvChannel ||
+              emote.type == EmoteType.bttvShared ||
+              emote.type == EmoteType.ffzChannel ||
+              emote.type == EmoteType.sevenTVChannel)
+          .toList();
 
-    final subEmotes = emotes.where((emote) => emote.type == EmoteType.twitchSub).toList();
-    final miscEmotes = emotes.where((emote) => emote.type == EmoteType.twitchUnlocked).toList();
-
-    return CustomScrollView(
-      slivers: [
-        if (globalEmotes.isNotEmpty) ...[
-          const SliverToBoxAdapter(
-            child: SectionHeader(
-              'Global Emotes',
-              padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      return CustomScrollView(
+        slivers: [
+          if (globalEmotes.isNotEmpty) ...[
+            const SliverToBoxAdapter(
+              child: SectionHeader(
+                'Global Emotes',
+                padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+              ),
             ),
-          ),
-          EmoteMenuSection(
-            chatStore: chatStore,
-            emotes: globalEmotes,
-          ),
+            EmoteMenuSection(
+              chatStore: chatStore,
+              emotes: globalEmotes,
+            ),
+          ],
+          if (channelEmotes.isNotEmpty) ...[
+            const SliverToBoxAdapter(
+              child: SectionHeader('Channel Emotes'),
+            ),
+            EmoteMenuSection(
+              chatStore: chatStore,
+              emotes: channelEmotes,
+            ),
+          ],
         ],
-        if (channelEmotes.isNotEmpty) ...[
-          const SliverToBoxAdapter(
-            child: SectionHeader('Channel Emotes'),
-          ),
-          EmoteMenuSection(
-            chatStore: chatStore,
-            emotes: channelEmotes,
-          ),
+      );
+    } else {
+      return CustomScrollView(
+        slivers: [
+          for (final entry in twitchEmotes!.entries) ...[
+            SliverToBoxAdapter(
+              child: SectionHeader(
+                entry.key,
+                padding: entry.key == 'Global Emotes' ? const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0) : null,
+              ),
+            ),
+            EmoteMenuSection(
+              chatStore: chatStore,
+              emotes: entry.value,
+            ),
+          ]
         ],
-        if (subEmotes.isNotEmpty) ...[
-          const SliverToBoxAdapter(
-            child: SectionHeader('Subscribed Emotes'),
-          ),
-          EmoteMenuSection(
-            chatStore: chatStore,
-            emotes: subEmotes,
-          ),
-        ],
-        if (miscEmotes.isNotEmpty) ...[
-          const SliverToBoxAdapter(
-            child: SectionHeader('Unlocked Emotes'),
-          ),
-          EmoteMenuSection(
-            chatStore: chatStore,
-            emotes: miscEmotes,
-          ),
-        ],
-      ],
-    );
+      );
+    }
   }
 }
