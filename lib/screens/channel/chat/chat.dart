@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
-import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/button.dart';
 
@@ -37,55 +35,14 @@ class Chat extends StatelessWidget {
                         style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
                         child: Observer(
                           builder: (context) {
-                            final showDividers = chatStore.settings.showChatMessageDividers;
-
-                            return ListView.separated(
-                              padding: const EdgeInsets.symmetric(vertical: 5.0),
+                            return ListView.builder(
                               addAutomaticKeepAlives: false,
                               addRepaintBoundaries: false,
                               itemCount: chatStore.messages.length,
                               controller: chatStore.scrollController,
-                              separatorBuilder: (context, index) => showDividers
-                                  ? Divider(
-                                      height: chatStore.settings.messageSpacing,
-                                      thickness: 1.0,
-                                    )
-                                  : SizedBox(height: chatStore.settings.messageSpacing),
-                              itemBuilder: (context, index) => Observer(
-                                builder: (context) {
-                                  final message = chatStore.messages[index];
-                                  final chatMessage = ChatMessage(
-                                    ircMessage: message,
-                                    assetsStore: chatStore.assetsStore,
-                                    settingsStore: chatStore.settings,
-                                  );
-
-                                  if (message.user != null && message.user != chatStore.auth.user.details?.login) {
-                                    return InkWell(
-                                      onTap: () {
-                                        FocusScope.of(context).unfocus();
-                                        if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
-                                      },
-                                      onLongPress: () {
-                                        HapticFeedback.lightImpact();
-
-                                        showModalBottomSheet(
-                                          backgroundColor: Colors.transparent,
-                                          isScrollControlled: true,
-                                          context: context,
-                                          builder: (context) => ChatUserModal(
-                                            chatStore: chatStore,
-                                            username: message.user!,
-                                            userId: message.tags['user-id']!,
-                                            displayName: message.tags['display-name']!,
-                                          ),
-                                        );
-                                      },
-                                      child: chatMessage,
-                                    );
-                                  }
-                                  return chatMessage;
-                                },
+                              itemBuilder: (context, index) => ChatMessage(
+                                ircMessage: chatStore.messages[index],
+                                chatStore: chatStore,
                               ),
                             );
                           },
