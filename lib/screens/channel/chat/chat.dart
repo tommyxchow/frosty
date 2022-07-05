@@ -36,6 +36,7 @@ class Chat extends StatelessWidget {
                         child: Observer(
                           builder: (context) {
                             return ListView.builder(
+                              padding: EdgeInsets.zero,
                               addAutomaticKeepAlives: false,
                               addRepaintBoundaries: false,
                               itemCount: chatStore.messages.length,
