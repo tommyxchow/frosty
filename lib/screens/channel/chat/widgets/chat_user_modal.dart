@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
@@ -31,7 +32,6 @@ class ChatUserModal extends StatefulWidget {
 class _ChatUserModalState extends State<ChatUserModal> {
   @override
   Widget build(BuildContext context) {
-    final userMessages = widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
     final name = regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
 
     return FrostyModal(
@@ -90,48 +90,33 @@ class _ChatUserModalState extends State<ChatUserModal> {
               'Recent Messages',
               padding: EdgeInsets.all(10.0),
             ),
-            if (userMessages.isEmpty)
-              const Expanded(child: AlertMessage(message: 'No recent messages'))
-            else
-              Expanded(
-                child: MediaQuery(
-                  data: MediaQuery.of(context).copyWith(textScaleFactor: widget.chatStore.settings.messageScale),
-                  child: DefaultTextStyle(
-                    style: DefaultTextStyle.of(context).style.copyWith(fontSize: widget.chatStore.settings.fontSize),
-                    child: ListView.separated(
-                      padding: EdgeInsets.zero,
-                      reverse: true,
-                      itemBuilder: (context, index) => InkWell(
-                        onLongPress: () async {
-                          HapticFeedback.lightImpact();
+            Expanded(
+              child: Observer(
+                builder: (context) {
+                  final userMessages = widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
 
-                          await Clipboard.setData(ClipboardData(text: userMessages[index].message));
+                  if (userMessages.isEmpty) {
+                    return const AlertMessage(message: 'No recent messages');
+                  }
 
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: AlertMessage(message: 'Message copied to clipboard'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        },
-                        child: ChatMessage(
+                  return MediaQuery(
+                    data: MediaQuery.of(context).copyWith(textScaleFactor: widget.chatStore.settings.messageScale),
+                    child: DefaultTextStyle(
+                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: widget.chatStore.settings.fontSize),
+                      child: ListView.builder(
+                        reverse: true,
+                        itemCount: userMessages.length,
+                        itemBuilder: (context, index) => ChatMessage(
                           ircMessage: userMessages[index],
-                          assetsStore: widget.chatStore.assetsStore,
-                          settingsStore: widget.chatStore.settings,
+                          chatStore: widget.chatStore,
+                          isModal: true,
                         ),
                       ),
-                      separatorBuilder: (context, index) => widget.chatStore.settings.showChatMessageDividers
-                          ? Divider(
-                              height: widget.chatStore.settings.messageSpacing,
-                              thickness: 1.0,
-                            )
-                          : SizedBox(height: widget.chatStore.settings.messageSpacing),
-                      itemCount: userMessages.length,
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
+            )
           ],
         ),
       ),
