@@ -21,11 +21,13 @@ class AlertMessage extends StatelessWidget {
           color: Colors.grey,
         ),
         const SizedBox(width: 5.0),
-        Text(
-          message,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.grey,
+        Flexible(
+          child: Text(
+            message,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
+            ),
           ),
         ),
       ],
