@@ -74,15 +74,7 @@ abstract class ListStoreBase with Store {
       });
     }
 
-    switch (listType) {
-      case ListType.followed:
-        if (listType == ListType.followed && authStore.isLoggedIn) getStreams();
-        break;
-      case ListType.top:
-      case ListType.category:
-        getStreams();
-        break;
-    }
+    getStreams();
   }
 
   /// Fetches the streams based on the type and current cursor.

@@ -145,7 +145,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              if (index > _listStore.streams.length - 8 && _listStore.hasMore) {
+                              if (index > _listStore.streams.length - 10 && _listStore.hasMore) {
                                 _listStore.getStreams();
                               }
                               return Observer(

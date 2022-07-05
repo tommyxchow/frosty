@@ -88,7 +88,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
             ),
             itemCount: _categoriesStore.categories.length,
             itemBuilder: (context, index) {
-              if (index > _categoriesStore.categories.length - 8 && _categoriesStore.hasMore) {
+              if (index > _categoriesStore.categories.length - 10 && _categoriesStore.hasMore) {
                 _categoriesStore.getCategories();
               }
               return CategoryCard(
