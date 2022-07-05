@@ -21,7 +21,7 @@ class _ChatSettingsState extends State<ChatSettings> {
 
   @override
   Widget build(BuildContext context) {
-    const timestamps = ['Disabled', '12-Hour', '24-Hour'];
+    const timestamps = ['Disabled', '12-hour', '24-hour'];
 
     const sectionPadding = EdgeInsets.only(left: 16.0, bottom: 5.0, top: 30.0);
 
@@ -96,6 +96,7 @@ class _ChatSettingsState extends State<ChatSettings> {
               ],
             ),
             subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Slider.adaptive(
                   value: settingsStore.chatWidth,
