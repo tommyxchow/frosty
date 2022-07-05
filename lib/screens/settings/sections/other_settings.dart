@@ -93,6 +93,12 @@ class _OtherSettingsState extends State<OtherSettings> {
         ),
         ListTile(
           leading: const Icon(Icons.launch),
+          title: const Text('Changelog'),
+          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
+              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+        ),
+        ListTile(
+          leading: const Icon(Icons.launch),
           title: const Text('FAQ'),
           onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty#faq'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
