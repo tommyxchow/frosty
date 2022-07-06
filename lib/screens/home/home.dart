@@ -42,13 +42,14 @@ class _HomeState extends State<Home> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text(
-                'Thank you so much for downloading and trying out Frosty! Hopefully it will make your mobile Twitch viewing experience a little more enjoyable.'),
+                'Thank you so much for downloading and trying out Frosty! Hopefully it\'ll make your mobile Twitch viewing experience a little more enjoyable.'),
             SizedBox(height: 20.0),
-            Text('You can see the full changelog on the app store listing or the "Releases" section on the GitHub repo (link on the top right of settings).'),
+            Text(
+                'Frosty is completely free and open-source. If you\'d like to explore the source code, report an issue, or make a feature request, check out the GitHub repo (link at the top-right of settings).'),
             SizedBox(height: 20.0),
-            Text('You can also find the FAQ on the GitHub repo (link in Settings -> Other).'),
+            Text('You can also find links to the full changelog and FAQ in Settings -> Other.'),
             SizedBox(height: 20.0),
-            Text('If you have any issues or feature requests for the app, please open an issue on GitHub.'),
+            Text('Don\'t forget to leave a rating and/or review on the app store!'),
           ],
         ),
         actions: [
