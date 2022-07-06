@@ -86,60 +86,61 @@
   <img
     title="Followed Streams"
     alt="Followed Streams"
-    src="https://user-images.githubusercontent.com/54859075/170803307-57c16834-1a4b-4c9d-b7e3-9dd8f1a13c33.png"
+    src="https://user-images.githubusercontent.com/54859075/177494837-14055c2e-0c47-4134-9554-821fb995a75e.png"
     width="32%"
   />
   <img
     title="Categories Section"
     alt="Categories Section"
-    src="https://user-images.githubusercontent.com/54859075/170803313-a7b122f4-36ac-480d-a138-dd8383c21bbe.png"
+    src="https://user-images.githubusercontent.com/54859075/177494836-96a99000-fd38-45dd-991b-a02d56da241a.png"
     width="32%"
   />
   <img
     title="Search Section"
     alt="Search Section"
-    src="https://user-images.githubusercontent.com/54859075/170803326-5338aec5-f201-4b0a-aa60-9dc44d76ea67.png"
+    src="https://user-images.githubusercontent.com/54859075/177494837-14055c2e-0c47-4134-9554-821fb995a75e.png"
     width="32%"
   />
   <img
     title="Channel (Video/Chat) View"
     alt="Channel (Video/Chat) View"
-    src="https://user-images.githubusercontent.com/54859075/170807736-f3fc4447-2d98-4a19-89d8-8d1b3f17c446.png"
+    src="https://user-images.githubusercontent.com/54859075/177494843-f4dc6a3f-b676-4366-be52-a0e7df6c45a1.png"
     width="32%"
   />
   <img
     title="Emote Menu"
     alt="Emote Menu"
-    src="https://user-images.githubusercontent.com/54859075/170807753-f3ae4eb4-a6ce-4261-901d-2e9ac5f147f7.png"
+    src="https://user-images.githubusercontent.com/54859075/177494841-8c01ba96-693a-4ced-98b6-8950d7743384.png"
     width="32%"
   />
   <img
     title="Settings Section"
     alt="Settings Section"
-    src="https://user-images.githubusercontent.com/54859075/170807760-7ffdd3a5-ce3a-43c3-85ae-24ae0b0874a4.png"
+    src="https://user-images.githubusercontent.com/54859075/177494840-43481564-0c9a-45ba-bc37-1f5ea49313a8.png"
     width="32%"
   />
 </p>
 
 ## Features
 
+- Support for BetterTTV, FrankerFaceZ, and 7TV emotes and badges
 - Browse followed streams, top streams, and top categories
-- Search for channels and categories
-- Watch live streams with chat
-- Support for BTTV, FFZ, and 7TV emotes/badges
-- Emote menu and autocomplete
-- Local chat user message history
-- Chatters list with filter
-- Theater and full-screen mode
-- Picture-in-picture mode (iOS only)
-- Sleep timer
-- Block and report users
+- Autocomplete for emotes and user mentions
 - Light, dark, and black (OLED) themes
-- Customizable settings
+- Search for channels and categories
+- See and filter chatters in a channel
+- Picture-in-picture mode (iOS only)
+- Local chat user message history
+- Theater and fullscreen mode
+- Watch live streams with chat
+- Block and report users
+- Emote menu
+- Sleep timer
+- And more...
 
 ## Motivation
 
-A major problem with the official Twitch app for many users is that emotes from services such as [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb), and [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh) are not officially supported. Twitch is unaffiliated with these services, hence why they haven't been integrated officially.
+A major problem with the official Twitch app for many users is that emotes and badges from services such as [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb), and [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh) are not officially supported. Twitch is unaffiliated with these services, hence why they haven't been integrated officially.
 
 As a result, the millions of users of these services have an unideal viewing experience on the official Twitch app. In the stream chat, only text is positioned where emotes should be (imagine only being able to see :emoji_code: rather than the emojis themselves).
 
@@ -172,10 +173,6 @@ I've looked into implementing it for Android a while back but web browsers on An
 ### Why do certain animations and scrolling appear to be janky?
 
 Due to the Flutter framework, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes usually resolves it.
-
-### Why isn't the video stream playing on Android?
-
-If you're on an older version of Android (below 7.1.1), the video stream will not play properly due to the reliance on Twitch's web player. Older Android versions use an older version of the native web browser (WebView), resulting in many compatibility issues with newer websites.
 
 ### Why is there a delay between the stream and chat?
 
