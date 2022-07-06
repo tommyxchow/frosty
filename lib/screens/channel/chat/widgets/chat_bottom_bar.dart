@@ -87,7 +87,7 @@ class ChatBottomBar extends StatelessWidget {
               )
             ],
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              padding: const EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 10.0),
               child: Row(
                 children: [
                   if (!chatStore.expandChat &&
@@ -104,33 +104,30 @@ class ChatBottomBar extends StatelessWidget {
                     )
                   else
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                        child: TextField(
-                          textInputAction: TextInputAction.send,
-                          focusNode: chatStore.textFieldFocusNode,
-                          minLines: 1,
-                          maxLines: 5,
-                          enabled: chatStore.auth.isLoggedIn ? true : false,
-                          decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 10.0),
-                            suffixIcon: IconButton(
-                              color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
-                              tooltip: 'Emote menu',
-                              icon: const Icon(Icons.emoji_emotions_outlined),
-                              onPressed: () {
-                                FocusScope.of(context).unfocus();
-                                chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
-                              },
-                            ),
-                            hintMaxLines: 1,
-                            hintText: chatStore.auth.isLoggedIn
-                                ? 'Send a message ${chatStore.settings.chatDelay == 0 ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
-                                : 'Log in to chat',
+                      child: TextField(
+                        textInputAction: TextInputAction.send,
+                        focusNode: chatStore.textFieldFocusNode,
+                        minLines: 1,
+                        maxLines: 5,
+                        enabled: chatStore.auth.isLoggedIn ? true : false,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 10.0),
+                          suffixIcon: IconButton(
+                            color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
+                            tooltip: 'Emote menu',
+                            icon: const Icon(Icons.emoji_emotions_outlined),
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                              chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
+                            },
                           ),
-                          controller: chatStore.textController,
-                          onSubmitted: chatStore.sendMessage,
+                          hintMaxLines: 1,
+                          hintText: chatStore.auth.isLoggedIn
+                              ? 'Send a message ${chatStore.settings.chatDelay == 0 ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
+                              : 'Log in to chat',
                         ),
+                        controller: chatStore.textController,
+                        onSubmitted: chatStore.sendMessage,
                       ),
                     ),
                   if (chatStore.showSendButton &&
