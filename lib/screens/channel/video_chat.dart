@@ -603,7 +603,7 @@ class _VideoOverlay extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 5.0),
                                   Text(
-                                    '${videoStore.streamInfo?.gameName} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                    '${videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo?.gameName : 'No Category'} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
                                     style: const TextStyle(
                                       color: Colors.white,
                                     ),

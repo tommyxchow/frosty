@@ -156,24 +156,26 @@ class StreamCard extends StatelessWidget {
           const SizedBox(height: 5.0),
           if (showCategory) ...[
             InkWell(
+              onTap: streamInfo.gameName.isNotEmpty
+                  ? () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CategoryStreams(
+                            categoryName: streamInfo.gameName,
+                            categoryId: streamInfo.gameId,
+                          ),
+                        ),
+                      )
+                  : null,
               child: Tooltip(
                 message: streamInfo.gameName,
                 preferBelow: false,
                 child: Text(
-                  streamInfo.gameName,
+                  streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: subFontSize,
                     color: fontColor?.withOpacity(0.8),
-                  ),
-                ),
-              ),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CategoryStreams(
-                    categoryName: streamInfo.gameName,
-                    categoryId: streamInfo.gameId,
                   ),
                 ),
               ),
