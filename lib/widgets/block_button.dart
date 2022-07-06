@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 
 class BlockButton extends StatelessWidget {
   final AuthStore authStore;
@@ -24,17 +26,12 @@ class BlockButton extends StatelessWidget {
   }) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: isBlocked ? const Text('Unblock') : const Text('Block'),
+      builder: (context) => FrostyDialog(
+        title: isBlocked ? 'Unblock' : 'Block',
         content: Text(
             'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}'),
         actions: [
-          TextButton(
-            onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
+          Button(
             onPressed: () {
               if (isBlocked) {
                 authStore.user.unblock(targetId: targetUserId, headers: authStore.headersTwitch);
@@ -49,6 +46,12 @@ class BlockButton extends StatelessWidget {
             },
             child: const Text('Yes'),
           ),
+          Button(
+            fill: true,
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red.shade700,
+            child: const Text('Cancel'),
+          ),
         ],
       ),
     );
@@ -60,16 +63,18 @@ class BlockButton extends StatelessWidget {
       builder: (context) {
         final isBlocked = authStore.user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
 
-        return OutlinedButton.icon(
+        return Button(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
           icon: const Icon(Icons.block),
-          label: isBlocked ? Text(simple ? 'Unblock' : 'Unblock $targetUser') : Text(simple ? 'Block' : 'Block $targetUser'),
+          color: Colors.red.shade700,
+          fill: true,
           onPressed: () => _showDialog(
             context,
             isBlocked: isBlocked,
             targetUser: targetUser,
             targetUserId: targetUserId,
           ),
-          style: OutlinedButton.styleFrom(primary: Colors.red),
+          child: isBlocked ? Text(simple ? 'Unblock' : 'Unblock $targetUser') : Text(simple ? 'Block' : 'Block $targetUser'),
         );
       },
     );

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
@@ -21,18 +20,8 @@ abstract class CategoriesStoreBase with Store {
   String? _categoriesCursor;
 
   /// The loading status for pagination.
+  @readonly
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  /// Returns whether or not there are more streams and loading status for pagination.
-  bool get hasMore => _isLoading == false && _categoriesCursor != null;
-
-  /// The scroll controller used for handling scroll to top.
-  final scrollController = ScrollController();
-
-  /// Whether or not the scroll to top button is visible.
-  @observable
-  var showJumpButton = false;
 
   /// The current visible categories, sorted by total viewers.
   @readonly
@@ -42,20 +31,15 @@ abstract class CategoriesStoreBase with Store {
   @readonly
   String? _error;
 
-  CategoriesStoreBase({required this.authStore, required this.twitchApi}) {
-    scrollController.addListener(() {
-      if (scrollController.position.atEdge || scrollController.position.outOfRange) {
-        showJumpButton = false;
-      } else {
-        showJumpButton = true;
-      }
-    });
+  /// Returns whether or not there are more streams and loading status for pagination.
+  @computed
+  bool get hasMore => _isLoading == false && _categoriesCursor != null;
 
+  CategoriesStoreBase({required this.authStore, required this.twitchApi}) {
     getCategories();
   }
 
   // Fetches the top categories based on the current cursor.
-  @action
   Future<void> getCategories() async {
     _isLoading = true;
 
@@ -64,6 +48,7 @@ abstract class CategoriesStoreBase with Store {
         headers: authStore.headersTwitch,
         cursor: _categoriesCursor,
       );
+
       if (_categoriesCursor == null) {
         _categories = result.data.asObservable();
       } else {
@@ -73,7 +58,7 @@ abstract class CategoriesStoreBase with Store {
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect :(';
+      _error = 'Failed to connect';
     } catch (e) {
       _error = e.toString();
     }
@@ -87,9 +72,5 @@ abstract class CategoriesStoreBase with Store {
     _categoriesCursor = null;
 
     return getCategories();
-  }
-
-  void dispose() {
-    scrollController.dispose();
   }
 }

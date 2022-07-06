@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,27 +28,32 @@ class _OtherSettingsState extends State<OtherSettings> {
   Future<void> _showConfirmDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Reset All Settings'),
+      builder: (context) => FrostyDialog(
+        title: 'Reset All Settings',
         content: const Text('Are you sure you want to reset all settings?'),
         actions: [
-          TextButton(
-            onPressed: Navigator.of(context).pop,
-            style: TextButton.styleFrom(primary: Colors.red),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
+          Button(
             onPressed: () {
-              widget.settingsStore.reset();
+              HapticFeedback.heavyImpact();
+
+              widget.settingsStore.resetAllSettings();
+
               Navigator.pop(context);
+
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Settings reset!'),
+                  content: AlertMessage(message: 'All settings reset'),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             },
             child: const Text('Yes'),
+          ),
+          Button(
+            fill: true,
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red.shade700,
+            child: const Text('Cancel'),
           ),
         ],
       ),
@@ -54,6 +63,7 @@ class _OtherSettingsState extends State<OtherSettings> {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
+      childrenPadding: const EdgeInsets.only(bottom: 10.0),
       leading: const Icon(Icons.help),
       title: const Text(
         'Other',
@@ -83,13 +93,21 @@ class _OtherSettingsState extends State<OtherSettings> {
         ),
         ListTile(
           leading: const Icon(Icons.launch),
+          title: const Text('Changelog'),
+          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
+              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+        ),
+        ListTile(
+          leading: const Icon(Icons.launch),
           title: const Text('FAQ'),
           onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty#faq'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
         Observer(
           builder: (_) => SwitchListTile.adaptive(
-            title: const Text('Send Anonymous Crash Logs'),
+            title: const Text('Send anonymous crash logs'),
+            isThreeLine: true,
+            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.'),
             value: widget.settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
@@ -101,32 +119,39 @@ class _OtherSettingsState extends State<OtherSettings> {
             },
           ),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          width: double.infinity,
-          child: OutlinedButton.icon(
+        ...[
+          Button(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
             icon: const Icon(Icons.delete_sweep),
-            label: const Text('Clear Image Cache'),
+            child: const Text('Clear Image Cache'),
             onPressed: () async {
+              HapticFeedback.mediumImpact();
+
               await DefaultCacheManager().emptyCache();
 
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Image cache cleared!'),
+                  content: AlertMessage(message: 'Image cache cleared'),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             },
           ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.restore),
-            label: const Text('Reset All Settings'),
+          Button(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
             onPressed: () => _showConfirmDialog(context),
+            icon: const Icon(Icons.restore),
+            child: const Text('Reset All Settings'),
+          )
+        ].map(
+          (button) => Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 15.0,
+              vertical: 5.0,
+            ),
+            width: double.infinity,
+            child: button,
           ),
         ),
       ],

@@ -131,6 +131,7 @@ Emote _$EmoteFromJson(Map<String, dynamic> json) => Emote(
       zeroWidth: json['zeroWidth'] as bool,
       url: json['url'] as String,
       type: $enumDecode(_$EmoteTypeEnumMap, json['type']),
+      ownerId: json['ownerId'] as String?,
     );
 
 Map<String, dynamic> _$EmoteToJson(Emote instance) => <String, dynamic>{
@@ -140,6 +141,7 @@ Map<String, dynamic> _$EmoteToJson(Emote instance) => <String, dynamic>{
       'zeroWidth': instance.zeroWidth,
       'url': instance.url,
       'type': _$EmoteTypeEnumMap[instance.type],
+      'ownerId': instance.ownerId,
     };
 
 const _$EmoteTypeEnumMap = {

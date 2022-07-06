@@ -56,19 +56,21 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
     });
   }
 
-  late final _$filterTextAtom =
-      Atom(name: 'ChatDetailsStoreBase.filterText', context: context);
+  late final _$_filterTextAtom =
+      Atom(name: 'ChatDetailsStoreBase._filterText', context: context);
 
-  @override
   String get filterText {
-    _$filterTextAtom.reportRead();
-    return super.filterText;
+    _$_filterTextAtom.reportRead();
+    return super._filterText;
   }
 
   @override
-  set filterText(String value) {
-    _$filterTextAtom.reportWrite(value, super.filterText, () {
-      super.filterText = value;
+  String get _filterText => filterText;
+
+  @override
+  set _filterText(String value) {
+    _$_filterTextAtom.reportWrite(value, super._filterText, () {
+      super._filterText = value;
     });
   }
 
@@ -112,9 +114,8 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
       AsyncAction('ChatDetailsStoreBase.updateChatters', context: context);
 
   @override
-  Future<void> updateChatters(String userLogin) {
-    return _$updateChattersAsyncAction
-        .run(() => super.updateChatters(userLogin));
+  Future<void> updateChatters() {
+    return _$updateChattersAsyncAction.run(() => super.updateChatters());
   }
 
   @override
@@ -122,7 +123,6 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
     return '''
 roomState: ${roomState},
 showJumpButton: ${showJumpButton},
-filterText: ${filterText},
 filteredUsers: ${filteredUsers},
 allChatters: ${allChatters}
     ''';

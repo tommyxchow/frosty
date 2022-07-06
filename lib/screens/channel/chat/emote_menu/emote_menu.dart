@@ -4,6 +4,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/button.dart';
 
 class EmoteMenu extends StatefulWidget {
   final ChatStore chatStore;
@@ -31,14 +33,21 @@ class _EmoteMenuState extends State<EmoteMenu> {
     ];
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const Divider(
+          height: 5.0,
+          thickness: 1.0,
+        ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: sections
-                .mapIndexed(
-                  (index, section) => Observer(
-                    builder: (context) => TextButton(
+            children: [
+              ...sections.mapIndexed(
+                (index, section) => Padding(
+                  padding: const EdgeInsets.only(right: 5.0),
+                  child: Observer(
+                    builder: (context) => Button(
                       onPressed: () {
                         _pageContoller.animateToPage(
                           index,
@@ -47,18 +56,41 @@ class _EmoteMenuState extends State<EmoteMenu> {
                         );
                         widget.chatStore.assetsStore.emoteMenuIndex = index;
                       },
-                      style: index == widget.chatStore.assetsStore.emoteMenuIndex ? null : TextButton.styleFrom(primary: Colors.grey),
+                      color: index == widget.chatStore.assetsStore.emoteMenuIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,
                       child: Text(
                         section,
                         style: const TextStyle(
-                          letterSpacing: 0.5,
+                          letterSpacing: 0.8,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-                )
-                .toList(),
+                ),
+              ),
+              Button(
+                onPressed: () async {
+                  await widget.chatStore.getAssets();
+
+                  if (!mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: AlertMessage(message: 'Emotes refreshed'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                color: Theme.of(context).colorScheme.secondary,
+                child: const Text(
+                  'REFRESH EMOTES',
+                  style: TextStyle(
+                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         Expanded(
@@ -72,7 +104,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
               Observer(
                 builder: (_) => EmoteMenuPanel(
                   chatStore: widget.chatStore,
-                  emotes: widget.chatStore.assetsStore.userEmoteToObject.values.toList(),
+                  twitchEmotes: widget.chatStore.assetsStore.userEmoteSectionToEmotes,
                 ),
               ),
               Observer(

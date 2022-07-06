@@ -80,8 +80,8 @@ mixin _$AuthStore on AuthBase, Store {
       AsyncAction('AuthBase.login', context: context);
 
   @override
-  Future<void> login({String? customToken}) {
-    return _$loginAsyncAction.run(() => super.login(customToken: customToken));
+  Future<void> login({required String token}) {
+    return _$loginAsyncAction.run(() => super.login(token: token));
   }
 
   late final _$logoutAsyncAction =

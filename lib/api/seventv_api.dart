@@ -64,7 +64,7 @@ class SevenTVApi {
 
       return result;
     } else {
-      return Future.error('Failed to get 7TV badges.');
+      return Future.error('Failed to get 7TV badges');
     }
   }
 }

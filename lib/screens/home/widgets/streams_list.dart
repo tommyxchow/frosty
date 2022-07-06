@@ -3,22 +3,26 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stores/list_store.dart';
 import 'package:frosty/screens/home/widgets/stream_card.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
-import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
+/// A widget that displays a list of followed or top streams based on the provided [listType].
+/// For a widget that displays the top streams under a category, refer to [CategoryStreams].
 class StreamsList extends StatefulWidget {
+  /// The type of list to display.
   final ListType listType;
-  final CategoryTwitch? categoryTwitch;
+
+  /// The scroll controller to use for scroll to top functionality.
+  final ScrollController scrollController;
 
   const StreamsList({
     Key? key,
     required this.listType,
-    this.categoryTwitch,
+    required this.scrollController,
   }) : super(key: key);
 
   @override
@@ -30,26 +34,24 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
     authStore: context.read<AuthStore>(),
     twitchApi: context.read<TwitchApi>(),
     listType: widget.listType,
-    categoryInfo: widget.categoryTwitch,
   );
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final size = MediaQuery.of(context).size;
-    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
-    final thumbnailWidth = (size.width * pixelRatio) ~/ 3;
-    final thumbnailHeight = (thumbnailWidth * (9 / 16)).toInt();
 
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
+
         await _listStore.refreshStreams();
 
         if (_listStore.error != null) {
           final snackBar = SnackBar(
-            content: Text(_listStore.error!),
+            content: AlertMessage(
+              message: _listStore.error!,
+              icon: Icons.error,
+            ),
             behavior: SnackBarBehavior.floating,
           );
 
@@ -59,39 +61,54 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
       },
       child: Observer(
         builder: (_) {
-          if (_listStore.streams.isEmpty && _listStore.isLoading && _listStore.error == null) {
-            return const LoadingIndicator(subtitle: Text('Loading streams...'));
+          Widget? statusWidget;
+
+          if (_listStore.error != null) {
+            statusWidget = AlertMessage(
+              message: _listStore.error!,
+              icon: Icons.error,
+            );
           }
-          return Stack(
-            alignment: AlignmentDirectional.bottomCenter,
-            children: [
-              ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _listStore.scrollController,
-                itemCount: _listStore.streams.length,
-                itemBuilder: (context, index) {
-                  if (index > _listStore.streams.length / 2 && _listStore.hasMore) {
-                    _listStore.getStreams();
-                  }
-                  return Observer(
-                    builder: (context) => StreamCard(
-                      listStore: _listStore,
-                      streamInfo: _listStore.streams[index],
-                      width: thumbnailWidth,
-                      height: thumbnailHeight,
-                      showThumbnail: context.read<SettingsStore>().showThumbnails,
-                      showUptime: context.read<SettingsStore>().showThumbnailUptime,
-                    ),
-                  );
-                },
-              ),
-              Observer(
-                builder: (context) => AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: _listStore.showJumpButton ? ScrollToTopButton(scrollController: _listStore.scrollController) : null,
+
+          if (_listStore.streams.isEmpty) {
+            if (_listStore.isLoading && _listStore.error == null) {
+              statusWidget = const LoadingIndicator(subtitle: 'Loading streams...');
+            } else {
+              statusWidget = AlertMessage(message: widget.listType == ListType.followed ? 'No followed streams' : 'No top streams');
+            }
+          }
+
+          if (statusWidget != null) {
+            return CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  child: Center(
+                    child: statusWidget,
+                  ),
+                )
+              ],
+            );
+          }
+
+          return ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            controller: widget.scrollController,
+            itemCount: _listStore.streams.length,
+            itemBuilder: (context, index) {
+              if (index > _listStore.streams.length - 10 && _listStore.hasMore) {
+                debugPrint('$index ${_listStore.streams.length}');
+
+                _listStore.getStreams();
+              }
+              return Observer(
+                builder: (context) => StreamCard(
+                  streamInfo: _listStore.streams[index],
+                  showThumbnail: context.read<SettingsStore>().showThumbnails,
+                  large: context.read<SettingsStore>().largeStreamCard,
+                  showUptime: context.read<SettingsStore>().showThumbnailUptime,
                 ),
-              ),
-            ],
+              );
+            },
           );
         },
       ),

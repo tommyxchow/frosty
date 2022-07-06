@@ -1,160 +1,209 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/irc.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
+import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
-  final ChatAssetsStore assetsStore;
-  final SettingsStore settingsStore;
+  final ChatStore chatStore;
+  final bool isModal;
 
   const ChatMessage({
     Key? key,
     required this.ircMessage,
-    required this.assetsStore,
-    required this.settingsStore,
+    required this.chatStore,
+    this.isModal = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    const highlightPadding = EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0);
-    const messagePadding = EdgeInsets.symmetric(horizontal: 10.0);
+    return Observer(
+      builder: (context) {
+        Color? color;
+        final Widget renderMessage;
+        switch (ircMessage.command) {
+          case Command.privateMessage:
+          case Command.userState:
+            // If user is being mentioned in the message, highlight it red.
+            if (ircMessage.mention == true) color = Colors.red.withOpacity(0.3);
 
-    switch (ircMessage.command) {
-      case Command.privateMessage:
-      case Command.userState:
-        // Render normal chat message (PRIVMSG).
-        final child = Observer(
-          builder: (context) => Text.rich(
-            TextSpan(
-              children: ircMessage.generateSpan(
-                style: DefaultTextStyle.of(context).style,
-                assetsStore: assetsStore,
-                emoteScale: settingsStore.emoteScale,
-                badgeScale: settingsStore.badgeScale,
-                useZeroWidth: settingsStore.showZeroWidth,
-                useReadableColors: settingsStore.useReadableColors,
-                isLightTheme: Theme.of(context).brightness == Brightness.light,
-                launchExternal: settingsStore.launchUrlExternal,
-                timestamp: settingsStore.timestampType,
+            renderMessage = Text.rich(
+              TextSpan(
+                children: ircMessage.generateSpan(
+                  style: DefaultTextStyle.of(context).style,
+                  assetsStore: chatStore.assetsStore,
+                  emoteScale: chatStore.settings.emoteScale,
+                  badgeScale: chatStore.settings.badgeScale,
+                  useZeroWidth: chatStore.settings.showZeroWidth,
+                  useReadableColors: chatStore.settings.useReadableColors,
+                  isLightTheme: Theme.of(context).brightness == Brightness.light,
+                  launchExternal: chatStore.settings.launchUrlExternal,
+                  timestamp: chatStore.settings.timestampType,
+                ),
               ),
-            ),
-          ),
-        );
+            );
+            break;
+          case Command.clearChat:
+          case Command.clearMessage:
+            // Render timeouts and bans
+            final banDuration = ircMessage.tags['ban-duration'];
+            renderMessage = Opacity(
+              opacity: 0.5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text.rich(
+                    TextSpan(
+                      children: ircMessage.generateSpan(
+                        style: DefaultTextStyle.of(context).style,
+                        assetsStore: chatStore.assetsStore,
+                        emoteScale: chatStore.settings.emoteScale,
+                        badgeScale: chatStore.settings.badgeScale,
+                        showMessage: chatStore.settings.showDeletedMessages,
+                        useZeroWidth: chatStore.settings.showZeroWidth,
+                        useReadableColors: chatStore.settings.useReadableColors,
+                        isLightTheme: Theme.of(context).brightness == Brightness.light,
+                        launchExternal: chatStore.settings.launchUrlExternal,
+                        timestamp: chatStore.settings.timestampType,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5.0),
+                  if (banDuration == null)
+                    if (ircMessage.command == Command.clearMessage)
+                      const Text(
+                        'Message deleted',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      )
+                    else
+                      const Text(
+                        'User permanently banned',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      )
+                  else
+                    Text(
+                      'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    )
+                ],
+              ),
+            );
+            break;
+          case Command.notice:
+            renderMessage = Text.rich(
+              TextSpan(text: ircMessage.message),
+              style: TextStyle(color: Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.5)),
+            );
+            break;
+          case Command.userNotice:
+            color = Colors.deepPurple.withOpacity(0.3);
 
-        if (ircMessage.mention == true) {
-          return Container(
-            padding: highlightPadding,
-            color: const Color(0x4DFF0000),
-            child: child,
-          );
-        }
-        return Padding(
-          padding: messagePadding,
-          child: child,
-        );
-      case Command.clearChat:
-      case Command.clearMessage:
-        // Render timeouts and bans
-        final banDuration = ircMessage.tags['ban-duration'];
-        return Padding(
-          padding: highlightPadding,
-          child: Opacity(
-            opacity: 0.50,
-            child: Column(
+            renderMessage = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Observer(
-                  builder: (context) => Text.rich(
-                    TextSpan(
-                      children: ircMessage.generateSpan(
-                        style: DefaultTextStyle.of(context).style,
-                        assetsStore: assetsStore,
-                        emoteScale: settingsStore.emoteScale,
-                        badgeScale: settingsStore.badgeScale,
-                        showMessage: settingsStore.showDeletedMessages,
-                        useZeroWidth: settingsStore.showZeroWidth,
-                        useReadableColors: settingsStore.useReadableColors,
-                        isLightTheme: Theme.of(context).brightness == Brightness.light,
-                        launchExternal: settingsStore.launchUrlExternal,
-                        timestamp: settingsStore.timestampType,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 5.0),
-                if (banDuration == null)
-                  if (ircMessage.command == Command.clearMessage)
-                    const Text(
-                      'Message Deleted',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )
-                  else
-                    const Text(
-                      'User Permanently Banned',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )
-                else
+                if (ircMessage.tags.containsKey('system-msg'))
                   Text(
-                    'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  )
-              ],
-            ),
-          ),
-        );
-      case Command.notice:
-        return Padding(
-          padding: messagePadding,
-          child: Text.rich(
-            TextSpan(text: ircMessage.message),
-            style: TextStyle(color: Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.5)),
-          ),
-        );
-      case Command.userNotice:
-        return Container(
-          padding: highlightPadding,
-          color: const Color(0x339146FF),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (ircMessage.tags.containsKey('system-msg')) Text(ircMessage.tags['system-msg']!),
-              if (ircMessage.tags.containsKey('msg-id') && ircMessage.tags['msg-id'] == 'announcement')
-                Row(
-                  children: const [
-                    Icon(Icons.announcement),
-                    SizedBox(width: 5.0),
-                    Text(
-                      'Announcement',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              const SizedBox(height: 5.0),
-              if (ircMessage.message != null)
-                Observer(
-                  builder: (context) => Text.rich(
+                    ircMessage.tags['system-msg']!,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                if (ircMessage.tags.containsKey('msg-id') && ircMessage.tags['msg-id'] == 'announcement')
+                  Row(
+                    children: const [
+                      Icon(Icons.announcement),
+                      SizedBox(width: 5.0),
+                      Text(
+                        'Announcement',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                const SizedBox(height: 5.0),
+                if (ircMessage.message != null)
+                  Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
                         style: DefaultTextStyle.of(context).style,
-                        assetsStore: assetsStore,
-                        emoteScale: settingsStore.emoteScale,
-                        badgeScale: settingsStore.badgeScale,
-                        useZeroWidth: settingsStore.showZeroWidth,
-                        useReadableColors: settingsStore.useReadableColors,
+                        assetsStore: chatStore.assetsStore,
+                        emoteScale: chatStore.settings.emoteScale,
+                        badgeScale: chatStore.settings.badgeScale,
+                        useZeroWidth: chatStore.settings.showZeroWidth,
+                        useReadableColors: chatStore.settings.useReadableColors,
                         isLightTheme: Theme.of(context).brightness == Brightness.light,
-                        launchExternal: settingsStore.launchUrlExternal,
-                        timestamp: settingsStore.timestampType,
+                        launchExternal: chatStore.settings.launchUrlExternal,
+                        timestamp: chatStore.settings.timestampType,
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            );
+            break;
+          default:
+            renderMessage = const SizedBox();
+        }
+
+        final paddedMessage = Padding(
+          padding: EdgeInsets.symmetric(vertical: chatStore.settings.messageSpacing / 2, horizontal: 10.0),
+          child: renderMessage,
         );
-      default:
-        return const SizedBox();
-    }
+
+        // Add a divider above the message if dividers are enabled.
+        final dividedMessage = chatStore.settings.showChatMessageDividers
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  paddedMessage,
+                  const Divider(
+                    height: 1.0,
+                    thickness: 1.0,
+                  ),
+                ],
+              )
+            : paddedMessage;
+
+        // Color the message if the color has been set.
+        final coloredMessage = color == null ? dividedMessage : ColoredBox(color: color, child: dividedMessage);
+
+        return InkWell(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
+          },
+          onLongPress: isModal
+              ? () {
+                  HapticFeedback.lightImpact();
+
+                  Clipboard.setData(ClipboardData(text: ircMessage.message));
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: AlertMessage(message: 'Message copied to clipboard'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              : ircMessage.user != null && ircMessage.user != chatStore.auth.user.details?.login
+                  ? () {
+                      HapticFeedback.lightImpact();
+
+                      showModalBottomSheet(
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => ChatUserModal(
+                          chatStore: chatStore,
+                          username: ircMessage.user!,
+                          userId: ircMessage.tags['user-id']!,
+                          displayName: ircMessage.tags['display-name']!,
+                        ),
+                      );
+                    }
+                  : null,
+          child: coloredMessage,
+        );
+      },
+    );
   }
 }

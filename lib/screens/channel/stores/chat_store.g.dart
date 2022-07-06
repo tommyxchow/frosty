@@ -45,6 +45,24 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$_showSendButtonAtom =
+      Atom(name: 'ChatStoreBase._showSendButton', context: context);
+
+  bool get showSendButton {
+    _$_showSendButtonAtom.reportRead();
+    return super._showSendButton;
+  }
+
+  @override
+  bool get _showSendButton => showSendButton;
+
+  @override
+  set _showSendButton(bool value) {
+    _$_showSendButtonAtom.reportWrite(value, super._showSendButton, () {
+      super._showSendButton = value;
+    });
+  }
+
   late final _$_showEmoteAutocompleteAtom =
       Atom(name: 'ChatStoreBase._showEmoteAutocomplete', context: context);
 

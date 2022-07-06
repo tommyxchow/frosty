@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/category.dart';
@@ -13,6 +14,13 @@ abstract class SearchStoreBase with Store {
   final AuthStore authStore;
 
   final TwitchApi twitchApi;
+
+  final textEditingController = TextEditingController();
+
+  final textFieldFocusNode = FocusNode();
+
+  @readonly
+  var _searchText = '';
 
   @readonly
   var _searchHistory = ObservableList<String>();
@@ -32,21 +40,29 @@ abstract class SearchStoreBase with Store {
     // Retrieve the instance that will allow us to retrieve local search history.
     final prefs = await SharedPreferences.getInstance();
 
+    // Retrieve the search history from local storage. If it doesn't exist, use an empty list.
     _searchHistory = prefs.getStringList('search_history')?.asObservable() ?? ObservableList<String>();
 
+    // Create a reaction that will limit the history to 8 entries and update it to local storage automatically.
     autorun((_) {
       if (_searchHistory.length > 8) _searchHistory.removeLast();
       prefs.setStringList('search_history', _searchHistory);
     });
+
+    // Add a listener to update the cancel button visibility whenever the text changes.
+    textEditingController.addListener(() => _searchText = textEditingController.text);
   }
 
+  /// Obtain the channels and categories that match the provided [query].
   @action
-  Future<void> handleQuery(String query) async {
+  void handleQuery(String query) {
     if (query.isEmpty) return;
 
+    // Move the query to the most recent result (top of the stack).
     _searchHistory.remove(query);
     _searchHistory.insert(0, query);
 
+    // Fetch the matching channels, sort it by live status, and then set it.
     _channelFuture = twitchApi
         .searchChannels(
       query: query,
@@ -59,6 +75,7 @@ abstract class SearchStoreBase with Store {
       },
     ).asObservable();
 
+    // Fetch and set the categories that match the query.
     _categoryFuture = twitchApi
         .searchCategories(
           query: query,
@@ -67,8 +84,15 @@ abstract class SearchStoreBase with Store {
         .asObservable();
   }
 
+  /// Find a specific channel provided the [query].
+  /// This is used for channels that may not show up in the search results.
   Future<Channel> searchChannel(String query) async {
     final user = await twitchApi.getUser(userLogin: query, headers: authStore.headersTwitch);
     return await twitchApi.getChannel(userId: user.id, headers: authStore.headersTwitch);
+  }
+
+  void dispose() {
+    textEditingController.dispose();
+    textFieldFocusNode.dispose();
   }
 }

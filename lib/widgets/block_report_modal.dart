@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/widgets/block_button.dart';
+import 'package:frosty/widgets/modal.dart';
 import 'package:frosty/widgets/report_button.dart';
 
 class BlockReportModal extends StatelessWidget {
@@ -19,17 +22,10 @@ class BlockReportModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return FrostyModal(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(
-            width: 50.0,
-            child: Divider(
-              height: 25.0,
-              thickness: 3.0,
-            ),
-          ),
           if (authStore.isLoggedIn)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -41,6 +37,7 @@ class BlockReportModal extends StatelessWidget {
                 simple: false,
               ),
             ),
+          const SizedBox(height: 10.0),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             width: double.infinity,
@@ -49,6 +46,7 @@ class BlockReportModal extends StatelessWidget {
               displayName: name,
             ),
           ),
+          if (Platform.isAndroid) const SizedBox(height: 20.0),
         ],
       ),
     );

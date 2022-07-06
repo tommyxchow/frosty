@@ -28,7 +28,7 @@ class FFZApi {
 
       return emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzGlobal)).toList();
     } else {
-      return Future.error('Failed to get FFZ global emotes.');
+      return Future.error('Failed to get FFZ global emotes');
     }
   }
 
@@ -46,7 +46,7 @@ class FFZApi {
 
       return Tuple2(roomInfo, emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel)).toList());
     } else {
-      return Future.error('Failed to get FFZ room info.');
+      return Future.error('Failed to get FFZ room info');
     }
   }
 
@@ -75,7 +75,7 @@ class FFZApi {
 
       return result;
     } else {
-      return Future.error('Failed to get FFZ badges.');
+      return Future.error('Failed to get FFZ badges');
     }
   }
 }

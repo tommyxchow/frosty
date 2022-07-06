@@ -6,11 +6,19 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/search/search_results_categories.dart';
 import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/stores/search_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
+/// The search section that contians search history and search results for channels and categories.
 class Search extends StatefulWidget {
-  const Search({Key? key}) : super(key: key);
+  // The scroll controller for handling scroll to top functionality.
+  final ScrollController scrollController;
+
+  const Search({
+    Key? key,
+    required this.scrollController,
+  }) : super(key: key);
 
   @override
   State<Search> createState() => _SearchState();
@@ -22,8 +30,6 @@ class _SearchState extends State<Search> {
     twitchApi: context.read<TwitchApi>(),
   );
 
-  final _textEditingController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     const headerPadding = EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 10.0);
@@ -32,45 +38,53 @@ class _SearchState extends State<Search> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          child: TextField(
-            controller: _textEditingController,
-            autocorrect: false,
-            decoration: InputDecoration(
-              isDense: true,
-              labelText: 'Find a channel or category',
-              contentPadding: const EdgeInsets.all(10.0),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0)),
-              ),
-              suffixIcon: IconButton(
-                tooltip: 'Clear Search',
-                onPressed: () {
-                  FocusScope.of(context).unfocus();
-                  setState(() {
-                    _textEditingController.clear();
-                  });
-                },
-                icon: const Icon(Icons.clear),
-              ),
-            ),
-            onSubmitted: _searchStore.handleQuery,
+          child: Observer(
+            builder: (context) {
+              return TextField(
+                controller: _searchStore.textEditingController,
+                focusNode: _searchStore.textFieldFocusNode,
+                autocorrect: false,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.all(0.0),
+                  hintText: 'Find a channel or category',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchStore.textFieldFocusNode.hasFocus || _searchStore.searchText.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          tooltip: _searchStore.searchText.isEmpty ? 'Cancel' : 'Clear',
+                          onPressed: () {
+                            if (_searchStore.searchText.isEmpty) _searchStore.textFieldFocusNode.unfocus();
+                            _searchStore.textEditingController.clear();
+                          },
+                        )
+                      : null,
+                ),
+                onSubmitted: _searchStore.handleQuery,
+              );
+            },
           ),
         ),
         Expanded(
           child: Observer(
             builder: (context) {
-              if (_textEditingController.text.isEmpty || _searchStore.channelFuture == null || _searchStore.categoryFuture == null) {
+              if (_searchStore.textEditingController.text.isEmpty) {
+                if (_searchStore.searchHistory.isEmpty) {
+                  return const AlertMessage(
+                    message: 'No recent searches',
+                    icon: Icons.search_off,
+                  );
+                }
+
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (_searchStore.searchHistory.isNotEmpty)
-                      const SectionHeader(
-                        'History',
-                        fontSize: 12.0,
-                        padding: headerPadding,
-                      ),
+                    const SectionHeader(
+                      'History',
+                      padding: headerPadding,
+                    ),
                     Expanded(
                       child: ListView(
+                        controller: widget.scrollController,
                         children: _searchStore.searchHistory
                             .mapIndexed(
                               (index, searchTerm) => ListTile(
@@ -79,15 +93,13 @@ class _SearchState extends State<Search> {
                                 trailing: IconButton(
                                   tooltip: 'Remove',
                                   icon: const Icon(Icons.cancel),
-                                  onPressed: () => setState(() {
-                                    _searchStore.searchHistory.removeAt(index);
-                                  }),
+                                  onPressed: () => _searchStore.searchHistory.removeAt(index),
                                 ),
                                 onTap: () {
-                                  setState(() {
-                                    _textEditingController.text = searchTerm;
-                                    _searchStore.handleQuery(searchTerm);
-                                  });
+                                  _searchStore.textEditingController.text = searchTerm;
+                                  _searchStore.handleQuery(searchTerm);
+                                  _searchStore.textEditingController.selection =
+                                      TextSelection.fromPosition(TextPosition(offset: _searchStore.textEditingController.text.length));
                                 },
                               ),
                             )
@@ -98,22 +110,21 @@ class _SearchState extends State<Search> {
                 );
               }
               return CustomScrollView(
+                controller: widget.scrollController,
                 slivers: [
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Channels',
-                      fontSize: 12.0,
                       padding: headerPadding,
                     ),
                   ),
                   SearchResultsChannels(
                     searchStore: _searchStore,
-                    query: _textEditingController.text,
+                    query: _searchStore.searchText,
                   ),
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Categories',
-                      fontSize: 12.0,
                       padding: headerPadding,
                     ),
                   ),
@@ -129,7 +140,7 @@ class _SearchState extends State<Search> {
 
   @override
   void dispose() {
-    _textEditingController.dispose();
+    _searchStore.dispose();
     super.dispose();
   }
 }

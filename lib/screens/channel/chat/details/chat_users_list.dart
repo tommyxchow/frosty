@@ -7,45 +7,25 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ChattersList extends StatefulWidget {
-  final ChatDetailsStore chatDetails;
+class ChattersList extends StatelessWidget {
+  final ChatDetailsStore chatDetailsStore;
   final ChatStore chatStore;
   final String userLogin;
 
   const ChattersList({
     Key? key,
-    required this.chatDetails,
+    required this.chatDetailsStore,
     required this.chatStore,
     required this.userLogin,
   }) : super(key: key);
-
-  @override
-  State<ChattersList> createState() => _ChattersListState();
-}
-
-class _ChattersListState extends State<ChattersList> {
-  final _scrollController = ScrollController();
-  final _textController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.position.atEdge || _scrollController.position.outOfRange) {
-        widget.chatDetails.showJumpButton = false;
-      } else {
-        widget.chatDetails.showJumpButton = true;
-      }
-    });
-
-    widget.chatDetails.updateChatters(widget.userLogin);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,145 +39,173 @@ class _ChattersListState extends State<ChattersList> {
       'Viewers',
     ];
 
-    final chatDetailsStore = widget.chatDetails;
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: TextField(
-            controller: _textController,
-            autocorrect: false,
-            onChanged: (text) => chatDetailsStore.filterText = text,
-            decoration: InputDecoration(
-              isDense: true,
-              labelText: 'Filter chatters',
-              contentPadding: const EdgeInsets.all(10.0),
-              suffixIcon: IconButton(
-                tooltip: 'Clear Filter',
-                onPressed: () {
-                  FocusScope.of(context).unfocus();
-                  chatDetailsStore.filterText = '';
-                  _textController.clear();
-                },
-                icon: const Icon(Icons.clear),
+    return Observer(
+      builder: (context) {
+        if (chatDetailsStore.error != null) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AlertMessage(
+                message: 'Failed to get chatters',
+                icon: Icons.error,
               ),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0)),
+              const SizedBox(height: 10.0),
+              Button(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                onPressed: chatDetailsStore.updateChatters,
+                child: const Text('Try Again'),
+              )
+            ],
+          );
+        }
+
+        if (chatDetailsStore.chatUsers == null) {
+          return const LoadingIndicator(subtitle: 'Getting chatters...');
+        }
+
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Observer(
+                builder: (context) {
+                  return TextField(
+                    controller: chatDetailsStore.textController,
+                    focusNode: chatDetailsStore.textFieldFocusNode,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      prefixIcon: const Icon(Icons.filter_list),
+                      hintText: 'Filter chatters',
+                      suffixIcon: chatDetailsStore.textFieldFocusNode.hasFocus || chatDetailsStore.filterText.isNotEmpty
+                          ? IconButton(
+                              tooltip: chatDetailsStore.filterText.isEmpty ? 'Cancel' : 'Clear',
+                              onPressed: () {
+                                if (chatDetailsStore.filterText.isEmpty) chatDetailsStore.textFieldFocusNode.unfocus();
+                                chatDetailsStore.textController.clear();
+                              },
+                              icon: const Icon(Icons.clear),
+                            )
+                          : null,
+                    ),
+                  );
+                },
               ),
             ),
-          ),
-        ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: () async {
-              HapticFeedback.lightImpact();
-              await chatDetailsStore.updateChatters(widget.userLogin);
-            },
-            child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              children: [
-                Observer(
-                  builder: (context) {
-                    if (chatDetailsStore.error != null) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('Failed to get chatters'),
-                          TextButton(
-                            onPressed: () => chatDetailsStore.updateChatters(widget.userLogin),
-                            child: const Text('Try Again'),
-                          )
-                        ],
-                      );
-                    }
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  HapticFeedback.lightImpact();
 
-                    if (chatDetailsStore.chatUsers == null) {
-                      return const LoadingIndicator(subtitle: Text('Getting chatters...'));
-                    }
-
-                    return CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: _scrollController,
-                      slivers: [
-                        SliverPadding(
-                          padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
-                          sliver: SliverToBoxAdapter(
-                            child: Text(
-                              '${NumberFormat().format(chatDetailsStore.chatUsers?.chatterCount)} ${chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                              ),
-                            ),
-                          ),
-                        ),
-                        ...chatDetailsStore.filteredUsers.expandIndexed(
-                          (index, users) => [
-                            if (users.isNotEmpty) ...[
+                  chatDetailsStore.updateChatters();
+                },
+                child: Stack(
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    Observer(
+                      builder: (context) {
+                        return CustomScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          controller: chatDetailsStore.scrollController,
+                          slivers: [
+                            if (chatDetailsStore.filterText.isEmpty)
                               SliverPadding(
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                                 sliver: SliverToBoxAdapter(
-                                  child: SectionHeader(
-                                    headers[index],
-                                    fontSize: 12.0,
-                                    padding: const EdgeInsets.all(0.0),
-                                  ),
-                                ),
-                              ),
-                              SliverPadding(
-                                padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 5.0),
-                                sliver: SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) => InkWell(
-                                      child: Text(users[index]),
-                                      onLongPress: () async {
-                                        final userInfo = await context
-                                            .read<TwitchApi>()
-                                            .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
-
-                                        showModalBottomSheet(
-                                          context: context,
-                                          builder: (context) => ChatUserModal(
-                                            chatStore: widget.chatStore,
-                                            username: userInfo.login,
-                                            userId: userInfo.id,
-                                            displayName: userInfo.displayName,
-                                          ),
-                                        );
-                                      },
+                                  child: Text(
+                                    '${NumberFormat().format(chatDetailsStore.chatUsers?.chatterCount)} ${chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18.0,
                                     ),
-                                    childCount: users.length,
                                   ),
                                 ),
                               ),
-                            ]
-                          ],
-                        )
-                      ],
-                    );
-                  },
-                ),
-                SafeArea(
-                  child: Observer(
-                    builder: (context) => AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: _scrollController) : null,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+                            if (chatDetailsStore.chatUsers?.chatterCount == 0)
+                              const SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: Center(
+                                  child: AlertMessage(
+                                    message: 'No chatters found',
+                                    icon: Icons.person_off,
+                                  ),
+                                ),
+                              )
+                            else if (chatDetailsStore.filteredUsers.expand((element) => element).isEmpty)
+                              const SliverFillRemaining(
+                                hasScrollBody: false,
+                                child: Center(
+                                  child: AlertMessage(
+                                    message: 'No matching chatters',
+                                    icon: Icons.person_off,
+                                  ),
+                                ),
+                              )
+                            else
+                              ...chatDetailsStore.filteredUsers.expandIndexed(
+                                (index, users) => [
+                                  if (users.isNotEmpty) ...[
+                                    SliverPadding(
+                                      padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+                                      sliver: SliverToBoxAdapter(
+                                        child: SectionHeader(
+                                          headers[index],
+                                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                        ),
+                                      ),
+                                    ),
+                                    SliverList(
+                                      delegate: SliverChildBuilderDelegate(
+                                        (context, index) => InkWell(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                                            child: Text(users[index]),
+                                          ),
+                                          onLongPress: () async {
+                                            HapticFeedback.lightImpact();
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    _textController.dispose();
-    super.dispose();
+                                            final userInfo = await context
+                                                .read<TwitchApi>()
+                                                .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
+
+                                            showModalBottomSheet(
+                                              backgroundColor: Colors.transparent,
+                                              isScrollControlled: true,
+                                              context: context,
+                                              builder: (context) => ChatUserModal(
+                                                chatStore: chatStore,
+                                                username: userInfo.login,
+                                                userId: userInfo.id,
+                                                displayName: userInfo.displayName,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        childCount: users.length,
+                                      ),
+                                    ),
+                                  ]
+                                ],
+                              ),
+                          ],
+                        );
+                      },
+                    ),
+                    Observer(
+                      builder: (context) => AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: chatDetailsStore.scrollController) : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
