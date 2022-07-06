@@ -98,7 +98,7 @@
   <img
     title="Search Section"
     alt="Search Section"
-    src="https://user-images.githubusercontent.com/54859075/177494837-14055c2e-0c47-4134-9554-821fb995a75e.png"
+    src="https://user-images.githubusercontent.com/54859075/177501555-74b098ae-d3a6-4454-bfbe-6deaaab28a5c.png"
     width="32%"
   />
   <img
