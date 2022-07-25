@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:floating/floating.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/api/twitch_api.dart';
@@ -23,6 +24,8 @@ abstract class VideoStoreBase with Store {
   late Timer _overlayTimer;
 
   Timer? sleepTimer;
+
+  final floating = Floating();
 
   @observable
   var sleepHours = 0;
@@ -184,7 +187,11 @@ abstract class VideoStoreBase with Store {
 
   void requestPictureInPicture() {
     try {
-      controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+      if (Platform.isAndroid) {
+        floating.enable();
+      } else if (Platform.isIOS) {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -227,5 +234,10 @@ abstract class VideoStoreBase with Store {
   void cancelSleepTimer() {
     sleepTimer?.cancel();
     timeRemaining = const Duration();
+  }
+
+  void dispose() {
+    floating.dispose();
+    sleepTimer?.cancel();
   }
 }

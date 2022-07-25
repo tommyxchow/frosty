@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/irc.dart';
-import 'package:intl/intl.dart';
 
 class ChatModes extends StatelessWidget {
   final ROOMSTATE roomState;
@@ -11,10 +10,6 @@ class ChatModes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final test = Intl.plural(2, other: 'test');
-
-    debugPrint(test);
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
