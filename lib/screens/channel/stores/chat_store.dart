@@ -18,9 +18,8 @@ part 'chat_store.g.dart';
 class ChatStore = ChatStoreBase with _$ChatStore;
 
 abstract class ChatStoreBase with Store {
-  static const _messageUpperLimit = 15000;
-  static const _messageLimit = 10000;
-  static const _renderMessageLimit = 100;
+  static const _messageLimit = 5000;
+  static const _renderMessageLimit = 88;
 
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
@@ -69,8 +68,7 @@ abstract class ChatStoreBase with Store {
   final _messageBuffer = <IRCMessage>[];
 
   /// The list of chat messages to render and display.
-  @readonly
-  var _messages = ObservableList<IRCMessage>();
+  final messages = ObservableList<IRCMessage>();
 
   @computed
   List<IRCMessage> get renderMessages {
@@ -80,10 +78,10 @@ abstract class ChatStoreBase with Store {
     // Else, when autoscroll is enabled, only show the first [_renderMessageLimit] messages.
     // This will improve performance by only rendering a limited amount of messages
     // instead of the entire history at all times.
-    if (!_autoScroll || _messages.length < _renderMessageLimit) {
-      return _messages;
+    if (!_autoScroll || messages.length < _renderMessageLimit) {
+      return messages;
     } else {
-      return _messages.sublist(_messages.length - _renderMessageLimit);
+      return messages.sublist(messages.length - _renderMessageLimit);
     }
   }
 
@@ -131,7 +129,7 @@ abstract class ChatStoreBase with Store {
       (_) => _autoScroll,
       (_) {
         if (_messageBuffer.isNotEmpty) {
-          _messages.addAll(_messageBuffer);
+          messages.addAll(_messageBuffer);
           _messageBuffer.clear();
         }
       },
@@ -140,10 +138,10 @@ abstract class ChatStoreBase with Store {
     assetsStore.init();
     chatDetailsStore.updateChatters();
 
-    _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+    messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.chatDelay > 0) {
-      _messages.add(IRCMessage.createNotice(
+      messages.add(IRCMessage.createNotice(
           message: 'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
     }
 
@@ -193,7 +191,7 @@ abstract class ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      // debugPrint(message);
+      debugPrint('$message\n');
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message, userLogin: auth.user.details?.login);
 
@@ -207,17 +205,25 @@ abstract class ChatStoreBase with Store {
           case Command.notice:
           case Command.userNotice:
             if (_autoScroll) {
-              _messages.add(parsedIRCMessage);
+              messages.add(parsedIRCMessage);
             } else {
               // If audoscroll is disabled, buffer the message to prevent the chat from shifting.
               _messageBuffer.add(parsedIRCMessage);
             }
             break;
           case Command.clearChat:
-            _messages = IRCMessage.clearChat(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
+            IRCMessage.clearChat(
+              messages: messages,
+              bufferedMessages: _messageBuffer,
+              ircMessage: parsedIRCMessage,
+            );
             break;
           case Command.clearMessage:
-            _messages = IRCMessage.clearMessage(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
+            IRCMessage.clearMessage(
+              messages: messages,
+              bufferedMessages: _messageBuffer,
+              ircMessage: parsedIRCMessage,
+            );
             break;
           case Command.roomState:
             chatDetailsStore.roomState = chatDetailsStore.roomState.fromIRCMessage(parsedIRCMessage);
@@ -225,7 +231,12 @@ abstract class ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
             if (toSend != null) {
-              _messages.add(toSend!);
+              if (_autoScroll) {
+                messages.add(toSend!);
+              } else {
+                // If audoscroll is disabled, buffer the sent message to prevent the chat from shifting.
+                _messageBuffer.add(toSend!);
+              }
               toSend = null;
             }
             break;
@@ -248,18 +259,12 @@ abstract class ChatStoreBase with Store {
         }
 
         // If the message limit is reached, remove the oldest message.
-        if (_messages.length >= _messageLimit) _messages.removeAt(0);
-
-        // Remove messages when an upper limit is reached.
-        // This will prevent an infinite amount of messages building up when autoscroll is off.
-        if (_messages.length >= _messageUpperLimit) _messages.removeRange(0, 500);
-
-        // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
+        if (_autoScroll && messages.length >= _messageLimit) messages.removeRange(0, 500);
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messages.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
+        messages.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
         getAssets();
 
@@ -309,7 +314,7 @@ abstract class ChatStoreBase with Store {
         if (_backoffTime > 0) {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
           final notice = 'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          _messages.add(IRCMessage.createNotice(message: notice));
+          messages.add(IRCMessage.createNotice(message: notice));
         }
 
         await Future.delayed(Duration(seconds: _backoffTime));
@@ -319,7 +324,7 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
+        messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
         connectToChat();
       },
     );
@@ -353,7 +358,7 @@ abstract class ChatStoreBase with Store {
     if (message.isEmpty) return;
 
     if (_channel == null || _channel?.closeCode != null) {
-      _messages.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
+      messages.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
     } else {
       // Send the message to the IRC chat room.
       _channel?.sink.add('PRIVMSG #$channelName :$message');
@@ -376,9 +381,6 @@ abstract class ChatStoreBase with Store {
       // Clear the previous input in the TextField.
       textController.clear();
     }
-
-    // Scroll to the latest message after sending.
-    if (scrollController.hasClients) scrollController.jumpTo(0);
   }
 
   /// Adds the given [emote] to the chat textfield.

@@ -36,12 +36,17 @@ class IRCMessage {
   });
 
   /// Returns a list of messages where the given CLEARCHAT message is applied.
-  static List<IRCMessage> clearChat({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+  static void clearChat({
+    required List<IRCMessage> messages,
+    required List<IRCMessage> bufferedMessages,
+    required IRCMessage ircMessage,
+  }) {
     // If there is no message, it means that entire chat was cleared.
     if (ircMessage.message == null) {
       messages.clear();
+      bufferedMessages.clear();
       messages.add(IRCMessage.createNotice(message: 'Chat was cleared by a moderator'));
-      return messages;
+      return;
     }
 
     final bannedUser = ircMessage.message;
@@ -60,11 +65,26 @@ class IRCMessage {
       }
     });
 
-    return messages;
+    // Search the buffered messages for the banned/timed-out user.
+    bufferedMessages.asMap().forEach((i, bufferedMessage) {
+      if (bufferedMessage.user == bannedUser) {
+        // Mark the message for removal.
+        bufferedMessages[i].command = Command.clearChat;
+
+        // If timed-out, indicate the duration.
+        if (banDuration != null) {
+          bufferedMessages[i].tags['ban-duration'] = banDuration;
+        }
+      }
+    });
   }
 
   /// Returns a list of messages where the gievn CLEARMSG message is applied.
-  static List<IRCMessage> clearMessage({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
+  static void clearMessage({
+    required List<IRCMessage> messages,
+    required List<IRCMessage> bufferedMessages,
+    required IRCMessage ircMessage,
+  }) {
     final targetId = ircMessage.tags['target-msg-id'];
 
     // Search for the message associated with the ID and mark the message for deletion.
@@ -75,7 +95,13 @@ class IRCMessage {
       }
     }
 
-    return messages;
+    // Search for the buffered message associated with the ID and mark the message for deletion.
+    for (var i = 0; i < bufferedMessages.length; i++) {
+      if (bufferedMessages[i].tags['id'] == targetId) {
+        bufferedMessages[i].command = Command.clearMessage;
+        break;
+      }
+    }
   }
 
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].

@@ -17,24 +17,6 @@ mixin _$ChatStore on ChatStoreBase, Store {
               name: 'ChatStoreBase.renderMessages'))
       .value;
 
-  late final _$_messagesAtom =
-      Atom(name: 'ChatStoreBase._messages', context: context);
-
-  ObservableList<IRCMessage> get messages {
-    _$_messagesAtom.reportRead();
-    return super._messages;
-  }
-
-  @override
-  ObservableList<IRCMessage> get _messages => messages;
-
-  @override
-  set _messages(ObservableList<IRCMessage> value) {
-    _$_messagesAtom.reportWrite(value, super._messages, () {
-      super._messages = value;
-    });
-  }
-
   late final _$_autoScrollAtom =
       Atom(name: 'ChatStoreBase._autoScroll', context: context);
 
