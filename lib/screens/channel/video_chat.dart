@@ -169,7 +169,7 @@ class _VideoChatState extends State<VideoChat> {
           builder: (context, orientation) {
             // Scroll to bottom when summoning keyboard or rotating.
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(_chatStore.scrollController.position.maxScrollExtent);
+              if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(0);
             });
 
             if (orientation == Orientation.landscape) {

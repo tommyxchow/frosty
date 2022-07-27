@@ -35,7 +35,7 @@ class IRCMessage {
     this.mention,
   });
 
-  /// Returns a list of messages where the gievn CLEARCHAT message is applied.
+  /// Returns a list of messages where the given CLEARCHAT message is applied.
   static List<IRCMessage> clearChat({required List<IRCMessage> messages, required IRCMessage ircMessage}) {
     // If there is no message, it means that entire chat was cleared.
     if (ircMessage.message == null) {
@@ -367,9 +367,7 @@ class IRCMessage {
                               Column(
                                 children: [
                                   Text(
-                                    nextWordIsEmoji
-                                        ? '${words[index]} - Emoji'
-                                        : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
+                                    nextWordIsEmoji ? '${words[index]} - Emoji' : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
                                     style: const TextStyle(color: Colors.black),
                                   ),
                                   Text(

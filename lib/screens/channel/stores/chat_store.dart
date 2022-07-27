@@ -18,8 +18,9 @@ part 'chat_store.g.dart';
 class ChatStore = ChatStoreBase with _$ChatStore;
 
 abstract class ChatStoreBase with Store {
-  static const _messageUpperLimit = 7500;
-  static const _messageLimit = 5000;
+  static const _messageUpperLimit = 15000;
+  static const _messageLimit = 10000;
+  static const _renderMessageLimit = 100;
 
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
@@ -63,9 +64,28 @@ abstract class ChatStoreBase with Store {
   /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
 
+  /// The list of chat messages to add once autoscroll is resumed.
+  /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
+  final _messageBuffer = <IRCMessage>[];
+
   /// The list of chat messages to render and display.
   @readonly
   var _messages = ObservableList<IRCMessage>();
+
+  @computed
+  List<IRCMessage> get renderMessages {
+    // If autoscroll is disabled, render ALL messages in chat.
+    // The second condition is to prevent an out of index error with sublist.
+    //
+    // Else, when autoscroll is enabled, only show the first [_renderMessageLimit] messages.
+    // This will improve performance by only rendering a limited amount of messages
+    // instead of the entire history at all times.
+    if (!_autoScroll || _messages.length < _renderMessageLimit) {
+      return _messages;
+    } else {
+      return _messages.sublist(_messages.length - _renderMessageLimit);
+    }
+  }
 
   /// If the chat should automatically scroll/jump to the latest message.
   @readonly
@@ -105,6 +125,18 @@ abstract class ChatStoreBase with Store {
       (_) => _channel?.sink.close(1001),
     ));
 
+    // Create a reaction that will add buffered messages to the chat
+    // when autoscroll is changed.
+    reactions.add(reaction(
+      (_) => _autoScroll,
+      (_) {
+        if (_messageBuffer.isNotEmpty) {
+          _messages.addAll(_messageBuffer);
+          _messageBuffer.clear();
+        }
+      },
+    ));
+
     assetsStore.init();
     chatDetailsStore.updateChatters();
 
@@ -119,12 +151,12 @@ abstract class ChatStoreBase with Store {
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
-      // If the user scrolls up, auto-scroll will stop, allowing them to freely scroll back to previous messages.
-      // Else if the user scrolls back to the bottom edge (latest message), auto-scroll will resume.
-      if (scrollController.position.pixels < scrollController.position.maxScrollExtent) {
-        if (_autoScroll == true) _autoScroll = false;
-      } else if (scrollController.position.atEdge || scrollController.position.pixels > scrollController.position.maxScrollExtent) {
-        if (_autoScroll == false) _autoScroll = true;
+      // If the scroll position is at the latest message (maximum possible), enable autoscroll.
+      // Else if the position is before the latest message (not at the edge), disable autoscroll.
+      if (scrollController.position.pixels <= 0) {
+        _autoScroll = true;
+      } else if (scrollController.position.pixels > 0) {
+        _autoScroll = false;
       }
     });
 
@@ -172,17 +204,20 @@ abstract class ChatStoreBase with Store {
 
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
-            _messages.add(parsedIRCMessage);
+          case Command.notice:
+          case Command.userNotice:
+            if (_autoScroll) {
+              _messages.add(parsedIRCMessage);
+            } else {
+              // If audoscroll is disabled, buffer the message to prevent the chat from shifting.
+              _messageBuffer.add(parsedIRCMessage);
+            }
             break;
           case Command.clearChat:
             _messages = IRCMessage.clearChat(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
             break;
           case Command.clearMessage:
             _messages = IRCMessage.clearMessage(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
-            break;
-          case Command.notice:
-          case Command.userNotice:
-            _messages.add(parsedIRCMessage);
             break;
           case Command.roomState:
             chatDetailsStore.roomState = chatDetailsStore.roomState.fromIRCMessage(parsedIRCMessage);
@@ -212,16 +247,11 @@ abstract class ChatStoreBase with Store {
             continue;
         }
 
-        if (_autoScroll) {
-          if (_messages.length >= _messageLimit) _messages.removeAt(0);
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-          });
-        }
+        // If the message limit is reached, remove the oldest message.
+        if (_messages.length >= _messageLimit) _messages.removeAt(0);
 
         // Remove messages when an upper limit is reached.
-        // This will prevent an infinite amount of messages when autoscroll is off.
+        // This will prevent an infinite amount of messages building up when autoscroll is off.
         if (_messages.length >= _messageUpperLimit) _messages.removeRange(0, 500);
 
         // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
@@ -258,15 +288,10 @@ abstract class ChatStoreBase with Store {
   /// Re-enables [_autoScroll] and jumps to the latest message.
   @action
   void resumeScroll() {
-    if (_messages.length >= _messageLimit) _messages.removeRange(0, _messages.length - _messageLimit);
-
     _autoScroll = true;
 
     // Jump to the latest message (bottom of the list/chat).
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
-
-    // Schedule a postFrameCallback in the event a new message is added at the same time.
-    WidgetsBinding.instance.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
+    scrollController.jumpTo(0);
   }
 
   @action
@@ -353,9 +378,7 @@ abstract class ChatStoreBase with Store {
     }
 
     // Scroll to the latest message after sending.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
+    if (scrollController.hasClients) scrollController.jumpTo(0);
   }
 
   /// Adds the given [emote] to the chat textfield.

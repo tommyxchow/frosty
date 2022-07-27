@@ -48,7 +48,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
-      'themeType': _$ThemeTypeEnumMap[instance.themeType],
+      'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
       'showThumbnails': instance.showThumbnails,
       'largeStreamCard': instance.largeStreamCard,
       'showThumbnailUptime': instance.showThumbnailUptime,
@@ -68,7 +68,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'useReadableColors': instance.useReadableColors,
       'showDeletedMessages': instance.showDeletedMessages,
       'showChatMessageDividers': instance.showChatMessageDividers,
-      'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
+      'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'messageScale': instance.messageScale,

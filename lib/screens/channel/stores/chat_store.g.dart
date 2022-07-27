@@ -9,6 +9,14 @@ part of 'chat_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$ChatStore on ChatStoreBase, Store {
+  Computed<List<IRCMessage>>? _$renderMessagesComputed;
+
+  @override
+  List<IRCMessage> get renderMessages => (_$renderMessagesComputed ??=
+          Computed<List<IRCMessage>>(() => super.renderMessages,
+              name: 'ChatStoreBase.renderMessages'))
+      .value;
+
   late final _$_messagesAtom =
       Atom(name: 'ChatStoreBase._messages', context: context);
 
@@ -135,6 +143,14 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$getAssetsAsyncAction =
+      AsyncAction('ChatStoreBase.getAssets', context: context);
+
+  @override
+  Future<void> getAssets() {
+    return _$getAssetsAsyncAction.run(() => super.getAssets());
+  }
+
   late final _$ChatStoreBaseActionController =
       ActionController(name: 'ChatStoreBase', context: context);
 
@@ -196,7 +212,8 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   String toString() {
     return '''
-expandChat: ${expandChat}
+expandChat: ${expandChat},
+renderMessages: ${renderMessages}
     ''';
   }
 }
