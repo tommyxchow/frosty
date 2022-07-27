@@ -297,6 +297,11 @@ abstract class ChatStoreBase with Store {
 
     // Jump to the latest message (bottom of the list/chat).
     scrollController.jumpTo(0);
+
+    // Add a post frame callback in the event a messages is added at the same time.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollController.jumpTo(0);
+    });
   }
 
   @action

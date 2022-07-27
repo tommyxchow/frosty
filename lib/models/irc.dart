@@ -35,7 +35,7 @@ class IRCMessage {
     this.mention,
   });
 
-  /// Returns a list of messages where the given CLEARCHAT message is applied.
+  /// Applies the given CLEARCHAT message to the provided messages and buffer.
   static void clearChat({
     required List<IRCMessage> messages,
     required List<IRCMessage> bufferedMessages,
@@ -79,7 +79,7 @@ class IRCMessage {
     });
   }
 
-  /// Returns a list of messages where the gievn CLEARMSG message is applied.
+  /// Applies the given CLEARMSG message to the provided messages and buffer.
   static void clearMessage({
     required List<IRCMessage> messages,
     required List<IRCMessage> bufferedMessages,
