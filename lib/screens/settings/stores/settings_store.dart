@@ -228,6 +228,7 @@ abstract class _SettingsStoreBase with Store {
 
   @action
   void resetAllSettings() {
+    resetGeneralSettings();
     resetVideoSettings();
     resetChatSettings();
     resetOtherSettings();
