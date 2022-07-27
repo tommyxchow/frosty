@@ -35,16 +35,17 @@ class Chat extends StatelessWidget {
                         style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
                         child: Observer(
                           builder: (context) {
-                            return ListView.builder(
+                            return ListView(
+                              reverse: true,
                               padding: EdgeInsets.zero,
                               addAutomaticKeepAlives: false,
-                              addRepaintBoundaries: false,
-                              itemCount: chatStore.messages.length,
                               controller: chatStore.scrollController,
-                              itemBuilder: (context, index) => ChatMessage(
-                                ircMessage: chatStore.messages[index],
-                                chatStore: chatStore,
-                              ),
+                              children: chatStore.renderMessages.reversed
+                                  .map((e) => ChatMessage(
+                                        ircMessage: e,
+                                        chatStore: chatStore,
+                                      ))
+                                  .toList(),
                             );
                           },
                         ),
@@ -83,7 +84,6 @@ class Chat extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 child: EmoteMenu(chatStore: chatStore),
               ),
-              onEnd: () => chatStore.scrollController.jumpTo(chatStore.scrollController.position.maxScrollExtent),
             ),
           ],
         );

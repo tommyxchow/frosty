@@ -18,8 +18,8 @@ part 'chat_store.g.dart';
 class ChatStore = ChatStoreBase with _$ChatStore;
 
 abstract class ChatStoreBase with Store {
-  static const _messageUpperLimit = 7500;
   static const _messageLimit = 5000;
+  static const _renderMessageLimit = 88;
 
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
@@ -63,9 +63,27 @@ abstract class ChatStoreBase with Store {
   /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
 
+  /// The list of chat messages to add once autoscroll is resumed.
+  /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
+  final _messageBuffer = <IRCMessage>[];
+
   /// The list of chat messages to render and display.
-  @readonly
-  var _messages = ObservableList<IRCMessage>();
+  final messages = ObservableList<IRCMessage>();
+
+  @computed
+  List<IRCMessage> get renderMessages {
+    // If autoscroll is disabled, render ALL messages in chat.
+    // The second condition is to prevent an out of index error with sublist.
+    //
+    // Else, when autoscroll is enabled, only show the first [_renderMessageLimit] messages.
+    // This will improve performance by only rendering a limited amount of messages
+    // instead of the entire history at all times.
+    if (!_autoScroll || messages.length < _renderMessageLimit) {
+      return messages;
+    } else {
+      return messages.sublist(messages.length - _renderMessageLimit);
+    }
+  }
 
   /// If the chat should automatically scroll/jump to the latest message.
   @readonly
@@ -105,13 +123,25 @@ abstract class ChatStoreBase with Store {
       (_) => _channel?.sink.close(1001),
     ));
 
+    // Create a reaction that will add buffered messages to the chat
+    // when autoscroll is changed.
+    reactions.add(reaction(
+      (_) => _autoScroll,
+      (_) {
+        if (_messageBuffer.isNotEmpty) {
+          messages.addAll(_messageBuffer);
+          _messageBuffer.clear();
+        }
+      },
+    ));
+
     assetsStore.init();
     chatDetailsStore.updateChatters();
 
-    _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+    messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.chatDelay > 0) {
-      _messages.add(IRCMessage.createNotice(
+      messages.add(IRCMessage.createNotice(
           message: 'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
     }
 
@@ -119,12 +149,12 @@ abstract class ChatStoreBase with Store {
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
-      // If the user scrolls up, auto-scroll will stop, allowing them to freely scroll back to previous messages.
-      // Else if the user scrolls back to the bottom edge (latest message), auto-scroll will resume.
-      if (scrollController.position.pixels < scrollController.position.maxScrollExtent) {
-        if (_autoScroll == true) _autoScroll = false;
-      } else if (scrollController.position.atEdge || scrollController.position.pixels > scrollController.position.maxScrollExtent) {
-        if (_autoScroll == false) _autoScroll = true;
+      // If the scroll position is at the latest message (maximum possible), enable autoscroll.
+      // Else if the position is before the latest message (not at the edge), disable autoscroll.
+      if (scrollController.position.pixels <= 0) {
+        _autoScroll = true;
+      } else if (scrollController.position.pixels > 0) {
+        _autoScroll = false;
       }
     });
 
@@ -161,7 +191,7 @@ abstract class ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      // debugPrint(message);
+      debugPrint('$message\n');
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message, userLogin: auth.user.details?.login);
 
@@ -172,17 +202,28 @@ abstract class ChatStoreBase with Store {
 
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
-            _messages.add(parsedIRCMessage);
-            break;
-          case Command.clearChat:
-            _messages = IRCMessage.clearChat(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
-            break;
-          case Command.clearMessage:
-            _messages = IRCMessage.clearMessage(messages: _messages, ircMessage: parsedIRCMessage).asObservable();
-            break;
           case Command.notice:
           case Command.userNotice:
-            _messages.add(parsedIRCMessage);
+            if (_autoScroll) {
+              messages.add(parsedIRCMessage);
+            } else {
+              // If audoscroll is disabled, buffer the message to prevent the chat from shifting.
+              _messageBuffer.add(parsedIRCMessage);
+            }
+            break;
+          case Command.clearChat:
+            IRCMessage.clearChat(
+              messages: messages,
+              bufferedMessages: _messageBuffer,
+              ircMessage: parsedIRCMessage,
+            );
+            break;
+          case Command.clearMessage:
+            IRCMessage.clearMessage(
+              messages: messages,
+              bufferedMessages: _messageBuffer,
+              ircMessage: parsedIRCMessage,
+            );
             break;
           case Command.roomState:
             chatDetailsStore.roomState = chatDetailsStore.roomState.fromIRCMessage(parsedIRCMessage);
@@ -190,7 +231,12 @@ abstract class ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
             if (toSend != null) {
-              _messages.add(toSend!);
+              if (_autoScroll) {
+                messages.add(toSend!);
+              } else {
+                // If audoscroll is disabled, buffer the sent message to prevent the chat from shifting.
+                _messageBuffer.add(toSend!);
+              }
               toSend = null;
             }
             break;
@@ -212,24 +258,13 @@ abstract class ChatStoreBase with Store {
             continue;
         }
 
-        if (_autoScroll) {
-          if (_messages.length >= _messageLimit) _messages.removeAt(0);
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-          });
-        }
-
-        // Remove messages when an upper limit is reached.
-        // This will prevent an infinite amount of messages when autoscroll is off.
-        if (_messages.length >= _messageUpperLimit) _messages.removeRange(0, 500);
-
-        // Hard upper-limit of 5000 messages to prevent infinite messages being added when scrolling.
+        // If the message limit is reached, remove the oldest message.
+        if (_autoScroll && messages.length >= _messageLimit) messages.removeRange(0, 500);
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messages.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
+        messages.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
         getAssets();
 
@@ -258,15 +293,10 @@ abstract class ChatStoreBase with Store {
   /// Re-enables [_autoScroll] and jumps to the latest message.
   @action
   void resumeScroll() {
-    if (_messages.length >= _messageLimit) _messages.removeRange(0, _messages.length - _messageLimit);
-
     _autoScroll = true;
 
     // Jump to the latest message (bottom of the list/chat).
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
-
-    // Schedule a postFrameCallback in the event a new message is added at the same time.
-    WidgetsBinding.instance.addPostFrameCallback((_) => scrollController.jumpTo(scrollController.position.maxScrollExtent));
+    scrollController.jumpTo(0);
   }
 
   @action
@@ -284,7 +314,7 @@ abstract class ChatStoreBase with Store {
         if (_backoffTime > 0) {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
           final notice = 'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          _messages.add(IRCMessage.createNotice(message: notice));
+          messages.add(IRCMessage.createNotice(message: notice));
         }
 
         await Future.delayed(Duration(seconds: _backoffTime));
@@ -294,7 +324,7 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        _messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
+        messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
         connectToChat();
       },
     );
@@ -328,7 +358,7 @@ abstract class ChatStoreBase with Store {
     if (message.isEmpty) return;
 
     if (_channel == null || _channel?.closeCode != null) {
-      _messages.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
+      messages.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
     } else {
       // Send the message to the IRC chat room.
       _channel?.sink.add('PRIVMSG #$channelName :$message');
@@ -351,11 +381,6 @@ abstract class ChatStoreBase with Store {
       // Clear the previous input in the TextField.
       textController.clear();
     }
-
-    // Scroll to the latest message after sending.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (scrollController.hasClients) scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
   }
 
   /// Adds the given [emote] to the chat textfield.

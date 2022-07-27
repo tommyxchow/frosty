@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -34,14 +32,13 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
           ),
-          if (Platform.isIOS)
-            SwitchListTile.adaptive(
-              isThreeLine: true,
-              title: const Text('Picture-in-picture Button (experimental)'),
-              subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay (may cause freezes/crashes).'),
-              value: settingsStore.pictureInPicture,
-              onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
-            ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Picture-in-picture Button (experimental)'),
+            subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay (may cause freezes/crashes).'),
+            value: settingsStore.pictureInPicture,
+            onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
+          ),
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Long-press player to toggle overlay'),

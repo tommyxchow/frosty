@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -160,14 +161,9 @@ class _VideoChatState extends State<VideoChat> {
       ],
     );
 
-    return Scaffold(
+    final videoChat = Scaffold(
       body: OrientationBuilder(
         builder: (context, orientation) {
-          // Scroll to bottom when summoning keyboard or rotating.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(_chatStore.scrollController.position.maxScrollExtent);
-          });
-
           if (orientation == Orientation.landscape) {
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
@@ -246,13 +242,24 @@ class _VideoChatState extends State<VideoChat> {
         },
       ),
     );
+
+    // If on Android, use PiPSwitcher to enable PiP functionality.
+    if (Platform.isAndroid) {
+      return PiPSwitcher(
+        floating: _videoStore.floating,
+        childWhenEnabled: player,
+        childWhenDisabled: videoChat,
+      );
+    }
+
+    return videoChat;
   }
 
   @override
   void dispose() {
     _chatStore.dispose();
 
-    _videoStore.cancelSleepTimer();
+    _videoStore.dispose();
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
@@ -614,7 +621,7 @@ class _VideoOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
+                  if (videoStore.settingsStore.pictureInPicture)
                     IconButton(
                       tooltip: 'Picture-in-picture',
                       icon: const Icon(
