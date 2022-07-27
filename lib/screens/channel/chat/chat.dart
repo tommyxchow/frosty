@@ -83,7 +83,6 @@ class Chat extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 child: EmoteMenu(chatStore: chatStore),
               ),
-              onEnd: () => chatStore.scrollController.jumpTo(0),
             ),
           ],
         );
