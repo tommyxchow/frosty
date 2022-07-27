@@ -199,6 +199,17 @@ mixin _$VideoStore on VideoStoreBase, Store {
   }
 
   @override
+  void handleRefresh() {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.handleRefresh');
+    try {
+      return super.handleRefresh();
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 sleepHours: ${sleepHours},

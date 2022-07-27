@@ -135,6 +135,14 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$getAssetsAsyncAction =
+      AsyncAction('ChatStoreBase.getAssets', context: context);
+
+  @override
+  Future<void> getAssets() {
+    return _$getAssetsAsyncAction.run(() => super.getAssets());
+  }
+
   late final _$ChatStoreBaseActionController =
       ActionController(name: 'ChatStoreBase', context: context);
 

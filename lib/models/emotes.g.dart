@@ -140,7 +140,7 @@ Map<String, dynamic> _$EmoteToJson(Emote instance) => <String, dynamic>{
       'height': instance.height,
       'zeroWidth': instance.zeroWidth,
       'url': instance.url,
-      'type': _$EmoteTypeEnumMap[instance.type],
+      'type': _$EmoteTypeEnumMap[instance.type]!,
       'ownerId': instance.ownerId,
     };
 

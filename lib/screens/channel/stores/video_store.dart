@@ -147,9 +147,11 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  @action
   void handleRefresh() {
     HapticFeedback.lightImpact();
     controller?.reload();
+    updateStreamInfo();
   }
 
   FutureOr<NavigationDecision> handleNavigation(NavigationRequest navigation) {
