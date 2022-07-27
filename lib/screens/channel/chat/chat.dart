@@ -35,16 +35,17 @@ class Chat extends StatelessWidget {
                         style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
                         child: Observer(
                           builder: (context) {
-                            return ListView.builder(
+                            return ListView(
                               reverse: true,
                               padding: EdgeInsets.zero,
                               addAutomaticKeepAlives: false,
                               controller: chatStore.scrollController,
-                              itemCount: chatStore.renderMessages.length,
-                              itemBuilder: (context, index) => ChatMessage(
-                                ircMessage: chatStore.renderMessages.reversed.toList()[index],
-                                chatStore: chatStore,
-                              ),
+                              children: chatStore.renderMessages.reversed
+                                  .map((e) => ChatMessage(
+                                        ircMessage: e,
+                                        chatStore: chatStore,
+                                      ))
+                                  .toList(),
                             );
                           },
                         ),
