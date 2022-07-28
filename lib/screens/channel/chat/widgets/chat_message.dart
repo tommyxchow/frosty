@@ -20,6 +20,39 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void onLongPressName() {
+      if (isModal) return;
+
+      if (ircMessage.user == null && ircMessage.user == chatStore.auth.user.details?.login) return;
+
+      HapticFeedback.lightImpact();
+
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        context: context,
+        builder: (context) => ChatUserModal(
+          chatStore: chatStore,
+          username: ircMessage.user!,
+          userId: ircMessage.tags['user-id']!,
+          displayName: ircMessage.tags['display-name']!,
+        ),
+      );
+    }
+
+    void onLongPressMessage() {
+      HapticFeedback.lightImpact();
+
+      Clipboard.setData(ClipboardData(text: ircMessage.message));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: AlertMessage(message: 'Message copied to clipboard'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+
     return Observer(
       builder: (context) {
         Color? color;
@@ -33,6 +66,7 @@ class ChatMessage extends StatelessWidget {
             renderMessage = Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
+                  onLongPressName: onLongPressName,
                   style: DefaultTextStyle.of(context).style,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
@@ -58,6 +92,7 @@ class ChatMessage extends StatelessWidget {
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
+                        onLongPressName: onLongPressName,
                         style: DefaultTextStyle.of(context).style,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
@@ -125,6 +160,7 @@ class ChatMessage extends StatelessWidget {
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
+                        onLongPressName: onLongPressName,
                         style: DefaultTextStyle.of(context).style,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
@@ -171,36 +207,7 @@ class ChatMessage extends StatelessWidget {
             FocusScope.of(context).unfocus();
             if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
           },
-          onLongPress: isModal
-              ? () {
-                  HapticFeedback.lightImpact();
-
-                  Clipboard.setData(ClipboardData(text: ircMessage.message));
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: AlertMessage(message: 'Message copied to clipboard'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
-              : ircMessage.user != null && ircMessage.user != chatStore.auth.user.details?.login
-                  ? () {
-                      HapticFeedback.lightImpact();
-
-                      showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (context) => ChatUserModal(
-                          chatStore: chatStore,
-                          username: ircMessage.user!,
-                          userId: ircMessage.tags['user-id']!,
-                          displayName: ircMessage.tags['display-name']!,
-                        ),
-                      );
-                    }
-                  : null,
+          onLongPress: onLongPressMessage,
           child: coloredMessage,
         );
       },

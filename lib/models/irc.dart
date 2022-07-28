@@ -112,6 +112,7 @@ class IRCMessage {
     required double emoteScale,
     required bool isLightTheme,
     required bool launchExternal,
+    required void Function()? onLongPressName,
     bool showMessage = true,
     bool useZeroWidth = false,
     bool useReadableColors = false,
@@ -289,11 +290,16 @@ class IRCMessage {
     // debugPrint('NEW - NAME: ${tags['display-name']!}, HUE: ${hsl.hue}, SATURATION: ${hsl.saturation}, LIGHNTESS: ${hsl.lightness}');
 
     span.add(
-      TextSpan(
-        text: tags['display-name']!,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
+      WidgetSpan(
+        child: InkWell(
+          onLongPress: onLongPressName,
+          child: Text(
+            tags['display-name']!,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );
