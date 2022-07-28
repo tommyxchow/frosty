@@ -40,14 +40,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
         ),
         children: [
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Autocomplete'),
-            subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
-            value: settingsStore.autocomplete,
-            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
-          ),
-          const SizedBox(height: 15.0),
           ListTile(
             title: Row(
               children: [
@@ -70,6 +62,20 @@ class _ChatSettingsState extends State<ChatSettings> {
                 const SizedBox(height: 15),
               ],
             ),
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Prevent sleep in chat-only mode'),
+            subtitle: const Text('Requires restarting the chat in order to take effect.'),
+            value: settingsStore.chatOnlyPreventSleep,
+            onChanged: !settingsStore.showVideo ? (newValue) => settingsStore.chatOnlyPreventSleep = newValue : null,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Autocomplete'),
+            subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
+            value: settingsStore.autocomplete,
+            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
           ),
           const SectionHeader(
             'Layout',
