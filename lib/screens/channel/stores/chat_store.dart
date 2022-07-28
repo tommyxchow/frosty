@@ -19,8 +19,11 @@ part 'chat_store.g.dart';
 class ChatStore = ChatStoreBase with _$ChatStore;
 
 abstract class ChatStoreBase with Store {
-  static const _messageLimit = 5000;
-  static const _renderMessageLimit = 88;
+  /// The total maximum amount of messages in chat.
+  static const _messageLimit = 10000;
+
+  /// The maximum ammount of messages to render when autoscroll is enabled.
+  static const _renderMessageLimit = 100;
 
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
@@ -71,19 +74,22 @@ abstract class ChatStoreBase with Store {
   /// The list of chat messages to render and display.
   final messages = ObservableList<IRCMessage>();
 
+  /// The list of reaction disposer functions that will be used later when disposing.
+  final reactions = <ReactionDisposer>[];
+
+  /// The periodic timer used for batching chat message re-renders.
+  late final Timer _messageBufferTimer;
+
   @computed
   List<IRCMessage> get renderMessages {
     // If autoscroll is disabled, render ALL messages in chat.
     // The second condition is to prevent an out of index error with sublist.
-    //
-    // Else, when autoscroll is enabled, only show the first [_renderMessageLimit] messages.
+    if (!_autoScroll || messages.length < _renderMessageLimit) return messages;
+
+    // When autoscroll is enabled, only show the first [_renderMessageLimit] messages.
     // This will improve performance by only rendering a limited amount of messages
     // instead of the entire history at all times.
-    if (!_autoScroll || messages.length < _renderMessageLimit) {
-      return messages;
-    } else {
-      return messages.sublist(messages.length - _renderMessageLimit);
-    }
+    return messages.sublist(messages.length - _renderMessageLimit);
   }
 
   /// If the chat should automatically scroll/jump to the latest message.
@@ -106,8 +112,6 @@ abstract class ChatStoreBase with Store {
   @observable
   var expandChat = false;
 
-  final reactions = <ReactionDisposer>[];
-
   ChatStoreBase({
     required this.auth,
     required this.chatDetailsStore,
@@ -127,25 +131,16 @@ abstract class ChatStoreBase with Store {
       (_) => _channel?.sink.close(1001),
     ));
 
-    // Create a reaction that will add buffered messages to the chat
-    // when autoscroll is changed.
-    reactions.add(reaction(
-      (_) => _autoScroll,
-      (_) {
-        if (_messageBuffer.isNotEmpty) {
-          messages.addAll(_messageBuffer);
-          _messageBuffer.clear();
-        }
-      },
-    ));
+    // Create a timer that will add messages from the buffer every 200 milliseconds.
+    _messageBufferTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) => addMessages());
 
     assetsStore.init();
     chatDetailsStore.updateChatters();
 
-    messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+    _messageBuffer.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.chatDelay > 0) {
-      messages.add(IRCMessage.createNotice(
+      _messageBuffer.add(IRCMessage.createNotice(
           message: 'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
     }
 
@@ -195,7 +190,7 @@ abstract class ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      debugPrint('$message\n');
+      // debugPrint('$message\n');
       if (message.startsWith('@')) {
         final parsedIRCMessage = IRCMessage.fromString(message, userLogin: auth.user.details?.login);
 
@@ -208,12 +203,7 @@ abstract class ChatStoreBase with Store {
           case Command.privateMessage:
           case Command.notice:
           case Command.userNotice:
-            if (_autoScroll) {
-              messages.add(parsedIRCMessage);
-            } else {
-              // If audoscroll is disabled, buffer the message to prevent the chat from shifting.
-              _messageBuffer.add(parsedIRCMessage);
-            }
+            _messageBuffer.add(parsedIRCMessage);
             break;
           case Command.clearChat:
             IRCMessage.clearChat(
@@ -235,12 +225,7 @@ abstract class ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
             if (toSend != null) {
-              if (_autoScroll) {
-                messages.add(toSend!);
-              } else {
-                // If audoscroll is disabled, buffer the sent message to prevent the chat from shifting.
-                _messageBuffer.add(toSend!);
-              }
+              _messageBuffer.add(toSend!);
               toSend = null;
             }
             break;
@@ -268,7 +253,7 @@ abstract class ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        messages.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
+        _messageBuffer.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
         getAssets();
 
@@ -323,7 +308,7 @@ abstract class ChatStoreBase with Store {
         if (_backoffTime > 0) {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
           final notice = 'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          messages.add(IRCMessage.createNotice(message: notice));
+          _messageBuffer.add(IRCMessage.createNotice(message: notice));
         }
 
         await Future.delayed(Duration(seconds: _backoffTime));
@@ -333,7 +318,7 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        messages.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
+        _messageBuffer.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
         connectToChat();
       },
     );
@@ -360,6 +345,14 @@ abstract class ChatStoreBase with Store {
     }
   }
 
+  @action
+  void addMessages() {
+    if (!_autoScroll || _messageBuffer.isEmpty) return;
+
+    messages.addAll(_messageBuffer);
+    _messageBuffer.clear();
+  }
+
   /// Sends the given string message by the logged-in user and adds it to [_messages].
   @action
   void sendMessage(String message) {
@@ -367,7 +360,7 @@ abstract class ChatStoreBase with Store {
     if (message.isEmpty) return;
 
     if (_channel == null || _channel?.closeCode != null) {
-      messages.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
+      _messageBuffer.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
     } else {
       // Send the message to the IRC chat room.
       _channel?.sink.add('PRIVMSG #$channelName :$message');
@@ -416,6 +409,8 @@ abstract class ChatStoreBase with Store {
 
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
+    _messageBufferTimer.cancel();
+
     _channel?.sink.close(1001);
     _channel = null;
 

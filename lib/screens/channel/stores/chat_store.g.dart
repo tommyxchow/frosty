@@ -170,6 +170,17 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
+  void addMessages() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.addMessages');
+    try {
+      return super.addMessages();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void sendMessage(String message) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
         name: 'ChatStoreBase.sendMessage');
