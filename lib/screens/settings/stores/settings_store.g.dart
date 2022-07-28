@@ -20,8 +20,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
       ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
-      ..autocomplete = json['autocomplete'] as bool? ?? true
       ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
+      ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? true
+      ..autocomplete = json['autocomplete'] as bool? ?? true
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
       ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
@@ -58,8 +59,9 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'toggleableOverlay': instance.toggleableOverlay,
       'pictureInPicture': instance.pictureInPicture,
       'overlayOpacity': instance.overlayOpacity,
-      'autocomplete': instance.autocomplete,
       'chatDelay': instance.chatDelay,
+      'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
+      'autocomplete': instance.autocomplete,
       'showBottomBar': instance.showBottomBar,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
       'chatWidth': instance.chatWidth,
@@ -260,22 +262,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$autocompleteAtom =
-      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
-
-  @override
-  bool get autocomplete {
-    _$autocompleteAtom.reportRead();
-    return super.autocomplete;
-  }
-
-  @override
-  set autocomplete(bool value) {
-    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
-      super.autocomplete = value;
-    });
-  }
-
   late final _$chatDelayAtom =
       Atom(name: '_SettingsStoreBase.chatDelay', context: context);
 
@@ -289,6 +275,39 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set chatDelay(double value) {
     _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
       super.chatDelay = value;
+    });
+  }
+
+  late final _$chatOnlyPreventSleepAtom =
+      Atom(name: '_SettingsStoreBase.chatOnlyPreventSleep', context: context);
+
+  @override
+  bool get chatOnlyPreventSleep {
+    _$chatOnlyPreventSleepAtom.reportRead();
+    return super.chatOnlyPreventSleep;
+  }
+
+  @override
+  set chatOnlyPreventSleep(bool value) {
+    _$chatOnlyPreventSleepAtom.reportWrite(value, super.chatOnlyPreventSleep,
+        () {
+      super.chatOnlyPreventSleep = value;
+    });
+  }
+
+  late final _$autocompleteAtom =
+      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
+
+  @override
+  bool get autocomplete {
+    _$autocompleteAtom.reportRead();
+    return super.autocomplete;
+  }
+
+  @override
+  set autocomplete(bool value) {
+    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
+      super.autocomplete = value;
     });
   }
 
@@ -667,8 +686,9 @@ showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
 overlayOpacity: ${overlayOpacity},
-autocomplete: ${autocomplete},
 chatDelay: ${chatDelay},
+chatOnlyPreventSleep: ${chatOnlyPreventSleep},
+autocomplete: ${autocomplete},
 showBottomBar: ${showBottomBar},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
 chatWidth: ${chatWidth},
