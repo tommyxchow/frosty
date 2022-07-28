@@ -195,6 +195,11 @@ class _VideoChatState extends State<VideoChat> {
                   color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
                   child: SafeArea(
                     bottom: false,
+                    left:
+                        (settingsStore.landscapeCutout == LandscapeCutoutType.both || settingsStore.landscapeCutout == LandscapeCutoutType.left) ? false : true,
+                    right: (settingsStore.landscapeCutout == LandscapeCutoutType.both || settingsStore.landscapeCutout == LandscapeCutoutType.right)
+                        ? false
+                        : true,
                     child: settingsStore.showVideo
                         ? settingsStore.fullScreen
                             ? Stack(
