@@ -19,40 +19,29 @@ class VideoStore = VideoStoreBase with _$VideoStore;
 abstract class VideoStoreBase with Store {
   final TwitchApi twitchApi;
 
-  WebViewController? controller;
+  /// The userlogin of the current channel.
+  final String userLogin;
 
-  late Timer _overlayTimer;
+  final AuthStore authStore;
 
-  Timer? sleepTimer;
+  final SettingsStore settingsStore;
 
+  /// The [Floating] instance used for initating PiP on Android.
   final floating = Floating();
 
-  @observable
-  var sleepHours = 0;
+  /// The webview controller used for injecting JavaScript to control the webview and video player.
+  WebViewController? controller;
 
-  @observable
-  var sleepMinutes = 0;
+  /// The current timer for the sleep timer if active.
+  Timer? sleepTimer;
 
-  @observable
-  var timeRemaining = const Duration();
+  /// The timer that handles hiding the overlay automatically
+  late Timer _overlayTimer;
 
-  @readonly
-  var _paused = true;
+  /// Disposes the overlay reactions.
+  late final ReactionDisposer _disposeOverlayReaction;
 
-  @readonly
-  var _overlayVisible = true;
-
-  @readonly
-  var _isIPad = false;
-
-  @readonly
-  StreamTwitch? _streamInfo;
-
-  @computed
-  String get videoUrl => settingsStore.showOverlay
-      ? 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty'
-      : 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';
-
+  /// The JavaScript channels used to communicate play/pause from the webview to Flutter.
   late final javascriptChannels = {
     JavascriptChannel(
       name: 'Pause',
@@ -68,95 +57,7 @@ abstract class VideoStoreBase with Store {
     ),
   };
 
-  final String userLogin;
-  final AuthStore authStore;
-  final SettingsStore settingsStore;
-
-  VideoStoreBase({
-    required this.userLogin,
-    required this.twitchApi,
-    required this.authStore,
-    required this.settingsStore,
-  }) {
-    _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
-    updateStreamInfo();
-  }
-
-  @action
-  void handlePausePlay() {
-    try {
-      if (_paused) {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
-      } else {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
-      }
-
-      _paused = !_paused;
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-  }
-
-  @action
-  void handleVideoTap() {
-    _overlayTimer.cancel();
-
-    if (_overlayVisible) {
-      _overlayVisible = false;
-    } else {
-      updateStreamInfo();
-
-      _overlayVisible = true;
-      _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
-    }
-  }
-
-  @action
-  Future<void> updateStreamInfo() async {
-    try {
-      _streamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
-    } catch (e) {
-      debugPrint(e.toString());
-
-      _overlayTimer.cancel();
-      _streamInfo = null;
-      _paused = true;
-    }
-  }
-
-  @action
-  void handleExpand() {
-    settingsStore.expandInfo = !settingsStore.expandInfo;
-
-    _overlayTimer.cancel();
-    _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
-  }
-
-  @action
-  Future<void> handleToggleOverlay() async {
-    if (settingsStore.toggleableOverlay) {
-      HapticFeedback.mediumImpact();
-
-      settingsStore.showOverlay = !settingsStore.showOverlay;
-
-      await controller?.loadUrl(videoUrl);
-
-      if (settingsStore.showOverlay) {
-        _overlayVisible = true;
-
-        _overlayTimer.cancel();
-        _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
-      }
-    }
-  }
-
-  @action
-  void handleRefresh() {
-    HapticFeedback.lightImpact();
-    controller?.reload();
-    updateStreamInfo();
-  }
-
+  /// Used for preventing accidental navigation in the webview.
   FutureOr<NavigationDecision> handleNavigation(NavigationRequest navigation) {
     if (navigation.url.startsWith('https://player.twitch.tv')) {
       return NavigationDecision.navigate;
@@ -164,8 +65,64 @@ abstract class VideoStoreBase with Store {
     return NavigationDecision.prevent;
   }
 
+  /// The amount of hours the sleep timer is set to.
+  @observable
+  var sleepHours = 0;
+
+  /// The amount of minutes the sleep timer is set to.
+  @observable
+  var sleepMinutes = 0;
+
+  /// The time remaining for the sleep timer.
+  @observable
+  var timeRemaining = const Duration();
+
+  /// If the video is currently paused.
+  ///
+  /// Does not pause or play the video, only used for rendering state of the overlay.
+  @readonly
+  var _paused = true;
+
+  /// If the overlay is should be visible.
+  @readonly
+  var _overlayVisible = true;
+
+  /// If the current device is iPad.
+  @readonly
+  var _isIPad = false;
+
+  /// The current stream info, used for displaying relevant info on the overlay.
+  @readonly
+  StreamTwitch? _streamInfo;
+
+  /// The video URL to use for the webview. Controls will be disabled when custom overlay is enabled.
+  @computed
+  String get videoUrl => settingsStore.showOverlay
+      ? 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty'
+      : 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';
+
+  VideoStoreBase({
+    required this.userLogin,
+    required this.twitchApi,
+    required this.authStore,
+    required this.settingsStore,
+  }) {
+    // Initialize tthe [_overlayTimer] to hide the overlay automatically after 3 seconds.
+    _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+
+    // Initialize a reaction that will reload the webview whenever the overlay is toggled.
+    _disposeOverlayReaction = reaction(
+      (_) => settingsStore.showOverlay,
+      (_) => controller?.loadUrl(videoUrl),
+    );
+
+    updateStreamInfo();
+  }
+
+  /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
+    // Add event listeners to notify the JavaScript channels when the video plays and pauses.
     try {
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => Pause.postMessage("video paused"));');
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("play", () => Play.postMessage("video playing"));');
@@ -187,20 +144,94 @@ abstract class VideoStoreBase with Store {
     }
   }
 
-  void requestPictureInPicture() {
+  /// Play or pause the video depending on the current state of [_paused].
+  @action
+  void handlePausePlay() {
     try {
-      if (Platform.isAndroid) {
-        floating.enable();
-      } else if (Platform.isIOS) {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+      if (_paused) {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
+      } else {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
       }
+
+      _paused = !_paused;
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
+  /// Called whenever the video/overlay is tapped.
+  @action
+  void handleVideoTap() {
+    _overlayTimer.cancel();
+
+    if (_overlayVisible) {
+      _overlayVisible = false;
+    } else {
+      updateStreamInfo();
+
+      _overlayVisible = true;
+      _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+    }
+  }
+
+  /// Updates the stream info from the Twitch API.
+  ///
+  /// If the stream is offline, disables the overlay.
+  @action
+  Future<void> updateStreamInfo() async {
+    try {
+      _streamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
+    } catch (e) {
+      debugPrint(e.toString());
+
+      _overlayTimer.cancel();
+      _streamInfo = null;
+      _paused = true;
+    }
+  }
+
+  /// Handles toggling "minimal mode" on the overlay.
+  ///
+  /// "Minimal mode" is when only the channel name is visible on the bottom-left of the overlay.
+  @action
+  void handleExpand() {
+    settingsStore.expandInfo = !settingsStore.expandInfo;
+
+    _overlayTimer.cancel();
+    _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+  }
+
+  /// Handles the toggle overlay options.
+  ///
+  /// The toggle overlay option allows switching between the custom and Twitch's overlay by long-pressing the overlay.
+  @action
+  void handleToggleOverlay() {
+    if (settingsStore.toggleableOverlay) {
+      HapticFeedback.mediumImpact();
+
+      settingsStore.showOverlay = !settingsStore.showOverlay;
+
+      if (settingsStore.showOverlay) {
+        _overlayVisible = true;
+
+        _overlayTimer.cancel();
+        _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+      }
+    }
+  }
+
+  /// Refreshes the stream webview and updates the stream info.
+  @action
+  void handleRefresh() {
+    HapticFeedback.lightImpact();
+    controller?.reload();
+    updateStreamInfo();
+  }
+
   /// Updates the sleep timer with [sleepHours] and [sleepMinutes].
   /// Calls [onTimerFinished] when the sleep timer completes.
+  @action
   void updateSleepTimer({required void Function() onTimerFinished}) {
     // If hours and minutes are 0, do nothing.
     if (sleepHours == 0 && sleepMinutes == 0) return;
@@ -233,12 +264,32 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Cancels the sleep timer and resets the time remaining.
+  @action
   void cancelSleepTimer() {
     sleepTimer?.cancel();
     timeRemaining = const Duration();
   }
 
+  /// Initiate picture in picture if available.
+  ///
+  /// On iOS, this will utilize the web picture-in-picture API.
+  /// On Android, this will utilize the native Android PiP API.
+  void requestPictureInPicture() {
+    try {
+      if (Platform.isAndroid) {
+        floating.enable();
+      } else if (Platform.isIOS) {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  @action
   void dispose() {
+    controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
+    _disposeOverlayReaction();
     floating.dispose();
     sleepTimer?.cancel();
   }

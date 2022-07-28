@@ -137,29 +137,20 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
-  late final _$updateStreamInfoAsyncAction =
-      AsyncAction('VideoStoreBase.updateStreamInfo', context: context);
-
-  @override
-  Future<void> updateStreamInfo() {
-    return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
-  }
-
-  late final _$handleToggleOverlayAsyncAction =
-      AsyncAction('VideoStoreBase.handleToggleOverlay', context: context);
-
-  @override
-  Future<void> handleToggleOverlay() {
-    return _$handleToggleOverlayAsyncAction
-        .run(() => super.handleToggleOverlay());
-  }
-
   late final _$initVideoAsyncAction =
       AsyncAction('VideoStoreBase.initVideo', context: context);
 
   @override
   Future<void> initVideo() {
     return _$initVideoAsyncAction.run(() => super.initVideo());
+  }
+
+  late final _$updateStreamInfoAsyncAction =
+      AsyncAction('VideoStoreBase.updateStreamInfo', context: context);
+
+  @override
+  Future<void> updateStreamInfo() {
+    return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
   }
 
   late final _$VideoStoreBaseActionController =
@@ -199,11 +190,55 @@ mixin _$VideoStore on VideoStoreBase, Store {
   }
 
   @override
+  void handleToggleOverlay() {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.handleToggleOverlay');
+    try {
+      return super.handleToggleOverlay();
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void handleRefresh() {
     final _$actionInfo = _$VideoStoreBaseActionController.startAction(
         name: 'VideoStoreBase.handleRefresh');
     try {
       return super.handleRefresh();
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateSleepTimer({required void Function() onTimerFinished}) {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.updateSleepTimer');
+    try {
+      return super.updateSleepTimer(onTimerFinished: onTimerFinished);
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void cancelSleepTimer() {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.cancelSleepTimer');
+    try {
+      return super.cancelSleepTimer();
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void dispose() {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.dispose');
+    try {
+      return super.dispose();
     } finally {
       _$VideoStoreBaseActionController.endAction(_$actionInfo);
     }
