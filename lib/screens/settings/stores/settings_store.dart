@@ -88,6 +88,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultChatDelay = 0.0;
   static const defaultChatOnlyPreventSleep = true;
   static const defaultAutocomplete = true;
+  static const defaultLandscapeCutout = LandscapeCutoutType.none;
 
   static const defaultShowBottomBar = true;
   static const defaultLandscapeChatLeftSide = false;
@@ -126,6 +127,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
   @observable
   var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+
+  @JsonKey(defaultValue: defaultLandscapeCutout)
+  @observable
+  var landscapeCutout = defaultLandscapeCutout;
 
   @JsonKey(defaultValue: defaultChatWidth)
   @observable
@@ -253,4 +258,11 @@ enum TimestampType {
   disabled,
   twelve,
   twentyFour,
+}
+
+enum LandscapeCutoutType {
+  none,
+  left,
+  right,
+  both,
 }

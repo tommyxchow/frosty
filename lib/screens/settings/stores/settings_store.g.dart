@@ -25,6 +25,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..autocomplete = json['autocomplete'] as bool? ?? true
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+      ..landscapeCutout = $enumDecodeNullable(
+              _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
+          LandscapeCutoutType.none
       ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
@@ -64,6 +67,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'autocomplete': instance.autocomplete,
       'showBottomBar': instance.showBottomBar,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'landscapeCutout':
+          _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
       'chatWidth': instance.chatWidth,
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
       'showZeroWidth': instance.showZeroWidth,
@@ -87,6 +92,13 @@ const _$ThemeTypeEnumMap = {
   ThemeType.light: 'light',
   ThemeType.dark: 'dark',
   ThemeType.black: 'black',
+};
+
+const _$LandscapeCutoutTypeEnumMap = {
+  LandscapeCutoutType.none: 'none',
+  LandscapeCutoutType.left: 'left',
+  LandscapeCutoutType.right: 'right',
+  LandscapeCutoutType.both: 'both',
 };
 
 const _$TimestampTypeEnumMap = {
@@ -341,6 +353,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
         () {
       super.landscapeChatLeftSide = value;
+    });
+  }
+
+  late final _$landscapeCutoutAtom =
+      Atom(name: '_SettingsStoreBase.landscapeCutout', context: context);
+
+  @override
+  LandscapeCutoutType get landscapeCutout {
+    _$landscapeCutoutAtom.reportRead();
+    return super.landscapeCutout;
+  }
+
+  @override
+  set landscapeCutout(LandscapeCutoutType value) {
+    _$landscapeCutoutAtom.reportWrite(value, super.landscapeCutout, () {
+      super.landscapeCutout = value;
     });
   }
 
@@ -691,6 +719,7 @@ chatOnlyPreventSleep: ${chatOnlyPreventSleep},
 autocomplete: ${autocomplete},
 showBottomBar: ${showBottomBar},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
+landscapeCutout: ${landscapeCutout},
 chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 showZeroWidth: ${showZeroWidth},
