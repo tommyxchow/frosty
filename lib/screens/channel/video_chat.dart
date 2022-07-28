@@ -89,6 +89,12 @@ class _VideoChatState extends State<VideoChat> {
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
+      onDoubleTap: () {
+        if (MediaQuery.of(context).orientation == Orientation.portrait) return;
+
+        // Double tap to toggle fullscreen in landscape mode.
+        settingsStore.fullScreen = !settingsStore.fullScreen;
+      },
       onTap: () {
         if (_chatStore.assetsStore.showEmoteMenu) {
           _chatStore.assetsStore.showEmoteMenu = false;
