@@ -26,7 +26,7 @@ abstract class VideoStoreBase with Store {
 
   final SettingsStore settingsStore;
 
-  /// The [Floating] instance used for initating PiP on Android.
+  /// The [Floating] instance used for initiating PiP on Android.
   final floating = Floating();
 
   /// The webview controller used for injecting JavaScript to control the webview and video player.
@@ -44,11 +44,11 @@ abstract class VideoStoreBase with Store {
   /// The JavaScript channels used to communicate play/pause from the webview to Flutter.
   late final javascriptChannels = {
     JavascriptChannel(
-      name: 'Pause',
+      name: 'VideoPause',
       onMessageReceived: (message) => _paused = true,
     ),
     JavascriptChannel(
-      name: 'Play',
+      name: 'VideoPlaying',
       onMessageReceived: (message) {
         _paused = false;
         controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
@@ -107,8 +107,8 @@ abstract class VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
-    // Initialize tthe [_overlayTimer] to hide the overlay automatically after 3 seconds.
-    _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+    // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
+    _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
@@ -124,8 +124,8 @@ abstract class VideoStoreBase with Store {
   Future<void> initVideo() async {
     // Add event listeners to notify the JavaScript channels when the video plays and pauses.
     try {
-      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => Pause.postMessage("video paused"));');
-      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("play", () => Play.postMessage("video playing"));');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
+      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -141,22 +141,6 @@ abstract class VideoStoreBase with Store {
       } else {
         _isIPad = false;
       }
-    }
-  }
-
-  /// Play or pause the video depending on the current state of [_paused].
-  @action
-  void handlePausePlay() {
-    try {
-      if (_paused) {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
-      } else {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
-      }
-
-      _paused = !_paused;
-    } catch (e) {
-      debugPrint(e.toString());
     }
   }
 
@@ -268,6 +252,19 @@ abstract class VideoStoreBase with Store {
   void cancelSleepTimer() {
     sleepTimer?.cancel();
     timeRemaining = const Duration();
+  }
+
+  /// Play or pause the video depending on the current state of [_paused].
+  void handlePausePlay() {
+    try {
+      if (_paused) {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
+      } else {
+        controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   /// Initiate picture in picture if available.

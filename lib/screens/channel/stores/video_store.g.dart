@@ -157,17 +157,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
       ActionController(name: 'VideoStoreBase', context: context);
 
   @override
-  void handlePausePlay() {
-    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
-        name: 'VideoStoreBase.handlePausePlay');
-    try {
-      return super.handlePausePlay();
-    } finally {
-      _$VideoStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void handleVideoTap() {
     final _$actionInfo = _$VideoStoreBaseActionController.startAction(
         name: 'VideoStoreBase.handleVideoTap');
