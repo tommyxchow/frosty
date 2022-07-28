@@ -29,7 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  json_annotation: ^4.5.0
+  json_annotation: ^4.6.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -55,6 +55,7 @@ dependencies:
   flutter_cache_manager: ^3.3.0
   device_info_plus: ^4.0.0
   floating: ^1.1.0
+  wakelock: ^0.6.2
 
 dev_dependencies:
   flutter_test:
