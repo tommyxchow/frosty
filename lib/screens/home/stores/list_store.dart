@@ -78,6 +78,7 @@ abstract class ListStoreBase with Store {
   }
 
   /// Fetches the streams based on the type and current cursor.
+  @action
   Future<void> getStreams() async {
     _isLoading = true;
 
