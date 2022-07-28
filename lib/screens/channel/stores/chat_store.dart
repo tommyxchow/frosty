@@ -10,6 +10,7 @@ import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
+import 'package:wakelock/wakelock.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'chat_store.g.dart';
@@ -116,6 +117,9 @@ abstract class ChatStoreBase with Store {
     required this.channelId,
     required this.displayName,
   }) {
+    // Enable wakelock to prevent the chat from sleeping.
+    Wakelock.enable();
+
     // Create a reaction that will reconnect to chat when logging in or out.
     // Closing the channel will trigger a reconnect with the new credentials.
     reactions.add(reaction(
@@ -425,5 +429,8 @@ abstract class ChatStoreBase with Store {
 
     assetsStore.dispose();
     chatDetailsStore.dispose();
+
+    // Disable wakelock so that the sleep timer will function properly.
+    Wakelock.disable();
   }
 }
