@@ -129,10 +129,10 @@
 - Light, dark, and black (OLED) themes
 - Search for channels and categories
 - See and filter chatters in a channel
-- Picture-in-picture mode (iOS only)
 - Local chat user message history
 - Theater and fullscreen mode
 - Watch live streams with chat
+- Picture-in-picture mode
 - Block and report users
 - Emote menu
 - Sleep timer
@@ -158,6 +158,14 @@ Frosty aims to bring these emotes and other general quality of life features to 
 
 5. Choose an emulator or device and run the app!
 
+> **Note**
+> 
+> Frosty uses [MobX](https://mobx.netlify.app/) for state management. Please refer to the documentation about code generation, otherwise your changes within MobX stores may not be applied.
+
+> **Warning**
+> 
+> I built this project while learning Flutter, so some of the code may not be optimal. I'm working on refactoring, documenting, and cleaning up various parts as much as I can.
+
 ## FAQ
 
 ### Can I change the quality of the stream?
@@ -166,31 +174,19 @@ On Android, you can change the stream quality by turning off the custom stream o
 
 On iOS, sadly quality options aren't available through the native player and rely on an "auto" setting. There is no official API for getting the live stream URLs so specific quality options are not possible at this time.
 
-### Why is there no picture-in-picture (PiP) on Android?
-
-I've looked into implementing it for Android a while back but web browsers on Android don't support the [web Picture-in-Picture API](https://developer.mozilla.org/en-US/docs/Web/API/Picture-in-Picture_API). The reason I'm using the web PiP API is due to limitations in the Twitch API (the stream is just the Twitch channel website in fullscreen rather than an actual video player). I *might* be able to figure something out by working with the native Android code but I'll have to learn that first.
-
 ### Why do certain animations and scrolling appear to be janky?
 
-Due to the Flutter framework, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes usually resolves it.
+Due to the Flutter framework, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes should resolve it.
 
 ### Why is there a delay between the stream and chat?
 
 On Android, the delay should be minimal. Try refreshing the player if you have a delay.
 
-On iOS, there seems to be delays up to 15 seconds due to the native player so unfortunately it's out of my control. The best you can do for now is refreshing or pausing/playing the stream until the delay is minimized.
-
-**UPDATE**: Starting with version 1.4.0, there is a new message delay option that lets you set the delay (in seconds) before each message is rendered.
+On iOS, there seems to be delays up to 15 seconds due to the native player so unfortunately it's out of my control. As a workaround, Frosty has a message delay option that lets you set the delay (in seconds) before each message is rendered.
 
 ### Why are some GIFs either slow or very fast?
 
 This seems to be caused by the Flutter framework itself (see [here](https://github.com/flutter/flutter/issues/24804) and [here](https://github.com/flutter/flutter/issues/29130)).
-
-### Why is ProMotion (120hz) not working?
-
-This is caused by the Flutter framework and is being worked on (see [here](https://github.com/flutter/flutter/issues/90675)).
-
-**UPDATE**: With Flutter 3 and version 1.3.0 of the app, ProMotion *should* be working.
 
 ### Why is feature "X" from Twitch not in the app as well?
 
@@ -203,6 +199,20 @@ I'll try to add as many features as possible but occasionally I may take a break
 ### Where can I report a bug or request a new feature?
 
 You can open a new issue [here](https://github.com/tommyxchow/frosty/issues) with the appropriate labels (e.g., "bug" or "feature request") and I'll take a look at it.
+
+## Donate
+
+Downloading Frosty and leaving a review or starring this repository is more than enough to show support.
+
+If you're feeling generous and would like to support me with a donation, you can do so through the following:
+
+- [Buy Me a Coffee](https://www.buymeacoffee.com/tommychow)
+- [GitHub Sponsors](https://github.com/sponsors/tommyxchow)
+- [PayPal](https://www.paypal.com/donate/?business=NF33JDG6KBU6W)
+- BTC: bc1qzpth6gc3vum764lat6a8ul7cmekwles58070a6
+- ETH: 0x317b5930fc2898884f711016dCae79d24910888E
+
+If you decide to support me monetarily, it is extremely appreciated and further motivates me to continue improving and maintaining Frosty ❤️.
 
 ## License
 
