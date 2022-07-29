@@ -20,9 +20,11 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void onLongPressName() {
+      // Ignore if the message is a recent message in the modal bottom sheet.
       if (isModal) return;
 
-      if (ircMessage.user == null && ircMessage.user == chatStore.auth.user.details?.login) return;
+      // Ignore if long-pressing own username.
+      if (ircMessage.user == null || ircMessage.user == chatStore.auth.user.details?.login) return;
 
       HapticFeedback.lightImpact();
 
