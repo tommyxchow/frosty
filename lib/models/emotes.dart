@@ -233,7 +233,6 @@ class Emote7TV {
   final List<String> visibilitySimple;
   final String mime;
   final int status;
-  final List<String> tags;
   final List<int> width;
   final List<int> height;
   final List<List<String>> urls;
@@ -246,7 +245,6 @@ class Emote7TV {
     this.visibilitySimple,
     this.mime,
     this.status,
-    this.tags,
     this.width,
     this.height,
     this.urls,

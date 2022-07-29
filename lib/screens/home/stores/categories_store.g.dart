@@ -70,6 +70,14 @@ mixin _$CategoriesStore on CategoriesStoreBase, Store {
     });
   }
 
+  late final _$getCategoriesAsyncAction =
+      AsyncAction('CategoriesStoreBase.getCategories', context: context);
+
+  @override
+  Future<void> getCategories() {
+    return _$getCategoriesAsyncAction.run(() => super.getCategories());
+  }
+
   late final _$CategoriesStoreBaseActionController =
       ActionController(name: 'CategoriesStoreBase', context: context);
 

@@ -20,10 +20,14 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
       ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
-      ..autocomplete = json['autocomplete'] as bool? ?? true
       ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
+      ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? true
+      ..autocomplete = json['autocomplete'] as bool? ?? true
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+      ..landscapeCutout = $enumDecodeNullable(
+              _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
+          LandscapeCutoutType.none
       ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
@@ -48,7 +52,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
-      'themeType': _$ThemeTypeEnumMap[instance.themeType],
+      'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
       'showThumbnails': instance.showThumbnails,
       'largeStreamCard': instance.largeStreamCard,
       'showThumbnailUptime': instance.showThumbnailUptime,
@@ -58,17 +62,20 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'toggleableOverlay': instance.toggleableOverlay,
       'pictureInPicture': instance.pictureInPicture,
       'overlayOpacity': instance.overlayOpacity,
-      'autocomplete': instance.autocomplete,
       'chatDelay': instance.chatDelay,
+      'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
+      'autocomplete': instance.autocomplete,
       'showBottomBar': instance.showBottomBar,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'landscapeCutout':
+          _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
       'chatWidth': instance.chatWidth,
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
       'showZeroWidth': instance.showZeroWidth,
       'useReadableColors': instance.useReadableColors,
       'showDeletedMessages': instance.showDeletedMessages,
       'showChatMessageDividers': instance.showChatMessageDividers,
-      'timestampType': _$TimestampTypeEnumMap[instance.timestampType],
+      'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'messageScale': instance.messageScale,
@@ -85,6 +92,13 @@ const _$ThemeTypeEnumMap = {
   ThemeType.light: 'light',
   ThemeType.dark: 'dark',
   ThemeType.black: 'black',
+};
+
+const _$LandscapeCutoutTypeEnumMap = {
+  LandscapeCutoutType.none: 'none',
+  LandscapeCutoutType.left: 'left',
+  LandscapeCutoutType.right: 'right',
+  LandscapeCutoutType.both: 'both',
 };
 
 const _$TimestampTypeEnumMap = {
@@ -260,22 +274,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$autocompleteAtom =
-      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
-
-  @override
-  bool get autocomplete {
-    _$autocompleteAtom.reportRead();
-    return super.autocomplete;
-  }
-
-  @override
-  set autocomplete(bool value) {
-    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
-      super.autocomplete = value;
-    });
-  }
-
   late final _$chatDelayAtom =
       Atom(name: '_SettingsStoreBase.chatDelay', context: context);
 
@@ -289,6 +287,39 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set chatDelay(double value) {
     _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
       super.chatDelay = value;
+    });
+  }
+
+  late final _$chatOnlyPreventSleepAtom =
+      Atom(name: '_SettingsStoreBase.chatOnlyPreventSleep', context: context);
+
+  @override
+  bool get chatOnlyPreventSleep {
+    _$chatOnlyPreventSleepAtom.reportRead();
+    return super.chatOnlyPreventSleep;
+  }
+
+  @override
+  set chatOnlyPreventSleep(bool value) {
+    _$chatOnlyPreventSleepAtom.reportWrite(value, super.chatOnlyPreventSleep,
+        () {
+      super.chatOnlyPreventSleep = value;
+    });
+  }
+
+  late final _$autocompleteAtom =
+      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
+
+  @override
+  bool get autocomplete {
+    _$autocompleteAtom.reportRead();
+    return super.autocomplete;
+  }
+
+  @override
+  set autocomplete(bool value) {
+    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
+      super.autocomplete = value;
     });
   }
 
@@ -322,6 +353,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
         () {
       super.landscapeChatLeftSide = value;
+    });
+  }
+
+  late final _$landscapeCutoutAtom =
+      Atom(name: '_SettingsStoreBase.landscapeCutout', context: context);
+
+  @override
+  LandscapeCutoutType get landscapeCutout {
+    _$landscapeCutoutAtom.reportRead();
+    return super.landscapeCutout;
+  }
+
+  @override
+  set landscapeCutout(LandscapeCutoutType value) {
+    _$landscapeCutoutAtom.reportWrite(value, super.landscapeCutout, () {
+      super.landscapeCutout = value;
     });
   }
 
@@ -667,10 +714,12 @@ showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 pictureInPicture: ${pictureInPicture},
 overlayOpacity: ${overlayOpacity},
-autocomplete: ${autocomplete},
 chatDelay: ${chatDelay},
+chatOnlyPreventSleep: ${chatOnlyPreventSleep},
+autocomplete: ${autocomplete},
 showBottomBar: ${showBottomBar},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
+landscapeCutout: ${landscapeCutout},
 chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 showZeroWidth: ${showZeroWidth},

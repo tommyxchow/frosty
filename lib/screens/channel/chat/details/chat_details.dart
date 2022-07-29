@@ -6,7 +6,7 @@ import 'package:frosty/screens/channel/stores/chat_details_store.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/widgets/modal.dart';
 
-class ChatDetails extends StatelessWidget {
+class ChatDetails extends StatefulWidget {
   final ChatDetailsStore chatDetailsStore;
   final ChatStore chatStore;
   final String userLogin;
@@ -17,6 +17,17 @@ class ChatDetails extends StatelessWidget {
     required this.chatStore,
     required this.userLogin,
   }) : super(key: key);
+
+  @override
+  State<ChatDetails> createState() => _ChatDetailsState();
+}
+
+class _ChatDetailsState extends State<ChatDetails> {
+  @override
+  void initState() {
+    super.initState();
+    widget.chatDetailsStore.updateChatters();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +41,13 @@ class ChatDetails extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  child: ChatModes(roomState: chatDetailsStore.roomState),
+                  child: ChatModes(roomState: widget.chatDetailsStore.roomState),
                 ),
                 Expanded(
                   child: ChattersList(
-                    chatDetailsStore: chatDetailsStore,
-                    chatStore: chatStore,
-                    userLogin: userLogin,
+                    chatDetailsStore: widget.chatDetailsStore,
+                    chatStore: widget.chatStore,
+                    userLogin: widget.userLogin,
                   ),
                 ),
               ],

@@ -9,23 +9,13 @@ part of 'chat_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$ChatStore on ChatStoreBase, Store {
-  late final _$_messagesAtom =
-      Atom(name: 'ChatStoreBase._messages', context: context);
-
-  ObservableList<IRCMessage> get messages {
-    _$_messagesAtom.reportRead();
-    return super._messages;
-  }
+  Computed<List<IRCMessage>>? _$renderMessagesComputed;
 
   @override
-  ObservableList<IRCMessage> get _messages => messages;
-
-  @override
-  set _messages(ObservableList<IRCMessage> value) {
-    _$_messagesAtom.reportWrite(value, super._messages, () {
-      super._messages = value;
-    });
-  }
+  List<IRCMessage> get renderMessages => (_$renderMessagesComputed ??=
+          Computed<List<IRCMessage>>(() => super.renderMessages,
+              name: 'ChatStoreBase.renderMessages'))
+      .value;
 
   late final _$_autoScrollAtom =
       Atom(name: 'ChatStoreBase._autoScroll', context: context);
@@ -135,6 +125,30 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$notificationAtom =
+      Atom(name: 'ChatStoreBase.notification', context: context);
+
+  @override
+  String? get notification {
+    _$notificationAtom.reportRead();
+    return super.notification;
+  }
+
+  @override
+  set notification(String? value) {
+    _$notificationAtom.reportWrite(value, super.notification, () {
+      super.notification = value;
+    });
+  }
+
+  late final _$getAssetsAsyncAction =
+      AsyncAction('ChatStoreBase.getAssets', context: context);
+
+  @override
+  Future<void> getAssets() {
+    return _$getAssetsAsyncAction.run(() => super.getAssets());
+  }
+
   late final _$ChatStoreBaseActionController =
       ActionController(name: 'ChatStoreBase', context: context);
 
@@ -172,6 +186,17 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
+  void addMessages() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.addMessages');
+    try {
+      return super.addMessages();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void sendMessage(String message) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
         name: 'ChatStoreBase.sendMessage');
@@ -196,7 +221,9 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   String toString() {
     return '''
-expandChat: ${expandChat}
+expandChat: ${expandChat},
+notification: ${notification},
+renderMessages: ${renderMessages}
     ''';
   }
 }

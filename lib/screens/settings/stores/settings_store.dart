@@ -85,8 +85,10 @@ abstract class _SettingsStoreBase with Store {
   }
 
   // * Chat Settings
-  static const defaultAutocomplete = true;
   static const defaultChatDelay = 0.0;
+  static const defaultChatOnlyPreventSleep = true;
+  static const defaultAutocomplete = true;
+  static const defaultLandscapeCutout = LandscapeCutoutType.none;
 
   static const defaultShowBottomBar = true;
   static const defaultLandscapeChatLeftSide = false;
@@ -106,13 +108,17 @@ abstract class _SettingsStoreBase with Store {
   static const defaultMessageSpacing = 10.0;
   static const defaultFontSize = 12.0;
 
-  @JsonKey(defaultValue: defaultAutocomplete)
-  @observable
-  var autocomplete = defaultAutocomplete;
-
   @JsonKey(defaultValue: defaultChatDelay)
   @observable
   var chatDelay = defaultChatDelay;
+
+  @JsonKey(defaultValue: defaultChatOnlyPreventSleep)
+  @observable
+  var chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
+
+  @JsonKey(defaultValue: defaultAutocomplete)
+  @observable
+  var autocomplete = defaultAutocomplete;
 
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
@@ -121,6 +127,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
   @observable
   var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+
+  @JsonKey(defaultValue: defaultLandscapeCutout)
+  @observable
+  var landscapeCutout = defaultLandscapeCutout;
 
   @JsonKey(defaultValue: defaultChatWidth)
   @observable
@@ -172,8 +182,9 @@ abstract class _SettingsStoreBase with Store {
 
   @action
   void resetChatSettings() {
-    autocomplete = defaultAutocomplete;
     chatDelay = defaultChatDelay;
+    chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
+    autocomplete = defaultAutocomplete;
     showBottomBar = defaultShowBottomBar;
     landscapeChatLeftSide = defaultLandscapeChatLeftSide;
     chatWidth = defaultChatWidth;
@@ -228,6 +239,7 @@ abstract class _SettingsStoreBase with Store {
 
   @action
   void resetAllSettings() {
+    resetGeneralSettings();
     resetVideoSettings();
     resetChatSettings();
     resetOtherSettings();
@@ -246,4 +258,11 @@ enum TimestampType {
   disabled,
   twelve,
   twentyFour,
+}
+
+enum LandscapeCutoutType {
+  none,
+  left,
+  right,
+  both,
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -88,6 +89,12 @@ class _VideoChatState extends State<VideoChat> {
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
+      onDoubleTap: () {
+        if (MediaQuery.of(context).orientation == Orientation.portrait) return;
+
+        // Double tap to toggle fullscreen in landscape mode.
+        settingsStore.fullScreen = !settingsStore.fullScreen;
+      },
       onTap: () {
         if (_chatStore.assetsStore.showEmoteMenu) {
           _chatStore.assetsStore.showEmoteMenu = false;
@@ -160,14 +167,9 @@ class _VideoChatState extends State<VideoChat> {
       ],
     );
 
-    return Scaffold(
+    final videoChat = Scaffold(
       body: OrientationBuilder(
         builder: (context, orientation) {
-          // Scroll to bottom when summoning keyboard or rotating.
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_chatStore.scrollController.hasClients) _chatStore.scrollController.jumpTo(_chatStore.scrollController.position.maxScrollExtent);
-          });
-
           if (orientation == Orientation.landscape) {
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
@@ -199,6 +201,11 @@ class _VideoChatState extends State<VideoChat> {
                   color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
                   child: SafeArea(
                     bottom: false,
+                    left:
+                        (settingsStore.landscapeCutout == LandscapeCutoutType.both || settingsStore.landscapeCutout == LandscapeCutoutType.left) ? false : true,
+                    right: (settingsStore.landscapeCutout == LandscapeCutoutType.both || settingsStore.landscapeCutout == LandscapeCutoutType.right)
+                        ? false
+                        : true,
                     child: settingsStore.showVideo
                         ? settingsStore.fullScreen
                             ? Stack(
@@ -246,13 +253,24 @@ class _VideoChatState extends State<VideoChat> {
         },
       ),
     );
+
+    // If on Android, use PiPSwitcher to enable PiP functionality.
+    if (Platform.isAndroid) {
+      return PiPSwitcher(
+        floating: _videoStore.floating,
+        childWhenEnabled: player,
+        childWhenDisabled: videoChat,
+      );
+    }
+
+    return videoChat;
   }
 
   @override
   void dispose() {
     _chatStore.dispose();
 
-    _videoStore.cancelSleepTimer();
+    _videoStore.dispose();
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
@@ -614,7 +632,7 @@ class _VideoOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (Platform.isIOS && videoStore.settingsStore.pictureInPicture)
+                  if (videoStore.settingsStore.pictureInPicture)
                     IconButton(
                       tooltip: 'Picture-in-picture',
                       icon: const Icon(

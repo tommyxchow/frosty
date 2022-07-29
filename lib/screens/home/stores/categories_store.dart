@@ -40,6 +40,7 @@ abstract class CategoriesStoreBase with Store {
   }
 
   // Fetches the top categories based on the current cursor.
+  @action
   Future<void> getCategories() async {
     _isLoading = true;
 

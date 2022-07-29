@@ -21,6 +21,8 @@ class _ChatSettingsState extends State<ChatSettings> {
 
   @override
   Widget build(BuildContext context) {
+    const landscapeCutouts = ['None', 'Left', 'Right', 'Both'];
+
     const timestamps = ['Disabled', '12-hour', '24-hour'];
 
     const sectionPadding = EdgeInsets.only(left: 16.0, bottom: 5.0, top: 30.0);
@@ -40,14 +42,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
         ),
         children: [
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Autocomplete'),
-            subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
-            value: settingsStore.autocomplete,
-            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
-          ),
-          const SizedBox(height: 15.0),
           ListTile(
             title: Row(
               children: [
@@ -71,6 +65,20 @@ class _ChatSettingsState extends State<ChatSettings> {
               ],
             ),
           ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Prevent sleep in chat-only mode'),
+            subtitle: const Text('Requires restarting the chat in order to take effect.'),
+            value: settingsStore.chatOnlyPreventSleep,
+            onChanged: !settingsStore.showVideo ? (newValue) => settingsStore.chatOnlyPreventSleep = newValue : null,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Autocomplete'),
+            subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
+            value: settingsStore.autocomplete,
+            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
+          ),
           const SectionHeader(
             'Layout',
             padding: sectionPadding,
@@ -85,6 +93,21 @@ class _ChatSettingsState extends State<ChatSettings> {
             title: const Text('Landscape chat on left side'),
             value: settingsStore.landscapeChatLeftSide,
             onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
+          ),
+          ListTile(
+            isThreeLine: true,
+            title: const Text('Landscape fill cutout side'),
+            subtitle: const Text('Overrides and fills the available space in the display cutout/notch.'),
+            trailing: DropdownButton(
+              value: settingsStore.landscapeCutout,
+              onChanged: (LandscapeCutoutType? newValue) => settingsStore.landscapeCutout = newValue!,
+              items: LandscapeCutoutType.values
+                  .map((LandscapeCutoutType value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(landscapeCutouts[value.index]),
+                      ))
+                  .toList(),
+            ),
           ),
           const SizedBox(height: 15.0),
           ListTile(

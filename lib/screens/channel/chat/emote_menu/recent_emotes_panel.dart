@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/section_header.dart';
@@ -77,43 +78,49 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
             ],
           ),
         ),
-        SliverGrid(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
-                ? 8
-                : context.read<SettingsStore>().showVideo
-                    ? 6
-                    : 16,
-          ),
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final emote = widget.chatStore.assetsStore.recentEmotes[index];
-              final validEmotes = [...widget.chatStore.assetsStore.emoteToObject.values, ...widget.chatStore.assetsStore.userEmoteToObject.values];
-              final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name && existingEmote.type == emote.type);
+        if (widget.chatStore.assetsStore.recentEmotes.isEmpty)
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: AlertMessage(message: 'No recent emotes'),
+          )
+        else
+          SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
+                  ? 8
+                  : context.read<SettingsStore>().showVideo
+                      ? 6
+                      : 16,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final emote = widget.chatStore.assetsStore.recentEmotes[index];
+                final validEmotes = [...widget.chatStore.assetsStore.emoteToObject.values, ...widget.chatStore.assetsStore.userEmoteToObject.values];
+                final matchingEmotes = validEmotes.where((existingEmote) => existingEmote.name == emote.name && existingEmote.type == emote.type);
 
-              return InkWell(
-                onTap: matchingEmotes.isNotEmpty ? () => widget.chatStore.addEmote(emote) : null,
-                child: Tooltip(
-                  message: emote.name,
-                  preferBelow: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Center(
-                      child: CachedNetworkImage(
-                        imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
-                        color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
-                        colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
-                        height: emote.height?.toDouble() ?? defaultEmoteSize,
-                        width: emote.width?.toDouble(),
+                return InkWell(
+                  onTap: matchingEmotes.isNotEmpty ? () => widget.chatStore.addEmote(emote) : null,
+                  child: Tooltip(
+                    message: emote.name,
+                    preferBelow: false,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Center(
+                        child: CachedNetworkImage(
+                          imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
+                          color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
+                          colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
+                          height: emote.height?.toDouble() ?? defaultEmoteSize,
+                          width: emote.width?.toDouble(),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
-            childCount: widget.chatStore.assetsStore.recentEmotes.length,
+                );
+              },
+              childCount: widget.chatStore.assetsStore.recentEmotes.length,
+            ),
           ),
-        ),
       ],
     );
   }

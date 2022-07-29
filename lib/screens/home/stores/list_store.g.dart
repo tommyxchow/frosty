@@ -93,6 +93,14 @@ mixin _$ListStore on ListStoreBase, Store {
     });
   }
 
+  late final _$getStreamsAsyncAction =
+      AsyncAction('ListStoreBase.getStreams', context: context);
+
+  @override
+  Future<void> getStreams() {
+    return _$getStreamsAsyncAction.run(() => super.getStreams());
+  }
+
   late final _$ListStoreBaseActionController =
       ActionController(name: 'ListStoreBase', context: context);
 
