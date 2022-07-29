@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frosty/models/emotes.dart';
 
@@ -284,7 +285,6 @@ void main() {
       expect(emote.visibilitySimple, ['GLOBAL']);
       expect(emote.mime, 'image/gif');
       expect(emote.status, 3);
-      expect(emote.tags, []);
       expect(emote.width, [32, 48, 76, 128]);
       expect(emote.height, [32, 48, 76, 128]);
 
@@ -383,7 +383,6 @@ void main() {
       expect(emote.visibilitySimple, []);
       expect(emote.mime, 'image/png');
       expect(emote.status, 3);
-      expect(emote.tags, []);
       expect(emote.width, [32, 48, 76, 128]);
       expect(emote.height, [32, 48, 76, 128]);
 
