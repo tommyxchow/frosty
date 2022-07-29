@@ -243,7 +243,9 @@ abstract class ChatStoreBase with Store {
             continue;
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
+
             if (toSend != null) {
+              textController.clear();
               _messageBuffer.add(toSend!);
               toSend = null;
             }
@@ -395,12 +397,10 @@ abstract class ChatStoreBase with Store {
 
         final userChatMessage = IRCMessage.fromString(userStateString);
         userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
+        if (auth.isLoggedIn && auth.user.details != null) userChatMessage.tags['user-id'] = auth.user.details!.id;
 
         toSend = userChatMessage;
       }
-
-      // Clear the previous input in the TextField.
-      textController.clear();
     }
   }
 
