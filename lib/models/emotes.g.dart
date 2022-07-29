@@ -116,7 +116,6 @@ Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
           .toList(),
       json['mime'] as String,
       json['status'] as int,
-      (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
       (json['width'] as List<dynamic>).map((e) => e as int).toList(),
       (json['height'] as List<dynamic>).map((e) => e as int).toList(),
       (json['urls'] as List<dynamic>)
