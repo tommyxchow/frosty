@@ -125,6 +125,22 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$notificationAtom =
+      Atom(name: 'ChatStoreBase.notification', context: context);
+
+  @override
+  String? get notification {
+    _$notificationAtom.reportRead();
+    return super.notification;
+  }
+
+  @override
+  set notification(String? value) {
+    _$notificationAtom.reportWrite(value, super.notification, () {
+      super.notification = value;
+    });
+  }
+
   late final _$getAssetsAsyncAction =
       AsyncAction('ChatStoreBase.getAssets', context: context);
 
@@ -206,6 +222,7 @@ mixin _$ChatStore on ChatStoreBase, Store {
   String toString() {
     return '''
 expandChat: ${expandChat},
+notification: ${notification},
 renderMessages: ${renderMessages}
     ''';
   }

@@ -4,7 +4,6 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
-import 'package:frosty/widgets/alert_message.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
@@ -45,12 +44,7 @@ class ChatMessage extends StatelessWidget {
 
       Clipboard.setData(ClipboardData(text: ircMessage.message));
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: AlertMessage(message: 'Message copied to clipboard'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      chatStore.notification = 'Message copied';
     }
 
     return Observer(

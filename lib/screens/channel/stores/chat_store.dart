@@ -112,6 +112,13 @@ abstract class ChatStoreBase with Store {
   @observable
   var expandChat = false;
 
+  /// A notification message to display above the chat.
+  @observable
+  String? notification;
+
+  /// Timer used for dismissing the notification.
+  Timer? _notificationTimer;
+
   ChatStoreBase({
     required this.auth,
     required this.chatDetailsStore,
@@ -126,10 +133,22 @@ abstract class ChatStoreBase with Store {
 
     // Create a reaction that will reconnect to chat when logging in or out.
     // Closing the channel will trigger a reconnect with the new credentials.
-    reactions.add(reaction(
-      (_) => auth.isLoggedIn,
-      (_) => _channel?.sink.close(1001),
-    ));
+    reactions.add(
+      reaction(
+        (_) => auth.isLoggedIn,
+        (_) => _channel?.sink.close(1001),
+      ),
+    );
+
+    reactions.add(
+      reaction(
+        (_) => notification,
+        (_) {
+          if (_notificationTimer != null) _notificationTimer?.cancel();
+          _notificationTimer = Timer(const Duration(seconds: 2), () => notification = null);
+        },
+      ),
+    );
 
     // Create a timer that will add messages from the buffer every 200 milliseconds.
     _messageBufferTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) => addMessages());

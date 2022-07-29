@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class AlertMessage extends StatelessWidget {
   final String message;
   final IconData icon;
+  final Color? color;
 
   const AlertMessage({
     Key? key,
     required this.message,
     final this.icon = Icons.info,
+    this.color,
   }) : super(key: key);
 
   @override
@@ -18,15 +20,15 @@ class AlertMessage extends StatelessWidget {
       children: [
         Icon(
           icon,
-          color: Colors.grey,
+          color: color ?? Colors.grey,
         ),
         const SizedBox(width: 5.0),
         Flexible(
           child: Text(
             message,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.w500,
-              color: Colors.grey,
+              color: color ?? Colors.grey,
             ),
           ),
         ),
