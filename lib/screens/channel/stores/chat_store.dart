@@ -67,29 +67,30 @@ abstract class ChatStoreBase with Store {
   /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
 
-  /// The list of chat messages to add once autoscroll is resumed.
-  /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
-  final _messageBuffer = <IRCMessage>[];
-
-  /// The list of chat messages to render and display.
-  final messages = ObservableList<IRCMessage>();
-
   /// The list of reaction disposer functions that will be used later when disposing.
   final reactions = <ReactionDisposer>[];
 
   /// The periodic timer used for batching chat message re-renders.
   late final Timer _messageBufferTimer;
 
+  /// The list of chat messages to add once autoscroll is resumed.
+  /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
+  final _messageBuffer = <IRCMessage>[];
+
+  /// The list of chat messages to render and display.
+  @readonly
+  var _messages = ObservableList<IRCMessage>();
+
   @computed
   List<IRCMessage> get renderMessages {
     // If autoscroll is disabled, render ALL messages in chat.
     // The second condition is to prevent an out of index error with sublist.
-    if (!_autoScroll || messages.length < _renderMessageLimit) return messages;
+    if (!_autoScroll || _messages.length < _renderMessageLimit) return _messages;
 
     // When autoscroll is enabled, only show the first [_renderMessageLimit] messages.
     // This will improve performance by only rendering a limited amount of messages
     // instead of the entire history at all times.
-    return messages.sublist(messages.length - _renderMessageLimit);
+    return _messages.sublist(_messages.length - _renderMessageLimit);
   }
 
   /// If the chat should automatically scroll/jump to the latest message.
@@ -226,14 +227,14 @@ abstract class ChatStoreBase with Store {
             break;
           case Command.clearChat:
             IRCMessage.clearChat(
-              messages: messages,
+              messages: _messages,
               bufferedMessages: _messageBuffer,
               ircMessage: parsedIRCMessage,
             );
             break;
           case Command.clearMessage:
             IRCMessage.clearMessage(
-              messages: messages,
+              messages: _messages,
               bufferedMessages: _messageBuffer,
               ircMessage: parsedIRCMessage,
             );
@@ -269,7 +270,7 @@ abstract class ChatStoreBase with Store {
         }
 
         // If the message limit is reached, remove the oldest message.
-        if (_autoScroll && messages.length >= _messageLimit) messages.removeRange(0, 500);
+        if (_autoScroll && _messages.length >= _messageLimit) _messages = _messages.sublist(2000).asObservable();
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
@@ -370,7 +371,7 @@ abstract class ChatStoreBase with Store {
   void addMessages() {
     if (!_autoScroll || _messageBuffer.isEmpty) return;
 
-    messages.addAll(_messageBuffer);
+    _messages.addAll(_messageBuffer);
     _messageBuffer.clear();
   }
 
