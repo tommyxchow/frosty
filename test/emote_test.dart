@@ -38,15 +38,7 @@ void main() {
 
       expect(emote.id, '304456832');
       expect(emote.name, 'twitchdevPitchfork');
-      expect(emote.images.url1x, 'https://static-cdn.jtvnw.net/emoticons/v2/304456832/static/light/1.0');
-      expect(emote.images.url2x, 'https://static-cdn.jtvnw.net/emoticons/v2/304456832/static/light/2.0');
-      expect(emote.images.url4x, 'https://static-cdn.jtvnw.net/emoticons/v2/304456832/static/light/3.0');
-      expect(emote.tier, '1000');
       expect(emote.emoteType, 'subscriptions');
-      expect(emote.emoteSetId, '301590448');
-      expect(emote.format, ['static']);
-      expect(emote.scale, ['1.0', '2.0', '3.0']);
-      expect(emote.themeMode, ['light', 'dark']);
     });
   });
 
@@ -66,8 +58,6 @@ void main() {
 
       expect(emote.id, '54fa8f1401e468494b85b537');
       expect(emote.code, ':tf:');
-      expect(emote.imageType, 'png');
-      expect(emote.userId, '5561169bd6b9d206222a8c19');
     });
 
     test('shared emote should parse correctly', () {
@@ -90,11 +80,6 @@ void main() {
 
       expect(emote.id, '5590b223b344e2c42a9e28e3');
       expect(emote.code, 'EZ');
-      expect(emote.imageType, 'png');
-      expect(emote.user?.id, '558f7862b344e2c42a9e2822');
-      expect(emote.user?.name, 'helloboat');
-      expect(emote.user?.displayName, 'helloboat');
-      expect(emote.user?.providerId, '39819556');
     });
 
     test('global emotes should parse correctly', () {
@@ -113,13 +98,10 @@ void main() {
 
       final emoteIds = ['54fa903b01e468494b85b53f', '54fa909b01e468494b85b542', '54fa90ba01e468494b85b543', '54fa90f201e468494b85b545'];
       final emoteCodes = ['DatSauce', 'ForeverAlone', 'GabeN', 'HailHelix'];
-      final userIds = ['5561169bd6b9d206222a8c19', '5561169bd6b9d206222a8c19', '5561169bd6b9d206222a8c19', '5561169bd6b9d206222a8c19'];
 
       emotes.asMap().forEach((index, emote) {
         expect(emote.id, emoteIds[index]);
         expect(emote.code, emoteCodes[index]);
-        expect(emote.imageType, 'png');
-        expect(emote.userId, userIds[index]);
       });
     });
 
@@ -155,27 +137,16 @@ void main() {
       ''';
 
       final decoded = jsonDecode(sampleJson);
-      final result = EmoteBTTVChannel.fromJson(decoded);
 
-      expect(result.id, '5509bd19a607044d1a3dd1bb');
-      expect(result.bots, ['emotestats', 'hnlbot']);
-
-      final channelEmote = result.channelEmotes.first;
+      final channelEmote = EmoteBTTV.fromJson(decoded['channelEmotes'].first);
 
       expect(channelEmote.id, '5509bd3ba607044d1a3dd1bc');
       expect(channelEmote.code, 'sodaTP');
-      expect(channelEmote.imageType, 'png');
-      expect(channelEmote.userId, '5509bd19a607044d1a3dd1bb');
 
-      final sharedEmote = result.sharedEmotes.first;
+      final sharedEmote = EmoteBTTV.fromJson(decoded['sharedEmotes'].first);
 
       expect(sharedEmote.id, '5ed3bde8f54be95e2a838279');
       expect(sharedEmote.code, 'pugPls');
-      expect(sharedEmote.imageType, 'gif');
-      expect(sharedEmote.user?.id, '5c5510a1c0a5642a696190d9');
-      expect(sharedEmote.user?.name, 'wolfabelle');
-      expect(sharedEmote.user?.displayName, 'Wolfabelle');
-      expect(sharedEmote.user?.providerId, '190146087');
     });
   });
 
@@ -213,13 +184,9 @@ void main() {
       final json = jsonDecode(sampleJson);
       final emote = EmoteFFZ.fromJson(json);
 
-      expect(emote.id, 27081);
       expect(emote.height, 30);
       expect(emote.width, 40);
       expect(emote.name, 'ZreknarF');
-      expect(emote.owner.id, 1);
-      expect(emote.owner.name, 'sirstendec');
-      expect(emote.owner.displayName, 'SirStendec');
       expect(emote.urls.url1x, '//cdn.frankerfacez.com/emote/27081/1');
       expect(emote.urls.url2x, '//cdn.frankerfacez.com/emote/27081/2');
       expect(emote.urls.url4x, '//cdn.frankerfacez.com/emote/27081/4');
@@ -278,13 +245,8 @@ void main() {
       final json = jsonDecode(sampleGlobal7TVEmote);
       final emote = Emote7TV.fromJson(json);
 
-      expect(emote.id, '603ca884faf3a00014dff0ab');
       expect(emote.name, 'gachiBASS');
-      expect(emote.owner, null);
-      expect(emote.visibility, 2);
       expect(emote.visibilitySimple, ['GLOBAL']);
-      expect(emote.mime, 'image/gif');
-      expect(emote.status, 3);
       expect(emote.width, [32, 48, 76, 128]);
       expect(emote.height, [32, 48, 76, 128]);
 
@@ -363,26 +325,9 @@ void main() {
       final json = jsonDecode(sampleEmote);
       final emote = Emote7TV.fromJson(json);
 
-      expect(emote.id, '603caea243b9e100141caf4f');
       expect(emote.name, 'TrollDespair');
 
-      expect(emote.owner, isNotNull);
-      expect(emote.owner?.id, '603cae2496832ffa78c758cd');
-      expect(emote.owner?.twitchId, '');
-      expect(emote.owner?.login, 'swyfty_');
-      expect(emote.owner?.displayName, 'swyfty_');
-      expect(emote.owner?.role.id, '000000000000000000000000');
-      expect(emote.owner?.role.name, '');
-      expect(emote.owner?.role.position, 0);
-      expect(emote.owner?.role.color, 0);
-      expect(emote.owner?.role.allowed, 523);
-      expect(emote.owner?.role.denied, 0);
-      expect(emote.owner?.role.defaults, true);
-
-      expect(emote.visibility, 0);
       expect(emote.visibilitySimple, []);
-      expect(emote.mime, 'image/png');
-      expect(emote.status, 3);
       expect(emote.width, [32, 48, 76, 128]);
       expect(emote.height, [32, 48, 76, 128]);
 
