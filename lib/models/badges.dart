@@ -2,7 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'badges.g.dart';
 
-// Twitch Badges
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class BadgeInfoTwitch {
   @JsonKey(name: 'image_url_1x')
@@ -12,19 +11,13 @@ class BadgeInfoTwitch {
   @JsonKey(name: 'image_url_4x')
   final String imageUrl4x;
 
-  final String description;
   final String title;
-  final String clickAction;
-  final String clickUrl;
 
   const BadgeInfoTwitch(
     this.imageUrl1x,
     this.imageUrl2x,
     this.imageUrl4x,
-    this.description,
     this.title,
-    this.clickAction,
-    this.clickUrl,
   );
 
   factory BadgeInfoTwitch.fromJson(Map<String, dynamic> json) => _$BadgeInfoTwitchFromJson(json);
@@ -33,22 +26,14 @@ class BadgeInfoTwitch {
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class BadgeInfoFFZ {
   final int id;
-  final String name;
   final String title;
-  final int slot;
-  final String? replaces;
   final String color;
-  final String image;
   final BadgeUrlsFFZ urls;
 
   const BadgeInfoFFZ(
     this.id,
-    this.name,
     this.title,
-    this.slot,
-    this.replaces,
     this.color,
-    this.image,
     this.urls,
   );
 
@@ -75,15 +60,11 @@ class BadgeUrlsFFZ {
 
 @JsonSerializable(createToJson: false)
 class BadgeInfo7TV {
-  final String id;
-  final String name;
   final String tooltip;
   final List<List<String>> urls;
   final List<String> users;
 
   BadgeInfo7TV(
-    this.id,
-    this.name,
     this.tooltip,
     this.urls,
     this.users,
@@ -94,16 +75,10 @@ class BadgeInfo7TV {
 
 @JsonSerializable(createToJson: false)
 class BadgeInfoBTTV {
-  final String id;
-  final String name;
-  final String displayName;
   final String providerId;
   final BadgeDetailsBTTV badge;
 
   BadgeInfoBTTV(
-    this.id,
-    this.name,
-    this.displayName,
     this.providerId,
     this.badge,
   );
