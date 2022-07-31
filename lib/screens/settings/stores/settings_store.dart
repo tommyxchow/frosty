@@ -187,6 +187,7 @@ abstract class _SettingsStoreBase with Store {
     autocomplete = defaultAutocomplete;
     showBottomBar = defaultShowBottomBar;
     landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+    landscapeCutout = defaultLandscapeCutout;
     chatWidth = defaultChatWidth;
     fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
     showZeroWidth = defaultShowZeroWidth;
