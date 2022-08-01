@@ -285,7 +285,10 @@ abstract class VideoStoreBase with Store {
 
   @action
   void dispose() {
-    controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
+    // Not ideal, but seems like the only way of disposing of the video properly.
+    // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
+    controller?.reload();
+
     _disposeOverlayReaction();
     floating.dispose();
     sleepTimer?.cancel();
