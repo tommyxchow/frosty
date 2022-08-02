@@ -32,8 +32,8 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
         run: |
-          echo | ls
-          echo "$UPLOAD_KEYSTORE" | base64 --decode > key.properties
+          echo "$UPLOAD_KEYSTORE" | base64 --decode > android/key.properties
+          echo | ls android
           flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
           
       - name: Install bundler
