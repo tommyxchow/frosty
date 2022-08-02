@@ -1,0 +1,48 @@
+name: Release
+
+# For now, have the option to run manually just to test things.
+on: [workflow_dispatch]
+
+jobs:
+  deploy:
+    name: Release/deploy the app for iOS and Android
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        
+      - name: Futter pre-checks and install packages
+        run: |
+          flutter doctor -v
+          flutter pub get
+          flutter analyze
+      
+      - name: Build for iOS and Android
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          SECRET: ${{ secrets.SECRET }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: |
+          flutter build ipa --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+          flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+          
+      - name: Install bundler
+        run: gem install bundler
+        
+      - name: Install fastlane Android dependencies with bundler
+        run: |
+          cd android
+          bundle install
+      
+      - name: Install fastlane iOS dependencies with bundler
+        run: |
+          cd ios
+          bundle install
+          
+      - name: Run fastlane for Android
+        env:
+          PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
+        run: fastlane deploy
+          
