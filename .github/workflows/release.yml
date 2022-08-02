@@ -12,6 +12,10 @@ jobs:
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
         
       - name: Futter pre-checks and install packages
         run: |
