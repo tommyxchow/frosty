@@ -1,0 +1,8 @@
+app_identifier("com.tommychow.frosty") # The bundle identifier of your app
+apple_id("clamfucius@gmail.com") # Your Apple email address
+
+itc_team_id("123391120") # App Store Connect Team ID
+team_id("7W46KBTB6P") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
