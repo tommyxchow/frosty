@@ -26,9 +26,10 @@ jobs:
       - name: Setup Match
         env:
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
         run: |
           cd ios
-          bundle exec fastlane match appstore --git_basic_authorization "$MATCH_GIT_BASIC_AUTHORIZATION"
+          bundle exec fastlane match appstore
           
       - name: Create key.properties
         env:
