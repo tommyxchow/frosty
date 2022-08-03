@@ -6,7 +6,7 @@ on: [workflow_dispatch]
 jobs:
   deploy:
     name: Release/deploy the app for iOS and Android
-    runs-on: macos-latest
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
       
