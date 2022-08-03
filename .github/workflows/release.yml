@@ -10,6 +10,37 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      - name: Install bundler
+        run: gem install bundler
+        
+      - name: Install fastlane Android dependencies with bundler
+        run: |
+          cd android
+          bundle install
+          
+      - name: Install fastlane iOS dependencies with bundler
+        run: |
+          cd ios
+          bundle install
+        
+      - name: Setup Match
+        env:
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+        run: |
+          cd ios
+          bundle exec fastlane match appstore --git_basic_authorization "$MATCH_GIT_BASIC_AUTHORIZATION"
+          
+      - name: Create key.properties
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_FILE_PATH: android/key.properties
+        run: |
+          echo "storePassword=$STORE_PASSWORD" >> "$KEY_FILE_PATH"
+          echo "keyPassword=$KEY_PASSWORD" >> "$KEY_FILE_PATH"
+          echo "keyAlias=upload" >> "$KEY_FILE_PATH"
+          echo "storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks" >> "$KEY_FILE_PATH"
+          
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -27,40 +58,11 @@ jobs:
           flutter doctor -v
           flutter pub get
           flutter analyze
-          
-      - name: Create key.properties
-        env:
-          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          KEY_FILE_PATH: android/key.properties
-        run: |
-          echo "storePassword=$STORE_PASSWORD" >> "$KEY_FILE_PATH"
-          echo "keyPassword=$KEY_PASSWORD" >> "$KEY_FILE_PATH"
-          echo "keyAlias=upload" >> "$KEY_FILE_PATH"
-          echo "storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks" >> "$KEY_FILE_PATH"
       
       - name: Decode and create upload-keystore.jks
         env:
           UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
         run: echo "$UPLOAD_KEYSTORE" | base64 --decode > "$GITHUB_WORKSPACE/android/upload-keystore.jks"
-        
-      - name: Install bundler
-        run: gem install bundler
-        
-      - name: Install fastlane Android dependencies with bundler
-        run: |
-          cd android
-          bundle install
-          
-      - name: Install fastlane iOS dependencies with bundler
-        run: |
-          cd ios
-          bundle install
-        
-      - name: Setup Match
-        run: |
-          cd ios
-          bundle exec fastlane match appstore
       
       - name: Build for iOS and Android
         env:
