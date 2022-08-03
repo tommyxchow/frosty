@@ -12,6 +12,8 @@ jobs:
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
+        with:
+          cache: true
       
       - name: Setup Java 11
         uses: actions/setup-java@v2
@@ -34,12 +36,12 @@ jobs:
           echo "storePassword=$STORE_PASSWORD" >> "$KEY_FILE_PATH"
           echo "keyPassword=$KEY_PASSWORD" >> "$KEY_FILE_PATH"
           echo "keyAlias=upload" >> "$KEY_FILE_PATH"
-          echo "storeFile=upload-keystore.jks" >> "$KEY_FILE_PATH"
+          echo "storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks" >> "$KEY_FILE_PATH"
       
       - name: Decode and create upload-keystore.jks
         env:
           UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
-        run: echo "$UPLOAD_KEYSTORE" | base64 --decode > android/upload-keystore.jks
+        run: echo "$UPLOAD_KEYSTORE" | base64 --decode > "$GITHUB_WORKSPACE/android/upload-keystore.jks"
 
           
       
@@ -50,7 +52,7 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
           echo | ls android
-          flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+          flutter build appbundle --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
           
       - name: Install bundler
         run: gem install bundler
