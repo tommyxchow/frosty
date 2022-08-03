@@ -17,17 +17,6 @@ jobs:
         run: |
           cd ios
           bundle install
-        
-      - name: Setup Match
-        env:
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
-          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
-          APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
-        run: |
-          cd ios
-          bundle exec fastlane config
           
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -41,7 +30,14 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: flutter build ios --release --no-codesign --config-only --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
         
-      - name: Build, upload, and release
+      - name: Setup Match
+        env:
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+          APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
         run: |
           cd ios
+          bundle exec fastlane config
           bundle exec fastlane release
