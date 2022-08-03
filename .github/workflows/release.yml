@@ -34,9 +34,14 @@ jobs:
         with:
           cache: true
       
-      - name: Build for iOS and Android
+      - name: Build for iOS
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           SECRET: ${{ secrets.SECRET }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: flutter build ios --release --no-codesign --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
+        
+      - name: Upload and release
+        run: |
+          cd ios
+          bundle exec fastlane release
