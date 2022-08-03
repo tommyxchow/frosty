@@ -39,5 +39,4 @@ jobs:
           APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
         run: |
           cd ios
-          bundle exec fastlane config
           bundle exec fastlane release
