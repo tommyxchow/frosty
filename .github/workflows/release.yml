@@ -36,14 +36,11 @@ jobs:
         run: |
           cd android
           bundle install
-      
-      - name: Install fastlane iOS dependencies with bundler
-        run: |
-          cd ios
-          bundle install
           
       - name: Run fastlane for Android
         env:
           PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
-        run: fastlane deploy
+        run: |
+          cd android
+          fastlane deploy
           
