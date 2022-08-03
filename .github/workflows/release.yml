@@ -42,8 +42,11 @@ jobs:
         env:
           UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
         run: echo "$UPLOAD_KEYSTORE" | base64 --decode > "$GITHUB_WORKSPACE/android/upload-keystore.jks"
-
-          
+        
+      - name: Setup Match
+        run: |
+          cd ios
+          bundle exec fastlane match appstore
       
       - name: Build for iOS and Android
         env:
@@ -51,7 +54,7 @@ jobs:
           SECRET: ${{ secrets.SECRET }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
-          echo | ls android
+          flutter build ipa --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
           flutter build appbundle --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
           
       - name: Install bundler
@@ -62,10 +65,15 @@ jobs:
           cd android
           bundle install
           
-      - name: Run fastlane for Android
+      - name: Install fastlane iOS dependencies with bundler
+        run: |
+          cd ios
+          bundle install
+          
+      - name: Run fastlane to deploy the Android build
         env:
           PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
         run: |
           cd android
-          fastlane deploy
+          bundle exec fastlane deploy
           
