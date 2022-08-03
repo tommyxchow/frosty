@@ -24,15 +24,31 @@ jobs:
           flutter doctor -v
           flutter pub get
           flutter analyze
+          
+      - name: Create key.properties
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_FILE_PATH: android/key.properties
+        run: |
+          echo "storePassword=$STORE_PASSWORD" >> "$KEY_FILE_PATH"
+          echo "keyPassword=$KEY_PASSWORD" >> "$KEY_FILE_PATH"
+          echo "keyAlias=upload" >> "$KEY_FILE_PATH"
+          echo "storeFile=upload-keystore.jks" >> "$KEY_FILE_PATH"
+      
+      - name: Decode and create upload-keystore.jks
+        env:
+          UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
+        run: echo "$UPLOAD_KEYSTORE" | base64 --decode > android/upload-keystore.jks
+
+          
       
       - name: Build for iOS and Android
         env:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           SECRET: ${{ secrets.SECRET }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
         run: |
-          echo "$UPLOAD_KEYSTORE" | base64 --decode > android/key.properties
           echo | ls android
           flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
           
