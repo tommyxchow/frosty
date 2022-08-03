@@ -16,12 +16,6 @@
 default_platform(:ios)
 
 platform :ios do
-  desc "Push a new release build to the App Store"
-  lane :release do
-    build_app(workspace: "Runner.xcworkspace", scheme: "Runner")
-    upload_to_app_store
-  end
-
   desc "Config certificate information"
   lane :config do
     app_store_connect_api_key(
@@ -35,14 +29,14 @@ platform :ios do
     match(type: "appstore")
   end
 
-  desc "Upload a new build to TestFlight"
-  lane :testflight do
-    # gym, AKA the build action
-    gym(
-      skip_build_archive: true,
-      archive_path: "../build/ios/archive/Runner.xcarchive",
+  desc "Push a new release build to the App Store"
+  lane :release do
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      output_directory: "../build/ios/archive"
     )
-    
+
     upload_to_testflight(
       skip_submission: true,
     )
