@@ -74,13 +74,5 @@ jobs:
           SECRET: ${{ secrets.SECRET }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         run: |
-          flutter build ipa --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
-          flutter build appbundle --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
-          
-      - name: Run fastlane to deploy the Android build
-        env:
-          PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
-        run: |
-          cd android
-          bundle exec fastlane deploy
+          flutter build ipa
           
