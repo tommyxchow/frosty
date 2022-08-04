@@ -26,12 +26,9 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           cache: true
-          
-      - name: Setup Match
-        run: cd ios && bundle exec fastlane config
 
       - name: Config the iOS build
-        run: flutter build ipa --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
+        run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
 
       - name: Release with fastlane
         run: cd ios && bundle exec fastlane release
