@@ -19,7 +19,7 @@ env:
 jobs:
   android:
     name: Build and release Frosty on Android
-    runs-on: macos-latest
+    runs-on: windows-latest
     env:
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
@@ -28,7 +28,13 @@ jobs:
       PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Frosty repo
+        uses: actions/checkout@v3
+      
+      - name: Setup ruby and bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
       
       # Setup Java so that we can build the appbundle.
       - name: Setup Java 11
@@ -40,14 +46,6 @@ jobs:
       # Setup Flutter to install packages and build.
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
-      
-      # Install bundler to use fastlane.
-      - name: Install bundler
-        run: gem install bundler
-      
-      # Install fastlane and its dependencies.
-      - name: Install fastlane Android dependencies with bundler
-        run: cd android && bundle install
       
       # Decode and create the upload-keystore.jks file, used for signing the app.
       - name: Decode and create upload-keystore.jks
@@ -79,7 +77,8 @@ jobs:
 #       MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
 #       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
 #     steps:
-#       - uses: actions/checkout@v3
+#       - name: Checkout Frosty repo
+#         uses: actions/checkout@v3
 
 #       # Setup Flutter to install packages and build.        
 #       - name: Setup Flutter
