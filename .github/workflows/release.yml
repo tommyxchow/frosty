@@ -21,7 +21,7 @@ env:
 jobs:
   android:
     name: Build and release Frosty on Android
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
