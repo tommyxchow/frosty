@@ -19,7 +19,7 @@ env:
 jobs:
   android:
     name: Build and release Frosty on Android
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     env:
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
@@ -29,10 +29,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
       
       # Setup Java so that we can build the appbundle.
       - name: Setup Java 11
