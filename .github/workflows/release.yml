@@ -1,16 +1,79 @@
-name: Release Frosty on iOS
+name: Build and release Frosty
 
-# For now, have the option to run manually just to test things.
-on: [workflow_dispatch]
+on:
+  # Enable the option to manually run the workflow in the "Actions" tab.
+  workflow_dispatch:
+  # Only run if pushing to the main branch with a version tag.
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+
+# Setup environment variables for use in all jobs.
+env:
+  CLIENT_ID: ${{ secrets.CLIENT_ID }}
+  SECRET: ${{ secrets.SECRET }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
 jobs:
-  deploy:
-    name: Release/deploy the app for iOS and Android
+  android:
+    name: Build and release Frosty on Android
+    runs-on: ubuntu-latest
+    env:
+      UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEY_FILE_PATH: android/key.properties
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Setup Java so that we can build the appbundle.
+      - name: Setup Java 11
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      
+      # Setup Flutter to install packages and build.
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+      
+#       # Install bundler to use fastlane.
+#       - name: Install bundler
+#         run: gem install bundler
+      
+      # Install fastlane and its dependencies.
+      - name: Install fastlane Android dependencies with bundler
+        run: cd android && bundle install
+      
+      # Decode and create the upload-keystore.jks file, used for signing the app.
+      - name: Decode and create upload-keystore.jks
+        run: echo "$UPLOAD_KEYSTORE" | base64 --decode > "$GITHUB_WORKSPACE/android/upload-keystore.jks"
+      
+      # Create the key.properties file, used for signing the app.
+      - name: Create key.properties
+        run: |
+          echo "storePassword=$STORE_PASSWORD" >> "$KEY_FILE_PATH"
+          echo "keyPassword=$KEY_PASSWORD" >> "$KEY_FILE_PATH"
+          echo "keyAlias=upload" >> "$KEY_FILE_PATH"
+          echo "storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks" >> "$KEY_FILE_PATH"
+      
+      # Built the appbundle and pass the environment variables.
+      - name: Build for Android
+        run: flutter build appbundle --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
+      
+      # Deploy to the play store with fastlane.
+      - name: Deploy with fastlane
+        run: cd android && bundle exec fastlane deploy
+
+  ios:
+    name: Build and release Frosty on iOS
     runs-on: macos-latest
     env:
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      SECRET: ${{ secrets.SECRET }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
       APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
       APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
@@ -19,16 +82,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install fastlane iOS dependencies with bundler
-        run: cd ios && bundle install
-
+      # Setup Flutter to install packages and build.        
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           cache: true
 
+      # Install fastlane and its dependencies.
+      - name: Install fastlane iOS dependencies with bundler
+        run: cd ios && bundle install
+
+      # Setup the iOS project with environment variables without signing (building and signing will happen in fastlane)
       - name: Config the iOS build
         run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
 
+      # Build the app and deploy to app store with fastlane.
       - name: Sign and release with fastlane
         run: cd ios && bundle exec fastlane release
