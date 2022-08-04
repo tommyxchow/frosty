@@ -52,7 +52,6 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           cache: true
-          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       
       # Decode and create the upload-keystore.jks file, used for signing the app.
       - name: Decode and create upload-keystore.jks
