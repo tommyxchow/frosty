@@ -15,10 +15,22 @@
 
 default_platform(:ios)
 
-platform :ios do  
+platform :ios do
+  desc "Config for iOS"
+  lane :config do
+    app_store_connect_api_key(
+      key_id: ENV["APP_STORE_KEY_ID"],
+      issuer_id: ENV["APP_STORE_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CREDENTIALS"],
+      is_key_content_base64: true,
+    )
+  
+    match(type: "appstore")
+  end
+
   desc "Push a new release build to the App Store"
   lane :release do
-    setup_ci()
+    setup_ci
 
     app_store_connect_api_key(
       key_id: ENV["APP_STORE_KEY_ID"],
@@ -27,7 +39,6 @@ platform :ios do
       is_key_content_base64: true,
     )
   
-    # Signing and certificate information
     match(type: "appstore")
 
     build_app(
