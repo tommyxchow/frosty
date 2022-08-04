@@ -42,9 +42,9 @@ jobs:
         with:
           cache: true
       
-#       # Install bundler to use fastlane.
-#       - name: Install bundler
-#         run: gem install bundler
+      # Install bundler to use fastlane.
+      - name: Install bundler
+        run: gem install bundler
       
       # Install fastlane and its dependencies.
       - name: Install fastlane Android dependencies with bundler
