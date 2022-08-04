@@ -1,4 +1,4 @@
-name: Release
+name: Release Frosty on iOS
 
 # For now, have the option to run manually just to test things.
 on: [workflow_dispatch]
@@ -7,36 +7,31 @@ jobs:
   deploy:
     name: Release/deploy the app for iOS and Android
     runs-on: macos-latest
+    env:
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      SECRET: ${{ secrets.SECRET }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+      APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+      APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Install bundler
-        run: gem install bundler
-          
+
       - name: Install fastlane iOS dependencies with bundler
-        run: |
-          cd ios
-          bundle install
-          
+        run: cd ios && bundle install
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           cache: true
-      
-      - name: Config the iOS build
-        env:
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          SECRET: ${{ secrets.SECRET }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: flutter build ipa --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
-        
+          
       - name: Setup Match
-        env:
-          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-          APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
-          APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
-          APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
-        run: |
-          cd ios
-          bundle exec fastlane release
+        run: cd ios && fastlane match
+
+      - name: Config the iOS build
+        run: flutter build ipa --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
+
+      - name: Release with fastlane
+        run: cd ios && bundle exec fastlane release
