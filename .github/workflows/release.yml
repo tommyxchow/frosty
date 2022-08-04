@@ -47,9 +47,12 @@ jobs:
           distribution: 'zulu'
           java-version: '11'
       
-      # Setup Flutter to install packages and build.
+      # Setup and cache Flutter to install packages and build.
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
       
       # Decode and create the upload-keystore.jks file, used for signing the app.
       - name: Decode and create upload-keystore.jks
@@ -91,9 +94,12 @@ jobs:
           ruby-version: '3.1'
           bundler-cache: true
 
-      # Setup Flutter to install packages and build.        
+      # Setup and cache Flutter to install packages and build.        
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
+        with:
+          cache: true
+          cache-key: 'flutter-:os:-:channel:-:version:-:arch:-:hash:'
 
       # Setup the iOS project with environment variables without signing (building and signing will happen in fastlane).
       - name: Config the iOS build
