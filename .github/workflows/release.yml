@@ -30,6 +30,8 @@ jobs:
       - uses: actions/checkout@v3
       
       - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2
       
       # Setup Java so that we can build the appbundle.
       - name: Setup Java 11
@@ -72,32 +74,32 @@ jobs:
       - name: Deploy with fastlane
         run: cd android && bundle exec fastlane deploy
 
-  ios:
-    name: Build and release Frosty on iOS
-    runs-on: macos-latest
-    env:
-      APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
-      APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
-      APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
-      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-    steps:
-      - uses: actions/checkout@v3
+#   ios:
+#     name: Build and release Frosty on iOS
+#     runs-on: macos-latest
+#     env:
+#       APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+#       APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+#       APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
+#       MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+#       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+#     steps:
+#       - uses: actions/checkout@v3
 
-      # Setup Flutter to install packages and build.        
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          cache: true
+#       # Setup Flutter to install packages and build.        
+#       - name: Setup Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           cache: true
 
-      # Install fastlane and its dependencies.
-      - name: Install fastlane iOS dependencies with bundler
-        run: cd ios && bundle install
+#       # Install fastlane and its dependencies.
+#       - name: Install fastlane iOS dependencies with bundler
+#         run: cd ios && bundle install
 
-      # Setup the iOS project with environment variables without signing (building and signing will happen in fastlane)
-      - name: Config the iOS build
-        run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
+#       # Setup the iOS project with environment variables without signing (building and signing will happen in fastlane)
+#       - name: Config the iOS build
+#         run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
 
-      # Build the app and deploy to app store with fastlane.
-      - name: Sign and release with fastlane
-        run: cd ios && bundle exec fastlane release
+#       # Build the app and deploy to app store with fastlane.
+#       - name: Sign and release with fastlane
+#         run: cd ios && bundle exec fastlane release
