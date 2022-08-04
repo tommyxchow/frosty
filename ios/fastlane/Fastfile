@@ -18,25 +18,30 @@ default_platform(:ios)
 platform :ios do
   desc 'Push a new release build to the App Store'
   lane :release do
+    # Setup for CI. Uses a keychain to prevent the CI from hanging due to password prompts.
     setup_ci
 
+    # Obtain credentials from App Store Connect API. Will be automatically used for the rest of the lane.
     app_store_connect_api_key(
       key_id: ENV['APP_STORE_KEY_ID'],
       issuer_id: ENV['APP_STORE_ISSUER_ID'],
       key_content: ENV['APP_STORE_CREDENTIALS'],
       is_key_content_base64: true,
     )
-  
-    match(type: 'appstore')
 
+    # Use match to manage code signing.
+    match
+
+    # Build the app for release.
     build_app(
       workspace: 'Runner.xcworkspace',
       scheme: 'Runner',
       output_directory: '../build/ios/archive'
     )
 
-    upload_to_testflight(
-      skip_submission: true,
+    # Upload the app to the App Store.
+    upload_to_app_store(
+      submit_for_review: true,
     )
   end
 end
