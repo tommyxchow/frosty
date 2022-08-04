@@ -13,7 +13,7 @@ on:
 # Setup environment variables for use in all jobs.
 env:
   # Gemfile path used for caching dependencies.
-  BUNDLE_GEMFILE: ${{ github.workspace }}/ios/Gemfile
+  BUNDLE_GEMFILE: ${{ github.workspace }}/android/Gemfile
   CLIENT_ID: ${{ secrets.CLIENT_ID }}
   SECRET: ${{ secrets.SECRET }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -21,7 +21,7 @@ env:
 jobs:
   android:
     name: Build and release Frosty on Android
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
