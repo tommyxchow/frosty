@@ -25,13 +25,14 @@ jobs:
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       KEY_FILE_PATH: android/key.properties
+      PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
 
     steps:
       - uses: actions/checkout@v3
       
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1.2
+          ruby-version: '3.1'
       
       # Setup Java so that we can build the appbundle.
       - name: Setup Java 11
@@ -43,8 +44,6 @@ jobs:
       # Setup Flutter to install packages and build.
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
-        with:
-          cache: true
       
       # Install bundler to use fastlane.
       - name: Install bundler
@@ -89,8 +88,6 @@ jobs:
 #       # Setup Flutter to install packages and build.        
 #       - name: Setup Flutter
 #         uses: subosito/flutter-action@v2
-#         with:
-#           cache: true
 
 #       # Install fastlane and its dependencies.
 #       - name: Install fastlane iOS dependencies with bundler
