@@ -30,10 +30,10 @@ platform :ios do
     match(type: 'appstore')
 
     sh(
-      'flutter', 'build', 'ios', '--no-codesign','--config-only',
-      '--dart-define', 'CLIENT_ID=' + ENV[CLIENT_ID],
-      '--dart-define', 'SECRET=' + ENV[SECRET],
-      '--dart-define', 'SENTRY_DSN=' + ENV[SENTRY_DSN]
+      'flutter', 'build', 'ios', '--no-codesign', '--config-only',
+      '--dart-define', 'CLIENT_ID="$CLIENT_ID"',
+      '--dart-define', 'SECRET="$SECRET"',
+      '--dart-define', 'SENTRY_DSN="$SENTRY_DSN"',
     )
 
     build_app(
