@@ -11,11 +11,11 @@ jobs:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SECRET: ${{ secrets.SECRET }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
       APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
       APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
+      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
     steps:
       - uses: actions/checkout@v3
 
@@ -27,5 +27,8 @@ jobs:
         with:
           cache: true
 
-      - name: Build and release with fastlane
+      - name: Config the iOS build
+        run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID="$CLIENT_ID" --dart-define SECRET="$SECRET" --dart-define SENTRY_DSN="$SENTRY_DSN"
+
+      - name: Sign and release with fastlane
         run: cd ios && bundle exec fastlane release
