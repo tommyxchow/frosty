@@ -12,6 +12,8 @@ on:
 
 # Setup environment variables for use in all jobs.
 env:
+  # Gemfile path used for caching dependencies.
+  BUNDLE_GEMFILE: ${{ github.workspace }}/ios/Gemfile
   CLIENT_ID: ${{ secrets.CLIENT_ID }}
   SECRET: ${{ secrets.SECRET }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
