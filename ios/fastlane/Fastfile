@@ -18,6 +18,8 @@ default_platform(:ios)
 platform :ios do  
   desc "Push a new release build to the App Store"
   lane :release do
+    setup_ci()
+
     app_store_connect_api_key(
       key_id: ENV["APP_STORE_KEY_ID"],
       issuer_id: ENV["APP_STORE_ISSUER_ID"],
