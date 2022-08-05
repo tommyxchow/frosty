@@ -17,7 +17,7 @@
   <a href="https://github.com/tommyxchow/frosty/actions/workflows/ci.yml">
     <img
       alt="CI"
-      src="https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg"
+      src="https://github.com/tommyxchow/frosty/actions/workflows/ci.yml/badge.svg"
     />
   </a>
   <a href="https://github.com/tommyxchow/frosty/issues">
