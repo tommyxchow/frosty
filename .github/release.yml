@@ -1,0 +1,18 @@
+# Used for auto-generating release notes.
+changelog:
+  exclude:
+    labels:
+      - misc
+  categories:
+    - title: New Features
+      labels:
+        - new feature
+    - title: Improvements
+      labels:
+        - improvement
+    - title: Bug Fixes
+      labels:
+        - bug fix
+    - title: Other Changes
+      labels:
+        - "*"

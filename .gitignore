@@ -57,6 +57,10 @@ random/
 
 # snapshot generated screenshots
 **/fastlane/screenshots
+**/fastlane/metadata/android/en-US/images
 
 # scan temporary files
 **/fastlane/test_output
+
+# potentially sensitive review information
+**/fastlane/metadata/review_information

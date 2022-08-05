@@ -18,10 +18,8 @@ default_platform(:android)
 platform :android do
   desc "Deploy a new version to the Google Play"
   lane :deploy do
+    # Upload to the play store ussing the provided credentials and AAB from flutter build.
     upload_to_play_store(
-      validate_only: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true,
       json_key_data: Base64.decode64(ENV["PLAY_STORE_CREDENTIALS"]),
       aab: "../build/app/outputs/bundle/release/app-release.aab"
     )

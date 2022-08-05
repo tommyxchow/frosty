@@ -1,0 +1,2 @@
+Bug Fixes
+• Fixed picture-in-picture not dismissing when going back

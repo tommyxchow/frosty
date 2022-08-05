@@ -1,0 +1,103 @@
+# Builds and releases frosty on the Google Play Store and Apple App Store through fastlane.
+name: Build and release Frosty
+on:
+  # Enable the option to manually run the workflow in the Actions tab.
+  workflow_dispatch:
+  # Only run if a semver tag was pushed.
+  push:
+    tags:
+      - v*.*.*
+# Setup environment variables for use in all jobs.
+env:
+  # Gemfile path used for caching dependencies.
+  BUNDLE_GEMFILE: ${{ github.workspace }}/android/Gemfile
+  CLIENT_ID: ${{ secrets.CLIENT_ID }}
+  SECRET: ${{ secrets.SECRET }}
+  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+jobs:
+  android:
+    name: Build and release Frosty on Android
+    runs-on: ubuntu-latest
+    env:
+      UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEY_FILE_PATH: android/key.properties
+      PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
+
+    steps:
+      - name: Checkout Frosty repo
+        uses: actions/checkout@v3
+      
+      # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
+      - name: Set up Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1
+          bundler-cache: true
+      
+      # Setup Java so that we can build the appbundle.
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 11
+      
+      # Setup and cache Flutter to install packages and build.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+      
+      # Decode and create the upload-keystore.jks file, used for signing the app.
+      - name: Decode and create upload-keystore.jks
+        run: echo $UPLOAD_KEYSTORE | base64 --decode > $GITHUB_WORKSPACE/android/upload-keystore.jks
+      
+      # Create the key.properties file, used for signing the app.
+      - name: Create key.properties
+        run: |
+          echo storePassword=$STORE_PASSWORD >> $KEY_FILE_PATH
+          echo keyPassword=$KEY_PASSWORD >> $KEY_FILE_PATH
+          echo keyAlias=upload >> $KEY_FILE_PATH
+          echo storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks >> $KEY_FILE_PATH
+      
+      # Build the Android app bundle (AAB) and pass the environment variables.
+      - name: Build the Android AAB
+        run: flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+      
+      # Deploy to the play store with fastlane.
+      - name: Deploy with fastlane
+        run: cd android && bundle exec fastlane deploy
+  ios:
+    name: Build and release Frosty on iOS
+    runs-on: macos-latest
+    env:
+      APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+      APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+      APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
+      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+    steps:
+      - name: Checkout Frosty repo
+        uses: actions/checkout@v3
+        
+      # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
+      - name: Set up Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1
+          bundler-cache: true
+
+      # Setup and cache Flutter to install packages and build.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+
+      # Setup the iOS project with environment variables without signing (building and signing will happen in fastlane).
+      - name: Config the iOS build
+        run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+
+      # Sign, build the app, and deploy to app store with fastlane.
+      - name: Sign, build, and release with fastlane
+        run: cd ios && bundle exec fastlane release

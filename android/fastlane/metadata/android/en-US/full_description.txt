@@ -1,0 +1,19 @@
+Frosty is a free and open-source mobile app for Twitch built from the ground up. It supports emotes and badges from BetterTTV (BTTV), FrankerFaceZ (FFZ), and 7TV — popular third-party extensions for Twitch used by millions.
+
+Features:
+• Support for BetterTTV, FrankerFaceZ, and 7TV emotes and badges
+• Browse followed streams, top streams, and top categories
+• Autocomplete for emotes and user mentions
+• Light, dark, and black (OLED) themes
+• Search for channels and categories
+• See and filter chatters in a channel
+• Local chat user message history
+• Theater and fullscreen mode
+• Watch live streams with chat
+• Picture-in-picture mode
+• Block and report users
+• Emote menu
+• Sleep timer
+• And more...
+
+For more details, check out the full source on GitHub: https://github.com/tommyxchow/frosty
