@@ -61,8 +61,8 @@ jobs:
           echo keyAlias=upload >> $KEY_FILE_PATH
           echo storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks >> $KEY_FILE_PATH
       
-      # Build the appbundle and pass the environment variables.
-      - name: Build for Android
+      # Build the Android app bundle (AAB) and pass the environment variables.
+      - name: Build the Android AAB
         run: flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
       
       # Deploy to the play store with fastlane.
@@ -98,6 +98,6 @@ jobs:
       - name: Config the iOS build
         run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
 
-      # Build the app and deploy to app store with fastlane.
-      - name: Sign and release with fastlane
+      # Sign, build the app, and deploy to app store with fastlane.
+      - name: Sign, build, and release with fastlane
         run: cd ios && bundle exec fastlane release
