@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
@@ -99,12 +100,30 @@ class Chat extends StatelessWidget {
                           color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                           borderRadius: BorderRadius.circular(30.0),
                         ),
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(10.0),
                         margin: const EdgeInsets.all(10.0),
-                        child: AlertMessage(
-                          message: chatStore.notification!,
-                          color: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: AlertMessage(
+                                message: chatStore.notification!,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Button(
+                              onPressed: () async {
+                                // Paste clipboard text into the text controller.
+                                final data = await Clipboard.getData(Clipboard.kTextPlain);
+
+                                if (data != null) chatStore.textController.text = data.text!;
+
+                                chatStore.notification = null;
+                              },
+                              fill: false,
+                              child: const Text('Paste'),
+                            ),
+                          ],
                         ),
                       ),
                     )
