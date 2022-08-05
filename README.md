@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tommyxchow/frosty/actions/workflows/main.yml">
+  <a href="https://github.com/tommyxchow/frosty/actions/workflows/ci.yml">
     <img
       alt="CI"
       src="https://github.com/tommyxchow/frosty/actions/workflows/main.yml/badge.svg"
@@ -121,6 +121,14 @@
   />
 </p>
 
+## Motivation
+
+A major problem with the official Twitch app for many users is that emotes and badges from services such as [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb), and [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh) are not officially supported. Twitch is unaffiliated with these services, hence why they haven't been integrated officially.
+
+As a result, the millions of users of these services have an unideal viewing experience on the official Twitch app. In the stream chat, only text is positioned where emotes should be (imagine only being able to see :emoji_code: rather than the emojis themselves).
+
+Frosty aims to bring these emotes and other general quality of life features to **both iOS and Android**.
+
 ## Features
 
 - Support for BetterTTV, FrankerFaceZ, and 7TV emotes and badges
@@ -137,14 +145,6 @@
 - Emote menu
 - Sleep timer
 - And more...
-
-## Motivation
-
-A major problem with the official Twitch app for many users is that emotes and badges from services such as [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb), and [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh) are not officially supported. Twitch is unaffiliated with these services, hence why they haven't been integrated officially.
-
-As a result, the millions of users of these services have an unideal viewing experience on the official Twitch app. In the stream chat, only text is positioned where emotes should be (imagine only being able to see :emoji_code: rather than the emojis themselves).
-
-Frosty aims to bring these emotes and other general quality of life features to **both iOS and Android**.
 
 ## Development Setup
 
@@ -164,27 +164,27 @@ Frosty aims to bring these emotes and other general quality of life features to 
 
 > **Warning**
 > 
-> I built this project while learning Flutter, so some of the code may not be optimal. I'm working on refactoring, documenting, and cleaning up various parts as much as I can.
+> I built Frosty while learning Flutter, so some of the code may not be optimal. I'm working on refactoring, documenting, and cleaning up various parts as much as I can.
 
-## FAQ
+## Frequently Asked Questions (FAQ)
 
 ### Can I change the quality of the stream?
 
-On Android, you can change the stream quality by turning off the custom stream overlay in the settings and tapping the gear icon on the bottom right.
+Unfortunately, quality options aren't available through the native player and rely on an "auto" setting. There is no official API for getting the live stream URLs, so specific quality options are not possible currently.
 
-On iOS, sadly quality options aren't available through the native player and rely on an "auto" setting. There is no official API for getting the live stream URLs so specific quality options are not possible at this time.
+### Why do some animations and scrolling appear to be janky?
 
-### Why do certain animations and scrolling appear to be janky?
+Due to the side effects of the Flutter framework, there may be some stutter and jank on the first installation and launch.
 
-Due to the Flutter framework, there may be some stutter and jank on the first installation and launch. After using and moving around the app for a bit the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a relatively fast chat for a couple of minutes should resolve it.
+After using and moving around the app for a bit, the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a fast chat for a few minutes should resolve it.
 
 ### Why is there a delay between the stream and chat?
 
-On Android, the delay should be minimal. Try refreshing the player if you have a delay.
+On Android, there should be no delay. Try refreshing the player if there is a delay.
 
-On iOS, there seems to be delays up to 15 seconds due to the native player so unfortunately it's out of my control. As a workaround, Frosty has a message delay option that lets you set the delay (in seconds) before each message is rendered.
+On iOS, there is a delay of around 15 seconds due to the native player, so unfortunately it's out of my control. As a workaround, Frosty has a message delay option that lets you set the delay (in seconds) before each message is rendered.
 
-### Why are some GIFs either slow or very fast?
+### Why are some GIF emotes either slow or very fast?
 
 This seems to be caused by the Flutter framework itself (see [here](https://github.com/flutter/flutter/issues/24804) and [here](https://github.com/flutter/flutter/issues/29130)).
 
@@ -193,8 +193,6 @@ This seems to be caused by the Flutter framework itself (see [here](https://gith
 I'm limited to what is available in the [Twitch API](https://dev.twitch.tv/docs/api/reference), so certain features from the Twitch web or mobile app (e.g., voting on predictions and category viewer count) are sadly not available at the moment.
 
 Other features related to ad-blocking or utilizing private APIs will likely not be implemented officially because they would violate Twitch's terms of service. My highest priority currently is staying on the app stores and focusing on making features for those builds.
-
-I'll try to add as many features as possible but occasionally I may take a break or be limited in time due to studies and personal reasons.
 
 ### Where can I report a bug or request a new feature?
 
