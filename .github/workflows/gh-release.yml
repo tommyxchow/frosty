@@ -1,1 +1,66 @@
+# Drafts a GitHub release.
 
+name: Draft GitHub release
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*.*.*
+jobs:
+  android:
+    name: Draft release and attach APK
+    runs-on: ubuntu-latest
+    env:
+      UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEY_FILE_PATH: android/key.properties
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      SECRET: ${{ secrets.SECRET }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+
+    steps:
+      - name: Checkout Frosty repo
+        uses: actions/checkout@v3
+      
+      # Setup Java so that we can build the APK.
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: zulu
+          java-version: 11
+      
+      # Setup and cache Flutter to install packages and build.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          cache: true
+      
+      # Decode and create the upload-keystore.jks file, used for signing the app.
+      - name: Decode and create upload-keystore.jks
+        run: echo $UPLOAD_KEYSTORE | base64 --decode > android/upload-keystore.jks
+      
+      # Create the key.properties file, used for signing the app.
+      - name: Create key.properties
+        run: |
+          echo storePassword=$STORE_PASSWORD >> $KEY_FILE_PATH
+          echo keyPassword=$KEY_PASSWORD >> $KEY_FILE_PATH
+          echo keyAlias=upload >> $KEY_FILE_PATH
+          echo storeFile=upload-keystore.jks >> $KEY_FILE_PATH
+      
+      # Build the APK with the environment variables.
+      - name: Build for Android
+        run: |
+          flutter build apk --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+          mv build/app/outputs/flutter-apk/app-release.apk frosty-$
+        
+      # Create a release on GitHub.
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: frosty.apk
+          
+
+        
