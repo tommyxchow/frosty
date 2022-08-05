@@ -410,6 +410,12 @@ class TwitchApi {
         final result = blockedList.map((e) => UserBlockedTwitch.fromJson(e)).toList();
 
         if (cursor != null) {
+          // Wait a bit (150 milliseconds) before recursively calling.
+          // This will prevent going over the rate limit to due a massive blocked users list.
+          //
+          // With the Twitch API, we can make up to 800 requests per minute.
+          // Waiting 150 milliseconds between requests will cap the rate here at 400 requests per minute.
+          await Future.delayed(const Duration(milliseconds: 150));
           result.addAll(await getUserBlockedList(id: id, cursor: cursor, headers: headers));
         }
 
