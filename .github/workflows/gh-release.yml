@@ -1,6 +1,7 @@
 # Drafts a GitHub release with the APK attached.
 name: Draft GitHub release
 on:
+  workflow_dispatch:
   push:
     tags:
       - v*.*.*

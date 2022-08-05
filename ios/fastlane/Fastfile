@@ -29,8 +29,8 @@ platform :ios do
       is_key_content_base64: true,
     )
 
-    # Use match to manage code signing.
-    match
+    # Manage code signing (with match).
+    sync_code_signing
 
     # Build the app for release.
     build_app(

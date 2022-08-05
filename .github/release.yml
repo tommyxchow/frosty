@@ -1,4 +1,4 @@
-# Used for autogenerating release notes.
+# Used for auto-generating release notes.
 changelog:
   exclude:
     labels:
