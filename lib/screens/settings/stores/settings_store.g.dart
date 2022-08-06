@@ -25,6 +25,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..autocomplete = json['autocomplete'] as bool? ?? true
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+      ..chatNotificationsOnBottom =
+          json['chatNotificationsOnBottom'] as bool? ?? false
       ..landscapeCutout = $enumDecodeNullable(
               _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
           LandscapeCutoutType.none
@@ -67,6 +69,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'autocomplete': instance.autocomplete,
       'showBottomBar': instance.showBottomBar,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'chatNotificationsOnBottom': instance.chatNotificationsOnBottom,
       'landscapeCutout':
           _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
       'chatWidth': instance.chatWidth,
@@ -353,6 +356,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
         () {
       super.landscapeChatLeftSide = value;
+    });
+  }
+
+  late final _$chatNotificationsOnBottomAtom = Atom(
+      name: '_SettingsStoreBase.chatNotificationsOnBottom', context: context);
+
+  @override
+  bool get chatNotificationsOnBottom {
+    _$chatNotificationsOnBottomAtom.reportRead();
+    return super.chatNotificationsOnBottom;
+  }
+
+  @override
+  set chatNotificationsOnBottom(bool value) {
+    _$chatNotificationsOnBottomAtom
+        .reportWrite(value, super.chatNotificationsOnBottom, () {
+      super.chatNotificationsOnBottom = value;
     });
   }
 
@@ -719,6 +739,7 @@ chatOnlyPreventSleep: ${chatOnlyPreventSleep},
 autocomplete: ${autocomplete},
 showBottomBar: ${showBottomBar},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
+chatNotificationsOnBottom: ${chatNotificationsOnBottom},
 landscapeCutout: ${landscapeCutout},
 chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
