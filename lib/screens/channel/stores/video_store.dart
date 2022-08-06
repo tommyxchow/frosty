@@ -287,7 +287,7 @@ abstract class VideoStoreBase with Store {
   void dispose() {
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
-    controller?.reload();
+    if (Platform.isIOS) controller?.reload();
 
     _disposeOverlayReaction();
     floating.dispose();
