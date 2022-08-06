@@ -94,6 +94,13 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.landscapeChatLeftSide,
             onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
           ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Notifications on bottom'),
+            subtitle: const Text('Shows notifications (e.g., "Message copied") on the bottom of the chat.'),
+            value: settingsStore.chatNotificationsOnBottom,
+            onChanged: (newValue) => settingsStore.chatNotificationsOnBottom = newValue,
+          ),
           ListTile(
             isThreeLine: true,
             title: const Text('Landscape fill cutout side'),
