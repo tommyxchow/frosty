@@ -46,7 +46,7 @@ class ChatMessage extends StatelessWidget {
 
       await Clipboard.setData(ClipboardData(text: ircMessage.message));
 
-      chatStore.notification = 'Message copied';
+      chatStore.updateNotification('Message copied');
     }
 
     return Observer(

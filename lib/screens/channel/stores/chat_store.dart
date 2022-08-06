@@ -77,6 +77,13 @@ abstract class ChatStoreBase with Store {
   /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
   final _messageBuffer = <IRCMessage>[];
 
+  /// Timer used for dismissing the notification.
+  Timer? _notificationTimer;
+
+  /// A notification message to display above the chat.
+  @readonly
+  String? _notification;
+
   /// The list of chat messages to render and display.
   @readonly
   var _messages = ObservableList<IRCMessage>();
@@ -113,13 +120,6 @@ abstract class ChatStoreBase with Store {
   @observable
   var expandChat = false;
 
-  /// A notification message to display above the chat.
-  @observable
-  String? notification;
-
-  /// Timer used for dismissing the notification.
-  Timer? _notificationTimer;
-
   ChatStoreBase({
     required this.auth,
     required this.chatDetailsStore,
@@ -138,16 +138,6 @@ abstract class ChatStoreBase with Store {
       reaction(
         (_) => auth.isLoggedIn,
         (_) => _channel?.sink.close(1001),
-      ),
-    );
-
-    reactions.add(
-      reaction(
-        (_) => notification,
-        (_) {
-          if (_notificationTimer != null) _notificationTimer?.cancel();
-          _notificationTimer = Timer(const Duration(seconds: 2), () => notification = null);
-        },
       ),
     );
 
@@ -427,9 +417,28 @@ abstract class ChatStoreBase with Store {
     textController.selection = TextSelection.fromPosition(TextPosition(offset: textController.text.length));
   }
 
+  /// Cancels the previous notification/timer and creates a new one with the provided [notificationMessage].
+  @action
+  void updateNotification(String notificationMessage) {
+    // Cancel the previous notification to prevent the notification from phasing in and out
+    // when copying messages repeatedly.
+    _notificationTimer?.cancel();
+
+    // If empty, clear the notification and don't make a new timer (empty message means cancelling the notification).
+    if (notificationMessage.isEmpty) {
+      _notification = null;
+      return;
+    }
+
+    // Set the new notification message and create a new timer that will dismiss it after 2 seconds.
+    _notification = notificationMessage;
+    _notificationTimer = Timer(const Duration(seconds: 2), () => _notification = null);
+  }
+
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
     _messageBufferTimer.cancel();
+    _notificationTimer?.cancel();
 
     _channel?.sink.close(1001);
     _channel = null;

@@ -17,6 +17,24 @@ mixin _$ChatStore on ChatStoreBase, Store {
               name: 'ChatStoreBase.renderMessages'))
       .value;
 
+  late final _$_notificationAtom =
+      Atom(name: 'ChatStoreBase._notification', context: context);
+
+  String? get notification {
+    _$_notificationAtom.reportRead();
+    return super._notification;
+  }
+
+  @override
+  String? get _notification => notification;
+
+  @override
+  set _notification(String? value) {
+    _$_notificationAtom.reportWrite(value, super._notification, () {
+      super._notification = value;
+    });
+  }
+
   late final _$_messagesAtom =
       Atom(name: 'ChatStoreBase._messages', context: context);
 
@@ -143,22 +161,6 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$notificationAtom =
-      Atom(name: 'ChatStoreBase.notification', context: context);
-
-  @override
-  String? get notification {
-    _$notificationAtom.reportRead();
-    return super.notification;
-  }
-
-  @override
-  set notification(String? value) {
-    _$notificationAtom.reportWrite(value, super.notification, () {
-      super.notification = value;
-    });
-  }
-
   late final _$getAssetsAsyncAction =
       AsyncAction('ChatStoreBase.getAssets', context: context);
 
@@ -237,10 +239,20 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
+  void updateNotification(String notificationMessage) {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.updateNotification');
+    try {
+      return super.updateNotification(notificationMessage);
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 expandChat: ${expandChat},
-notification: ${notification},
 renderMessages: ${renderMessages}
     ''';
   }
