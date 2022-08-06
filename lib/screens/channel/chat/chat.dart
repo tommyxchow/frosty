@@ -80,7 +80,7 @@ class Chat extends StatelessWidget {
 
                                         if (data != null) chatStore.textController.text = data.text!;
 
-                                        chatStore.notification = null;
+                                        chatStore.updateNotification('');
                                       },
                                       fill: false,
                                       child: const Text('Paste'),
