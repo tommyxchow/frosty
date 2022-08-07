@@ -20,7 +20,7 @@ class ChatStore = ChatStoreBase with _$ChatStore;
 
 abstract class ChatStoreBase with Store {
   /// The total maximum amount of messages in chat.
-  static const _messageLimit = 10000;
+  static const _messageLimit = 5000;
 
   /// The maximum ammount of messages to render when autoscroll is enabled.
   static const _renderMessageLimit = 100;
