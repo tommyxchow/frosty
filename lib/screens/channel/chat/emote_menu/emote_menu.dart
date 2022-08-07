@@ -4,7 +4,6 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
-import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 
 class EmoteMenu extends StatefulWidget {
@@ -65,28 +64,6 @@ class _EmoteMenuState extends State<EmoteMenu> {
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
-              Button(
-                onPressed: () async {
-                  await widget.chatStore.getAssets();
-
-                  if (!mounted) return;
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: AlertMessage(message: 'Emotes refreshed'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                },
-                color: Theme.of(context).colorScheme.secondary,
-                child: const Text(
-                  'REFRESH EMOTES',
-                  style: TextStyle(
-                    letterSpacing: 0.8,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),

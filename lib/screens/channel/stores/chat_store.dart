@@ -49,6 +49,9 @@ abstract class ChatStoreBase with Store {
   /// The Twitch IRC WebSocket channel.
   WebSocketChannel? _channel;
 
+  /// The subscription that handles the WebSocket connection.
+  StreamSubscription? _channelListener;
+
   // The retry counter for exponential backoff.
   var _retries = 0;
 
@@ -322,7 +325,7 @@ abstract class ChatStoreBase with Store {
     _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
     // Listen for new messages and forward them to the handler.
-    _channel?.stream.listen(
+    _channelListener = _channel?.stream.listen(
       (data) => Future.delayed(Duration(seconds: settings.chatDelay.toInt()), () => _handleIRCData(data.toString())),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
@@ -342,6 +345,7 @@ abstract class ChatStoreBase with Store {
         // Increment the retry count and attempt the reconnect.
         _retries++;
         _messageBuffer.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
+        _channelListener?.cancel();
         connectToChat();
       },
     );
@@ -453,6 +457,7 @@ abstract class ChatStoreBase with Store {
 
     _channel?.sink.close(1001);
     _channel = null;
+    _channelListener?.cancel();
 
     for (final reactionDisposer in reactions) {
       reactionDisposer();
