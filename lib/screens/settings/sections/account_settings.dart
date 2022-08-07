@@ -37,7 +37,7 @@ class AccountSettings extends StatelessWidget {
           ProfileCard(authStore: authStore),
           if (authStore.isLoggedIn) ...[
             ListTile(
-              title: const Text('Blocked Users'),
+              title: const Text('Blocked users'),
               trailing: Icon(Icons.adaptive.arrow_forward),
               onTap: () => Navigator.push(
                 context,
