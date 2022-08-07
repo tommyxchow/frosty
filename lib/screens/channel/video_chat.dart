@@ -103,15 +103,19 @@ class _VideoChatState extends State<VideoChat> {
               ListTile(
                 leading: const Icon(Icons.refresh),
                 title: const Text('Reconnect to chat'),
-                onTap: _chatStore.connectToChat,
+                onTap: () {
+                  _chatStore.updateNotification('Reconnecting to chat...');
+
+                  _chatStore.connectToChat();
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.refresh),
-                title: const Text('Refresh emotes'),
+                title: const Text('Refresh badges and emotes'),
                 onTap: () async {
                   await _chatStore.getAssets();
 
-                  _chatStore.updateNotification('Emotes refreshed');
+                  _chatStore.updateNotification('Badges and emotes refreshed');
                 },
               ),
             ],

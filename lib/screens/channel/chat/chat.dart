@@ -73,18 +73,19 @@ class Chat extends StatelessWidget {
                                         color: Colors.white,
                                       ),
                                     ),
-                                    Button(
-                                      onPressed: () async {
-                                        // Paste clipboard text into the text controller.
-                                        final data = await Clipboard.getData(Clipboard.kTextPlain);
+                                    if (chatStore.notification!.contains('copied'))
+                                      Button(
+                                        onPressed: () async {
+                                          // Paste clipboard text into the text controller.
+                                          final data = await Clipboard.getData(Clipboard.kTextPlain);
 
-                                        if (data != null) chatStore.textController.text = data.text!;
+                                          if (data != null) chatStore.textController.text = data.text!;
 
-                                        chatStore.updateNotification('');
-                                      },
-                                      fill: false,
-                                      child: const Text('Paste'),
-                                    ),
+                                          chatStore.updateNotification('');
+                                        },
+                                        fill: false,
+                                        child: const Text('Paste'),
+                                      ),
                                   ],
                                 ),
                               ),
