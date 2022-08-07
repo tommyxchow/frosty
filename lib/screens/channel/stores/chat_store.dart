@@ -25,6 +25,9 @@ abstract class ChatStoreBase with Store {
   /// The maximum ammount of messages to render when autoscroll is enabled.
   static const _renderMessageLimit = 100;
 
+  /// The amount of messages to free (remove) when the [_messageLimit] is reached.
+  final _messagesToRemove = (_messageLimit * 0.2).toInt();
+
   /// The provided auth store to determine login status, get the token, and use the headers for requests.
   final AuthStore auth;
 
@@ -259,8 +262,16 @@ abstract class ChatStoreBase with Store {
             continue;
         }
 
-        // If the message limit is reached, remove the oldest message.
-        if (_autoScroll && _messages.length >= _messageLimit) _messages = _messages.sublist(2000).asObservable();
+        if (!_autoScroll) {
+          // While autoscroll is disabled, occasionally move messages from the buffer to the messages to prevent a memory leak.
+          if (_messageBuffer.length >= _messagesToRemove) {
+            _messages.addAll(_messageBuffer);
+            _messageBuffer.clear();
+          }
+        }
+
+        // If the message limit is reached, remove the oldest messages.
+        if (_messages.length >= _messageLimit) _messages = _messages.sublist(_messagesToRemove).asObservable();
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
