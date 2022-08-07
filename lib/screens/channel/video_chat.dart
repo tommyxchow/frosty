@@ -77,6 +77,67 @@ class _VideoChatState extends State<VideoChat> {
   Widget build(BuildContext context) {
     final settingsStore = _chatStore.settings;
 
+    void showSettings() {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => FrostyModal(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.app_settings_alt),
+                title: const Text('App settings'),
+                onTap: () => showModalBottomSheet(
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) => FrostyModal(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      child: Settings(settingsStore: settingsStore),
+                    ),
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.refresh),
+                title: const Text('Reconnect to chat'),
+                onTap: () {
+                  _chatStore.updateNotification('Reconnecting to chat...');
+
+                  _chatStore.connectToChat();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.refresh),
+                title: const Text('Refresh badges and emotes'),
+                onTap: () async {
+                  await _chatStore.getAssets();
+
+                  _chatStore.updateNotification('Badges and emotes refreshed');
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final appBar = AppBar(
+      title: Text(
+        regexEnglish.hasMatch(_chatStore.displayName) ? _chatStore.displayName : '${_chatStore.displayName} (${_chatStore.channelName})',
+        style: const TextStyle(fontSize: 20),
+      ),
+      actions: [
+        IconButton(
+          tooltip: 'Settings',
+          icon: const Icon(Icons.settings),
+          onPressed: showSettings,
+        ),
+      ],
+    );
+
     final player = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
       child: _Video(
@@ -85,7 +146,10 @@ class _VideoChatState extends State<VideoChat> {
       ),
     );
 
-    final videoOverlay = _VideoOverlay(videoStore: _videoStore);
+    final videoOverlay = _VideoOverlay(
+      videoStore: _videoStore,
+      onSettingsPressed: showSettings,
+    );
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
@@ -136,30 +200,6 @@ class _VideoChatState extends State<VideoChat> {
     final chat = Chat(
       key: _chatKey,
       chatStore: _chatStore,
-    );
-
-    final appBar = AppBar(
-      title: Text(
-        regexEnglish.hasMatch(_chatStore.displayName) ? _chatStore.displayName : '${_chatStore.displayName} (${_chatStore.channelName})',
-        style: const TextStyle(fontSize: 20),
-      ),
-      actions: [
-        IconButton(
-          tooltip: 'Settings',
-          icon: const Icon(Icons.settings),
-          onPressed: () => showModalBottomSheet(
-            backgroundColor: Colors.transparent,
-            isScrollControlled: true,
-            context: context,
-            builder: (context) => FrostyModal(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: Settings(settingsStore: settingsStore),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
 
     final videoChat = Scaffold(
@@ -306,8 +346,13 @@ class _Video extends StatelessWidget {
 /// Creates a widget containing controls which enable interactions with an underlying [_Video] widget.
 class _VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
+  final void Function() onSettingsPressed;
 
-  const _VideoOverlay({Key? key, required this.videoStore}) : super(key: key);
+  const _VideoOverlay({
+    Key? key,
+    required this.videoStore,
+    required this.onSettingsPressed,
+  }) : super(key: key);
 
   Future<void> _showSleepTimerDialog(BuildContext context) {
     return showDialog(
@@ -401,17 +446,7 @@ class _VideoOverlay extends StatelessWidget {
         Icons.settings,
         color: Colors.white,
       ),
-      onPressed: () => showModalBottomSheet(
-        backgroundColor: Colors.transparent,
-        isScrollControlled: true,
-        context: context,
-        builder: (context) => FrostyModal(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: Settings(settingsStore: videoStore.settingsStore),
-          ),
-        ),
-      ),
+      onPressed: onSettingsPressed,
     );
 
     final chatOverlayButton = Observer(
