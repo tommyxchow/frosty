@@ -62,7 +62,7 @@ class Chat extends StatelessWidget {
                                   color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
                                   borderRadius: BorderRadius.circular(30.0),
                                 ),
-                                margin: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                                margin: const EdgeInsets.all(10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
