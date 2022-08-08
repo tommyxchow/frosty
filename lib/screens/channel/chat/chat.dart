@@ -5,8 +5,8 @@ import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/screens/channel/stores/chat_store.dart';
-import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/notification.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -57,37 +57,17 @@ class Chat extends StatelessWidget {
                       child: chatStore.notification != null
                           ? Align(
                               alignment: chatStore.settings.chatNotificationsOnBottom ? Alignment.bottomCenter : Alignment.topCenter,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                margin: const EdgeInsets.all(10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(10.0),
-                                      child: AlertMessage(
-                                        message: chatStore.notification!,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    if (chatStore.notification!.contains('copied'))
-                                      Button(
-                                        onPressed: () async {
-                                          // Paste clipboard text into the text controller.
-                                          final data = await Clipboard.getData(Clipboard.kTextPlain);
+                              child: FrostyNotification(
+                                message: chatStore.notification!,
+                                showPasteButton: chatStore.notification!.contains('copied'),
+                                onButtonPressed: () async {
+                                  // Paste clipboard text into the text controller.
+                                  final data = await Clipboard.getData(Clipboard.kTextPlain);
 
-                                          if (data != null) chatStore.textController.text = data.text!;
+                                  if (data != null) chatStore.textController.text = data.text!;
 
-                                          chatStore.updateNotification('');
-                                        },
-                                        fill: false,
-                                        child: const Text('Paste'),
-                                      ),
-                                  ],
-                                ),
+                                  chatStore.updateNotification('');
+                                },
                               ),
                             )
                           : null,
