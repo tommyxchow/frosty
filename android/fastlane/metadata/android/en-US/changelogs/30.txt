@@ -1,3 +1,5 @@
+Version 2.2.0
+
 New Features
 • Added a "Paste" button for easier pasting when copying a message
 • Added an option to move chat notifications to the bottom
