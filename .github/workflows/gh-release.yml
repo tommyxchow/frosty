@@ -36,7 +36,7 @@ jobs:
       
       # Decode and create the upload-keystore.jks file, used for signing the app.
       - name: Decode and create upload-keystore.jks
-        run: echo $UPLOAD_KEYSTORE | base64 --decode > android/upload-keystore.jks
+        run: echo $UPLOAD_KEYSTORE | base64 --decode > $GITHUB_WORKSPACE/android/upload-keystore.jks
       
       # Create the key.properties file, used for signing the app.
       - name: Create key.properties
@@ -44,7 +44,7 @@ jobs:
           echo storePassword=$STORE_PASSWORD >> $KEY_FILE_PATH
           echo keyPassword=$KEY_PASSWORD >> $KEY_FILE_PATH
           echo keyAlias=upload >> $KEY_FILE_PATH
-          echo storeFile=upload-keystore.jks >> $KEY_FILE_PATH
+          echo storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks >> $KEY_FILE_PATH
       
       # Build the APK with the environment variables and move/rename it.
       - name: Build for Android
