@@ -1,16 +1,5 @@
 Version 2.2.0
 
-New Features
-• Added a "Paste" button for easier pasting when copying a message
-• Added an option to move chat notifications to the bottom
-• Added the ability to refresh chat
+This update contains new features including a "Reconnect to chat" button, a "Paste" button when copying messages, and other improvements and bug fixes.
 
-Improvements
-• Accessing the settings while in a channel now summons a panel with various options
-• Moved the "Refresh emotes" button to the new settings panel
-
-Bug Fixes
-• Fixed chat notifications dismissing early when copying a message
-• Fixed a potential memory leak caused by chat messages growing to infinity when auto-scroll is disabled
-• Fixed delay when tapping overlay in portrait mode
-• Fixed default subscriber badges showing in chat rather than channel-specific badges
+See the full release notes on GitHub (since they can't fit here): https://github.com/tommyxchow/frosty/releases
