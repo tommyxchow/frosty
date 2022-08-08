@@ -42,6 +42,7 @@ platform :ios do
     # Upload the app to the App Store.
     upload_to_app_store(
       submit_for_review: true,
+      force: true, # Disable HTML summary prompt that appears when uploading to the App Store.
     )
   end
 end
