@@ -1,70 +1,71 @@
 <p align="center">
-  <a align="center" href='https://frostyapp.io'/>
-    <img src="https://user-images.githubusercontent.com/54859075/160067655-f96b7e62-67f7-43d6-96ea-19ac85418bf6.svg" width="180px" alt="Frosty Logo" />
+  <a align="center" href="https://frostyapp.io">
+    <img
+      src="https://user-images.githubusercontent.com/54859075/185783257-228d5c49-015e-4ee6-bf78-41f898cf770a.svg"
+      width="180px"
+      alt="The Frosty rounded logo."
+    />
     <h1 align="center">Frosty</h1>
   </a>
 </p>
 
 <p align="center">
-  A <a href="https://www.twitch.tv/">Twitch</a> client for iOS and Android with
-  <a href="https://betterttv.com/">BTTV</a>,
-  <a href="https://www.frankerfacez.com/">FFZ</a>, and
-  <a href="https://7tv.app/">7TV</a> support. Built with
+  A mobile
+  <a href="https://www.twitch.tv/">Twitch</a>
+  client for iOS and Android with
+  <a href="https://7tv.app/">7TV</a>, <a href="https://betterttv.com/">BTTV</a>,
+  and
+  <a href="https://www.frankerfacez.com/">FFZ</a>
+  support. Built with
   <a href="https://flutter.dev/">Flutter</a>.
 </p>
 
 <p align="center">
   <a href="https://github.com/tommyxchow/frosty/actions/workflows/ci.yml">
     <img
-      alt="CI"
+      alt="Badge showing the CI status."
       src="https://github.com/tommyxchow/frosty/actions/workflows/ci.yml/badge.svg"
     />
   </a>
   <a href="https://github.com/tommyxchow/frosty/issues">
     <img
-      alt="Issues"
+      alt="Badge showing the number of open issues."
       src="https://img.shields.io/github/issues/tommyxchow/frosty"
     />
   </a>
   <a href="https://github.com/tommyxchow/frosty/commits">
     <img
-      alt="Last Commit"
+      alt="Badge showing the date of the last commit."
       src="https://img.shields.io/github/last-commit/tommyxchow/frosty"
     />
   </a>
   <a href="https://github.com/tommyxchow/frosty/blob/main/LICENSE">
     <img
-      alt="License"
+      alt="Badge showing the current license of the repo."
       src="https://img.shields.io/github/license/tommyxchow/frosty"
     />
   </a>
   <a href="https://github.com/tommyxchow/frosty/releases/latest">
     <img
-      alt="Release"
+      alt="Badge showing the version of the latest release."
       src="https://img.shields.io/github/v/release/tommyxchow/frosty"
     />
   </a>
 </p>
 
 <p align="center">
-  <a
-    href="https://apps.apple.com/us/app/frosty-for-twitch/id1603987585"
-    target="_blank"
-  >
+  <a href="https://apps.apple.com/us/app/frosty-for-twitch/id1603987585">
     <img
       title="Get it on iOS (Apple App Store)"
-      alt="Apple App Store Badge"
+      alt="Apple App Store badge."
       src="https://user-images.githubusercontent.com/54859075/160051843-1d8b2186-97e9-4edd-a957-bb4797b71b4a.svg"
       width="200px"
     />
   </a>
-  <a
-    href="https://play.google.com/store/apps/details?id=com.tommychow.frosty"
-    target="_blank"
-  >
+  <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty">
     <img
       title="Get it on Android (Google Play Store)"
-      alt="Google Play Store Badge"
+      alt="Google Play Store badge."
       src="https://user-images.githubusercontent.com/54859075/160051854-21a57556-6b5a-41e9-8127-334daf1fac47.svg"
       width="225px"
     />
@@ -72,10 +73,10 @@
 </p>
 
 <p align="center">
-  <a href="https://www.buymeacoffee.com/tommychow" target="_blank">
+  <a href="https://www.buymeacoffee.com/tommychow">
     <img
-      title="Support the App!"
-      alt="Buy Me A Coffee"
+      title="Donate"
+      alt="Buy Me A Coffee badge."
       src="https://user-images.githubusercontent.com/54859075/160051848-2e581476-a6c6-4de6-9af7-773d96632de1.svg"
       width="200px"
     />
@@ -84,54 +85,32 @@
 
 <p align="center">
   <img
-    title="Followed Streams"
-    alt="Followed Streams"
-    src="https://user-images.githubusercontent.com/54859075/177494837-14055c2e-0c47-4134-9554-821fb995a75e.png"
+    title="Followed streams section"
+    alt="iOS screenshot of the Followed Streams section."
+    src="https://user-images.githubusercontent.com/54859075/185780262-a3ba5ecf-a710-4511-a583-94e0d0ce0156.png"
     width="32%"
   />
   <img
-    title="Categories Section"
-    alt="Categories Section"
-    src="https://user-images.githubusercontent.com/54859075/177494836-96a99000-fd38-45dd-991b-a02d56da241a.png"
+    title="Channel (video/chat) view"
+    alt="iOS screenshot of xQc's channel with the stream and chat."
+    src="https://user-images.githubusercontent.com/54859075/185780260-0f7f3247-2cb5-431d-8714-e88e9fcb72f5.png"
     width="32%"
   />
   <img
-    title="Search Section"
-    alt="Search Section"
-    src="https://user-images.githubusercontent.com/54859075/177501555-74b098ae-d3a6-4454-bfbe-6deaaab28a5c.png"
-    width="32%"
-  />
-  <img
-    title="Channel (Video/Chat) View"
-    alt="Channel (Video/Chat) View"
-    src="https://user-images.githubusercontent.com/54859075/177494843-f4dc6a3f-b676-4366-be52-a0e7df6c45a1.png"
-    width="32%"
-  />
-  <img
-    title="Emote Menu"
-    alt="Emote Menu"
-    src="https://user-images.githubusercontent.com/54859075/177494841-8c01ba96-693a-4ced-98b6-8950d7743384.png"
-    width="32%"
-  />
-  <img
-    title="Settings Section"
-    alt="Settings Section"
-    src="https://user-images.githubusercontent.com/54859075/177494840-43481564-0c9a-45ba-bc37-1f5ea49313a8.png"
+    title="Search section"
+    alt='iOS screenshot of the search section with results from the query "pokelaw".'
+    src="https://user-images.githubusercontent.com/54859075/185780261-4301f180-04dc-4328-8a4c-4f035a5ec796.png"
     width="32%"
   />
 </p>
 
 ## Motivation
 
-A major problem with the official Twitch app for many users is that emotes and badges from services such as [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb), and [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh) are not officially supported. Twitch is unaffiliated with these services, hence why they haven't been integrated officially.
-
-As a result, the millions of users of these services have an unideal viewing experience on the official Twitch app. In the stream chat, only text is positioned where emotes should be (imagine only being able to see :emoji_code: rather than the emojis themselves).
-
-Frosty aims to bring these emotes and other general quality of life features to **both iOS and Android**.
+The official Twitch mobile app doesn't support emotes from [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh), [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), and [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb) — third-party services and extensions for Twitch used by millions of viewers and many top channels. This results in a poor mobile chat experience since only emote codes render rather than their image or GIF counterpart.
 
 ## Features
 
-- Support for BetterTTV, FrankerFaceZ, and 7TV emotes and badges
+- Support for 7TV, BetterTTV, and FrankerFaceZ emotes and badges
 - Browse followed streams, top streams, and top categories
 - Autocomplete for emotes and user mentions
 - Light, dark, and black (OLED) themes
@@ -146,7 +125,9 @@ Frosty aims to bring these emotes and other general quality of life features to 
 - Sleep timer
 - And more...
 
-## Development Setup
+For a more detailed overview, visit [frostyapp.io](https://www.frostyapp.io/).
+
+## Development setup
 
 1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **Client ID** and **Client Secret**.
 
@@ -159,44 +140,20 @@ Frosty aims to bring these emotes and other general quality of life features to 
 5. Choose an emulator or device and run the app!
 
 > **Note**
-> 
+>
 > Frosty uses [MobX](https://mobx.netlify.app/) for state management. Please refer to the documentation about code generation, otherwise your changes within MobX stores may not be applied.
 
 > **Warning**
-> 
+>
 > I built Frosty while learning Flutter, so some of the code may not be optimal. I'm working on refactoring, documenting, and cleaning up various parts as much as I can.
 
-## Frequently Asked Questions (FAQ)
+## Feature requests and issues
 
-### Can I change the quality of the stream?
+If you have a feature request, found a bug, or have a general issue, you can submit it [here](https://github.com/tommyxchow/frosty/issues/new/choose) on the issues tab. Doing so makes it easier for me to keep track of them and makes it publicly visible for others to review.
 
-Unfortunately, quality options aren't available through the native player and rely on an "auto" setting. There is no official API for getting the live stream URLs, so specific quality options are not possible currently.
-
-### Why do some animations and scrolling appear to be janky?
-
-Due to the side effects of the Flutter framework, there may be some stutter and jank on the first installation and launch.
-
-After using and moving around the app for a bit, the jank will be mitigated through shader warmup/caching and should be minimal on subsequent launches. Watching a stream with a fast chat for a few minutes should resolve it.
-
-### Why is there a delay between the stream and chat?
-
-On Android, there should be no delay. Try refreshing the player if there is a delay.
-
-On iOS, there is a delay of around 15 seconds due to the native player, so unfortunately it's out of my control. As a workaround, Frosty has a message delay option that lets you set the delay (in seconds) before each message is rendered.
-
-### Why are some GIF emotes either slow or very fast?
-
-This seems to be caused by the Flutter framework itself (see [here](https://github.com/flutter/flutter/issues/24804) and [here](https://github.com/flutter/flutter/issues/29130)).
-
-### Why is feature "X" from Twitch not in the app as well?
-
-I'm limited to what is available in the [Twitch API](https://dev.twitch.tv/docs/api/reference), so certain features from the Twitch web or mobile app (e.g., voting on predictions and category viewer count) are sadly not available at the moment.
-
-Other features related to ad-blocking or utilizing private APIs will likely not be implemented officially because they would violate Twitch's terms of service. My highest priority currently is staying on the app stores and focusing on making features for those builds.
-
-### Where can I report a bug or request a new feature?
-
-You can open a new issue [here](https://github.com/tommyxchow/frosty/issues) with the appropriate labels (e.g., "bug" or "feature request") and I'll take a look at it.
+> **Note**
+>
+> I work on Frosty in my free time and take occasional breaks, so I may not respond immediately.
 
 ## Donate
 
