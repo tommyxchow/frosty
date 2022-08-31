@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/models/channel.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/stream.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:mobx/mobx.dart';
 
 part 'stream_list_store.g.dart';

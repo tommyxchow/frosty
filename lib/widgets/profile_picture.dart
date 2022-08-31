@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/user.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePicture extends StatelessWidget {
