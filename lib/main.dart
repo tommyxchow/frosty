@@ -11,7 +11,7 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/home.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/settings_store.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';

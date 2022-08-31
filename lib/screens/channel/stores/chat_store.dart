@@ -8,7 +8,7 @@ import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/stores/chat_details_store.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';

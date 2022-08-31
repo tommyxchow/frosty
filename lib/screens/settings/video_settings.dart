@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/settings_store.dart';
 
 class VideoSettings extends StatelessWidget {
   final SettingsStore settingsStore;

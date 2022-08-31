@@ -19,7 +19,7 @@ import 'package:frosty/screens/channel/stores/video_store.dart';
 import 'package:frosty/screens/channel/widgets/video.dart';
 import 'package:frosty/screens/channel/widgets/video_overlay.dart';
 import 'package:frosty/screens/settings/settings.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/settings_store.dart';
 import 'package:frosty/widgets/modal.dart';
 import 'package:provider/provider.dart';
 
