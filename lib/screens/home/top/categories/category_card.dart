@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/category.dart';
-import 'package:frosty/screens/home/top/category_streams.dart';
+import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/search/search.dart';
-import 'package:frosty/screens/home/stores/home_store.dart';
-import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/top/top_section.dart';
-import 'package:frosty/screens/home/widgets/streams_list.dart';
+import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
+import 'package:frosty/screens/home/stream_list/streams_list.dart';
+import 'package:frosty/screens/home/top/top.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';

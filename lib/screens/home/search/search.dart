@@ -5,7 +5,7 @@ import 'package:frosty/api/twitch_api.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/screens/home/search/search_results_categories.dart';
 import 'package:frosty/screens/home/search/search_results_channels.dart';
-import 'package:frosty/screens/home/stores/search_store.dart';
+import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';

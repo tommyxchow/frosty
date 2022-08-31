@@ -6,7 +6,7 @@ import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:mobx/mobx.dart';
 
-part 'list_store.g.dart';
+part 'stream_list_store.g.dart';
 
 class ListStore = ListStoreBase with _$ListStore;
 

@@ -4,7 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/video_chat.dart';
-import 'package:frosty/screens/home/stores/search_store.dart';
+import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
