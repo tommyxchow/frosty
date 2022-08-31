@@ -131,9 +131,9 @@ For a more detailed overview, visit [frostyapp.io](https://www.frostyapp.io/).
 
 1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **Client ID** and **Client Secret**.
 
-2. Clone the repo to a directory with (e.g., `git clone https://github.com/tommyxchow/frosty.git`).
+2. Clone the repo to a directory (e.g., `git clone https://github.com/tommyxchow/frosty.git`).
 
-3. Navigate to `lib/constants/constants.dart` and replace the `clientId` and `secret` constants with your **client ID** and **client secret** from step 1 (if using VSCode, use `--dart-define` to [define them as environment variables](https://dartcode.org/docs/using-dart-define-in-flutter/)).
+3. Navigate to `lib/constants.dart` and replace the `clientId` and `secret` constants with your **client ID** and **client secret** from step 1 (if using VSCode, use `--dart-define` to [define them as environment variables](https://dartcode.org/docs/using-dart-define-in-flutter/)).
 
 4. Run `flutter pub get` to fetch all the dependencies.
 
