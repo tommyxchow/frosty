@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/core/auth/auth_store.dart';
 import 'package:frosty/models/stream.dart';
-import 'package:frosty/screens/channel/video_chat.dart';
+import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';

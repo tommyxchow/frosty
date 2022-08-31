@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
-import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/widgets/button.dart';
 
 class EmoteMenu extends StatefulWidget {

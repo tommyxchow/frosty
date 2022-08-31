@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/irc.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
-import 'package:frosty/screens/channel/stores/chat_store.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;

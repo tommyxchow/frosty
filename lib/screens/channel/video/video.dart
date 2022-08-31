@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/screens/channel/stores/video_store.dart';
+import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// Creates a [WebView] widget that shows a channel's video stream.

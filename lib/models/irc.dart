@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/settings_store.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';

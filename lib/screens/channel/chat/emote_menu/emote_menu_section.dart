@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/constants/constants.dart';
 import 'package:frosty/models/emotes.dart';
-import 'package:frosty/screens/channel/stores/chat_store.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings_store.dart';
 import 'package:provider/provider.dart';
 
