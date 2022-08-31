@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:frosty/api/bttv_api.dart';
-import 'package:frosty/api/ffz_api.dart';
-import 'package:frosty/api/seventv_api.dart';
-import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/apis/bttv_api.dart';
+import 'package:frosty/apis/ffz_api.dart';
+import 'package:frosty/apis/seventv_api.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:mobx/mobx.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:mobx/mobx.dart';
 
 part 'home_store.g.dart';

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/block_button.dart';
 import 'package:frosty/widgets/modal.dart';
 import 'package:frosty/widgets/report_button.dart';

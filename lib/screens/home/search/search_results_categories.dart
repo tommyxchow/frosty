@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/category.dart';
-import 'package:frosty/screens/home/stores/search_store.dart';
-import 'package:frosty/screens/home/widgets/category_card.dart';
+import 'package:frosty/screens/home/search/search_store.dart';
+import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:mobx/mobx.dart';

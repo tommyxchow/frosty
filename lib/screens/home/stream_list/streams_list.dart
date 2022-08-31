@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/api/twitch_api.dart';
-import 'package:frosty/core/auth/auth_store.dart';
-import 'package:frosty/screens/home/stores/list_store.dart';
-import 'package:frosty/screens/home/widgets/stream_card.dart';
+import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/screens/home/stream_list/stream_card.dart';
+import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';

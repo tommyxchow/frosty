@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:frosty/api/twitch_api.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/chatters.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:mobx/mobx.dart';

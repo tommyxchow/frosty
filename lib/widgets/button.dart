@@ -36,8 +36,8 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final buttonStyle = ElevatedButton.styleFrom(
-      primary: widget.color == null || widget.fill ? widget.color : Colors.transparent,
-      onPrimary: widget.fill ? null : widget.color,
+      foregroundColor: widget.fill ? null : widget.color,
+      backgroundColor: widget.color == null || widget.fill ? widget.color : Colors.transparent,
       padding: widget.padding,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: widget.fontSize),

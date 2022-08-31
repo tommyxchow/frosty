@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:frosty/constants/constants.dart';
-import 'package:frosty/core/auth/auth_store.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
-import 'package:frosty/screens/channel/stores/chat_assets_store.dart';
-import 'package:frosty/screens/channel/stores/chat_details_store.dart';
+import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wakelock/wakelock.dart';

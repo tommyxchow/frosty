@@ -9,7 +9,7 @@ class AlertMessage extends StatelessWidget {
   const AlertMessage({
     Key? key,
     required this.message,
-    final this.icon = Icons.info,
+    this.icon = Icons.info,
     this.color,
   }) : super(key: key);
 
