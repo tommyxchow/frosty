@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -58,16 +60,21 @@ void main() async {
   await authStore.init();
 
   runApp(
-    MultiProvider(
-      providers: [
-        Provider<AuthStore>(create: (_) => authStore),
-        Provider<SettingsStore>(create: (_) => settingsStore),
-        Provider<TwitchApi>(create: (_) => twitchApiService),
-        Provider<BTTVApi>(create: (_) => bttvApiService),
-        Provider<FFZApi>(create: (_) => ffzApiService),
-        Provider<SevenTVApi>(create: (_) => sevenTVApiService),
-      ],
-      child: const MyApp(),
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) {
+        return MultiProvider(
+          providers: [
+            Provider<AuthStore>(create: (_) => authStore),
+            Provider<SettingsStore>(create: (_) => settingsStore),
+            Provider<TwitchApi>(create: (_) => twitchApiService),
+            Provider<BTTVApi>(create: (_) => bttvApiService),
+            Provider<FFZApi>(create: (_) => ffzApiService),
+            Provider<SevenTVApi>(create: (_) => sevenTVApiService),
+          ],
+          child: const MyApp(),
+        );
+      },
     ),
   );
 }
@@ -180,6 +187,8 @@ class MyApp extends StatelessWidget {
         final settingsStore = context.read<SettingsStore>();
 
         return MaterialApp(
+          useInheritedMediaQuery: true,
+          locale: DevicePreview.locale(context),
           title: 'Frosty',
           theme: lightTheme,
           darkTheme: settingsStore.themeType == ThemeType.dark || settingsStore.themeType == ThemeType.system ? darkTheme : oledTheme,
