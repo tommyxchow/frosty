@@ -300,14 +300,17 @@ class IRCMessage {
     // Add the colon separator between the username and their message to the span.
     if (action == false) span.add(const TextSpan(text: ':'));
 
-    // Italicize the text it was called with an IRC Action i.e., "/me".
+    // Italicize the text if it was called with an IRC Action (e.g., "/me").
     final textStyle = action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;
 
     if (!showMessage) {
       span.add(const TextSpan(text: ' <message deleted>'));
     } else {
+      // Check if the message is a reply. If it is, remove the reply username from the message.
+      final replyUser = tags['reply-parent-display-name'];
+      final words = replyUser == null ? split : split?.sublist(1);
+
       // Add the message and any emotes to the span.
-      final words = split;
       if (words != null) {
         if (useZeroWidth) {
           // Keep a local span which will be reversed and added to the final span.

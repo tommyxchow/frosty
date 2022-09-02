@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
@@ -53,13 +54,14 @@ class ChatMessage extends StatelessWidget {
       builder: (context) {
         Color? color;
         final Widget renderMessage;
+
         switch (ircMessage.command) {
           case Command.privateMessage:
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
             if (ircMessage.mention == true) color = Colors.red.withOpacity(0.3);
 
-            renderMessage = Text.rich(
+            final messageSpan = Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
                   onLongPressName: onLongPressName,
@@ -75,11 +77,52 @@ class ChatMessage extends StatelessWidget {
                 ),
               ),
             );
+
+            // Check if the message is replying to another message.
+            final replyUser = ircMessage.tags['reply-parent-display-name'];
+            final replyBody = ircMessage.tags['reply-parent-msg-body'];
+
+            if (replyUser != null && replyBody != null) {
+              renderMessage = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Opacity(
+                    opacity: 0.5,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.reply,
+                          size: defaultBadgeSize * chatStore.settings.badgeScale,
+                        ),
+                        const SizedBox(width: 5.0),
+                        Flexible(
+                          child: Tooltip(
+                            message: 'Replying to @$replyUser: $replyBody',
+                            preferBelow: false,
+                            child: Text(
+                              'Replying to @$replyUser: $replyBody',
+                              maxLines: 1,
+                              style: const TextStyle(overflow: TextOverflow.ellipsis),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 5.0),
+                  messageSpan,
+                ],
+              );
+            } else {
+              renderMessage = messageSpan;
+            }
+
             break;
           case Command.clearChat:
           case Command.clearMessage:
             // Render timeouts and bans
             final banDuration = ircMessage.tags['ban-duration'];
+
             renderMessage = Opacity(
               opacity: 0.5,
               child: Column(
