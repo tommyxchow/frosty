@@ -285,22 +285,15 @@ class IRCMessage {
       }
     }
 
-    // Printing template for debugging purposes.
-    // debugPrint('OLD - NAME: ${tags['display-name']!}, HUE: ${hsl.hue}, SATURATION: ${hsl.saturation}, LIGHNTESS: ${hsl.lightness}');
-    // debugPrint('NEW - NAME: ${tags['display-name']!}, HUE: ${hsl.hue}, SATURATION: ${hsl.saturation}, LIGHNTESS: ${hsl.lightness}');
-
+    // Add the display name (username) to the span and apply the onLongPressName callback.
     span.add(
-      WidgetSpan(
-        child: InkWell(
-          onLongPress: onLongPressName,
-          child: Text(
-            tags['display-name']!,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+      TextSpan(
+        text: tags['display-name']!,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
         ),
+        recognizer: LongPressGestureRecognizer()..onLongPress = onLongPressName,
       ),
     );
 
