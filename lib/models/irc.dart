@@ -306,9 +306,8 @@ class IRCMessage {
     if (!showMessage) {
       span.add(const TextSpan(text: ' <message deleted>'));
     } else {
-      // Check if the message is a reply. If it is, remove the reply username from the message.
-      final replyUser = tags['reply-parent-display-name'];
-      final words = replyUser == null ? split : split?.sublist(1);
+      // Check if the message is a reply. If it is, remove the reply username (first word) from the message.
+      final words = tags.containsKey('reply-parent-display-name') ? split?.sublist(1) : split;
 
       // Add the message and any emotes to the span.
       if (words != null) {
