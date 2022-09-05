@@ -62,7 +62,7 @@ class ChatMessage extends StatelessWidget {
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
             if (ircMessage.mention == true) color = Colors.red.withOpacity(0.2);
-            if (ircMessage.tags['first-msg'] == '1') color = Colors.green.withOpacity(0.2);
+            if (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1') color = Colors.green.withOpacity(0.2);
 
             final messageSpan = Text.rich(
               TextSpan(
@@ -85,7 +85,7 @@ class ChatMessage extends StatelessWidget {
             final replyUser = ircMessage.tags['reply-parent-display-name'];
             final replyBody = ircMessage.tags['reply-parent-msg-body'];
 
-            if ((replyUser != null && replyBody != null) || ircMessage.tags['first-msg'] == '1') {
+            if ((replyUser != null && replyBody != null) || (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1')) {
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -185,50 +185,54 @@ class ChatMessage extends StatelessWidget {
             );
             break;
           case Command.userNotice:
-            color = Colors.deepPurple.withOpacity(0.2);
+            if (chatStore.settings.showUserNotices) {
+              color = Colors.deepPurple.withOpacity(0.2);
 
-            renderMessage = Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (ircMessage.tags.containsKey('system-msg'))
-                  Text(
-                    ircMessage.tags['system-msg']!,
-                    style: TextStyle(fontWeight: FontWeight.w600, color: defaultTextStyle.color?.withOpacity(0.5)),
-                  ),
-                if (ircMessage.tags.containsKey('msg-id') && ircMessage.tags['msg-id'] == 'announcement')
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.announcement_outlined,
-                        size: defaultBadgeSize * chatStore.settings.badgeScale,
-                      ),
-                      const SizedBox(width: 5.0),
-                      const Text(
-                        'Announcement',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
-                const SizedBox(height: 5.0),
-                if (ircMessage.message != null)
-                  Text.rich(
-                    TextSpan(
-                      children: ircMessage.generateSpan(
-                        onLongPressName: onLongPressName,
-                        style: defaultTextStyle,
-                        assetsStore: chatStore.assetsStore,
-                        emoteScale: chatStore.settings.emoteScale,
-                        badgeScale: chatStore.settings.badgeScale,
-                        useZeroWidth: chatStore.settings.showZeroWidth,
-                        useReadableColors: chatStore.settings.useReadableColors,
-                        isLightTheme: Theme.of(context).brightness == Brightness.light,
-                        launchExternal: chatStore.settings.launchUrlExternal,
-                        timestamp: chatStore.settings.timestampType,
+              renderMessage = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (ircMessage.tags.containsKey('system-msg'))
+                    Text(
+                      ircMessage.tags['system-msg']!,
+                      style: TextStyle(fontWeight: FontWeight.w600, color: defaultTextStyle.color?.withOpacity(0.5)),
+                    ),
+                  if (ircMessage.tags['msg-id'] == 'announcement')
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.announcement_outlined,
+                          size: defaultBadgeSize * chatStore.settings.badgeScale,
+                        ),
+                        const SizedBox(width: 5.0),
+                        const Text(
+                          'Announcement',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  const SizedBox(height: 5.0),
+                  if (ircMessage.message != null)
+                    Text.rich(
+                      TextSpan(
+                        children: ircMessage.generateSpan(
+                          onLongPressName: onLongPressName,
+                          style: defaultTextStyle,
+                          assetsStore: chatStore.assetsStore,
+                          emoteScale: chatStore.settings.emoteScale,
+                          badgeScale: chatStore.settings.badgeScale,
+                          useZeroWidth: chatStore.settings.showZeroWidth,
+                          useReadableColors: chatStore.settings.useReadableColors,
+                          isLightTheme: Theme.of(context).brightness == Brightness.light,
+                          launchExternal: chatStore.settings.launchUrlExternal,
+                          timestamp: chatStore.settings.timestampType,
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            );
+                ],
+              );
+            } else {
+              renderMessage = const SizedBox();
+            }
             break;
           default:
             renderMessage = const SizedBox();
