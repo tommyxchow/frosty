@@ -181,7 +181,7 @@ class ChatMessage extends StatelessWidget {
           case Command.notice:
             renderMessage = Text.rich(
               TextSpan(text: ircMessage.message),
-              style: TextStyle(color: Theme.of(context).textTheme.bodyText2?.color?.withOpacity(0.5)),
+              style: TextStyle(color: defaultTextStyle.color?.withOpacity(0.5)),
             );
             break;
           case Command.userNotice:
