@@ -45,7 +45,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..highlightFirstTimeChatter =
           json['highlightFirstTimeChatter'] as bool? ?? true
       ..showUserNotices = json['showUserNotices'] as bool? ?? true
-      ..showAnnouncements = json['showAnnouncements'] as bool? ?? true
       ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
@@ -85,7 +84,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
       'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
       'showUserNotices': instance.showUserNotices,
-      'showAnnouncements': instance.showAnnouncements,
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'messageScale': instance.messageScale,
@@ -547,22 +545,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showAnnouncementsAtom =
-      Atom(name: '_SettingsStoreBase.showAnnouncements', context: context);
-
-  @override
-  bool get showAnnouncements {
-    _$showAnnouncementsAtom.reportRead();
-    return super.showAnnouncements;
-  }
-
-  @override
-  set showAnnouncements(bool value) {
-    _$showAnnouncementsAtom.reportWrite(value, super.showAnnouncements, () {
-      super.showAnnouncements = value;
-    });
-  }
-
   late final _$badgeScaleAtom =
       Atom(name: '_SettingsStoreBase.badgeScale', context: context);
 
@@ -806,7 +788,6 @@ showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
-showAnnouncements: ${showAnnouncements},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 messageScale: ${messageScale},
