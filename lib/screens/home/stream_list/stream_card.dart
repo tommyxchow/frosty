@@ -129,7 +129,7 @@ class StreamCard extends StatelessWidget {
                     streamerName,
                     style: TextStyle(
                       fontSize: large ? 20.0 : 16.0,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       color: fontColor,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -149,7 +149,7 @@ class StreamCard extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w500,
                 fontSize: subFontSize,
-                color: fontColor,
+                color: fontColor?.withOpacity(0.8),
               ),
             ),
           ),
