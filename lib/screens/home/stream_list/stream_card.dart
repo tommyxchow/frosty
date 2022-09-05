@@ -147,7 +147,6 @@ class StreamCard extends StatelessWidget {
               streamInfo.title.trim(),
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontWeight: FontWeight.w500,
                 fontSize: subFontSize,
                 color: fontColor?.withOpacity(0.8),
               ),
