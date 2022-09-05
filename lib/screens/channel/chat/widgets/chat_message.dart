@@ -50,6 +50,8 @@ class ChatMessage extends StatelessWidget {
       chatStore.updateNotification('Message copied');
     }
 
+    final defaultTextStyle = DefaultTextStyle.of(context).style;
+
     return Observer(
       builder: (context) {
         Color? color;
@@ -59,13 +61,14 @@ class ChatMessage extends StatelessWidget {
           case Command.privateMessage:
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
-            if (ircMessage.mention == true) color = Colors.red.withOpacity(0.3);
+            if (ircMessage.mention == true) color = Colors.red.withOpacity(0.2);
+            if (ircMessage.tags['first-msg'] == '1') color = Colors.green.withOpacity(0.2);
 
             final messageSpan = Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
                   onLongPressName: onLongPressName,
-                  style: DefaultTextStyle.of(context).style,
+                  style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
@@ -82,32 +85,41 @@ class ChatMessage extends StatelessWidget {
             final replyUser = ircMessage.tags['reply-parent-display-name'];
             final replyBody = ircMessage.tags['reply-parent-msg-body'];
 
-            if (replyUser != null && replyBody != null) {
+            if ((replyUser != null && replyBody != null) || ircMessage.tags['first-msg'] == '1') {
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Opacity(
-                    opacity: 0.5,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.reply,
-                          size: defaultBadgeSize * chatStore.settings.badgeScale,
-                        ),
-                        const SizedBox(width: 5.0),
-                        Flexible(
-                          child: Tooltip(
-                            message: 'Replying to @$replyUser: $replyBody',
-                            preferBelow: false,
-                            child: Text(
-                              'Replying to @$replyUser: $replyBody',
-                              maxLines: 1,
-                              style: const TextStyle(overflow: TextOverflow.ellipsis),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        replyUser != null && replyBody != null ? Icons.reply : Icons.new_releases_outlined,
+                        size: defaultBadgeSize * chatStore.settings.badgeScale,
+                        color: defaultTextStyle.color?.withOpacity(0.5),
+                      ),
+                      const SizedBox(width: 5.0),
+                      Flexible(
+                        child: replyUser != null && replyBody != null
+                            ? Tooltip(
+                                message: 'Replying to @$replyUser: $replyBody',
+                                preferBelow: false,
+                                child: Text(
+                                  'Replying to @$replyUser: $replyBody',
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    color: defaultTextStyle.color?.withOpacity(0.5),
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                'First time chatting',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: defaultTextStyle.color?.withOpacity(0.5),
+                                ),
+                              ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 5.0),
                   messageSpan,
@@ -124,15 +136,32 @@ class ChatMessage extends StatelessWidget {
             final banDuration = ircMessage.tags['ban-duration'];
 
             renderMessage = Opacity(
-              opacity: 0.5,
+              opacity: 0.4,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (banDuration == null)
+                    if (ircMessage.command == Command.clearMessage)
+                      const Text(
+                        'Message deleted',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      )
+                    else
+                      const Text(
+                        'Permanently banned',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      )
+                  else
+                    Text(
+                      'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  const SizedBox(height: 5.0),
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
                         onLongPressName: onLongPressName,
-                        style: DefaultTextStyle.of(context).style,
+                        style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
                         badgeScale: chatStore.settings.badgeScale,
@@ -145,23 +174,6 @@ class ChatMessage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 5.0),
-                  if (banDuration == null)
-                    if (ircMessage.command == Command.clearMessage)
-                      const Text(
-                        'Message deleted',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      )
-                    else
-                      const Text(
-                        'User permanently banned',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      )
-                  else
-                    Text(
-                      'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    )
                 ],
               ),
             );
@@ -173,7 +185,7 @@ class ChatMessage extends StatelessWidget {
             );
             break;
           case Command.userNotice:
-            color = Colors.deepPurple.withOpacity(0.3);
+            color = Colors.deepPurple.withOpacity(0.2);
 
             renderMessage = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,14 +193,17 @@ class ChatMessage extends StatelessWidget {
                 if (ircMessage.tags.containsKey('system-msg'))
                   Text(
                     ircMessage.tags['system-msg']!,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(fontWeight: FontWeight.w600, color: defaultTextStyle.color?.withOpacity(0.5)),
                   ),
                 if (ircMessage.tags.containsKey('msg-id') && ircMessage.tags['msg-id'] == 'announcement')
                   Row(
-                    children: const [
-                      Icon(Icons.announcement),
-                      SizedBox(width: 5.0),
-                      Text(
+                    children: [
+                      Icon(
+                        Icons.announcement_outlined,
+                        size: defaultBadgeSize * chatStore.settings.badgeScale,
+                      ),
+                      const SizedBox(width: 5.0),
+                      const Text(
                         'Announcement',
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
@@ -200,7 +215,7 @@ class ChatMessage extends StatelessWidget {
                     TextSpan(
                       children: ircMessage.generateSpan(
                         onLongPressName: onLongPressName,
-                        style: DefaultTextStyle.of(context).style,
+                        style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
                         badgeScale: chatStore.settings.badgeScale,
