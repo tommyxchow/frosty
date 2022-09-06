@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -31,7 +33,7 @@ class _EmoteMenuState extends State<EmoteMenu> {
       '7TV',
     ];
 
-    return Column(
+    final emoteMenu = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(
@@ -107,6 +109,23 @@ class _EmoteMenuState extends State<EmoteMenu> {
         ),
       ],
     );
+
+    if (Platform.isAndroid) {
+      return WillPopScope(
+        onWillPop: () async {
+          // If pressing the back button on Android while the emote menu is open, close it instead of going back to the streams list.
+          if (widget.chatStore.assetsStore.showEmoteMenu) {
+            widget.chatStore.assetsStore.showEmoteMenu = false;
+            return false;
+          } else {
+            return true;
+          }
+        },
+        child: emoteMenu,
+      );
+    }
+
+    return emoteMenu;
   }
 
   @override
