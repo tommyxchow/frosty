@@ -91,6 +91,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultLandscapeCutout = LandscapeCutoutType.none;
 
   static const defaultShowBottomBar = true;
+  static const defaultEmoteMenuButtonOnLeft = false;
   static const defaultLandscapeChatLeftSide = false;
   static const defaultChatNotificationsOnBottom = false;
   static const defaultChatWidth = 0.3;
@@ -127,6 +128,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultShowBottomBar)
   @observable
   var showBottomBar = defaultShowBottomBar;
+
+  @JsonKey(defaultValue: defaultEmoteMenuButtonOnLeft)
+  @observable
+  var emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
 
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
   @observable
@@ -202,6 +207,7 @@ abstract class _SettingsStoreBase with Store {
     chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
     autocomplete = defaultAutocomplete;
     showBottomBar = defaultShowBottomBar;
+    emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
     landscapeChatLeftSide = defaultLandscapeChatLeftSide;
     chatNotificationsOnBottom = defaultChatNotificationsOnBottom;
     landscapeCutout = defaultLandscapeCutout;
