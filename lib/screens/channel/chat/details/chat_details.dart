@@ -33,16 +33,17 @@ class _ChatDetailsState extends State<ChatDetails> {
   Widget build(BuildContext context) {
     return FrostyModal(
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: ChatModes(roomState: widget.chatDetailsStore.roomState),
+          ListTile(
+            title: ChatModes(roomState: widget.chatDetailsStore.roomState),
+          ),
+          const Divider(
+            height: 1.0,
+            thickness: 1.0,
           ),
           ListTile(
-            leading: const Icon(Icons.app_settings_alt),
-            title: const Text('App settings'),
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
             onTap: () => showModalBottomSheet(
               backgroundColor: Colors.transparent,
               isScrollControlled: true,
