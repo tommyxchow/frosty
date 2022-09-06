@@ -90,6 +90,11 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.showBottomBar = newValue,
           ),
           SwitchListTile.adaptive(
+            title: const Text('Emote menu button on left side'),
+            value: settingsStore.emoteMenuButtonOnLeft,
+            onChanged: (newValue) => settingsStore.emoteMenuButtonOnLeft = newValue,
+          ),
+          SwitchListTile.adaptive(
             title: const Text('Landscape chat on left side'),
             value: settingsStore.landscapeChatLeftSide,
             onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,

@@ -24,6 +24,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? true
       ..autocomplete = json['autocomplete'] as bool? ?? true
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
+      ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
       ..chatNotificationsOnBottom =
           json['chatNotificationsOnBottom'] as bool? ?? false
@@ -71,6 +72,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
       'autocomplete': instance.autocomplete,
       'showBottomBar': instance.showBottomBar,
+      'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
       'chatNotificationsOnBottom': instance.chatNotificationsOnBottom,
       'landscapeCutout':
@@ -344,6 +346,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showBottomBar(bool value) {
     _$showBottomBarAtom.reportWrite(value, super.showBottomBar, () {
       super.showBottomBar = value;
+    });
+  }
+
+  late final _$emoteMenuButtonOnLeftAtom =
+      Atom(name: '_SettingsStoreBase.emoteMenuButtonOnLeft', context: context);
+
+  @override
+  bool get emoteMenuButtonOnLeft {
+    _$emoteMenuButtonOnLeftAtom.reportRead();
+    return super.emoteMenuButtonOnLeft;
+  }
+
+  @override
+  set emoteMenuButtonOnLeft(bool value) {
+    _$emoteMenuButtonOnLeftAtom.reportWrite(value, super.emoteMenuButtonOnLeft,
+        () {
+      super.emoteMenuButtonOnLeft = value;
     });
   }
 
@@ -776,6 +795,7 @@ chatDelay: ${chatDelay},
 chatOnlyPreventSleep: ${chatOnlyPreventSleep},
 autocomplete: ${autocomplete},
 showBottomBar: ${showBottomBar},
+emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
 chatNotificationsOnBottom: ${chatNotificationsOnBottom},
 landscapeCutout: ${landscapeCutout},

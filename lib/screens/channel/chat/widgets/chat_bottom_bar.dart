@@ -13,6 +13,16 @@ class ChatBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final emoteMenuButton = IconButton(
+      color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
+      tooltip: 'Emote menu',
+      icon: const Icon(Icons.emoji_emotions_outlined),
+      onPressed: () {
+        FocusScope.of(context).unfocus();
+        chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
+      },
+    );
+
     return Observer(
       builder: (context) {
         final matchingEmotes = [
@@ -112,15 +122,8 @@ class ChatBottomBar extends StatelessWidget {
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 10.0),
-                          suffixIcon: IconButton(
-                            color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
-                            tooltip: 'Emote menu',
-                            icon: const Icon(Icons.emoji_emotions_outlined),
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
-                            },
-                          ),
+                          prefixIcon: chatStore.settings.emoteMenuButtonOnLeft ? emoteMenuButton : null,
+                          suffixIcon: chatStore.settings.emoteMenuButtonOnLeft ? null : emoteMenuButton,
                           hintMaxLines: 1,
                           hintText: chatStore.auth.isLoggedIn
                               ? 'Send a message ${chatStore.settings.chatDelay == 0 ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
