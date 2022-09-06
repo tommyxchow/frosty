@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
@@ -68,12 +67,10 @@ class _ChatDetailsState extends State<ChatDetails> {
                   height: MediaQuery.of(context).size.height * 0.8,
                   child: GestureDetector(
                     onTap: FocusScope.of(context).unfocus,
-                    child: Observer(
-                      builder: (_) => ChattersList(
-                        chatDetailsStore: widget.chatDetailsStore,
-                        chatStore: widget.chatStore,
-                        userLogin: widget.userLogin,
-                      ),
+                    child: ChattersList(
+                      chatDetailsStore: widget.chatDetailsStore,
+                      chatStore: widget.chatStore,
+                      userLogin: widget.userLogin,
                     ),
                   ),
                 ),
