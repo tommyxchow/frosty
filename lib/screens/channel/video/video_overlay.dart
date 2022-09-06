@@ -14,12 +14,10 @@ import 'package:intl/intl.dart';
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
-  final void Function() onSettingsPressed;
 
   const VideoOverlay({
     Key? key,
     required this.videoStore,
-    required this.onSettingsPressed,
   }) : super(key: key);
 
   Future<void> _showSleepTimerDialog(BuildContext context) {
@@ -108,15 +106,6 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
-    final settingsButton = IconButton(
-      tooltip: 'Settings',
-      icon: const Icon(
-        Icons.settings,
-        color: Colors.white,
-      ),
-      onPressed: onSettingsPressed,
-    );
-
     final chatOverlayButton = Observer(
       builder: (_) => IconButton(
         tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
@@ -196,7 +185,6 @@ class VideoOverlay extends StatelessWidget {
               backButton,
               const Spacer(),
               if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-              settingsButton,
             ],
           ),
           Align(
@@ -251,7 +239,6 @@ class VideoOverlay extends StatelessWidget {
                 const Spacer(),
                 if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
                 sleepTimerButton,
-                settingsButton,
               ],
             ),
 
