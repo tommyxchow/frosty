@@ -103,6 +103,9 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowChatMessageDividers = false;
   static const defaultTimestampType = TimestampType.disabled;
 
+  static const defaultHighlightFirstTimeChatter = true;
+  static const defaultShowUserNotices = true;
+
   static const defaultBadgeScale = 1.0;
   static const defaultEmoteScale = 1.0;
   static const defaultMessageScale = 1.0;
@@ -165,6 +168,14 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var timestampType = defaultTimestampType;
 
+  @JsonKey(defaultValue: defaultHighlightFirstTimeChatter)
+  @observable
+  var highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
+
+  @JsonKey(defaultValue: defaultShowUserNotices)
+  @observable
+  var showUserNotices = defaultHighlightFirstTimeChatter;
+
   @JsonKey(defaultValue: defaultBadgeScale)
   @observable
   var badgeScale = defaultBadgeScale;
@@ -201,6 +212,8 @@ abstract class _SettingsStoreBase with Store {
     showDeletedMessages = defaultShowDeletedMessages;
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
+    highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
+    showUserNotices = defaultShowUserNotices;
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
     messageScale = defaultMessageScale;

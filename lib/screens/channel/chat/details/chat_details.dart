@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/widgets/modal.dart';
 
 class ChatDetails extends StatefulWidget {
@@ -32,28 +32,71 @@ class _ChatDetailsState extends State<ChatDetails> {
   @override
   Widget build(BuildContext context) {
     return FrostyModal(
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.8,
-        child: GestureDetector(
-          onTap: FocusScope.of(context).unfocus,
-          child: Observer(
-            builder: (_) => Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 15.0),
-                  child: ChatModes(roomState: widget.chatDetailsStore.roomState),
+      child: Column(
+        children: [
+          ListTile(
+            title: ChatModes(roomState: widget.chatDetailsStore.roomState),
+          ),
+          const Divider(
+            height: 1.0,
+            thickness: 1.0,
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () => showModalBottomSheet(
+              backgroundColor: Colors.transparent,
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => FrostyModal(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: Settings(settingsStore: widget.chatStore.settings),
                 ),
-                Expanded(
-                  child: ChattersList(
-                    chatDetailsStore: widget.chatDetailsStore,
-                    chatStore: widget.chatStore,
-                    userLogin: widget.userLogin,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+          ListTile(
+            leading: const Icon(Icons.people),
+            title: const Text('Chatters'),
+            onTap: () => showModalBottomSheet(
+              backgroundColor: Colors.transparent,
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => FrostyModal(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: GestureDetector(
+                    onTap: FocusScope.of(context).unfocus,
+                    child: ChattersList(
+                      chatDetailsStore: widget.chatDetailsStore,
+                      chatStore: widget.chatStore,
+                      userLogin: widget.userLogin,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.refresh),
+            title: const Text('Reconnect to chat'),
+            onTap: () {
+              widget.chatStore.updateNotification('Reconnecting to chat...');
+
+              widget.chatStore.connectToChat();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.refresh),
+            title: const Text('Refresh badges and emotes'),
+            onTap: () async {
+              await widget.chatStore.getAssets();
+
+              widget.chatStore.updateNotification('Badges and emotes refreshed');
+            },
+          ),
+        ],
       ),
     );
   }

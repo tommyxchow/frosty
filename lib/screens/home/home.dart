@@ -82,7 +82,7 @@ class _HomeState extends State<Home> {
           title: Observer(
             builder: (_) {
               final titles = [
-                if (_authStore.isLoggedIn) 'Followed Streams',
+                if (_authStore.isLoggedIn) 'Following',
                 'Top',
                 'Search',
               ];
@@ -139,7 +139,7 @@ class _HomeState extends State<Home> {
               if (_authStore.isLoggedIn)
                 const BottomNavigationBarItem(
                   icon: Icon(Icons.favorite),
-                  label: 'Followed',
+                  label: 'Following',
                   tooltip: 'Followed streams',
                 ),
               const BottomNavigationBarItem(

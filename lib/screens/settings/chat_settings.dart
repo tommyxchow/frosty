@@ -218,6 +218,23 @@ class _ChatSettingsState extends State<ChatSettings> {
             ),
           ),
           const SectionHeader(
+            'Alerts',
+            padding: sectionPadding,
+            showDivider: true,
+          ),
+          SwitchListTile.adaptive(
+            title: const Text('Highlight first time chatters'),
+            value: settingsStore.highlightFirstTimeChatter,
+            onChanged: (newValue) => settingsStore.highlightFirstTimeChatter = newValue,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Show notices'),
+            subtitle: const Text('Shows notices such as subs and re-subs, announcements, and raids.'),
+            value: settingsStore.showUserNotices,
+            onChanged: (newValue) => settingsStore.showUserNotices = newValue,
+          ),
+          const SectionHeader(
             'Message Sizing',
             padding: sectionPadding,
             showDivider: true,

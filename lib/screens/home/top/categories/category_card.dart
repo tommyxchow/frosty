@@ -55,7 +55,7 @@ class CategoryCard extends StatelessWidget {
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 category.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

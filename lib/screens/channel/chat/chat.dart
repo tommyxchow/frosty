@@ -84,8 +84,8 @@ class Chat extends StatelessWidget {
                               : Button(
                                   padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                                   onPressed: chatStore.resumeScroll,
-                                  icon: const Icon(Icons.arrow_circle_down),
-                                  child: const Text('Resume Scroll'),
+                                  icon: const Icon(Icons.arrow_downward),
+                                  child: const Text('Resume scroll'),
                                 ),
                         ),
                       ),

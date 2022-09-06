@@ -82,7 +82,7 @@ void main() async {
 // Navigator key for sleep timer. Allows navigation popping without context.
 final navigatorKey = GlobalKey<NavigatorState>();
 
-const gray = Color.fromRGBO(22, 22, 22, 1.0);
+const gray = Color.fromRGBO(18, 18, 18, 1.0);
 const purple = Color(0xff9146ff);
 
 const inputTheme = InputDecorationTheme(
