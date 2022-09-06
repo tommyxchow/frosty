@@ -20,10 +20,7 @@ class ChatStore = ChatStoreBase with _$ChatStore;
 
 abstract class ChatStoreBase with Store {
   /// The total maximum amount of messages in chat.
-  static const _messageLimit = 10000;
-
-  /// The maximum ammount of messages to render when autoscroll is enabled.
-  static const _renderMessageLimit = 100;
+  static const _messageLimit = 5000;
 
   /// The amount of messages to free (remove) when the [_messageLimit] is reached.
   final _messagesToRemove = (_messageLimit * 0.2).toInt();
@@ -93,18 +90,6 @@ abstract class ChatStoreBase with Store {
   /// The list of chat messages to render and display.
   @readonly
   var _messages = ObservableList<IRCMessage>();
-
-  @computed
-  List<IRCMessage> get renderMessages {
-    // If autoscroll is disabled, render ALL messages in chat.
-    // The second condition is to prevent an out of index error with sublist.
-    if (!_autoScroll || _messages.length < _renderMessageLimit) return _messages;
-
-    // When autoscroll is enabled, only show the first [_renderMessageLimit] messages.
-    // This will improve performance by only rendering a limited amount of messages
-    // instead of the entire history at all times.
-    return _messages.sublist(_messages.length - _renderMessageLimit);
-  }
 
   /// If the chat should automatically scroll/jump to the latest message.
   @readonly
