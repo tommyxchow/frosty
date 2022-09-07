@@ -1,1 +1,1 @@
-twitch,bttv,ffz,7tv,betterttv,frankerfacez,seventv,emote,stream,chat,xqc,forsen,flutter,twitchtv,lol
+twitch,emote,7tv,bttv,ffz,betterttv,frankerfacez,live,stream,chat,xqc,forsen,flutter,valorant,esport

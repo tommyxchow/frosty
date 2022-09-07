@@ -1,1 +1,1 @@
-A free and open-source mobile app for Twitch with BetterTTV (BTTV), FrankerFaceZ (FFZ), and 7TV support.
+Watch and chat on Twitch with your favorite emotes from 7TV, BTTV, and FFZ!
