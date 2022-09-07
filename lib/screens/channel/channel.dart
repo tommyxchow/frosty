@@ -17,8 +17,10 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/modal.dart';
 import 'package:provider/provider.dart';
 
 /// Creates a widget that shows the video stream (if live) and chat of the given user.
@@ -71,11 +73,30 @@ class _VideoChatState extends State<VideoChat> {
   Widget build(BuildContext context) {
     final settingsStore = _chatStore.settings;
 
+    void showSettings() => showModalBottomSheet(
+          backgroundColor: Colors.transparent,
+          isScrollControlled: true,
+          context: context,
+          builder: (context) => FrostyModal(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: Settings(settingsStore: settingsStore),
+            ),
+          ),
+        );
+
     final appBar = AppBar(
       title: Text(
         regexEnglish.hasMatch(_chatStore.displayName) ? _chatStore.displayName : '${_chatStore.displayName} (${_chatStore.channelName})',
         style: const TextStyle(fontSize: 20),
       ),
+      actions: [
+        IconButton(
+          tooltip: 'Settings',
+          icon: const Icon(Icons.settings),
+          onPressed: showSettings,
+        ),
+      ],
     );
 
     final player = GestureDetector(
@@ -88,6 +109,7 @@ class _VideoChatState extends State<VideoChat> {
 
     final videoOverlay = VideoOverlay(
       videoStore: _videoStore,
+      onSettingsPressed: showSettings,
     );
 
     final overlay = GestureDetector(

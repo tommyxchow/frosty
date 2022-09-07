@@ -3,8 +3,8 @@ import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
-import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/widgets/modal.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class ChatDetails extends StatefulWidget {
   final ChatDetailsStore chatDetailsStore;
@@ -33,29 +33,13 @@ class _ChatDetailsState extends State<ChatDetails> {
   Widget build(BuildContext context) {
     return FrostyModal(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SectionHeader('Chat modes'),
           ListTile(
             title: ChatModes(roomState: widget.chatDetailsStore.roomState),
           ),
-          const Divider(
-            height: 1.0,
-            thickness: 1.0,
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
-            onTap: () => showModalBottomSheet(
-              backgroundColor: Colors.transparent,
-              isScrollControlled: true,
-              context: context,
-              builder: (context) => FrostyModal(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.8,
-                  child: Settings(settingsStore: widget.chatStore.settings),
-                ),
-              ),
-            ),
-          ),
+          const SectionHeader('Other'),
           ListTile(
             leading: const Icon(Icons.people),
             title: const Text('Chatters'),
