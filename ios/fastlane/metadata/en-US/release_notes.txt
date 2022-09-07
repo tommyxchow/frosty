@@ -1,14 +1,18 @@
+This update contains various chat enhancements and improvements in layouts and styles.
+
 New Features
-• Added a "Paste" button for easier pasting when copying a message
-• Added an option to move chat notifications to the bottom
-• Added the ability to refresh chat
+• Added replied message to replies in chat
+• Added first message highlights
+• Added options to hide highlights and notices in chat
+• Added an option to move the emote menu button to the left side
 
 Improvements
-• Accessing the settings while in a channel now summons a panel with various options
-• Moved the "Refresh emotes" button to the new settings panel
+• Moved settings panel to the "More" button (three dots) in chat
+• Changed arrow icon for resume scroll button
+• Reduced title opacity and font-weight on stream cards for consistency
+• Renamed the "Followed Streams" tab to just "Following"
+• Darkened the dark theme (again)
 
 Bug Fixes
-• Fixed chat notifications dismissing early when copying a message
-• Fixed a potential memory leak caused by chat messages growing to infinity when auto-scroll is disabled
-• Fixed delay when tapping overlay in portrait mode
-• Fixed default subscriber badges showing in chat rather than channel-specific badges
+• Fixed misaligned alert messages
+• Fixed misaligned chat names when setting message scale above 1.0
