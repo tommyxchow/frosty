@@ -95,6 +95,7 @@ class ChatMessage extends StatelessWidget {
                         replyUser != null && replyBody != null ? Icons.reply : Icons.new_releases_outlined,
                         size: defaultBadgeSize * chatStore.settings.badgeScale,
                         color: defaultTextStyle.color?.withOpacity(0.5),
+                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(width: 5.0),
                       Flexible(
