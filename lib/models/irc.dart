@@ -114,7 +114,6 @@ class IRCMessage {
     required bool launchExternal,
     required void Function()? onLongPressName,
     bool showMessage = true,
-    bool useZeroWidth = false,
     bool useReadableColors = false,
     TimestampType timestamp = TimestampType.disabled,
   }) {
@@ -311,161 +310,138 @@ class IRCMessage {
 
       // Add the message and any emotes to the span.
       if (words != null) {
-        if (useZeroWidth) {
-          // Keep a local span which will be reversed and added to the final span.
-          final localSpan = <InlineSpan>[];
+        // Keep a local span which will be reversed and added to the final span.
+        final localSpan = <InlineSpan>[];
 
-          // Iterate through the words in reverse-order.
-          // Index starts at the last word in the message.
-          var index = words.length - 1;
+        // Iterate through the words in reverse-order.
+        // Index starts at the last word in the message.
+        var index = words.length - 1;
 
-          // Terminate after the first word in the message reached.
-          while (index != -1) {
-            // Check if current word is a valid emote.
-            final word = words[index];
-            final emote = emoteToObject[word] ?? localEmotes?[word];
+        // Terminate after the first word in the message reached.
+        while (index != -1) {
+          // Check if current word is a valid emote.
+          final word = words[index];
+          final emote = emoteToObject[word] ?? localEmotes?[word];
 
-            if (emote != null) {
-              // If the emote is zero-width and not the first word, process the stack.
-              if (emote.zeroWidth && index != 0) {
-                final emoteStack = <Emote>[];
+          if (emote != null) {
+            // If the emote is zero-width and not the first word, process the stack.
+            if (emote.zeroWidth && index != 0) {
+              final emoteStack = <Emote>[];
 
-                // Handle stacking consecutive zero-width emotes.
-                Emote? nextEmote = emote;
-                while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
-                  emoteStack.add(nextEmote);
-                  index--;
-                  nextEmote = emoteToObject[words[index]] ?? localEmotes?[words[index]];
-                }
+              // Handle stacking consecutive zero-width emotes.
+              Emote? nextEmote = emote;
+              while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
+                emoteStack.add(nextEmote);
+                index--;
+                nextEmote = emoteToObject[words[index]] ?? localEmotes?[words[index]];
+              }
 
-                // If there's one more emote thats NOT zero-width, add it to the base of the stack.
-                if (nextEmote != null) emoteStack.add(nextEmote);
+              // If there's one more emote thats NOT zero-width, add it to the base of the stack.
+              if (nextEmote != null) emoteStack.add(nextEmote);
 
-                // Check if the next word is an emoji to be added to the stack.
-                final nextWordIsEmoji = regexEmoji.hasMatch(words[index]);
+              // Check if the next word is an emoji to be added to the stack.
+              final nextWordIsEmoji = regexEmoji.hasMatch(words[index]);
 
-                // Create the stack of emotes with the base emoji if there is one.
-                // Will be used as the children of the Stack widget.
-                final children = [
-                  if (nextWordIsEmoji)
-                    Text(
-                      words[index],
-                      style: textStyle?.copyWith(fontSize: emoteSize - 5),
-                    ),
-                  ...emoteStack.reversed.map(
-                    (emote) => CachedNetworkImage(
-                      imageUrl: emote.url,
-                      fadeInDuration: const Duration(),
-                      height: emote.height != null ? emote.height! * emoteScale : emoteSize,
-                      width: emote.width != null ? emote.width! * emoteScale : emoteSize,
-                    ),
-                  )
-                ];
+              // Create the stack of emotes with the base emoji if there is one.
+              // Will be used as the children of the Stack widget.
+              final children = [
+                if (nextWordIsEmoji)
+                  Text(
+                    words[index],
+                    style: textStyle?.copyWith(fontSize: emoteSize - 5),
+                  ),
+                ...emoteStack.reversed.map(
+                  (emote) => CachedNetworkImage(
+                    imageUrl: emote.url,
+                    fadeInDuration: const Duration(),
+                    height: emote.height != null ? emote.height! * emoteScale : emoteSize,
+                    width: emote.width != null ? emote.width! * emoteScale : emoteSize,
+                  ),
+                )
+              ];
 
-                // Create the message for the tooltip
-                final message = emoteStack.reversed.map((emote) => '${emote.name} - ${emoteType[emote.type.index]}');
-                localSpan.add(
-                  WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: Tooltip(
-                      richMessage: WidgetSpan(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Column(
-                            children: [
-                              Stack(
-                                alignment: AlignmentDirectional.center,
-                                children: [
-                                  if (nextWordIsEmoji)
-                                    Text(
-                                      words[index],
-                                      style: textStyle?.copyWith(fontSize: 75),
-                                    ),
-                                  ...emoteStack.reversed.map(
-                                    (emote) => CachedNetworkImage(
-                                      imageUrl: emote.url,
-                                      fadeInDuration: const Duration(),
-                                      height: 80,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 5.0),
-                              Column(
-                                children: [
+              // Create the message for the tooltip
+              final message = emoteStack.reversed.map((emote) => '${emote.name} - ${emoteType[emote.type.index]}');
+              localSpan.add(
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Tooltip(
+                    richMessage: WidgetSpan(
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Column(
+                          children: [
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                if (nextWordIsEmoji)
                                   Text(
-                                    nextWordIsEmoji ? '${words[index]} - Emoji' : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
-                                    style: const TextStyle(color: Colors.black),
+                                    words[index],
+                                    style: textStyle?.copyWith(fontSize: 75),
                                   ),
-                                  Text(
-                                    nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
-                                    style: const TextStyle(color: Colors.black),
+                                ...emoteStack.reversed.map(
+                                  (emote) => CachedNetworkImage(
+                                    imageUrl: emote.url,
+                                    fadeInDuration: const Duration(),
+                                    height: 80,
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                )
+                              ],
+                            ),
+                            const SizedBox(height: 5.0),
+                            Column(
+                              children: [
+                                Text(
+                                  nextWordIsEmoji ? '${words[index]} - Emoji' : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                Text(
+                                  nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      preferBelow: false,
-                      child: Stack(
-                        alignment: AlignmentDirectional.center,
-                        children: children,
-                      ),
+                    ),
+                    preferBelow: false,
+                    child: Stack(
+                      alignment: AlignmentDirectional.center,
+                      children: children,
                     ),
                   ),
-                );
+                ),
+              );
 
-                // If the next word is neither an emote or emoji, add it as a text span.
-                if (nextEmote == null && !nextWordIsEmoji) {
-                  localSpan.add(const TextSpan(text: ' '));
-                  localSpan.add(_createTextSpan(text: words[index], style: textStyle, launchExternal: launchExternal));
-                }
-              } else {
-                localSpan.add(
-                  _createEmoteSpan(
-                    emote: emote,
-                    height: emote.height != null ? emote.height! * emoteScale : emoteSize,
-                    width: emote.width != null ? emote.width! * emoteScale : null,
-                  ),
-                );
+              // If the next word is neither an emote or emoji, add it as a text span.
+              if (nextEmote == null && !nextWordIsEmoji) {
+                localSpan.add(const TextSpan(text: ' '));
+                localSpan.add(_createTextSpan(text: words[index], style: textStyle, launchExternal: launchExternal));
               }
             } else {
-              if (regexEmoji.hasMatch(word)) {
-                localSpan.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteSize - 5)));
-              } else {
-                localSpan.add(_createTextSpan(text: word, style: textStyle, launchExternal: launchExternal));
-              }
-            }
-            localSpan.add(const TextSpan(text: ' '));
-            index--;
-          }
-
-          // Add the the local span reversed to the final span.
-          span.addAll(localSpan.reversed);
-        } else {
-          // Iterate through the words and add to the span based on word, emote, and emoji.
-          for (final word in words) {
-            span.add(const TextSpan(text: ' '));
-
-            final emote = emoteToObject[word] ?? localEmotes?[word];
-            if (emote != null) {
-              span.add(
+              localSpan.add(
                 _createEmoteSpan(
                   emote: emote,
                   height: emote.height != null ? emote.height! * emoteScale : emoteSize,
                   width: emote.width != null ? emote.width! * emoteScale : null,
                 ),
               );
+            }
+          } else {
+            if (regexEmoji.hasMatch(word)) {
+              localSpan.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteSize - 5)));
             } else {
-              if (regexEmoji.hasMatch(word)) {
-                span.add(_createEmojiSpan(emoji: word, style: textStyle?.copyWith(fontSize: emoteSize - 5)));
-              } else {
-                span.add(_createTextSpan(text: word, style: textStyle, launchExternal: launchExternal));
-              }
+              localSpan.add(_createTextSpan(text: word, style: textStyle, launchExternal: launchExternal));
             }
           }
+
+          localSpan.add(const TextSpan(text: ' '));
+          index--;
         }
+
+        // Add the the local span reversed to the final span.
+        span.addAll(localSpan.reversed);
       }
     }
 

@@ -170,18 +170,6 @@ class _ChatSettingsState extends State<ChatSettings> {
             ),
           ),
           const SectionHeader(
-            'Emotes',
-            padding: sectionPadding,
-            showDivider: true,
-          ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Zero-width emotes'),
-            subtitle: const Text('Shows "stacked" emotes from BetterTTV and 7TV.'),
-            value: settingsStore.showZeroWidth,
-            onChanged: (newValue) => settingsStore.showZeroWidth = newValue,
-          ),
-          const SectionHeader(
             'Message Appearance',
             padding: sectionPadding,
             showDivider: true,

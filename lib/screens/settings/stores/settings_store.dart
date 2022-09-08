@@ -97,8 +97,6 @@ abstract class _SettingsStoreBase with Store {
   static const defaultChatWidth = 0.3;
   static const defaultFullScreenChatOverlayOpacity = 0.5;
 
-  static const defaultShowZeroWidth = false;
-
   static const defaultUseReadableColors = true;
   static const defaultShowDeletedMessages = false;
   static const defaultShowChatMessageDividers = false;
@@ -152,10 +150,6 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultFullScreenChatOverlayOpacity)
   @observable
   var fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
-
-  @JsonKey(defaultValue: defaultShowZeroWidth)
-  @observable
-  var showZeroWidth = defaultShowZeroWidth;
 
   @JsonKey(defaultValue: defaultUseReadableColors)
   @observable
@@ -213,7 +207,6 @@ abstract class _SettingsStoreBase with Store {
     landscapeCutout = defaultLandscapeCutout;
     chatWidth = defaultChatWidth;
     fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
-    showZeroWidth = defaultShowZeroWidth;
     useReadableColors = defaultUseReadableColors;
     showDeletedMessages = defaultShowDeletedMessages;
     showChatMessageDividers = defaultShowChatMessageDividers;

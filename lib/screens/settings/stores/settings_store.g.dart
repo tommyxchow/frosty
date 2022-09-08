@@ -34,7 +34,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
-      ..showZeroWidth = json['showZeroWidth'] as bool? ?? false
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showChatMessageDividers =
@@ -79,7 +78,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
           _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
       'chatWidth': instance.chatWidth,
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
-      'showZeroWidth': instance.showZeroWidth,
       'useReadableColors': instance.useReadableColors,
       'showDeletedMessages': instance.showDeletedMessages,
       'showChatMessageDividers': instance.showChatMessageDividers,
@@ -450,22 +448,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showZeroWidthAtom =
-      Atom(name: '_SettingsStoreBase.showZeroWidth', context: context);
-
-  @override
-  bool get showZeroWidth {
-    _$showZeroWidthAtom.reportRead();
-    return super.showZeroWidth;
-  }
-
-  @override
-  set showZeroWidth(bool value) {
-    _$showZeroWidthAtom.reportWrite(value, super.showZeroWidth, () {
-      super.showZeroWidth = value;
-    });
-  }
-
   late final _$useReadableColorsAtom =
       Atom(name: '_SettingsStoreBase.useReadableColors', context: context);
 
@@ -801,7 +783,6 @@ chatNotificationsOnBottom: ${chatNotificationsOnBottom},
 landscapeCutout: ${landscapeCutout},
 chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
-showZeroWidth: ${showZeroWidth},
 useReadableColors: ${useReadableColors},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
