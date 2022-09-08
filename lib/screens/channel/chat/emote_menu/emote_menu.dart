@@ -28,9 +28,9 @@ class _EmoteMenuState extends State<EmoteMenu> {
     const sections = [
       'RECENT',
       'TWITCH',
+      '7TV',
       'BTTV',
       'FFZ',
-      '7TV',
     ];
 
     final emoteMenu = Column(
@@ -89,6 +89,12 @@ class _EmoteMenuState extends State<EmoteMenu> {
               Observer(
                 builder: (_) => EmoteMenuPanel(
                   chatStore: widget.chatStore,
+                  emotes: widget.chatStore.assetsStore.sevenTVEmotes,
+                ),
+              ),
+              Observer(
+                builder: (_) => EmoteMenuPanel(
+                  chatStore: widget.chatStore,
                   emotes: widget.chatStore.assetsStore.bttvEmotes,
                 ),
               ),
@@ -96,12 +102,6 @@ class _EmoteMenuState extends State<EmoteMenu> {
                 builder: (_) => EmoteMenuPanel(
                   chatStore: widget.chatStore,
                   emotes: widget.chatStore.assetsStore.ffzEmotes,
-                ),
-              ),
-              Observer(
-                builder: (_) => EmoteMenuPanel(
-                  chatStore: widget.chatStore,
-                  emotes: widget.chatStore.assetsStore.sevenTVEmotes,
                 ),
               ),
             ],
