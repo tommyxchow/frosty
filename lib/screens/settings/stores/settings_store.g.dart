@@ -26,6 +26,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+      ..landscapeForceVerticalChat =
+          json['landscapeForceVerticalChat'] as bool? ?? false
       ..chatNotificationsOnBottom =
           json['chatNotificationsOnBottom'] as bool? ?? false
       ..landscapeCutout = $enumDecodeNullable(
@@ -73,6 +75,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showBottomBar': instance.showBottomBar,
       'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
       'chatNotificationsOnBottom': instance.chatNotificationsOnBottom,
       'landscapeCutout':
           _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
@@ -378,6 +381,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
         () {
       super.landscapeChatLeftSide = value;
+    });
+  }
+
+  late final _$landscapeForceVerticalChatAtom = Atom(
+      name: '_SettingsStoreBase.landscapeForceVerticalChat', context: context);
+
+  @override
+  bool get landscapeForceVerticalChat {
+    _$landscapeForceVerticalChatAtom.reportRead();
+    return super.landscapeForceVerticalChat;
+  }
+
+  @override
+  set landscapeForceVerticalChat(bool value) {
+    _$landscapeForceVerticalChatAtom
+        .reportWrite(value, super.landscapeForceVerticalChat, () {
+      super.landscapeForceVerticalChat = value;
     });
   }
 
@@ -779,6 +799,7 @@ autocomplete: ${autocomplete},
 showBottomBar: ${showBottomBar},
 emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
+landscapeForceVerticalChat: ${landscapeForceVerticalChat},
 chatNotificationsOnBottom: ${chatNotificationsOnBottom},
 landscapeCutout: ${landscapeCutout},
 chatWidth: ${chatWidth},

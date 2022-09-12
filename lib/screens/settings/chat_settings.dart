@@ -101,6 +101,13 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
+            title: const Text('Force vertical chat in landscape mode'),
+            subtitle: const Text('Note: this option is intended for tablets and other larger displays.'),
+            value: settingsStore.landscapeForceVerticalChat,
+            onChanged: (newValue) => settingsStore.landscapeForceVerticalChat = newValue,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
             title: const Text('Notifications on bottom'),
             subtitle: const Text('Shows notifications (e.g., "Message copied") on the bottom of the chat.'),
             value: settingsStore.chatNotificationsOnBottom,
