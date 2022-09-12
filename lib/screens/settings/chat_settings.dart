@@ -100,6 +100,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
           ),
           SwitchListTile.adaptive(
+            isThreeLine: true,
             title: const Text('Force vertical chat in landscape mode'),
             subtitle: const Text('Note: this option is intended for tablets and other larger displays.'),
             value: settingsStore.landscapeForceVerticalChat,
