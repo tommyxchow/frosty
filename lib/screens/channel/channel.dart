@@ -166,11 +166,11 @@ class _VideoChatState extends State<VideoChat> {
     final videoChat = Scaffold(
       body: OrientationBuilder(
         builder: (context, orientation) {
-          if (orientation == Orientation.landscape) {
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+          return Observer(
+            builder: (_) {
+              if (orientation == Orientation.landscape && !settingsStore.landscapeForceVerticalChat) {
+                SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-            return Observer(
-              builder: (context) {
                 final landscapeChat = AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: _chatStore.expandChat ? MediaQuery.of(context).size.width / 2 : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
@@ -224,27 +224,21 @@ class _VideoChatState extends State<VideoChat> {
                           ),
                   ),
                 );
-              },
-            );
-          }
+              }
 
-          SystemChrome.setEnabledSystemUIMode(
-            SystemUiMode.manual,
-            overlays: SystemUiOverlay.values,
-          );
-          return SafeArea(
-            child: Column(
-              children: [
-                Observer(
-                  builder: (_) {
-                    if (!settingsStore.showVideo) return appBar;
-
-                    return AspectRatio(aspectRatio: 16 / 9, child: video);
-                  },
+              SystemChrome.setEnabledSystemUIMode(
+                SystemUiMode.manual,
+                overlays: SystemUiOverlay.values,
+              );
+              return SafeArea(
+                child: Column(
+                  children: [
+                    if (!settingsStore.showVideo) appBar else AspectRatio(aspectRatio: 16 / 9, child: video),
+                    Expanded(child: chat),
+                  ],
                 ),
-                Expanded(child: chat),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
