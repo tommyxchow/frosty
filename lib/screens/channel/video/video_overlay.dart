@@ -311,10 +311,7 @@ class VideoOverlay extends StatelessWidget {
                                       videoStore.streamInfo!.title.trim(),
                                       maxLines: orientation == Orientation.portrait ? 1 : 5,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                      style: const TextStyle(color: Colors.white),
                                     ),
                                   ),
                                   const SizedBox(height: 5.0),
