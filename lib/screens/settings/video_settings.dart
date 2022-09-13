@@ -34,13 +34,6 @@ class VideoSettings extends StatelessWidget {
           ),
           SwitchListTile.adaptive(
             isThreeLine: true,
-            title: const Text('Picture-in-picture button (experimental)'),
-            subtitle: const Text('Adds a button to enter PiP mode on the bottom right of the overlay (may cause freezes/crashes).'),
-            value: settingsStore.pictureInPicture,
-            onChanged: settingsStore.showVideo && settingsStore.showOverlay ? (newValue) => settingsStore.pictureInPicture = newValue : null,
-          ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
             title: const Text('Long-press player to toggle overlay'),
             subtitle: const Text('Allows switching between Twitch\'s default overlay and the custom overlay.'),
             value: settingsStore.toggleableOverlay,

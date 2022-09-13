@@ -327,15 +327,14 @@ class VideoOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (videoStore.settingsStore.pictureInPicture)
-                    IconButton(
-                      tooltip: 'Picture-in-picture',
-                      icon: const Icon(
-                        Icons.picture_in_picture_alt_rounded,
-                        color: Colors.white,
-                      ),
-                      onPressed: videoStore.requestPictureInPicture,
+                  IconButton(
+                    tooltip: 'Picture-in-picture',
+                    icon: const Icon(
+                      Icons.picture_in_picture_alt_rounded,
+                      color: Colors.white,
                     ),
+                    onPressed: videoStore.requestPictureInPicture,
+                  ),
                   refreshButton,
                   if (!videoStore.isIPad) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,

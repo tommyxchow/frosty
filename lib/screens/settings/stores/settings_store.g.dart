@@ -18,7 +18,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
-      ..pictureInPicture = json['pictureInPicture'] as bool? ?? false
       ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
       ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? true
@@ -67,7 +66,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
-      'pictureInPicture': instance.pictureInPicture,
       'overlayOpacity': instance.overlayOpacity,
       'chatDelay': instance.chatDelay,
       'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
@@ -250,22 +248,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set toggleableOverlay(bool value) {
     _$toggleableOverlayAtom.reportWrite(value, super.toggleableOverlay, () {
       super.toggleableOverlay = value;
-    });
-  }
-
-  late final _$pictureInPictureAtom =
-      Atom(name: '_SettingsStoreBase.pictureInPicture', context: context);
-
-  @override
-  bool get pictureInPicture {
-    _$pictureInPictureAtom.reportRead();
-    return super.pictureInPicture;
-  }
-
-  @override
-  set pictureInPicture(bool value) {
-    _$pictureInPictureAtom.reportWrite(value, super.pictureInPicture, () {
-      super.pictureInPicture = value;
     });
   }
 
@@ -791,7 +773,6 @@ launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
-pictureInPicture: ${pictureInPicture},
 overlayOpacity: ${overlayOpacity},
 chatDelay: ${chatDelay},
 chatOnlyPreventSleep: ${chatOnlyPreventSleep},
