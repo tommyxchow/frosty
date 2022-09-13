@@ -43,7 +43,10 @@ platform :ios do
     upload_to_app_store(
       submit_for_review: true,
       force: true, # Disable HTML summary prompt that appears when uploading to the App Store.
-      precheck_include_in_app_purchases: false # Disabled due to not being supported with the App Store Connect API Key.
+      precheck_include_in_app_purchases: false, # Disabled due to not being supported with the App Store Connect API Key.
+      skip_screenshots: true,
+      automatic_release: true,
+      submission_information: { add_id_info_uses_idfa: false }
     )
   end
 end
