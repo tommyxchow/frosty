@@ -1,3 +1,5 @@
+Version 2.4.0
+
 New Features
 • Added an option to force vertical chat in landscape mode
 
