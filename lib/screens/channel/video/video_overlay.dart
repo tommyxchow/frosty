@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -10,15 +12,24 @@ import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
+import 'package:screen_brightness/screen_brightness.dart';
+import 'package:vector_math/vector_math.dart' as vec;
+import 'package:volume_controller/volume_controller.dart';
+
+import '../../../widgets/modal.dart';
+import '../chat/details/chat_users_list.dart';
+import '../chat/stores/chat_store.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
+  final ChatStore chatStore;
   final void Function() onSettingsPressed;
 
   const VideoOverlay({
     Key? key,
     required this.videoStore,
+    required this.chatStore,
     required this.onSettingsPressed,
   }) : super(key: key);
 
@@ -240,6 +251,49 @@ class VideoOverlay extends StatelessWidget {
       ],
     );
 
+    final volumeSlider = Align(
+      alignment: Alignment.centerRight,
+      child: Transform.rotate(
+        angle: vec.radians(-90),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.height / 2,
+          child: Observer(
+            builder: (context) {
+              return CupertinoSlider(
+                value: videoStore.currentVolume,
+                onChanged: (value) {
+                  videoStore.currentVolume = value;
+                  VolumeController().setVolume(value);
+                },
+              );
+            }
+          ),
+        ),
+      ),
+    );
+
+    final brightnessSlider = Align(
+      alignment: Alignment.centerLeft,
+      child: Transform.rotate(
+        angle: vec.radians(-90),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.height / 2,
+          child: Observer(
+            builder: (context) {
+              return CupertinoSlider(
+                value: videoStore.currentBrightness,
+                onChanged: (value) {
+                  videoStore.currentBrightness = value;
+                  ScreenBrightness().setScreenBrightness(value);
+                },
+              );
+            }
+          ),
+        ),
+      ),
+    );
+
+
     return Observer(
       builder: (context) {
         return Stack(
@@ -254,6 +308,14 @@ class VideoOverlay extends StatelessWidget {
                 settingsButton,
               ],
             ),
+
+            // volume slider, allows the user to change the volume when the overlay is visible
+            if (orientation == Orientation.landscape)
+              volumeSlider,
+
+            // allows the user to change the brightness when the overlay is visible
+            if (orientation == Orientation.landscape)
+              brightnessSlider,
 
             // Add a play button when paused for Android
             // When an ad is paused on Android there is no way to unpause, so a play button is necessary.
@@ -274,7 +336,7 @@ class VideoOverlay extends StatelessWidget {
                   onPressed: videoStore.handlePausePlay,
                 ),
               )
-            else if (!videoStore.paused)
+            else if (videoStore.paused)
               Center(
                 child: IconButton(
                   tooltip: 'Pause',
@@ -311,14 +373,37 @@ class VideoOverlay extends StatelessWidget {
                                       videoStore.streamInfo!.title.trim(),
                                       maxLines: orientation == Orientation.portrait ? 1 : 5,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: Colors.white),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 5.0),
-                                  Text(
-                                    '${videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo?.gameName : 'No Category'} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                  GestureDetector(
+                                    onTap: () => showModalBottomSheet(
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder: (context) => FrostyModal(
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context).size.height * 0.8,
+                                          child: GestureDetector(
+                                            onTap: FocusScope.of(context).unfocus,
+                                            child: ChattersList(
+                                              chatDetailsStore: chatStore.chatDetailsStore,
+                                              chatStore: chatStore,
+                                              userLogin: chatStore.channelName,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo?.gameName : 'No Category'} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   ),
                                 ],

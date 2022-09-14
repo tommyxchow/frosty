@@ -10,6 +10,8 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
+import 'package:screen_brightness/screen_brightness.dart';
+import 'package:volume_controller/volume_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part 'video_store.g.dart';
@@ -91,6 +93,12 @@ abstract class VideoStoreBase with Store {
   @readonly
   var _isIPad = false;
 
+  @observable
+  double currentVolume = 0.5;
+
+  @observable
+  double currentBrightness = 0.5;
+
   /// The current stream info, used for displaying relevant info on the overlay.
   @readonly
   StreamTwitch? _streamInfo;
@@ -115,6 +123,10 @@ abstract class VideoStoreBase with Store {
       (_) => settingsStore.showOverlay,
       (_) => controller?.loadUrl(videoUrl),
     );
+
+    VolumeController().getVolume().then((value) => currentVolume = value);
+    VolumeController().listener((p0) => currentVolume = p0); // setup a listener that will change the slider's value to reflect the actual device volume if it is changed outside
+    ScreenBrightness().current.then((value) => currentBrightness = value);
 
     updateStreamInfo();
   }

@@ -119,6 +119,38 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$currentVolumeAtom =
+      Atom(name: 'VideoStoreBase.currentVolume', context: context);
+
+  @override
+  double get currentVolume {
+    _$currentVolumeAtom.reportRead();
+    return super.currentVolume;
+  }
+
+  @override
+  set currentVolume(double value) {
+    _$currentVolumeAtom.reportWrite(value, super.currentVolume, () {
+      super.currentVolume = value;
+    });
+  }
+
+  late final _$currentBrightnessAtom =
+      Atom(name: 'VideoStoreBase.currentBrightness', context: context);
+
+  @override
+  double get currentBrightness {
+    _$currentBrightnessAtom.reportRead();
+    return super.currentBrightness;
+  }
+
+  @override
+  set currentBrightness(double value) {
+    _$currentBrightnessAtom.reportWrite(value, super.currentBrightness, () {
+      super.currentBrightness = value;
+    });
+  }
+
   late final _$_streamInfoAtom =
       Atom(name: 'VideoStoreBase._streamInfo', context: context);
 
@@ -239,6 +271,8 @@ mixin _$VideoStore on VideoStoreBase, Store {
 sleepHours: ${sleepHours},
 sleepMinutes: ${sleepMinutes},
 timeRemaining: ${timeRemaining},
+currentVolume: ${currentVolume},
+currentBrightness: ${currentBrightness},
 videoUrl: ${videoUrl}
     ''';
   }

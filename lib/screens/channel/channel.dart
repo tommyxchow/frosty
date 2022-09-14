@@ -109,6 +109,7 @@ class _VideoChatState extends State<VideoChat> {
 
     final videoOverlay = VideoOverlay(
       videoStore: _videoStore,
+      chatStore: _chatStore,
       onSettingsPressed: showSettings,
     );
 

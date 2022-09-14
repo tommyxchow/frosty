@@ -57,6 +57,10 @@ dependencies:
   floating: ^1.1.0
   wakelock: ^0.6.2
   device_preview: ^1.1.0
+  volume_controller: ^2.0.4
+  vector_math: ^2.1.2
+  screen_brightness: ^0.2.1
+  flutter_fgbg: ^0.2.0
 
 dev_dependencies:
   flutter_test:

@@ -249,7 +249,7 @@ class ChatMessage extends StatelessWidget {
                   paddedMessage,
                   const Divider(
                     height: 1.0,
-                    thickness: 1.0,
+                    thickness: 0.2,
                   ),
                 ],
               )

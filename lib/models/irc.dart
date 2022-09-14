@@ -541,6 +541,7 @@ class IRCMessage {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
+        triggerMode: TooltipTriggerMode.tap,
         richMessage: WidgetSpan(
           child: Padding(
             padding: const EdgeInsets.all(5.0),
