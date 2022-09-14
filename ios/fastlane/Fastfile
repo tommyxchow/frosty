@@ -32,6 +32,12 @@ platform :ios do
     # Manage code signing (with match).
     sync_code_signing
 
+    # Automatic signing is used during development, but fastlane needs to use manual signing.
+    update_code_signing_settings(
+      code_signing_identity: 'iPhone Distribution',
+      profile_name: 'match AppStore com.tommychow.frosty'
+    )
+
     # Build the app for release.
     build_app(
       workspace: 'Runner.xcworkspace',
