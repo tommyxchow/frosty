@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 2.4.0+32
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
+  sdk: '>=2.19.0-312.0.dev <3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -61,6 +61,7 @@ dependencies:
   vector_math: ^2.1.2
   screen_brightness: ^0.2.1
   flutter_fgbg: ^0.2.0
+  animations: ^2.0.7
 
 dev_dependencies:
   flutter_test:

@@ -45,7 +45,7 @@ void main() async {
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
   // Initialize Sentry for crash reporting if enabled.
-  if (settingsStore.sendCrashLogs) await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
+  if (false) await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
 
   /// Initialize API services with a common client.
   /// This will prevent every request from creating a new client instance.
@@ -103,6 +103,7 @@ const inputTheme = InputDecorationTheme(
 );
 
 final lightTheme = ThemeData(
+  useMaterial3: true,
   canvasColor: Colors.white,
   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
   fontFamily: 'Inter',
@@ -117,10 +118,7 @@ final lightTheme = ThemeData(
     ),
     iconTheme: IconThemeData(color: Colors.black),
   ),
-  colorScheme: ColorScheme.fromSwatch(
-    primarySwatch: Colors.deepPurple,
-    accentColor: purple,
-  ),
+  colorSchemeSeed: Colors.deepPurple,
   toggleableActiveColor: purple,
   tabBarTheme: const TabBarTheme(
     labelColor: Colors.black,
@@ -130,6 +128,7 @@ final lightTheme = ThemeData(
 );
 
 final darkTheme = ThemeData(
+  useMaterial3: true,
   canvasColor: gray,
   brightness: Brightness.dark,
   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
@@ -144,17 +143,19 @@ final darkTheme = ThemeData(
     ),
   ),
   bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: gray),
-  colorScheme: ColorScheme.fromSwatch(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.deepPurple,
-    accentColor: purple,
-  ),
+  // colorScheme: ColorScheme.fromSwatch(
+  //   brightness: Brightness.dark,
+  //   primarySwatch: Colors.deepPurple,
+  //   accentColor: purple,
+  // ),
+  colorSchemeSeed: Colors.deepPurple,
   dialogBackgroundColor: gray,
   toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,
 );
 
 final oledTheme = ThemeData(
+  useMaterial3: true,
   canvasColor: Colors.black,
   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
   fontFamily: 'Inter',
@@ -167,11 +168,7 @@ final oledTheme = ThemeData(
       fontWeight: FontWeight.bold,
     ),
   ),
-  colorScheme: ColorScheme.fromSwatch(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.deepPurple,
-    accentColor: purple,
-  ),
+  colorSchemeSeed: Colors.deepPurple,
   dialogBackgroundColor: Colors.black,
   toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,

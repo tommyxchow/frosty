@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/home_store.dart';
@@ -70,7 +71,23 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _showStartDialog();
+
+    pageList = [
+      if (_authStore.isLoggedIn)
+        StreamsList(
+          listType: ListType.followed,
+          scrollController: _homeStore.followedScrollController,
+        ),
+      TopSection(
+        homeStore: _homeStore,
+      ),
+      Search(
+        scrollController: _homeStore.searchScrollController,
+      ),
+    ];
   }
+
+  List<Widget> pageList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -108,22 +125,30 @@ class _HomeState extends State<Home> {
             children: [
               Expanded(
                 child: Observer(
-                  builder: (_) => IndexedStack(
-                    index: _homeStore.selectedIndex,
-                    children: [
-                      if (_authStore.isLoggedIn)
-                        StreamsList(
-                          listType: ListType.followed,
-                          scrollController: _homeStore.followedScrollController,
-                        ),
-                      TopSection(
-                        homeStore: _homeStore,
+                  builder: (_) => PageTransitionSwitcher(
+                      transitionBuilder: (
+                        Widget child,
+                        Animation<double> animation,
+                        Animation<double> secondaryAnimation,
+                      ) {
+                        return FadeThroughTransition(animation: animation, secondaryAnimation: secondaryAnimation, child: child);
+                      },
+                      child: pageList[_homeStore.selectedIndex]
+                      // index: _homeStore.selectedIndex,
+                      // children: [
+                      //   if (_authStore.isLoggedIn)
+                      //     StreamsList(
+                      //       listType: ListType.followed,
+                      //       scrollController: _homeStore.followedScrollController,
+                      //     ),
+                      //   TopSection(
+                      //     homeStore: _homeStore,
+                      //   ),
+                      //   Search(
+                      //     scrollController: _homeStore.searchScrollController,
+                      //   ),
+                      // ],
                       ),
-                      Search(
-                        scrollController: _homeStore.searchScrollController,
-                      ),
-                    ],
-                  ),
                 ),
               ),
               const Divider(height: 1.0, thickness: 1.0),
@@ -131,30 +156,33 @@ class _HomeState extends State<Home> {
           ),
         ),
         bottomNavigationBar: Observer(
-          builder: (_) => BottomNavigationBar(
-            unselectedFontSize: 12.0,
-            selectedFontSize: 12.0,
-            type: BottomNavigationBarType.fixed,
-            items: [
-              if (_authStore.isLoggedIn)
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite),
-                  label: 'Following',
-                  tooltip: 'Followed streams',
+          builder: (_) => Theme(
+            data: Theme.of(context).copyWith(splashColor: Colors.transparent, highlightColor: Colors.transparent, hoverColor: Colors.transparent),
+            child: NavigationBar(
+              // unselectedFontSize: 12.0,
+              // selectedFontSize: 12.0,
+              // type: BottomNavigationBarType.fixed,
+              destinations: [
+                if (_authStore.isLoggedIn)
+                  const NavigationDestination(
+                    icon: Icon(Icons.favorite),
+                    label: 'Following',
+                    tooltip: 'Followed streams',
+                  ),
+                const NavigationDestination(
+                  icon: Icon(Icons.arrow_upward),
+                  label: 'Top',
+                  tooltip: 'Top streams and categories',
                 ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.arrow_upward),
-                label: 'Top',
-                tooltip: 'Top streams and categories',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.search),
-                label: 'Search',
-                tooltip: 'Search for channels and categories',
-              ),
-            ],
-            currentIndex: _homeStore.selectedIndex,
-            onTap: _homeStore.handleTap,
+                const NavigationDestination(
+                  icon: Icon(Icons.search),
+                  label: 'Search',
+                  tooltip: 'Search for channels and categories',
+                ),
+              ],
+              selectedIndex: _homeStore.selectedIndex,
+              onDestinationSelected: _homeStore.handleTap,
+            ),
           ),
         ),
       ),

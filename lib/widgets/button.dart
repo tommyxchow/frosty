@@ -35,36 +35,36 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final buttonStyle = ElevatedButton.styleFrom(
-      foregroundColor: widget.fill ? null : widget.color,
-      backgroundColor: widget.color == null || widget.fill ? widget.color : Colors.transparent,
-      padding: widget.padding,
-      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
-      elevation: widget.color == null ? 10.0 : 0.0,
-    ).copyWith(
-      elevation: (widget.color == null || widget.fill) && widget.onPressed != null
-          ? MaterialStateProperty.resolveWith(
-              (states) {
-                if (states.contains(MaterialState.pressed)) {
-                  return 0.0;
-                } else {
-                  return 5.0;
-                }
-              },
-            )
-          : MaterialStateProperty.all(0.0),
-    );
+    // final buttonStyle = ElevatedButton.styleFrom(
+    //   foregroundColor: widget.fill ? null : widget.color,
+    //   backgroundColor: widget.color == null || widget.fill ? widget.color : Colors.transparent,
+    //   padding: widget.padding,
+    //   splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+    //   textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
+    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+    //   elevation: widget.color == null ? 10.0 : 0.0,
+    // ).copyWith(
+    //   elevation: (widget.color == null || widget.fill) && widget.onPressed != null
+    //       ? MaterialStateProperty.resolveWith(
+    //           (states) {
+    //             if (states.contains(MaterialState.pressed)) {
+    //               return 0.0;
+    //             } else {
+    //               return 5.0;
+    //             }
+    //           },
+    //         )
+    //       : MaterialStateProperty.all(0.0),
+    // );
 
     final button = widget.icon == null
         ? ElevatedButton(
-            style: buttonStyle,
+            // style: buttonStyle,
             onPressed: widget.onPressed,
             child: widget.child,
           )
         : ElevatedButton.icon(
-            style: buttonStyle,
+            // style: buttonStyle,
             onPressed: widget.onPressed,
             icon: widget.icon!,
             label: widget.child,

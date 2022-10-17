@@ -262,7 +262,7 @@ class VideoOverlay extends StatelessWidget {
               return CupertinoSlider(
                 value: videoStore.currentVolume,
                 onChanged: (value) {
-                  videoStore.currentVolume = value;
+                  // videoStore.currentVolume = value; // this will now be changed by the callback on the volume
                   VolumeController().setVolume(value);
                 },
               );
@@ -400,7 +400,7 @@ class VideoOverlay extends StatelessWidget {
                                       ),
                                     ),
                                     child: Text(
-                                      '${videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo?.gameName : 'No Category'} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers',
+                                      '${videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo?.gameName : 'No Category'} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers - ${DateTime.now().difference(DateTime.parse(videoStore.streamInfo!.startedAt)).toString().split('.')[0]}',
                                       style: const TextStyle(
                                         color: Colors.white,
                                       ),
