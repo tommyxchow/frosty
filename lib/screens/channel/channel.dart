@@ -71,8 +71,6 @@ class _VideoChatState extends State<VideoChat> {
     settingsStore: context.read<SettingsStore>(),
   );
 
-  bool isInPipMode = false;
-
   @override
   Widget build(BuildContext context) {
     final settingsStore = _chatStore.settings;
@@ -252,23 +250,22 @@ class _VideoChatState extends State<VideoChat> {
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
       return PipWidget(
-        child: Scaffold(
-            key: scaffoldKey,
-            body: isInPipMode ? player : videoChat,
+        child: Observer(
+          builder: (_) {
+            return Scaffold(
+                key: scaffoldKey,
+                body: _videoStore.isInPipMode ? player : videoChat,
+            );
+          }
         ),
         onResume: (bool? pipMode) {
-          isInPipMode = pipMode!;
+          _videoStore.isInPipMode = pipMode!;
         },
         onSuspending: () {
-          isInPipMode = true;
+          _videoStore.isInPipMode = true;
           FlutterPip.enterPictureInPictureMode();
         },
       );
-      // return PiPSwitcher(
-      //   floating: _videoStore.floating,
-      //   childWhenEnabled: player,
-      //   childWhenDisabled: videoChat,
-      // );
     }
 
     return videoChat;

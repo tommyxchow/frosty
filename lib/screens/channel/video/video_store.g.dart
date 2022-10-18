@@ -185,6 +185,22 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$isInPipModeAtom =
+      Atom(name: 'VideoStoreBase.isInPipMode', context: context);
+
+  @override
+  bool get isInPipMode {
+    _$isInPipModeAtom.reportRead();
+    return super.isInPipMode;
+  }
+
+  @override
+  set isInPipMode(bool value) {
+    _$isInPipModeAtom.reportWrite(value, super.isInPipMode, () {
+      super.isInPipMode = value;
+    });
+  }
+
   late final _$_streamInfoAtom =
       Atom(name: 'VideoStoreBase._streamInfo', context: context);
 
@@ -318,6 +334,7 @@ currentVolumePercentage: ${currentVolumePercentage},
 currentBrightnessPercentage: ${currentBrightnessPercentage},
 showVolumeUI: ${showVolumeUI},
 showBrightnessUI: ${showBrightnessUI},
+isInPipMode: ${isInPipMode},
 videoUrl: ${videoUrl}
     ''';
   }

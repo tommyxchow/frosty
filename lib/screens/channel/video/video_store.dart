@@ -108,6 +108,9 @@ abstract class VideoStoreBase with Store {
   @observable
   bool showBrightnessUI = false;
 
+  @observable
+  bool isInPipMode = false;
+
   /// The current stream info, used for displaying relevant info on the overlay.
   @readonly
   StreamTwitch? _streamInfo;
@@ -314,7 +317,7 @@ abstract class VideoStoreBase with Store {
   Future<void> handleVolumeGesture(double primaryDelta) async {
     int maxVolume = await Volume.getMaxVol;
     int currentVolume = await Volume.getVol;
-    int newVolume = (currentVolume + primaryDelta * 0.2 * (-1)).round();
+    int newVolume = (currentVolume + primaryDelta * 0.1 * (-1)).round();
     currentVolumePercentage = newVolume > maxVolume
         ? '100'
         : newVolume < 0
