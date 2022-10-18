@@ -2,15 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:floating/floating.dart';
+// import 'package:floating/floating.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pip/platform_channel/channel.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
+import 'package:screen/screen.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+import 'package:volume/volume.dart';
 import 'package:volume_controller/volume_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -29,7 +32,7 @@ abstract class VideoStoreBase with Store {
   final SettingsStore settingsStore;
 
   /// The [Floating] instance used for initiating PiP on Android.
-  final floating = Floating();
+  // final floating = Floating();
 
   /// The webview controller used for injecting JavaScript to control the webview and video player.
   WebViewController? controller;
@@ -94,10 +97,16 @@ abstract class VideoStoreBase with Store {
   var _isIPad = false;
 
   @observable
-  double currentVolume = 0.5;
+  String currentVolumePercentage = '';
 
   @observable
-  double currentBrightness = 0.5;
+  String currentBrightnessPercentage = '';
+
+  @observable
+  bool showVolumeUI = false;
+
+  @observable
+  bool showBrightnessUI = false;
 
   /// The current stream info, used for displaying relevant info on the overlay.
   @readonly
@@ -124,9 +133,13 @@ abstract class VideoStoreBase with Store {
       (_) => controller?.loadUrl(videoUrl),
     );
 
-    VolumeController().getVolume().then((value) => currentVolume = value);
-    VolumeController().listener((p0) => currentVolume = p0); // setup a listener that will change the slider's value to reflect the actual device volume if it is changed outside
-    ScreenBrightness().current.then((value) => currentBrightness = value);
+    Volume.controlVolume(AudioManager.STREAM_MUSIC).then((value) async {
+      currentVolumePercentage = '${(((await Volume.getVol) / (await Volume.getMaxVol)) * 100).round()}';
+    });
+    Screen.brightness.then((value) {
+      currentBrightnessPercentage = '${((value! / 1) * 100).round()}';
+    });
+    Screen.keepOn(true);
 
     updateStreamInfo();
   }
@@ -137,7 +150,8 @@ abstract class VideoStoreBase with Store {
     // Add event listeners to notify the JavaScript channels when the video plays and pauses.
     try {
       controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
-      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
+      controller
+          ?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -286,7 +300,8 @@ abstract class VideoStoreBase with Store {
   void requestPictureInPicture() {
     try {
       if (Platform.isAndroid) {
-        floating.enable();
+        // floating.enable();
+        FlutterPip.enterPictureInPictureMode();
       } else if (Platform.isIOS) {
         controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
       }
@@ -296,13 +311,57 @@ abstract class VideoStoreBase with Store {
   }
 
   @action
+  Future<void> handleVolumeGesture(double primaryDelta) async {
+    int maxVolume = await Volume.getMaxVol;
+    int currentVolume = await Volume.getVol;
+    int newVolume = (currentVolume + primaryDelta * 0.2 * (-1)).round();
+    currentVolumePercentage = newVolume > maxVolume
+        ? '100'
+        : newVolume < 0
+            ? '0'
+            : '${((newVolume / maxVolume) * 100).round()}';
+    Volume.setVol(newVolume > maxVolume ? maxVolume : newVolume, showVolumeUI: ShowVolumeUI.HIDE);
+    if (!showVolumeUI) {
+      _overlayVisible = true;
+      showVolumeUI = true;
+      showBrightnessUI = false;
+    }
+    Future.delayed(const Duration(seconds: 5), () {
+      _overlayVisible = false;
+      showVolumeUI = false;
+      showBrightnessUI = false;
+    });
+  }
+
+  void handleBrightnessGesture(double primaryDelta) async {
+    double? currentBrightness = await Screen.brightness;
+    double newBrightness = currentBrightness! + ((primaryDelta*-1)*0.01);
+    currentBrightnessPercentage = newBrightness > 1
+        ? '100'
+          : newBrightness < 0
+            ? '0'
+              : '${((newBrightness/1)*100).round()}';
+    Screen.setBrightness( newBrightness > 1 ? 1 : newBrightness < 0 ? 0 : newBrightness);
+    if (!showBrightnessUI) {
+      _overlayVisible  = true;
+      showBrightnessUI = true;
+    }
+    Future.delayed(const Duration(seconds: 5), () {
+      _overlayVisible  = false;
+      showBrightnessUI = false;
+      showVolumeUI = false;
+    });
+  }
+
+  @action
   void dispose() {
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
     if (Platform.isIOS) controller?.reload();
 
     _disposeOverlayReaction();
-    floating.dispose();
+    // floating.dispose();
     sleepTimer?.cancel();
+    Screen.keepOn(false);
   }
 }

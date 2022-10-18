@@ -1,9 +1,10 @@
 import 'dart:io';
 
-import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_pip/flutter_pip.dart';
+import 'package:flutter_pip/platform_channel/channel.dart';
 import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
@@ -43,6 +44,7 @@ class VideoChat extends StatefulWidget {
 class _VideoChatState extends State<VideoChat> {
   final _videoKey = GlobalKey();
   final _chatKey = GlobalKey();
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   late final ChatStore _chatStore = ChatStore(
     channelName: widget.userLogin,
@@ -68,6 +70,8 @@ class _VideoChatState extends State<VideoChat> {
     authStore: context.read<AuthStore>(),
     settingsStore: context.read<SettingsStore>(),
   );
+
+  bool isInPipMode = false;
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +141,7 @@ class _VideoChatState extends State<VideoChat> {
             child: ColoredBox(
               color: Colors.black.withOpacity(settingsStore.overlayOpacity),
               child: IgnorePointer(
-                ignoring: !_videoStore.overlayVisible,
+                ignoring: false,
                 child: videoOverlay,
               ),
             ),
@@ -247,11 +251,24 @@ class _VideoChatState extends State<VideoChat> {
 
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
-      return PiPSwitcher(
-        floating: _videoStore.floating,
-        childWhenEnabled: player,
-        childWhenDisabled: videoChat,
+      return PipWidget(
+        child: Scaffold(
+            key: scaffoldKey,
+            body: isInPipMode ? player : videoChat,
+        ),
+        onResume: (bool? pipMode) {
+          isInPipMode = pipMode!;
+        },
+        onSuspending: () {
+          isInPipMode = true;
+          FlutterPip.enterPictureInPictureMode();
+        },
       );
+      // return PiPSwitcher(
+      //   floating: _videoStore.floating,
+      //   childWhenEnabled: player,
+      //   childWhenDisabled: videoChat,
+      // );
     }
 
     return videoChat;
