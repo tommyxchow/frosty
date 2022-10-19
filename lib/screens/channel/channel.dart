@@ -139,7 +139,7 @@ class _VideoChatState extends State<VideoChat> {
             child: ColoredBox(
               color: Colors.black.withOpacity(settingsStore.overlayOpacity),
               child: IgnorePointer(
-                ignoring: false,
+                ignoring: !_videoStore.overlayVisible,
                 child: videoOverlay,
               ),
             ),

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -12,8 +11,6 @@ import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
-import 'package:screen_brightness/screen_brightness.dart';
-import 'package:vector_math/vector_math.dart' as vec;
 
 import '../../../widgets/modal.dart';
 import '../chat/details/chat_users_list.dart';
@@ -253,6 +250,7 @@ class VideoOverlay extends StatelessWidget {
     final brightnessSlider = Flexible(
       flex: 1,
       child: GestureDetector(
+        onTap: () => videoStore.handleVideoTap(),
         onVerticalDragUpdate: MediaQuery.of(context).orientation == Orientation.landscape
             ? (update) {
                 videoStore.handleBrightnessGesture(update.primaryDelta!);
@@ -263,29 +261,27 @@ class VideoOverlay extends StatelessWidget {
           width: double.infinity,
           height: double.infinity,
           color: Colors.black.withOpacity(0.3),
-          child: Observer(
-            builder: (_) {
-              return Center(
-                child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    reverseDuration: const Duration(milliseconds: 500),
-                    child: videoStore.showBrightnessUI
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.sunny, color: Colors.white, size: 32),
-                              const SizedBox(width: 12),
-                              Text(
-                                '${videoStore.currentBrightnessPercentage}%',
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 36, letterSpacing: 0.2, fontFamily: 'Product Sans', fontWeight: FontWeight.w700),
-                              ),
-                            ],
-                          )
-                        : Container()),
-              );
-            }
-          ),
+          child: Observer(builder: (_) {
+            return Center(
+              child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  reverseDuration: const Duration(milliseconds: 500),
+                  child: videoStore.showBrightnessUI
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.sunny, color: Colors.white, size: 32),
+                            const SizedBox(width: 12),
+                            Text(
+                              '${videoStore.currentBrightnessPercentage}%',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 36, letterSpacing: 0.2, fontFamily: 'Product Sans', fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        )
+                      : Container()),
+            );
+          }),
         ),
       ),
     );
@@ -293,48 +289,39 @@ class VideoOverlay extends StatelessWidget {
     final volumeSlider = Flexible(
       flex: 1,
       child: GestureDetector(
-          onVerticalDragUpdate: MediaQuery.of(context).orientation == Orientation.landscape
-              ? (update) {
-            videoStore.handleVolumeGesture(update.primaryDelta!);
-          }
-              : null,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.black.withOpacity(0.3),
-            child: Observer(
-              builder: (_) {
-                return Center(
-                  child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      reverseDuration: const Duration(milliseconds: 500),
-                      child: videoStore.showVolumeUI
-                          ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.volume_up,
-                              color: Colors.white,
-                              size: 32),
-                          const SizedBox(width: 12),
-                          Text(
-                            '${videoStore.currentVolumePercentage}%',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 36,
-                                letterSpacing: 0.2,
-                                fontFamily: 'Product Sans',
-                                fontWeight: FontWeight.w700
-                            ),
-                          ),
-                        ],
-                      )
-                          : Container()
-                  ),
-                );
+        onTap: () => videoStore.handleVideoTap(),
+        onVerticalDragUpdate: MediaQuery.of(context).orientation == Orientation.landscape
+            ? (update) {
+                videoStore.handleVolumeGesture(update.primaryDelta!);
               }
-            ),
-          ),
+            : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.black.withOpacity(0.3),
+          child: Observer(builder: (_) {
+            return Center(
+              child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  reverseDuration: const Duration(milliseconds: 500),
+                  child: videoStore.showVolumeUI
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.volume_up, color: Colors.white, size: 32),
+                            const SizedBox(width: 12),
+                            Text(
+                              '${videoStore.currentVolumePercentage}%',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 36, letterSpacing: 0.2, fontFamily: 'Product Sans', fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        )
+                      : Container()),
+            );
+          }),
+        ),
       ),
     );
 
@@ -345,10 +332,7 @@ class VideoOverlay extends StatelessWidget {
             // brightness and volume sliders at the bottom of the stack
             Flex(
               direction: Axis.horizontal,
-              children: [
-                brightnessSlider,
-                volumeSlider
-              ],
+              children: [brightnessSlider, volumeSlider],
             ),
 
             Row(
@@ -444,16 +428,14 @@ class VideoOverlay extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    child: Observer(
-                                      builder: (_) {
-                                        return Text(
-                                          '${videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo?.gameName : 'No Category'} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers - ${DateTime.now().difference(DateTime.parse(videoStore.streamInfo!.startedAt)).toString().split('.')[0]}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                        );
-                                      }
-                                    ),
+                                    child: Observer(builder: (_) {
+                                      return Text(
+                                        '${videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo?.gameName : 'No Category'} \u2022 ${NumberFormat().format(videoStore.streamInfo?.viewerCount)} viewers - ${DateTime.now().difference(DateTime.parse(videoStore.streamInfo!.startedAt)).toString().split('.')[0]}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      );
+                                    }),
                                   ),
                                 ],
                               )

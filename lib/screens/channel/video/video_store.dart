@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-// import 'package:floating/floating.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pip/platform_channel/channel.dart';
@@ -12,9 +11,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:screen/screen.dart';
-import 'package:screen_brightness/screen_brightness.dart';
 import 'package:volume/volume.dart';
-import 'package:volume_controller/volume_controller.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part 'video_store.g.dart';
@@ -108,6 +105,10 @@ abstract class VideoStoreBase with Store {
   @observable
   bool showBrightnessUI = false;
 
+  late Timer volumeUITimer;
+
+  late Timer brightnessUITimer;
+
   @observable
   bool isInPipMode = false;
 
@@ -129,6 +130,8 @@ abstract class VideoStoreBase with Store {
   }) {
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
     _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+    brightnessUITimer = Timer(const Duration(seconds: 5), () => showBrightnessUI = false);
+    volumeUITimer = Timer(const Duration(seconds: 5), () => showVolumeUI = false);
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
@@ -317,23 +320,19 @@ abstract class VideoStoreBase with Store {
   Future<void> handleVolumeGesture(double primaryDelta) async {
     int maxVolume = await Volume.getMaxVol;
     int currentVolume = await Volume.getVol;
-    int newVolume = (currentVolume + primaryDelta * 0.1 * (-1)).round();
+    int newVolume = (currentVolume + primaryDelta * 0.05 * (-1)).round();
+    // int newVolume = currentVolume + ((primaryDelta*-1)*0.1).round();
     currentVolumePercentage = newVolume > maxVolume
         ? '100'
         : newVolume < 0
             ? '0'
             : '${((newVolume / maxVolume) * 100).round()}';
     Volume.setVol(newVolume > maxVolume ? maxVolume : newVolume, showVolumeUI: ShowVolumeUI.HIDE);
+
     if (!showVolumeUI) {
-      _overlayVisible = true;
       showVolumeUI = true;
-      showBrightnessUI = false;
+      volumeUITimer = Timer(const Duration(seconds: 5), () => showVolumeUI = false);
     }
-    Future.delayed(const Duration(seconds: 5), () {
-      _overlayVisible = false;
-      showVolumeUI = false;
-      showBrightnessUI = false;
-    });
   }
 
   void handleBrightnessGesture(double primaryDelta) async {
@@ -345,15 +344,11 @@ abstract class VideoStoreBase with Store {
             ? '0'
               : '${((newBrightness/1)*100).round()}';
     Screen.setBrightness( newBrightness > 1 ? 1 : newBrightness < 0 ? 0 : newBrightness);
+
     if (!showBrightnessUI) {
-      _overlayVisible  = true;
       showBrightnessUI = true;
+      brightnessUITimer = Timer(const Duration(seconds: 5), () => showBrightnessUI = false);
     }
-    Future.delayed(const Duration(seconds: 5), () {
-      _overlayVisible  = false;
-      showBrightnessUI = false;
-      showVolumeUI = false;
-    });
   }
 
   @action
