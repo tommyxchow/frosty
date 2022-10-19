@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/channel.dart';
+import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animate_scale.dart';
@@ -15,11 +16,12 @@ import 'package:mobx/mobx.dart';
 class SearchResultsChannels extends StatefulWidget {
   final SearchStore searchStore;
   final String query;
+  final HomeStore homeStore;
 
   const SearchResultsChannels({
     Key? key,
     required this.searchStore,
-    required this.query,
+    required this.query, required this.homeStore,
   }) : super(key: key);
 
   @override
@@ -32,6 +34,11 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
       final channelInfo = await widget.searchStore.searchChannel(search);
 
       if (!mounted) return;
+
+      if (widget.homeStore.userLogin != '') {
+        widget.homeStore.setStreamInfo('', '', '');
+      }
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -39,6 +46,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
             userId: channelInfo.broadcasterId,
             userName: channelInfo.broadcasterName,
             userLogin: channelInfo.broadcasterLogin,
+            homeStore: widget.homeStore,
           ),
         ),
       );
@@ -90,16 +98,22 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                         regexEnglish.hasMatch(channel.displayName) ? channel.displayName : '${channel.displayName} (${channel.broadcasterLogin})';
 
                     return AnimateScale(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoChat(
-                            userId: channel.id,
-                            userName: channel.displayName,
-                            userLogin: channel.broadcasterLogin,
+                      onTap: () {
+                        if (widget.homeStore.userLogin != '') {
+                          widget.homeStore.setStreamInfo('', '', '');
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoChat(
+                              userId: channel.id,
+                              userName: channel.displayName,
+                              userLogin: channel.broadcasterLogin,
+                              homeStore: widget.homeStore,
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                       onLongPress: () {
                         HapticFeedback.lightImpact();
 

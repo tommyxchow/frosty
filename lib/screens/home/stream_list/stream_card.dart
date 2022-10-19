@@ -15,6 +15,8 @@ import 'package:frosty/widgets/profile_picture.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../home_store.dart';
+
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
   final StreamTwitch streamInfo;
@@ -22,6 +24,7 @@ class StreamCard extends StatelessWidget {
   final bool showThumbnail;
   final bool large;
   final bool showCategory;
+  final HomeStore homeStore;
 
   const StreamCard({
     Key? key,
@@ -29,6 +32,8 @@ class StreamCard extends StatelessWidget {
     required this.showUptime,
     required this.showThumbnail,
     required this.large,
+    required this.homeStore,
+
     this.showCategory = true,
   }) : super(key: key);
 
@@ -160,6 +165,7 @@ class StreamCard extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => CategoryStreams(
+                            homeStore: homeStore,
                             categoryName: streamInfo.gameName,
                             categoryId: streamInfo.gameId,
                           ),
@@ -193,16 +199,22 @@ class StreamCard extends StatelessWidget {
     );
 
     return AnimateScale(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VideoChat(
-            userId: streamInfo.userId,
-            userName: streamInfo.userName,
-            userLogin: streamInfo.userLogin,
+      onTap: () {
+        if (homeStore.userLogin != '') {
+          homeStore.setStreamInfo('', '', '');
+        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoChat(
+              userId: streamInfo.userId,
+              userName: streamInfo.userName,
+              userLogin: streamInfo.userLogin,
+              homeStore: homeStore,
+            ),
           ),
-        ),
-      ),
+        );
+      },
       onLongPress: () {
         HapticFeedback.mediumImpact();
 

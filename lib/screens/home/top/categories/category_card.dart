@@ -5,13 +5,16 @@ import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 
+import '../../home_store.dart';
+
 /// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
   final CategoryTwitch category;
+  final HomeStore homeStore;
 
   const CategoryCard({
     Key? key,
-    required this.category,
+    required this.category, required this.homeStore,
   }) : super(key: key);
 
   @override
@@ -27,6 +30,7 @@ class CategoryCard extends StatelessWidget {
         context,
         MaterialPageRoute(
           builder: (context) => CategoryStreams(
+            homeStore: homeStore,
             categoryName: category.name,
             categoryId: category.id,
           ),

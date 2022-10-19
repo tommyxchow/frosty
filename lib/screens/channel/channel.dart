@@ -11,6 +11,7 @@ import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
+import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
@@ -18,6 +19,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -29,12 +31,14 @@ class VideoChat extends StatefulWidget {
   final String userId;
   final String userName;
   final String userLogin;
+  final HomeStore homeStore;
 
   const VideoChat({
     Key? key,
     required this.userId,
     required this.userName,
     required this.userLogin,
+    required this.homeStore,
   }) : super(key: key);
 
   @override
@@ -113,6 +117,10 @@ class _VideoChatState extends State<VideoChat> {
       videoStore: _videoStore,
       chatStore: _chatStore,
       onSettingsPressed: showSettings,
+      onBackPressed: () {
+        widget.homeStore.setStreamInfo(widget.userId, widget.userName, widget.userLogin);
+        Navigator.of(context).pop();
+      }
     );
 
     final overlay = GestureDetector(
@@ -252,9 +260,16 @@ class _VideoChatState extends State<VideoChat> {
       return PipWidget(
         child: Observer(
           builder: (_) {
-            return Scaffold(
-                key: scaffoldKey,
-                body: _videoStore.isInPipMode ? player : videoChat,
+            return WillPopScope(
+              onWillPop: () async {
+              // set the user login so that the collapsed player can continue the current stream
+                widget.homeStore.setStreamInfo(widget.userId, widget.userName, widget.userLogin);
+                return true;
+              },
+              child: Scaffold(
+                  key: scaffoldKey,
+                  body: _videoStore.isInPipMode ? player : videoChat,
+              ),
             );
           }
         ),

@@ -358,8 +358,11 @@ abstract class VideoStoreBase with Store {
     if (Platform.isIOS) controller?.reload();
 
     _disposeOverlayReaction();
-    // floating.dispose();
+
     sleepTimer?.cancel();
+    
+    Screen.resetBrightness();
+
     Screen.keepOn(false);
   }
 }

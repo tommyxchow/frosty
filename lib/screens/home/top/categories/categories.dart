@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/top/categories/categories_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -11,10 +12,10 @@ import 'package:provider/provider.dart';
 
 class Categories extends StatefulWidget {
   final ScrollController scrollController;
-
+  final HomeStore homeStore;
   const Categories({
     Key? key,
-    required this.scrollController,
+    required this.scrollController, required this.homeStore,
   }) : super(key: key);
 
   @override
@@ -92,6 +93,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
                 _categoriesStore.getCategories();
               }
               return CategoryCard(
+                homeStore: widget.homeStore,
                 category: _categoriesStore.categories[index],
               );
             },

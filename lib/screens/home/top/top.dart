@@ -52,10 +52,12 @@ class _TopSectionState extends State<TopSection> with SingleTickerProviderStateM
             controller: _tabBarController,
             children: [
               StreamsList(
+                homeStore: widget.homeStore,
                 listType: ListType.top,
                 scrollController: widget.homeStore.topSectionScrollControllers[0],
               ),
               Categories(
+                homeStore: widget.homeStore,
                 scrollController: widget.homeStore.topSectionScrollControllers[1],
               ),
             ],

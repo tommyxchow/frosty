@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
+import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/stream_list/stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -22,10 +23,13 @@ class CategoryStreams extends StatefulWidget {
   /// The category id, used for fetching the relevant streams in the [ListStore].
   final String categoryId;
 
+  final HomeStore homeStore;
+
   const CategoryStreams({
     Key? key,
     required this.categoryName,
     required this.categoryId,
+    required this.homeStore,
   }) : super(key: key);
 
   @override
@@ -150,6 +154,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                               }
                               return Observer(
                                 builder: (context) => StreamCard(
+                                  homeStore: widget.homeStore,
                                   streamInfo: _listStore.streams[index],
                                   showUptime: context.read<SettingsStore>().showThumbnailUptime,
                                   showThumbnail: context.read<SettingsStore>().showThumbnails,

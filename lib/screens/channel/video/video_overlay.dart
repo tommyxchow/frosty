@@ -21,12 +21,14 @@ class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
   final ChatStore chatStore;
   final void Function() onSettingsPressed;
+  final void Function() onBackPressed;
 
   const VideoOverlay({
     Key? key,
     required this.videoStore,
     required this.chatStore,
     required this.onSettingsPressed,
+    required this.onBackPressed,
   }) : super(key: key);
 
   Future<void> _showSleepTimerDialog(BuildContext context) {
@@ -111,7 +113,7 @@ class VideoOverlay extends StatelessWidget {
           Icons.adaptive.arrow_back,
           color: Colors.white,
         ),
-        onPressed: Navigator.of(context).pop,
+        onPressed: onBackPressed,
       ),
     );
 

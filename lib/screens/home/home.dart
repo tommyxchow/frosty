@@ -9,11 +9,14 @@ import 'package:frosty/screens/home/top/top.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../channel/video/collapsed_video.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -77,12 +80,14 @@ class _HomeState extends State<Home> {
         StreamsList(
           listType: ListType.followed,
           scrollController: _homeStore.followedScrollController,
+          homeStore: _homeStore,
         ),
       TopSection(
         homeStore: _homeStore,
       ),
       Search(
         scrollController: _homeStore.searchScrollController,
+        homeStore: _homeStore,
       ),
     ];
   }
@@ -121,37 +126,50 @@ class _HomeState extends State<Home> {
           ],
         ),
         body: SafeArea(
-          child: Column(
+          child: Stack(
             children: [
-              Expanded(
-                child: Observer(
-                  builder: (_) => PageTransitionSwitcher(
-                      transitionBuilder: (
-                        Widget child,
-                        Animation<double> animation,
-                        Animation<double> secondaryAnimation,
-                      ) {
-                        return FadeThroughTransition(animation: animation, secondaryAnimation: secondaryAnimation, child: child);
-                      },
-                      child: pageList[_homeStore.selectedIndex]
-                      // index: _homeStore.selectedIndex,
-                      // children: [
-                      //   if (_authStore.isLoggedIn)
-                      //     StreamsList(
-                      //       listType: ListType.followed,
-                      //       scrollController: _homeStore.followedScrollController,
-                      //     ),
-                      //   TopSection(
-                      //     homeStore: _homeStore,
-                      //   ),
-                      //   Search(
-                      //     scrollController: _homeStore.searchScrollController,
-                      //   ),
-                      // ],
-                      ),
-                ),
+              Column(
+                children: [
+                  Expanded(
+                    child: Observer(
+                      builder: (_) => PageTransitionSwitcher(
+                          transitionBuilder: (
+                            Widget child,
+                            Animation<double> animation,
+                            Animation<double> secondaryAnimation,
+                          ) {
+                            return FadeThroughTransition(animation: animation, secondaryAnimation: secondaryAnimation, child: child);
+                          },
+                          child: pageList[_homeStore.selectedIndex]
+                          // index: _homeStore.selectedIndex,
+                          // children: [
+                          //   if (_authStore.isLoggedIn)
+                          //     StreamsList(
+                          //       listType: ListType.followed,
+                          //       scrollController: _homeStore.followedScrollController,
+                          //     ),
+                          //   TopSection(
+                          //     homeStore: _homeStore,
+                          //   ),
+                          //   Search(
+                          //     scrollController: _homeStore.searchScrollController,
+                          //   ),
+                          // ],
+                          ),
+                    ),
+                  ),
+                  const Divider(height: 1.0, thickness: 1.0),
+                ],
               ),
-              const Divider(height: 1.0, thickness: 1.0),
+              Observer(
+                builder: (_) {
+                  return _homeStore.userLogin != ''
+                      ? Align(
+                          alignment: Alignment.bottomRight,
+                          child: CollapsedVideoPlayer(homeStore: _homeStore))
+                      : Container();
+                },
+              ),
             ],
           ),
         ),

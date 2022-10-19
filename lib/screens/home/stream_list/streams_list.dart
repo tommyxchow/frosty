@@ -10,6 +10,8 @@ import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
+import '../home_store.dart';
+
 /// A widget that displays a list of followed or top streams based on the provided [listType].
 /// For a widget that displays the top streams under a category, refer to [CategoryStreams].
 class StreamsList extends StatefulWidget {
@@ -19,10 +21,14 @@ class StreamsList extends StatefulWidget {
   /// The scroll controller to use for scroll to top functionality.
   final ScrollController scrollController;
 
+  final HomeStore homeStore;
+
   const StreamsList({
     Key? key,
     required this.listType,
     required this.scrollController,
+    required this.homeStore,
+
   }) : super(key: key);
 
   @override
@@ -102,6 +108,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
               }
               return Observer(
                 builder: (context) => StreamCard(
+                  homeStore: widget.homeStore,
                   streamInfo: _listStore.streams[index],
                   showThumbnail: context.read<SettingsStore>().showThumbnails,
                   large: context.read<SettingsStore>().largeStreamCard,

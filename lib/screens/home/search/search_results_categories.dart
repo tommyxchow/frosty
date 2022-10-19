@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/category.dart';
+import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/widgets/alert_message.dart';
@@ -9,8 +10,9 @@ import 'package:mobx/mobx.dart';
 
 class SearchResultsCategories extends StatelessWidget {
   final SearchStore searchStore;
+  final HomeStore homeStore;
 
-  const SearchResultsCategories({Key? key, required this.searchStore}) : super(key: key);
+  const SearchResultsCategories({Key? key, required this.searchStore, required this.homeStore}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +71,7 @@ class SearchResultsCategories extends StatelessWidget {
                   .map(
                     (category) => GridTile(
                       child: CategoryCard(
+                        homeStore: homeStore,
                         category: category,
                       ),
                     ),

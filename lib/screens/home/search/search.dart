@@ -10,14 +10,16 @@ import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
+import '../home_store.dart';
+
 /// The search section that contians search history and search results for channels and categories.
 class Search extends StatefulWidget {
   // The scroll controller for handling scroll to top functionality.
   final ScrollController scrollController;
-
+  final HomeStore homeStore;
   const Search({
     Key? key,
-    required this.scrollController,
+    required this.scrollController, required this.homeStore,
   }) : super(key: key);
 
   @override
@@ -121,6 +123,7 @@ class _SearchState extends State<Search> {
                   SearchResultsChannels(
                     searchStore: _searchStore,
                     query: _searchStore.searchText,
+                    homeStore: widget.homeStore
                   ),
                   const SliverToBoxAdapter(
                     child: SectionHeader(
@@ -128,7 +131,10 @@ class _SearchState extends State<Search> {
                       padding: headerPadding,
                     ),
                   ),
-                  SearchResultsCategories(searchStore: _searchStore),
+                  SearchResultsCategories(
+                    searchStore: _searchStore,
+                    homeStore: widget.homeStore,
+                  ),
                 ],
               );
             },

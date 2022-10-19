@@ -3,6 +3,8 @@ import 'package:flutter/widgets.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:mobx/mobx.dart';
 
+import '../../models/stream.dart';
+
 part 'home_store.g.dart';
 
 /// The home store that handles scrolling and navigating between tabs on the home screen.
@@ -30,6 +32,22 @@ abstract class HomeStoreBase with Store {
   /// The current selected index/tab of the bottom navigation bar.
   @readonly
   var _selectedIndex = 0;
+
+  @observable
+  String userId = '';
+
+  @observable
+  String userName = '';
+
+  @observable
+  String userLogin = '';
+
+  @action
+  void setStreamInfo(String newUserId, String newUserName, String newUserLogin) {
+    userId = newUserId;
+    userName = newUserName;
+    userLogin = newUserLogin;
+  }
 
   late final ReactionDisposer _disposeReaction;
   HomeStoreBase({required this.authStore}) {

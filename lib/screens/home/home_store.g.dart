@@ -27,8 +27,68 @@ mixin _$HomeStore on HomeStoreBase, Store {
     });
   }
 
+  late final _$userIdAtom =
+      Atom(name: 'HomeStoreBase.userId', context: context);
+
+  @override
+  String get userId {
+    _$userIdAtom.reportRead();
+    return super.userId;
+  }
+
+  @override
+  set userId(String value) {
+    _$userIdAtom.reportWrite(value, super.userId, () {
+      super.userId = value;
+    });
+  }
+
+  late final _$userNameAtom =
+      Atom(name: 'HomeStoreBase.userName', context: context);
+
+  @override
+  String get userName {
+    _$userNameAtom.reportRead();
+    return super.userName;
+  }
+
+  @override
+  set userName(String value) {
+    _$userNameAtom.reportWrite(value, super.userName, () {
+      super.userName = value;
+    });
+  }
+
+  late final _$userLoginAtom =
+      Atom(name: 'HomeStoreBase.userLogin', context: context);
+
+  @override
+  String get userLogin {
+    _$userLoginAtom.reportRead();
+    return super.userLogin;
+  }
+
+  @override
+  set userLogin(String value) {
+    _$userLoginAtom.reportWrite(value, super.userLogin, () {
+      super.userLogin = value;
+    });
+  }
+
   late final _$HomeStoreBaseActionController =
       ActionController(name: 'HomeStoreBase', context: context);
+
+  @override
+  void setStreamInfo(
+      String newUserId, String newUserName, String newUserLogin) {
+    final _$actionInfo = _$HomeStoreBaseActionController.startAction(
+        name: 'HomeStoreBase.setStreamInfo');
+    try {
+      return super.setStreamInfo(newUserId, newUserName, newUserLogin);
+    } finally {
+      _$HomeStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void handleTap(int index) {
@@ -44,7 +104,9 @@ mixin _$HomeStore on HomeStoreBase, Store {
   @override
   String toString() {
     return '''
-
+userId: ${userId},
+userName: ${userName},
+userLogin: ${userLogin}
     ''';
   }
 }
