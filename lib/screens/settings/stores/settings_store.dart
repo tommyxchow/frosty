@@ -52,6 +52,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowVideo = true;
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
+  static const defaultAutomaticPip = false;
   static const defaultOverlayOpacity = 0.5;
 
   @JsonKey(defaultValue: defaultShowVideo)
@@ -66,6 +67,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var toggleableOverlay = defaultToggleableOverlay;
 
+  @JsonKey(defaultValue: defaultAutomaticPip)
+  @observable
+  var automaticPip = defaultAutomaticPip;
+
   @JsonKey(defaultValue: defaultOverlayOpacity)
   @observable
   var overlayOpacity = defaultOverlayOpacity;
@@ -75,6 +80,7 @@ abstract class _SettingsStoreBase with Store {
     showVideo = defaultShowVideo;
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
+    automaticPip = defaultAutomaticPip;
     overlayOpacity = defaultOverlayOpacity;
   }
 
