@@ -1,0 +1,37 @@
+import 'dart:async';
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+/// A widget that displays a timer representing the time since the given start time.
+/// The timer is updated every second.
+class Uptime extends StatefulWidget {
+  final String startTime;
+  final TextStyle? style;
+
+  const Uptime({
+    Key? key,
+    required this.startTime,
+    this.style,
+  }) : super(key: key);
+
+  @override
+  State<Uptime> createState() => _UptimeState();
+}
+
+class _UptimeState extends State<Uptime> {
+  @override
+  void initState() {
+    super.initState();
+
+    Timer.periodic(const Duration(seconds: 1), (timer) => setState(() {}));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      DateTime.now().difference(DateTime.parse(widget.startTime)).toString().split('.')[0],
+      style: widget.style?.copyWith(fontFeatures: [const FontFeature.tabularFigures()]),
+    );
+  }
+}
