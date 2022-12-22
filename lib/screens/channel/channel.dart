@@ -133,8 +133,20 @@ class _VideoChatState extends State<VideoChat> {
           return AnimatedOpacity(
             opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 200),
-            child: ColoredBox(
-              color: Colors.black.withOpacity(settingsStore.overlayOpacity),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0.0, 0.25, 0.75, 1.0],
+                  colors: [
+                    Colors.black.withOpacity(settingsStore.overlayOpacity),
+                    Colors.transparent,
+                    Colors.transparent,
+                    Colors.black.withOpacity(settingsStore.overlayOpacity),
+                  ],
+                ),
+              ),
               child: IgnorePointer(
                 ignoring: !_videoStore.overlayVisible,
                 child: videoOverlay,

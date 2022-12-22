@@ -260,7 +260,7 @@ class VideoOverlay extends StatelessWidget {
                           message: streamTitle,
                           child: Text(
                             streamTitle,
-                            maxLines: orientation == Orientation.portrait ? 1 : 5,
+                            maxLines: orientation == Orientation.portrait ? 1 : 3,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white,
