@@ -277,38 +277,22 @@ class VideoOverlay extends StatelessWidget {
                 settingsButton,
               ],
             ),
-
-            // Add a play button when paused for Android
-            // When an ad is paused on Android there is no way to unpause, so a play button is necessary.
-            if (Platform.isAndroid)
-              Center(
-                child: IconButton(
-                  tooltip: videoStore.paused ? 'Play' : 'Pause',
-                  iconSize: 50.0,
-                  icon: videoStore.paused
-                      ? const Icon(
-                          Icons.play_arrow,
-                          color: Colors.white,
-                        )
-                      : const Icon(
-                          Icons.pause,
-                          color: Colors.white,
-                        ),
-                  onPressed: videoStore.handlePausePlay,
-                ),
-              )
-            else if (!videoStore.paused)
-              Center(
-                child: IconButton(
-                  tooltip: 'Pause',
-                  iconSize: 50.0,
-                  icon: const Icon(
-                    Icons.pause,
-                    color: Colors.white,
-                  ),
-                  onPressed: videoStore.handlePausePlay,
-                ),
+            Center(
+              child: IconButton(
+                tooltip: videoStore.paused ? 'Play' : 'Pause',
+                iconSize: 50.0,
+                icon: videoStore.paused
+                    ? const Icon(
+                        Icons.play_arrow,
+                        color: Colors.white,
+                      )
+                    : const Icon(
+                        Icons.pause,
+                        color: Colors.white,
+                      ),
+                onPressed: videoStore.handlePausePlay,
               ),
+            ),
             Align(
               alignment: Alignment.bottomLeft,
               child: Row(
