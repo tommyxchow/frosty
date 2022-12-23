@@ -380,6 +380,7 @@ class VideoOverlay extends StatelessWidget {
                     ),
                     onPressed: videoStore.requestPictureInPicture,
                   ),
+                  refreshButton,
                   if (!videoStore.isIPad) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
