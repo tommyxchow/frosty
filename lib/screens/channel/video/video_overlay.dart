@@ -316,6 +316,7 @@ class VideoOverlay extends StatelessWidget {
                               Flexible(
                                 child: Tooltip(
                                   message: category,
+                                  preferBelow: false,
                                   child: Text(
                                     category,
                                     style: const TextStyle(
