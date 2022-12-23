@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -22,6 +21,8 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/modal.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
+import 'package:simple_pip_mode/pip_widget.dart';
 
 /// Creates a widget that shows the video stream (if live) and chat of the given user.
 class VideoChat extends StatefulWidget {
@@ -258,10 +259,11 @@ class _VideoChatState extends State<VideoChat> {
 
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
-      return PiPSwitcher(
-        floating: _videoStore.floating,
-        childWhenEnabled: player,
-        childWhenDisabled: videoChat,
+      return PipWidget(
+        pipLayout: PipActionsLayout.media_only_pause,
+        onPipAction: (_) => _videoStore.handlePausePlay(),
+        pipChild: player,
+        child: videoChat,
       );
     }
 

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:floating/floating.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
@@ -10,6 +9,7 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
+import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part 'video_store.g.dart';
@@ -26,8 +26,8 @@ abstract class VideoStoreBase with Store {
 
   final SettingsStore settingsStore;
 
-  /// The [Floating] instance used for initiating PiP on Android.
-  final floating = Floating();
+  /// The [SimplePip] instance used for initiating PiP on Android.
+  final pip = SimplePip();
 
   /// The webview controller used for injecting JavaScript to control the webview and video player.
   WebViewController? controller;
@@ -45,12 +45,16 @@ abstract class VideoStoreBase with Store {
   late final javascriptChannels = {
     JavascriptChannel(
       name: 'VideoPause',
-      onMessageReceived: (message) => _paused = true,
+      onMessageReceived: (message) {
+        _paused = true;
+        if (Platform.isAndroid) pip.setIsPlaying(false);
+      },
     ),
     JavascriptChannel(
       name: 'VideoPlaying',
       onMessageReceived: (message) {
         _paused = false;
+        if (Platform.isAndroid) pip.setIsPlaying(true);
         controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
         controller?.runJavascript('document.getElementsByTagName("video")[0].volume = 1.0;');
       },
@@ -107,6 +111,8 @@ abstract class VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
+    if (Platform.isAndroid) pip.setAutoPipMode();
+
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
     _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
 
@@ -274,7 +280,7 @@ abstract class VideoStoreBase with Store {
   void requestPictureInPicture() {
     try {
       if (Platform.isAndroid) {
-        floating.enable();
+        pip.enterPipMode(autoEnter: true);
       } else if (Platform.isIOS) {
         controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
       }
@@ -290,7 +296,6 @@ abstract class VideoStoreBase with Store {
     if (Platform.isIOS) controller?.reload();
 
     _disposeOverlayReaction();
-    floating.dispose();
     sleepTimer?.cancel();
   }
 }
