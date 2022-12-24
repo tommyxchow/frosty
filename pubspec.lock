@@ -857,9 +857,11 @@ packages:
   simple_pip_mode:
     dependency: "direct main"
     description:
-      name: simple_pip_mode
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: HEAD
+      resolved-ref: "1acaf4fc25cc87dbc5ce07f341ad4fd2ff086f4f"
+      url: "https://github.com/tommyxchow/simple_pip_mode_flutter"
+    source: git
     version: "0.8.0"
   sky_engine:
     dependency: transitive

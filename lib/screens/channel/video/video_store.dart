@@ -296,6 +296,9 @@ abstract class VideoStoreBase with Store {
 
   @action
   void dispose() {
+    // Disable auto PiP when leaving so that we don't enter PiP on other screens.
+    pip.setAutoPipMode(autoEnter: false);
+
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
     if (Platform.isIOS) controller?.reload();
