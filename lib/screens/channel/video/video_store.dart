@@ -285,7 +285,7 @@ abstract class VideoStoreBase with Store {
   void requestPictureInPicture() {
     try {
       if (Platform.isAndroid) {
-        pip.enterPipMode();
+        pip.enterPipMode(autoEnter: true);
       } else if (Platform.isIOS) {
         controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
       }
