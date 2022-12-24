@@ -20,11 +20,12 @@ class Uptime extends StatefulWidget {
 }
 
 class _UptimeState extends State<Uptime> {
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
-
-    Timer.periodic(const Duration(seconds: 1), (timer) => setState(() {}));
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => setState(() {}));
   }
 
   @override
@@ -33,5 +34,11 @@ class _UptimeState extends State<Uptime> {
       DateTime.now().difference(DateTime.parse(widget.startTime)).toString().split('.')[0],
       style: widget.style?.copyWith(fontFeatures: [const FontFeature.tabularFigures()]),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 }
