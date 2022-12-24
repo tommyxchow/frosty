@@ -111,7 +111,12 @@ abstract class VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
-    if (Platform.isAndroid) pip.setAutoPipMode();
+    // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
+    if (Platform.isAndroid) {
+      SimplePip.isAutoPipAvailable.then((isAutoPipAvailable) {
+        if (isAutoPipAvailable) pip.setAutoPipMode();
+      });
+    }
 
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
     _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
@@ -275,12 +280,12 @@ abstract class VideoStoreBase with Store {
 
   /// Initiate picture in picture if available.
   ///
-  /// On iOS, this will utilize the web picture-in-picture API.
   /// On Android, this will utilize the native Android PiP API.
+  /// On iOS, this will utilize the web picture-in-picture API.
   void requestPictureInPicture() {
     try {
       if (Platform.isAndroid) {
-        pip.enterPipMode(autoEnter: true);
+        pip.enterPipMode();
       } else if (Platform.isIOS) {
         controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
       }

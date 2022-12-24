@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// Creates a [WebView] widget that shows a channel's video stream.
@@ -25,8 +26,8 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) {
-    if (widget.videoStore.settingsStore.automaticPip && Platform.isAndroid && lifecycleState == AppLifecycleState.inactive) {
+  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) async {
+    if (Platform.isAndroid && !await SimplePip.isAutoPipAvailable && lifecycleState == AppLifecycleState.inactive) {
       widget.videoStore.requestPictureInPicture();
     }
   }
