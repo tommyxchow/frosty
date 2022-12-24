@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -41,14 +39,6 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.toggleableOverlay,
             onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
           ),
-          if (Platform.isAndroid)
-            SwitchListTile.adaptive(
-              isThreeLine: true,
-              title: const Text('Automatic PiP'),
-              subtitle: const Text('Automatically enter PiP (picture-in-picture) mode when leaving Frosty.'),
-              value: settingsStore.automaticPip,
-              onChanged: settingsStore.showVideo ? (newValue) => settingsStore.automaticPip = newValue : null,
-            ),
           const SizedBox(height: 15.0),
           ListTile(
             title: Row(

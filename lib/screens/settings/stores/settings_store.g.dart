@@ -18,8 +18,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
-      ..automaticPip = json['automaticPip'] as bool? ?? false
-      ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
+      ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.8
       ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
       ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? true
       ..autocomplete = json['autocomplete'] as bool? ?? true
@@ -67,7 +66,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
-      'automaticPip': instance.automaticPip,
       'overlayOpacity': instance.overlayOpacity,
       'chatDelay': instance.chatDelay,
       'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
@@ -250,22 +248,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set toggleableOverlay(bool value) {
     _$toggleableOverlayAtom.reportWrite(value, super.toggleableOverlay, () {
       super.toggleableOverlay = value;
-    });
-  }
-
-  late final _$automaticPipAtom =
-      Atom(name: '_SettingsStoreBase.automaticPip', context: context);
-
-  @override
-  bool get automaticPip {
-    _$automaticPipAtom.reportRead();
-    return super.automaticPip;
-  }
-
-  @override
-  set automaticPip(bool value) {
-    _$automaticPipAtom.reportWrite(value, super.automaticPip, () {
-      super.automaticPip = value;
     });
   }
 
@@ -791,7 +773,6 @@ launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
-automaticPip: ${automaticPip},
 overlayOpacity: ${overlayOpacity},
 chatDelay: ${chatDelay},
 chatOnlyPreventSleep: ${chatOnlyPreventSleep},
