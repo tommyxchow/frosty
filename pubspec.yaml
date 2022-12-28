@@ -54,9 +54,11 @@ dependencies:
   collection: ^1.16.0
   flutter_cache_manager: ^3.3.0
   device_info_plus: ^4.0.0
-  floating: ^1.1.0
   wakelock: ^0.6.2
   device_preview: ^1.1.0
+  simple_pip_mode:
+    git:
+      url: https://github.com/tommyxchow/simple_pip_mode_flutter
 
 dev_dependencies:
   flutter_test:

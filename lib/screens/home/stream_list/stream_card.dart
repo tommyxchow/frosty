@@ -12,6 +12,7 @@ import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -87,8 +88,8 @@ class StreamCard extends StatelessWidget {
                 if (large)
                   Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: Text(
-                      DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
+                    child: Uptime(
+                      startTime: streamInfo.startedAt,
                       style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.white.withOpacity(0.8),
@@ -97,11 +98,21 @@ class StreamCard extends StatelessWidget {
                   )
                 else
                   Container(
-                    color: const Color.fromRGBO(0, 0, 0, 0.5),
-                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                    child: Text(
-                      DateTime.now().difference(DateTime.parse(streamInfo.startedAt)).toString().split('.')[0],
-                      style: const TextStyle(fontSize: 12, color: Colors.white),
+                    padding: const EdgeInsets.all(2.0),
+                    decoration: const BoxDecoration(
+                      color: Color.fromRGBO(0, 0, 0, 0.5),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(3.0),
+                      ),
+                    ),
+                    margin: const EdgeInsets.all(2.0),
+                    child: Uptime(
+                      startTime: streamInfo.startedAt,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                   )
               ],

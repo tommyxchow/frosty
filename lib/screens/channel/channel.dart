@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -22,6 +21,8 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/modal.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
+import 'package:simple_pip_mode/pip_widget.dart';
 
 /// Creates a widget that shows the video stream (if live) and chat of the given user.
 class VideoChat extends StatefulWidget {
@@ -133,8 +134,20 @@ class _VideoChatState extends State<VideoChat> {
           return AnimatedOpacity(
             opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
             duration: const Duration(milliseconds: 200),
-            child: ColoredBox(
-              color: Colors.black.withOpacity(settingsStore.overlayOpacity),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: const [0.0, 0.25, 0.75, 1.0],
+                  colors: [
+                    Colors.black.withOpacity(settingsStore.overlayOpacity),
+                    Colors.transparent,
+                    Colors.transparent,
+                    Colors.black.withOpacity(settingsStore.overlayOpacity),
+                  ],
+                ),
+              ),
               child: IgnorePointer(
                 ignoring: !_videoStore.overlayVisible,
                 child: videoOverlay,
@@ -246,10 +259,11 @@ class _VideoChatState extends State<VideoChat> {
 
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
-      return PiPSwitcher(
-        floating: _videoStore.floating,
-        childWhenEnabled: player,
-        childWhenDisabled: videoChat,
+      return PipWidget(
+        pipLayout: PipActionsLayout.media_only_pause,
+        onPipAction: (_) => _videoStore.handlePausePlay(),
+        pipChild: player,
+        child: videoChat,
       );
     }
 
