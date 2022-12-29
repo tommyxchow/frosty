@@ -29,12 +29,28 @@ class StreamsList extends StatefulWidget {
   State<StreamsList> createState() => _StreamsListState();
 }
 
-class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClientMixin {
+class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final _listStore = ListStore(
     authStore: context.read<AuthStore>(),
     twitchApi: context.read<TwitchApi>(),
     listType: widget.listType,
   );
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) _listStore.checkLastTimeRefreshedAndUpdate();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +132,8 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
   }
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _listStore.dispose();
     super.dispose();
   }

@@ -30,6 +30,9 @@ abstract class ListStoreBase with Store {
   /// The pagination cursor for the streams.
   String? _streamsCursor;
 
+  /// The last time the streams were refreshed/updated.
+  var lastTimeRefreshed = DateTime.now();
+
   /// Returns whether or not there are more streams and loading status for pagination.
   @computed
   bool get hasMore => _isLoading == false && _streamsCursor != null;
@@ -130,6 +133,16 @@ abstract class ListStoreBase with Store {
     _streamsCursor = null;
 
     return getStreams();
+  }
+
+  /// Checks the last time the streams were refreshed and updates them if it has been more than 5 minutes.
+  void checkLastTimeRefreshedAndUpdate() {
+    final now = DateTime.now();
+    final difference = now.difference(lastTimeRefreshed);
+
+    if (difference.inMinutes >= 5) refreshStreams();
+
+    lastTimeRefreshed = now;
   }
 
   void dispose() => scrollController?.dispose();
