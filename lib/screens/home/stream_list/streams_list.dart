@@ -56,6 +56,8 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
   Widget build(BuildContext context) {
     super.build(context);
 
+    _listStore.checkLastTimeRefreshedAndUpdate();
+
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();

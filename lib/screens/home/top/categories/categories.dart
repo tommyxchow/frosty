@@ -47,6 +47,8 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
   Widget build(BuildContext context) {
     super.build(context);
 
+    _categoriesStore.checkLastTimeRefreshedAndUpdate();
+
     return RefreshIndicator(
       onRefresh: () async {
         HapticFeedback.lightImpact();
