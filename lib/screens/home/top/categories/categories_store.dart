@@ -19,6 +19,9 @@ abstract class CategoriesStoreBase with Store {
   /// The pagination cursor for the categories.
   String? _categoriesCursor;
 
+  /// The last time the categories were refreshed/updated.
+  var lastTimeRefreshed = DateTime.now();
+
   /// The loading status for pagination.
   @readonly
   bool _isLoading = false;
@@ -73,5 +76,15 @@ abstract class CategoriesStoreBase with Store {
     _categoriesCursor = null;
 
     return getCategories();
+  }
+
+  /// Checks the last time the categories were refreshed and updates them if it has been more than 5 minutes.
+  void checkLastTimeRefreshedAndUpdate() {
+    final now = DateTime.now();
+    final difference = now.difference(lastTimeRefreshed);
+
+    if (difference.inMinutes >= 5) refreshCategories();
+
+    lastTimeRefreshed = now;
   }
 }

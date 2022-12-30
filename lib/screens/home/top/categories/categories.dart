@@ -21,15 +21,33 @@ class Categories extends StatefulWidget {
   State<Categories> createState() => _CategoriesState();
 }
 
-class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMixin {
+class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final _categoriesStore = CategoriesStore(
     authStore: context.read<AuthStore>(),
     twitchApi: context.read<TwitchApi>(),
   );
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) _categoriesStore.checkLastTimeRefreshedAndUpdate();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
+
+    _categoriesStore.checkLastTimeRefreshedAndUpdate();
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -102,5 +120,8 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
   }
 
   @override
-  bool get wantKeepAlive => true;
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 }
