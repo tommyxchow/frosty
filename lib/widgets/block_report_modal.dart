@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/block_button.dart';
-import 'package:frosty/widgets/modal.dart';
+import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/report_button.dart';
 
 class BlockReportModal extends StatelessWidget {
@@ -22,7 +22,7 @@ class BlockReportModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FrostyModal(
+    return FrostyBottomSheet(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

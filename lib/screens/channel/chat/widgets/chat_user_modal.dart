@@ -6,8 +6,8 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
+import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/section_header.dart';
 
@@ -34,7 +34,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
   Widget build(BuildContext context) {
     final name = regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
 
-    return FrostyModal(
+    return FrostyBottomSheet(
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.5,
         child: Column(

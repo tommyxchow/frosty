@@ -3,7 +3,7 @@ import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
-import 'package:frosty/widgets/modal.dart';
+import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class ChatDetails extends StatefulWidget {
@@ -31,7 +31,7 @@ class _ChatDetailsState extends State<ChatDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return FrostyModal(
+    return FrostyBottomSheet(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -47,7 +47,7 @@ class _ChatDetailsState extends State<ChatDetails> {
               backgroundColor: Colors.transparent,
               isScrollControlled: true,
               context: context,
-              builder: (context) => FrostyModal(
+              builder: (context) => FrostyBottomSheet(
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.8,
                   child: GestureDetector(
