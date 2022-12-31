@@ -51,21 +51,21 @@ abstract class HomeStoreBase with Store {
 
       // Use different logic if logged in/out since there will be one less tab when logged out.
       if (authStore.isLoggedIn) {
-        if (index == 0) {
+        if (index == 0 && followedScrollController.hasClients) {
           // If on the followed tab and tapping the followed tab, scroll to the top.
           followedScrollController.animateTo(
             0.0,
             duration: duration,
             curve: Curves.easeOutCubic,
           );
-        } else if (index == 1) {
+        } else if (index == 1 && topSectionScrollControllers[topSectionCurrentIndex].hasClients) {
           // If on the top section, scroll to the top of the tab based on the current top tab.
           topSectionScrollControllers[topSectionCurrentIndex].animateTo(
             0.0,
             duration: duration,
             curve: Curves.easeOutCubic,
           );
-        } else {
+        } else if (searchScrollController.hasClients) {
           // If on the search tab and tapping the search tab, scroll to the top.
           searchScrollController.animateTo(
             0.0,
@@ -74,14 +74,14 @@ abstract class HomeStoreBase with Store {
           );
         }
       } else {
-        if (index == 0) {
+        if (index == 0 && topSectionScrollControllers[topSectionCurrentIndex].hasClients) {
           // If on the top section, scroll to the top of the tab based on the current top tab.
           topSectionScrollControllers[topSectionCurrentIndex].animateTo(
             0.0,
             duration: duration,
             curve: Curves.easeOutCubic,
           );
-        } else {
+        } else if (searchScrollController.hasClients) {
           // If on the search tab and tapping the search tab, scroll to the top.
           searchScrollController.animateTo(
             0.0,
