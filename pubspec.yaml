@@ -59,6 +59,15 @@ dependencies:
   simple_pip_mode:
     git:
       url: https://github.com/tommyxchow/simple_pip_mode_flutter
+  screen:
+    git:
+      url: https://github.com/hiruthicShaSS/flutter_screen
+      ref: master
+  volume:
+    git:
+      url: https://github.com/upvorg/Volume_Flutter
+      ref: master
+
 
 dev_dependencies:
   flutter_test:

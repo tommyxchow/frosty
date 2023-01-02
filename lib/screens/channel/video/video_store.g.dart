@@ -101,6 +101,38 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$volumeUIVisibleAtom =
+      Atom(name: 'VideoStoreBase.volumeUIVisible', context: context);
+
+  @override
+  bool get volumeUIVisible {
+    _$volumeUIVisibleAtom.reportRead();
+    return super.volumeUIVisible;
+  }
+
+  @override
+  set volumeUIVisible(bool value) {
+    _$volumeUIVisibleAtom.reportWrite(value, super.volumeUIVisible, () {
+      super.volumeUIVisible = value;
+    });
+  }
+
+  late final _$brightnessUIVisibleAtom =
+      Atom(name: 'VideoStoreBase.brightnessUIVisible', context: context);
+
+  @override
+  bool get brightnessUIVisible {
+    _$brightnessUIVisibleAtom.reportRead();
+    return super.brightnessUIVisible;
+  }
+
+  @override
+  set brightnessUIVisible(bool value) {
+    _$brightnessUIVisibleAtom.reportWrite(value, super.brightnessUIVisible, () {
+      super.brightnessUIVisible = value;
+    });
+  }
+
   late final _$_isIPadAtom =
       Atom(name: 'VideoStoreBase._isIPad', context: context);
 
@@ -116,6 +148,40 @@ mixin _$VideoStore on VideoStoreBase, Store {
   set _isIPad(bool value) {
     _$_isIPadAtom.reportWrite(value, super._isIPad, () {
       super._isIPad = value;
+    });
+  }
+
+  late final _$currentVolumePercentageAtom =
+      Atom(name: 'VideoStoreBase.currentVolumePercentage', context: context);
+
+  @override
+  String get currentVolumePercentage {
+    _$currentVolumePercentageAtom.reportRead();
+    return super.currentVolumePercentage;
+  }
+
+  @override
+  set currentVolumePercentage(String value) {
+    _$currentVolumePercentageAtom
+        .reportWrite(value, super.currentVolumePercentage, () {
+      super.currentVolumePercentage = value;
+    });
+  }
+
+  late final _$currentBrightnessPercentageAtom = Atom(
+      name: 'VideoStoreBase.currentBrightnessPercentage', context: context);
+
+  @override
+  String get currentBrightnessPercentage {
+    _$currentBrightnessPercentageAtom.reportRead();
+    return super.currentBrightnessPercentage;
+  }
+
+  @override
+  set currentBrightnessPercentage(String value) {
+    _$currentBrightnessPercentageAtom
+        .reportWrite(value, super.currentBrightnessPercentage, () {
+      super.currentBrightnessPercentage = value;
     });
   }
 
@@ -151,6 +217,24 @@ mixin _$VideoStore on VideoStoreBase, Store {
   @override
   Future<void> updateStreamInfo() {
     return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
+  }
+
+  late final _$handleVolumeGestureAsyncAction =
+      AsyncAction('VideoStoreBase.handleVolumeGesture', context: context);
+
+  @override
+  Future<void> handleVolumeGesture(double primaryDelta) {
+    return _$handleVolumeGestureAsyncAction
+        .run(() => super.handleVolumeGesture(primaryDelta));
+  }
+
+  late final _$handleBrightnessGestureAsyncAction =
+      AsyncAction('VideoStoreBase.handleBrightnessGesture', context: context);
+
+  @override
+  Future<void> handleBrightnessGesture(double primaryDelta) {
+    return _$handleBrightnessGestureAsyncAction
+        .run(() => super.handleBrightnessGesture(primaryDelta));
   }
 
   late final _$VideoStoreBaseActionController =
@@ -239,6 +323,10 @@ mixin _$VideoStore on VideoStoreBase, Store {
 sleepHours: ${sleepHours},
 sleepMinutes: ${sleepMinutes},
 timeRemaining: ${timeRemaining},
+volumeUIVisible: ${volumeUIVisible},
+brightnessUIVisible: ${brightnessUIVisible},
+currentVolumePercentage: ${currentVolumePercentage},
+currentBrightnessPercentage: ${currentBrightnessPercentage},
 videoUrl: ${videoUrl}
     ''';
   }

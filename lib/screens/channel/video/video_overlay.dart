@@ -217,10 +217,105 @@ class VideoOverlay extends StatelessWidget {
 
     final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
 
+    final brightnessSlider = Flexible(
+      flex: 1,
+      child: GestureDetector(
+        onTap: () => videoStore.handleVideoTap(),
+        onVerticalDragUpdate:
+            MediaQuery.of(context).orientation == Orientation.landscape
+                ? (update) {
+                    videoStore.handleBrightnessGesture(update.primaryDelta!);
+                  }
+                : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.black.withOpacity(0.3),
+          child: Observer(builder: (_) {
+            return Center(
+              child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  reverseDuration: const Duration(milliseconds: 500),
+                  child: videoStore.brightnessUIVisible
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.sunny,
+                                color: Colors.white, size: 32),
+                            const SizedBox(width: 12),
+                            Text(
+                              '${videoStore.currentBrightnessPercentage}%',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 36,
+                                  letterSpacing: 0.2,
+                                  fontFamily: 'Product Sans',
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        )
+                      : Container()),
+            );
+          }),
+        ),
+      ),
+    );
+
+    final volumeSlider = Flexible(
+      flex: 1,
+      child: GestureDetector(
+        onTap: () => videoStore.handleVideoTap(),
+        onVerticalDragUpdate:
+            MediaQuery.of(context).orientation == Orientation.landscape
+                ? (update) {
+                    videoStore.handleVolumeGesture(update.primaryDelta!);
+                  }
+                : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.black.withOpacity(0.3),
+          child: Observer(builder: (_) {
+            return Center(
+              child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  reverseDuration: const Duration(milliseconds: 500),
+                  child: videoStore.volumeUIVisible
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.volume_up,
+                                color: Colors.white, size: 32),
+                            const SizedBox(width: 12),
+                            Text(
+                              '${videoStore.currentVolumePercentage}%',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 36,
+                                  letterSpacing: 0.2,
+                                  fontFamily: 'Product Sans',
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          ],
+                        )
+                      : Container()),
+            );
+          }),
+        ),
+      ),
+    );
+
     return Observer(
       builder: (context) {
         return Stack(
           children: [
+            Flex(
+              direction: Axis.horizontal,
+              children: [brightnessSlider, volumeSlider],
+            ),
+
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

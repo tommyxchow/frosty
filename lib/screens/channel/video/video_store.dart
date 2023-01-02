@@ -9,6 +9,8 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
+import 'package:screen/screen.dart';
+import 'package:volume/volume.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -37,6 +39,13 @@ abstract class VideoStoreBase with Store {
 
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
+
+  /// Slide Volume overlay timer
+  late Timer volumeUITimer;
+
+  /// Slide Brightness overlay timer
+  late Timer brightnessUITimer;
+
 
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
@@ -91,9 +100,21 @@ abstract class VideoStoreBase with Store {
   @readonly
   var _overlayVisible = true;
 
+  @observable
+  bool volumeUIVisible = false;
+
+  @observable
+  bool brightnessUIVisible = false;
+
   /// If the current device is iPad.
   @readonly
   var _isIPad = false;
+
+  @observable
+  String currentVolumePercentage = '';
+
+  @observable
+  String currentBrightnessPercentage = '';
 
   /// The current stream info, used for displaying relevant info on the overlay.
   @readonly
@@ -120,12 +141,26 @@ abstract class VideoStoreBase with Store {
 
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
     _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+    brightnessUITimer = Timer(const Duration(seconds: 5), () => brightnessUIVisible = false);
+    volumeUITimer = Timer(const Duration(seconds: 5), () => volumeUIVisible = false);
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
       (_) => settingsStore.showOverlay,
       (_) => controller?.loadUrl(videoUrl),
     );
+
+    // get the current volume and brightness
+    Volume.controlVolume(AudioManager.STREAM_MUSIC).then((value) async {
+      currentVolumePercentage = '${(((await Volume.getVol) / (await Volume.getMaxVol)) * 100).round()}';
+    });
+
+    Screen.brightness.then((value) {
+      currentBrightnessPercentage = '${((value! / 1) * 100).round()}';
+    });
+
+    // keep the screen on while we're watching the stream
+    Screen.keepOn(true);
 
     updateStreamInfo();
   }
@@ -294,6 +329,63 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  /// handles slide volume controls
+  @action
+  Future<void> handleVolumeGesture(double primaryDelta) async {
+    int maxVolume = await Volume.getMaxVol;
+    int currentVolume = await Volume.getVol;
+
+    int newVolume = (currentVolume + primaryDelta * 0.10 * (-1)).round();
+    currentVolumePercentage = newVolume > maxVolume
+        ? '100'
+        : newVolume < 0
+            ? '0'
+            : '${((newVolume / maxVolume) * 100).round()}';
+    Volume.setVol(newVolume > maxVolume ? maxVolume : newVolume,
+        showVolumeUI: ShowVolumeUI.HIDE);
+
+    if (!volumeUIVisible) {
+      _overlayTimer.cancel();
+
+      volumeUIVisible = true;
+      _overlayVisible = true;
+
+      volumeUITimer = Timer(const Duration(seconds: 5), () {
+        volumeUIVisible = false;
+        _overlayVisible = false;
+      });
+    }
+  }
+
+  /// handles slide brightness controls
+  @action
+  Future<void> handleBrightnessGesture(double primaryDelta) async {
+    double? currentBrightness = await Screen.brightness;
+    double newBrightness = currentBrightness! + ((primaryDelta * -1) * 0.01);
+    currentBrightnessPercentage = newBrightness > 1
+        ? '100'
+        : newBrightness < 0
+            ? '0'
+            : '${((newBrightness / 1) * 100).round()}';
+    Screen.setBrightness(newBrightness > 1
+        ? 1
+        : newBrightness < 0
+            ? 0
+            : newBrightness);
+
+    if (!brightnessUIVisible) {
+      _overlayTimer.cancel();
+
+      brightnessUIVisible = true;
+      _overlayVisible = true;
+
+      brightnessUITimer = Timer(const Duration(seconds: 5), () {
+        brightnessUIVisible = false;
+        _overlayVisible = false;
+      });
+    }
+  }
+
   @action
   void dispose() {
     // Disable auto PiP when leaving so that we don't enter PiP on other screens.
@@ -305,5 +397,9 @@ abstract class VideoStoreBase with Store {
 
     _disposeOverlayReaction();
     sleepTimer?.cancel();
+
+    Screen.resetBrightness();
+
+    Screen.keepOn(false);
   }
 }
