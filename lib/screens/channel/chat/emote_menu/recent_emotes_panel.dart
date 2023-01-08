@@ -69,7 +69,7 @@ class _RecentEmotesPanelState extends State<RecentEmotesPanel> {
                   child: const Text(
                     'CLEAR',
                     style: TextStyle(
-                      letterSpacing: 0.8,
+                      letterSpacing: 0.5,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
