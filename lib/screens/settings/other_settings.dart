@@ -62,16 +62,7 @@ class _OtherSettingsState extends State<OtherSettings> {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      childrenPadding: const EdgeInsets.only(bottom: 10.0),
-      leading: const Icon(Icons.help),
-      title: const Text(
-        'Other',
-        style: TextStyle(
-          fontSize: 18.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    return Column(
       children: [
         ListTile(
           leading: const Icon(Icons.info),
@@ -107,7 +98,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           builder: (_) => SwitchListTile.adaptive(
             title: const Text('Send anonymous crash logs'),
             isThreeLine: true,
-            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.'),
+            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
             value: widget.settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {

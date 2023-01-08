@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/screens/settings/account/account_options.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/profile_picture.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+class ProfileCard extends StatelessWidget {
+  final AuthStore authStore;
+
+  const ProfileCard({Key? key, required this.authStore}) : super(key: key);
+
+  Future<void> _showLoginDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => FrostyDialog(
+        title: 'Log In',
+        content: Column(
+          children: [
+            Button(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: const Text('Connect with Twitch'),
+                      ),
+                      body: WebView(
+                        initialUrl: authStore.loginUri.toString(),
+                        navigationDelegate: authStore.handleNavigation,
+                        javascriptMode: JavascriptMode.unrestricted,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              icon: Image.asset(
+                'assets/icons/TwitchGlitchWhite.png',
+                height: 25,
+              ),
+              child: const Text(
+                'Connect with Twitch',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            const Center(
+              child: Text(
+                'Or',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 20.0),
+            TextField(
+              autocorrect: false,
+              textAlign: TextAlign.center,
+              decoration: const InputDecoration(
+                hintText: 'Token',
+              ),
+              onSubmitted: (token) {
+                authStore.login(token: token);
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (context) {
+        if (authStore.error != null) {
+          return ListTile(
+            leading: const Icon(
+              Icons.error,
+              color: Colors.red,
+            ),
+            title: const Text('Failed to connect'),
+            trailing: Button(
+              onPressed: authStore.init,
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: const Text('Reconnect'),
+            ),
+          );
+        }
+        if (authStore.isLoggedIn && authStore.user.details != null) {
+          return ListTile(
+            leading: ProfilePicture(
+              userLogin: authStore.user.details!.login,
+              radius: 12,
+            ),
+            title: Text(
+              authStore.user.details!.displayName,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            trailing: Icon(Icons.adaptive.arrow_forward),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => Scaffold(
+                  appBar: AppBar(title: const Text('Account')),
+                  body: AccountOptions(authStore: authStore),
+                ),
+              ),
+            ),
+          );
+        }
+        return ListTile(
+          isThreeLine: true,
+          leading: const Icon(
+            Icons.no_accounts,
+            size: 40,
+          ),
+          title: const Text('Anonymous User'),
+          subtitle: const Text('Tap to log in to chat, view followed streams, and more.'),
+          trailing: Icon(Icons.adaptive.arrow_forward),
+          onTap: () => _showLoginDialog(context),
+        );
+      },
+    );
+  }
+}

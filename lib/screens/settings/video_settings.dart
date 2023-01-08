@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class VideoSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -10,21 +11,15 @@ class VideoSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder: (context) => ExpansionTile(
-        leading: const Icon(Icons.ondemand_video),
-        title: const Text(
-          'Video',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      builder: (context) => ListView(
         children: [
+          const SectionHeader('Player'),
           SwitchListTile.adaptive(
             title: const Text('Video'),
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
+          const SectionHeader('Overlay'),
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Custom overlay'),

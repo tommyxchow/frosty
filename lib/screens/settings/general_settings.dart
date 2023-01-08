@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class GeneralSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -12,16 +13,9 @@ class GeneralSettings extends StatelessWidget {
     const themes = ['System', 'Light', 'Dark', 'Black'];
 
     return Observer(
-      builder: (context) => ExpansionTile(
-        leading: const Icon(Icons.settings),
-        title: const Text(
-          'General',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      builder: (context) => ListView(
         children: [
+          const SectionHeader('Display'),
           ListTile(
             title: const Text('Theme'),
             trailing: DropdownButton(
@@ -35,6 +29,7 @@ class GeneralSettings extends StatelessWidget {
                   .toList(),
             ),
           ),
+          const SectionHeader('Stream card'),
           SwitchListTile.adaptive(
             title: const Text('Large stream card'),
             value: settingsStore.largeStreamCard,
@@ -52,6 +47,7 @@ class GeneralSettings extends StatelessWidget {
             value: settingsStore.showThumbnailUptime,
             onChanged: settingsStore.showThumbnails ? (newValue) => settingsStore.showThumbnailUptime = newValue : null,
           ),
+          const SectionHeader('Links'),
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Launch URLs in external browser'),

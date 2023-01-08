@@ -25,23 +25,26 @@ class _ChatSettingsState extends State<ChatSettings> {
 
     const timestamps = ['Disabled', '12-hour', '24-hour'];
 
-    const sectionPadding = EdgeInsets.only(left: 16.0, bottom: 5.0, top: 30.0);
-
     final settingsStore = widget.settingsStore;
 
     return Observer(
-      builder: (context) => ExpansionTile(
-        expandedCrossAxisAlignment: CrossAxisAlignment.start,
-        childrenPadding: const EdgeInsets.symmetric(vertical: 10.0),
-        leading: const Icon(Icons.chat),
-        title: const Text(
-          'Chat',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      builder: (context) => ListView(
         children: [
+          const SectionHeader('General'),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Prevent sleep in chat-only mode'),
+            subtitle: const Text('Requires restarting the chat in order to take effect.'),
+            value: settingsStore.chatOnlyPreventSleep,
+            onChanged: !settingsStore.showVideo ? (newValue) => settingsStore.chatOnlyPreventSleep = newValue : null,
+          ),
+          SwitchListTile.adaptive(
+            isThreeLine: true,
+            title: const Text('Autocomplete'),
+            subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
+            value: settingsStore.autocomplete,
+            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
+          ),
           ListTile(
             title: Row(
               children: [
@@ -65,25 +68,7 @@ class _ChatSettingsState extends State<ChatSettings> {
               ],
             ),
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Prevent sleep in chat-only mode'),
-            subtitle: const Text('Requires restarting the chat in order to take effect.'),
-            value: settingsStore.chatOnlyPreventSleep,
-            onChanged: !settingsStore.showVideo ? (newValue) => settingsStore.chatOnlyPreventSleep = newValue : null,
-          ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Autocomplete'),
-            subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
-            value: settingsStore.autocomplete,
-            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
-          ),
-          const SectionHeader(
-            'Layout',
-            padding: sectionPadding,
-            showDivider: true,
-          ),
+          const SectionHeader('Layout'),
           SwitchListTile.adaptive(
             title: const Text('Bottom bar'),
             value: settingsStore.showBottomBar,
@@ -176,11 +161,7 @@ class _ChatSettingsState extends State<ChatSettings> {
               ],
             ),
           ),
-          const SectionHeader(
-            'Message Appearance',
-            padding: sectionPadding,
-            showDivider: true,
-          ),
+          const SectionHeader('Message Appearance'),
           SwitchListTile.adaptive(
             isThreeLine: true,
             title: const Text('Readable name colors'),
@@ -217,11 +198,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                   .toList(),
             ),
           ),
-          const SectionHeader(
-            'Alerts',
-            padding: sectionPadding,
-            showDivider: true,
-          ),
+          const SectionHeader('Alerts'),
           SwitchListTile.adaptive(
             title: const Text('Highlight first time chatters'),
             value: settingsStore.highlightFirstTimeChatter,
@@ -234,11 +211,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
-          const SectionHeader(
-            'Message Sizing',
-            padding: sectionPadding,
-            showDivider: true,
-          ),
+          const SectionHeader('Message Sizing'),
           ExpansionTile(
             title: const Text('Preview'),
             children: [
