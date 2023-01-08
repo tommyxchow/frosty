@@ -10,6 +10,7 @@ import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/uptime.dart';
 import 'package:mobx/mobx.dart';
 
 class SearchResultsChannels extends StatefulWidget {
@@ -117,24 +118,19 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                       child: ListTile(
                         title: Text(displayName),
                         leading: ProfilePicture(userLogin: channel.broadcasterLogin),
-                        trailing: channel.isLive
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(5.0),
-                                child: Container(
-                                  color: const Color(0xFFF44336),
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: const Text(
-                                    'LIVE',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                        subtitle: channel.isLive
+                            ? Row(
+                                children: [
+                                  const Icon(
+                                    Icons.circle,
+                                    color: Colors.red,
+                                    size: 14,
                                   ),
-                                ),
+                                  const SizedBox(width: 5),
+                                  Uptime(startTime: channel.startedAt),
+                                ],
                               )
                             : null,
-                        subtitle:
-                            channel.isLive ? Text('Uptime: ${DateTime.now().difference(DateTime.parse(channel.startedAt)).toString().split('.')[0]}') : null,
                       ),
                     );
                   },
