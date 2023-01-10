@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
+import 'package:frosty/screens/home/stream_list/large_stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -149,13 +150,17 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                 _listStore.getStreams();
                               }
                               return Observer(
-                                builder: (context) => StreamCard(
-                                  streamInfo: _listStore.streams[index],
-                                  showUptime: context.read<SettingsStore>().showThumbnailUptime,
-                                  showThumbnail: context.read<SettingsStore>().showThumbnails,
-                                  large: context.read<SettingsStore>().largeStreamCard,
-                                  showCategory: false,
-                                ),
+                                builder: (context) => context.read<SettingsStore>().largeStreamCard
+                                    ? LargeStreamCard(
+                                        streamInfo: _listStore.streams[index],
+                                        showThumbnail: context.read<SettingsStore>().showThumbnails,
+                                        showCategory: false,
+                                      )
+                                    : StreamCard(
+                                        streamInfo: _listStore.streams[index],
+                                        showThumbnail: context.read<SettingsStore>().showThumbnails,
+                                        showCategory: false,
+                                      ),
                               );
                             },
                             childCount: _listStore.streams.length,
@@ -170,7 +175,9 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                       duration: const Duration(milliseconds: 200),
                       switchInCurve: Curves.easeOutCubic,
                       switchOutCurve: Curves.easeInCubic,
-                      child: _listStore.showJumpButton ? ScrollToTopButton(scrollController: _listStore.scrollController!) : null,
+                      child: _listStore.showJumpButton
+                          ? ScrollToTopButton(scrollController: _listStore.scrollController!)
+                          : null,
                     ),
                   ),
                 ),

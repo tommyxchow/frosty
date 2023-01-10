@@ -16,13 +16,12 @@ import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-/// A tappable card widget that displays a stream's thumbnail and details.
-class StreamCard extends StatelessWidget {
+class LargeStreamCard extends StatelessWidget {
   final StreamTwitch streamInfo;
   final bool showThumbnail;
   final bool showCategory;
 
-  const StreamCard({
+  const LargeStreamCard({
     Key? key,
     required this.streamInfo,
     required this.showThumbnail,
@@ -40,10 +39,10 @@ class StreamCard extends StatelessWidget {
     // Constraint the resolution to 1920x1080 since that's the max resolution of the Twitch API.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final thumbnailWidth = min((size.width * pixelRatio) ~/ 3, 1920);
+    final thumbnailWidth = min((size.width * pixelRatio) ~/ 1, 1920);
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
 
-    final thumbnail = AspectRatio(
+    final image = AspectRatio(
       aspectRatio: 16 / 9,
       child: CachedNetworkImage(
         imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
@@ -53,43 +52,28 @@ class StreamCard extends StatelessWidget {
       ),
     );
 
+    final thumbnail = Container(
+      foregroundDecoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.black.withOpacity(0.8),
+            Colors.transparent,
+            Colors.transparent,
+            Colors.black.withOpacity(0.8),
+          ],
+        ),
+      ),
+      child: image,
+    );
+
     final streamerName = regexEnglish.hasMatch(streamInfo.userName)
         ? streamInfo.userName
         : '${streamInfo.userName} (${streamInfo.userLogin})';
 
-    const subFontSize = 14.0;
-
-    final fontColor = DefaultTextStyle.of(context).style.color;
-
-    final imageSection = ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-        child: Stack(
-          alignment: AlignmentDirectional.bottomEnd,
-          children: [
-            thumbnail,
-            Container(
-              padding: const EdgeInsets.all(2.0),
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(0, 0, 0, 0.5),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(3.0),
-                ),
-              ),
-              margin: const EdgeInsets.all(2.0),
-              child: Uptime(
-                startTime: streamInfo.startedAt,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-              ),
-            )
-          ],
-        ));
-
     final streamInfoSection = Padding(
-      padding: const EdgeInsets.only(left: 10.0),
+      padding: const EdgeInsets.all(10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -106,10 +90,10 @@ class StreamCard extends StatelessWidget {
                   preferBelow: false,
                   child: Text(
                     streamerName,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
-                      color: fontColor,
+                      color: Colors.white,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -125,13 +109,13 @@ class StreamCard extends StatelessWidget {
             child: Text(
               streamInfo.title.trim(),
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: subFontSize,
-                color: fontColor?.withOpacity(0.8),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          const SizedBox(height: 5.0),
+          const Spacer(),
           if (showCategory) ...[
             InkWell(
               onTap: streamInfo.gameName.isNotEmpty
@@ -148,24 +132,66 @@ class StreamCard extends StatelessWidget {
               child: Tooltip(
                 message: streamInfo.gameName,
                 preferBelow: false,
-                child: Text(
-                  streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: subFontSize,
-                    color: fontColor?.withOpacity(0.8),
-                  ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.games,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                    const SizedBox(width: 5.0),
+                    Text(
+                      streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
             const SizedBox(height: 5.0),
           ],
-          Text(
-            '${NumberFormat().format(streamInfo.viewerCount)} viewers',
-            style: TextStyle(
-              fontSize: subFontSize,
-              color: fontColor?.withOpacity(0.8),
-            ),
+          Row(
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.circle,
+                    color: Colors.red,
+                    size: 10,
+                  ),
+                  const SizedBox(width: 5),
+                  Uptime(
+                    startTime: streamInfo.startedAt,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 10.0),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.people,
+                    color: Colors.white,
+                    size: 14,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    NumberFormat().format(streamInfo.viewerCount),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              )
+            ],
           ),
         ],
       ),
@@ -198,18 +224,19 @@ class StreamCard extends StatelessWidget {
       },
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: showThumbnail ? 15.0 : 5.0),
-        child: Row(
-          children: [
-            if (showThumbnail)
-              Flexible(
-                flex: 1,
-                child: imageSection,
-              ),
-            Flexible(
-              flex: 2,
-              child: streamInfoSection,
-            ),
-          ],
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Stack(
+            alignment: AlignmentDirectional.bottomStart,
+            children: [
+              if (showThumbnail)
+                ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                  child: thumbnail,
+                ),
+              streamInfoSection
+            ],
+          ),
         ),
       ),
     );
