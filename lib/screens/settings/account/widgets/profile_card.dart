@@ -117,13 +117,10 @@ class ProfileCard extends StatelessWidget {
         }
         return ListTile(
           isThreeLine: true,
-          leading: const Icon(
-            Icons.no_accounts,
-            size: 40,
-          ),
-          title: const Text('Anonymous User'),
-          subtitle: const Text('Tap to log in to chat, view followed streams, and more.'),
-          trailing: Icon(Icons.adaptive.arrow_forward),
+          leading: const Icon(Icons.no_accounts),
+          title: const Text('Anonymous', style: TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: const Text('Tap to log in and enable the ability to chat, view followed streams, and more.'),
+          trailing: SizedBox(height: double.infinity, child: Icon(Icons.adaptive.arrow_forward)),
           onTap: () => _showLoginDialog(context),
         );
       },
