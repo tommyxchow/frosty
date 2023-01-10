@@ -39,7 +39,9 @@ class VideoOverlay extends StatelessWidget {
                   const Spacer(),
                   IconButton(
                     tooltip: 'Cancel sleep timer',
-                    onPressed: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive ? videoStore.cancelSleepTimer : null,
+                    onPressed: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive
+                        ? videoStore.cancelSleepTimer
+                        : null,
                     icon: const Icon(Icons.cancel),
                   ),
                 ],
@@ -48,7 +50,9 @@ class VideoOverlay extends StatelessWidget {
                 children: [
                   DropdownButton(
                     value: videoStore.sleepHours,
-                    items: List.generate(24, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
+                    items: List.generate(24, (index) => index)
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+                        .toList(),
                     onChanged: (int? hours) => videoStore.sleepHours = hours!,
                     menuMaxHeight: 200,
                   ),
@@ -60,7 +64,9 @@ class VideoOverlay extends StatelessWidget {
                 children: [
                   DropdownButton(
                     value: videoStore.sleepMinutes,
-                    items: List.generate(60, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
+                    items: List.generate(60, (index) => index)
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+                        .toList(),
                     onChanged: (int? minutes) => videoStore.sleepMinutes = minutes!,
                     menuMaxHeight: 200,
                   ),
@@ -118,8 +124,11 @@ class VideoOverlay extends StatelessWidget {
     final chatOverlayButton = Observer(
       builder: (_) => IconButton(
         tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
-        onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
-        icon: videoStore.settingsStore.fullScreenChatOverlay ? const Icon(Icons.chat_bubble_outline) : const Icon(Icons.chat_bubble),
+        onPressed: () =>
+            videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
+        icon: videoStore.settingsStore.fullScreenChatOverlay
+            ? const Icon(Icons.chat_bubble_outline)
+            : const Icon(Icons.chat_bubble),
         color: Colors.white,
       ),
     );
@@ -215,7 +224,9 @@ class VideoOverlay extends StatelessWidget {
     final streamTitle = videoStore.streamInfo!.title.trim();
     final category = videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo!.gameName : 'No Category';
 
-    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName)
+        ? streamInfo.userName
+        : '${streamInfo.userName} (${streamInfo.userLogin})';
 
     return Observer(
       builder: (context) {
@@ -337,7 +348,7 @@ class VideoOverlay extends StatelessWidget {
                                   const Icon(
                                     Icons.circle,
                                     color: Colors.red,
-                                    size: 14,
+                                    size: 10,
                                   ),
                                   const SizedBox(width: 5),
                                   Uptime(
