@@ -88,7 +88,9 @@ class _VideoChatState extends State<VideoChat> {
 
     final appBar = AppBar(
       title: Text(
-        regexEnglish.hasMatch(_chatStore.displayName) ? _chatStore.displayName : '${_chatStore.displayName} (${_chatStore.channelName})',
+        regexEnglish.hasMatch(_chatStore.displayName)
+            ? _chatStore.displayName
+            : '${_chatStore.displayName} (${_chatStore.channelName})',
         style: const TextStyle(fontSize: 20),
       ),
       actions: [
@@ -115,7 +117,9 @@ class _VideoChatState extends State<VideoChat> {
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
-      onDoubleTap: MediaQuery.of(context).orientation == Orientation.landscape ? () => settingsStore.fullScreen = !settingsStore.fullScreen : null,
+      onDoubleTap: MediaQuery.of(context).orientation == Orientation.landscape
+          ? () => settingsStore.fullScreen = !settingsStore.fullScreen
+          : null,
       onTap: () {
         if (_chatStore.assetsStore.showEmoteMenu) {
           _chatStore.assetsStore.showEmoteMenu = false;
@@ -136,17 +140,7 @@ class _VideoChatState extends State<VideoChat> {
             duration: const Duration(milliseconds: 200),
             child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: const [0.0, 0.25, 0.75, 1.0],
-                  colors: [
-                    Colors.black.withOpacity(settingsStore.overlayOpacity),
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.black.withOpacity(settingsStore.overlayOpacity),
-                  ],
-                ),
+                color: Colors.black.withOpacity(settingsStore.overlayOpacity),
               ),
               child: IgnorePointer(
                 ignoring: !_videoStore.overlayVisible,
@@ -186,7 +180,9 @@ class _VideoChatState extends State<VideoChat> {
 
                 final landscapeChat = AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  width: _chatStore.expandChat ? MediaQuery.of(context).size.width / 2 : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
+                  width: _chatStore.expandChat
+                      ? MediaQuery.of(context).size.width / 2
+                      : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
                   curve: Curves.ease,
                   color: _chatStore.settings.fullScreen
                       ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
@@ -210,9 +206,12 @@ class _VideoChatState extends State<VideoChat> {
                   color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
                   child: SafeArea(
                     bottom: false,
-                    left:
-                        (settingsStore.landscapeCutout == LandscapeCutoutType.both || settingsStore.landscapeCutout == LandscapeCutoutType.left) ? false : true,
-                    right: (settingsStore.landscapeCutout == LandscapeCutoutType.both || settingsStore.landscapeCutout == LandscapeCutoutType.right)
+                    left: (settingsStore.landscapeCutout == LandscapeCutoutType.both ||
+                            settingsStore.landscapeCutout == LandscapeCutoutType.left)
+                        ? false
+                        : true,
+                    right: (settingsStore.landscapeCutout == LandscapeCutoutType.both ||
+                            settingsStore.landscapeCutout == LandscapeCutoutType.right)
                         ? false
                         : true,
                     child: settingsStore.showVideo
@@ -229,8 +228,9 @@ class _VideoChatState extends State<VideoChat> {
                                 ],
                               )
                             : Row(
-                                children:
-                                    settingsStore.landscapeChatLeftSide ? [landscapeChat, Expanded(child: video)] : [Expanded(child: video), landscapeChat],
+                                children: settingsStore.landscapeChatLeftSide
+                                    ? [landscapeChat, Expanded(child: video)]
+                                    : [Expanded(child: video), landscapeChat],
                               )
                         : Column(
                             children: [appBar, Expanded(child: chat)],
