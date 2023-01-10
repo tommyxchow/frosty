@@ -13,14 +13,14 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           ThemeType.system
       ..showThumbnails = json['showThumbnails'] as bool? ?? true
       ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
-      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? false
+      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? true
       ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
-      ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.8
+      ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
-      ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? true
+      ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? false
       ..autocomplete = json['autocomplete'] as bool? ?? true
       ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
@@ -53,7 +53,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
-      ..expandInfo = json['expandInfo'] as bool? ?? true
       ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false;
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
@@ -92,7 +91,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'fontSize': instance.fontSize,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
-      'expandInfo': instance.expandInfo,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
     };
 
@@ -660,22 +658,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$expandInfoAtom =
-      Atom(name: '_SettingsStoreBase.expandInfo', context: context);
-
-  @override
-  bool get expandInfo {
-    _$expandInfoAtom.reportRead();
-    return super.expandInfo;
-  }
-
-  @override
-  set expandInfo(bool value) {
-    _$expandInfoAtom.reportWrite(value, super.expandInfo, () {
-      super.expandInfo = value;
-    });
-  }
-
   late final _$fullScreenChatOverlayAtom =
       Atom(name: '_SettingsStoreBase.fullScreenChatOverlay', context: context);
 
@@ -798,7 +780,6 @@ messageSpacing: ${messageSpacing},
 fontSize: ${fontSize},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
-expandInfo: ${expandInfo},
 fullScreenChatOverlay: ${fullScreenChatOverlay}
     ''';
   }

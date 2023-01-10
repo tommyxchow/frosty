@@ -16,7 +16,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultThemeType = ThemeType.system;
   static const defaultShowThumbnails = true;
   static const defaultLargeStreamCard = false;
-  static const defaultShowThumbnailUptime = false;
+  static const defaultShowThumbnailUptime = true;
   static const defaultLaunchUrlExternal = false;
 
   @JsonKey(defaultValue: defaultThemeType, unknownEnumValue: ThemeType.system)
@@ -52,7 +52,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowVideo = true;
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
-  static const defaultOverlayOpacity = 0.8;
+  static const defaultOverlayOpacity = 0.5;
 
   @JsonKey(defaultValue: defaultShowVideo)
   @observable
@@ -80,15 +80,15 @@ abstract class _SettingsStoreBase with Store {
 
   // * Chat Settings
   static const defaultChatDelay = 0.0;
-  static const defaultChatOnlyPreventSleep = true;
+  static const defaultChatOnlyPreventSleep = false;
   static const defaultAutocomplete = true;
-  static const defaultLandscapeCutout = LandscapeCutoutType.none;
 
   static const defaultShowBottomBar = true;
   static const defaultEmoteMenuButtonOnLeft = false;
   static const defaultLandscapeChatLeftSide = false;
   static const defaultLandscapeForceVerticalChat = false;
   static const defaultChatNotificationsOnBottom = false;
+  static const defaultLandscapeCutout = LandscapeCutoutType.none;
   static const defaultChatWidth = 0.3;
   static const defaultFullScreenChatOverlayOpacity = 0.5;
 
@@ -234,16 +234,11 @@ abstract class _SettingsStoreBase with Store {
 
   // * Global configs
   static const defaultFullScreen = false;
-  static const defaultExpandInfo = true;
   static const defaultFullScreenChatOverlay = false;
 
   @JsonKey(defaultValue: defaultFullScreen)
   @observable
   var fullScreen = defaultFullScreen;
-
-  @JsonKey(defaultValue: defaultExpandInfo)
-  @observable
-  var expandInfo = defaultExpandInfo;
 
   @JsonKey(defaultValue: defaultFullScreenChatOverlay)
   @observable
@@ -252,7 +247,6 @@ abstract class _SettingsStoreBase with Store {
   @action
   void resetGlobalConfigs() {
     fullScreen = defaultFullScreen;
-    expandInfo = defaultExpandInfo;
     fullScreenChatOverlay = defaultFullScreenChatOverlay;
   }
 

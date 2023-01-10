@@ -135,8 +135,10 @@ abstract class VideoStoreBase with Store {
   Future<void> initVideo() async {
     // Add event listeners to notify the JavaScript channels when the video plays and pauses.
     try {
-      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
-      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
+      controller?.runJavascript(
+          'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
+      controller?.runJavascript(
+          'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -184,17 +186,6 @@ abstract class VideoStoreBase with Store {
       _streamInfo = null;
       _paused = true;
     }
-  }
-
-  /// Handles toggling "minimal mode" on the overlay.
-  ///
-  /// "Minimal mode" is when only the channel name is visible on the bottom-left of the overlay.
-  @action
-  void handleExpand() {
-    settingsStore.expandInfo = !settingsStore.expandInfo;
-
-    _overlayTimer.cancel();
-    _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
   }
 
   /// Handles the toggle overlay options.

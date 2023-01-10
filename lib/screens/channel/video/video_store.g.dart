@@ -168,17 +168,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
   }
 
   @override
-  void handleExpand() {
-    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
-        name: 'VideoStoreBase.handleExpand');
-    try {
-      return super.handleExpand();
-    } finally {
-      _$VideoStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void handleToggleOverlay() {
     final _$actionInfo = _$VideoStoreBaseActionController.startAction(
         name: 'VideoStoreBase.handleToggleOverlay');
