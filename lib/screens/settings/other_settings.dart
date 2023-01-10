@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
@@ -62,11 +63,13 @@ class _OtherSettingsState extends State<OtherSettings> {
 
   @override
   Widget build(BuildContext context) {
+    const titleStyle = TextStyle(fontWeight: FontWeight.w600);
+
     return Column(
       children: [
         ListTile(
           leading: const Icon(Icons.info),
-          title: const Text('About Frosty'),
+          title: const Text('About Frosty', style: titleStyle),
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
@@ -84,20 +87,16 @@ class _OtherSettingsState extends State<OtherSettings> {
         ),
         ListTile(
           leading: const Icon(Icons.launch),
-          title: const Text('Changelog'),
+          title: const Text(
+            'Changelog',
+            style: titleStyle,
+          ),
           onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
-        ListTile(
-          leading: const Icon(Icons.launch),
-          title: const Text('FAQ'),
-          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty#faq'),
-              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
-        ),
         Observer(
-          builder: (_) => SwitchListTile.adaptive(
-            title: const Text('Send anonymous crash logs'),
-            isThreeLine: true,
+          builder: (_) => SettingsListSwitch(
+            title: 'Send anonymous crash logs',
             subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
             value: widget.settingsStore.sendCrashLogs,
             onChanged: (newValue) {

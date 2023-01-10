@@ -16,50 +16,47 @@ class BlockedUsers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Blocked Users'),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          HapticFeedback.lightImpact();
+    return RefreshIndicator(
+      onRefresh: () async {
+        HapticFeedback.lightImpact();
 
-          await authStore.user.refreshBlockedUsers(headers: authStore.headersTwitch);
-        },
-        child: Observer(
-          builder: (context) {
-            if (authStore.user.blockedUsers.isEmpty) {
-              return const Center(
-                child: AlertMessage(
-                  message: 'No blocked users',
-                ),
-              );
-            }
-            return ListView(
-              children: authStore.user.blockedUsers.map(
-                (user) {
-                  final displayName = regexEnglish.hasMatch(user.displayName) ? user.displayName : '${user.displayName} (${user.userLogin})';
-
-                  return ListTile(
-                    title: Tooltip(
-                      preferBelow: false,
-                      message: displayName,
-                      child: Text(
-                        displayName,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    trailing: BlockButton(
-                      authStore: authStore,
-                      targetUser: displayName,
-                      targetUserId: user.userId,
-                    ),
-                  );
-                },
-              ).toList(),
+        await authStore.user.refreshBlockedUsers(headers: authStore.headersTwitch);
+      },
+      child: Observer(
+        builder: (context) {
+          if (authStore.user.blockedUsers.isEmpty) {
+            return const Center(
+              child: AlertMessage(
+                message: 'No blocked users',
+              ),
             );
-          },
-        ),
+          }
+          return ListView(
+            children: authStore.user.blockedUsers.map(
+              (user) {
+                final displayName = regexEnglish.hasMatch(user.displayName)
+                    ? user.displayName
+                    : '${user.displayName} (${user.userLogin})';
+
+                return ListTile(
+                  title: Tooltip(
+                    preferBelow: false,
+                    message: displayName,
+                    child: Text(
+                      displayName,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  trailing: BlockButton(
+                    authStore: authStore,
+                    targetUser: displayName,
+                    targetUserId: user.userId,
+                  ),
+                );
+              },
+            ).toList(),
+          );
+        },
       ),
     );
   }

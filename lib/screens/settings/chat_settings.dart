@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class ChatSettings extends StatefulWidget {
@@ -30,199 +33,132 @@ class _ChatSettingsState extends State<ChatSettings> {
     return Observer(
       builder: (context) => ListView(
         children: [
-          const SectionHeader('General'),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Prevent sleep in chat-only mode'),
+          const SectionHeader('Delay'),
+          SettingsListSlider(
+            title: 'Message delay',
+            trailing: '${settingsStore.chatDelay.toInt()}s',
+            subtitle:
+                'Adds a delay (in seconds) before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}',
+            value: settingsStore.chatDelay,
+            max: 30.0,
+            divisions: 30,
+            onChanged: (newValue) => settingsStore.chatDelay = newValue,
+          ),
+          const SectionHeader('Sleep'),
+          SettingsListSwitch(
+            title: 'Prevent sleep in chat-only mode',
             subtitle: const Text('Requires restarting the chat in order to take effect.'),
             value: settingsStore.chatOnlyPreventSleep,
-            onChanged: !settingsStore.showVideo ? (newValue) => settingsStore.chatOnlyPreventSleep = newValue : null,
+            onChanged: (newValue) => settingsStore.chatOnlyPreventSleep = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Autocomplete'),
+          const SectionHeader('Autocomplete'),
+          SettingsListSwitch(
+            title: 'Emote autocomplete',
             subtitle: const Text('Shows a bar that suggests matching emotes and mentions while typing.'),
             value: settingsStore.autocomplete,
-            onChanged: settingsStore.showBottomBar ? (newValue) => settingsStore.autocomplete = newValue : null,
-          ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Message delay'),
-                const Spacer(),
-                Text('${settingsStore.chatDelay.toInt()} ${settingsStore.chatDelay == 1.0 ? 'second' : 'seconds'}'),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Slider.adaptive(
-                  value: settingsStore.chatDelay,
-                  min: 0.0,
-                  max: 30.0,
-                  divisions: 30,
-                  onChanged: (newValue) => settingsStore.chatDelay = newValue,
-                ),
-                Text('Adds a delay before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}'),
-                const SizedBox(height: 15),
-              ],
-            ),
+            onChanged: (newValue) => settingsStore.autocomplete = newValue,
           ),
           const SectionHeader('Layout'),
-          SwitchListTile.adaptive(
-            title: const Text('Bottom bar'),
+          SettingsListSwitch(
+            title: 'Bottom bar',
             value: settingsStore.showBottomBar,
             onChanged: (newValue) => settingsStore.showBottomBar = newValue,
           ),
-          SwitchListTile.adaptive(
-            title: const Text('Emote menu button on left side'),
+          SettingsListSwitch(
+            title: 'Emote menu button on left side',
             value: settingsStore.emoteMenuButtonOnLeft,
             onChanged: (newValue) => settingsStore.emoteMenuButtonOnLeft = newValue,
           ),
-          SwitchListTile.adaptive(
-            title: const Text('Landscape chat on left side'),
+          SettingsListSwitch(
+            title: 'Landscape chat on left side',
             value: settingsStore.landscapeChatLeftSide,
             onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Force vertical chat in landscape mode'),
+          SettingsListSwitch(
+            title: 'Force vertical chat in landscape mode',
             subtitle: const Text('Note: this option is intended for tablets and other larger displays.'),
             value: settingsStore.landscapeForceVerticalChat,
             onChanged: (newValue) => settingsStore.landscapeForceVerticalChat = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Notifications on bottom'),
+          SettingsListSwitch(
+            title: 'Notifications on bottom',
             subtitle: const Text('Shows notifications (e.g., "Message copied") on the bottom of the chat.'),
             value: settingsStore.chatNotificationsOnBottom,
             onChanged: (newValue) => settingsStore.chatNotificationsOnBottom = newValue,
           ),
-          ListTile(
-            isThreeLine: true,
-            title: const Text('Landscape fill cutout side'),
-            subtitle: const Text('Overrides and fills the available space in the display cutout/notch.'),
-            trailing: DropdownButton(
-              value: settingsStore.landscapeCutout,
-              onChanged: (LandscapeCutoutType? newValue) => settingsStore.landscapeCutout = newValue!,
-              items: LandscapeCutoutType.values
-                  .map((LandscapeCutoutType value) => DropdownMenuItem(
-                        value: value,
-                        child: Text(landscapeCutouts[value.index]),
-                      ))
-                  .toList(),
-            ),
+          SettingsListSelect(
+            title: 'Landscape fill cutout side',
+            subtitle: 'Overrides and fills the available space in the display cutout/notch.',
+            selectedOption: landscapeCutouts[settingsStore.landscapeCutout.index],
+            options: landscapeCutouts,
+            onChanged: (newValue) =>
+                settingsStore.landscapeCutout = LandscapeCutoutType.values[landscapeCutouts.indexOf(newValue)],
           ),
           const SizedBox(height: 15.0),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Chat width'),
-                const Spacer(),
-                Text('${(settingsStore.chatWidth * 100).toStringAsFixed(0)}%'),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Slider.adaptive(
-                  value: settingsStore.chatWidth,
-                  min: 0.2,
-                  max: 0.6,
-                  divisions: 8,
-                  onChanged: (newValue) => settingsStore.chatWidth = newValue,
-                ),
-                const Text('Sets the width of the chat in fullscreen and theater mode.'),
-                const SizedBox(height: 15),
-              ],
-            ),
+          SettingsListSlider(
+            title: 'Chat width',
+            trailing: '${(settingsStore.chatWidth * 100).toStringAsFixed(0)}%',
+            subtitle: 'Sets the width of the chat in fullscreen and theater mode.',
+            value: settingsStore.chatWidth,
+            min: 0.2,
+            max: 0.6,
+            divisions: 8,
+            onChanged: (newValue) => settingsStore.chatWidth = newValue,
           ),
           const SizedBox(height: 15.0),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Chat overlay opacity'),
-                const Spacer(),
-                Text('${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%'),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Slider.adaptive(
-                  value: settingsStore.fullScreenChatOverlayOpacity,
-                  min: 0.0,
-                  max: 1.0,
-                  divisions: 10,
-                  onChanged: (newValue) => settingsStore.fullScreenChatOverlayOpacity = newValue,
-                ),
-                const Text('Sets the opacity (transparency) of the overlay chat in fullscreen mode.'),
-                const SizedBox(height: 15),
-              ],
-            ),
+          SettingsListSlider(
+            title: 'Chat overlay opacity',
+            trailing: '${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%',
+            subtitle: 'Sets the opacity (transparency) of the overlay chat in fullscreen mode.',
+            value: settingsStore.fullScreenChatOverlayOpacity,
+            divisions: 10,
+            onChanged: (newValue) => settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
           const SectionHeader('Message Appearance'),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Readable name colors'),
+          SettingsListSwitch(
+            title: 'Readable name colors',
             subtitle: const Text('Adjusts the lightness value of overly bright or dark names.'),
             value: settingsStore.useReadableColors,
             onChanged: (newValue) => settingsStore.useReadableColors = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Show deleted messages'),
+          SettingsListSwitch(
+            title: 'Show deleted messages',
             subtitle: const Text('Restores the original message of deleted messages.'),
             value: settingsStore.showDeletedMessages,
             onChanged: (newValue) => settingsStore.showDeletedMessages = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Message dividers'),
+          SettingsListSwitch(
+            title: 'Message dividers',
             subtitle: const Text('Shows a subtle divider between each message.'),
             value: settingsStore.showChatMessageDividers,
             onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
           ),
-          ListTile(
-            isThreeLine: true,
-            title: const Text('Message timestamps'),
-            subtitle: const Text('Shows timestamps for when a message was sent.'),
-            trailing: DropdownButton(
-              value: settingsStore.timestampType,
-              onChanged: (TimestampType? newTimestamp) => settingsStore.timestampType = newTimestamp!,
-              items: TimestampType.values
-                  .map((TimestampType value) => DropdownMenuItem(
-                        value: value,
-                        child: Text(timestamps[value.index]),
-                      ))
-                  .toList(),
-            ),
+          SettingsListSelect(
+            title: 'Message timestamps',
+            subtitle: 'Shows timestamps for when a message was sent.',
+            selectedOption: timestamps[settingsStore.timestampType.index],
+            options: timestamps,
+            onChanged: (newValue) => settingsStore.timestampType = TimestampType.values[timestamps.indexOf(newValue)],
           ),
           const SectionHeader('Alerts'),
-          SwitchListTile.adaptive(
-            title: const Text('Highlight first time chatters'),
+          SettingsListSwitch(
+            title: 'Highlight first time chatters',
             value: settingsStore.highlightFirstTimeChatter,
             onChanged: (newValue) => settingsStore.highlightFirstTimeChatter = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Show notices'),
+          SettingsListSwitch(
+            title: 'Show notices',
             subtitle: const Text('Shows notices such as subs and re-subs, announcements, and raids.'),
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
           const SectionHeader('Message Sizing'),
           ExpansionTile(
-            title: const Text('Preview'),
+            title: const Text('Preview', style: TextStyle(fontWeight: FontWeight.w600)),
             children: [
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20.0),
-                margin: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.deepPurple),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
+                padding: const EdgeInsets.all(16),
                 child: DefaultTextStyle(
                   style: DefaultTextStyle.of(context).style.copyWith(fontSize: settingsStore.fontSize),
                   child: Column(
@@ -234,7 +170,8 @@ class _ChatSettingsState extends State<ChatSettings> {
                             WidgetSpan(
                               alignment: PlaceholderAlignment.middle,
                               child: CachedNetworkImage(
-                                imageUrl: 'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
+                                imageUrl:
+                                    'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
                                 height: defaultBadgeSize * settingsStore.badgeScale,
                                 width: defaultBadgeSize * settingsStore.badgeScale,
                               ),
@@ -269,85 +206,49 @@ class _ChatSettingsState extends State<ChatSettings> {
             ],
           ),
           const SizedBox(height: 10.0),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Badge scale'),
-                const Spacer(),
-                Text('${settingsStore.badgeScale.toStringAsFixed(2)}x'),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.badgeScale,
-              min: 0.25,
-              max: 3.0,
-              divisions: 11,
-              onChanged: (newValue) => settingsStore.badgeScale = newValue,
-            ),
+          SettingsListSlider(
+            title: 'Badge scale',
+            trailing: '${settingsStore.badgeScale.toStringAsFixed(2)}x',
+            value: settingsStore.badgeScale,
+            min: 0.25,
+            max: 3.0,
+            divisions: 11,
+            onChanged: (newValue) => settingsStore.badgeScale = newValue,
           ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Emote scale'),
-                const Spacer(),
-                Text('${settingsStore.emoteScale.toStringAsFixed(2)}x'),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.emoteScale,
-              min: 0.25,
-              max: 3.0,
-              divisions: 11,
-              onChanged: (newValue) => settingsStore.emoteScale = newValue,
-            ),
+          SettingsListSlider(
+            title: 'Emote scale',
+            trailing: '${settingsStore.emoteScale.toStringAsFixed(2)}x',
+            value: settingsStore.emoteScale,
+            min: 0.25,
+            max: 3.0,
+            divisions: 11,
+            onChanged: (newValue) => settingsStore.emoteScale = newValue,
           ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Message scale'),
-                const Spacer(),
-                Text('${settingsStore.messageScale.toStringAsFixed(2)}x'),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.messageScale,
-              min: 0.5,
-              max: 2.0,
-              divisions: 6,
-              onChanged: (newValue) => settingsStore.messageScale = newValue,
-            ),
+          SettingsListSlider(
+            title: 'Message scale',
+            trailing: '${settingsStore.messageScale.toStringAsFixed(2)}x',
+            value: settingsStore.messageScale,
+            min: 0.5,
+            max: 2.0,
+            divisions: 6,
+            onChanged: (newValue) => settingsStore.messageScale = newValue,
           ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Message spacing'),
-                const Spacer(),
-                Text(settingsStore.messageSpacing.toStringAsFixed(0).toString()),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.messageSpacing,
-              min: 0.0,
-              max: 30.0,
-              divisions: 6,
-              onChanged: (newValue) => settingsStore.messageSpacing = newValue,
-            ),
+          SettingsListSlider(
+            title: 'Message spacing',
+            trailing: '${settingsStore.messageSpacing.toStringAsFixed(0)}px',
+            value: settingsStore.messageSpacing,
+            max: 30.0,
+            divisions: 6,
+            onChanged: (newValue) => settingsStore.messageSpacing = newValue,
           ),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Font size'),
-                const Spacer(),
-                Text(settingsStore.fontSize.toInt().toString()),
-              ],
-            ),
-            subtitle: Slider.adaptive(
-              value: settingsStore.fontSize,
-              min: 5,
-              max: 20,
-              divisions: 15,
-              onChanged: (newValue) => settingsStore.fontSize = newValue,
-            ),
+          SettingsListSlider(
+            title: 'Font size',
+            trailing: settingsStore.fontSize.toInt().toString(),
+            value: settingsStore.fontSize,
+            min: 5,
+            max: 20,
+            divisions: 15,
+            onChanged: (newValue) => settingsStore.fontSize = newValue,
           ),
         ],
       ),

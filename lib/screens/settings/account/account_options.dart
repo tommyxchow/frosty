@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/account/blocked_users.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 
@@ -39,21 +40,16 @@ class AccountOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        ListTile(
-          leading: const Icon(Icons.block),
-          title: const Text('Blocked users'),
-          trailing: Icon(Icons.adaptive.arrow_forward),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => BlockedUsers(
-                authStore: authStore,
-              ),
-            ),
+        SettingsTileRoute(
+          leading: const Icon(Icons.person_off),
+          title: 'Blocked',
+          child: BlockedUsers(
+            authStore: authStore,
           ),
         ),
         ListTile(
           leading: const Icon(Icons.login),
-          title: const Text('Log out'),
+          title: const Text('Log out', style: TextStyle(fontWeight: FontWeight.w600)),
           trailing: Icon(Icons.adaptive.arrow_forward),
           onTap: () => _showLogoutDialog(context),
         )

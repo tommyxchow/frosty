@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class VideoSettings extends StatelessWidget {
@@ -14,49 +16,32 @@ class VideoSettings extends StatelessWidget {
       builder: (context) => ListView(
         children: [
           const SectionHeader('Player'),
-          SwitchListTile.adaptive(
-            title: const Text('Video'),
+          SettingsListSwitch(
+            title: 'Video',
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
           const SectionHeader('Overlay'),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Custom overlay'),
+          SettingsListSwitch(
+            title: 'Custom overlay',
             subtitle: const Text('Replaces Twitch\'s default overlay with a mobile-friendly version.'),
             value: settingsStore.showOverlay,
-            onChanged: settingsStore.showVideo ? (newValue) => settingsStore.showOverlay = newValue : null,
+            onChanged: (newValue) => settingsStore.showOverlay = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Long-press player to toggle overlay'),
+          SettingsListSwitch(
+            title: 'Long-press player to toggle overlay',
             subtitle: const Text('Allows switching between Twitch\'s default overlay and the custom overlay.'),
             value: settingsStore.toggleableOverlay,
-            onChanged: settingsStore.showVideo ? (newValue) => settingsStore.toggleableOverlay = newValue : null,
+            onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
           ),
           const SizedBox(height: 15.0),
-          ListTile(
-            title: Row(
-              children: [
-                const Text('Custom overlay opacity'),
-                const Spacer(),
-                Text('${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%'),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Slider.adaptive(
-                  value: settingsStore.overlayOpacity,
-                  min: 0.0,
-                  max: 1.0,
-                  divisions: 10,
-                  onChanged: (newValue) => settingsStore.overlayOpacity = newValue,
-                ),
-                const Text('Adjusts the opacity (transparency) of the stream overlay when active.'),
-                const SizedBox(height: 15),
-              ],
-            ),
+          SettingsListSlider(
+            title: 'Custom overlay opacity',
+            trailing: '${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%',
+            subtitle: 'Adjusts the opacity (transparency) of the stream overlay when active.',
+            value: settingsStore.overlayOpacity,
+            divisions: 10,
+            onChanged: (newValue) => settingsStore.overlayOpacity = newValue,
           ),
         ],
       ),
