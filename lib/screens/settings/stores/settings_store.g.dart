@@ -35,6 +35,9 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
+      ..highlightFirstTimeChatter =
+          json['highlightFirstTimeChatter'] as bool? ?? true
+      ..showUserNotices = json['showUserNotices'] as bool? ?? true
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showChatMessageDividers =
@@ -43,9 +46,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               _$TimestampTypeEnumMap, json['timestampType'],
               unknownValue: TimestampType.disabled) ??
           TimestampType.disabled
-      ..highlightFirstTimeChatter =
-          json['highlightFirstTimeChatter'] as bool? ?? true
-      ..showUserNotices = json['showUserNotices'] as bool? ?? true
       ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
       ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
       ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
@@ -78,12 +78,12 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
           _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
       'chatWidth': instance.chatWidth,
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
+      'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
+      'showUserNotices': instance.showUserNotices,
       'useReadableColors': instance.useReadableColors,
       'showDeletedMessages': instance.showDeletedMessages,
       'showChatMessageDividers': instance.showChatMessageDividers,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
-      'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
-      'showUserNotices': instance.showUserNotices,
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'messageScale': instance.messageScale,
@@ -448,6 +448,39 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$highlightFirstTimeChatterAtom = Atom(
+      name: '_SettingsStoreBase.highlightFirstTimeChatter', context: context);
+
+  @override
+  bool get highlightFirstTimeChatter {
+    _$highlightFirstTimeChatterAtom.reportRead();
+    return super.highlightFirstTimeChatter;
+  }
+
+  @override
+  set highlightFirstTimeChatter(bool value) {
+    _$highlightFirstTimeChatterAtom
+        .reportWrite(value, super.highlightFirstTimeChatter, () {
+      super.highlightFirstTimeChatter = value;
+    });
+  }
+
+  late final _$showUserNoticesAtom =
+      Atom(name: '_SettingsStoreBase.showUserNotices', context: context);
+
+  @override
+  bool get showUserNotices {
+    _$showUserNoticesAtom.reportRead();
+    return super.showUserNotices;
+  }
+
+  @override
+  set showUserNotices(bool value) {
+    _$showUserNoticesAtom.reportWrite(value, super.showUserNotices, () {
+      super.showUserNotices = value;
+    });
+  }
+
   late final _$useReadableColorsAtom =
       Atom(name: '_SettingsStoreBase.useReadableColors', context: context);
 
@@ -510,39 +543,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set timestampType(TimestampType value) {
     _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
       super.timestampType = value;
-    });
-  }
-
-  late final _$highlightFirstTimeChatterAtom = Atom(
-      name: '_SettingsStoreBase.highlightFirstTimeChatter', context: context);
-
-  @override
-  bool get highlightFirstTimeChatter {
-    _$highlightFirstTimeChatterAtom.reportRead();
-    return super.highlightFirstTimeChatter;
-  }
-
-  @override
-  set highlightFirstTimeChatter(bool value) {
-    _$highlightFirstTimeChatterAtom
-        .reportWrite(value, super.highlightFirstTimeChatter, () {
-      super.highlightFirstTimeChatter = value;
-    });
-  }
-
-  late final _$showUserNoticesAtom =
-      Atom(name: '_SettingsStoreBase.showUserNotices', context: context);
-
-  @override
-  bool get showUserNotices {
-    _$showUserNoticesAtom.reportRead();
-    return super.showUserNotices;
-  }
-
-  @override
-  set showUserNotices(bool value) {
-    _$showUserNoticesAtom.reportWrite(value, super.showUserNotices, () {
-      super.showUserNotices = value;
     });
   }
 
@@ -767,12 +767,12 @@ chatNotificationsOnBottom: ${chatNotificationsOnBottom},
 landscapeCutout: ${landscapeCutout},
 chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
+highlightFirstTimeChatter: ${highlightFirstTimeChatter},
+showUserNotices: ${showUserNotices},
 useReadableColors: ${useReadableColors},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
-highlightFirstTimeChatter: ${highlightFirstTimeChatter},
-showUserNotices: ${showUserNotices},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 messageScale: ${messageScale},

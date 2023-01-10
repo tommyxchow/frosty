@@ -17,20 +17,20 @@ class VideoSettings extends StatelessWidget {
         children: [
           const SectionHeader('Player'),
           SettingsListSwitch(
-            title: 'Video',
+            title: 'Enable video',
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
           const SectionHeader('Overlay'),
           SettingsListSwitch(
-            title: 'Custom overlay',
-            subtitle: const Text('Replaces Twitch\'s default overlay with a mobile-friendly version.'),
+            title: 'Use custom video overlay',
+            subtitle: const Text('Replaces Twitch\'s default web overlay with a mobile-friendly version.'),
             value: settingsStore.showOverlay,
             onChanged: (newValue) => settingsStore.showOverlay = newValue,
           ),
           SettingsListSwitch(
             title: 'Long-press player to toggle overlay',
-            subtitle: const Text('Allows switching between Twitch\'s default overlay and the custom overlay.'),
+            subtitle: const Text('Allows switching between Twitch\'s overlay and the custom overlay.'),
             value: settingsStore.toggleableOverlay,
             onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
           ),
@@ -38,7 +38,7 @@ class VideoSettings extends StatelessWidget {
           SettingsListSlider(
             title: 'Custom overlay opacity',
             trailing: '${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%',
-            subtitle: 'Adjusts the opacity (transparency) of the stream overlay when active.',
+            subtitle: 'Adjusts the opacity (transparency) of the custom video overlay when active.',
             value: settingsStore.overlayOpacity,
             divisions: 10,
             onChanged: (newValue) => settingsStore.overlayOpacity = newValue,

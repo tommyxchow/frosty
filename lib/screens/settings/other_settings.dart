@@ -94,6 +94,34 @@ class _OtherSettingsState extends State<OtherSettings> {
           onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
+        ListTile(
+          leading: const Icon(Icons.delete),
+          title: const Text(
+            'Clear image cache',
+            style: titleStyle,
+          ),
+          onTap: () async {
+            HapticFeedback.mediumImpact();
+
+            await DefaultCacheManager().emptyCache();
+
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: AlertMessage(message: 'Image cache cleared'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.restore),
+          title: const Text(
+            'Reset settings',
+            style: titleStyle,
+          ),
+          onTap: () => _showConfirmDialog(context),
+        ),
         Observer(
           builder: (_) => SettingsListSwitch(
             title: 'Send anonymous crash logs',
@@ -107,41 +135,6 @@ class _OtherSettingsState extends State<OtherSettings> {
               }
               widget.settingsStore.sendCrashLogs = newValue;
             },
-          ),
-        ),
-        ...[
-          Button(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-            icon: const Icon(Icons.delete_sweep),
-            child: const Text('Clear image cache'),
-            onPressed: () async {
-              HapticFeedback.mediumImpact();
-
-              await DefaultCacheManager().emptyCache();
-
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: AlertMessage(message: 'Image cache cleared'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-          ),
-          Button(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-            onPressed: () => _showConfirmDialog(context),
-            icon: const Icon(Icons.restore),
-            child: const Text('Reset all settings'),
-          )
-        ].map(
-          (button) => Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15.0,
-              vertical: 5.0,
-            ),
-            width: double.infinity,
-            child: button,
           ),
         ),
       ],
