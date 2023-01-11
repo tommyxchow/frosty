@@ -139,6 +139,8 @@ class _HomeState extends State<Home> {
             unselectedFontSize: 12.0,
             selectedFontSize: 12.0,
             type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
             items: [
               if (_authStore.isLoggedIn)
                 const BottomNavigationBarItem(
