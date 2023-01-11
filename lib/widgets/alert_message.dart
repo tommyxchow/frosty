@@ -20,7 +20,6 @@ class AlertMessage extends StatelessWidget {
         HeroIcon(
           HeroIcons.informationCircle,
           color: color ?? Colors.grey,
-          style: HeroIconStyle.mini,
         ),
         const SizedBox(width: 5.0),
         Flexible(
