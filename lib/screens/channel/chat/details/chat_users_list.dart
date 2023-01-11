@@ -12,6 +12,7 @@ import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -47,7 +48,6 @@ class ChattersList extends StatelessWidget {
             children: [
               const AlertMessage(
                 message: 'Failed to get chatters',
-                icon: Icons.error,
               ),
               const SizedBox(height: 10.0),
               Button(
@@ -84,7 +84,10 @@ class ChattersList extends StatelessWidget {
                                 if (chatDetailsStore.filterText.isEmpty) chatDetailsStore.textFieldFocusNode.unfocus();
                                 chatDetailsStore.textController.clear();
                               },
-                              icon: const Icon(Icons.clear),
+                              icon: const HeroIcon(
+                                HeroIcons.xMark,
+                                style: HeroIconStyle.solid,
+                              ),
                             )
                           : null,
                     ),
@@ -125,20 +128,14 @@ class ChattersList extends StatelessWidget {
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: Center(
-                                  child: AlertMessage(
-                                    message: 'No chatters found',
-                                    icon: Icons.person_off,
-                                  ),
+                                  child: AlertMessage(message: 'No chatters found'),
                                 ),
                               )
                             else if (chatDetailsStore.filteredUsers.expand((element) => element).isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: Center(
-                                  child: AlertMessage(
-                                    message: 'No matching chatters',
-                                    icon: Icons.person_off,
-                                  ),
+                                  child: AlertMessage(message: 'No matching chatters'),
                                 ),
                               )
                             else
@@ -164,9 +161,9 @@ class ChattersList extends StatelessWidget {
                                           onLongPress: () async {
                                             HapticFeedback.lightImpact();
 
-                                            final userInfo = await context
-                                                .read<TwitchApi>()
-                                                .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
+                                            final userInfo = await context.read<TwitchApi>().getUser(
+                                                headers: context.read<AuthStore>().headersTwitch,
+                                                userLogin: users[index]);
 
                                             showModalBottomSheet(
                                               backgroundColor: Colors.transparent,
@@ -196,7 +193,9 @@ class ChattersList extends StatelessWidget {
                         duration: const Duration(milliseconds: 200),
                         switchInCurve: Curves.easeOutCubic,
                         switchOutCurve: Curves.easeInCubic,
-                        child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: chatDetailsStore.scrollController) : null,
+                        child: chatDetailsStore.showJumpButton
+                            ? ScrollToTopButton(scrollController: chatDetailsStore.scrollController)
+                            : null,
                       ),
                     ),
                   ],

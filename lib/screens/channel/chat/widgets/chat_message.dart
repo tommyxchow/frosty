@@ -5,6 +5,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
+import 'package:heroicons/heroicons.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
@@ -62,7 +63,9 @@ class ChatMessage extends StatelessWidget {
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
             if (ircMessage.mention == true) color = Colors.red.withOpacity(0.2);
-            if (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1') color = Colors.green.withOpacity(0.2);
+            if (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1') {
+              color = Colors.green.withOpacity(0.2);
+            }
 
             final messageSpan = Text.rich(
               TextSpan(
@@ -84,17 +87,19 @@ class ChatMessage extends StatelessWidget {
             final replyUser = ircMessage.tags['reply-parent-display-name'];
             final replyBody = ircMessage.tags['reply-parent-msg-body'];
 
-            if ((replyUser != null && replyBody != null) || (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1')) {
+            if ((replyUser != null && replyBody != null) ||
+                (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1')) {
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        replyUser != null && replyBody != null ? Icons.reply : Icons.new_releases_outlined,
+                      HeroIcon(
+                        replyUser != null && replyBody != null
+                            ? HeroIcons.arrowUturnRight
+                            : HeroIcons.chatBubbleOvalLeftEllipsis,
                         size: defaultBadgeSize * chatStore.settings.badgeScale,
                         color: defaultTextStyle.color?.withOpacity(0.5),
-                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(width: 5.0),
                       Flexible(
@@ -198,8 +203,8 @@ class ChatMessage extends StatelessWidget {
                   if (ircMessage.tags['msg-id'] == 'announcement')
                     Row(
                       children: [
-                        Icon(
-                          Icons.announcement_outlined,
+                        HeroIcon(
+                          HeroIcons.bell,
                           size: defaultBadgeSize * chatStore.settings.badgeScale,
                         ),
                         const SizedBox(width: 5.0),

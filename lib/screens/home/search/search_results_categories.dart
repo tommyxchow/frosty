@@ -32,10 +32,7 @@ class SearchResultsCategories extends StatelessWidget {
             return const SliverToBoxAdapter(
               child: SizedBox(
                 height: 100.0,
-                child: AlertMessage(
-                  message: 'Failed to get categories',
-                  icon: Icons.error,
-                ),
+                child: AlertMessage(message: 'Failed to get categories'),
               ),
             );
           case FutureStatus.fulfilled:
@@ -45,10 +42,7 @@ class SearchResultsCategories extends StatelessWidget {
               return const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 100.0,
-                  child: AlertMessage(
-                    message: 'Failed to get categories',
-                    icon: Icons.error,
-                  ),
+                  child: AlertMessage(message: 'Failed to get categories'),
                 ),
               );
             }

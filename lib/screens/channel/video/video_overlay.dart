@@ -10,6 +10,7 @@ import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
@@ -32,19 +33,20 @@ class VideoOverlay extends StatelessWidget {
           builder: (context) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.timer),
-                  Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
-                  const Spacer(),
-                  IconButton(
-                    tooltip: 'Cancel sleep timer',
-                    onPressed: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive
-                        ? videoStore.cancelSleepTimer
-                        : null,
-                    icon: const Icon(Icons.cancel),
-                  ),
-                ],
+              Opacity(
+                opacity: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive ? 1.0 : 0.5,
+                child: Row(
+                  children: [
+                    const HeroIcon(HeroIcons.clock, style: HeroIconStyle.solid),
+                    Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
+                    const Spacer(),
+                    IconButton(
+                      tooltip: 'Cancel sleep timer',
+                      onPressed: videoStore.cancelSleepTimer,
+                      icon: const HeroIcon(HeroIcons.xCircle, style: HeroIconStyle.solid),
+                    ),
+                  ],
+                ),
               ),
               Row(
                 children: [
@@ -105,18 +107,20 @@ class VideoOverlay extends StatelessWidget {
 
     final backButton = IconButton(
       tooltip: 'Back',
-      icon: Icon(
-        Icons.adaptive.arrow_back,
+      icon: const HeroIcon(
+        HeroIcons.chevronLeft,
         color: Colors.white,
+        style: HeroIconStyle.solid,
       ),
       onPressed: Navigator.of(context).pop,
     );
 
     final settingsButton = IconButton(
       tooltip: 'Settings',
-      icon: const Icon(
-        Icons.settings,
+      icon: const HeroIcon(
+        HeroIcons.cog6Tooth,
         color: Colors.white,
+        style: HeroIconStyle.solid,
       ),
       onPressed: onSettingsPressed,
     );
@@ -126,18 +130,18 @@ class VideoOverlay extends StatelessWidget {
         tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
         onPressed: () =>
             videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
-        icon: videoStore.settingsStore.fullScreenChatOverlay
-            ? const Icon(Icons.chat_bubble_outline)
-            : const Icon(Icons.chat_bubble),
+        icon: HeroIcon(HeroIcons.chatBubbleOvalLeftEllipsis,
+            style: videoStore.settingsStore.fullScreenChatOverlay ? null : HeroIconStyle.solid),
         color: Colors.white,
       ),
     );
 
     final refreshButton = IconButton(
       tooltip: 'Refresh',
-      icon: const Icon(
-        Icons.refresh,
+      icon: const HeroIcon(
+        HeroIcons.arrowPath,
         color: Colors.white,
+        style: HeroIconStyle.solid,
       ),
       onPressed: videoStore.handleRefresh,
     );
@@ -145,22 +149,25 @@ class VideoOverlay extends StatelessWidget {
     final fullScreenButton = IconButton(
       tooltip: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
       icon: videoStore.settingsStore.fullScreen
-          ? const Icon(
-              Icons.fullscreen_exit,
+          ? const HeroIcon(
+              HeroIcons.arrowsPointingIn,
               color: Colors.white,
+              style: HeroIconStyle.solid,
             )
-          : const Icon(
-              Icons.fullscreen,
+          : const HeroIcon(
+              HeroIcons.arrowsPointingOut,
               color: Colors.white,
+              style: HeroIconStyle.solid,
             ),
       onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
     );
 
     final sleepTimerButton = IconButton(
       tooltip: 'Sleep timer',
-      icon: const Icon(
-        Icons.timer,
+      icon: const HeroIcon(
+        HeroIcons.clock,
         color: Colors.white,
+        style: HeroIconStyle.solid,
       ),
       onPressed: () => _showSleepTimerDialog(context),
     );
@@ -293,13 +300,15 @@ class VideoOverlay extends StatelessWidget {
                 tooltip: videoStore.paused ? 'Play' : 'Pause',
                 iconSize: 50.0,
                 icon: videoStore.paused
-                    ? const Icon(
-                        Icons.play_arrow,
+                    ? const HeroIcon(
+                        HeroIcons.play,
                         color: Colors.white,
+                        style: HeroIconStyle.solid,
                       )
-                    : const Icon(
-                        Icons.pause,
+                    : const HeroIcon(
+                        HeroIcons.pause,
                         color: Colors.white,
+                        style: HeroIconStyle.solid,
                       ),
                 onPressed: videoStore.handlePausePlay,
               ),
@@ -345,10 +354,13 @@ class VideoOverlay extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  const Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
-                                    size: 10,
+                                  const Padding(
+                                    padding: EdgeInsets.all(2.0),
+                                    child: Icon(
+                                      Icons.circle,
+                                      color: Colors.red,
+                                      size: 10,
+                                    ),
                                   ),
                                   const SizedBox(width: 5),
                                   Uptime(
@@ -363,10 +375,11 @@ class VideoOverlay extends StatelessWidget {
                               const SizedBox(width: 10),
                               Row(
                                 children: [
-                                  const Icon(
-                                    Icons.people,
-                                    color: Colors.white,
+                                  const HeroIcon(
+                                    HeroIcons.users,
                                     size: 14,
+                                    color: Colors.white,
+                                    style: HeroIconStyle.solid,
                                   ),
                                   const SizedBox(width: 5),
                                   Text(

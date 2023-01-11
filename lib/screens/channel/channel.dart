@@ -20,6 +20,7 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/bottom_sheet.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
@@ -96,7 +97,7 @@ class _VideoChatState extends State<VideoChat> {
       actions: [
         IconButton(
           tooltip: 'Settings',
-          icon: const Icon(Icons.settings),
+          icon: const HeroIcon(HeroIcons.cog6Tooth, style: HeroIconStyle.solid),
           onPressed: showSettings,
         ),
       ],

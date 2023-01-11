@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:heroicons/heroicons.dart';
 
 class ScrollToTopButton extends StatelessWidget {
   final ScrollController scrollController;
@@ -20,7 +21,7 @@ class ScrollToTopButton extends StatelessWidget {
             duration: const Duration(milliseconds: 500),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
-          child: const Icon(Icons.keyboard_arrow_up),
+          child: const HeroIcon(HeroIcons.chevronDoubleUp, style: HeroIconStyle.mini),
         ),
       ),
     );

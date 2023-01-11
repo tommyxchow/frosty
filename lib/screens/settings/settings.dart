@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frosty/screens/settings/account/widgets/profile_card.dart';
 import 'package:frosty/screens/settings/chat_settings.dart';
 import 'package:frosty/screens/settings/general_settings.dart';
@@ -11,7 +10,9 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/video_settings.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
+import 'package:simple_icons/simple_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatelessWidget {
@@ -30,13 +31,13 @@ class Settings extends StatelessWidget {
               tooltip: 'Support the app',
               onPressed: () => launchUrl(Uri.parse('https://www.buymeacoffee.com/tommychow'),
                   mode: settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
-              icon: const FaIcon(FontAwesomeIcons.circleDollarToSlot),
+              icon: const Icon(SimpleIcons.buymeacoffee),
             ),
           IconButton(
             tooltip: 'View source on GitHub',
             onPressed: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty'),
                 mode: settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
-            icon: const FaIcon(FontAwesomeIcons.github),
+            icon: const Icon(SimpleIcons.github),
           ),
         ],
       ),
@@ -48,17 +49,17 @@ class Settings extends StatelessWidget {
             ProfileCard(authStore: context.read<AuthStore>()),
             const SectionHeader('Customize'),
             SettingsTileRoute(
-              leading: const Icon(Icons.settings),
+              leading: const HeroIcon(HeroIcons.cog6Tooth),
               title: 'General',
               child: GeneralSettings(settingsStore: settingsStore),
             ),
             SettingsTileRoute(
-              leading: const Icon(Icons.live_tv),
+              leading: const HeroIcon(HeroIcons.tv),
               title: 'Video',
               child: VideoSettings(settingsStore: settingsStore),
             ),
             SettingsTileRoute(
-              leading: const Icon(Icons.chat),
+              leading: const HeroIcon(HeroIcons.chatBubbleOvalLeftEllipsis),
               title: 'Chat',
               child: ChatSettings(settingsStore: settingsStore),
             ),

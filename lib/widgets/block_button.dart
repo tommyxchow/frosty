@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:heroicons/heroicons.dart';
 
 class BlockButton extends StatelessWidget {
   final AuthStore authStore;
@@ -61,11 +62,12 @@ class BlockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        final isBlocked = authStore.user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
+        final isBlocked =
+            authStore.user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
 
         return Button(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-          icon: const Icon(Icons.block),
+          icon: const HeroIcon(HeroIcons.noSymbol, style: HeroIconStyle.mini),
           color: Colors.red.shade700,
           fill: true,
           onPressed: () => _showDialog(
@@ -74,7 +76,9 @@ class BlockButton extends StatelessWidget {
             targetUser: targetUser,
             targetUserId: targetUserId,
           ),
-          child: isBlocked ? Text(simple ? 'Unblock' : 'Unblock $targetUser') : Text(simple ? 'Block' : 'Block $targetUser'),
+          child: isBlocked
+              ? Text(simple ? 'Unblock' : 'Unblock $targetUser')
+              : Text(simple ? 'Block' : 'Block $targetUser'),
         );
       },
     );

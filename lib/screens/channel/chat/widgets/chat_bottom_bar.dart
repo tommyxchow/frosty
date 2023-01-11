@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -5,6 +7,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:heroicons/heroicons.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -16,7 +19,7 @@ class ChatBottomBar extends StatelessWidget {
     final emoteMenuButton = IconButton(
       color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
       tooltip: 'Emote menu',
-      icon: const Icon(Icons.emoji_emotions_outlined),
+      icon: HeroIcon(HeroIcons.faceSmile, style: chatStore.assetsStore.showEmoteMenu ? HeroIconStyle.solid : null),
       onPressed: () {
         FocusScope.of(context).unfocus();
         chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
@@ -30,10 +33,14 @@ class ChatBottomBar extends StatelessWidget {
           ...chatStore.assetsStore.bttvEmotes,
           ...chatStore.assetsStore.ffzEmotes,
           ...chatStore.assetsStore.sevenTVEmotes
-        ].where((emote) => emote.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase())).toList();
+        ]
+            .where((emote) =>
+                emote.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase()))
+            .toList();
 
         final matchingChatters = chatStore.chatDetailsStore.allChatters
-            .where((chatter) => chatter.contains(chatStore.textController.text.split(' ').last.replaceFirst('@', '').toLowerCase()))
+            .where((chatter) =>
+                chatter.contains(chatStore.textController.text.split(' ').last.replaceFirst('@', '').toLowerCase()))
             .toList();
 
         return Column(
@@ -70,7 +77,9 @@ class ChatBottomBar extends StatelessWidget {
                 ),
               ),
             ],
-            if (chatStore.settings.autocomplete && chatStore.showMentionAutocomplete && matchingChatters.isNotEmpty) ...[
+            if (chatStore.settings.autocomplete &&
+                chatStore.showMentionAutocomplete &&
+                matchingChatters.isNotEmpty) ...[
               const Divider(
                 height: 1.0,
                 thickness: 1.0,
@@ -89,7 +98,8 @@ class ChatBottomBar extends StatelessWidget {
                         ..add('@${matchingChatters[index]} ');
 
                       chatStore.textController.text = split.join(' ');
-                      chatStore.textController.selection = TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
+                      chatStore.textController.selection =
+                          TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
                     },
                     child: Text(matchingChatters[index]),
                   ),
@@ -110,7 +120,10 @@ class ChatBottomBar extends StatelessWidget {
                         chatStore.expandChat = true;
                         chatStore.textFieldFocusNode.requestFocus();
                       },
-                      icon: const Icon(Icons.chat),
+                      icon: const HeroIcon(
+                        HeroIcons.chatBubbleOvalLeftEllipsis,
+                        style: HeroIconStyle.solid,
+                      ),
                     )
                   else
                     Expanded(
@@ -134,15 +147,21 @@ class ChatBottomBar extends StatelessWidget {
                       ),
                     ),
                   if (chatStore.showSendButton &&
-                      (chatStore.settings.chatWidth >= 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait))
+                      (chatStore.settings.chatWidth >= 0.3 ||
+                          chatStore.expandChat ||
+                          MediaQuery.of(context).orientation == Orientation.portrait))
                     IconButton(
                       tooltip: 'Send',
-                      icon: const Icon(Icons.send),
-                      onPressed: chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
+                      icon: const HeroIcon(HeroIcons.paperAirplane, style: HeroIconStyle.solid),
+                      onPressed:
+                          chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
                     )
                   else
                     IconButton(
-                      icon: Icon(Icons.adaptive.more),
+                      icon: HeroIcon(
+                        Platform.isAndroid ? HeroIcons.ellipsisVertical : HeroIcons.ellipsisHorizontal,
+                        style: HeroIconStyle.solid,
+                      ),
                       tooltip: 'More',
                       onPressed: () => showModalBottomSheet(
                         backgroundColor: Colors.transparent,

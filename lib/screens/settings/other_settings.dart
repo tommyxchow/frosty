@@ -9,6 +9,7 @@ import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -68,7 +69,7 @@ class _OtherSettingsState extends State<OtherSettings> {
     return Column(
       children: [
         ListTile(
-          leading: const Icon(Icons.info),
+          leading: const HeroIcon(HeroIcons.informationCircle),
           title: const Text('About Frosty', style: titleStyle),
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
@@ -86,7 +87,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.launch),
+          leading: const HeroIcon(HeroIcons.arrowTopRightOnSquare),
           title: const Text(
             'Changelog',
             style: titleStyle,
@@ -95,7 +96,7 @@ class _OtherSettingsState extends State<OtherSettings> {
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
         ListTile(
-          leading: const Icon(Icons.delete),
+          leading: const HeroIcon(HeroIcons.trash),
           title: const Text(
             'Clear image cache',
             style: titleStyle,
@@ -115,7 +116,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.restore),
+          leading: const HeroIcon(HeroIcons.arrowPath),
           title: const Text(
             'Reset settings',
             style: titleStyle,

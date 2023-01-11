@@ -10,6 +10,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -93,7 +94,10 @@ class _HomeState extends State<Home> {
           actions: [
             IconButton(
               tooltip: 'Settings',
-              icon: const Icon(Icons.settings),
+              icon: const HeroIcon(
+                HeroIcons.cog6Tooth,
+                style: HeroIconStyle.solid,
+              ),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -138,17 +142,17 @@ class _HomeState extends State<Home> {
             items: [
               if (_authStore.isLoggedIn)
                 const BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite),
+                  icon: HeroIcon(HeroIcons.heart, style: HeroIconStyle.solid),
                   label: 'Following',
                   tooltip: 'Followed streams',
                 ),
               const BottomNavigationBarItem(
-                icon: Icon(Icons.arrow_upward),
+                icon: HeroIcon(HeroIcons.arrowSmallUp, style: HeroIconStyle.solid),
                 label: 'Top',
                 tooltip: 'Top streams and categories',
               ),
               const BottomNavigationBarItem(
-                icon: Icon(Icons.search),
+                icon: HeroIcon(HeroIcons.magnifyingGlass, style: HeroIconStyle.solid),
                 label: 'Search',
                 tooltip: 'Search for channels and categories',
               ),

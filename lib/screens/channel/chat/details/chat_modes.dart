@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/irc.dart';
+import 'package:heroicons/heroicons.dart';
 
 class ChatModes extends StatelessWidget {
   final ROOMSTATE roomState;
@@ -16,9 +17,10 @@ class ChatModes extends StatelessWidget {
         Tooltip(
           preferBelow: false,
           message: 'Emote-only mode ${roomState.emoteOnly != '0' ? 'on' : 'off'}',
-          child: Icon(
-            Icons.emoji_emotions_outlined,
+          child: HeroIcon(
+            HeroIcons.faceSmile,
             color: roomState.emoteOnly != '0' ? Colors.yellow : Colors.grey,
+            style: roomState.emoteOnly != '0' ? HeroIconStyle.solid : null,
           ),
         ),
         Tooltip(
@@ -28,33 +30,40 @@ class ChatModes extends StatelessWidget {
               : roomState.followersOnly == '0'
                   ? 'Followers-only mode on'
                   : 'Followers-only mode on (${roomState.followersOnly} ${pluralize('minute', roomState.followersOnly)})',
-          child: Icon(
-            Icons.favorite,
+          child: HeroIcon(
+            HeroIcons.heart,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
+            style: roomState.followersOnly != '-1' ? HeroIconStyle.solid : null,
           ),
         ),
         Tooltip(
           preferBelow: false,
-          message: 'R9K mode ${roomState.r9k != '0' ? 'on' : 'off'}',
+          message: 'R9K (unique-chat) mode ${roomState.r9k != '0' ? 'on' : 'off'}',
           child: Text(
             'R9K',
-            style: TextStyle(color: roomState.r9k != '0' ? Colors.purple : Colors.grey),
+            style: TextStyle(
+              color: roomState.r9k != '0' ? Colors.purple : Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         Tooltip(
           preferBelow: false,
-          message: 'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
-          child: Icon(
-            Icons.history_toggle_off,
+          message:
+              'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
+          child: HeroIcon(
+            HeroIcons.clock,
             color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,
+            style: roomState.slowMode != '0' ? HeroIconStyle.solid : null,
           ),
         ),
         Tooltip(
           preferBelow: false,
           message: 'Subs-only mode ${roomState.subMode != '0' ? 'on' : 'off'}',
-          child: Icon(
-            Icons.attach_money,
+          child: HeroIcon(
+            HeroIcons.banknotes,
             color: roomState.subMode != '0' ? Colors.green : Colors.grey,
+            style: roomState.subMode != '0' ? HeroIconStyle.solid : null,
           ),
         ),
       ],

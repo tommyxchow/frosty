@@ -58,10 +58,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
 
           if (_listStore.error != null) {
             final snackBar = SnackBar(
-              content: AlertMessage(
-                message: _listStore.error!,
-                icon: Icons.error,
-              ),
+              content: AlertMessage(message: _listStore.error!),
               behavior: SnackBarBehavior.floating,
             );
 
@@ -120,10 +117,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                     if (_listStore.error != null)
                       SliverFillRemaining(
                         hasScrollBody: false,
-                        child: AlertMessage(
-                          message: _listStore.error!,
-                          icon: Icons.error,
-                        ),
+                        child: AlertMessage(message: _listStore.error!),
                       )
                     else if (_listStore.streams.isEmpty)
                       if (_listStore.isLoading && _listStore.error == null)

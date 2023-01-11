@@ -13,6 +13,7 @@ import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -158,10 +159,13 @@ class LargeStreamCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.circle,
-                    color: Colors.red,
-                    size: 10,
+                  const Padding(
+                    padding: EdgeInsets.all(2.0),
+                    child: Icon(
+                      Icons.circle,
+                      color: Colors.red,
+                      size: 10,
+                    ),
                   ),
                   const SizedBox(width: 5),
                   Uptime(
@@ -176,10 +180,11 @@ class LargeStreamCard extends StatelessWidget {
               const SizedBox(width: 10.0),
               Row(
                 children: [
-                  const Icon(
-                    Icons.people,
-                    color: Colors.white,
+                  const HeroIcon(
+                    HeroIcons.users,
                     size: 14,
+                    color: Colors.white,
+                    style: HeroIconStyle.solid,
                   ),
                   const SizedBox(width: 5),
                   Text(

@@ -4,6 +4,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:heroicons/heroicons.dart';
 
 class AccountOptions extends StatelessWidget {
   final AuthStore authStore;
@@ -41,16 +42,16 @@ class AccountOptions extends StatelessWidget {
     return ListView(
       children: [
         SettingsTileRoute(
-          leading: const Icon(Icons.person_off),
+          leading: const HeroIcon(HeroIcons.noSymbol),
           title: 'Blocked',
           child: BlockedUsers(
             authStore: authStore,
           ),
         ),
         ListTile(
-          leading: const Icon(Icons.login),
+          leading: const HeroIcon(HeroIcons.arrowLeftOnRectangle),
           title: const Text('Log out', style: TextStyle(fontWeight: FontWeight.w600)),
-          trailing: Icon(Icons.adaptive.arrow_forward),
+          trailing: const HeroIcon(HeroIcons.chevronRight, style: HeroIconStyle.mini),
           onTap: () => _showLogoutDialog(context),
         )
       ],

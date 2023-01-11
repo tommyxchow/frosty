@@ -7,6 +7,7 @@ import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:heroicons/heroicons.dart';
 
 class ChatDetails extends StatefulWidget {
   final ChatDetailsStore chatDetailsStore;
@@ -68,7 +69,7 @@ class _ChatDetailsState extends State<ChatDetails> {
           ),
           const SectionHeader('Other'),
           ListTile(
-            leading: const Icon(Icons.people),
+            leading: const HeroIcon(HeroIcons.users),
             title: const Text('Chatters'),
             onTap: () => showModalBottomSheet(
               backgroundColor: Colors.transparent,
@@ -90,12 +91,12 @@ class _ChatDetailsState extends State<ChatDetails> {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.clear_all),
+            leading: const HeroIcon(HeroIcons.trash),
             title: const Text('Clear recent emotes'),
             onTap: _showClearDialog,
           ),
           ListTile(
-            leading: const Icon(Icons.refresh),
+            leading: const HeroIcon(HeroIcons.arrowPath),
             title: const Text('Reconnect to chat'),
             onTap: () {
               widget.chatStore.updateNotification('Reconnecting to chat...');
@@ -104,7 +105,7 @@ class _ChatDetailsState extends State<ChatDetails> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.refresh),
+            leading: const HeroIcon(HeroIcons.arrowPath),
             title: const Text('Refresh badges and emotes'),
             onTap: () async {
               await widget.chatStore.getAssets();

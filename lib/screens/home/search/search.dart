@@ -8,6 +8,7 @@ import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 
 /// The search section that contians search history and search results for channels and categories.
@@ -45,12 +46,14 @@ class _SearchState extends State<Search> {
                 focusNode: _searchStore.textFieldFocusNode,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(0.0),
+                  contentPadding: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 10.0),
                   hintText: 'Find a channel or category',
-                  prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchStore.textFieldFocusNode.hasFocus || _searchStore.searchText.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear),
+                          icon: const HeroIcon(
+                            HeroIcons.xMark,
+                            style: HeroIconStyle.solid,
+                          ),
                           tooltip: _searchStore.searchText.isEmpty ? 'Cancel' : 'Clear',
                           onPressed: () {
                             if (_searchStore.searchText.isEmpty) _searchStore.textFieldFocusNode.unfocus();
@@ -69,10 +72,7 @@ class _SearchState extends State<Search> {
             builder: (context) {
               if (_searchStore.textEditingController.text.isEmpty) {
                 if (_searchStore.searchHistory.isEmpty) {
-                  return const AlertMessage(
-                    message: 'No recent searches',
-                    icon: Icons.search_off,
-                  );
+                  return const AlertMessage(message: 'No recent searches');
                 }
 
                 return Column(
@@ -88,18 +88,27 @@ class _SearchState extends State<Search> {
                         children: _searchStore.searchHistory
                             .mapIndexed(
                               (index, searchTerm) => ListTile(
-                                leading: const Icon(Icons.history),
-                                title: Text(searchTerm),
+                                leading: const HeroIcon(
+                                  HeroIcons.magnifyingGlass,
+                                  style: HeroIconStyle.solid,
+                                ),
+                                title: Text(
+                                  searchTerm,
+                                  style: const TextStyle(fontWeight: FontWeight.w600),
+                                ),
                                 trailing: IconButton(
                                   tooltip: 'Remove',
-                                  icon: const Icon(Icons.cancel),
+                                  icon: const HeroIcon(
+                                    HeroIcons.xMark,
+                                    style: HeroIconStyle.solid,
+                                  ),
                                   onPressed: () => _searchStore.searchHistory.removeAt(index),
                                 ),
                                 onTap: () {
                                   _searchStore.textEditingController.text = searchTerm;
                                   _searchStore.handleQuery(searchTerm);
-                                  _searchStore.textEditingController.selection =
-                                      TextSelection.fromPosition(TextPosition(offset: _searchStore.textEditingController.text.length));
+                                  _searchStore.textEditingController.selection = TextSelection.fromPosition(
+                                      TextPosition(offset: _searchStore.textEditingController.text.length));
                                 },
                               ),
                             )

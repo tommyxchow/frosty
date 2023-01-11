@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ReportButton extends StatelessWidget {
@@ -15,7 +16,7 @@ class ReportButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Button(
-      icon: const Icon(Icons.report),
+      icon: const HeroIcon(HeroIcons.flag, style: HeroIconStyle.mini),
       onPressed: () => Navigator.push(
         context,
         MaterialPageRoute(

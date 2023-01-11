@@ -67,10 +67,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
 
         if (_listStore.error != null) {
           final snackBar = SnackBar(
-            content: AlertMessage(
-              message: _listStore.error!,
-              icon: Icons.error,
-            ),
+            content: AlertMessage(message: _listStore.error!),
             behavior: SnackBarBehavior.floating,
           );
 
@@ -83,10 +80,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
           Widget? statusWidget;
 
           if (_listStore.error != null) {
-            statusWidget = AlertMessage(
-              message: _listStore.error!,
-              icon: Icons.error,
-            );
+            statusWidget = AlertMessage(message: _listStore.error!);
           }
 
           if (_listStore.streams.isEmpty) {

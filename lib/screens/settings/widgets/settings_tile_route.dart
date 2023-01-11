@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:heroicons/heroicons.dart';
 
 class SettingsTileRoute extends StatelessWidget {
   final Widget leading;
@@ -17,7 +18,7 @@ class SettingsTileRoute extends StatelessWidget {
     return ListTile(
       leading: leading,
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      trailing: Icon(Icons.adaptive.arrow_forward),
+      trailing: const HeroIcon(HeroIcons.chevronRight, style: HeroIconStyle.mini),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => Scaffold(

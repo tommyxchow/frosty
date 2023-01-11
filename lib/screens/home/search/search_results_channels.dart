@@ -11,6 +11,7 @@ import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:mobx/mobx.dart';
 
 class SearchResultsChannels extends StatefulWidget {
@@ -45,10 +46,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
       );
     } catch (error) {
       final snackBar = SnackBar(
-        content: AlertMessage(
-          message: error.toString(),
-          icon: Icons.error,
-        ),
+        content: AlertMessage(message: error.toString()),
         behavior: SnackBarBehavior.floating,
       );
 
@@ -73,74 +71,85 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
             return const SliverToBoxAdapter(
               child: SizedBox(
                 height: 100.0,
-                child: AlertMessage(
-                  message: 'Failed to get channels',
-                  icon: Icons.error,
-                ),
+                child: AlertMessage(message: 'Failed to get channels'),
               ),
             );
           case FutureStatus.fulfilled:
-            final results = (future.result as List<ChannelQuery>)
-                .where((channel) => !widget.searchStore.authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(channel.id));
+            final results = (future.result as List<ChannelQuery>).where((channel) => !widget
+                .searchStore.authStore.user.blockedUsers
+                .map((blockedUser) => blockedUser.userId)
+                .contains(channel.id));
 
             return SliverList(
-              delegate: SliverChildListDelegate.fixed([
-                ...results.map(
-                  (channel) {
-                    final displayName =
-                        regexEnglish.hasMatch(channel.displayName) ? channel.displayName : '${channel.displayName} (${channel.broadcasterLogin})';
+              delegate: SliverChildListDelegate.fixed(
+                [
+                  ...results.map(
+                    (channel) {
+                      final displayName = regexEnglish.hasMatch(channel.displayName)
+                          ? channel.displayName
+                          : '${channel.displayName} (${channel.broadcasterLogin})';
 
-                    return AnimateScale(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoChat(
-                            userId: channel.id,
-                            userName: channel.displayName,
-                            userLogin: channel.broadcasterLogin,
+                      return AnimateScale(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VideoChat(
+                              userId: channel.id,
+                              userName: channel.displayName,
+                              userLogin: channel.broadcasterLogin,
+                            ),
                           ),
                         ),
-                      ),
-                      onLongPress: () {
-                        HapticFeedback.lightImpact();
+                        onLongPress: () {
+                          HapticFeedback.lightImpact();
 
-                        showModalBottomSheet(
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          builder: (context) => BlockReportModal(
-                            authStore: widget.searchStore.authStore,
-                            name: displayName,
-                            userLogin: channel.broadcasterLogin,
-                            userId: channel.id,
+                          showModalBottomSheet(
+                            backgroundColor: Colors.transparent,
+                            context: context,
+                            builder: (context) => BlockReportModal(
+                              authStore: widget.searchStore.authStore,
+                              name: displayName,
+                              userLogin: channel.broadcasterLogin,
+                              userId: channel.id,
+                            ),
+                          );
+                        },
+                        child: ListTile(
+                          title: Text(
+                            displayName,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
-                        );
-                      },
-                      child: ListTile(
-                        title: Text(displayName),
-                        leading: ProfilePicture(userLogin: channel.broadcasterLogin),
-                        subtitle: channel.isLive
-                            ? Row(
-                                children: [
-                                  const Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Uptime(startTime: channel.startedAt),
-                                ],
-                              )
-                            : null,
-                      ),
-                    );
-                  },
-                ),
-                ListTile(
-                  title: Text('Go to channel "${widget.query}"'),
-                  onTap: () => _handleSearch(context, widget.query),
-                  trailing: Icon(Icons.adaptive.arrow_forward),
-                )
-              ]),
+                          leading: ProfilePicture(userLogin: channel.broadcasterLogin),
+                          subtitle: channel.isLive
+                              ? Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.circle,
+                                      color: Colors.red,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Uptime(startTime: channel.startedAt),
+                                  ],
+                                )
+                              : null,
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    title: Text(
+                      'Go to channel "${widget.query}"',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    onTap: () => _handleSearch(context, widget.query),
+                    trailing: const HeroIcon(
+                      HeroIcons.chevronRight,
+                      style: HeroIconStyle.mini,
+                    ),
+                  )
+                ],
+              ),
             );
         }
       },

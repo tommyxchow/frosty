@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/widgets/bottom_sheet.dart';
+import 'package:heroicons/heroicons.dart';
 
 /// A custom-styled adaptive [ListTile] with options to select.
 class SettingsListSelect extends StatelessWidget {
@@ -29,9 +30,15 @@ class SettingsListSelect extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Opacity(opacity: 0.8, child: Text(selectedOption)),
+            Opacity(
+              opacity: 0.8,
+              child: Text(
+                selectedOption,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
             const SizedBox(width: 5),
-            Icon(Icons.adaptive.arrow_forward),
+            const HeroIcon(HeroIcons.chevronRight, style: HeroIconStyle.mini),
           ],
         ),
       ),
@@ -52,8 +59,13 @@ class SettingsListSelect extends StatelessWidget {
               ),
               ...options
                   .map((option) => ListTile(
-                      title: Text(option),
-                      trailing: selectedOption == option ? const Icon(Icons.check) : null,
+                      title: Text(option, style: const TextStyle(fontWeight: FontWeight.w500)),
+                      trailing: selectedOption == option
+                          ? const HeroIcon(
+                              HeroIcons.check,
+                              style: HeroIconStyle.mini,
+                            )
+                          : null,
                       onTap: () {
                         onChanged(option);
                         Navigator.of(context).pop();
