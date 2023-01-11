@@ -9,6 +9,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/video_settings.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
+import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: FrostyAppBar(
         title: const Text('Settings'),
         actions: [
           if (Platform.isAndroid)

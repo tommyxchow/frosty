@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/account/account_options.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -28,8 +29,8 @@ class ProfileCard extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) {
                     return Scaffold(
-                      appBar: AppBar(
-                        title: const Text('Connect with Twitch'),
+                      appBar: const FrostyAppBar(
+                        title: Text('Connect with Twitch'),
                       ),
                       body: WebView(
                         initialUrl: authStore.loginUri.toString(),
@@ -113,7 +114,7 @@ class ProfileCard extends StatelessWidget {
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => Scaffold(
-                  appBar: AppBar(title: const Text('Account')),
+                  appBar: const FrostyAppBar(title: Text('Account')),
                   body: AccountOptions(authStore: authStore),
                 ),
               ),

@@ -19,6 +19,7 @@ import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
@@ -87,12 +88,11 @@ class _VideoChatState extends State<VideoChat> {
           ),
         );
 
-    final appBar = AppBar(
+    final appBar = FrostyAppBar(
       title: Text(
         regexEnglish.hasMatch(_chatStore.displayName)
             ? _chatStore.displayName
             : '${_chatStore.displayName} (${_chatStore.channelName})',
-        style: const TextStyle(fontSize: 20),
       ),
       actions: [
         IconButton(

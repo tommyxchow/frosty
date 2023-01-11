@@ -12,6 +12,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
+import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 
 /// A widget that displays a list of streams under the provided [categoryId].
@@ -76,6 +77,13 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                   controller: _listStore.scrollController,
                   slivers: [
                     SliverAppBar(
+                      leading: IconButton(
+                        icon: const HeroIcon(
+                          HeroIcons.chevronLeft,
+                          style: HeroIconStyle.solid,
+                        ),
+                        onPressed: Navigator.of(context).pop,
+                      ),
                       stretch: true,
                       pinned: true,
                       expandedHeight: MediaQuery.of(context).size.height / 3,

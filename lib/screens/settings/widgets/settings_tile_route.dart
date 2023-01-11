@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/widgets/app_bar.dart';
 import 'package:heroicons/heroicons.dart';
 
 class SettingsTileRoute extends StatelessWidget {
@@ -22,7 +23,7 @@ class SettingsTileRoute extends StatelessWidget {
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => Scaffold(
-            appBar: AppBar(title: Text(title)),
+            appBar: FrostyAppBar(title: Text(title)),
             body: child,
           ),
         ),

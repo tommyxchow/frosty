@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -22,8 +23,8 @@ class ReportButton extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) {
             return Scaffold(
-              appBar: AppBar(
-                title: const Text('Report'),
+              appBar: const FrostyAppBar(
+                title: Text('Report'),
               ),
               body: WebView(
                 initialUrl: 'https://www.twitch.tv/$userLogin/report',
