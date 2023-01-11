@@ -18,7 +18,7 @@ class EmoteMenuSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverGrid(
+    return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
             ? 8
@@ -26,26 +26,24 @@ class EmoteMenuSection extends StatelessWidget {
                 ? 6
                 : 16,
       ),
-      delegate: SliverChildBuilderDelegate(
-        (context, index) => InkWell(
-          onTap: () => chatStore.addEmote(emotes[index]),
-          child: Tooltip(
-            message: emotes[index].name,
-            preferBelow: false,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Center(
-                child: CachedNetworkImage(
-                  imageUrl: emotes[index].url,
-                  height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
-                  width: emotes[index].width?.toDouble(),
-                ),
+      itemBuilder: (context, index) => InkWell(
+        onTap: () => chatStore.addEmote(emotes[index]),
+        child: Tooltip(
+          message: emotes[index].name,
+          preferBelow: false,
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: Center(
+              child: CachedNetworkImage(
+                imageUrl: emotes[index].url,
+                height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
+                width: emotes[index].width?.toDouble(),
               ),
             ),
           ),
         ),
-        childCount: emotes.length,
       ),
+      itemCount: emotes.length,
     );
   }
 }

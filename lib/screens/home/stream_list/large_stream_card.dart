@@ -223,7 +223,7 @@ class LargeStreamCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: showThumbnail ? 15.0 : 5.0),
+        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: showThumbnail ? 16.0 : 4.0),
         child: AspectRatio(
           aspectRatio: 16 / 9,
           child: Stack(
