@@ -1,10 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/widgets/block_button.dart';
+import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/bottom_sheet.dart';
-import 'package:frosty/widgets/report_button.dart';
+import 'package:frosty/widgets/list_tile.dart';
+import 'package:heroicons/heroicons.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class BlockReportModal extends StatelessWidget {
   final AuthStore authStore;
@@ -27,26 +27,33 @@ class BlockReportModal extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (authStore.isLoggedIn)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              width: double.infinity,
-              child: BlockButton(
-                authStore: authStore,
-                targetUser: name,
-                targetUserId: userId,
-                simple: false,
+            FrostyListTile(
+              leading: const HeroIcon(HeroIcons.noSymbol),
+              onTap: () => authStore
+                  .showBlockDialog(context, targetUser: name, targetUserId: userId)
+                  .then((_) => Navigator.pop(context)),
+              title: 'Block $name',
+            ),
+          FrostyListTile(
+            leading: const HeroIcon(HeroIcons.flag),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  return Scaffold(
+                    appBar: FrostyAppBar(
+                      title: Text('Report $name'),
+                    ),
+                    body: WebView(
+                      initialUrl: 'https://www.twitch.tv/$userLogin/report',
+                      javascriptMode: JavascriptMode.unrestricted,
+                    ),
+                  );
+                },
               ),
             ),
-          const SizedBox(height: 10.0),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            width: double.infinity,
-            child: ReportButton(
-              userLogin: userLogin,
-              displayName: name,
-            ),
-          ),
-          if (Platform.isAndroid) const SizedBox(height: 20.0),
+            title: 'Report $name',
+          )
         ],
       ),
     );

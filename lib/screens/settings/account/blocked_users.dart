@@ -4,7 +4,8 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/block_button.dart';
+import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/list_tile.dart';
 
 class BlockedUsers extends StatelessWidget {
   final AuthStore authStore;
@@ -33,24 +34,21 @@ class BlockedUsers extends StatelessWidget {
           }
           return ListView(
             children: authStore.user.blockedUsers.map(
-              (user) {
-                final displayName = regexEnglish.hasMatch(user.displayName)
-                    ? user.displayName
-                    : '${user.displayName} (${user.userLogin})';
+              (blockedUser) {
+                final displayName = regexEnglish.hasMatch(blockedUser.displayName)
+                    ? blockedUser.displayName
+                    : '${blockedUser.displayName} (${blockedUser.userLogin})';
 
-                return ListTile(
-                  title: Tooltip(
-                    preferBelow: false,
-                    message: displayName,
-                    child: Text(
-                      displayName,
-                      overflow: TextOverflow.ellipsis,
+                return FrostyListTile(
+                  title: displayName,
+                  trailing: Button(
+                    color: Colors.red,
+                    onPressed: () => authStore.showBlockDialog(
+                      context,
+                      targetUser: displayName,
+                      targetUserId: blockedUser.userId,
                     ),
-                  ),
-                  trailing: BlockButton(
-                    authStore: authStore,
-                    targetUser: displayName,
-                    targetUserId: user.userId,
+                    child: const Text('Unblock'),
                   ),
                 );
               },

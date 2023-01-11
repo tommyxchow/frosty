@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
+import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -86,6 +88,52 @@ abstract class AuthBase with Store {
 
     // Always allow navigation to the next URL.
     return NavigationDecision.navigate;
+  }
+
+  /// Shows a dialog verifying that the user is sure they want to block/unblock the target user.
+  Future<void> showBlockDialog(
+    BuildContext context, {
+    required String targetUser,
+    required String targetUserId,
+  }) {
+    final isBlocked = user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
+
+    final title = isBlocked ? 'Unblock $targetUser' : 'Block $targetUser';
+
+    final content = Text(
+        'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}');
+
+    void onPressed() {
+      if (isBlocked) {
+        user.unblock(targetId: targetUserId, headers: headersTwitch);
+      } else {
+        user.block(
+          targetId: targetUserId,
+          displayName: targetUser,
+          headers: headersTwitch,
+        );
+      }
+      Navigator.pop(context);
+    }
+
+    return showDialog(
+      context: context,
+      builder: (context) => FrostyDialog(
+        title: title,
+        content: content,
+        actions: [
+          Button(
+            onPressed: onPressed,
+            child: const Text('Yes'),
+          ),
+          Button(
+            onPressed: Navigator.of(context).pop,
+            color: Colors.red.shade700,
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
   }
 
   AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
