@@ -35,16 +35,17 @@ class EmoteMenuPanel extends StatelessWidget {
           .toList();
 
       return FrostyPageView(
-        headers: const ['Global Emotes', 'Channel Emotes'],
+        headers: ['Global Emotes', if (channelEmotes.isNotEmpty) 'Channel Emotes'],
         children: [
           EmoteMenuSection(
             chatStore: chatStore,
             emotes: globalEmotes,
           ),
-          EmoteMenuSection(
-            chatStore: chatStore,
-            emotes: channelEmotes,
-          ),
+          if (channelEmotes.isNotEmpty)
+            EmoteMenuSection(
+              chatStore: chatStore,
+              emotes: channelEmotes,
+            ),
         ],
       );
     } else {
