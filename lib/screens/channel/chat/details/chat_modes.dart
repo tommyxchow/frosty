@@ -43,7 +43,7 @@ class ChatModes extends StatelessWidget {
             'R9K',
             style: TextStyle(
               color: roomState.r9k != '0' ? Colors.purple : Colors.grey,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
