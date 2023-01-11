@@ -32,7 +32,7 @@ class _ChatDetailsState extends State<ChatDetails> {
       context: context,
       builder: (context) => FrostyDialog(
         title: 'Clear Recent Emotes',
-        content: const Text('Are you sure you want to clear your recent emotes?'),
+        message: 'Are you sure you want to clear your recent emotes?',
         actions: [
           Button(
             onPressed: () {
@@ -42,9 +42,8 @@ class _ChatDetailsState extends State<ChatDetails> {
             child: const Text('Yes'),
           ),
           Button(
-            fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red.shade700,
+            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],

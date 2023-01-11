@@ -33,7 +33,7 @@ class _OtherSettingsState extends State<OtherSettings> {
       context: context,
       builder: (context) => FrostyDialog(
         title: 'Reset All Settings',
-        content: const Text('Are you sure you want to reset all settings?'),
+        message: 'Are you sure you want to reset all settings?',
         actions: [
           Button(
             onPressed: () {
@@ -53,9 +53,8 @@ class _OtherSettingsState extends State<OtherSettings> {
             child: const Text('Yes'),
           ),
           Button(
-            fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red.shade700,
+            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],

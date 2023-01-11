@@ -100,8 +100,8 @@ abstract class AuthBase with Store {
 
     final title = isBlocked ? 'Unblock $targetUser' : 'Block $targetUser';
 
-    final content = Text(
-        'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}');
+    final message =
+        'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}';
 
     void onPressed() {
       if (isBlocked) {
@@ -120,7 +120,7 @@ abstract class AuthBase with Store {
       context: context,
       builder: (context) => FrostyDialog(
         title: title,
-        content: content,
+        message: message,
         actions: [
           Button(
             onPressed: onPressed,
@@ -128,7 +128,7 @@ abstract class AuthBase with Store {
           ),
           Button(
             onPressed: Navigator.of(context).pop,
-            color: Colors.red.shade700,
+            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],

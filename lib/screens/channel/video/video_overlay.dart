@@ -92,8 +92,7 @@ class VideoOverlay extends StatelessWidget {
           ),
           Button(
             onPressed: Navigator.of(context).pop,
-            fill: true,
-            color: Colors.red.shade700,
+            color: Colors.grey,
             child: const Text('Close'),
           ),
         ],

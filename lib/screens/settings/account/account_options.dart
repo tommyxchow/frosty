@@ -17,7 +17,7 @@ class AccountOptions extends StatelessWidget {
       context: context,
       builder: (context) => FrostyDialog(
         title: 'Log Out',
-        content: const Text('Are you sure you want to log out?'),
+        message: 'Are you sure you want to log out?',
         actions: [
           Button(
             onPressed: () {
@@ -28,9 +28,8 @@ class AccountOptions extends StatelessWidget {
             child: const Text('Yes'),
           ),
           Button(
-            fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red.shade700,
+            color: Colors.grey,
             child: const Text('Cancel'),
           )
         ],
