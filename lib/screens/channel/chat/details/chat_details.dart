@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/main.dart';
@@ -44,7 +46,10 @@ class _ChatDetailsState extends State<ChatDetails> {
                 child: Row(
                   children: [
                     const HeroIcon(HeroIcons.clock, style: HeroIconStyle.solid),
-                    Text(' ${widget.chatStore.timeRemaining.toString().split('.')[0]}'),
+                    Text(
+                      ' ${widget.chatStore.timeRemaining.toString().split('.')[0]}',
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()]),
+                    ),
                     const Spacer(),
                     IconButton(
                       tooltip: 'Cancel sleep timer',
