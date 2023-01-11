@@ -6,6 +6,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:heroicons/heroicons.dart';
 
@@ -68,9 +69,9 @@ class _ChatDetailsState extends State<ChatDetails> {
             title: ChatModes(roomState: widget.chatDetailsStore.roomState),
           ),
           const SectionHeader('Other'),
-          ListTile(
+          FrostyListTile(
             leading: const HeroIcon(HeroIcons.users),
-            title: const Text('Chatters'),
+            title: 'Chatters',
             onTap: () => showModalBottomSheet(
               backgroundColor: Colors.transparent,
               isScrollControlled: true,
@@ -90,23 +91,23 @@ class _ChatDetailsState extends State<ChatDetails> {
               ),
             ),
           ),
-          ListTile(
+          FrostyListTile(
             leading: const HeroIcon(HeroIcons.trash),
-            title: const Text('Clear recent emotes'),
+            title: 'Clear recent emotes',
             onTap: _showClearDialog,
           ),
-          ListTile(
+          FrostyListTile(
             leading: const HeroIcon(HeroIcons.arrowPath),
-            title: const Text('Reconnect to chat'),
+            title: 'Reconnect to chat',
             onTap: () {
               widget.chatStore.updateNotification('Reconnecting to chat...');
 
               widget.chatStore.connectToChat();
             },
           ),
-          ListTile(
+          FrostyListTile(
             leading: const HeroIcon(HeroIcons.arrowPath),
-            title: const Text('Refresh badges and emotes'),
+            title: 'Refresh badges and emotes',
             onTap: () async {
               await widget.chatStore.getAssets();
 

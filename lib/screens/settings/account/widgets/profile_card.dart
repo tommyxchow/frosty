@@ -5,6 +5,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:simple_icons/simple_icons.dart';
@@ -81,18 +82,12 @@ class ProfileCard extends StatelessWidget {
     return Observer(
       builder: (context) {
         if (authStore.error != null) {
-          return ListTile(
+          return FrostyListTile(
             leading: const HeroIcon(
               HeroIcons.exclamationCircle,
               color: Colors.red,
             ),
-            title: const Text(
-              'Failed to connect',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Colors.red,
-              ),
-            ),
+            title: 'Failed to connect',
             trailing: Button(
               onPressed: authStore.init,
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -101,15 +96,12 @@ class ProfileCard extends StatelessWidget {
           );
         }
         if (authStore.isLoggedIn && authStore.user.details != null) {
-          return ListTile(
+          return FrostyListTile(
             leading: ProfilePicture(
               userLogin: authStore.user.details!.login,
               radius: 12,
             ),
-            title: Text(
-              authStore.user.details!.displayName,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
+            title: authStore.user.details!.displayName,
             trailing: const HeroIcon(HeroIcons.chevronRight, style: HeroIconStyle.mini),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
@@ -121,10 +113,9 @@ class ProfileCard extends StatelessWidget {
             ),
           );
         }
-        return ListTile(
-          isThreeLine: true,
+        return FrostyListTile(
           leading: const HeroIcon(HeroIcons.questionMarkCircle),
-          title: const Text('Anonymous', style: TextStyle(fontWeight: FontWeight.w600)),
+          title: 'Anonymous',
           subtitle: const Text('Tap to log in and enable the ability to chat, view followed streams, and more.'),
           trailing: const SizedBox(
             height: double.infinity,

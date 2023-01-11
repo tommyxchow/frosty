@@ -7,6 +7,7 @@ import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
@@ -87,15 +88,12 @@ class _SearchState extends State<Search> {
                         controller: widget.scrollController,
                         children: _searchStore.searchHistory
                             .mapIndexed(
-                              (index, searchTerm) => ListTile(
+                              (index, searchTerm) => FrostyListTile(
                                 leading: const HeroIcon(
                                   HeroIcons.magnifyingGlass,
                                   style: HeroIconStyle.solid,
                                 ),
-                                title: Text(
-                                  searchTerm,
-                                  style: const TextStyle(fontWeight: FontWeight.w600),
-                                ),
+                                title: searchTerm,
                                 trailing: IconButton(
                                   tooltip: 'Remove',
                                   icon: const HeroIcon(
