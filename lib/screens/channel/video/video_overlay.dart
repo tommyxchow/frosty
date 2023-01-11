@@ -188,7 +188,6 @@ class VideoOverlay extends StatelessWidget {
                   ),
                 ),
                 if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-                refreshButton,
               ],
             ),
             Center(
@@ -301,6 +300,7 @@ class VideoOverlay extends StatelessWidget {
                     ),
                     onPressed: videoStore.requestPictureInPicture,
                   ),
+                  refreshButton,
                   if (!videoStore.isIPad) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
