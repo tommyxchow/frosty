@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FrostyListTile extends StatelessWidget {
+  final bool? isThreeLine;
   final Widget? leading;
   final String title;
   final Widget? subtitle;
@@ -9,6 +10,7 @@ class FrostyListTile extends StatelessWidget {
 
   const FrostyListTile({
     Key? key,
+    this.isThreeLine,
     this.leading,
     required this.title,
     this.trailing,
@@ -19,7 +21,7 @@ class FrostyListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      isThreeLine: subtitle != null,
+      isThreeLine: isThreeLine ?? subtitle != null,
       leading: leading,
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: subtitle,

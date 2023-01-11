@@ -116,6 +116,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                           );
                         },
                         child: FrostyListTile(
+                          isThreeLine: false,
                           title: displayName,
                           leading: ProfilePicture(userLogin: channel.broadcasterLogin),
                           subtitle: channel.isLive
@@ -124,7 +125,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                                     const Icon(
                                       Icons.circle,
                                       color: Colors.red,
-                                      size: 14,
+                                      size: 10,
                                     ),
                                     const SizedBox(width: 5),
                                     Uptime(startTime: channel.startedAt),
