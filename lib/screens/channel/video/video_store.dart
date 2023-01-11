@@ -32,9 +32,6 @@ abstract class VideoStoreBase with Store {
   /// The webview controller used for injecting JavaScript to control the webview and video player.
   WebViewController? controller;
 
-  /// The current timer for the sleep timer if active.
-  Timer? sleepTimer;
-
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
 
@@ -68,18 +65,6 @@ abstract class VideoStoreBase with Store {
     }
     return NavigationDecision.prevent;
   }
-
-  /// The amount of hours the sleep timer is set to.
-  @observable
-  var sleepHours = 0;
-
-  /// The amount of minutes the sleep timer is set to.
-  @observable
-  var sleepMinutes = 0;
-
-  /// The time remaining for the sleep timer.
-  @observable
-  var timeRemaining = const Duration();
 
   /// If the video is currently paused.
   ///
@@ -215,47 +200,6 @@ abstract class VideoStoreBase with Store {
     updateStreamInfo();
   }
 
-  /// Updates the sleep timer with [sleepHours] and [sleepMinutes].
-  /// Calls [onTimerFinished] when the sleep timer completes.
-  @action
-  void updateSleepTimer({required void Function() onTimerFinished}) {
-    // If hours and minutes are 0, do nothing.
-    if (sleepHours == 0 && sleepMinutes == 0) return;
-
-    // If there is an ongoing timer, cancel it since it'll be replaced.
-    if (sleepTimer != null) cancelSleepTimer();
-
-    // Update the new time remaining
-    timeRemaining = Duration(hours: sleepHours, minutes: sleepMinutes);
-
-    // Reset the hours and minutes in the dropdown buttons.
-    sleepHours = 0;
-    sleepMinutes = 0;
-
-    // Set a periodic timer that will update the time remaining every second.
-    sleepTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        // If the timer is up, cancel the timer and exit the app.
-        if (timeRemaining.inSeconds == 0) {
-          timer.cancel();
-          onTimerFinished();
-          return;
-        }
-
-        // Decrement the time remaining.
-        timeRemaining = Duration(seconds: timeRemaining.inSeconds - 1);
-      },
-    );
-  }
-
-  /// Cancels the sleep timer and resets the time remaining.
-  @action
-  void cancelSleepTimer() {
-    sleepTimer?.cancel();
-    timeRemaining = const Duration();
-  }
-
   /// Play or pause the video depending on the current state of [_paused].
   void handlePausePlay() {
     try {
@@ -295,6 +239,5 @@ abstract class VideoStoreBase with Store {
     if (Platform.isIOS) controller?.reload();
 
     _disposeOverlayReaction();
-    sleepTimer?.cancel();
   }
 }

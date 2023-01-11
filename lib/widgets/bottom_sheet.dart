@@ -20,11 +20,11 @@ class FrostyBottomSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const FractionallySizedBox(
-              widthFactor: 0.1,
+              widthFactor: 0.2,
               child: SizedBox(
                 child: Divider(
-                  height: 25.0,
-                  thickness: 3.0,
+                  height: 30.0,
+                  thickness: 2.0,
                 ),
               ),
             ),

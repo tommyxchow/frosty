@@ -17,54 +17,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
               name: 'VideoStoreBase.videoUrl'))
           .value;
 
-  late final _$sleepHoursAtom =
-      Atom(name: 'VideoStoreBase.sleepHours', context: context);
-
-  @override
-  int get sleepHours {
-    _$sleepHoursAtom.reportRead();
-    return super.sleepHours;
-  }
-
-  @override
-  set sleepHours(int value) {
-    _$sleepHoursAtom.reportWrite(value, super.sleepHours, () {
-      super.sleepHours = value;
-    });
-  }
-
-  late final _$sleepMinutesAtom =
-      Atom(name: 'VideoStoreBase.sleepMinutes', context: context);
-
-  @override
-  int get sleepMinutes {
-    _$sleepMinutesAtom.reportRead();
-    return super.sleepMinutes;
-  }
-
-  @override
-  set sleepMinutes(int value) {
-    _$sleepMinutesAtom.reportWrite(value, super.sleepMinutes, () {
-      super.sleepMinutes = value;
-    });
-  }
-
-  late final _$timeRemainingAtom =
-      Atom(name: 'VideoStoreBase.timeRemaining', context: context);
-
-  @override
-  Duration get timeRemaining {
-    _$timeRemainingAtom.reportRead();
-    return super.timeRemaining;
-  }
-
-  @override
-  set timeRemaining(Duration value) {
-    _$timeRemainingAtom.reportWrite(value, super.timeRemaining, () {
-      super.timeRemaining = value;
-    });
-  }
-
   late final _$_pausedAtom =
       Atom(name: 'VideoStoreBase._paused', context: context);
 
@@ -190,28 +142,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
   }
 
   @override
-  void updateSleepTimer({required void Function() onTimerFinished}) {
-    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
-        name: 'VideoStoreBase.updateSleepTimer');
-    try {
-      return super.updateSleepTimer(onTimerFinished: onTimerFinished);
-    } finally {
-      _$VideoStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void cancelSleepTimer() {
-    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
-        name: 'VideoStoreBase.cancelSleepTimer');
-    try {
-      return super.cancelSleepTimer();
-    } finally {
-      _$VideoStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void dispose() {
     final _$actionInfo = _$VideoStoreBaseActionController.startAction(
         name: 'VideoStoreBase.dispose');
@@ -225,9 +155,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
   @override
   String toString() {
     return '''
-sleepHours: ${sleepHours},
-sleepMinutes: ${sleepMinutes},
-timeRemaining: ${timeRemaining},
 videoUrl: ${videoUrl}
     ''';
   }

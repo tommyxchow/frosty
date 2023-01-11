@@ -86,6 +86,21 @@ abstract class ChatStoreBase with Store {
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
 
+  /// The current timer for the sleep timer if active.
+  Timer? sleepTimer;
+
+  /// The amount of hours the sleep timer is set to.
+  @observable
+  var sleepHours = 0;
+
+  /// The amount of minutes the sleep timer is set to.
+  @observable
+  var sleepMinutes = 0;
+
+  /// The time remaining for the sleep timer.
+  @observable
+  var timeRemaining = const Duration();
+
   /// A notification message to display above the chat.
   @readonly
   String? _notification;
@@ -158,7 +173,8 @@ abstract class ChatStoreBase with Store {
 
     if (settings.chatDelay > 0) {
       _messageBuffer.add(IRCMessage.createNotice(
-          message: 'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
+          message:
+              'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
     }
 
     connectToChat();
@@ -189,8 +205,8 @@ abstract class ChatStoreBase with Store {
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
     // Will also rebuild the autocomplete bar when typing, refreshing the results as the user types.
-    textController
-        .addListener(() => _showEmoteAutocomplete = !_showMentionAutocomplete && textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty);
+    textController.addListener(() => _showEmoteAutocomplete =
+        !_showMentionAutocomplete && textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty);
 
     textController.addListener(() {
       _showSendButton = textController.text.isNotEmpty;
@@ -214,7 +230,9 @@ abstract class ChatStoreBase with Store {
         // Filter messages from any blocked users if not a moderator or not the channel owner.
         if (!_userState.mod &&
             channelName != auth.user.details?.login &&
-            auth.user.blockedUsers.where((blockedUser) => blockedUser.userLogin == parsedIRCMessage.user).isNotEmpty) continue;
+            auth.user.blockedUsers.where((blockedUser) => blockedUser.userLogin == parsedIRCMessage.user).isNotEmpty) {
+          continue;
+        }
 
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
@@ -280,7 +298,9 @@ abstract class ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messageBuffer.add(IRCMessage.createNotice(message: "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
+        _messageBuffer.add(IRCMessage.createNotice(
+            message:
+                "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
         getAssets();
 
@@ -334,7 +354,8 @@ abstract class ChatStoreBase with Store {
 
         if (_backoffTime > 0) {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
-          final notice = 'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
+          final notice =
+              'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
           _messageBuffer.add(IRCMessage.createNotice(message: notice));
         }
 
@@ -451,10 +472,52 @@ abstract class ChatStoreBase with Store {
     _notificationTimer = Timer(const Duration(seconds: 2), () => _notification = null);
   }
 
+  /// Updates the sleep timer with [sleepHours] and [sleepMinutes].
+  /// Calls [onTimerFinished] when the sleep timer completes.
+  @action
+  void updateSleepTimer({required void Function() onTimerFinished}) {
+    // If hours and minutes are 0, do nothing.
+    if (sleepHours == 0 && sleepMinutes == 0) return;
+
+    // If there is an ongoing timer, cancel it since it'll be replaced.
+    if (sleepTimer != null) cancelSleepTimer();
+
+    // Update the new time remaining
+    timeRemaining = Duration(hours: sleepHours, minutes: sleepMinutes);
+
+    // Reset the hours and minutes in the dropdown buttons.
+    sleepHours = 0;
+    sleepMinutes = 0;
+
+    // Set a periodic timer that will update the time remaining every second.
+    sleepTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        // If the timer is up, cancel the timer and exit the app.
+        if (timeRemaining.inSeconds == 0) {
+          timer.cancel();
+          onTimerFinished();
+          return;
+        }
+
+        // Decrement the time remaining.
+        timeRemaining = Duration(seconds: timeRemaining.inSeconds - 1);
+      },
+    );
+  }
+
+  /// Cancels the sleep timer and resets the time remaining.
+  @action
+  void cancelSleepTimer() {
+    sleepTimer?.cancel();
+    timeRemaining = const Duration();
+  }
+
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
     _messageBufferTimer.cancel();
     _notificationTimer?.cancel();
+    sleepTimer?.cancel();
 
     _channel?.sink.close(1001);
     _channel = null;

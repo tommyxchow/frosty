@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
-import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:heroicons/heroicons.dart';
@@ -16,89 +13,11 @@ import 'package:intl/intl.dart';
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
-  final void Function() onSettingsPressed;
 
   const VideoOverlay({
     Key? key,
     required this.videoStore,
-    required this.onSettingsPressed,
   }) : super(key: key);
-
-  Future<void> _showSleepTimerDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Sleep Timer',
-        content: Observer(
-          builder: (context) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Opacity(
-                opacity: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive ? 1.0 : 0.5,
-                child: Row(
-                  children: [
-                    const HeroIcon(HeroIcons.clock, style: HeroIconStyle.solid),
-                    Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
-                    const Spacer(),
-                    IconButton(
-                      tooltip: 'Cancel sleep timer',
-                      onPressed: videoStore.cancelSleepTimer,
-                      icon: const HeroIcon(HeroIcons.xCircle, style: HeroIconStyle.solid),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                children: [
-                  DropdownButton(
-                    value: videoStore.sleepHours,
-                    items: List.generate(24, (index) => index)
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
-                        .toList(),
-                    onChanged: (int? hours) => videoStore.sleepHours = hours!,
-                    menuMaxHeight: 200,
-                  ),
-                  const SizedBox(width: 10.0),
-                  const Text('Hours'),
-                ],
-              ),
-              Row(
-                children: [
-                  DropdownButton(
-                    value: videoStore.sleepMinutes,
-                    items: List.generate(60, (index) => index)
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
-                        .toList(),
-                    onChanged: (int? minutes) => videoStore.sleepMinutes = minutes!,
-                    menuMaxHeight: 200,
-                  ),
-                  const SizedBox(width: 10.0),
-                  const Text('Minutes'),
-                ],
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          Observer(
-            builder: (context) => Button(
-              onPressed: videoStore.sleepHours == 0 && videoStore.sleepMinutes == 0
-                  ? null
-                  : () => videoStore.updateSleepTimer(
-                        onTimerFinished: () => navigatorKey.currentState?.popUntil((route) => route.isFirst),
-                      ),
-              child: const Text('Set Timer'),
-            ),
-          ),
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,23 +33,13 @@ class VideoOverlay extends StatelessWidget {
       onPressed: Navigator.of(context).pop,
     );
 
-    final settingsButton = IconButton(
-      tooltip: 'Settings',
-      icon: const HeroIcon(
-        HeroIcons.cog6Tooth,
-        color: Colors.white,
-        style: HeroIconStyle.solid,
-      ),
-      onPressed: onSettingsPressed,
-    );
-
     final chatOverlayButton = Observer(
       builder: (_) => IconButton(
         tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
         onPressed: () =>
             videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
         icon: HeroIcon(HeroIcons.chatBubbleOvalLeftEllipsis,
-            style: videoStore.settingsStore.fullScreenChatOverlay ? null : HeroIconStyle.solid),
+            style: videoStore.settingsStore.fullScreenChatOverlay ? HeroIconStyle.solid : null),
         color: Colors.white,
       ),
     );
@@ -159,16 +68,6 @@ class VideoOverlay extends StatelessWidget {
               style: HeroIconStyle.solid,
             ),
       onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
-    );
-
-    final sleepTimerButton = IconButton(
-      tooltip: 'Sleep timer',
-      icon: const HeroIcon(
-        HeroIcons.clock,
-        color: Colors.white,
-        style: HeroIconStyle.solid,
-      ),
-      onPressed: () => _showSleepTimerDialog(context),
     );
 
     final rotateButton = IconButton(
@@ -209,7 +108,7 @@ class VideoOverlay extends StatelessWidget {
               backButton,
               const Spacer(),
               if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-              settingsButton,
+              refreshButton,
             ],
           ),
           Align(
@@ -217,7 +116,6 @@ class VideoOverlay extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                refreshButton,
                 if (!videoStore.isIPad) rotateButton,
                 if (orientation == Orientation.landscape) fullScreenButton,
               ],
@@ -290,8 +188,7 @@ class VideoOverlay extends StatelessWidget {
                   ),
                 ),
                 if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-                sleepTimerButton,
-                settingsButton,
+                refreshButton,
               ],
             ),
             Center(
@@ -404,7 +301,6 @@ class VideoOverlay extends StatelessWidget {
                     ),
                     onPressed: videoStore.requestPictureInPicture,
                   ),
-                  refreshButton,
                   if (!videoStore.isIPad) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
