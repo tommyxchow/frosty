@@ -13,31 +13,16 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           ThemeType.system
       ..showThumbnails = json['showThumbnails'] as bool? ?? true
       ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
-      ..showThumbnailUptime = json['showThumbnailUptime'] as bool? ?? true
       ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
-      ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
-      ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? false
-      ..autocomplete = json['autocomplete'] as bool? ?? true
-      ..showBottomBar = json['showBottomBar'] as bool? ?? true
-      ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
-      ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
-      ..landscapeForceVerticalChat =
-          json['landscapeForceVerticalChat'] as bool? ?? false
-      ..chatNotificationsOnBottom =
-          json['chatNotificationsOnBottom'] as bool? ?? false
-      ..landscapeCutout = $enumDecodeNullable(
-              _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
-          LandscapeCutoutType.none
-      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
-      ..fullScreenChatOverlayOpacity =
-          (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
-      ..highlightFirstTimeChatter =
-          json['highlightFirstTimeChatter'] as bool? ?? true
-      ..showUserNotices = json['showUserNotices'] as bool? ?? true
+      ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
+      ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
+      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
+      ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
+      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
       ..useReadableColors = json['useReadableColors'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showChatMessageDividers =
@@ -46,11 +31,25 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               _$TimestampTypeEnumMap, json['timestampType'],
               unknownValue: TimestampType.disabled) ??
           TimestampType.disabled
-      ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
-      ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
-      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
-      ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 10.0
-      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
+      ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
+      ..highlightFirstTimeChatter =
+          json['highlightFirstTimeChatter'] as bool? ?? true
+      ..showUserNotices = json['showUserNotices'] as bool? ?? true
+      ..showBottomBar = json['showBottomBar'] as bool? ?? true
+      ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
+      ..chatNotificationsOnBottom =
+          json['chatNotificationsOnBottom'] as bool? ?? false
+      ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+      ..landscapeForceVerticalChat =
+          json['landscapeForceVerticalChat'] as bool? ?? false
+      ..landscapeCutout = $enumDecodeNullable(
+              _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
+          LandscapeCutoutType.none
+      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
+      ..fullScreenChatOverlayOpacity =
+          (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
+      ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? false
+      ..autocomplete = json['autocomplete'] as bool? ?? true
       ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false;
@@ -60,35 +59,34 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
       'showThumbnails': instance.showThumbnails,
       'largeStreamCard': instance.largeStreamCard,
-      'showThumbnailUptime': instance.showThumbnailUptime,
       'launchUrlExternal': instance.launchUrlExternal,
       'showVideo': instance.showVideo,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
       'overlayOpacity': instance.overlayOpacity,
-      'chatDelay': instance.chatDelay,
-      'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
-      'autocomplete': instance.autocomplete,
-      'showBottomBar': instance.showBottomBar,
-      'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
-      'landscapeChatLeftSide': instance.landscapeChatLeftSide,
-      'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
-      'chatNotificationsOnBottom': instance.chatNotificationsOnBottom,
-      'landscapeCutout':
-          _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
-      'chatWidth': instance.chatWidth,
-      'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
-      'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
-      'showUserNotices': instance.showUserNotices,
-      'useReadableColors': instance.useReadableColors,
-      'showDeletedMessages': instance.showDeletedMessages,
-      'showChatMessageDividers': instance.showChatMessageDividers,
-      'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
       'badgeScale': instance.badgeScale,
       'emoteScale': instance.emoteScale,
       'messageScale': instance.messageScale,
       'messageSpacing': instance.messageSpacing,
       'fontSize': instance.fontSize,
+      'useReadableColors': instance.useReadableColors,
+      'showDeletedMessages': instance.showDeletedMessages,
+      'showChatMessageDividers': instance.showChatMessageDividers,
+      'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
+      'chatDelay': instance.chatDelay,
+      'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
+      'showUserNotices': instance.showUserNotices,
+      'showBottomBar': instance.showBottomBar,
+      'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
+      'chatNotificationsOnBottom': instance.chatNotificationsOnBottom,
+      'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
+      'landscapeCutout':
+          _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
+      'chatWidth': instance.chatWidth,
+      'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
+      'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
+      'autocomplete': instance.autocomplete,
       'sendCrashLogs': instance.sendCrashLogs,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
@@ -101,17 +99,17 @@ const _$ThemeTypeEnumMap = {
   ThemeType.black: 'black',
 };
 
+const _$TimestampTypeEnumMap = {
+  TimestampType.disabled: 'disabled',
+  TimestampType.twelve: 'twelve',
+  TimestampType.twentyFour: 'twentyFour',
+};
+
 const _$LandscapeCutoutTypeEnumMap = {
   LandscapeCutoutType.none: 'none',
   LandscapeCutoutType.left: 'left',
   LandscapeCutoutType.right: 'right',
   LandscapeCutoutType.both: 'both',
-};
-
-const _$TimestampTypeEnumMap = {
-  TimestampType.disabled: 'disabled',
-  TimestampType.twelve: 'twelve',
-  TimestampType.twentyFour: 'twentyFour',
 };
 
 // **************************************************************************
@@ -166,22 +164,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set largeStreamCard(bool value) {
     _$largeStreamCardAtom.reportWrite(value, super.largeStreamCard, () {
       super.largeStreamCard = value;
-    });
-  }
-
-  late final _$showThumbnailUptimeAtom =
-      Atom(name: '_SettingsStoreBase.showThumbnailUptime', context: context);
-
-  @override
-  bool get showThumbnailUptime {
-    _$showThumbnailUptimeAtom.reportRead();
-    return super.showThumbnailUptime;
-  }
-
-  @override
-  set showThumbnailUptime(bool value) {
-    _$showThumbnailUptimeAtom.reportWrite(value, super.showThumbnailUptime, () {
-      super.showThumbnailUptime = value;
     });
   }
 
@@ -265,287 +247,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$chatDelayAtom =
-      Atom(name: '_SettingsStoreBase.chatDelay', context: context);
-
-  @override
-  double get chatDelay {
-    _$chatDelayAtom.reportRead();
-    return super.chatDelay;
-  }
-
-  @override
-  set chatDelay(double value) {
-    _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
-      super.chatDelay = value;
-    });
-  }
-
-  late final _$chatOnlyPreventSleepAtom =
-      Atom(name: '_SettingsStoreBase.chatOnlyPreventSleep', context: context);
-
-  @override
-  bool get chatOnlyPreventSleep {
-    _$chatOnlyPreventSleepAtom.reportRead();
-    return super.chatOnlyPreventSleep;
-  }
-
-  @override
-  set chatOnlyPreventSleep(bool value) {
-    _$chatOnlyPreventSleepAtom.reportWrite(value, super.chatOnlyPreventSleep,
-        () {
-      super.chatOnlyPreventSleep = value;
-    });
-  }
-
-  late final _$autocompleteAtom =
-      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
-
-  @override
-  bool get autocomplete {
-    _$autocompleteAtom.reportRead();
-    return super.autocomplete;
-  }
-
-  @override
-  set autocomplete(bool value) {
-    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
-      super.autocomplete = value;
-    });
-  }
-
-  late final _$showBottomBarAtom =
-      Atom(name: '_SettingsStoreBase.showBottomBar', context: context);
-
-  @override
-  bool get showBottomBar {
-    _$showBottomBarAtom.reportRead();
-    return super.showBottomBar;
-  }
-
-  @override
-  set showBottomBar(bool value) {
-    _$showBottomBarAtom.reportWrite(value, super.showBottomBar, () {
-      super.showBottomBar = value;
-    });
-  }
-
-  late final _$emoteMenuButtonOnLeftAtom =
-      Atom(name: '_SettingsStoreBase.emoteMenuButtonOnLeft', context: context);
-
-  @override
-  bool get emoteMenuButtonOnLeft {
-    _$emoteMenuButtonOnLeftAtom.reportRead();
-    return super.emoteMenuButtonOnLeft;
-  }
-
-  @override
-  set emoteMenuButtonOnLeft(bool value) {
-    _$emoteMenuButtonOnLeftAtom.reportWrite(value, super.emoteMenuButtonOnLeft,
-        () {
-      super.emoteMenuButtonOnLeft = value;
-    });
-  }
-
-  late final _$landscapeChatLeftSideAtom =
-      Atom(name: '_SettingsStoreBase.landscapeChatLeftSide', context: context);
-
-  @override
-  bool get landscapeChatLeftSide {
-    _$landscapeChatLeftSideAtom.reportRead();
-    return super.landscapeChatLeftSide;
-  }
-
-  @override
-  set landscapeChatLeftSide(bool value) {
-    _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
-        () {
-      super.landscapeChatLeftSide = value;
-    });
-  }
-
-  late final _$landscapeForceVerticalChatAtom = Atom(
-      name: '_SettingsStoreBase.landscapeForceVerticalChat', context: context);
-
-  @override
-  bool get landscapeForceVerticalChat {
-    _$landscapeForceVerticalChatAtom.reportRead();
-    return super.landscapeForceVerticalChat;
-  }
-
-  @override
-  set landscapeForceVerticalChat(bool value) {
-    _$landscapeForceVerticalChatAtom
-        .reportWrite(value, super.landscapeForceVerticalChat, () {
-      super.landscapeForceVerticalChat = value;
-    });
-  }
-
-  late final _$chatNotificationsOnBottomAtom = Atom(
-      name: '_SettingsStoreBase.chatNotificationsOnBottom', context: context);
-
-  @override
-  bool get chatNotificationsOnBottom {
-    _$chatNotificationsOnBottomAtom.reportRead();
-    return super.chatNotificationsOnBottom;
-  }
-
-  @override
-  set chatNotificationsOnBottom(bool value) {
-    _$chatNotificationsOnBottomAtom
-        .reportWrite(value, super.chatNotificationsOnBottom, () {
-      super.chatNotificationsOnBottom = value;
-    });
-  }
-
-  late final _$landscapeCutoutAtom =
-      Atom(name: '_SettingsStoreBase.landscapeCutout', context: context);
-
-  @override
-  LandscapeCutoutType get landscapeCutout {
-    _$landscapeCutoutAtom.reportRead();
-    return super.landscapeCutout;
-  }
-
-  @override
-  set landscapeCutout(LandscapeCutoutType value) {
-    _$landscapeCutoutAtom.reportWrite(value, super.landscapeCutout, () {
-      super.landscapeCutout = value;
-    });
-  }
-
-  late final _$chatWidthAtom =
-      Atom(name: '_SettingsStoreBase.chatWidth', context: context);
-
-  @override
-  double get chatWidth {
-    _$chatWidthAtom.reportRead();
-    return super.chatWidth;
-  }
-
-  @override
-  set chatWidth(double value) {
-    _$chatWidthAtom.reportWrite(value, super.chatWidth, () {
-      super.chatWidth = value;
-    });
-  }
-
-  late final _$fullScreenChatOverlayOpacityAtom = Atom(
-      name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
-      context: context);
-
-  @override
-  double get fullScreenChatOverlayOpacity {
-    _$fullScreenChatOverlayOpacityAtom.reportRead();
-    return super.fullScreenChatOverlayOpacity;
-  }
-
-  @override
-  set fullScreenChatOverlayOpacity(double value) {
-    _$fullScreenChatOverlayOpacityAtom
-        .reportWrite(value, super.fullScreenChatOverlayOpacity, () {
-      super.fullScreenChatOverlayOpacity = value;
-    });
-  }
-
-  late final _$highlightFirstTimeChatterAtom = Atom(
-      name: '_SettingsStoreBase.highlightFirstTimeChatter', context: context);
-
-  @override
-  bool get highlightFirstTimeChatter {
-    _$highlightFirstTimeChatterAtom.reportRead();
-    return super.highlightFirstTimeChatter;
-  }
-
-  @override
-  set highlightFirstTimeChatter(bool value) {
-    _$highlightFirstTimeChatterAtom
-        .reportWrite(value, super.highlightFirstTimeChatter, () {
-      super.highlightFirstTimeChatter = value;
-    });
-  }
-
-  late final _$showUserNoticesAtom =
-      Atom(name: '_SettingsStoreBase.showUserNotices', context: context);
-
-  @override
-  bool get showUserNotices {
-    _$showUserNoticesAtom.reportRead();
-    return super.showUserNotices;
-  }
-
-  @override
-  set showUserNotices(bool value) {
-    _$showUserNoticesAtom.reportWrite(value, super.showUserNotices, () {
-      super.showUserNotices = value;
-    });
-  }
-
-  late final _$useReadableColorsAtom =
-      Atom(name: '_SettingsStoreBase.useReadableColors', context: context);
-
-  @override
-  bool get useReadableColors {
-    _$useReadableColorsAtom.reportRead();
-    return super.useReadableColors;
-  }
-
-  @override
-  set useReadableColors(bool value) {
-    _$useReadableColorsAtom.reportWrite(value, super.useReadableColors, () {
-      super.useReadableColors = value;
-    });
-  }
-
-  late final _$showDeletedMessagesAtom =
-      Atom(name: '_SettingsStoreBase.showDeletedMessages', context: context);
-
-  @override
-  bool get showDeletedMessages {
-    _$showDeletedMessagesAtom.reportRead();
-    return super.showDeletedMessages;
-  }
-
-  @override
-  set showDeletedMessages(bool value) {
-    _$showDeletedMessagesAtom.reportWrite(value, super.showDeletedMessages, () {
-      super.showDeletedMessages = value;
-    });
-  }
-
-  late final _$showChatMessageDividersAtom = Atom(
-      name: '_SettingsStoreBase.showChatMessageDividers', context: context);
-
-  @override
-  bool get showChatMessageDividers {
-    _$showChatMessageDividersAtom.reportRead();
-    return super.showChatMessageDividers;
-  }
-
-  @override
-  set showChatMessageDividers(bool value) {
-    _$showChatMessageDividersAtom
-        .reportWrite(value, super.showChatMessageDividers, () {
-      super.showChatMessageDividers = value;
-    });
-  }
-
-  late final _$timestampTypeAtom =
-      Atom(name: '_SettingsStoreBase.timestampType', context: context);
-
-  @override
-  TimestampType get timestampType {
-    _$timestampTypeAtom.reportRead();
-    return super.timestampType;
-  }
-
-  @override
-  set timestampType(TimestampType value) {
-    _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
-      super.timestampType = value;
-    });
-  }
-
   late final _$badgeScaleAtom =
       Atom(name: '_SettingsStoreBase.badgeScale', context: context);
 
@@ -623,6 +324,287 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set fontSize(double value) {
     _$fontSizeAtom.reportWrite(value, super.fontSize, () {
       super.fontSize = value;
+    });
+  }
+
+  late final _$useReadableColorsAtom =
+      Atom(name: '_SettingsStoreBase.useReadableColors', context: context);
+
+  @override
+  bool get useReadableColors {
+    _$useReadableColorsAtom.reportRead();
+    return super.useReadableColors;
+  }
+
+  @override
+  set useReadableColors(bool value) {
+    _$useReadableColorsAtom.reportWrite(value, super.useReadableColors, () {
+      super.useReadableColors = value;
+    });
+  }
+
+  late final _$showDeletedMessagesAtom =
+      Atom(name: '_SettingsStoreBase.showDeletedMessages', context: context);
+
+  @override
+  bool get showDeletedMessages {
+    _$showDeletedMessagesAtom.reportRead();
+    return super.showDeletedMessages;
+  }
+
+  @override
+  set showDeletedMessages(bool value) {
+    _$showDeletedMessagesAtom.reportWrite(value, super.showDeletedMessages, () {
+      super.showDeletedMessages = value;
+    });
+  }
+
+  late final _$showChatMessageDividersAtom = Atom(
+      name: '_SettingsStoreBase.showChatMessageDividers', context: context);
+
+  @override
+  bool get showChatMessageDividers {
+    _$showChatMessageDividersAtom.reportRead();
+    return super.showChatMessageDividers;
+  }
+
+  @override
+  set showChatMessageDividers(bool value) {
+    _$showChatMessageDividersAtom
+        .reportWrite(value, super.showChatMessageDividers, () {
+      super.showChatMessageDividers = value;
+    });
+  }
+
+  late final _$timestampTypeAtom =
+      Atom(name: '_SettingsStoreBase.timestampType', context: context);
+
+  @override
+  TimestampType get timestampType {
+    _$timestampTypeAtom.reportRead();
+    return super.timestampType;
+  }
+
+  @override
+  set timestampType(TimestampType value) {
+    _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
+      super.timestampType = value;
+    });
+  }
+
+  late final _$chatDelayAtom =
+      Atom(name: '_SettingsStoreBase.chatDelay', context: context);
+
+  @override
+  double get chatDelay {
+    _$chatDelayAtom.reportRead();
+    return super.chatDelay;
+  }
+
+  @override
+  set chatDelay(double value) {
+    _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
+      super.chatDelay = value;
+    });
+  }
+
+  late final _$highlightFirstTimeChatterAtom = Atom(
+      name: '_SettingsStoreBase.highlightFirstTimeChatter', context: context);
+
+  @override
+  bool get highlightFirstTimeChatter {
+    _$highlightFirstTimeChatterAtom.reportRead();
+    return super.highlightFirstTimeChatter;
+  }
+
+  @override
+  set highlightFirstTimeChatter(bool value) {
+    _$highlightFirstTimeChatterAtom
+        .reportWrite(value, super.highlightFirstTimeChatter, () {
+      super.highlightFirstTimeChatter = value;
+    });
+  }
+
+  late final _$showUserNoticesAtom =
+      Atom(name: '_SettingsStoreBase.showUserNotices', context: context);
+
+  @override
+  bool get showUserNotices {
+    _$showUserNoticesAtom.reportRead();
+    return super.showUserNotices;
+  }
+
+  @override
+  set showUserNotices(bool value) {
+    _$showUserNoticesAtom.reportWrite(value, super.showUserNotices, () {
+      super.showUserNotices = value;
+    });
+  }
+
+  late final _$showBottomBarAtom =
+      Atom(name: '_SettingsStoreBase.showBottomBar', context: context);
+
+  @override
+  bool get showBottomBar {
+    _$showBottomBarAtom.reportRead();
+    return super.showBottomBar;
+  }
+
+  @override
+  set showBottomBar(bool value) {
+    _$showBottomBarAtom.reportWrite(value, super.showBottomBar, () {
+      super.showBottomBar = value;
+    });
+  }
+
+  late final _$emoteMenuButtonOnLeftAtom =
+      Atom(name: '_SettingsStoreBase.emoteMenuButtonOnLeft', context: context);
+
+  @override
+  bool get emoteMenuButtonOnLeft {
+    _$emoteMenuButtonOnLeftAtom.reportRead();
+    return super.emoteMenuButtonOnLeft;
+  }
+
+  @override
+  set emoteMenuButtonOnLeft(bool value) {
+    _$emoteMenuButtonOnLeftAtom.reportWrite(value, super.emoteMenuButtonOnLeft,
+        () {
+      super.emoteMenuButtonOnLeft = value;
+    });
+  }
+
+  late final _$chatNotificationsOnBottomAtom = Atom(
+      name: '_SettingsStoreBase.chatNotificationsOnBottom', context: context);
+
+  @override
+  bool get chatNotificationsOnBottom {
+    _$chatNotificationsOnBottomAtom.reportRead();
+    return super.chatNotificationsOnBottom;
+  }
+
+  @override
+  set chatNotificationsOnBottom(bool value) {
+    _$chatNotificationsOnBottomAtom
+        .reportWrite(value, super.chatNotificationsOnBottom, () {
+      super.chatNotificationsOnBottom = value;
+    });
+  }
+
+  late final _$landscapeChatLeftSideAtom =
+      Atom(name: '_SettingsStoreBase.landscapeChatLeftSide', context: context);
+
+  @override
+  bool get landscapeChatLeftSide {
+    _$landscapeChatLeftSideAtom.reportRead();
+    return super.landscapeChatLeftSide;
+  }
+
+  @override
+  set landscapeChatLeftSide(bool value) {
+    _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
+        () {
+      super.landscapeChatLeftSide = value;
+    });
+  }
+
+  late final _$landscapeForceVerticalChatAtom = Atom(
+      name: '_SettingsStoreBase.landscapeForceVerticalChat', context: context);
+
+  @override
+  bool get landscapeForceVerticalChat {
+    _$landscapeForceVerticalChatAtom.reportRead();
+    return super.landscapeForceVerticalChat;
+  }
+
+  @override
+  set landscapeForceVerticalChat(bool value) {
+    _$landscapeForceVerticalChatAtom
+        .reportWrite(value, super.landscapeForceVerticalChat, () {
+      super.landscapeForceVerticalChat = value;
+    });
+  }
+
+  late final _$landscapeCutoutAtom =
+      Atom(name: '_SettingsStoreBase.landscapeCutout', context: context);
+
+  @override
+  LandscapeCutoutType get landscapeCutout {
+    _$landscapeCutoutAtom.reportRead();
+    return super.landscapeCutout;
+  }
+
+  @override
+  set landscapeCutout(LandscapeCutoutType value) {
+    _$landscapeCutoutAtom.reportWrite(value, super.landscapeCutout, () {
+      super.landscapeCutout = value;
+    });
+  }
+
+  late final _$chatWidthAtom =
+      Atom(name: '_SettingsStoreBase.chatWidth', context: context);
+
+  @override
+  double get chatWidth {
+    _$chatWidthAtom.reportRead();
+    return super.chatWidth;
+  }
+
+  @override
+  set chatWidth(double value) {
+    _$chatWidthAtom.reportWrite(value, super.chatWidth, () {
+      super.chatWidth = value;
+    });
+  }
+
+  late final _$fullScreenChatOverlayOpacityAtom = Atom(
+      name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
+      context: context);
+
+  @override
+  double get fullScreenChatOverlayOpacity {
+    _$fullScreenChatOverlayOpacityAtom.reportRead();
+    return super.fullScreenChatOverlayOpacity;
+  }
+
+  @override
+  set fullScreenChatOverlayOpacity(double value) {
+    _$fullScreenChatOverlayOpacityAtom
+        .reportWrite(value, super.fullScreenChatOverlayOpacity, () {
+      super.fullScreenChatOverlayOpacity = value;
+    });
+  }
+
+  late final _$chatOnlyPreventSleepAtom =
+      Atom(name: '_SettingsStoreBase.chatOnlyPreventSleep', context: context);
+
+  @override
+  bool get chatOnlyPreventSleep {
+    _$chatOnlyPreventSleepAtom.reportRead();
+    return super.chatOnlyPreventSleep;
+  }
+
+  @override
+  set chatOnlyPreventSleep(bool value) {
+    _$chatOnlyPreventSleepAtom.reportWrite(value, super.chatOnlyPreventSleep,
+        () {
+      super.chatOnlyPreventSleep = value;
+    });
+  }
+
+  late final _$autocompleteAtom =
+      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
+
+  @override
+  bool get autocomplete {
+    _$autocompleteAtom.reportRead();
+    return super.autocomplete;
+  }
+
+  @override
+  set autocomplete(bool value) {
+    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
+      super.autocomplete = value;
     });
   }
 
@@ -750,34 +732,33 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 themeType: ${themeType},
 showThumbnails: ${showThumbnails},
 largeStreamCard: ${largeStreamCard},
-showThumbnailUptime: ${showThumbnailUptime},
 launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 overlayOpacity: ${overlayOpacity},
-chatDelay: ${chatDelay},
-chatOnlyPreventSleep: ${chatOnlyPreventSleep},
-autocomplete: ${autocomplete},
-showBottomBar: ${showBottomBar},
-emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
-landscapeChatLeftSide: ${landscapeChatLeftSide},
-landscapeForceVerticalChat: ${landscapeForceVerticalChat},
-chatNotificationsOnBottom: ${chatNotificationsOnBottom},
-landscapeCutout: ${landscapeCutout},
-chatWidth: ${chatWidth},
-fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
-highlightFirstTimeChatter: ${highlightFirstTimeChatter},
-showUserNotices: ${showUserNotices},
-useReadableColors: ${useReadableColors},
-showDeletedMessages: ${showDeletedMessages},
-showChatMessageDividers: ${showChatMessageDividers},
-timestampType: ${timestampType},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 messageScale: ${messageScale},
 messageSpacing: ${messageSpacing},
 fontSize: ${fontSize},
+useReadableColors: ${useReadableColors},
+showDeletedMessages: ${showDeletedMessages},
+showChatMessageDividers: ${showChatMessageDividers},
+timestampType: ${timestampType},
+chatDelay: ${chatDelay},
+highlightFirstTimeChatter: ${highlightFirstTimeChatter},
+showUserNotices: ${showUserNotices},
+showBottomBar: ${showBottomBar},
+emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
+chatNotificationsOnBottom: ${chatNotificationsOnBottom},
+landscapeChatLeftSide: ${landscapeChatLeftSide},
+landscapeForceVerticalChat: ${landscapeForceVerticalChat},
+landscapeCutout: ${landscapeCutout},
+chatWidth: ${chatWidth},
+fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
+chatOnlyPreventSleep: ${chatOnlyPreventSleep},
+autocomplete: ${autocomplete},
 sendCrashLogs: ${sendCrashLogs},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay}

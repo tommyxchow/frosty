@@ -35,11 +35,6 @@ class GeneralSettings extends StatelessWidget {
             value: settingsStore.showThumbnails,
             onChanged: (newValue) => settingsStore.showThumbnails = newValue,
           ),
-          SettingsListSwitch(
-            title: 'Show stream uptime',
-            value: settingsStore.showThumbnailUptime,
-            onChanged: (newValue) => settingsStore.showThumbnailUptime = newValue,
-          ),
           const SectionHeader('Links'),
           SettingsListSwitch(
             title: 'Open links in external browser',

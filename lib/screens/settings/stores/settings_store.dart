@@ -19,7 +19,6 @@ abstract class _SettingsStoreBase with Store {
   // Stream card defaults
   static const defaultShowThumbnails = true;
   static const defaultLargeStreamCard = false;
-  static const defaultShowThumbnailUptime = true;
 
   // Links defaults
   static const defaultLaunchUrlExternal = false;
@@ -38,10 +37,6 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var largeStreamCard = defaultLargeStreamCard;
 
-  @JsonKey(defaultValue: defaultShowThumbnailUptime)
-  @observable
-  var showThumbnailUptime = defaultShowThumbnailUptime;
-
   // Links options
   @JsonKey(defaultValue: defaultLaunchUrlExternal)
   @observable
@@ -53,7 +48,6 @@ abstract class _SettingsStoreBase with Store {
 
     largeStreamCard = defaultLargeStreamCard;
     showThumbnails = defaultShowThumbnails;
-    showThumbnailUptime = defaultShowThumbnailUptime;
 
     launchUrlExternal = defaultLaunchUrlExternal;
   }
