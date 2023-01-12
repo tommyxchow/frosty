@@ -21,7 +21,7 @@ class FrostyDialog extends StatelessWidget {
       titlePadding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
       contentPadding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.circular(15.0),
       ),
       title: Text(
         title,

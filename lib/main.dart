@@ -103,11 +103,20 @@ const inputTheme = InputDecorationTheme(
 );
 
 const tooltipTheme = TooltipThemeData(
+  padding: EdgeInsets.all(10.0),
   decoration: BoxDecoration(
     color: lightGray,
-    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
   textStyle: TextStyle(color: Colors.white),
+);
+
+const snackBarTheme = SnackBarThemeData(
+  backgroundColor: lightGray,
+  contentTextStyle: TextStyle(color: Colors.white),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(15.0)),
+  ),
 );
 
 final lightTheme = ThemeData(
@@ -136,6 +145,7 @@ final lightTheme = ThemeData(
   ),
   inputDecorationTheme: inputTheme,
   tooltipTheme: tooltipTheme,
+  snackBarTheme: snackBarTheme,
 );
 
 final darkTheme = ThemeData(
@@ -162,6 +172,7 @@ final darkTheme = ThemeData(
   toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,
   tooltipTheme: tooltipTheme,
+  snackBarTheme: snackBarTheme,
 );
 
 final oledTheme = ThemeData(
@@ -186,6 +197,7 @@ final oledTheme = ThemeData(
   toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,
   tooltipTheme: tooltipTheme,
+  snackBarTheme: snackBarTheme,
 );
 
 class MyApp extends StatelessWidget {

@@ -369,44 +369,41 @@ class IRCMessage {
                   alignment: PlaceholderAlignment.middle,
                   child: Tooltip(
                     richMessage: WidgetSpan(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: Column(
-                          children: [
-                            Stack(
-                              alignment: AlignmentDirectional.center,
-                              children: [
-                                if (nextWordIsEmoji)
-                                  Text(
-                                    words[index],
-                                    style: textStyle?.copyWith(fontSize: 75),
-                                  ),
-                                ...emoteStack.reversed.map(
-                                  (emote) => CachedNetworkImage(
-                                    imageUrl: emote.url,
-                                    fadeInDuration: const Duration(),
-                                    height: 80,
-                                  ),
-                                )
-                              ],
-                            ),
-                            const SizedBox(height: 5.0),
-                            Column(
-                              children: [
+                      child: Column(
+                        children: [
+                          Stack(
+                            alignment: AlignmentDirectional.center,
+                            children: [
+                              if (nextWordIsEmoji)
                                 Text(
-                                  nextWordIsEmoji
-                                      ? '${words[index]} - Emoji'
-                                      : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
-                                  style: const TextStyle(color: Colors.white),
+                                  words[index],
+                                  style: textStyle?.copyWith(fontSize: 75),
                                 ),
-                                Text(
-                                  nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
-                                  style: const TextStyle(color: Colors.white),
+                              ...emoteStack.reversed.map(
+                                (emote) => CachedNetworkImage(
+                                  imageUrl: emote.url,
+                                  fadeInDuration: const Duration(),
+                                  height: 80,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 5.0),
+                          Column(
+                            children: [
+                              Text(
+                                nextWordIsEmoji
+                                    ? '${words[index]} - Emoji'
+                                    : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                     preferBelow: false,
@@ -507,23 +504,20 @@ class IRCMessage {
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
         richMessage: WidgetSpan(
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                _createBadgeWidget(
-                  badge: badge,
-                  size: 80,
-                  backgroundColor: backgroundColor,
-                  isSvg: isSvg,
-                ),
-                const SizedBox(height: 5.0),
-                Text(
-                  badge.name,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
+          child: Column(
+            children: [
+              _createBadgeWidget(
+                badge: badge,
+                size: 80,
+                backgroundColor: backgroundColor,
+                isSvg: isSvg,
+              ),
+              const SizedBox(height: 5.0),
+              Text(
+                badge.name,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
           ),
         ),
         preferBelow: false,
@@ -546,26 +540,23 @@ class IRCMessage {
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
         richMessage: WidgetSpan(
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                CachedNetworkImage(
-                  imageUrl: emote.url,
-                  fadeInDuration: const Duration(),
-                  height: 80,
-                ),
-                const SizedBox(height: 5.0),
-                Text(
-                  emote.name,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  emoteType[emote.type.index],
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
+          child: Column(
+            children: [
+              CachedNetworkImage(
+                imageUrl: emote.url,
+                fadeInDuration: const Duration(),
+                height: 80,
+              ),
+              const SizedBox(height: 5.0),
+              Text(
+                emote.name,
+                style: const TextStyle(color: Colors.white),
+              ),
+              Text(
+                emoteType[emote.type.index],
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
           ),
         ),
         preferBelow: false,
