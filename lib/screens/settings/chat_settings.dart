@@ -195,7 +195,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.chatNotificationsOnBottom,
             onChanged: (newValue) => settingsStore.chatNotificationsOnBottom = newValue,
           ),
-          const SectionHeader('Landscape mode'),
+          const SectionHeader('Landscape Mode'),
           SettingsListSwitch(
             title: 'Move chat left',
             value: settingsStore.landscapeChatLeftSide,

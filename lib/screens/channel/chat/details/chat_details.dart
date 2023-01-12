@@ -144,7 +144,7 @@ class _ChatDetailsState extends State<ChatDetails> {
   @override
   Widget build(BuildContext context) {
     final children = [
-      const SectionHeader('Chat modes'),
+      const SectionHeader('Chat Modes'),
       ListTile(
         title: ChatModes(roomState: widget.chatDetailsStore.roomState),
       ),

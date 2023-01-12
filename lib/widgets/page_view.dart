@@ -49,11 +49,8 @@ class _FrostyPageViewState extends State<FrostyPageView> {
                     },
                     color: index == currentIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,
                     child: Text(
-                      section.toUpperCase(),
-                      style: const TextStyle(
-                        letterSpacing: 0.5,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      section,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),

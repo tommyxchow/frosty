@@ -127,8 +127,8 @@ class Chat extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: FrostyPageView(
                     headers: const [
-                      'RECENT',
-                      'TWITCH',
+                      'Recent',
+                      'Twitch',
                       '7TV',
                       'BTTV',
                       'FFZ',

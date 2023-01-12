@@ -18,12 +18,11 @@ class SectionHeader extends StatelessWidget {
     return Padding(
       padding: padding ?? const EdgeInsets.fromLTRB(16, 30, 16, 5),
       child: Text(
-        text.toUpperCase(),
+        text,
         style: TextStyle(
           color: purple,
-          fontSize: fontSize,
+          fontSize: fontSize ?? 16,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
         ),
       ),
     );
