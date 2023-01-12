@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
-import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 
 /// A tappable card widget that displays a category's box art and name under.
@@ -22,7 +21,7 @@ class CategoryCard extends StatelessWidget {
     final artWidth = (size.width * pixelRatio) ~/ 3;
     final artHeight = (artWidth * (4 / 3)).toInt();
 
-    return AnimateScale(
+    return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
@@ -42,7 +41,8 @@ class CategoryCard extends StatelessWidget {
                 child: AspectRatio(
                   aspectRatio: 3 / 4,
                   child: CachedNetworkImage(
-                    imageUrl: category.boxArtUrl.replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${artWidth}x$artHeight.jpg'),
+                    imageUrl: category.boxArtUrl
+                        .replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${artWidth}x$artHeight.jpg'),
                     placeholder: (context, url) => const LoadingIndicator(),
                   ),
                 ),
