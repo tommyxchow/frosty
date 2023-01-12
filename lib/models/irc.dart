@@ -287,9 +287,10 @@ class IRCMessage {
     }
 
     // Add the display name (username) to the span and apply the onLongPressName callback.
+    final displayName = tags['display-name']!;
     span.add(
       TextSpan(
-        text: tags['display-name']!,
+        text: regexEnglish.hasMatch(displayName) ? displayName : '$displayName ($user)',
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.bold,
