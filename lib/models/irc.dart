@@ -174,7 +174,8 @@ class IRCMessage {
               badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
-              badgeUrl = 'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
+              badgeUrl =
+                  'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
             }
 
             final newBadge = Badge(
@@ -196,7 +197,8 @@ class IRCMessage {
 
           // Add custom FFZ vip badge if it exists
           if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
-            badgeUrl = 'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
+            badgeUrl =
+                'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
           }
 
           final newBadge = Badge(
@@ -368,7 +370,7 @@ class IRCMessage {
                   child: Tooltip(
                     richMessage: WidgetSpan(
                       child: Padding(
-                        padding: const EdgeInsets.all(5.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: Column(
                           children: [
                             Stack(
@@ -392,12 +394,14 @@ class IRCMessage {
                             Column(
                               children: [
                                 Text(
-                                  nextWordIsEmoji ? '${words[index]} - Emoji' : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
-                                  style: const TextStyle(color: Colors.black),
+                                  nextWordIsEmoji
+                                      ? '${words[index]} - Emoji'
+                                      : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                                 Text(
                                   nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
-                                  style: const TextStyle(color: Colors.black),
+                                  style: const TextStyle(color: Colors.white),
                                 ),
                               ],
                             ),
@@ -504,7 +508,7 @@ class IRCMessage {
       child: Tooltip(
         richMessage: WidgetSpan(
           child: Padding(
-            padding: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
                 _createBadgeWidget(
@@ -516,7 +520,7 @@ class IRCMessage {
                 const SizedBox(height: 5.0),
                 Text(
                   badge.name,
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
@@ -543,7 +547,7 @@ class IRCMessage {
       child: Tooltip(
         richMessage: WidgetSpan(
           child: Padding(
-            padding: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
                 CachedNetworkImage(
@@ -554,11 +558,11 @@ class IRCMessage {
                 const SizedBox(height: 5.0),
                 Text(
                   emote.name,
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.white),
                 ),
                 Text(
                   emoteType[emote.type.index],
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ],
             ),
@@ -584,7 +588,8 @@ class IRCMessage {
         text: text,
         style: style?.copyWith(color: Colors.blue),
         recognizer: TapGestureRecognizer()
-          ..onTap = () => launchUrl(Uri.parse(text), mode: launchExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+          ..onTap = () => launchUrl(Uri.parse(text),
+              mode: launchExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
       );
     } else {
       return TextSpan(text: text, style: style);
@@ -633,7 +638,8 @@ class IRCMessage {
 
     // If the username exists, set it.
     // tmi.twitch.tv means the message was sent by Twitch rather than a user, so will be irrelevant.
-    final String? user = splitMessage[0] == 'tmi.twitch.tv' ? null : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
+    final String? user =
+        splitMessage[0] == 'tmi.twitch.tv' ? null : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
 
     // If there is an associated message, set it.
     //
@@ -697,7 +703,11 @@ class IRCMessage {
       if (userLogin != null) mention = message.toLowerCase().contains(userLogin);
 
       // Escape the message
-      message = message.split(' ').map((word) => word.replaceAll('\u{E0000}', '').trim()).where((element) => element != '').join(' ');
+      message = message
+          .split(' ')
+          .map((word) => word.replaceAll('\u{E0000}', '').trim())
+          .where((element) => element != '')
+          .join(' ');
 
       final emojiBuffer = StringBuffer();
       final wordBuffer = StringBuffer();
