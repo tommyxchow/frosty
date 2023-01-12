@@ -108,7 +108,6 @@ class VideoOverlay extends StatelessWidget {
               backButton,
               const Spacer(),
               if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-              refreshButton,
             ],
           ),
           Align(
@@ -116,6 +115,7 @@ class VideoOverlay extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                refreshButton,
                 if (!videoStore.isIPad) rotateButton,
                 if (orientation == Orientation.landscape) fullScreenButton,
               ],
