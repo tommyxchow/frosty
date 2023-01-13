@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/main.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -43,7 +44,7 @@ class CategoryCard extends StatelessWidget {
                   child: FrostyCachedNetworkImage(
                     imageUrl: category.boxArtUrl
                         .replaceRange(category.boxArtUrl.lastIndexOf('-') + 1, null, '${artWidth}x$artHeight.jpg'),
-                    placeholder: (context, url) => const LoadingIndicator(),
+                    placeholder: (context, url) => const ColoredBox(color: lightGray, child: LoadingIndicator()),
                   ),
                 ),
               ),

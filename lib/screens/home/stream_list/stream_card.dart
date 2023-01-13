@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
+import 'package:frosty/main.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
@@ -48,7 +49,7 @@ class StreamCard extends StatelessWidget {
       child: FrostyCachedNetworkImage(
         imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
             cacheUrlExtension,
-        placeholder: (context, url) => const LoadingIndicator(),
+        placeholder: (context, url) => const ColoredBox(color: lightGray, child: LoadingIndicator()),
       ),
     );
 

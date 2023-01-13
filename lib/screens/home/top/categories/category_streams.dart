@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/main.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/stream_list/large_stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_card.dart';
@@ -112,7 +113,8 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                       null,
                                       '${artWidth}x$artHeight.jpg',
                                     ),
-                                    placeholder: (context, url) => const LoadingIndicator(),
+                                    placeholder: (context, url) =>
+                                        const ColoredBox(color: lightGray, child: LoadingIndicator()),
                                     color: const Color.fromRGBO(255, 255, 255, 0.5),
                                     colorBlendMode: BlendMode.modulate,
                                     fit: BoxFit.cover,
