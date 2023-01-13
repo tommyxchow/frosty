@@ -89,15 +89,15 @@ const inputTheme = InputDecorationTheme(
   filled: true,
   contentPadding: EdgeInsets.all(10.0),
   border: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
     borderSide: BorderSide(style: BorderStyle.none),
   ),
   enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
     borderSide: BorderSide(style: BorderStyle.none),
   ),
   disabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
     borderSide: BorderSide(style: BorderStyle.none),
   ),
 );
@@ -115,7 +115,7 @@ const snackBarTheme = SnackBarThemeData(
   backgroundColor: lightGray,
   contentTextStyle: TextStyle(color: Colors.white),
   shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(15.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
 );
 

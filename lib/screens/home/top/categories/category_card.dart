@@ -37,7 +37,7 @@ class CategoryCard extends StatelessWidget {
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
                 child: AspectRatio(
                   aspectRatio: 3 / 4,
                   child: CachedNetworkImage(
