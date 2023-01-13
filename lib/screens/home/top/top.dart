@@ -28,23 +28,19 @@ class _TopSectionState extends State<TopSection> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TabBar(
+          isScrollable: true,
           controller: _tabBarController,
-          indicatorColor: const Color(0xff9146ff),
+          indicatorColor: Colors.transparent,
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 20.0,
+          ),
           tabs: const [
-            Tab(
-              child: Text(
-                'Streams',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            Tab(
-              child: Text(
-                'Categories',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
+            Tab(child: Text('Streams')),
+            Tab(child: Text('Categories')),
           ],
         ),
         Expanded(
