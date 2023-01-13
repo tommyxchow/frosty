@@ -104,6 +104,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
                 _categoriesStore.getCategories();
               }
               return CategoryCard(
+                key: ValueKey(_categoriesStore.categories[index].id),
                 category: _categoriesStore.categories[index],
               );
             },
