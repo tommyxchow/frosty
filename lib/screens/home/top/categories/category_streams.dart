@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -10,6 +9,7 @@ import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:heroicons/heroicons.dart';
@@ -106,7 +106,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                               ),
                           builder: (context, AsyncSnapshot<CategoriesTwitch> snapshot) {
                             return snapshot.hasData
-                                ? CachedNetworkImage(
+                                ? FrostyCachedNetworkImage(
                                     imageUrl: snapshot.data!.data.first.boxArtUrl.replaceRange(
                                       snapshot.data!.data.first.boxArtUrl.lastIndexOf('-') + 1,
                                       null,

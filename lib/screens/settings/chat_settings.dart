@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
@@ -8,6 +7,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class ChatSettings extends StatefulWidget {
@@ -50,7 +50,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                           children: [
                             WidgetSpan(
                               alignment: PlaceholderAlignment.middle,
-                              child: CachedNetworkImage(
+                              child: FrostyCachedNetworkImage(
                                 imageUrl:
                                     'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
                                 height: defaultBadgeSize * settingsStore.badgeScale,
@@ -60,7 +60,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                             const TextSpan(text: ' Badge and emote preview. '),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.middle,
-                              child: CachedNetworkImage(
+                              child: FrostyCachedNetworkImage(
                                 imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
                                 height: defaultEmoteSize * settingsStore.emoteScale,
                                 width: defaultEmoteSize * settingsStore.emoteScale,

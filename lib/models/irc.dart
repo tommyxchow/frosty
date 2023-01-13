@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -354,11 +354,11 @@ class IRCMessage {
                     style: textStyle?.copyWith(fontSize: emoteSize - 5),
                   ),
                 ...emoteStack.reversed.map(
-                  (emote) => CachedNetworkImage(
+                  (emote) => FrostyCachedNetworkImage(
                     imageUrl: emote.url,
-                    fadeInDuration: const Duration(),
                     height: emote.height != null ? emote.height! * emoteScale : emoteSize,
                     width: emote.width != null ? emote.width! * emoteScale : emoteSize,
+                    useFade: false,
                   ),
                 )
               ];
@@ -381,10 +381,10 @@ class IRCMessage {
                                   style: textStyle?.copyWith(fontSize: 75),
                                 ),
                               ...emoteStack.reversed.map(
-                                (emote) => CachedNetworkImage(
+                                (emote) => FrostyCachedNetworkImage(
                                   imageUrl: emote.url,
-                                  fadeInDuration: const Duration(),
                                   height: 80,
+                                  useFade: false,
                                 ),
                               )
                             ],
@@ -472,11 +472,11 @@ class IRCMessage {
     if (backgroundColor != null) {
       return ColoredBox(
         color: backgroundColor,
-        child: CachedNetworkImage(
+        child: FrostyCachedNetworkImage(
           imageUrl: badge.url,
-          fadeInDuration: const Duration(),
           height: size,
           width: size,
+          useFade: false,
         ),
       );
     } else if (isSvg == true) {
@@ -486,11 +486,11 @@ class IRCMessage {
         width: size,
       );
     } else {
-      return CachedNetworkImage(
+      return FrostyCachedNetworkImage(
         imageUrl: badge.url,
-        fadeInDuration: const Duration(),
         height: size,
         width: size,
+        useFade: false,
       );
     }
   }
@@ -543,10 +543,10 @@ class IRCMessage {
         richMessage: WidgetSpan(
           child: Column(
             children: [
-              CachedNetworkImage(
+              FrostyCachedNetworkImage(
                 imageUrl: emote.url,
-                fadeInDuration: const Duration(),
                 height: 80,
+                useFade: false,
               ),
               const SizedBox(height: 5.0),
               Text(
@@ -561,12 +561,11 @@ class IRCMessage {
           ),
         ),
         preferBelow: false,
-        child: CachedNetworkImage(
+        child: FrostyCachedNetworkImage(
           imageUrl: emote.url,
-          placeholder: (context, url) => const SizedBox(),
-          fadeInDuration: const Duration(),
           height: height,
           width: width,
+          useFade: false,
         ),
       ),
     );

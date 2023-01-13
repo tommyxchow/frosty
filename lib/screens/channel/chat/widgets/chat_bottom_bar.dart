@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:heroicons/heroicons.dart';
 
 class ChatBottomBar extends StatelessWidget {
@@ -64,9 +64,9 @@ class ChatBottomBar extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: Center(
-                          child: CachedNetworkImage(
+                          child: FrostyCachedNetworkImage(
                             imageUrl: matchingEmotes[index].url,
-                            fadeInDuration: const Duration(),
+                            useFade: false,
                             height: matchingEmotes[index].height?.toDouble() ?? defaultEmoteSize,
                             width: matchingEmotes[index].width?.toDouble(),
                           ),

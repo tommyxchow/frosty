@@ -1,9 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:provider/provider.dart';
 
 class EmoteMenuSection extends StatelessWidget {
@@ -34,7 +34,7 @@ class EmoteMenuSection extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Center(
-              child: CachedNetworkImage(
+              child: FrostyCachedNetworkImage(
                 imageUrl: emotes[index].url,
                 height: emotes[index].height?.toDouble() ?? defaultEmoteSize,
                 width: emotes[index].width?.toDouble(),

@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
@@ -10,6 +9,7 @@ import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
@@ -45,11 +45,10 @@ class StreamCard extends StatelessWidget {
 
     final thumbnail = AspectRatio(
       aspectRatio: 16 / 9,
-      child: CachedNetworkImage(
+      child: FrostyCachedNetworkImage(
         imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
             cacheUrlExtension,
         placeholder: (context, url) => const LoadingIndicator(),
-        useOldImageOnUrlChange: true,
       ),
     );
 
