@@ -86,7 +86,6 @@ class _ChatSettingsState extends State<ChatSettings> {
               ),
             ],
           ),
-          const SizedBox(height: 10.0),
           SettingsListSlider(
             title: 'Badge scale',
             trailing: '${settingsStore.badgeScale.toStringAsFixed(2)}x',
@@ -215,7 +214,6 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.landscapeCutout = LandscapeCutoutType.values[landscapeCutouts.indexOf(newValue)],
           ),
-          const SizedBox(height: 15.0),
           SettingsListSlider(
             title: 'Chat width',
             trailing: '${(settingsStore.chatWidth * 100).toStringAsFixed(0)}%',
@@ -225,7 +223,6 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 8,
             onChanged: (newValue) => settingsStore.chatWidth = newValue,
           ),
-          const SizedBox(height: 15.0),
           SettingsListSlider(
             title: 'Chat overlay opacity',
             trailing: '${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%',

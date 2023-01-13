@@ -34,7 +34,6 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.toggleableOverlay,
             onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
           ),
-          const SizedBox(height: 15.0),
           SettingsListSlider(
             title: 'Custom overlay opacity',
             trailing: '${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%',
