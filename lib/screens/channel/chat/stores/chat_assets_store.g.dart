@@ -159,22 +159,6 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
     });
   }
 
-  late final _$emoteMenuIndexAtom =
-      Atom(name: 'ChatAssetsStoreBase.emoteMenuIndex', context: context);
-
-  @override
-  int get emoteMenuIndex {
-    _$emoteMenuIndexAtom.reportRead();
-    return super.emoteMenuIndex;
-  }
-
-  @override
-  set emoteMenuIndex(int value) {
-    _$emoteMenuIndexAtom.reportWrite(value, super.emoteMenuIndex, () {
-      super.emoteMenuIndex = value;
-    });
-  }
-
   late final _$showEmoteMenuAtom =
       Atom(name: 'ChatAssetsStoreBase.showEmoteMenu', context: context);
 
@@ -266,7 +250,6 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
   @override
   String toString() {
     return '''
-emoteMenuIndex: ${emoteMenuIndex},
 showEmoteMenu: ${showEmoteMenu},
 bttvEmotes: ${bttvEmotes},
 ffzEmotes: ${ffzEmotes},

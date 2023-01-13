@@ -121,38 +121,40 @@ class Chat extends StatelessWidget {
                     ? MediaQuery.of(context).size.height /
                         (MediaQuery.of(context).orientation == Orientation.portrait ? 3 : 2)
                     : 0,
-                child: AnimatedOpacity(
-                  curve: Curves.ease,
-                  opacity: chatStore.assetsStore.showEmoteMenu ? 1 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child: FrostyPageView(
-                    headers: const [
-                      'Recent',
-                      'Twitch',
-                      '7TV',
-                      'BTTV',
-                      'FFZ',
-                    ],
-                    children: [
-                      RecentEmotesPanel(
-                        chatStore: chatStore,
-                      ),
-                      EmoteMenuPanel(
-                        chatStore: chatStore,
-                        twitchEmotes: chatStore.assetsStore.userEmoteSectionToEmotes,
-                      ),
-                      ...[
-                        chatStore.assetsStore.sevenTVEmotes,
-                        chatStore.assetsStore.bttvEmotes,
-                        chatStore.assetsStore.ffzEmotes
-                      ].map(
-                        (emotes) => EmoteMenuPanel(
-                          chatStore: chatStore,
-                          emotes: emotes,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 100),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  child: chatStore.assetsStore.showEmoteMenu
+                      ? FrostyPageView(
+                          headers: const [
+                            'Recent',
+                            'Twitch',
+                            '7TV',
+                            'BTTV',
+                            'FFZ',
+                          ],
+                          children: [
+                            RecentEmotesPanel(
+                              chatStore: chatStore,
+                            ),
+                            EmoteMenuPanel(
+                              chatStore: chatStore,
+                              twitchEmotes: chatStore.assetsStore.userEmoteSectionToEmotes,
+                            ),
+                            ...[
+                              chatStore.assetsStore.sevenTVEmotes,
+                              chatStore.assetsStore.bttvEmotes,
+                              chatStore.assetsStore.ffzEmotes
+                            ].map(
+                              (emotes) => EmoteMenuPanel(
+                                chatStore: chatStore,
+                                emotes: emotes,
+                              ),
+                            ),
+                          ],
+                        )
+                      : null,
                 ),
               ),
             ),
