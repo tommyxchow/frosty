@@ -566,6 +566,7 @@ class IRCMessage {
           height: height,
           width: width,
           useFade: false,
+          placeholder: (context, url) => const SizedBox(),
         ),
       ),
     );
