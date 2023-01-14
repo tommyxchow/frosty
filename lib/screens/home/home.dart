@@ -108,30 +108,23 @@ class _HomeState extends State<Home> {
           ],
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: Observer(
-                  builder: (_) => IndexedStack(
-                    index: _homeStore.selectedIndex,
-                    children: [
-                      if (_authStore.isLoggedIn)
-                        StreamsList(
-                          listType: ListType.followed,
-                          scrollController: _homeStore.followedScrollController,
-                        ),
-                      TopSection(
-                        homeStore: _homeStore,
-                      ),
-                      Search(
-                        scrollController: _homeStore.searchScrollController,
-                      ),
-                    ],
+          child: Observer(
+            builder: (_) => IndexedStack(
+              index: _homeStore.selectedIndex,
+              children: [
+                if (_authStore.isLoggedIn)
+                  StreamsList(
+                    listType: ListType.followed,
+                    scrollController: _homeStore.followedScrollController,
                   ),
+                TopSection(
+                  homeStore: _homeStore,
                 ),
-              ),
-              const Divider(height: 1.0, thickness: 1.0),
-            ],
+                Search(
+                  scrollController: _homeStore.searchScrollController,
+                ),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: Observer(
