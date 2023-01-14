@@ -75,7 +75,6 @@ class ChattersList extends StatelessWidget {
                     autocorrect: false,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.zero,
-                      prefixIcon: const Icon(Icons.filter_list),
                       hintText: 'Filter chatters',
                       suffixIcon: chatDetailsStore.textFieldFocusNode.hasFocus || chatDetailsStore.filterText.isNotEmpty
                           ? IconButton(
