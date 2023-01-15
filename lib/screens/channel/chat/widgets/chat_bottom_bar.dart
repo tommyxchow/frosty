@@ -134,7 +134,7 @@ class ChatBottomBar extends StatelessWidget {
                         maxLines: 5,
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 10.0),
+                          contentPadding: const EdgeInsets.only(left: 15.0),
                           prefixIcon: chatStore.settings.emoteMenuButtonOnLeft ? emoteMenuButton : null,
                           suffixIcon: chatStore.settings.emoteMenuButtonOnLeft ? null : emoteMenuButton,
                           hintMaxLines: 1,
