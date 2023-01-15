@@ -14,6 +14,7 @@ import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video.dart';
+import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -161,7 +162,6 @@ class _VideoChatState extends State<VideoChat> {
                   width: _chatStore.expandChat
                       ? MediaQuery.of(context).size.width / 2
                       : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
-                  curve: Curves.ease,
                   color: _chatStore.settings.fullScreen
                       ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
                       : Theme.of(context).scaffoldBackgroundColor,
@@ -225,6 +225,23 @@ class _VideoChatState extends State<VideoChat> {
                 child: Column(
                   children: [
                     if (!settingsStore.showVideo) appBar else AspectRatio(aspectRatio: 16 / 9, child: video),
+                    Observer(
+                      builder: (_) {
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
+                          child: _videoStore.streamInfo != null && (_videoStore.paused || _videoStore.overlayVisible)
+                              ? Column(
+                                  children: [
+                                    VideoBar(streamInfo: _videoStore.streamInfo!),
+                                    const Divider(height: 1, thickness: 1),
+                                  ],
+                                )
+                              : null,
+                        );
+                      },
+                    ),
                     Expanded(child: chat),
                   ],
                 ),
