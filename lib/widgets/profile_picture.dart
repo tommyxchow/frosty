@@ -25,18 +25,23 @@ class ProfilePicture extends StatelessWidget {
         future:
             context.read<TwitchApi>().getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
         builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
-          return snapshot.hasData
-              ? FrostyCachedNetworkImage(
-                  width: diameter,
-                  height: diameter,
-                  imageUrl: snapshot.data!.profileImageUrl,
-                  placeholder: (context, url) => const ColoredBox(color: lightGray),
-                )
-              : Container(
-                  color: lightGray,
-                  width: diameter,
-                  height: diameter,
-                );
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child: snapshot.hasData
+                ? FrostyCachedNetworkImage(
+                    width: diameter,
+                    height: diameter,
+                    imageUrl: snapshot.data!.profileImageUrl,
+                    placeholder: (context, url) => const ColoredBox(color: lightGray),
+                  )
+                : Container(
+                    color: lightGray,
+                    width: diameter,
+                    height: diameter,
+                  ),
+          );
         },
       ),
     );
