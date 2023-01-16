@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
@@ -71,20 +70,16 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       child: const Text('Reply'),
                     )
                   : null,
-              onTap: () {
-                HapticFeedback.mediumImpact();
-
-                showModalBottomSheet(
-                  backgroundColor: Colors.transparent,
-                  context: context,
-                  builder: (context) => BlockReportModal(
-                    authStore: widget.chatStore.auth,
-                    name: name,
-                    userLogin: widget.username,
-                    userId: widget.userId,
-                  ),
-                );
-              },
+              onTap: () => showModalBottomSheet(
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (context) => BlockReportModal(
+                  authStore: widget.chatStore.auth,
+                  name: name,
+                  userLogin: widget.username,
+                  userId: widget.userId,
+                ),
+              ),
             ),
             const SectionHeader(
               'Recent Messages',

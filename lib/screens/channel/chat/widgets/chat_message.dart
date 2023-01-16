@@ -21,14 +21,12 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void onLongPressName() {
+    void onTapName() {
       // Ignore if the message is a recent message in the modal bottom sheet.
       if (isModal) return;
 
       // Ignore if long-pressing own username.
       if (ircMessage.user == null || ircMessage.user == chatStore.auth.user.details?.login) return;
-
-      HapticFeedback.lightImpact();
 
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
@@ -70,7 +68,7 @@ class ChatMessage extends StatelessWidget {
             final messageSpan = Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
-                  onTapName: onLongPressName,
+                  onTapName: onTapName,
                   style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
@@ -107,6 +105,8 @@ class ChatMessage extends StatelessWidget {
                             ? Tooltip(
                                 message: 'Replying to @$replyUser: $replyBody',
                                 preferBelow: false,
+                                triggerMode: TooltipTriggerMode.tap,
+                                showDuration: const Duration(seconds: 5),
                                 child: Text(
                                   'Replying to @$replyUser: $replyBody',
                                   maxLines: 1,
@@ -165,7 +165,7 @@ class ChatMessage extends StatelessWidget {
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
-                        onTapName: onLongPressName,
+                        onTapName: onTapName,
                         style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
@@ -219,7 +219,7 @@ class ChatMessage extends StatelessWidget {
                     Text.rich(
                       TextSpan(
                         children: ircMessage.generateSpan(
-                          onTapName: onLongPressName,
+                          onTapName: onTapName,
                           style: defaultTextStyle,
                           assetsStore: chatStore.assetsStore,
                           emoteScale: chatStore.settings.emoteScale,

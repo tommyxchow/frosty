@@ -370,6 +370,7 @@ class IRCMessage {
                   alignment: PlaceholderAlignment.middle,
                   child: Tooltip(
                     triggerMode: TooltipTriggerMode.tap,
+                    showDuration: const Duration(seconds: 3),
                     richMessage: WidgetSpan(
                       child: Column(
                         children: [
@@ -506,6 +507,7 @@ class IRCMessage {
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
         triggerMode: TooltipTriggerMode.tap,
+        showDuration: const Duration(seconds: 3),
         richMessage: WidgetSpan(
           child: Column(
             children: [
@@ -543,6 +545,7 @@ class IRCMessage {
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
         triggerMode: TooltipTriggerMode.tap,
+        showDuration: const Duration(seconds: 3),
         richMessage: WidgetSpan(
           child: Column(
             children: [

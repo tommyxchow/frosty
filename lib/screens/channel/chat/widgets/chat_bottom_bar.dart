@@ -16,14 +16,17 @@ class ChatBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emoteMenuButton = IconButton(
-      color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
-      tooltip: 'Emote menu',
-      icon: HeroIcon(HeroIcons.faceSmile, style: chatStore.assetsStore.showEmoteMenu ? HeroIconStyle.solid : null),
-      onPressed: () {
-        FocusScope.of(context).unfocus();
-        chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
-      },
+    final emoteMenuButton = Tooltip(
+      message: 'Emote menu',
+      preferBelow: false,
+      child: IconButton(
+        color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
+        icon: HeroIcon(HeroIcons.faceSmile, style: chatStore.assetsStore.showEmoteMenu ? HeroIconStyle.solid : null),
+        onPressed: () {
+          FocusScope.of(context).unfocus();
+          chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
+        },
+      ),
     );
 
     return Observer(
