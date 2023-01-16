@@ -49,14 +49,14 @@ class LargeStreamCard extends StatelessWidget {
         alignment: Alignment.bottomLeft,
         children: [
           Container(
-            foregroundDecoration: BoxDecoration(
+            foregroundDecoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                stops: const [0.8, 1.0],
+                stops: [0.8, 1.0],
                 colors: [
                   Colors.transparent,
-                  Colors.black.withOpacity(0.8),
+                  Colors.black,
                 ],
               ),
             ),
