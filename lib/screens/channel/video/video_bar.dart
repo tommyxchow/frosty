@@ -7,11 +7,13 @@ import 'package:frosty/widgets/profile_picture.dart';
 class VideoBar extends StatelessWidget {
   final StreamTwitch streamInfo;
   final bool showCategory;
+  final bool tappableCategory;
 
   const VideoBar({
     Key? key,
     required this.streamInfo,
     this.showCategory = true,
+    this.tappableCategory = true,
   }) : super(key: key);
 
   @override
@@ -36,7 +38,7 @@ class VideoBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Tooltip(
-                  message: streamerName,
+                  message: 'Streamer: $streamerName',
                   child: Text(
                     streamerName,
                     overflow: TextOverflow.ellipsis,
@@ -48,7 +50,7 @@ class VideoBar extends StatelessWidget {
                 ),
                 const SizedBox(height: 5.0),
                 Tooltip(
-                  message: streamTitle,
+                  message: 'Title: ${streamInfo.title.trim()}',
                   child: Text(
                     streamTitle,
                     overflow: TextOverflow.ellipsis,
@@ -58,7 +60,7 @@ class VideoBar extends StatelessWidget {
                 if (showCategory) ...[
                   const SizedBox(height: 5.0),
                   InkWell(
-                    onTap: streamInfo.gameName.isNotEmpty
+                    onTap: tappableCategory && streamInfo.gameName.isNotEmpty
                         ? () => Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -70,7 +72,7 @@ class VideoBar extends StatelessWidget {
                             )
                         : null,
                     child: Tooltip(
-                      message: category,
+                      message: 'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
                       child: Text(
                         category,
                         overflow: TextOverflow.ellipsis,

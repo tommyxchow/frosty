@@ -102,7 +102,7 @@ class StreamCard extends StatelessWidget {
               const SizedBox(width: 5.0),
               Flexible(
                 child: Tooltip(
-                  message: streamerName,
+                  message: 'Streamer: $streamerName',
                   preferBelow: false,
                   child: Text(
                     streamerName,
@@ -119,7 +119,7 @@ class StreamCard extends StatelessWidget {
           ),
           const SizedBox(height: 5.0),
           Tooltip(
-            message: streamInfo.title.trim(),
+            message: 'Title: ${streamInfo.title.trim()}',
             preferBelow: false,
             padding: const EdgeInsets.all(10.0),
             child: Text(
@@ -146,7 +146,7 @@ class StreamCard extends StatelessWidget {
                       )
                   : null,
               child: Tooltip(
-                message: streamInfo.gameName,
+                message: 'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
                 preferBelow: false,
                 child: Text(
                   streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category',

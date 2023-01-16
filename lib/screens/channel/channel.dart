@@ -237,7 +237,10 @@ class _VideoChatState extends State<VideoChat> {
                           child: _videoStore.streamInfo != null && (_videoStore.paused || _videoStore.overlayVisible)
                               ? Column(
                                   children: [
-                                    VideoBar(streamInfo: _videoStore.streamInfo!),
+                                    VideoBar(
+                                      streamInfo: _videoStore.streamInfo!,
+                                      tappableCategory: false,
+                                    ),
                                     const Divider(height: 1, thickness: 1),
                                   ],
                                 )
