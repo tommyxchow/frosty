@@ -94,13 +94,16 @@ class _SearchState extends State<Search> {
                                   style: HeroIconStyle.solid,
                                 ),
                                 title: searchTerm,
-                                trailing: IconButton(
-                                  tooltip: 'Remove',
-                                  icon: const HeroIcon(
-                                    HeroIcons.xMark,
-                                    style: HeroIconStyle.solid,
+                                trailing: Tooltip(
+                                  message: 'Remove',
+                                  preferBelow: false,
+                                  child: IconButton(
+                                    icon: const HeroIcon(
+                                      HeroIcons.xMark,
+                                      style: HeroIconStyle.solid,
+                                    ),
+                                    onPressed: () => _searchStore.searchHistory.removeAt(index),
                                   ),
-                                  onPressed: () => _searchStore.searchHistory.removeAt(index),
                                 ),
                                 onTap: () {
                                   _searchStore.textEditingController.text = searchTerm;

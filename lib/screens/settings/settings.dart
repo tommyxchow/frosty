@@ -29,7 +29,7 @@ class Settings extends StatelessWidget {
         actions: [
           if (Platform.isAndroid)
             IconButton(
-              tooltip: 'Support the app',
+              tooltip: 'Support Frosty',
               onPressed: () => launchUrl(Uri.parse('https://www.buymeacoffee.com/tommychow'),
                   mode: settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
               icon: const Icon(SimpleIcons.buymeacoffee),

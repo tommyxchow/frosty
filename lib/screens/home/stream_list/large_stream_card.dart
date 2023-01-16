@@ -74,44 +74,52 @@ class LargeStreamCard extends StatelessWidget {
             padding: const EdgeInsets.all(10.0),
             child: Row(
               children: [
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(2.0),
-                      child: Icon(
-                        Icons.circle,
-                        color: Colors.red,
-                        size: 10,
+                Tooltip(
+                  message: 'Stream uptime',
+                  preferBelow: false,
+                  child: Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(2.0),
+                        child: Icon(
+                          Icons.circle,
+                          color: Colors.red,
+                          size: 10,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 5),
-                    Uptime(
-                      startTime: streamInfo.startedAt,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(width: 5),
+                      Uptime(
+                        startTime: streamInfo.startedAt,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 10.0),
-                Row(
-                  children: [
-                    const HeroIcon(
-                      HeroIcons.users,
-                      size: 14,
-                      color: Colors.white,
-                      style: HeroIconStyle.solid,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      NumberFormat().format(streamInfo.viewerCount),
-                      style: const TextStyle(
+                Tooltip(
+                  message: 'Viewer count',
+                  preferBelow: false,
+                  child: Row(
+                    children: [
+                      const HeroIcon(
+                        HeroIcons.users,
+                        size: 14,
                         color: Colors.white,
-                        fontWeight: FontWeight.w500,
+                        style: HeroIconStyle.solid,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 5),
+                      Text(
+                        NumberFormat().format(streamInfo.viewerCount),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),

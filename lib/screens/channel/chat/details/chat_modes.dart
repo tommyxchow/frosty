@@ -16,6 +16,7 @@ class ChatModes extends StatelessWidget {
       children: [
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
           message: 'Emote-only mode ${roomState.emoteOnly != '0' ? 'on' : 'off'}',
           child: HeroIcon(
             HeroIcons.faceSmile,
@@ -25,6 +26,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
           message: roomState.followersOnly == '-1'
               ? 'Followers-only mode off'
               : roomState.followersOnly == '0'
@@ -38,6 +40,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
           message: 'R9K (unique-chat) mode ${roomState.r9k != '0' ? 'on' : 'off'}',
           child: Text(
             'R9K',
@@ -49,6 +52,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
           message:
               'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
           child: HeroIcon(
@@ -59,6 +63,7 @@ class ChatModes extends StatelessWidget {
         ),
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
           message: 'Subs-only mode ${roomState.subMode != '0' ? 'on' : 'off'}',
           child: HeroIcon(
             HeroIcons.banknotes,

@@ -104,7 +104,7 @@ const inputTheme = InputDecorationTheme(
 
 const tooltipTheme = TooltipThemeData(
   padding: EdgeInsets.all(10.0),
-  margin: EdgeInsets.symmetric(horizontal: 10.0),
+  margin: EdgeInsets.symmetric(horizontal: 5.0),
   decoration: BoxDecoration(
     color: lightGray,
     borderRadius: BorderRadius.all(Radius.circular(10.0)),

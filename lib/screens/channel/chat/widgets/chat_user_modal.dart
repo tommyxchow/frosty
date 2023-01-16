@@ -32,7 +32,8 @@ class ChatUserModal extends StatefulWidget {
 class _ChatUserModalState extends State<ChatUserModal> {
   @override
   Widget build(BuildContext context) {
-    final name = regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
+    final name =
+        regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
 
     return FrostyBottomSheet(
       child: SizedBox(
@@ -49,7 +50,6 @@ class _ChatUserModalState extends State<ChatUserModal> {
                 children: [
                   Flexible(
                     child: Tooltip(
-                      preferBelow: false,
                       message: name,
                       child: Text(
                         name,
@@ -71,7 +71,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       child: const Text('Reply'),
                     )
                   : null,
-              onLongPress: () {
+              onTap: () {
                 HapticFeedback.mediumImpact();
 
                 showModalBottomSheet(
@@ -93,7 +93,8 @@ class _ChatUserModalState extends State<ChatUserModal> {
             Expanded(
               child: Observer(
                 builder: (context) {
-                  final userMessages = widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
+                  final userMessages =
+                      widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
 
                   if (userMessages.isEmpty) {
                     return const AlertMessage(message: 'No recent messages');

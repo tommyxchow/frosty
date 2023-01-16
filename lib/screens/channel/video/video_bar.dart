@@ -16,8 +16,6 @@ class VideoBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
-
     final streamTitle = streamInfo.title.trim();
     final category = streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category';
 
@@ -39,23 +37,20 @@ class VideoBar extends StatelessWidget {
               children: [
                 Tooltip(
                   message: streamerName,
-                  preferBelow: false,
                   child: Text(
                     streamerName,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(height: 5.0),
                 Tooltip(
                   message: streamTitle,
-                  preferBelow: false,
                   child: Text(
                     streamTitle,
-                    maxLines: orientation == Orientation.portrait ? 1 : 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8)),
                   ),
@@ -76,10 +71,12 @@ class VideoBar extends StatelessWidget {
                         : null,
                     child: Tooltip(
                       message: category,
-                      preferBelow: false,
                       child: Text(
                         category,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8)),
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                        ),
                       ),
                     ),
                   ),

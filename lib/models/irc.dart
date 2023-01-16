@@ -112,7 +112,7 @@ class IRCMessage {
     required double emoteScale,
     required bool isLightTheme,
     required bool launchExternal,
-    required void Function()? onLongPressName,
+    required void Function()? onTapName,
     bool showMessage = true,
     bool useReadableColors = false,
     TimestampType timestamp = TimestampType.disabled,
@@ -295,7 +295,7 @@ class IRCMessage {
           color: color,
           fontWeight: FontWeight.bold,
         ),
-        recognizer: LongPressGestureRecognizer()..onLongPress = onLongPressName,
+        recognizer: TapGestureRecognizer()..onTap = onTapName,
       ),
     );
 
@@ -369,6 +369,7 @@ class IRCMessage {
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: Tooltip(
+                    triggerMode: TooltipTriggerMode.tap,
                     richMessage: WidgetSpan(
                       child: Column(
                         children: [
@@ -504,6 +505,7 @@ class IRCMessage {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
+        triggerMode: TooltipTriggerMode.tap,
         richMessage: WidgetSpan(
           child: Column(
             children: [
@@ -540,6 +542,7 @@ class IRCMessage {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
+        triggerMode: TooltipTriggerMode.tap,
         richMessage: WidgetSpan(
           child: Column(
             children: [

@@ -106,12 +106,12 @@ class StreamCard extends StatelessWidget {
                   preferBelow: false,
                   child: Text(
                     streamerName,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                       color: fontColor,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),

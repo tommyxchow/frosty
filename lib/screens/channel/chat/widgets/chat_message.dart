@@ -70,7 +70,7 @@ class ChatMessage extends StatelessWidget {
             final messageSpan = Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
-                  onLongPressName: onLongPressName,
+                  onTapName: onLongPressName,
                   style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
@@ -165,7 +165,7 @@ class ChatMessage extends StatelessWidget {
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
-                        onLongPressName: onLongPressName,
+                        onTapName: onLongPressName,
                         style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
@@ -219,7 +219,7 @@ class ChatMessage extends StatelessWidget {
                     Text.rich(
                       TextSpan(
                         children: ircMessage.generateSpan(
-                          onLongPressName: onLongPressName,
+                          onTapName: onLongPressName,
                           style: defaultTextStyle,
                           assetsStore: chatStore.assetsStore,
                           emoteScale: chatStore.settings.emoteScale,
