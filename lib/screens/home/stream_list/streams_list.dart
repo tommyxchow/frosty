@@ -119,7 +119,8 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
                     ? LargeStreamCard(
                         key: ValueKey(_listStore.streams[index].userId),
                         streamInfo: _listStore.streams[index],
-                        showThumbnail: context.read<SettingsStore>().showThumbnails)
+                        showThumbnail: context.read<SettingsStore>().showThumbnails,
+                      )
                     : StreamCard(
                         key: ValueKey(_listStore.streams[index].userId),
                         streamInfo: _listStore.streams[index],
