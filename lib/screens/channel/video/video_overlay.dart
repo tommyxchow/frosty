@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/main.dart';
+import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
@@ -13,10 +16,12 @@ import 'package:intl/intl.dart';
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
+  final ChatStore chatStore;
 
   const VideoOverlay({
     Key? key,
     required this.videoStore,
+    required this.chatStore,
   }) : super(key: key);
 
   @override
@@ -208,23 +213,43 @@ class VideoOverlay extends StatelessWidget {
                           Tooltip(
                             message: 'Viewer count',
                             preferBelow: false,
-                            child: Row(
-                              children: [
-                                const HeroIcon(
-                                  HeroIcons.users,
-                                  size: 14,
-                                  color: Colors.white,
-                                  style: HeroIconStyle.solid,
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  NumberFormat().format(videoStore.streamInfo?.viewerCount),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
+                            child: GestureDetector(
+                              onTap: () => showModalBottomSheet(
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (context) => FrostyBottomSheet(
+                                  child: SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.8,
+                                    child: GestureDetector(
+                                      onTap: FocusScope.of(context).unfocus,
+                                      child: ChattersList(
+                                        chatDetailsStore: chatStore.chatDetailsStore,
+                                        chatStore: chatStore,
+                                        userLogin: streamInfo.userLogin,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ],
+                              ),
+                              child: Row(
+                                children: [
+                                  const HeroIcon(
+                                    HeroIcons.users,
+                                    size: 14,
+                                    color: Colors.white,
+                                    style: HeroIconStyle.solid,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    NumberFormat().format(videoStore.streamInfo?.viewerCount),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
