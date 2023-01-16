@@ -234,7 +234,9 @@ class _VideoChatState extends State<VideoChat> {
                           duration: const Duration(milliseconds: 200),
                           switchInCurve: Curves.easeOut,
                           switchOutCurve: Curves.easeIn,
-                          child: _videoStore.streamInfo != null && (_videoStore.paused || _videoStore.overlayVisible)
+                          child: _videoStore.streamInfo != null &&
+                                  _chatStore.settings.showVideo &&
+                                  (_videoStore.paused || _videoStore.overlayVisible)
                               ? Column(
                                   children: [
                                     VideoBar(
