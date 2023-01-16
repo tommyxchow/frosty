@@ -56,21 +56,21 @@ abstract class HomeStoreBase with Store {
           followedScrollController.animateTo(
             0.0,
             duration: duration,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOut,
           );
         } else if (index == 1 && topSectionScrollControllers[topSectionCurrentIndex].hasClients) {
           // If on the top section, scroll to the top of the tab based on the current top tab.
           topSectionScrollControllers[topSectionCurrentIndex].animateTo(
             0.0,
             duration: duration,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOut,
           );
         } else if (searchScrollController.hasClients) {
           // If on the search tab and tapping the search tab, scroll to the top.
           searchScrollController.animateTo(
             0.0,
             duration: duration,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOut,
           );
         }
       } else {
@@ -79,14 +79,14 @@ abstract class HomeStoreBase with Store {
           topSectionScrollControllers[topSectionCurrentIndex].animateTo(
             0.0,
             duration: duration,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOut,
           );
         } else if (searchScrollController.hasClients) {
           // If on the search tab and tapping the search tab, scroll to the top.
           searchScrollController.animateTo(
             0.0,
             duration: duration,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOut,
           );
         }
       }

@@ -46,7 +46,7 @@ class _FrostyPageViewState extends State<FrostyPageView> {
                       _pageContoller.animateToPage(
                         index,
                         duration: const Duration(milliseconds: 200),
-                        curve: Curves.ease,
+                        curve: Curves.easeOut,
                       );
                     },
                     color: index == currentIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,

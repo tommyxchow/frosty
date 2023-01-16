@@ -190,8 +190,8 @@ class ChattersList extends StatelessWidget {
                     Observer(
                       builder: (context) => AnimatedSwitcher(
                         duration: const Duration(milliseconds: 200),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeIn,
                         child: chatDetailsStore.showJumpButton
                             ? ScrollToTopButton(scrollController: chatDetailsStore.scrollController)
                             : null,

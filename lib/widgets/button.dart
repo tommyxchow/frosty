@@ -81,7 +81,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                 if (mounted) {
                   _animationController.animateTo(
                     _animationController.upperBound,
-                    curve: Curves.easeOutCubic,
+                    curve: Curves.easeOut,
                     duration: duration,
                   );
                 }
@@ -90,7 +90,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                 if (mounted) {
                   _animationController.animateTo(
                     _animationController.lowerBound,
-                    curve: Curves.easeInCubic,
+                    curve: Curves.easeIn,
                     duration: duration,
                   );
                 }
@@ -99,7 +99,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                 if (mounted) {
                   _animationController.animateTo(
                     _animationController.lowerBound,
-                    curve: Curves.easeInCubic,
+                    curve: Curves.easeIn,
                     duration: duration,
                   );
                 }

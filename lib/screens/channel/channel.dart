@@ -114,18 +114,20 @@ class _VideoChatState extends State<VideoChat> {
         builder: (_) {
           if (_videoStore.paused || _videoStore.streamInfo == null) return videoOverlay;
 
-          return AnimatedOpacity(
-            opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
+          return AnimatedSwitcher(
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
             duration: const Duration(milliseconds: 200),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(settingsStore.overlayOpacity),
-              ),
-              child: IgnorePointer(
-                ignoring: !_videoStore.overlayVisible,
-                child: videoOverlay,
-              ),
-            ),
+            child: _videoStore.overlayVisible
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(settingsStore.overlayOpacity),
+                    ),
+                    child: videoOverlay,
+                  )
+                : const SizedBox.expand(
+                    child: ColoredBox(color: Colors.transparent),
+                  ),
           );
         },
       ),
@@ -158,6 +160,7 @@ class _VideoChatState extends State<VideoChat> {
                 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
                 final landscapeChat = AnimatedContainer(
+                  curve: Curves.ease,
                   duration: const Duration(milliseconds: 200),
                   width: _chatStore.expandChat
                       ? MediaQuery.of(context).size.width / 2

@@ -59,6 +59,8 @@ class Chat extends StatelessWidget {
                     ),
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
                       child: chatStore.notification != null
                           ? Align(
                               alignment: chatStore.settings.chatNotificationsOnBottom
@@ -84,8 +86,8 @@ class Chat extends StatelessWidget {
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
                           child: chatStore.autoScroll
                               ? null
                               : Button(
