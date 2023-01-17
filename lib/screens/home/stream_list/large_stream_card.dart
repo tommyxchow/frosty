@@ -71,7 +71,7 @@ class LargeStreamCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.only(left: 10.0, bottom: 12.0),
             child: Row(
               children: [
                 Tooltip(

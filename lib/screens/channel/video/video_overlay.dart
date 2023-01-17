@@ -182,7 +182,7 @@ class VideoOverlay extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(12.0),
+                      padding: const EdgeInsets.only(left: 10.0, bottom: 12.0),
                       child: Row(
                         children: [
                           Tooltip(
