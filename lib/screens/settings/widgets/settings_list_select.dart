@@ -23,7 +23,7 @@ class SettingsListSelect extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       isThreeLine: subtitle != null,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: subtitle != null ? Text(subtitle!) : null,
       trailing: SizedBox(
         height: double.infinity,
@@ -34,10 +34,8 @@ class SettingsListSelect extends StatelessWidget {
               opacity: 0.8,
               child: Text(
                 selectedOption,
-                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
-            const SizedBox(width: 5),
             const HeroIcon(HeroIcons.chevronRight, style: HeroIconStyle.mini),
           ],
         ),
@@ -59,7 +57,7 @@ class SettingsListSelect extends StatelessWidget {
               ),
               ...options
                   .map((option) => ListTile(
-                      title: Text(option, style: const TextStyle(fontWeight: FontWeight.w500)),
+                      title: Text(option),
                       trailing: selectedOption == option
                           ? const HeroIcon(
                               HeroIcons.check,

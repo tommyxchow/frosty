@@ -25,7 +25,7 @@ class SettingsListSlider extends StatelessWidget {
     this.divisions,
   }) : super(key: key);
 
-  static const _textStyle = TextStyle(fontWeight: FontWeight.w600);
+  static const _textStyle = TextStyle(fontWeight: FontWeight.w500);
 
   @override
   Widget build(BuildContext context) {

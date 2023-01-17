@@ -19,7 +19,7 @@ class SettingsListSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return SwitchListTile.adaptive(
       isThreeLine: subtitle != null,
-      title: Text(title!, style: const TextStyle(fontWeight: FontWeight.w600)),
+      title: Text(title!, style: const TextStyle(fontWeight: FontWeight.w500)),
       subtitle: subtitle,
       value: value,
       onChanged: onChanged,
