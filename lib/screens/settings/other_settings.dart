@@ -86,6 +86,12 @@ class _OtherSettingsState extends State<OtherSettings> {
         ),
         FrostyListTile(
           leading: const HeroIcon(HeroIcons.arrowTopRightOnSquare),
+          title: 'FAQ',
+          onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
+              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+        ),
+        FrostyListTile(
+          leading: const HeroIcon(HeroIcons.arrowTopRightOnSquare),
           title: 'Changelog',
           onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
