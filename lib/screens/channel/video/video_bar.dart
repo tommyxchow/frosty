@@ -39,7 +39,6 @@ class VideoBar extends StatelessWidget {
               children: [
                 Tooltip(
                   message: 'Streamer: $streamerName',
-                  triggerMode: TooltipTriggerMode.tap,
                   showDuration: const Duration(seconds: 3),
                   child: Text(
                     streamerName,
@@ -53,7 +52,6 @@ class VideoBar extends StatelessWidget {
                 const SizedBox(height: 5.0),
                 Tooltip(
                   message: 'Title: ${streamInfo.title.trim()}',
-                  triggerMode: TooltipTriggerMode.tap,
                   showDuration: const Duration(seconds: 5),
                   child: Text(
                     streamTitle,
@@ -77,7 +75,6 @@ class VideoBar extends StatelessWidget {
                         : null,
                     child: Tooltip(
                       message: 'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
-                      triggerMode: TooltipTriggerMode.tap,
                       showDuration: const Duration(seconds: 3),
                       child: Text(
                         category,
