@@ -12,7 +12,6 @@ import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/list_tile.dart';
-import 'package:frosty/widgets/section_header.dart';
 import 'package:heroicons/heroicons.dart';
 
 class ChatDetails extends StatefulWidget {
@@ -144,11 +143,9 @@ class _ChatDetailsState extends State<ChatDetails> {
   @override
   Widget build(BuildContext context) {
     final children = [
-      const SectionHeader('Chat modes'),
       ListTile(
         title: ChatModes(roomState: widget.chatDetailsStore.roomState),
       ),
-      const SectionHeader('Other'),
       FrostyListTile(
         leading: const HeroIcon(HeroIcons.users),
         title: 'Chatters',
