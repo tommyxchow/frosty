@@ -98,7 +98,7 @@ class _ChatDetailsState extends State<ChatDetails> {
                   : () => widget.chatStore.updateSleepTimer(
                         onTimerFinished: () => navigatorKey.currentState?.popUntil((route) => route.isFirst),
                       ),
-              child: const Text('Set Timer'),
+              child: const Text('Set timer'),
             ),
           ),
           Button(
@@ -144,7 +144,7 @@ class _ChatDetailsState extends State<ChatDetails> {
   @override
   Widget build(BuildContext context) {
     final children = [
-      const SectionHeader('Chat Modes'),
+      const SectionHeader('Chat modes'),
       ListTile(
         title: ChatModes(roomState: widget.chatDetailsStore.roomState),
       ),

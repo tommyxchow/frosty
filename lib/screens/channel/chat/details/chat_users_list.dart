@@ -39,7 +39,7 @@ class _ChattersListState extends State<ChattersList> {
       'Broadcaster',
       'Staff',
       'Admins',
-      'Global Moderators',
+      'Global moderators',
       'Moderators',
       'VIPs',
       'Viewers',
@@ -58,7 +58,7 @@ class _ChattersListState extends State<ChattersList> {
               Button(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 onPressed: widget.chatDetailsStore.updateChatters,
-                child: const Text('Try Again'),
+                child: const Text('Try again'),
               )
             ],
           );

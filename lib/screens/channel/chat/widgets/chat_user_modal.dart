@@ -82,7 +82,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
               ),
             ),
             const SectionHeader(
-              'Recent Messages',
+              'Recent messages',
               padding: EdgeInsets.all(10.0),
             ),
             Expanded(

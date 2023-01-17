@@ -33,7 +33,7 @@ class _ChatSettingsState extends State<ChatSettings> {
     return Observer(
       builder: (context) => ListView(
         children: [
-          const SectionHeader('Message Sizing'),
+          const SectionHeader('Message sizing'),
           ExpansionTile(
             title: const Text('Preview', style: TextStyle(fontWeight: FontWeight.w600)),
             children: [
@@ -130,7 +130,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 15,
             onChanged: (newValue) => settingsStore.fontSize = newValue,
           ),
-          const SectionHeader('Message Appearance'),
+          const SectionHeader('Message appearance'),
           SettingsListSwitch(
             title: 'Use readable name colors',
             subtitle: const Text('Adjusts the lightness value of overly bright and dark names.'),
@@ -194,7 +194,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.chatNotificationsOnBottom,
             onChanged: (newValue) => settingsStore.chatNotificationsOnBottom = newValue,
           ),
-          const SectionHeader('Landscape Mode'),
+          const SectionHeader('Landscape mode'),
           SettingsListSwitch(
             title: 'Move chat left',
             value: settingsStore.landscapeChatLeftSide,

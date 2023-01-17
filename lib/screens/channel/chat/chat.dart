@@ -94,7 +94,7 @@ class Chat extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                                   onPressed: chatStore.resumeScroll,
                                   icon: const HeroIcon(HeroIcons.chevronDoubleDown, style: HeroIconStyle.mini),
-                                  child: const Text('Resume Scroll'),
+                                  child: const Text('Resume scroll'),
                                 ),
                         ),
                       ),

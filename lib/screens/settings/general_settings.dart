@@ -24,7 +24,7 @@ class GeneralSettings extends StatelessWidget {
             options: themes,
             onChanged: (newTheme) => settingsStore.themeType = ThemeType.values[themes.indexOf(newTheme)],
           ),
-          const SectionHeader('Stream Card'),
+          const SectionHeader('Stream card'),
           SettingsListSwitch(
             title: 'Use large stream card',
             value: settingsStore.largeStreamCard,
