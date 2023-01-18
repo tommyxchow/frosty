@@ -50,7 +50,7 @@ class AccountOptions extends StatelessWidget {
         FrostyListTile(
           leading: const Icon(Icons.logout_rounded),
           title: 'Log out',
-          trailing: const Icon(Icons.chevron_right_rounded),
+          trailing: Icon(Icons.adaptive.arrow_forward_rounded),
           onTap: () => _showLogoutDialog(context),
         )
       ],

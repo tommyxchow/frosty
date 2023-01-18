@@ -109,9 +109,9 @@ class ProfileCard extends StatelessWidget {
           leading: const Icon(Icons.no_accounts_rounded),
           title: 'Anonymous',
           subtitle: const Text('Tap to log in and enable the ability to chat, view followed streams, and more.'),
-          trailing: const SizedBox(
+          trailing: SizedBox(
             height: double.infinity,
-            child: Icon(Icons.chevron_right_rounded),
+            child: Icon(Icons.adaptive.arrow_forward_rounded),
           ),
           onTap: () => _showLoginDialog(context),
         );

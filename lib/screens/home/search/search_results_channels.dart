@@ -138,7 +138,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                   FrostyListTile(
                     title: 'Go to channel "${widget.query}"',
                     onTap: () => _handleSearch(context, widget.query),
-                    trailing: const Icon(Icons.chevron_right_rounded),
+                    trailing: Icon(Icons.adaptive.arrow_forward_rounded),
                   )
                 ],
               ),
