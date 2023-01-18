@@ -86,7 +86,7 @@ class LargeStreamCard extends StatelessWidget {
                           size: 10,
                         ),
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 3.0),
                       Uptime(
                         startTime: streamInfo.startedAt,
                         style: const TextStyle(

@@ -50,7 +50,7 @@ class VideoBar extends StatelessWidget {
                     streamerName,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
                       fontSize: 16,
                       color: titleTextColor,
                     ),
