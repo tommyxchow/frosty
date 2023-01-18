@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
@@ -7,7 +5,6 @@ import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/cached_image.dart';
-import 'package:heroicons/heroicons.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -21,7 +18,7 @@ class ChatBottomBar extends StatelessWidget {
       preferBelow: false,
       child: IconButton(
         color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
-        icon: HeroIcon(HeroIcons.faceSmile, style: chatStore.assetsStore.showEmoteMenu ? HeroIconStyle.solid : null),
+        icon: Icon(chatStore.assetsStore.showEmoteMenu ? Icons.emoji_emotions_rounded : Icons.emoji_emotions_outlined),
         onPressed: () {
           FocusScope.of(context).unfocus();
           chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
@@ -118,15 +115,12 @@ class ChatBottomBar extends StatelessWidget {
                       chatStore.settings.showVideo &&
                       MediaQuery.of(context).orientation == Orientation.landscape)
                     IconButton(
-                      tooltip: 'Send a message',
+                      tooltip: 'Enter a message',
                       onPressed: () {
                         chatStore.expandChat = true;
                         chatStore.textFieldFocusNode.requestFocus();
                       },
-                      icon: const HeroIcon(
-                        HeroIcons.chatBubbleOvalLeftEllipsis,
-                        style: HeroIconStyle.solid,
-                      ),
+                      icon: const Icon(Icons.edit),
                     )
                   else
                     Expanded(
@@ -155,16 +149,13 @@ class ChatBottomBar extends StatelessWidget {
                           MediaQuery.of(context).orientation == Orientation.portrait))
                     IconButton(
                       tooltip: 'Send',
-                      icon: const HeroIcon(HeroIcons.paperAirplane, style: HeroIconStyle.solid),
+                      icon: const Icon(Icons.send_rounded),
                       onPressed:
                           chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
                     )
                   else
                     IconButton(
-                      icon: HeroIcon(
-                        Platform.isAndroid ? HeroIcons.ellipsisVertical : HeroIcons.ellipsisHorizontal,
-                        style: HeroIconStyle.solid,
-                      ),
+                      icon: Icon(Icons.adaptive.more_rounded),
                       tooltip: 'More',
                       onPressed: () => showModalBottomSheet(
                         backgroundColor: Colors.transparent,

@@ -9,7 +9,6 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/section_header.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 
 /// The search section that contians search history and search results for channels and categories.
@@ -47,14 +46,12 @@ class _SearchState extends State<Search> {
                 focusNode: _searchStore.textFieldFocusNode,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.only(left: 15.0),
+                  contentPadding: EdgeInsets.zero,
+                  prefixIcon: const Icon(Icons.search_rounded),
                   hintText: 'Find a channel or category',
                   suffixIcon: _searchStore.textFieldFocusNode.hasFocus || _searchStore.searchText.isNotEmpty
                       ? IconButton(
-                          icon: const HeroIcon(
-                            HeroIcons.xMark,
-                            style: HeroIconStyle.solid,
-                          ),
+                          icon: const Icon(Icons.close_rounded),
                           tooltip: _searchStore.searchText.isEmpty ? 'Cancel' : 'Clear',
                           onPressed: () {
                             if (_searchStore.searchText.isEmpty) _searchStore.textFieldFocusNode.unfocus();
@@ -89,19 +86,13 @@ class _SearchState extends State<Search> {
                         children: _searchStore.searchHistory
                             .mapIndexed(
                               (index, searchTerm) => FrostyListTile(
-                                leading: const HeroIcon(
-                                  HeroIcons.magnifyingGlass,
-                                  style: HeroIconStyle.solid,
-                                ),
+                                leading: const Icon(Icons.history_rounded),
                                 title: searchTerm,
                                 trailing: Tooltip(
                                   message: 'Remove',
                                   preferBelow: false,
                                   child: IconButton(
-                                    icon: const HeroIcon(
-                                      HeroIcons.xMark,
-                                      style: HeroIconStyle.solid,
-                                    ),
+                                    icon: const Icon(Icons.close_rounded),
                                     onPressed: () => _searchStore.searchHistory.removeAt(index),
                                   ),
                                 ),

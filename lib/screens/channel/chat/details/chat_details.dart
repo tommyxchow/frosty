@@ -12,7 +12,6 @@ import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/list_tile.dart';
-import 'package:heroicons/heroicons.dart';
 
 class ChatDetails extends StatefulWidget {
   final ChatDetailsStore chatDetailsStore;
@@ -44,7 +43,7 @@ class _ChatDetailsState extends State<ChatDetails> {
                 opacity: widget.chatStore.sleepTimer != null && widget.chatStore.sleepTimer!.isActive ? 1.0 : 0.5,
                 child: Row(
                   children: [
-                    const HeroIcon(HeroIcons.clock, style: HeroIconStyle.solid),
+                    const Icon(Icons.timer_rounded),
                     Text(
                       ' ${widget.chatStore.timeRemaining.toString().split('.')[0]}',
                       style: const TextStyle(fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()]),
@@ -53,7 +52,7 @@ class _ChatDetailsState extends State<ChatDetails> {
                     IconButton(
                       tooltip: 'Cancel sleep timer',
                       onPressed: widget.chatStore.cancelSleepTimer,
-                      icon: const HeroIcon(HeroIcons.xCircle, style: HeroIconStyle.solid),
+                      icon: const Icon(Icons.cancel_rounded),
                     ),
                   ],
                 ),
@@ -147,7 +146,7 @@ class _ChatDetailsState extends State<ChatDetails> {
         title: ChatModes(roomState: widget.chatDetailsStore.roomState),
       ),
       FrostyListTile(
-        leading: const HeroIcon(HeroIcons.users),
+        leading: const Icon(Icons.people_outline),
         title: 'Chatters',
         onTap: () => showModalBottomSheet(
           backgroundColor: Colors.transparent,
@@ -169,17 +168,17 @@ class _ChatDetailsState extends State<ChatDetails> {
         ),
       ),
       FrostyListTile(
-        leading: const HeroIcon(HeroIcons.clock),
+        leading: const Icon(Icons.timer_outlined),
         title: 'Sleep timer',
         onTap: () => _showSleepTimerDialog(context),
       ),
       FrostyListTile(
-        leading: const HeroIcon(HeroIcons.trash),
+        leading: const Icon(Icons.delete_outline_rounded),
         title: 'Clear recent emotes',
         onTap: _showClearDialog,
       ),
       FrostyListTile(
-        leading: const HeroIcon(HeroIcons.arrowPath),
+        leading: const Icon(Icons.refresh_rounded),
         title: 'Reconnect to chat',
         onTap: () {
           widget.chatStore.updateNotification('Reconnecting to chat...');
@@ -188,7 +187,7 @@ class _ChatDetailsState extends State<ChatDetails> {
         },
       ),
       FrostyListTile(
-        leading: const HeroIcon(HeroIcons.arrowPath),
+        leading: const Icon(Icons.refresh_rounded),
         title: 'Refresh badges and emotes',
         onTap: () async {
           await widget.chatStore.getAssets();
@@ -197,7 +196,7 @@ class _ChatDetailsState extends State<ChatDetails> {
         },
       ),
       FrostyListTile(
-        leading: const HeroIcon(HeroIcons.cog6Tooth),
+        leading: const Icon(Icons.settings_outlined),
         title: 'Settings',
         onTap: () => Navigator.push(
           context,

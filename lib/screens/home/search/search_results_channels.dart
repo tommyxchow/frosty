@@ -12,7 +12,6 @@ import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:mobx/mobx.dart';
 
 class SearchResultsChannels extends StatefulWidget {
@@ -139,10 +138,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                   FrostyListTile(
                     title: 'Go to channel "${widget.query}"',
                     onTap: () => _handleSearch(context, widget.query),
-                    trailing: const HeroIcon(
-                      HeroIcons.chevronRight,
-                      style: HeroIconStyle.mini,
-                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
                   )
                 ],
               ),

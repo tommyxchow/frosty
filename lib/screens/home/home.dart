@@ -10,7 +10,6 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,10 +93,7 @@ class _HomeState extends State<Home> {
           actions: [
             IconButton(
               tooltip: 'Settings',
-              icon: const HeroIcon(
-                HeroIcons.cog6Tooth,
-                style: HeroIconStyle.solid,
-              ),
+              icon: const Icon(Icons.settings_rounded),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -136,18 +132,20 @@ class _HomeState extends State<Home> {
             unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
             items: [
               if (_authStore.isLoggedIn)
-                const BottomNavigationBarItem(
-                  icon: HeroIcon(HeroIcons.heart, style: HeroIconStyle.solid),
+                BottomNavigationBarItem(
+                  icon: _homeStore.selectedIndex == 0
+                      ? const Icon(Icons.favorite_rounded)
+                      : const Icon(Icons.favorite_border_rounded),
                   label: 'Following',
                   tooltip: 'Followed streams',
                 ),
               const BottomNavigationBarItem(
-                icon: HeroIcon(HeroIcons.arrowSmallUp, style: HeroIconStyle.solid),
+                icon: Icon(Icons.arrow_upward_rounded),
                 label: 'Top',
                 tooltip: 'Top streams and categories',
               ),
               const BottomNavigationBarItem(
-                icon: HeroIcon(HeroIcons.magnifyingGlass, style: HeroIconStyle.solid),
+                icon: Icon(Icons.search_rounded),
                 label: 'Search',
                 tooltip: 'Search for channels and categories',
               ),

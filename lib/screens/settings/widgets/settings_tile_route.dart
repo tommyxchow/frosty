@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/widgets/app_bar.dart';
-import 'package:heroicons/heroicons.dart';
 
 class SettingsTileRoute extends StatelessWidget {
   final Widget leading;
@@ -19,7 +18,7 @@ class SettingsTileRoute extends StatelessWidget {
     return ListTile(
       leading: leading,
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      trailing: const HeroIcon(HeroIcons.chevronRight, style: HeroIconStyle.mini),
+      trailing: const Icon(Icons.chevron_right_rounded),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => Scaffold(

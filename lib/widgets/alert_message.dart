@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:heroicons/heroicons.dart';
 
 /// A simple widget that displays an alert message in the center.
 class AlertMessage extends StatelessWidget {
@@ -17,8 +16,8 @@ class AlertMessage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        HeroIcon(
-          HeroIcons.informationCircle,
+        Icon(
+          Icons.info_outline_rounded,
           color: color ?? Colors.grey,
         ),
         const SizedBox(width: 5.0),

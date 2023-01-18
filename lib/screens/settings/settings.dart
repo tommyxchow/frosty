@@ -11,7 +11,6 @@ import 'package:frosty/screens/settings/video_settings.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/section_header.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -50,17 +49,17 @@ class Settings extends StatelessWidget {
             ProfileCard(authStore: context.read<AuthStore>()),
             const SectionHeader('Customize'),
             SettingsTileRoute(
-              leading: const HeroIcon(HeroIcons.cog6Tooth),
+              leading: const Icon(Icons.settings_outlined),
               title: 'General',
               child: GeneralSettings(settingsStore: settingsStore),
             ),
             SettingsTileRoute(
-              leading: const HeroIcon(HeroIcons.tv),
+              leading: const Icon(Icons.tv_rounded),
               title: 'Video',
               child: VideoSettings(settingsStore: settingsStore),
             ),
             SettingsTileRoute(
-              leading: const HeroIcon(HeroIcons.chatBubbleOvalLeftEllipsis),
+              leading: const Icon(Icons.chat_outlined),
               title: 'Chat',
               child: ChatSettings(settingsStore: settingsStore),
             ),

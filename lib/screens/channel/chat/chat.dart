@@ -11,7 +11,6 @@ import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/notification.dart';
 import 'package:frosty/widgets/page_view.dart';
-import 'package:heroicons/heroicons.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -93,7 +92,7 @@ class Chat extends StatelessWidget {
                               : Button(
                                   padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                                   onPressed: chatStore.resumeScroll,
-                                  icon: const HeroIcon(HeroIcons.chevronDoubleDown, style: HeroIconStyle.mini),
+                                  icon: const Icon(Icons.keyboard_double_arrow_down_rounded),
                                   child: const Text('Resume scroll'),
                                 ),
                         ),

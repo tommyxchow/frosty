@@ -5,7 +5,6 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
-import 'package:heroicons/heroicons.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
@@ -92,12 +91,11 @@ class ChatMessage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      HeroIcon(
-                        replyUser != null && replyBody != null
-                            ? HeroIcons.arrowUturnRight
-                            : HeroIcons.chatBubbleOvalLeftEllipsis,
+                      Icon(
+                        replyUser != null && replyBody != null ? Icons.reply_rounded : Icons.new_releases_outlined,
                         size: defaultBadgeSize * chatStore.settings.badgeScale,
                         color: defaultTextStyle.color?.withOpacity(0.5),
+                        textDirection: TextDirection.rtl,
                       ),
                       const SizedBox(width: 5.0),
                       Flexible(
@@ -203,8 +201,8 @@ class ChatMessage extends StatelessWidget {
                   if (ircMessage.tags['msg-id'] == 'announcement')
                     Row(
                       children: [
-                        HeroIcon(
-                          HeroIcons.bell,
+                        Icon(
+                          Icons.announcement_outlined,
                           size: defaultBadgeSize * chatStore.settings.badgeScale,
                         ),
                         const SizedBox(width: 5.0),

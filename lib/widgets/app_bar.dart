@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:heroicons/heroicons.dart';
 
 class FrostyAppBar extends StatelessWidget with PreferredSizeWidget {
   final Widget title;
@@ -18,10 +17,7 @@ class FrostyAppBar extends StatelessWidget with PreferredSizeWidget {
     return AppBar(
       leading: IconButton(
         tooltip: 'Back',
-        icon: const HeroIcon(
-          HeroIcons.chevronLeft,
-          style: HeroIconStyle.solid,
-        ),
+        icon: Icon(Icons.adaptive.arrow_back_rounded),
         onPressed: Navigator.of(context).pop,
       ),
       title: title,

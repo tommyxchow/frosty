@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/widgets/bottom_sheet.dart';
-import 'package:heroicons/heroicons.dart';
 
 /// A custom-styled adaptive [ListTile] with options to select.
 class SettingsListSelect extends StatelessWidget {
@@ -36,7 +35,7 @@ class SettingsListSelect extends StatelessWidget {
                 selectedOption,
               ),
             ),
-            const HeroIcon(HeroIcons.chevronRight, style: HeroIconStyle.mini),
+            const Icon(Icons.chevron_right_rounded),
           ],
         ),
       ),
@@ -58,12 +57,7 @@ class SettingsListSelect extends StatelessWidget {
               ...options
                   .map((option) => ListTile(
                       title: Text(option),
-                      trailing: selectedOption == option
-                          ? const HeroIcon(
-                              HeroIcons.check,
-                              style: HeroIconStyle.mini,
-                            )
-                          : null,
+                      trailing: selectedOption == option ? const Icon(Icons.check_rounded) : null,
                       onTap: () {
                         onChanged(option);
                         Navigator.of(context).pop();

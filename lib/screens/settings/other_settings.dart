@@ -10,7 +10,6 @@ import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/list_tile.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -67,7 +66,7 @@ class _OtherSettingsState extends State<OtherSettings> {
     return Column(
       children: [
         FrostyListTile(
-          leading: const HeroIcon(HeroIcons.informationCircle),
+          leading: const Icon(Icons.info_outline_rounded),
           title: 'About Frosty',
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
@@ -85,19 +84,19 @@ class _OtherSettingsState extends State<OtherSettings> {
           },
         ),
         FrostyListTile(
-          leading: const HeroIcon(HeroIcons.arrowTopRightOnSquare),
+          leading: const Icon(Icons.launch_rounded),
           title: 'FAQ',
           onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
         FrostyListTile(
-          leading: const HeroIcon(HeroIcons.arrowTopRightOnSquare),
+          leading: const Icon(Icons.launch_rounded),
           title: 'Changelog',
           onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
         FrostyListTile(
-          leading: const HeroIcon(HeroIcons.trash),
+          leading: const Icon(Icons.delete_outline_rounded),
           title: 'Clear image cache',
           onTap: () async {
             HapticFeedback.mediumImpact();
@@ -114,7 +113,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           },
         ),
         FrostyListTile(
-          leading: const HeroIcon(HeroIcons.arrowPath),
+          leading: const Icon(Icons.restore_rounded),
           title: 'Reset settings',
           onTap: () => _showConfirmDialog(context),
         ),

@@ -10,7 +10,6 @@ import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/uptime.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
@@ -30,10 +29,9 @@ class VideoOverlay extends StatelessWidget {
 
     final backButton = IconButton(
       tooltip: 'Back',
-      icon: const HeroIcon(
-        HeroIcons.chevronLeft,
+      icon: Icon(
+        Icons.adaptive.arrow_back_rounded,
         color: Colors.white,
-        style: HeroIconStyle.solid,
       ),
       onPressed: Navigator.of(context).pop,
     );
@@ -43,8 +41,9 @@ class VideoOverlay extends StatelessWidget {
         tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
         onPressed: () =>
             videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
-        icon: HeroIcon(HeroIcons.chatBubbleOvalLeftEllipsis,
-            style: videoStore.settingsStore.fullScreenChatOverlay ? HeroIconStyle.solid : null),
+        icon: videoStore.settingsStore.fullScreenChatOverlay
+            ? const Icon(Icons.chat_rounded)
+            : const Icon(Icons.chat_outlined),
         color: Colors.white,
       ),
     );
@@ -53,10 +52,9 @@ class VideoOverlay extends StatelessWidget {
       message: 'Refresh',
       preferBelow: false,
       child: IconButton(
-        icon: const HeroIcon(
-          HeroIcons.arrowPath,
+        icon: const Icon(
+          Icons.refresh_rounded,
           color: Colors.white,
-          style: HeroIconStyle.solid,
         ),
         onPressed: videoStore.handleRefresh,
       ),
@@ -66,17 +64,7 @@ class VideoOverlay extends StatelessWidget {
       message: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
       preferBelow: false,
       child: IconButton(
-        icon: videoStore.settingsStore.fullScreen
-            ? const HeroIcon(
-                HeroIcons.arrowsPointingIn,
-                color: Colors.white,
-                style: HeroIconStyle.solid,
-              )
-            : const HeroIcon(
-                HeroIcons.arrowsPointingOut,
-                color: Colors.white,
-                style: HeroIconStyle.solid,
-              ),
+        icon: Icon(videoStore.settingsStore.fullScreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded),
         onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
       ),
     );
@@ -86,7 +74,7 @@ class VideoOverlay extends StatelessWidget {
       preferBelow: false,
       child: IconButton(
         icon: const Icon(
-          Icons.screen_rotation,
+          Icons.screen_rotation_rounded,
           color: Colors.white,
         ),
         onPressed: () {
@@ -160,17 +148,10 @@ class VideoOverlay extends StatelessWidget {
                 preferBelow: false,
                 child: IconButton(
                   iconSize: 50.0,
-                  icon: videoStore.paused
-                      ? const HeroIcon(
-                          HeroIcons.play,
-                          color: Colors.white,
-                          style: HeroIconStyle.solid,
-                        )
-                      : const HeroIcon(
-                          HeroIcons.pause,
-                          color: Colors.white,
-                          style: HeroIconStyle.solid,
-                        ),
+                  icon: Icon(
+                    videoStore.paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                    color: Colors.white,
+                  ),
                   onPressed: videoStore.handlePausePlay,
                 ),
               ),
@@ -234,11 +215,10 @@ class VideoOverlay extends StatelessWidget {
                               ),
                               child: Row(
                                 children: [
-                                  const HeroIcon(
-                                    HeroIcons.users,
+                                  const Icon(
+                                    Icons.visibility_rounded,
                                     size: 14,
                                     color: Colors.white,
-                                    style: HeroIconStyle.solid,
                                   ),
                                   const SizedBox(width: 5),
                                   Text(

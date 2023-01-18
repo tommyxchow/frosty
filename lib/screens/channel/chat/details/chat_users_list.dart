@@ -12,7 +12,6 @@ import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -79,7 +78,8 @@ class _ChattersListState extends State<ChattersList> {
                     focusNode: widget.chatDetailsStore.textFieldFocusNode,
                     autocorrect: false,
                     decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.only(left: 15.0),
+                      contentPadding: EdgeInsets.zero,
+                      prefixIcon: const Icon(Icons.filter_list_rounded),
                       hintText: 'Filter chatters',
                       suffixIcon: widget.chatDetailsStore.textFieldFocusNode.hasFocus ||
                               widget.chatDetailsStore.filterText.isNotEmpty
@@ -91,10 +91,7 @@ class _ChattersListState extends State<ChattersList> {
                                 }
                                 widget.chatDetailsStore.textController.clear();
                               },
-                              icon: const HeroIcon(
-                                HeroIcons.xMark,
-                                style: HeroIconStyle.solid,
-                              ),
+                              icon: const Icon(Icons.close_rounded),
                             )
                           : null,
                     ),

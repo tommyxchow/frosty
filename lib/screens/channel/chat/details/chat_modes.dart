@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/irc.dart';
-import 'package:heroicons/heroicons.dart';
 
 class ChatModes extends StatelessWidget {
   final ROOMSTATE roomState;
@@ -19,10 +18,9 @@ class ChatModes extends StatelessWidget {
           triggerMode: TooltipTriggerMode.tap,
           showDuration: const Duration(seconds: 3),
           message: 'Emote-only mode ${roomState.emoteOnly != '0' ? 'on' : 'off'}',
-          child: HeroIcon(
-            HeroIcons.faceSmile,
+          child: Icon(
+            roomState.emoteOnly != '0' ? Icons.emoji_emotions_rounded : Icons.emoji_emotions_outlined,
             color: roomState.emoteOnly != '0' ? Colors.yellow : Colors.grey,
-            style: roomState.emoteOnly != '0' ? HeroIconStyle.solid : null,
           ),
         ),
         Tooltip(
@@ -34,10 +32,9 @@ class ChatModes extends StatelessWidget {
               : roomState.followersOnly == '0'
                   ? 'Followers-only mode on'
                   : 'Followers-only mode on (${roomState.followersOnly} ${pluralize('minute', roomState.followersOnly)})',
-          child: HeroIcon(
-            HeroIcons.heart,
+          child: Icon(
+            roomState.followersOnly != '-1' ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
-            style: roomState.followersOnly != '-1' ? HeroIconStyle.solid : null,
           ),
         ),
         Tooltip(
@@ -59,10 +56,9 @@ class ChatModes extends StatelessWidget {
           showDuration: const Duration(seconds: 3),
           message:
               'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
-          child: HeroIcon(
-            HeroIcons.clock,
+          child: Icon(
+            roomState.slowMode != '0' ? Icons.hourglass_top_rounded : Icons.hourglass_empty_rounded,
             color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,
-            style: roomState.slowMode != '0' ? HeroIconStyle.solid : null,
           ),
         ),
         Tooltip(
@@ -70,10 +66,9 @@ class ChatModes extends StatelessWidget {
           triggerMode: TooltipTriggerMode.tap,
           showDuration: const Duration(seconds: 3),
           message: 'Subs-only mode ${roomState.subMode != '0' ? 'on' : 'off'}',
-          child: HeroIcon(
-            HeroIcons.banknotes,
+          child: Icon(
+            roomState.subMode != '0' ? Icons.monetization_on_rounded : Icons.monetization_on_outlined,
             color: roomState.subMode != '0' ? Colors.green : Colors.grey,
-            style: roomState.subMode != '0' ? HeroIconStyle.solid : null,
           ),
         ),
       ],

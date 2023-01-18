@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/widgets/button.dart';
-import 'package:heroicons/heroicons.dart';
 
 class FrostyNotification extends StatelessWidget {
   final String message;
@@ -30,8 +29,8 @@ class FrostyNotification extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
-                  const HeroIcon(
-                    HeroIcons.informationCircle,
+                  const Icon(
+                    Icons.info_outline_rounded,
                     color: Colors.white,
                   ),
                   const SizedBox(width: 10),

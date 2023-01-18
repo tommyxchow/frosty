@@ -420,13 +420,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
-  heroicons:
-    dependency: "direct main"
-    description:
-      name: heroicons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.7.0"
   html:
     dependency: transitive
     description:

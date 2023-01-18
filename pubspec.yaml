@@ -55,11 +55,10 @@ dependencies:
   device_info_plus: ^4.0.0
   wakelock: ^0.6.2
   device_preview: ^1.1.0
+  simple_icons: ^7.10.0
   simple_pip_mode:
     git:
       url: https://github.com/tommyxchow/simple_pip_mode_flutter
-  heroicons: ^0.7.0
-  simple_icons: ^7.10.0
 
 dev_dependencies:
   flutter_test:

@@ -13,7 +13,6 @@ import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/uptime.dart';
-import 'package:heroicons/heroicons.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -104,11 +103,10 @@ class LargeStreamCard extends StatelessWidget {
                   preferBelow: false,
                   child: Row(
                     children: [
-                      const HeroIcon(
-                        HeroIcons.users,
+                      const Icon(
+                        Icons.visibility_rounded,
                         size: 14,
                         color: Colors.white,
-                        style: HeroIconStyle.solid,
                       ),
                       const SizedBox(width: 5),
                       Text(
