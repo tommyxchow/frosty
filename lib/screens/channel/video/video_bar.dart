@@ -8,12 +8,18 @@ class VideoBar extends StatelessWidget {
   final StreamTwitch streamInfo;
   final bool showCategory;
   final bool tappableCategory;
+  final Color? titleTextColor;
+  final Color? subtitleTextColor;
+  final FontWeight? subtitleTextWeight;
 
   const VideoBar({
     Key? key,
     required this.streamInfo,
     this.showCategory = true,
     this.tappableCategory = true,
+    this.titleTextColor,
+    this.subtitleTextColor,
+    this.subtitleTextWeight,
   }) : super(key: key);
 
   @override
@@ -43,9 +49,10 @@ class VideoBar extends StatelessWidget {
                   child: Text(
                     streamerName,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
+                      color: titleTextColor,
                     ),
                   ),
                 ),
@@ -56,7 +63,10 @@ class VideoBar extends StatelessWidget {
                   child: Text(
                     streamTitle,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8)),
+                    style: TextStyle(
+                      color: subtitleTextColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                      fontWeight: subtitleTextWeight,
+                    ),
                   ),
                 ),
                 if (showCategory) ...[
@@ -80,7 +90,8 @@ class VideoBar extends StatelessWidget {
                         category,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          color: subtitleTextColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          fontWeight: subtitleTextWeight,
                         ),
                       ),
                     ),

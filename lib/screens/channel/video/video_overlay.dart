@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
@@ -64,7 +63,10 @@ class VideoOverlay extends StatelessWidget {
       message: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
       preferBelow: false,
       child: IconButton(
-        icon: Icon(videoStore.settingsStore.fullScreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded),
+        icon: Icon(
+          videoStore.settingsStore.fullScreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded,
+          color: Colors.white,
+        ),
         onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
       ),
     );
@@ -131,16 +133,21 @@ class VideoOverlay extends StatelessWidget {
       builder: (context) {
         return Stack(
           children: [
-            ColoredBox(
-              color: orientation == Orientation.landscape ? lightGray : Colors.transparent,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  backButton,
-                  if (orientation == Orientation.landscape) Expanded(child: VideoBar(streamInfo: streamInfo)),
-                  if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-                ],
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                backButton,
+                if (orientation == Orientation.landscape)
+                  Expanded(
+                    child: VideoBar(
+                      streamInfo: streamInfo,
+                      titleTextColor: Colors.white,
+                      subtitleTextColor: Colors.white,
+                      subtitleTextWeight: FontWeight.w500,
+                    ),
+                  ),
+                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
+              ],
             ),
             Center(
               child: Tooltip(
