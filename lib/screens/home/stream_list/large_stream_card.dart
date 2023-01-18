@@ -104,7 +104,7 @@ class LargeStreamCard extends StatelessWidget {
                   child: Row(
                     children: [
                       const Icon(
-                        Icons.visibility_rounded,
+                        Icons.visibility,
                         size: 14,
                         color: Colors.white,
                       ),
