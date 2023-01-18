@@ -35,7 +35,7 @@ class EmoteMenuPanel extends StatelessWidget {
           .toList();
 
       return FrostyPageView(
-        headers: ['Global Emotes', if (channelEmotes.isNotEmpty) 'Channel Emotes'],
+        headers: ['Global', if (channelEmotes.isNotEmpty) 'Channel'],
         children: [
           EmoteMenuSection(
             chatStore: chatStore,
@@ -50,7 +50,7 @@ class EmoteMenuPanel extends StatelessWidget {
       );
     } else {
       return FrostyPageView(
-        headers: twitchEmotes!.keys.toList(),
+        headers: twitchEmotes!.keys.map((header) => header.split(' ')[0]).toList(),
         children: twitchEmotes!.entries.map((e) => EmoteMenuSection(chatStore: chatStore, emotes: e.value)).toList(),
       );
     }
