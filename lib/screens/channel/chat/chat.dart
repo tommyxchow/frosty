@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
@@ -9,7 +8,6 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/notification.dart';
 import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
@@ -55,30 +53,6 @@ class Chat extends StatelessWidget {
                           },
                         ),
                       ),
-                    ),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      switchInCurve: Curves.easeOut,
-                      switchOutCurve: Curves.easeIn,
-                      child: chatStore.notification != null
-                          ? Align(
-                              alignment: chatStore.settings.chatNotificationsOnBottom
-                                  ? Alignment.bottomCenter
-                                  : Alignment.topCenter,
-                              child: FrostyNotification(
-                                message: chatStore.notification!,
-                                showPasteButton: chatStore.notification!.contains('copied'),
-                                onButtonPressed: () async {
-                                  // Paste clipboard text into the text controller.
-                                  final data = await Clipboard.getData(Clipboard.kTextPlain);
-
-                                  if (data != null) chatStore.textController.text = data.text!;
-
-                                  chatStore.updateNotification('');
-                                },
-                              ),
-                            )
-                          : null,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(5.0),
