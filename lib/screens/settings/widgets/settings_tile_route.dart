@@ -23,7 +23,10 @@ class SettingsTileRoute extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => Scaffold(
             appBar: FrostyAppBar(title: Text(title)),
-            body: child,
+            body: SafeArea(
+              bottom: false,
+              child: child,
+            ),
           ),
         ),
       ),
