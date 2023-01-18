@@ -213,7 +213,7 @@ class _VideoChatState extends State<VideoChat> {
 
     final videoChat = Scaffold(
       body: Observer(
-        builder: (_) {
+        builder: (context) {
           if (orientation == Orientation.landscape && !settingsStore.landscapeForceVerticalChat) {
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
