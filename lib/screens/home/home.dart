@@ -93,7 +93,7 @@ class _HomeState extends State<Home> {
           actions: [
             IconButton(
               tooltip: 'Settings',
-              icon: const Icon(Icons.settings),
+              icon: const Icon(Icons.settings_rounded),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -104,30 +104,23 @@ class _HomeState extends State<Home> {
           ],
         ),
         body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: Observer(
-                  builder: (_) => IndexedStack(
-                    index: _homeStore.selectedIndex,
-                    children: [
-                      if (_authStore.isLoggedIn)
-                        StreamsList(
-                          listType: ListType.followed,
-                          scrollController: _homeStore.followedScrollController,
-                        ),
-                      TopSection(
-                        homeStore: _homeStore,
-                      ),
-                      Search(
-                        scrollController: _homeStore.searchScrollController,
-                      ),
-                    ],
+          child: Observer(
+            builder: (_) => IndexedStack(
+              index: _homeStore.selectedIndex,
+              children: [
+                if (_authStore.isLoggedIn)
+                  StreamsList(
+                    listType: ListType.followed,
+                    scrollController: _homeStore.followedScrollController,
                   ),
+                TopSection(
+                  homeStore: _homeStore,
                 ),
-              ),
-              const Divider(height: 1.0, thickness: 1.0),
-            ],
+                Search(
+                  scrollController: _homeStore.searchScrollController,
+                ),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: Observer(
@@ -135,20 +128,24 @@ class _HomeState extends State<Home> {
             unselectedFontSize: 12.0,
             selectedFontSize: 12.0,
             type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
             items: [
               if (_authStore.isLoggedIn)
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.favorite),
+                BottomNavigationBarItem(
+                  icon: _homeStore.selectedIndex == 0
+                      ? const Icon(Icons.favorite_rounded)
+                      : const Icon(Icons.favorite_border_rounded),
                   label: 'Following',
                   tooltip: 'Followed streams',
                 ),
               const BottomNavigationBarItem(
-                icon: Icon(Icons.arrow_upward),
+                icon: Icon(Icons.arrow_upward_rounded),
                 label: 'Top',
                 tooltip: 'Top streams and categories',
               ),
               const BottomNavigationBarItem(
-                icon: Icon(Icons.search),
+                icon: Icon(Icons.search_rounded),
                 label: 'Search',
                 tooltip: 'Search for channels and categories',
               ),

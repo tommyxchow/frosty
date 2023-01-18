@@ -20,14 +20,12 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void onLongPressName() {
+    void onTapName() {
       // Ignore if the message is a recent message in the modal bottom sheet.
       if (isModal) return;
 
       // Ignore if long-pressing own username.
       if (ircMessage.user == null || ircMessage.user == chatStore.auth.user.details?.login) return;
-
-      HapticFeedback.lightImpact();
 
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
@@ -62,12 +60,14 @@ class ChatMessage extends StatelessWidget {
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
             if (ircMessage.mention == true) color = Colors.red.withOpacity(0.2);
-            if (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1') color = Colors.green.withOpacity(0.2);
+            if (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1') {
+              color = Colors.green.withOpacity(0.2);
+            }
 
             final messageSpan = Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
-                  onLongPressName: onLongPressName,
+                  onTapName: onTapName,
                   style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
@@ -84,14 +84,15 @@ class ChatMessage extends StatelessWidget {
             final replyUser = ircMessage.tags['reply-parent-display-name'];
             final replyBody = ircMessage.tags['reply-parent-msg-body'];
 
-            if ((replyUser != null && replyBody != null) || (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1')) {
+            if ((replyUser != null && replyBody != null) ||
+                (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1')) {
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Icon(
-                        replyUser != null && replyBody != null ? Icons.reply : Icons.new_releases_outlined,
+                        replyUser != null && replyBody != null ? Icons.reply_rounded : Icons.new_releases_outlined,
                         size: defaultBadgeSize * chatStore.settings.badgeScale,
                         color: defaultTextStyle.color?.withOpacity(0.5),
                         textDirection: TextDirection.rtl,
@@ -102,6 +103,8 @@ class ChatMessage extends StatelessWidget {
                             ? Tooltip(
                                 message: 'Replying to @$replyUser: $replyBody',
                                 preferBelow: false,
+                                triggerMode: TooltipTriggerMode.tap,
+                                showDuration: const Duration(seconds: 5),
                                 child: Text(
                                   'Replying to @$replyUser: $replyBody',
                                   maxLines: 1,
@@ -160,7 +163,7 @@ class ChatMessage extends StatelessWidget {
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
-                        onLongPressName: onLongPressName,
+                        onTapName: onTapName,
                         style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
@@ -214,7 +217,7 @@ class ChatMessage extends StatelessWidget {
                     Text.rich(
                       TextSpan(
                         children: ircMessage.generateSpan(
-                          onLongPressName: onLongPressName,
+                          onTapName: onTapName,
                           style: defaultTextStyle,
                           assetsStore: chatStore.assetsStore,
                           emoteScale: chatStore.settings.emoteScale,

@@ -63,16 +63,14 @@ abstract class ChatAssetsStoreBase with Store {
   @readonly
   var _userToBTTVBadges = <String, Badge>{};
 
-  /// The current index of the emote menu stack.
-  @observable
-  var emoteMenuIndex = 0;
-
   /// Whether or not the emote menu is visible.
   @observable
   var showEmoteMenu = false;
 
   bool isBTTV(Emote emote) {
-    return emote.type == EmoteType.bttvChannel || emote.type == EmoteType.bttvGlobal || emote.type == EmoteType.bttvShared;
+    return emote.type == EmoteType.bttvChannel ||
+        emote.type == EmoteType.bttvGlobal ||
+        emote.type == EmoteType.bttvShared;
   }
 
   bool isFFZ(Emote emote) {
@@ -97,8 +95,12 @@ abstract class ChatAssetsStoreBase with Store {
     // Retrieve the instance that will allow us to retrieve local search history.
     final prefs = await SharedPreferences.getInstance();
 
-    _recentEmotes =
-        prefs.getStringList('recent_emotes')?.map((emoteJson) => Emote.fromJson(jsonDecode(emoteJson))).toList().asObservable() ?? ObservableList<Emote>();
+    _recentEmotes = prefs
+            .getStringList('recent_emotes')
+            ?.map((emoteJson) => Emote.fromJson(jsonDecode(emoteJson)))
+            .toList()
+            .asObservable() ??
+        ObservableList<Emote>();
 
     _disposeReaction = autorun((_) {
       if (_recentEmotes.length > 48) _recentEmotes.removeLast();
@@ -150,7 +152,9 @@ abstract class ChatAssetsStoreBase with Store {
           ffzRoomInfo = ffzRoom.item1;
           return ffzRoom.item2;
         }).catchError(onError),
-      ]).then((assets) => assets.expand((list) => list)).then((emotes) => _emoteToObject = {for (final emote in emotes) emote.name: emote});
+      ])
+          .then((assets) => assets.expand((list) => list))
+          .then((emotes) => _emoteToObject = {for (final emote in emotes) emote.name: emote});
 
   @action
   Future<void> badgesFuture({
@@ -161,10 +165,10 @@ abstract class ChatAssetsStoreBase with Store {
       Future.wait([
         // Get global badges first, then channel badges to avoid badge conflicts.
         // We want the channel badges to override the global badges.
-        twitchApi
-            .getBadgesGlobal()
+        twitchApi.getBadgesGlobal().then((badges) => twitchBadgesToObject.addAll(badges)).then((_) => twitchApi
+            .getBadgesChannel(id: channelId)
             .then((badges) => twitchBadgesToObject.addAll(badges))
-            .then((_) => twitchApi.getBadgesChannel(id: channelId).then((badges) => twitchBadgesToObject.addAll(badges)).catchError(onError)),
+            .catchError(onError)),
         ffzApi.getBadges().then((badges) => _userToFFZBadges = badges).catchError(onError),
         sevenTVApi.getBadges().then((badges) => _userTo7TVBadges = badges).catchError(onError),
         bttvApi.getBadges().then((badges) => _userToBTTVBadges = badges).catchError(onError),
@@ -176,7 +180,8 @@ abstract class ChatAssetsStoreBase with Store {
     required Map<String, String> headers,
     required Function onError,
   }) async {
-    final userEmotes = await Future.wait(emoteSets.map((setId) => twitchApi.getEmotesSets(setId: setId, headers: headers).catchError(onError)));
+    final userEmotes = await Future.wait(
+        emoteSets.map((setId) => twitchApi.getEmotesSets(setId: setId, headers: headers).catchError(onError)));
 
     for (final emoteSet in userEmotes) {
       if (emoteSet.isNotEmpty) {

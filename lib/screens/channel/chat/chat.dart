@@ -1,12 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/channel/chat/emote_menu/emote_menu.dart';
+import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
+import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/notification.dart';
+import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -52,39 +54,19 @@ class Chat extends StatelessWidget {
                         ),
                       ),
                     ),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: chatStore.notification != null
-                          ? Align(
-                              alignment: chatStore.settings.chatNotificationsOnBottom ? Alignment.bottomCenter : Alignment.topCenter,
-                              child: FrostyNotification(
-                                message: chatStore.notification!,
-                                showPasteButton: chatStore.notification!.contains('copied'),
-                                onButtonPressed: () async {
-                                  // Paste clipboard text into the text controller.
-                                  final data = await Clipboard.getData(Clipboard.kTextPlain);
-
-                                  if (data != null) chatStore.textController.text = data.text!;
-
-                                  chatStore.updateNotification('');
-                                },
-                              ),
-                            )
-                          : null,
-                    ),
                     Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
-                          switchInCurve: Curves.easeOutCubic,
-                          switchOutCurve: Curves.easeInCubic,
+                          switchInCurve: Curves.easeOut,
+                          switchOutCurve: Curves.easeIn,
                           child: chatStore.autoScroll
                               ? null
                               : Button(
                                   padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
                                   onPressed: chatStore.resumeScroll,
-                                  icon: const Icon(Icons.arrow_downward),
+                                  icon: const Icon(Icons.keyboard_double_arrow_down_rounded),
                                   child: const Text('Resume scroll'),
                                 ),
                         ),
@@ -95,15 +77,60 @@ class Chat extends StatelessWidget {
               ),
             ),
             if (chatStore.settings.showBottomBar) ChatBottomBar(chatStore: chatStore),
-            AnimatedContainer(
-              curve: Curves.ease,
-              duration: const Duration(milliseconds: 200),
-              height: chatStore.assetsStore.showEmoteMenu ? MediaQuery.of(context).size.height / 3 : 0,
-              child: AnimatedOpacity(
+            WillPopScope(
+              onWillPop: Platform.isAndroid
+                  ? () async {
+                      // If pressing the back button on Android while the emote menu is open, close it instead of going back to the streams list.
+                      if (chatStore.assetsStore.showEmoteMenu) {
+                        chatStore.assetsStore.showEmoteMenu = false;
+                        return false;
+                      } else {
+                        return true;
+                      }
+                    }
+                  : null,
+              child: AnimatedContainer(
                 curve: Curves.ease,
-                opacity: chatStore.assetsStore.showEmoteMenu ? 1 : 0,
                 duration: const Duration(milliseconds: 200),
-                child: EmoteMenu(chatStore: chatStore),
+                height: chatStore.assetsStore.showEmoteMenu
+                    ? MediaQuery.of(context).size.height /
+                        (MediaQuery.of(context).orientation == Orientation.portrait ? 3 : 2)
+                    : 0,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 100),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  child: chatStore.assetsStore.showEmoteMenu
+                      ? FrostyPageView(
+                          headers: const [
+                            'Recent',
+                            'Twitch',
+                            '7TV',
+                            'BTTV',
+                            'FFZ',
+                          ],
+                          children: [
+                            RecentEmotesPanel(
+                              chatStore: chatStore,
+                            ),
+                            EmoteMenuPanel(
+                              chatStore: chatStore,
+                              twitchEmotes: chatStore.assetsStore.userEmoteSectionToEmotes,
+                            ),
+                            ...[
+                              chatStore.assetsStore.sevenTVEmotes,
+                              chatStore.assetsStore.bttvEmotes,
+                              chatStore.assetsStore.ffzEmotes
+                            ].map(
+                              (emotes) => EmoteMenuPanel(
+                                chatStore: chatStore,
+                                emotes: emotes,
+                              ),
+                            ),
+                          ],
+                        )
+                      : null,
+                ),
               ),
             ),
           ],

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -61,7 +60,7 @@ void main() async {
 
   runApp(
     DevicePreview(
-      enabled: !kReleaseMode,
+      enabled: false,
       builder: (context) {
         return MultiProvider(
           providers: [
@@ -83,22 +82,41 @@ void main() async {
 final navigatorKey = GlobalKey<NavigatorState>();
 
 const gray = Color.fromRGBO(18, 18, 18, 1.0);
+const lightGray = Color.fromRGBO(28, 28, 28, 1.0);
 const purple = Color(0xff9146ff);
 
 const inputTheme = InputDecorationTheme(
   filled: true,
   contentPadding: EdgeInsets.all(10.0),
   border: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
     borderSide: BorderSide(style: BorderStyle.none),
   ),
   enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
     borderSide: BorderSide(style: BorderStyle.none),
   ),
   disabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(30.0)),
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
     borderSide: BorderSide(style: BorderStyle.none),
+  ),
+);
+
+const tooltipTheme = TooltipThemeData(
+  padding: EdgeInsets.all(10.0),
+  margin: EdgeInsets.symmetric(horizontal: 5.0),
+  decoration: BoxDecoration(
+    color: lightGray,
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+  ),
+  textStyle: TextStyle(color: Colors.white),
+);
+
+const snackBarTheme = SnackBarThemeData(
+  backgroundColor: lightGray,
+  contentTextStyle: TextStyle(color: Colors.white),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
   ),
 );
 
@@ -127,6 +145,8 @@ final lightTheme = ThemeData(
     unselectedLabelColor: Colors.grey,
   ),
   inputDecorationTheme: inputTheme,
+  tooltipTheme: tooltipTheme,
+  snackBarTheme: snackBarTheme,
 );
 
 final darkTheme = ThemeData(
@@ -152,6 +172,8 @@ final darkTheme = ThemeData(
   dialogBackgroundColor: gray,
   toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,
+  tooltipTheme: tooltipTheme,
+  snackBarTheme: snackBarTheme,
 );
 
 final oledTheme = ThemeData(
@@ -175,6 +197,8 @@ final oledTheme = ThemeData(
   dialogBackgroundColor: Colors.black,
   toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,
+  tooltipTheme: tooltipTheme,
+  snackBarTheme: snackBarTheme,
 );
 
 class MyApp extends StatelessWidget {
@@ -191,7 +215,9 @@ class MyApp extends StatelessWidget {
           locale: DevicePreview.locale(context),
           title: 'Frosty',
           theme: lightTheme,
-          darkTheme: settingsStore.themeType == ThemeType.dark || settingsStore.themeType == ThemeType.system ? darkTheme : oledTheme,
+          darkTheme: settingsStore.themeType == ThemeType.dark || settingsStore.themeType == ThemeType.system
+              ? darkTheme
+              : oledTheme,
           themeMode: settingsStore.themeType == ThemeType.system
               ? ThemeMode.system
               : settingsStore.themeType == ThemeType.light

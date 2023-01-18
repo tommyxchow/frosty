@@ -56,10 +56,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
 
         if (_categoriesStore.error != null) {
           final snackBar = SnackBar(
-            content: AlertMessage(
-              message: _categoriesStore.error!,
-              icon: Icons.error,
-            ),
+            content: AlertMessage(message: _categoriesStore.error!),
             behavior: SnackBarBehavior.floating,
           );
 
@@ -72,10 +69,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
           Widget? statusWidget;
 
           if (_categoriesStore.error != null) {
-            statusWidget = AlertMessage(
-              message: _categoriesStore.error!,
-              icon: Icons.error,
-            );
+            statusWidget = AlertMessage(message: _categoriesStore.error!);
           }
 
           if (_categoriesStore.categories.isEmpty) {
@@ -110,6 +104,7 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
                 _categoriesStore.getCategories();
               }
               return CategoryCard(
+                key: ValueKey(_categoriesStore.categories[index].id),
                 category: _categoriesStore.categories[index],
               );
             },

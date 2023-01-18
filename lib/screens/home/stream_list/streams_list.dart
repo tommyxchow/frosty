@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/screens/home/stream_list/large_stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -66,10 +67,7 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
 
         if (_listStore.error != null) {
           final snackBar = SnackBar(
-            content: AlertMessage(
-              message: _listStore.error!,
-              icon: Icons.error,
-            ),
+            content: AlertMessage(message: _listStore.error!),
             behavior: SnackBarBehavior.floating,
           );
 
@@ -82,17 +80,15 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
           Widget? statusWidget;
 
           if (_listStore.error != null) {
-            statusWidget = AlertMessage(
-              message: _listStore.error!,
-              icon: Icons.error,
-            );
+            statusWidget = AlertMessage(message: _listStore.error!);
           }
 
           if (_listStore.streams.isEmpty) {
             if (_listStore.isLoading && _listStore.error == null) {
               statusWidget = const LoadingIndicator(subtitle: 'Loading streams...');
             } else {
-              statusWidget = AlertMessage(message: widget.listType == ListType.followed ? 'No followed streams' : 'No top streams');
+              statusWidget = AlertMessage(
+                  message: widget.listType == ListType.followed ? 'No followed streams' : 'No top streams');
             }
           }
 
@@ -119,12 +115,17 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
                 _listStore.getStreams();
               }
               return Observer(
-                builder: (context) => StreamCard(
-                  streamInfo: _listStore.streams[index],
-                  showThumbnail: context.read<SettingsStore>().showThumbnails,
-                  large: context.read<SettingsStore>().largeStreamCard,
-                  showUptime: context.read<SettingsStore>().showThumbnailUptime,
-                ),
+                builder: (context) => context.read<SettingsStore>().largeStreamCard
+                    ? LargeStreamCard(
+                        key: ValueKey(_listStore.streams[index].userId),
+                        streamInfo: _listStore.streams[index],
+                        showThumbnail: context.read<SettingsStore>().showThumbnails,
+                      )
+                    : StreamCard(
+                        key: ValueKey(_listStore.streams[index].userId),
+                        streamInfo: _listStore.streams[index],
+                        showThumbnail: context.read<SettingsStore>().showThumbnails,
+                      ),
               );
             },
           );

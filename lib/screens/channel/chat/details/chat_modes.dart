@@ -15,45 +15,59 @@ class ChatModes extends StatelessWidget {
       children: [
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
+          showDuration: const Duration(seconds: 3),
           message: 'Emote-only mode ${roomState.emoteOnly != '0' ? 'on' : 'off'}',
           child: Icon(
-            Icons.emoji_emotions_outlined,
+            roomState.emoteOnly != '0' ? Icons.emoji_emotions_rounded : Icons.emoji_emotions_outlined,
             color: roomState.emoteOnly != '0' ? Colors.yellow : Colors.grey,
           ),
         ),
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
+          showDuration: const Duration(seconds: 3),
           message: roomState.followersOnly == '-1'
               ? 'Followers-only mode off'
               : roomState.followersOnly == '0'
                   ? 'Followers-only mode on'
                   : 'Followers-only mode on (${roomState.followersOnly} ${pluralize('minute', roomState.followersOnly)})',
           child: Icon(
-            Icons.favorite,
+            roomState.followersOnly != '-1' ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
           ),
         ),
         Tooltip(
           preferBelow: false,
-          message: 'R9K mode ${roomState.r9k != '0' ? 'on' : 'off'}',
+          triggerMode: TooltipTriggerMode.tap,
+          showDuration: const Duration(seconds: 3),
+          message: 'R9K (unique-chat) mode ${roomState.r9k != '0' ? 'on' : 'off'}',
           child: Text(
             'R9K',
-            style: TextStyle(color: roomState.r9k != '0' ? Colors.purple : Colors.grey),
+            style: TextStyle(
+              color: roomState.r9k != '0' ? Colors.purple : Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         Tooltip(
           preferBelow: false,
-          message: 'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
+          triggerMode: TooltipTriggerMode.tap,
+          showDuration: const Duration(seconds: 3),
+          message:
+              'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
           child: Icon(
-            Icons.history_toggle_off,
+            roomState.slowMode != '0' ? Icons.hourglass_top_rounded : Icons.hourglass_empty_rounded,
             color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,
           ),
         ),
         Tooltip(
           preferBelow: false,
+          triggerMode: TooltipTriggerMode.tap,
+          showDuration: const Duration(seconds: 3),
           message: 'Subs-only mode ${roomState.subMode != '0' ? 'on' : 'off'}',
           child: Icon(
-            Icons.attach_money,
+            roomState.subMode != '0' ? Icons.monetization_on_rounded : Icons.monetization_on_outlined,
             color: roomState.subMode != '0' ? Colors.green : Colors.grey,
           ),
         ),

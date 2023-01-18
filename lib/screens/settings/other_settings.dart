@@ -5,9 +5,11 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/list_tile.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,7 +32,7 @@ class _OtherSettingsState extends State<OtherSettings> {
       context: context,
       builder: (context) => FrostyDialog(
         title: 'Reset All Settings',
-        content: const Text('Are you sure you want to reset all settings?'),
+        message: 'Are you sure you want to reset all settings?',
         actions: [
           Button(
             onPressed: () {
@@ -50,9 +52,8 @@ class _OtherSettingsState extends State<OtherSettings> {
             child: const Text('Yes'),
           ),
           Button(
-            fill: true,
             onPressed: Navigator.of(context).pop,
-            color: Colors.red.shade700,
+            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],
@@ -62,20 +63,11 @@ class _OtherSettingsState extends State<OtherSettings> {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      childrenPadding: const EdgeInsets.only(bottom: 10.0),
-      leading: const Icon(Icons.help),
-      title: const Text(
-        'Other',
-        style: TextStyle(
-          fontSize: 18.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    return Column(
       children: [
-        ListTile(
-          leading: const Icon(Icons.info),
-          title: const Text('About Frosty'),
+        FrostyListTile(
+          leading: const Icon(Icons.info_outline_rounded),
+          title: 'About Frosty',
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
@@ -91,23 +83,44 @@ class _OtherSettingsState extends State<OtherSettings> {
             );
           },
         ),
-        ListTile(
-          leading: const Icon(Icons.launch),
-          title: const Text('Changelog'),
+        FrostyListTile(
+          leading: const Icon(Icons.launch_rounded),
+          title: 'FAQ',
+          onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
+              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+        ),
+        FrostyListTile(
+          leading: const Icon(Icons.launch_rounded),
+          title: 'Changelog',
           onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
               mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
         ),
-        ListTile(
-          leading: const Icon(Icons.launch),
-          title: const Text('FAQ'),
-          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty#faq'),
-              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+        FrostyListTile(
+          leading: const Icon(Icons.delete_outline_rounded),
+          title: 'Clear image cache',
+          onTap: () async {
+            HapticFeedback.mediumImpact();
+
+            await DefaultCacheManager().emptyCache();
+
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: AlertMessage(message: 'Image cache cleared'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          },
+        ),
+        FrostyListTile(
+          leading: const Icon(Icons.restore_rounded),
+          title: 'Reset settings',
+          onTap: () => _showConfirmDialog(context),
         ),
         Observer(
-          builder: (_) => SwitchListTile.adaptive(
-            title: const Text('Send anonymous crash logs'),
-            isThreeLine: true,
-            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.'),
+          builder: (_) => SettingsListSwitch(
+            title: 'Send anonymous crash logs',
+            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
             value: widget.settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
@@ -117,41 +130,6 @@ class _OtherSettingsState extends State<OtherSettings> {
               }
               widget.settingsStore.sendCrashLogs = newValue;
             },
-          ),
-        ),
-        ...[
-          Button(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-            icon: const Icon(Icons.delete_sweep),
-            child: const Text('Clear image cache'),
-            onPressed: () async {
-              HapticFeedback.mediumImpact();
-
-              await DefaultCacheManager().emptyCache();
-
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: AlertMessage(message: 'Image cache cleared'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-          ),
-          Button(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-            onPressed: () => _showConfirmDialog(context),
-            icon: const Icon(Icons.restore),
-            child: const Text('Reset all settings'),
-          )
-        ].map(
-          (button) => Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15.0,
-              vertical: 5.0,
-            ),
-            width: double.infinity,
-            child: button,
           ),
         ),
       ],

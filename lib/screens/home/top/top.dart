@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/main.dart';
 import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
@@ -28,23 +29,19 @@ class _TopSectionState extends State<TopSection> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TabBar(
           controller: _tabBarController,
-          indicatorColor: const Color(0xff9146ff),
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+          ),
+          indicatorSize: TabBarIndicatorSize.label,
+          indicatorColor: purple,
           tabs: const [
-            Tab(
-              child: Text(
-                'Streams',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            Tab(
-              child: Text(
-                'Categories',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
+            Tab(child: Text('Streams')),
+            Tab(child: Text('Categories')),
           ],
         ),
         Expanded(

@@ -1,10 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:frosty/widgets/cached_image.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -13,14 +13,17 @@ class ChatBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emoteMenuButton = IconButton(
-      color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
-      tooltip: 'Emote menu',
-      icon: const Icon(Icons.emoji_emotions_outlined),
-      onPressed: () {
-        FocusScope.of(context).unfocus();
-        chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
-      },
+    final emoteMenuButton = Tooltip(
+      message: 'Emote menu',
+      preferBelow: false,
+      child: IconButton(
+        color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
+        icon: Icon(chatStore.assetsStore.showEmoteMenu ? Icons.emoji_emotions_rounded : Icons.emoji_emotions_outlined),
+        onPressed: () {
+          FocusScope.of(context).unfocus();
+          chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
+        },
+      ),
     );
 
     return Observer(
@@ -30,10 +33,14 @@ class ChatBottomBar extends StatelessWidget {
           ...chatStore.assetsStore.bttvEmotes,
           ...chatStore.assetsStore.ffzEmotes,
           ...chatStore.assetsStore.sevenTVEmotes
-        ].where((emote) => emote.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase())).toList();
+        ]
+            .where((emote) =>
+                emote.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase()))
+            .toList();
 
         final matchingChatters = chatStore.chatDetailsStore.allChatters
-            .where((chatter) => chatter.contains(chatStore.textController.text.split(' ').last.replaceFirst('@', '').toLowerCase()))
+            .where((chatter) =>
+                chatter.contains(chatStore.textController.text.split(' ').last.replaceFirst('@', '').toLowerCase()))
             .toList();
 
         return Column(
@@ -57,9 +64,9 @@ class ChatBottomBar extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: Center(
-                          child: CachedNetworkImage(
+                          child: FrostyCachedNetworkImage(
                             imageUrl: matchingEmotes[index].url,
-                            fadeInDuration: const Duration(),
+                            useFade: false,
                             height: matchingEmotes[index].height?.toDouble() ?? defaultEmoteSize,
                             width: matchingEmotes[index].width?.toDouble(),
                           ),
@@ -70,7 +77,9 @@ class ChatBottomBar extends StatelessWidget {
                 ),
               ),
             ],
-            if (chatStore.settings.autocomplete && chatStore.showMentionAutocomplete && matchingChatters.isNotEmpty) ...[
+            if (chatStore.settings.autocomplete &&
+                chatStore.showMentionAutocomplete &&
+                matchingChatters.isNotEmpty) ...[
               const Divider(
                 height: 1.0,
                 thickness: 1.0,
@@ -89,7 +98,8 @@ class ChatBottomBar extends StatelessWidget {
                         ..add('@${matchingChatters[index]} ');
 
                       chatStore.textController.text = split.join(' ');
-                      chatStore.textController.selection = TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
+                      chatStore.textController.selection =
+                          TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
                     },
                     child: Text(matchingChatters[index]),
                   ),
@@ -105,12 +115,12 @@ class ChatBottomBar extends StatelessWidget {
                       chatStore.settings.showVideo &&
                       MediaQuery.of(context).orientation == Orientation.landscape)
                     IconButton(
-                      tooltip: 'Send a message',
+                      tooltip: 'Enter a message',
                       onPressed: () {
                         chatStore.expandChat = true;
                         chatStore.textFieldFocusNode.requestFocus();
                       },
-                      icon: const Icon(Icons.chat),
+                      icon: const Icon(Icons.edit),
                     )
                   else
                     Expanded(
@@ -121,7 +131,7 @@ class ChatBottomBar extends StatelessWidget {
                         maxLines: 5,
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 10.0),
+                          contentPadding: const EdgeInsets.only(left: 15.0),
                           prefixIcon: chatStore.settings.emoteMenuButtonOnLeft ? emoteMenuButton : null,
                           suffixIcon: chatStore.settings.emoteMenuButtonOnLeft ? null : emoteMenuButton,
                           hintMaxLines: 1,
@@ -134,15 +144,18 @@ class ChatBottomBar extends StatelessWidget {
                       ),
                     ),
                   if (chatStore.showSendButton &&
-                      (chatStore.settings.chatWidth >= 0.3 || chatStore.expandChat || MediaQuery.of(context).orientation == Orientation.portrait))
+                      (chatStore.settings.chatWidth >= 0.3 ||
+                          chatStore.expandChat ||
+                          MediaQuery.of(context).orientation == Orientation.portrait))
                     IconButton(
                       tooltip: 'Send',
-                      icon: const Icon(Icons.send),
-                      onPressed: chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
+                      icon: const Icon(Icons.send_rounded),
+                      onPressed:
+                          chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
                     )
                   else
                     IconButton(
-                      icon: Icon(Icons.adaptive.more),
+                      icon: Icon(Icons.adaptive.more_rounded),
                       tooltip: 'More',
                       onPressed: () => showModalBottomSheet(
                         backgroundColor: Colors.transparent,

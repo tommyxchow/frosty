@@ -7,6 +7,7 @@ import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -45,12 +46,12 @@ class _SearchState extends State<Search> {
                 focusNode: _searchStore.textFieldFocusNode,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.all(0.0),
+                  contentPadding: EdgeInsets.zero,
+                  prefixIcon: const Icon(Icons.search_rounded),
                   hintText: 'Find a channel or category',
-                  prefixIcon: const Icon(Icons.search),
                   suffixIcon: _searchStore.textFieldFocusNode.hasFocus || _searchStore.searchText.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear),
+                          icon: const Icon(Icons.close_rounded),
                           tooltip: _searchStore.searchText.isEmpty ? 'Cancel' : 'Clear',
                           onPressed: () {
                             if (_searchStore.searchText.isEmpty) _searchStore.textFieldFocusNode.unfocus();
@@ -69,10 +70,7 @@ class _SearchState extends State<Search> {
             builder: (context) {
               if (_searchStore.textEditingController.text.isEmpty) {
                 if (_searchStore.searchHistory.isEmpty) {
-                  return const AlertMessage(
-                    message: 'No recent searches',
-                    icon: Icons.search_off,
-                  );
+                  return const AlertMessage(message: 'No recent searches');
                 }
 
                 return Column(
@@ -87,19 +85,22 @@ class _SearchState extends State<Search> {
                         controller: widget.scrollController,
                         children: _searchStore.searchHistory
                             .mapIndexed(
-                              (index, searchTerm) => ListTile(
-                                leading: const Icon(Icons.history),
-                                title: Text(searchTerm),
-                                trailing: IconButton(
-                                  tooltip: 'Remove',
-                                  icon: const Icon(Icons.cancel),
-                                  onPressed: () => _searchStore.searchHistory.removeAt(index),
+                              (index, searchTerm) => FrostyListTile(
+                                leading: const Icon(Icons.history_rounded),
+                                title: searchTerm,
+                                trailing: Tooltip(
+                                  message: 'Remove',
+                                  preferBelow: false,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.close_rounded),
+                                    onPressed: () => _searchStore.searchHistory.removeAt(index),
+                                  ),
                                 ),
                                 onTap: () {
                                   _searchStore.textEditingController.text = searchTerm;
                                   _searchStore.handleQuery(searchTerm);
-                                  _searchStore.textEditingController.selection =
-                                      TextSelection.fromPosition(TextPosition(offset: _searchStore.textEditingController.text.length));
+                                  _searchStore.textEditingController.selection = TextSelection.fromPosition(
+                                      TextPosition(offset: _searchStore.textEditingController.text.length));
                                 },
                               ),
                             )

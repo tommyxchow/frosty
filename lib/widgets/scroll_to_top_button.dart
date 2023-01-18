@@ -16,11 +16,11 @@ class ScrollToTopButton extends StatelessWidget {
         child: Button(
           onPressed: () => scrollController.animateTo(
             0.0,
-            curve: Curves.easeOutCubic,
+            curve: Curves.easeOut,
             duration: const Duration(milliseconds: 500),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10.0),
-          child: const Icon(Icons.keyboard_arrow_up),
+          child: const Icon(Icons.keyboard_double_arrow_up_rounded),
         ),
       ),
     );

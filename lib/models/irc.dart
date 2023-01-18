@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -112,7 +112,7 @@ class IRCMessage {
     required double emoteScale,
     required bool isLightTheme,
     required bool launchExternal,
-    required void Function()? onLongPressName,
+    required void Function()? onTapName,
     bool showMessage = true,
     bool useReadableColors = false,
     TimestampType timestamp = TimestampType.disabled,
@@ -174,7 +174,8 @@ class IRCMessage {
               badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
-              badgeUrl = 'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
+              badgeUrl =
+                  'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
             }
 
             final newBadge = Badge(
@@ -196,7 +197,8 @@ class IRCMessage {
 
           // Add custom FFZ vip badge if it exists
           if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
-            badgeUrl = 'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
+            badgeUrl =
+                'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
           }
 
           final newBadge = Badge(
@@ -285,14 +287,15 @@ class IRCMessage {
     }
 
     // Add the display name (username) to the span and apply the onLongPressName callback.
+    final displayName = tags['display-name']!;
     span.add(
       TextSpan(
-        text: tags['display-name']!,
+        text: regexEnglish.hasMatch(displayName) ? displayName : '$displayName ($user)',
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.bold,
         ),
-        recognizer: LongPressGestureRecognizer()..onLongPress = onLongPressName,
+        recognizer: TapGestureRecognizer()..onTap = onTapName,
       ),
     );
 
@@ -351,11 +354,11 @@ class IRCMessage {
                     style: textStyle?.copyWith(fontSize: emoteSize - 5),
                   ),
                 ...emoteStack.reversed.map(
-                  (emote) => CachedNetworkImage(
+                  (emote) => FrostyCachedNetworkImage(
                     imageUrl: emote.url,
-                    fadeInDuration: const Duration(),
                     height: emote.height != null ? emote.height! * emoteScale : emoteSize,
                     width: emote.width != null ? emote.width! * emoteScale : emoteSize,
+                    useFade: false,
                   ),
                 )
               ];
@@ -366,43 +369,44 @@ class IRCMessage {
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: Tooltip(
+                    triggerMode: TooltipTriggerMode.tap,
+                    showDuration: const Duration(seconds: 3),
                     richMessage: WidgetSpan(
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Column(
-                          children: [
-                            Stack(
-                              alignment: AlignmentDirectional.center,
-                              children: [
-                                if (nextWordIsEmoji)
-                                  Text(
-                                    words[index],
-                                    style: textStyle?.copyWith(fontSize: 75),
-                                  ),
-                                ...emoteStack.reversed.map(
-                                  (emote) => CachedNetworkImage(
-                                    imageUrl: emote.url,
-                                    fadeInDuration: const Duration(),
-                                    height: 80,
-                                  ),
-                                )
-                              ],
-                            ),
-                            const SizedBox(height: 5.0),
-                            Column(
-                              children: [
+                      child: Column(
+                        children: [
+                          Stack(
+                            alignment: AlignmentDirectional.center,
+                            children: [
+                              if (nextWordIsEmoji)
                                 Text(
-                                  nextWordIsEmoji ? '${words[index]} - Emoji' : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
-                                  style: const TextStyle(color: Colors.black),
+                                  words[index],
+                                  style: textStyle?.copyWith(fontSize: 75),
                                 ),
-                                Text(
-                                  nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
-                                  style: const TextStyle(color: Colors.black),
+                              ...emoteStack.reversed.map(
+                                (emote) => FrostyCachedNetworkImage(
+                                  imageUrl: emote.url,
+                                  height: 80,
+                                  useFade: false,
                                 ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 5.0),
+                          Column(
+                            children: [
+                              Text(
+                                nextWordIsEmoji
+                                    ? '${words[index]} - Emoji'
+                                    : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                nextWordIsEmoji ? message.join(', ') : message.skip(1).join(', '),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                     preferBelow: false,
@@ -470,11 +474,11 @@ class IRCMessage {
     if (backgroundColor != null) {
       return ColoredBox(
         color: backgroundColor,
-        child: CachedNetworkImage(
+        child: FrostyCachedNetworkImage(
           imageUrl: badge.url,
-          fadeInDuration: const Duration(),
           height: size,
           width: size,
+          useFade: false,
         ),
       );
     } else if (isSvg == true) {
@@ -484,11 +488,11 @@ class IRCMessage {
         width: size,
       );
     } else {
-      return CachedNetworkImage(
+      return FrostyCachedNetworkImage(
         imageUrl: badge.url,
-        fadeInDuration: const Duration(),
         height: size,
         width: size,
+        useFade: false,
       );
     }
   }
@@ -502,24 +506,23 @@ class IRCMessage {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
+        triggerMode: TooltipTriggerMode.tap,
+        showDuration: const Duration(seconds: 3),
         richMessage: WidgetSpan(
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Column(
-              children: [
-                _createBadgeWidget(
-                  badge: badge,
-                  size: 80,
-                  backgroundColor: backgroundColor,
-                  isSvg: isSvg,
-                ),
-                const SizedBox(height: 5.0),
-                Text(
-                  badge.name,
-                  style: const TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
+          child: Column(
+            children: [
+              _createBadgeWidget(
+                badge: badge,
+                size: 80,
+                backgroundColor: backgroundColor,
+                isSvg: isSvg,
+              ),
+              const SizedBox(height: 5.0),
+              Text(
+                badge.name,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
           ),
         ),
         preferBelow: false,
@@ -541,36 +544,35 @@ class IRCMessage {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
+        triggerMode: TooltipTriggerMode.tap,
+        showDuration: const Duration(seconds: 3),
         richMessage: WidgetSpan(
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Column(
-              children: [
-                CachedNetworkImage(
-                  imageUrl: emote.url,
-                  fadeInDuration: const Duration(),
-                  height: 80,
-                ),
-                const SizedBox(height: 5.0),
-                Text(
-                  emote.name,
-                  style: const TextStyle(color: Colors.black),
-                ),
-                Text(
-                  emoteType[emote.type.index],
-                  style: const TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
+          child: Column(
+            children: [
+              FrostyCachedNetworkImage(
+                imageUrl: emote.url,
+                height: 80,
+                useFade: false,
+              ),
+              const SizedBox(height: 5.0),
+              Text(
+                emote.name,
+                style: const TextStyle(color: Colors.white),
+              ),
+              Text(
+                emoteType[emote.type.index],
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
           ),
         ),
         preferBelow: false,
-        child: CachedNetworkImage(
+        child: FrostyCachedNetworkImage(
           imageUrl: emote.url,
-          placeholder: (context, url) => const SizedBox(),
-          fadeInDuration: const Duration(),
           height: height,
           width: width,
+          useFade: false,
+          placeholder: (context, url) => const SizedBox(),
         ),
       ),
     );
@@ -584,7 +586,8 @@ class IRCMessage {
         text: text,
         style: style?.copyWith(color: Colors.blue),
         recognizer: TapGestureRecognizer()
-          ..onTap = () => launchUrl(Uri.parse(text), mode: launchExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+          ..onTap = () => launchUrl(Uri.parse(text),
+              mode: launchExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
       );
     } else {
       return TextSpan(text: text, style: style);
@@ -633,7 +636,8 @@ class IRCMessage {
 
     // If the username exists, set it.
     // tmi.twitch.tv means the message was sent by Twitch rather than a user, so will be irrelevant.
-    final String? user = splitMessage[0] == 'tmi.twitch.tv' ? null : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
+    final String? user =
+        splitMessage[0] == 'tmi.twitch.tv' ? null : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
 
     // If there is an associated message, set it.
     //
@@ -697,7 +701,11 @@ class IRCMessage {
       if (userLogin != null) mention = message.toLowerCase().contains(userLogin);
 
       // Escape the message
-      message = message.split(' ').map((word) => word.replaceAll('\u{E0000}', '').trim()).where((element) => element != '').join(' ');
+      message = message
+          .split(' ')
+          .map((word) => word.replaceAll('\u{E0000}', '').trim())
+          .where((element) => element != '')
+          .join(' ');
 
       final emojiBuffer = StringBuffer();
       final wordBuffer = StringBuffer();

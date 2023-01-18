@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class GeneralSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -12,50 +15,29 @@ class GeneralSettings extends StatelessWidget {
     const themes = ['System', 'Light', 'Dark', 'Black'];
 
     return Observer(
-      builder: (context) => ExpansionTile(
-        leading: const Icon(Icons.settings),
-        title: const Text(
-          'General',
-          style: TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      builder: (context) => ListView(
         children: [
-          ListTile(
-            title: const Text('Theme'),
-            trailing: DropdownButton(
-              value: settingsStore.themeType,
-              onChanged: (ThemeType? newTheme) => settingsStore.themeType = newTheme!,
-              items: ThemeType.values
-                  .map((ThemeType value) => DropdownMenuItem(
-                        value: value,
-                        child: Text(themes[value.index]),
-                      ))
-                  .toList(),
-            ),
+          const SectionHeader('Display'),
+          SettingsListSelect(
+            title: 'Theme',
+            selectedOption: themes[settingsStore.themeType.index],
+            options: themes,
+            onChanged: (newTheme) => settingsStore.themeType = ThemeType.values[themes.indexOf(newTheme)],
           ),
-          SwitchListTile.adaptive(
-            title: const Text('Large stream card'),
+          const SectionHeader('Stream card'),
+          SettingsListSwitch(
+            title: 'Use large stream card',
             value: settingsStore.largeStreamCard,
             onChanged: (newValue) => settingsStore.largeStreamCard = newValue,
           ),
-          SwitchListTile.adaptive(
-            title: const Text('Stream card thumbnails'),
+          SettingsListSwitch(
+            title: 'Show thumbnail',
             value: settingsStore.showThumbnails,
             onChanged: (newValue) => settingsStore.showThumbnails = newValue,
           ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Stream uptime on thumbnails'),
-            subtitle: const Text('Shows the uptime of the stream in the HH:MM:SS format.'),
-            value: settingsStore.showThumbnailUptime,
-            onChanged: settingsStore.showThumbnails ? (newValue) => settingsStore.showThumbnailUptime = newValue : null,
-          ),
-          SwitchListTile.adaptive(
-            isThreeLine: true,
-            title: const Text('Launch URLs in external browser'),
-            subtitle: const Text('Opens links in the default external browser.'),
+          const SectionHeader('Links'),
+          SettingsListSwitch(
+            title: 'Open links in external browser',
             value: settingsStore.launchUrlExternal,
             onChanged: (newValue) => settingsStore.launchUrlExternal = newValue,
           ),

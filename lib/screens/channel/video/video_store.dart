@@ -32,9 +32,6 @@ abstract class VideoStoreBase with Store {
   /// The webview controller used for injecting JavaScript to control the webview and video player.
   WebViewController? controller;
 
-  /// The current timer for the sleep timer if active.
-  Timer? sleepTimer;
-
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
 
@@ -68,18 +65,6 @@ abstract class VideoStoreBase with Store {
     }
     return NavigationDecision.prevent;
   }
-
-  /// The amount of hours the sleep timer is set to.
-  @observable
-  var sleepHours = 0;
-
-  /// The amount of minutes the sleep timer is set to.
-  @observable
-  var sleepMinutes = 0;
-
-  /// The time remaining for the sleep timer.
-  @observable
-  var timeRemaining = const Duration();
 
   /// If the video is currently paused.
   ///
@@ -135,8 +120,10 @@ abstract class VideoStoreBase with Store {
   Future<void> initVideo() async {
     // Add event listeners to notify the JavaScript channels when the video plays and pauses.
     try {
-      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
-      controller?.runJavascript('document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
+      controller?.runJavascript(
+          'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
+      controller?.runJavascript(
+          'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -186,17 +173,6 @@ abstract class VideoStoreBase with Store {
     }
   }
 
-  /// Handles toggling "minimal mode" on the overlay.
-  ///
-  /// "Minimal mode" is when only the channel name is visible on the bottom-left of the overlay.
-  @action
-  void handleExpand() {
-    settingsStore.expandInfo = !settingsStore.expandInfo;
-
-    _overlayTimer.cancel();
-    _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
-  }
-
   /// Handles the toggle overlay options.
   ///
   /// The toggle overlay option allows switching between the custom and Twitch's overlay by long-pressing the overlay.
@@ -222,47 +198,6 @@ abstract class VideoStoreBase with Store {
     HapticFeedback.lightImpact();
     controller?.reload();
     updateStreamInfo();
-  }
-
-  /// Updates the sleep timer with [sleepHours] and [sleepMinutes].
-  /// Calls [onTimerFinished] when the sleep timer completes.
-  @action
-  void updateSleepTimer({required void Function() onTimerFinished}) {
-    // If hours and minutes are 0, do nothing.
-    if (sleepHours == 0 && sleepMinutes == 0) return;
-
-    // If there is an ongoing timer, cancel it since it'll be replaced.
-    if (sleepTimer != null) cancelSleepTimer();
-
-    // Update the new time remaining
-    timeRemaining = Duration(hours: sleepHours, minutes: sleepMinutes);
-
-    // Reset the hours and minutes in the dropdown buttons.
-    sleepHours = 0;
-    sleepMinutes = 0;
-
-    // Set a periodic timer that will update the time remaining every second.
-    sleepTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        // If the timer is up, cancel the timer and exit the app.
-        if (timeRemaining.inSeconds == 0) {
-          timer.cancel();
-          onTimerFinished();
-          return;
-        }
-
-        // Decrement the time remaining.
-        timeRemaining = Duration(seconds: timeRemaining.inSeconds - 1);
-      },
-    );
-  }
-
-  /// Cancels the sleep timer and resets the time remaining.
-  @action
-  void cancelSleepTimer() {
-    sleepTimer?.cancel();
-    timeRemaining = const Duration();
   }
 
   /// Play or pause the video depending on the current state of [_paused].
@@ -304,6 +239,5 @@ abstract class VideoStoreBase with Store {
     if (Platform.isIOS) controller?.reload();
 
     _disposeOverlayReaction();
-    sleepTimer?.cancel();
   }
 }

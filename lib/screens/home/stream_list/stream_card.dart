@@ -1,15 +1,16 @@
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
+import 'package:frosty/main.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
+import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
@@ -19,17 +20,13 @@ import 'package:provider/provider.dart';
 /// A tappable card widget that displays a stream's thumbnail and details.
 class StreamCard extends StatelessWidget {
   final StreamTwitch streamInfo;
-  final bool showUptime;
   final bool showThumbnail;
-  final bool large;
   final bool showCategory;
 
   const StreamCard({
     Key? key,
     required this.streamInfo,
-    required this.showUptime,
     required this.showThumbnail,
-    required this.large,
     this.showCategory = true,
   }) : super(key: key);
 
@@ -44,84 +41,55 @@ class StreamCard extends StatelessWidget {
     // Constraint the resolution to 1920x1080 since that's the max resolution of the Twitch API.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final thumbnailWidth = min((size.width * pixelRatio) ~/ (large ? 1 : 3), 1920);
+    final thumbnailWidth = min((size.width * pixelRatio) ~/ 3, 1920);
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
 
-    final image = AspectRatio(
+    final thumbnail = AspectRatio(
       aspectRatio: 16 / 9,
-      child: CachedNetworkImage(
-        imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') + cacheUrlExtension,
-        placeholder: (context, url) => const LoadingIndicator(),
-        useOldImageOnUrlChange: true,
+      child: FrostyCachedNetworkImage(
+        imageUrl: streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
+            cacheUrlExtension,
+        placeholder: (context, url) => const ColoredBox(color: lightGray, child: LoadingIndicator()),
       ),
     );
 
-    final thumbnail = large
-        ? Container(
-            foregroundDecoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black,
-                ],
-              ),
-            ),
-            child: image,
-          )
-        : image;
+    final streamerName = regexEnglish.hasMatch(streamInfo.userName)
+        ? streamInfo.userName
+        : '${streamInfo.userName} (${streamInfo.userLogin})';
 
-    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
+    const subFontSize = 14.0;
 
-    final subFontSize = large ? 16.0 : 14.0;
-
-    final fontColor = large ? Colors.white : DefaultTextStyle.of(context).style.color;
+    final fontColor = DefaultTextStyle.of(context).style.color;
 
     final imageSection = ClipRRect(
-      borderRadius: large ? const BorderRadius.all(Radius.circular(10.0)) : const BorderRadius.all(Radius.circular(5.0)),
-      child: showUptime
-          ? Stack(
-              alignment: AlignmentDirectional.bottomEnd,
-              children: [
-                thumbnail,
-                if (large)
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Uptime(
-                      startTime: streamInfo.startedAt,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        color: Colors.white.withOpacity(0.8),
-                      ),
-                    ),
-                  )
-                else
-                  Container(
-                    padding: const EdgeInsets.all(2.0),
-                    decoration: const BoxDecoration(
-                      color: Color.fromRGBO(0, 0, 0, 0.5),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(3.0),
-                      ),
-                    ),
-                    margin: const EdgeInsets.all(2.0),
-                    child: Uptime(
-                      startTime: streamInfo.startedAt,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )
-              ],
+        borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+        child: Stack(
+          alignment: AlignmentDirectional.bottomEnd,
+          children: [
+            thumbnail,
+            Container(
+              padding: const EdgeInsets.all(2.0),
+              decoration: const BoxDecoration(
+                color: Color.fromRGBO(0, 0, 0, 0.5),
+                borderRadius: BorderRadius.all(
+                  Radius.circular(3.0),
+                ),
+              ),
+              margin: const EdgeInsets.all(2.0),
+              child: Uptime(
+                startTime: streamInfo.startedAt,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
             )
-          : thumbnail,
-    );
+          ],
+        ));
 
     final streamInfoSection = Padding(
-      padding: large ? const EdgeInsets.all(10.0) : const EdgeInsets.only(left: 10.0),
+      padding: const EdgeInsets.only(left: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -134,16 +102,16 @@ class StreamCard extends StatelessWidget {
               const SizedBox(width: 5.0),
               Flexible(
                 child: Tooltip(
-                  message: streamerName,
+                  message: 'Streamer: $streamerName',
                   preferBelow: false,
                   child: Text(
                     streamerName,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: large ? 20.0 : 16.0,
+                      fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                       color: fontColor,
                     ),
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -151,7 +119,7 @@ class StreamCard extends StatelessWidget {
           ),
           const SizedBox(height: 5.0),
           Tooltip(
-            message: streamInfo.title.trim(),
+            message: 'Title: ${streamInfo.title.trim()}',
             preferBelow: false,
             padding: const EdgeInsets.all(10.0),
             child: Text(
@@ -178,7 +146,7 @@ class StreamCard extends StatelessWidget {
                       )
                   : null,
               child: Tooltip(
-                message: streamInfo.gameName,
+                message: 'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
                 preferBelow: false,
                 child: Text(
                   streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category',
@@ -230,24 +198,19 @@ class StreamCard extends StatelessWidget {
       },
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: showThumbnail ? 15.0 : 5.0),
-        child: large
-            ? Stack(
-                alignment: AlignmentDirectional.bottomStart,
-                children: [if (showThumbnail) imageSection, streamInfoSection],
-              )
-            : Row(
-                children: [
-                  if (showThumbnail)
-                    Flexible(
-                      flex: 1,
-                      child: imageSection,
-                    ),
-                  Flexible(
-                    flex: 2,
-                    child: streamInfoSection,
-                  ),
-                ],
+        child: Row(
+          children: [
+            if (showThumbnail)
+              Flexible(
+                flex: 1,
+                child: imageSection,
               ),
+            Flexible(
+              flex: 2,
+              child: streamInfoSection,
+            ),
+          ],
+        ),
       ),
     );
   }

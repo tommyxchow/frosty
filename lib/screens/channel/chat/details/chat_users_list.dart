@@ -15,7 +15,7 @@ import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class ChattersList extends StatelessWidget {
+class ChattersList extends StatefulWidget {
   final ChatDetailsStore chatDetailsStore;
   final ChatStore chatStore;
   final String userLogin;
@@ -28,12 +28,17 @@ class ChattersList extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ChattersList> createState() => _ChattersListState();
+}
+
+class _ChattersListState extends State<ChattersList> {
+  @override
   Widget build(BuildContext context) {
     const headers = [
       'Broadcaster',
       'Staff',
       'Admins',
-      'Global Moderators',
+      'Global moderators',
       'Moderators',
       'VIPs',
       'Viewers',
@@ -41,25 +46,24 @@ class ChattersList extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        if (chatDetailsStore.error != null) {
+        if (widget.chatDetailsStore.error != null) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const AlertMessage(
                 message: 'Failed to get chatters',
-                icon: Icons.error,
               ),
               const SizedBox(height: 10.0),
               Button(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                onPressed: chatDetailsStore.updateChatters,
-                child: const Text('Try Again'),
+                onPressed: widget.chatDetailsStore.updateChatters,
+                child: const Text('Try again'),
               )
             ],
           );
         }
 
-        if (chatDetailsStore.chatUsers == null) {
+        if (widget.chatDetailsStore.chatUsers == null) {
           return const LoadingIndicator(subtitle: 'Getting chatters...');
         }
 
@@ -70,21 +74,24 @@ class ChattersList extends StatelessWidget {
               child: Observer(
                 builder: (context) {
                   return TextField(
-                    controller: chatDetailsStore.textController,
-                    focusNode: chatDetailsStore.textFieldFocusNode,
+                    controller: widget.chatDetailsStore.textController,
+                    focusNode: widget.chatDetailsStore.textFieldFocusNode,
                     autocorrect: false,
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.zero,
-                      prefixIcon: const Icon(Icons.filter_list),
+                      prefixIcon: const Icon(Icons.filter_list_rounded),
                       hintText: 'Filter chatters',
-                      suffixIcon: chatDetailsStore.textFieldFocusNode.hasFocus || chatDetailsStore.filterText.isNotEmpty
+                      suffixIcon: widget.chatDetailsStore.textFieldFocusNode.hasFocus ||
+                              widget.chatDetailsStore.filterText.isNotEmpty
                           ? IconButton(
-                              tooltip: chatDetailsStore.filterText.isEmpty ? 'Cancel' : 'Clear',
+                              tooltip: widget.chatDetailsStore.filterText.isEmpty ? 'Cancel' : 'Clear',
                               onPressed: () {
-                                if (chatDetailsStore.filterText.isEmpty) chatDetailsStore.textFieldFocusNode.unfocus();
-                                chatDetailsStore.textController.clear();
+                                if (widget.chatDetailsStore.filterText.isEmpty) {
+                                  widget.chatDetailsStore.textFieldFocusNode.unfocus();
+                                }
+                                widget.chatDetailsStore.textController.clear();
                               },
-                              icon: const Icon(Icons.clear),
+                              icon: const Icon(Icons.close_rounded),
                             )
                           : null,
                     ),
@@ -97,7 +104,7 @@ class ChattersList extends StatelessWidget {
                 onRefresh: () async {
                   HapticFeedback.lightImpact();
 
-                  chatDetailsStore.updateChatters();
+                  widget.chatDetailsStore.updateChatters();
                 },
                 child: Stack(
                   alignment: AlignmentDirectional.bottomCenter,
@@ -106,14 +113,14 @@ class ChattersList extends StatelessWidget {
                       builder: (context) {
                         return CustomScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
-                          controller: chatDetailsStore.scrollController,
+                          controller: widget.chatDetailsStore.scrollController,
                           slivers: [
-                            if (chatDetailsStore.filterText.isEmpty)
+                            if (widget.chatDetailsStore.filterText.isEmpty)
                               SliverPadding(
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                                 sliver: SliverToBoxAdapter(
                                   child: Text(
-                                    '${NumberFormat().format(chatDetailsStore.chatUsers?.chatterCount)} ${chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
+                                    '${NumberFormat().format(widget.chatDetailsStore.chatUsers?.chatterCount)} ${widget.chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18.0,
@@ -121,28 +128,22 @@ class ChattersList extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            if (chatDetailsStore.chatUsers?.chatterCount == 0)
+                            if (widget.chatDetailsStore.chatUsers?.chatterCount == 0)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: Center(
-                                  child: AlertMessage(
-                                    message: 'No chatters found',
-                                    icon: Icons.person_off,
-                                  ),
+                                  child: AlertMessage(message: 'No chatters found'),
                                 ),
                               )
-                            else if (chatDetailsStore.filteredUsers.expand((element) => element).isEmpty)
+                            else if (widget.chatDetailsStore.filteredUsers.expand((element) => element).isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: Center(
-                                  child: AlertMessage(
-                                    message: 'No matching chatters',
-                                    icon: Icons.person_off,
-                                  ),
+                                  child: AlertMessage(message: 'No matching chatters'),
                                 ),
                               )
                             else
-                              ...chatDetailsStore.filteredUsers.expandIndexed(
+                              ...widget.chatDetailsStore.filteredUsers.expandIndexed(
                                 (index, users) => [
                                   if (users.isNotEmpty) ...[
                                     SliverPadding(
@@ -164,16 +165,16 @@ class ChattersList extends StatelessWidget {
                                           onLongPress: () async {
                                             HapticFeedback.lightImpact();
 
-                                            final userInfo = await context
-                                                .read<TwitchApi>()
-                                                .getUser(headers: context.read<AuthStore>().headersTwitch, userLogin: users[index]);
+                                            final userInfo = await context.read<TwitchApi>().getUser(
+                                                headers: context.read<AuthStore>().headersTwitch,
+                                                userLogin: users[index]);
 
                                             showModalBottomSheet(
                                               backgroundColor: Colors.transparent,
                                               isScrollControlled: true,
                                               context: context,
                                               builder: (context) => ChatUserModal(
-                                                chatStore: chatStore,
+                                                chatStore: widget.chatStore,
                                                 username: userInfo.login,
                                                 userId: userInfo.id,
                                                 displayName: userInfo.displayName,
@@ -194,9 +195,11 @@ class ChattersList extends StatelessWidget {
                     Observer(
                       builder: (context) => AnimatedSwitcher(
                         duration: const Duration(milliseconds: 200),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        child: chatDetailsStore.showJumpButton ? ScrollToTopButton(scrollController: chatDetailsStore.scrollController) : null,
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeIn,
+                        child: widget.chatDetailsStore.showJumpButton
+                            ? ScrollToTopButton(scrollController: widget.chatDetailsStore.scrollController)
+                            : null,
                       ),
                     ),
                   ],
@@ -207,5 +210,11 @@ class ChattersList extends StatelessWidget {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    widget.chatDetailsStore.showJumpButton = false;
+    super.dispose();
   }
 }

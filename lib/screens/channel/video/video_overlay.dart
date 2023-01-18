@@ -3,95 +3,24 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/constants.dart';
-import 'package:frosty/main.dart';
+import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
-import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
-  final void Function() onSettingsPressed;
+  final ChatStore chatStore;
 
   const VideoOverlay({
     Key? key,
     required this.videoStore,
-    required this.onSettingsPressed,
+    required this.chatStore,
   }) : super(key: key);
-
-  Future<void> _showSleepTimerDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Sleep Timer',
-        content: Observer(
-          builder: (context) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.timer),
-                  Text(' ${videoStore.timeRemaining.toString().split('.')[0]}'),
-                  const Spacer(),
-                  IconButton(
-                    tooltip: 'Cancel sleep timer',
-                    onPressed: videoStore.sleepTimer != null && videoStore.sleepTimer!.isActive ? videoStore.cancelSleepTimer : null,
-                    icon: const Icon(Icons.cancel),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  DropdownButton(
-                    value: videoStore.sleepHours,
-                    items: List.generate(24, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
-                    onChanged: (int? hours) => videoStore.sleepHours = hours!,
-                    menuMaxHeight: 200,
-                  ),
-                  const SizedBox(width: 10.0),
-                  const Text('Hours'),
-                ],
-              ),
-              Row(
-                children: [
-                  DropdownButton(
-                    value: videoStore.sleepMinutes,
-                    items: List.generate(60, (index) => index).map((e) => DropdownMenuItem(value: e, child: Text(e.toString()))).toList(),
-                    onChanged: (int? minutes) => videoStore.sleepMinutes = minutes!,
-                    menuMaxHeight: 200,
-                  ),
-                  const SizedBox(width: 10.0),
-                  const Text('Minutes'),
-                ],
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          Observer(
-            builder: (context) => Button(
-              onPressed: videoStore.sleepHours == 0 && videoStore.sleepMinutes == 0
-                  ? null
-                  : () => videoStore.updateSleepTimer(
-                        onTimerFinished: () => navigatorKey.currentState?.popUntil((route) => route.isFirst),
-                      ),
-              child: const Text('Set Timer'),
-            ),
-          ),
-          Button(
-            onPressed: Navigator.of(context).pop,
-            fill: true,
-            color: Colors.red.shade700,
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,88 +29,77 @@ class VideoOverlay extends StatelessWidget {
     final backButton = IconButton(
       tooltip: 'Back',
       icon: Icon(
-        Icons.adaptive.arrow_back,
+        Icons.adaptive.arrow_back_rounded,
         color: Colors.white,
       ),
       onPressed: Navigator.of(context).pop,
     );
 
-    final settingsButton = IconButton(
-      tooltip: 'Settings',
-      icon: const Icon(
-        Icons.settings,
-        color: Colors.white,
-      ),
-      onPressed: onSettingsPressed,
-    );
-
     final chatOverlayButton = Observer(
       builder: (_) => IconButton(
         tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
-        onPressed: () => videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
-        icon: videoStore.settingsStore.fullScreenChatOverlay ? const Icon(Icons.chat_bubble_outline) : const Icon(Icons.chat_bubble),
+        onPressed: () =>
+            videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
+        icon: videoStore.settingsStore.fullScreenChatOverlay
+            ? const Icon(Icons.chat_rounded)
+            : const Icon(Icons.chat_outlined),
         color: Colors.white,
       ),
     );
 
-    final refreshButton = IconButton(
-      tooltip: 'Refresh',
-      icon: const Icon(
-        Icons.refresh,
-        color: Colors.white,
+    final refreshButton = Tooltip(
+      message: 'Refresh',
+      preferBelow: false,
+      child: IconButton(
+        icon: const Icon(
+          Icons.refresh_rounded,
+          color: Colors.white,
+        ),
+        onPressed: videoStore.handleRefresh,
       ),
-      onPressed: videoStore.handleRefresh,
     );
 
-    final fullScreenButton = IconButton(
-      tooltip: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
-      icon: videoStore.settingsStore.fullScreen
-          ? const Icon(
-              Icons.fullscreen_exit,
-              color: Colors.white,
-            )
-          : const Icon(
-              Icons.fullscreen,
-              color: Colors.white,
-            ),
-      onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
+    final fullScreenButton = Tooltip(
+      message: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
+      preferBelow: false,
+      child: IconButton(
+        icon: Icon(
+          videoStore.settingsStore.fullScreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded,
+          color: Colors.white,
+        ),
+        onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
+      ),
     );
 
-    final sleepTimerButton = IconButton(
-      tooltip: 'Sleep timer',
-      icon: const Icon(
-        Icons.timer,
-        color: Colors.white,
-      ),
-      onPressed: () => _showSleepTimerDialog(context),
-    );
-
-    final rotateButton = IconButton(
-      tooltip: orientation == Orientation.portrait ? 'Enter landscape mode' : 'Exit landscape mode',
-      icon: const Icon(
-        Icons.screen_rotation,
-        color: Colors.white,
-      ),
-      onPressed: () {
-        if (orientation == Orientation.portrait) {
-          if (Platform.isIOS) {
-            SystemChrome.setPreferredOrientations([
-              DeviceOrientation.landscapeRight,
-            ]);
-            SystemChrome.setPreferredOrientations([]);
+    final rotateButton = Tooltip(
+      message: orientation == Orientation.portrait ? 'Enter landscape mode' : 'Exit landscape mode',
+      preferBelow: false,
+      child: IconButton(
+        icon: const Icon(
+          Icons.screen_rotation_rounded,
+          color: Colors.white,
+        ),
+        onPressed: () {
+          if (orientation == Orientation.portrait) {
+            if (Platform.isIOS) {
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.landscapeRight,
+              ]);
+              SystemChrome.setPreferredOrientations([]);
+            } else {
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.landscapeRight,
+                DeviceOrientation.landscapeLeft,
+              ]);
+            }
           } else {
             SystemChrome.setPreferredOrientations([
-              DeviceOrientation.landscapeRight,
-              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.portraitUp,
             ]);
+            SystemChrome.setPreferredOrientations([]);
           }
-        } else {
-          SystemChrome.setPreferredOrientations([
-            DeviceOrientation.portraitUp,
-          ]);
-          SystemChrome.setPreferredOrientations([]);
-        }
-      },
+        },
+      ),
     );
 
     final streamInfo = videoStore.streamInfo;
@@ -194,7 +112,6 @@ class VideoOverlay extends StatelessWidget {
               backButton,
               const Spacer(),
               if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-              settingsButton,
             ],
           ),
           Align(
@@ -212,11 +129,6 @@ class VideoOverlay extends StatelessWidget {
       );
     }
 
-    final streamTitle = videoStore.streamInfo!.title.trim();
-    final category = videoStore.streamInfo!.gameName.isNotEmpty ? videoStore.streamInfo!.gameName : 'No Category';
-
-    final streamerName = regexEnglish.hasMatch(streamInfo.userName) ? streamInfo.userName : '${streamInfo.userName} (${streamInfo.userLogin})';
-
     return Observer(
       builder: (context) {
         return Stack(
@@ -225,72 +137,30 @@ class VideoOverlay extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 backButton,
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ProfilePicture(
-                              userLogin: streamInfo.userLogin,
-                              radius: 10,
-                            ),
-                            const SizedBox(width: 5),
-                            Flexible(
-                              child: Tooltip(
-                                message: streamerName,
-                                child: Text(
-                                  streamerName,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5.0),
-                        Tooltip(
-                          message: streamTitle,
-                          child: Text(
-                            streamTitle,
-                            maxLines: orientation == Orientation.portrait ? 1 : 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
+                if (orientation == Orientation.landscape)
+                  Expanded(
+                    child: VideoBar(
+                      streamInfo: streamInfo,
+                      titleTextColor: Colors.white,
+                      subtitleTextColor: Colors.white,
+                      subtitleTextWeight: FontWeight.w500,
                     ),
                   ),
-                ),
                 if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
-                sleepTimerButton,
-                settingsButton,
               ],
             ),
             Center(
-              child: IconButton(
-                tooltip: videoStore.paused ? 'Play' : 'Pause',
-                iconSize: 50.0,
-                icon: videoStore.paused
-                    ? const Icon(
-                        Icons.play_arrow,
-                        color: Colors.white,
-                      )
-                    : const Icon(
-                        Icons.pause,
-                        color: Colors.white,
-                      ),
-                onPressed: videoStore.handlePausePlay,
+              child: Tooltip(
+                message: videoStore.paused ? 'Play' : 'Pause',
+                preferBelow: false,
+                child: IconButton(
+                  iconSize: 50.0,
+                  icon: Icon(
+                    videoStore.paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                    color: Colors.white,
+                  ),
+                  onPressed: videoStore.handlePausePlay,
+                ),
               ),
             ),
             Align(
@@ -300,62 +170,62 @@ class VideoOverlay extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0, left: 8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      padding: const EdgeInsets.only(left: 10.0, bottom: 12.0),
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.games,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 5),
-                              Flexible(
-                                child: Tooltip(
-                                  message: category,
-                                  preferBelow: false,
-                                  child: Text(
-                                    category,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white,
+                          Tooltip(
+                            message: 'Stream uptime',
+                            preferBelow: false,
+                            child: Row(
+                              children: [
+                                const Padding(
+                                  padding: EdgeInsets.all(2.0),
+                                  child: Icon(
+                                    Icons.circle,
+                                    color: Colors.red,
+                                    size: 10,
+                                  ),
+                                ),
+                                const SizedBox(width: 3.0),
+                                Uptime(
+                                  startTime: streamInfo.startedAt,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Tooltip(
+                            message: 'Viewer count',
+                            preferBelow: false,
+                            child: GestureDetector(
+                              onTap: () => showModalBottomSheet(
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (context) => FrostyBottomSheet(
+                                  child: SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.8,
+                                    child: GestureDetector(
+                                      onTap: FocusScope.of(context).unfocus,
+                                      child: ChattersList(
+                                        chatDetailsStore: chatStore.chatDetailsStore,
+                                        chatStore: chatStore,
+                                        userLogin: streamInfo.userLogin,
+                                      ),
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 5),
-                          Row(
-                            children: [
-                              Row(
+                              child: Row(
                                 children: [
                                   const Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
+                                    Icons.visibility,
                                     size: 14,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Uptime(
-                                    startTime: streamInfo.startedAt,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(width: 10),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.people,
                                     color: Colors.white,
-                                    size: 14,
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
@@ -367,19 +237,22 @@ class VideoOverlay extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  IconButton(
-                    tooltip: 'Picture-in-picture',
-                    icon: const Icon(
-                      Icons.picture_in_picture_alt_rounded,
-                      color: Colors.white,
+                  Tooltip(
+                    message: 'Enter picture-in-picture',
+                    preferBelow: false,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.picture_in_picture_alt_rounded,
+                        color: Colors.white,
+                      ),
+                      onPressed: videoStore.requestPictureInPicture,
                     ),
-                    onPressed: videoStore.requestPictureInPicture,
                   ),
                   refreshButton,
                   if (!videoStore.isIPad) rotateButton,

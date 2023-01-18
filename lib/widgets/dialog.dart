@@ -3,37 +3,40 @@ import 'package:flutter/material.dart';
 /// A custom dialog that makes the title bold, puts the actions in a column, and adds a subtle border.
 class FrostyDialog extends StatelessWidget {
   final String title;
-  final Widget content;
+  final String? message;
+  final Widget? content;
   final List<Widget>? actions;
 
   const FrostyDialog({
     Key? key,
     this.actions,
     required this.title,
-    required this.content,
+    this.message,
+    this.content,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      titlePadding: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 20.0),
-      contentPadding: const EdgeInsets.fromLTRB(30.0, 0.0, 30.0, 30.0),
+      titlePadding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
+      contentPadding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 20.0),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
+        borderRadius: BorderRadius.circular(15.0),
       ),
       title: Text(
         title,
         style: const TextStyle(fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
       ),
       content: SingleChildScrollView(
         child: Column(children: [
-          content,
+          content ?? Text(message!, textAlign: TextAlign.center),
           if (actions != null) ...[
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 25.0),
             ...?actions?.map(
               (action) => Container(
                 width: double.infinity,
-                padding: const EdgeInsets.only(top: 10.0),
+                padding: const EdgeInsets.only(top: 5.0),
                 child: action,
               ),
             ),

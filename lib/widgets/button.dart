@@ -40,8 +40,8 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
       backgroundColor: widget.color == null || widget.fill ? widget.color : Colors.transparent,
       padding: widget.padding,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      textStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+      textStyle: DefaultTextStyle.of(context).style.copyWith(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       elevation: widget.color == null ? 10.0 : 0.0,
     ).copyWith(
       elevation: (widget.color == null || widget.fill) && widget.onPressed != null
@@ -81,7 +81,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                 if (mounted) {
                   _animationController.animateTo(
                     _animationController.upperBound,
-                    curve: Curves.easeOutCubic,
+                    curve: Curves.easeOut,
                     duration: duration,
                   );
                 }
@@ -90,7 +90,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                 if (mounted) {
                   _animationController.animateTo(
                     _animationController.lowerBound,
-                    curve: Curves.easeInCubic,
+                    curve: Curves.easeIn,
                     duration: duration,
                   );
                 }
@@ -99,7 +99,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                 if (mounted) {
                   _animationController.animateTo(
                     _animationController.lowerBound,
-                    curve: Curves.easeInCubic,
+                    curve: Curves.easeIn,
                     duration: duration,
                   );
                 }

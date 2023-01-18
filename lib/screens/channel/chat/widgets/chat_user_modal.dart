@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
+import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/section_header.dart';
 
@@ -32,9 +31,10 @@ class ChatUserModal extends StatefulWidget {
 class _ChatUserModalState extends State<ChatUserModal> {
   @override
   Widget build(BuildContext context) {
-    final name = regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
+    final name =
+        regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
 
-    return FrostyModal(
+    return FrostyBottomSheet(
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.5,
         child: Column(
@@ -49,7 +49,6 @@ class _ChatUserModalState extends State<ChatUserModal> {
                 children: [
                   Flexible(
                     child: Tooltip(
-                      preferBelow: false,
                       message: name,
                       child: Text(
                         name,
@@ -71,29 +70,26 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       child: const Text('Reply'),
                     )
                   : null,
-              onLongPress: () {
-                HapticFeedback.mediumImpact();
-
-                showModalBottomSheet(
-                  backgroundColor: Colors.transparent,
-                  context: context,
-                  builder: (context) => BlockReportModal(
-                    authStore: widget.chatStore.auth,
-                    name: name,
-                    userLogin: widget.username,
-                    userId: widget.userId,
-                  ),
-                );
-              },
+              onTap: () => showModalBottomSheet(
+                backgroundColor: Colors.transparent,
+                context: context,
+                builder: (context) => BlockReportModal(
+                  authStore: widget.chatStore.auth,
+                  name: name,
+                  userLogin: widget.username,
+                  userId: widget.userId,
+                ),
+              ),
             ),
             const SectionHeader(
-              'Recent Messages',
+              'Recent messages',
               padding: EdgeInsets.all(10.0),
             ),
             Expanded(
               child: Observer(
                 builder: (context) {
-                  final userMessages = widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
+                  final userMessages =
+                      widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
 
                   if (userMessages.isEmpty) {
                     return const AlertMessage(message: 'No recent messages');
