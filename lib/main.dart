@@ -25,9 +25,11 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
 
+  final firstRun = prefs.getBool('first_run') ?? true;
+
   // Workaround for clearing stored tokens on uninstall.
   // If first time running app, will clear all tokens in the secure storage.
-  if (prefs.getBool('first_run') != false) {
+  if (firstRun) {
     debugPrint('Clearing secure storage...');
     const storage = FlutterSecureStorage();
 
@@ -72,7 +74,7 @@ void main() async {
             Provider<FFZApi>(create: (_) => ffzApiService),
             Provider<SevenTVApi>(create: (_) => sevenTVApiService),
           ],
-          child: MyApp(firstRun: prefs.getBool('first_run') ?? false),
+          child: MyApp(firstRun: firstRun),
         );
       },
     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/widgets/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScaffold extends StatelessWidget {
   final String header;
@@ -35,6 +36,8 @@ class OnboardingScaffold extends StatelessWidget {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
+    if (isLast) SharedPreferences.getInstance().then((prefs) => prefs.setBool('first_run', false));
 
     return Scaffold(
       appBar: AppBar(),
