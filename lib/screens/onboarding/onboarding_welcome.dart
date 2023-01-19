@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_scaffold.dart';
@@ -8,33 +9,36 @@ class OnboardingWelcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const text = [
-      'Frosty is completely free and open-source. If you\'d like to explore the source code, report an issue, or make a feature request, check out the GitHub repo (link at the top-right of settings).',
-      'You can also find links to the full changelog and FAQ in Settings -> Other.',
-      'Don\'t forget to leave a rating and/or review on the app store!',
+      'Check out the GitHub repo at the top-right of the settings page to explore Frosty\'s source code, report bugs, make feature requests, and more.',
+      'Links to the full changelog and FAQ are in the settings page under "Other".',
+      'Don\'t forget to leave a rating and/or review on the app store!'
     ];
 
     return OnboardingScaffold(
       header: 'Welcome!',
-      content: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Opacity(
-          opacity: 0.8,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: text
-                .map((e) => Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: Text(
-                        e,
-                        textAlign: TextAlign.center,
+      subtitle: 'Just a few more things...',
+      content: Opacity(
+        opacity: 0.8,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          children: text
+              .mapIndexed((index, sentence) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: ListTile(
+                      leading: Text(
+                        '${index + 1}.',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ))
-                .toList(),
-          ),
+                      title: Text(sentence),
+                    ),
+                  ))
+              .toList(),
         ),
       ),
-      buttonText: 'Lets go!',
+      buttonText: 'Let\'s go!',
       isLast: true,
       route: const Home(),
     );

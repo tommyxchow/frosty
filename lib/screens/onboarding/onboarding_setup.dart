@@ -18,7 +18,7 @@ class OnboardingSetup extends StatelessWidget {
 
     return OnboardingScaffold(
       header: 'Setup',
-      subtitle: 'Lets tweak some settings before you get started. You can always change these later.',
+      subtitle: 'Let\'s tweak some settings before you get started. You can always change these later.',
       content: Observer(
         builder: (context) {
           return ListView(

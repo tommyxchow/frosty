@@ -82,7 +82,7 @@ class OnboardingScaffold extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  padding: EdgeInsets.symmetric(vertical: content == null ? 20.0 : 0.0),
                   child: content ?? const SizedBox(),
                 ),
               ),
@@ -99,7 +99,7 @@ class OnboardingScaffold extends StatelessWidget {
                   ),
                 ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.all(10),
                 width: double.infinity,
                 child: Button(
                   onPressed: () => isLast
@@ -120,7 +120,7 @@ class OnboardingScaffold extends StatelessWidget {
               ),
               if (skipRoute != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                   width: double.infinity,
                   child: Button(
                     color: Colors.grey,
@@ -133,8 +133,6 @@ class OnboardingScaffold extends StatelessWidget {
                     child: const Text('Skip'),
                   ),
                 )
-              else
-                const SizedBox(height: 5),
             ],
           ),
         ),
