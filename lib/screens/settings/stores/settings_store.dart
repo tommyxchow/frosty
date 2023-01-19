@@ -295,6 +295,8 @@ abstract class _SettingsStoreBase with Store {
   }
 }
 
+const themeNames = ['System', 'Light', 'Dark', 'Black'];
+
 enum ThemeType {
   system,
   light,
@@ -302,11 +304,15 @@ enum ThemeType {
   black,
 }
 
+const timestampNames = ['Disabled', '12-hour', '24-hour'];
+
 enum TimestampType {
   disabled,
   twelve,
   twentyFour,
 }
+
+const landscapeCutoutNames = ['None', 'Left', 'Right', 'Both'];
 
 enum LandscapeCutoutType {
   none,

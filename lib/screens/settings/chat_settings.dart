@@ -24,10 +24,6 @@ class _ChatSettingsState extends State<ChatSettings> {
 
   @override
   Widget build(BuildContext context) {
-    const landscapeCutouts = ['None', 'Left', 'Right', 'Both'];
-
-    const timestamps = ['Disabled', '12-hour', '24-hour'];
-
     final settingsStore = widget.settingsStore;
 
     return Observer(
@@ -150,9 +146,10 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SettingsListSelect(
             title: 'Message timestamps',
-            selectedOption: timestamps[settingsStore.timestampType.index],
-            options: timestamps,
-            onChanged: (newValue) => settingsStore.timestampType = TimestampType.values[timestamps.indexOf(newValue)],
+            selectedOption: timestampNames[settingsStore.timestampType.index],
+            options: timestampNames,
+            onChanged: (newValue) =>
+                settingsStore.timestampType = TimestampType.values[timestampNames.indexOf(newValue)],
           ),
           const SectionHeader('Delay'),
           SettingsListSlider(
@@ -209,10 +206,10 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSelect(
             title: 'Fill notch side',
             subtitle: 'Overrides and fills the available space in devices with a display notch.',
-            selectedOption: landscapeCutouts[settingsStore.landscapeCutout.index],
-            options: landscapeCutouts,
+            selectedOption: landscapeCutoutNames[settingsStore.landscapeCutout.index],
+            options: landscapeCutoutNames,
             onChanged: (newValue) =>
-                settingsStore.landscapeCutout = LandscapeCutoutType.values[landscapeCutouts.indexOf(newValue)],
+                settingsStore.landscapeCutout = LandscapeCutoutType.values[landscapeCutoutNames.indexOf(newValue)],
           ),
           SettingsListSlider(
             title: 'Chat width',

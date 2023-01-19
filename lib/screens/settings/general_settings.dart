@@ -12,17 +12,15 @@ class GeneralSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const themes = ['System', 'Light', 'Dark', 'Black'];
-
     return Observer(
       builder: (context) => ListView(
         children: [
           const SectionHeader('Display'),
           SettingsListSelect(
             title: 'Theme',
-            selectedOption: themes[settingsStore.themeType.index],
-            options: themes,
-            onChanged: (newTheme) => settingsStore.themeType = ThemeType.values[themes.indexOf(newTheme)],
+            selectedOption: themeNames[settingsStore.themeType.index],
+            options: themeNames,
+            onChanged: (newTheme) => settingsStore.themeType = ThemeType.values[themeNames.indexOf(newTheme)],
           ),
           const SectionHeader('Stream card'),
           SettingsListSwitch(
