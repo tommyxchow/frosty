@@ -33,10 +33,10 @@ class ProfileCard extends StatelessWidget {
                       appBar: const FrostyAppBar(
                         title: Text('Connect with Twitch'),
                       ),
-                      body: WebView(
-                        initialUrl: authStore.loginUri.toString(),
-                        navigationDelegate: (navigation) => authStore.handleNavigation(navigation: navigation),
-                        javascriptMode: JavascriptMode.unrestricted,
+                      body: WebViewWidget(
+                        controller: authStore.webViewController
+                          ..setNavigationDelegate(authStore.createNavigationDelegate())
+                          ..loadRequest(authStore.loginUri),
                       ),
                     );
                   },

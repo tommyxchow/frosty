@@ -65,34 +65,42 @@ abstract class AuthBase with Store {
     },
   );
 
+  late final webViewController = WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setBackgroundColor(const Color(0x00000000));
+
   /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
-  FutureOr<NavigationDecision> handleNavigation({required NavigationRequest navigation, Widget? routeAfter}) {
-    // Check if the URL is the redirect URI.
-    if (navigation.url.startsWith('https://twitch.tv/login')) {
-      // Extract the token from the query parameters.
-      final uri = Uri.parse(navigation.url.replaceFirst('#', '?'));
-      final token = uri.queryParameters['access_token'];
+  NavigationDelegate createNavigationDelegate({Widget? routeWhenLogin}) {
+    return NavigationDelegate(
+      onNavigationRequest: (NavigationRequest request) {
+        // Check if the URL is the redirect URI.
+        if (request.url.startsWith('https://twitch.tv/login')) {
+          // Extract the token from the query parameters.
+          final uri = Uri.parse(request.url.replaceFirst('#', '?'));
+          final token = uri.queryParameters['access_token'];
 
-      // Login with the provided token.
-      if (token != null) login(token: token);
-    }
+          // Login with the provided token.
+          if (token != null) login(token: token);
+        }
 
-    // Check if the the URL has been redirected to "https://www.twitch.tv/?no-reload=true".
-    // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
-    // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
-    if (navigation.url == 'https://www.twitch.tv/?no-reload=true') {
-      if (routeAfter != null) {
-        navigatorKey.currentState?.pop();
-        navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => routeAfter));
-      } else {
-        // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
-        navigatorKey.currentState?.pop();
-        navigatorKey.currentState?.pop();
-      }
-    }
+        // Check if the the URL has been redirected to "https://www.twitch.tv/?no-reload=true".
+        // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
+        // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
+        if (request.url == 'https://www.twitch.tv/?no-reload=true') {
+          if (routeWhenLogin != null) {
+            navigatorKey.currentState?.pop();
+            navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => routeWhenLogin));
+          } else {
+            // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
+            navigatorKey.currentState?.pop();
+            navigatorKey.currentState?.pop();
+          }
+        }
 
-    // Always allow navigation to the next URL.
-    return NavigationDecision.navigate;
+        // Always allow navigation to the next URL.
+        return NavigationDecision.navigate;
+      },
+    );
   }
 
   /// Shows a dialog verifying that the user is sure they want to block/unblock the target user.

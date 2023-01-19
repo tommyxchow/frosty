@@ -43,9 +43,10 @@ class BlockReportModal extends StatelessWidget {
                     appBar: FrostyAppBar(
                       title: Text('Report $name'),
                     ),
-                    body: WebView(
-                      initialUrl: 'https://www.twitch.tv/$userLogin/report',
-                      javascriptMode: JavascriptMode.unrestricted,
+                    body: WebViewWidget(
+                      controller: WebViewController()
+                        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                        ..loadRequest(Uri.parse('https://www.twitch.tv/$userLogin/report')),
                     ),
                   );
                 },
