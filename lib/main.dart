@@ -11,6 +11,7 @@ import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/home/home.dart';
+import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:http/http.dart';
@@ -71,7 +72,7 @@ void main() async {
             Provider<FFZApi>(create: (_) => ffzApiService),
             Provider<SevenTVApi>(create: (_) => sevenTVApiService),
           ],
-          child: const MyApp(),
+          child: MyApp(firstRun: prefs.getBool('first_run') ?? false),
         );
       },
     ),
@@ -202,7 +203,12 @@ final oledTheme = ThemeData(
 );
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final bool firstRun;
+
+  const MyApp({
+    Key? key,
+    this.firstRun = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +229,7 @@ class MyApp extends StatelessWidget {
               : settingsStore.themeType == ThemeType.light
                   ? ThemeMode.light
                   : ThemeMode.dark,
-          home: const Home(),
+          home: firstRun ? const OnboardingIntro() : const Home(),
           navigatorKey: navigatorKey,
         );
       },

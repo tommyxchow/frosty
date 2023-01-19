@@ -66,7 +66,7 @@ abstract class AuthBase with Store {
   );
 
   /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
-  FutureOr<NavigationDecision> handleNavigation(NavigationRequest navigation) {
+  FutureOr<NavigationDecision> handleNavigation({required NavigationRequest navigation, Widget? routeAfter}) {
     // Check if the URL is the redirect URI.
     if (navigation.url.startsWith('https://twitch.tv/login')) {
       // Extract the token from the query parameters.
@@ -81,9 +81,14 @@ abstract class AuthBase with Store {
     // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
     // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
     if (navigation.url == 'https://www.twitch.tv/?no-reload=true') {
-      // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
-      navigatorKey.currentState?.pop();
-      navigatorKey.currentState?.pop();
+      if (routeAfter != null) {
+        navigatorKey.currentState?.pop();
+        navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => routeAfter));
+      } else {
+        // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
+        navigatorKey.currentState?.pop();
+        navigatorKey.currentState?.pop();
+      }
     }
 
     // Always allow navigation to the next URL.
