@@ -34,7 +34,7 @@ platform :ios do
 
     # Automatic signing is used during development, but fastlane needs to use manual signing.
     update_code_signing_settings(
-      code_signing_identity: 'iPhone Distribution',
+      code_sign_identity: 'iPhone Distribution',
       profile_name: 'match AppStore com.tommychow.frosty'
     )
 
