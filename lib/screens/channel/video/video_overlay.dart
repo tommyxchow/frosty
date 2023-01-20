@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -81,21 +79,12 @@ class VideoOverlay extends StatelessWidget {
         ),
         onPressed: () {
           if (orientation == Orientation.portrait) {
-            if (Platform.isIOS) {
-              SystemChrome.setPreferredOrientations([
-                DeviceOrientation.landscapeRight,
-              ]);
-              SystemChrome.setPreferredOrientations([]);
-            } else {
-              SystemChrome.setPreferredOrientations([
-                DeviceOrientation.landscapeRight,
-                DeviceOrientation.landscapeLeft,
-              ]);
-            }
-          } else {
             SystemChrome.setPreferredOrientations([
-              DeviceOrientation.portraitUp,
+              DeviceOrientation.landscapeLeft,
+              DeviceOrientation.landscapeRight,
             ]);
+          } else {
+            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
             SystemChrome.setPreferredOrientations([]);
           }
         },
