@@ -97,8 +97,8 @@ class TwitchApi {
     if (response.statusCode == 200) {
       final result = <String, Badge>{};
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
-      decoded.forEach((id, versions) =>
-          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+      decoded.forEach((id, versions) => (versions['versions'] as Map).forEach(
+          (version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {
@@ -114,8 +114,8 @@ class TwitchApi {
     if (response.statusCode == 200) {
       final result = <String, Badge>{};
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
-      decoded.forEach((id, versions) =>
-          (versions['versions'] as Map).forEach((version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+      decoded.forEach((id, versions) => (versions['versions'] as Map).forEach(
+          (version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {
@@ -175,7 +175,8 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/streams' : 'https://api.twitch.tv/helix/streams?after=$cursor');
+    final url = Uri.parse(
+        cursor == null ? 'https://api.twitch.tv/helix/streams' : 'https://api.twitch.tv/helix/streams?after=$cursor');
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -192,8 +193,9 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(
-        cursor == null ? 'https://api.twitch.tv/helix/streams/followed?user_id=$id' : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
+    final url = Uri.parse(cursor == null
+        ? 'https://api.twitch.tv/helix/streams/followed?user_id=$id'
+        : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -210,8 +212,9 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url =
-        Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/streams?game_id=$gameId' : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
+    final url = Uri.parse(cursor == null
+        ? 'https://api.twitch.tv/helix/streams?game_id=$gameId'
+        : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -250,7 +253,8 @@ class TwitchApi {
     String? id,
     required Map<String, String> headers,
   }) async {
-    final url = Uri.parse(id != null ? 'https://api.twitch.tv/helix/users?id=$id' : 'https://api.twitch.tv/helix/users?login=$userLogin');
+    final url = Uri.parse(
+        id != null ? 'https://api.twitch.tv/helix/users?id=$id' : 'https://api.twitch.tv/helix/users?login=$userLogin');
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -312,7 +316,9 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null ? 'https://api.twitch.tv/helix/games/top' : 'https://api.twitch.tv/helix/games/top?after=$cursor');
+    final url = Uri.parse(cursor == null
+        ? 'https://api.twitch.tv/helix/games/top'
+        : 'https://api.twitch.tv/helix/games/top?after=$cursor');
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);

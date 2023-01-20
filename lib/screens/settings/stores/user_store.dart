@@ -29,7 +29,9 @@ abstract class UserStoreBase with Store {
     // Get and update the current user's list of blocked users.
     // Don't use await because having a huge list of blocked users will block the UI.
     if (_details?.id != null) {
-      twitchApi.getUserBlockedList(id: _details!.id, headers: headers).then((blockedUsers) => _blockedUsers = blockedUsers.asObservable());
+      twitchApi
+          .getUserBlockedList(id: _details!.id, headers: headers)
+          .then((blockedUsers) => _blockedUsers = blockedUsers.asObservable());
     }
 
     _disposeReaction = autorun((_) => _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)));

@@ -96,7 +96,12 @@ void main() {
       final List<EmoteBTTV> emotes = decoded.map((emote) => EmoteBTTV.fromJson(emote)).toList();
       expect(emotes.length, 4);
 
-      final emoteIds = ['54fa903b01e468494b85b53f', '54fa909b01e468494b85b542', '54fa90ba01e468494b85b543', '54fa90f201e468494b85b545'];
+      final emoteIds = [
+        '54fa903b01e468494b85b53f',
+        '54fa909b01e468494b85b542',
+        '54fa90ba01e468494b85b543',
+        '54fa90f201e468494b85b545'
+      ];
       final emoteCodes = ['DatSauce', 'ForeverAlone', 'GabeN', 'HailHelix'];
 
       emotes.asMap().forEach((index, emote) {
