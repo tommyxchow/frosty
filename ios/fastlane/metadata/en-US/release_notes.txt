@@ -1,6 +1,3 @@
-New Features
-• Added an option to force vertical chat in landscape mode
+This update contains major redesigns, usability improvements, bug fixes, and more!
 
-Improvements
-• Removed zero-width emote option in favor of enabling it by default
-• Removed pip button option in favor of enabling it by default
+See the full release notes on GitHub: https://github.com/tommyxchow/frosty/releases
