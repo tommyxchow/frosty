@@ -71,6 +71,8 @@ class _OtherSettingsState extends State<OtherSettings> {
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
+            if (!mounted) return;
+
             showAboutDialog(
               context: context,
               applicationIcon: SvgPicture.asset(

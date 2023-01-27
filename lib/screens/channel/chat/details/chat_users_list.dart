@@ -169,6 +169,8 @@ class _ChattersListState extends State<ChattersList> {
                                                 headers: context.read<AuthStore>().headersTwitch,
                                                 userLogin: users[index]);
 
+                                            if (!mounted) return;
+
                                             showModalBottomSheet(
                                               backgroundColor: Colors.transparent,
                                               isScrollControlled: true,
