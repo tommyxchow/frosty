@@ -9,6 +9,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
   final Color? color;
   final BlendMode? colorBlendMode;
   final Widget Function(BuildContext, String)? placeholder;
+  final bool useOldImageOnUrlChange;
   final bool useFade;
   final BoxFit? fit;
 
@@ -21,6 +22,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
     this.colorBlendMode,
     this.placeholder,
     this.useFade = true,
+    this.useOldImageOnUrlChange = false,
     this.fit,
   }) : super(key: key);
 
@@ -33,7 +35,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
       color: color,
       colorBlendMode: colorBlendMode,
       placeholder: placeholder,
-      useOldImageOnUrlChange: true,
+      useOldImageOnUrlChange: useOldImageOnUrlChange,
       fadeOutDuration: useFade ? const Duration(milliseconds: 500) : Duration.zero,
       fadeInDuration: useFade ? const Duration(milliseconds: 500) : Duration.zero,
       fadeInCurve: Curves.easeOut,
