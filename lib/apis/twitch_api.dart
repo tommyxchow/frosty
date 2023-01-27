@@ -90,15 +90,15 @@ class TwitchApi {
   }
 
   /// Returns a map of global Twitch badges to their [Emote] object.
-  Future<Map<String, Badge>> getBadgesGlobal() async {
+  Future<Map<String, ChatBadge>> getBadgesGlobal() async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/global/display');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {
-      final result = <String, Badge>{};
+      final result = <String, ChatBadge>{};
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
       decoded.forEach((id, versions) => (versions['versions'] as Map).forEach(
-          (version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+          (version, badgeInfo) => result['$id/$version'] = ChatBadge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {
@@ -107,15 +107,15 @@ class TwitchApi {
   }
 
   /// Returns a map of a channel's Twitch badges to their [Emote] object.
-  Future<Map<String, Badge>> getBadgesChannel({required String id}) async {
+  Future<Map<String, ChatBadge>> getBadgesChannel({required String id}) async {
     final url = Uri.parse('https://badges.twitch.tv/v1/badges/channels/$id/display');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {
-      final result = <String, Badge>{};
+      final result = <String, ChatBadge>{};
       final decoded = jsonDecode(response.body)['badge_sets'] as Map;
       decoded.forEach((id, versions) => (versions['versions'] as Map).forEach(
-          (version, badgeInfo) => result['$id/$version'] = Badge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
+          (version, badgeInfo) => result['$id/$version'] = ChatBadge.fromTwitch(BadgeInfoTwitch.fromJson(badgeInfo))));
 
       return result;
     } else {

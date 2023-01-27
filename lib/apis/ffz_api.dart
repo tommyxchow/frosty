@@ -51,7 +51,7 @@ class FFZApi {
   }
 
   /// Returns a map of badges user IDs to a list of their FFZ badges.
-  Future<Map<String, List<Badge>>> getBadges() async {
+  Future<Map<String, List<ChatBadge>>> getBadges() async {
     final url = Uri.parse('https://api.frankerfacez.com/v1/badges/ids');
 
     final response = await _client.get(url);
@@ -60,11 +60,11 @@ class FFZApi {
       final badges = decoded['badges'] as List;
       final badgeObjects = badges.map((badge) => BadgeInfoFFZ.fromJson(badge)).toList();
 
-      final result = <String, List<Badge>>{};
+      final result = <String, List<ChatBadge>>{};
       for (final badge in badgeObjects.reversed) {
         for (final userId in decoded['users'][badge.id.toString()]) {
           final entry = result[userId.toString()];
-          final normalBadge = Badge.fromFFZ(badge);
+          final normalBadge = ChatBadge.fromFFZ(badge);
           if (entry == null) {
             result[userId.toString()] = [normalBadge];
           } else {

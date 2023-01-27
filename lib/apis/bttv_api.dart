@@ -45,7 +45,7 @@ class BTTVApi {
   }
 
   /// Returns a map of username to their BTTV badge.
-  Future<Map<String, Badge>> getBadges() async {
+  Future<Map<String, ChatBadge>> getBadges() async {
     final url = Uri.parse('https://api.betterttv.net/3/cached/badges');
 
     final response = await _client.get(url);
@@ -54,7 +54,7 @@ class BTTVApi {
 
       final badgeObjects = badges.map((badge) => BadgeInfoBTTV.fromJson(badge)).toList();
 
-      return {for (final badge in badgeObjects) badge.providerId: Badge.fromBTTV(badge)};
+      return {for (final badge in badgeObjects) badge.providerId: ChatBadge.fromBTTV(badge)};
     } else {
       return Future.error('Failed to get BTTV badges');
     }

@@ -99,39 +99,39 @@ class BadgeDetailsBTTV {
   factory BadgeDetailsBTTV.fromJson(Map<String, dynamic> json) => _$BadgeDetailsBTTVFromJson(json);
 }
 
-class Badge {
+class ChatBadge {
   final String name;
   final String url;
   final BadgeType type;
   final String? color;
 
-  const Badge({
+  const ChatBadge({
     required this.name,
     required this.url,
     this.color,
     required this.type,
   });
 
-  factory Badge.fromTwitch(BadgeInfoTwitch badge) => Badge(
+  factory ChatBadge.fromTwitch(BadgeInfoTwitch badge) => ChatBadge(
         name: badge.title,
         url: badge.imageUrl4x,
         type: BadgeType.twitch,
       );
 
-  factory Badge.fromBTTV(BadgeInfoBTTV badge) => Badge(
+  factory ChatBadge.fromBTTV(BadgeInfoBTTV badge) => ChatBadge(
         name: badge.badge.description,
         url: badge.badge.svg,
         type: BadgeType.bttv,
       );
 
-  factory Badge.fromFFZ(BadgeInfoFFZ badge) => Badge(
+  factory ChatBadge.fromFFZ(BadgeInfoFFZ badge) => ChatBadge(
         name: badge.title,
         url: 'https:${badge.urls.url4x}',
         color: badge.color,
         type: BadgeType.ffz,
       );
 
-  factory Badge.from7TV(BadgeInfo7TV badge) => Badge(
+  factory ChatBadge.from7TV(BadgeInfo7TV badge) => ChatBadge(
         name: badge.tooltip,
         url: badge.urls[2][1],
         type: BadgeType.sevenTV,
