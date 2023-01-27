@@ -66,6 +66,7 @@ class LargeStreamCard extends StatelessWidget {
                     streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
                         cacheUrlExtension,
                 placeholder: (context, url) => const ColoredBox(color: lightGray, child: LoadingIndicator()),
+                useOldImageOnUrlChange: true,
               ),
             ),
           ),
