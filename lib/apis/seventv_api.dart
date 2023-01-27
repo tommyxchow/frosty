@@ -41,7 +41,7 @@ class SevenTVApi {
   }
 
   /// Returns a map of user IDS to a list of their 7TV badges.
-  Future<Map<String, List<Badge>>> getBadges() async {
+  Future<Map<String, List<ChatBadge>>> getBadges() async {
     final url = Uri.parse('https://api.7tv.app/v2/badges?user_identifier=twitch_id');
 
     final response = await _client.get(url);
@@ -49,11 +49,11 @@ class SevenTVApi {
       final decoded = jsonDecode(response.body)['badges'] as List;
       final badges = decoded.map((emote) => BadgeInfo7TV.fromJson(emote));
 
-      final result = <String, List<Badge>>{};
+      final result = <String, List<ChatBadge>>{};
       for (final badge in badges) {
         for (final userId in badge.users) {
           final entry = result[userId];
-          final normalBadge = Badge.from7TV(badge);
+          final normalBadge = ChatBadge.from7TV(badge);
           if (entry == null) {
             result[userId] = [normalBadge];
           } else {

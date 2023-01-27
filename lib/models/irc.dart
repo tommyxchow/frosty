@@ -178,7 +178,7 @@ class IRCMessage {
                   'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
             }
 
-            final newBadge = Badge(
+            final newBadge = ChatBadge(
               name: skipBot ? 'Moderator (Bot)' : 'Moderator',
               url: badgeUrl,
               type: BadgeType.twitch,
@@ -201,7 +201,7 @@ class IRCMessage {
                 'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
           }
 
-          final newBadge = Badge(
+          final newBadge = ChatBadge(
             name: badgeInfo.name,
             url: badgeUrl,
             type: BadgeType.twitch,
@@ -466,7 +466,7 @@ class IRCMessage {
   }
 
   static Widget _createBadgeWidget({
-    required Badge badge,
+    required ChatBadge badge,
     required double size,
     Color? backgroundColor,
     bool? isSvg,
@@ -498,7 +498,7 @@ class IRCMessage {
   }
 
   static WidgetSpan _createBadgeSpan({
-    required Badge badge,
+    required ChatBadge badge,
     required double size,
     Color? backgroundColor,
     bool? isSvg,

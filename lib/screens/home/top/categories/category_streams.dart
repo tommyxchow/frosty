@@ -92,7 +92,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         centerTitle: true,
                         title: Text(
                           widget.categoryName,
-                          style: Theme.of(context).textTheme.headline6?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

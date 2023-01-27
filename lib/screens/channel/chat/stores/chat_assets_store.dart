@@ -32,7 +32,7 @@ abstract class ChatAssetsStoreBase with Store {
   List<Emote> get sevenTVEmotes => _emoteToObject.values.where((emote) => is7TV(emote)).toList();
 
   /// The map of badges ids to their object representation.
-  final twitchBadgesToObject = ObservableMap<String, Badge>();
+  final twitchBadgesToObject = ObservableMap<String, ChatBadge>();
 
   @readonly
   var _recentEmotes = ObservableList<Emote>();
@@ -53,15 +53,15 @@ abstract class ChatAssetsStoreBase with Store {
 
   /// The map of user IDs to their FFZ badges.
   @readonly
-  var _userToFFZBadges = <String, List<Badge>>{};
+  var _userToFFZBadges = <String, List<ChatBadge>>{};
 
   /// The map of user IDs to their 7TV badges.
   @readonly
-  var _userTo7TVBadges = <String, List<Badge>>{};
+  var _userTo7TVBadges = <String, List<ChatBadge>>{};
 
   /// The map of user IDs to their BTTV badge.
   @readonly
-  var _userToBTTVBadges = <String, Badge>{};
+  var _userToBTTVBadges = <String, ChatBadge>{};
 
   /// Whether or not the emote menu is visible.
   @observable

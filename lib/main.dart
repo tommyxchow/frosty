@@ -142,7 +142,6 @@ final lightTheme = ThemeData(
     primarySwatch: Colors.deepPurple,
     accentColor: purple,
   ),
-  toggleableActiveColor: purple,
   tabBarTheme: const TabBarTheme(
     labelColor: Colors.black,
     unselectedLabelColor: Colors.grey,
@@ -173,7 +172,6 @@ final darkTheme = ThemeData(
     accentColor: purple,
   ),
   dialogBackgroundColor: gray,
-  toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,
   tooltipTheme: tooltipTheme,
   snackBarTheme: snackBarTheme,
@@ -198,7 +196,6 @@ final oledTheme = ThemeData(
     accentColor: purple,
   ),
   dialogBackgroundColor: Colors.black,
-  toggleableActiveColor: purple,
   inputDecorationTheme: inputTheme,
   tooltipTheme: tooltipTheme,
   snackBarTheme: snackBarTheme,
