@@ -40,15 +40,11 @@ class _FrostyPageViewState extends State<FrostyPageView> {
                   height: 40,
                   child: Button(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                    onPressed: () {
-                      setState(() => currentIndex = index);
-
-                      _pageContoller.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOut,
-                      );
-                    },
+                    onPressed: () => _pageContoller.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeOut,
+                    ),
                     color: index == currentIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,
                     child: Text(
                       section,
@@ -62,6 +58,7 @@ class _FrostyPageViewState extends State<FrostyPageView> {
         ),
         Expanded(
           child: PageView.builder(
+            onPageChanged: (index) => setState(() => currentIndex = index),
             controller: _pageContoller,
             itemBuilder: (context, index) => widget.children[index],
             itemCount: widget.children.length,
