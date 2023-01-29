@@ -120,7 +120,7 @@ class _ChattersListState extends State<ChattersList> {
                                 padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
                                 sliver: SliverToBoxAdapter(
                                   child: Text(
-                                    '${NumberFormat().format(widget.chatDetailsStore.chatUsers?.chatterCount)} ${widget.chatDetailsStore.chatUsers?.chatterCount == 1 ? 'Chatter' : 'Chatters'}',
+                                    '${NumberFormat().format(widget.chatDetailsStore.chatUsers?.chatterCount)} in chat',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18.0,
