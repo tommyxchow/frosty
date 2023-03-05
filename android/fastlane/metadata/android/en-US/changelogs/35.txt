@@ -1,2 +1,4 @@
+Version 3.0.2
+
 Bug Fixes
 • Fixed FFZ emotes and badges no longer showing
