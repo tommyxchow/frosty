@@ -126,7 +126,7 @@ class ChatBadge {
 
   factory ChatBadge.fromFFZ(BadgeInfoFFZ badge) => ChatBadge(
         name: badge.title,
-        url: 'https:${badge.urls.url4x}',
+        url: badge.urls.url4x,
         color: badge.color,
         type: BadgeType.ffz,
       );

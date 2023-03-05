@@ -174,8 +174,7 @@ class IRCMessage {
               badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
-              badgeUrl =
-                  'https:${ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x}';
+              badgeUrl = ffzRoomInfo!.modUrls?.url4x ?? ffzRoomInfo.modUrls?.url2x ?? ffzRoomInfo.modUrls!.url1x;
             }
 
             final newBadge = ChatBadge(
@@ -197,8 +196,7 @@ class IRCMessage {
 
           // Add custom FFZ vip badge if it exists
           if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
-            badgeUrl =
-                'https:${ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x}';
+            badgeUrl = ffzRoomInfo!.vipBadge?.url4x ?? ffzRoomInfo.vipBadge?.url2x ?? ffzRoomInfo.vipBadge!.url1x;
           }
 
           final newBadge = ChatBadge(
