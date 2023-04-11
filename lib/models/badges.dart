@@ -11,13 +11,17 @@ class BadgeInfoTwitch {
   @JsonKey(name: 'image_url_4x')
   final String imageUrl4x;
 
+  final String id;
   final String title;
+  final String description;
 
   const BadgeInfoTwitch(
     this.imageUrl1x,
     this.imageUrl2x,
     this.imageUrl4x,
+    this.id,
     this.title,
+    this.description,
   );
 
   factory BadgeInfoTwitch.fromJson(Map<String, dynamic> json) => _$BadgeInfoTwitchFromJson(json);
