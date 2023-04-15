@@ -135,6 +135,52 @@ class VideoOverlay extends StatelessWidget {
                       subtitleTextWeight: FontWeight.w500,
                     ),
                   ),
+                const Spacer(),
+                if (videoStore.settingsStore.useNativePlayer && videoStore.streamLinks != null)
+                  IconButton(
+                    onPressed: () => showModalBottomSheet(
+                      backgroundColor: Colors.transparent,
+                      isScrollControlled: true,
+                      context: context,
+                      builder: (context) => FrostyBottomSheet(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Text(
+                                'Select quality',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.5,
+                              child: ListView(
+                                children: [
+                                  ...videoStore.streamLinks!.keys.map(
+                                    (quality) => ListTile(
+                                      title: Text(quality),
+                                      trailing: videoStore.selectedQuality == quality
+                                          ? const Icon(Icons.check_rounded)
+                                          : null,
+                                      onTap: () {
+                                        videoStore.handleQualityChange(quality);
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.settings_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
                 if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
               ],
             ),

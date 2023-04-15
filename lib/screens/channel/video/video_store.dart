@@ -33,7 +33,8 @@ abstract class VideoStoreBase with Store {
   /// The webview controller used for injecting JavaScript to control the webview and video player.
   WebViewController? controller;
 
-  VideoPlayerController? videoPlayerController;
+  @readonly
+  VideoPlayerController? _videoPlayerController;
 
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
@@ -91,6 +92,9 @@ abstract class VideoStoreBase with Store {
   @readonly
   Map<String, String>? _streamLinks;
 
+  @readonly
+  var _selectedQuality = 'best';
+
   /// The video URL to use for the webview. Controls will be disabled when custom overlay is enabled.
   @computed
   String get videoUrl => settingsStore.showOverlay
@@ -127,9 +131,9 @@ abstract class VideoStoreBase with Store {
   Future<void> initVideo() async {
     if (settingsStore.useNativePlayer) {
       _streamLinks = await twitchApi.getStreamLinks(userLogin: userLogin, token: authStore.streamLinkToken);
-      videoPlayerController = VideoPlayerController.network(_streamLinks?['best'] ?? '');
-      await videoPlayerController?.initialize();
-      await videoPlayerController?.play();
+      _videoPlayerController = VideoPlayerController.network(_streamLinks?[_selectedQuality] ?? '');
+      await _videoPlayerController?.initialize();
+      await _videoPlayerController?.play();
       _paused = false;
     } else {
       // Add event listeners to notify the JavaScript channels when the video plays and pauses.
@@ -155,6 +159,15 @@ abstract class VideoStoreBase with Store {
         _isIPad = false;
       }
     }
+  }
+
+  @action
+  Future<void> handleQualityChange(String quality) async {
+    await _videoPlayerController?.dispose();
+    _videoPlayerController = VideoPlayerController.network(_streamLinks?[quality] ?? '');
+    await _videoPlayerController?.initialize();
+    await _videoPlayerController?.play();
+    _selectedQuality = quality;
   }
 
   /// Called whenever the video/overlay is tapped.
@@ -218,12 +231,12 @@ abstract class VideoStoreBase with Store {
   void handlePausePlay() {
     try {
       if (_paused) {
-        videoPlayerController?.play();
+        _videoPlayerController?.play();
         if (settingsStore.useNativePlayer) _paused = false;
 
         controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
       } else {
-        videoPlayerController?.pause();
+        _videoPlayerController?.pause();
         if (settingsStore.useNativePlayer) _paused = true;
 
         controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
@@ -261,7 +274,7 @@ abstract class VideoStoreBase with Store {
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
     if (Platform.isIOS) controller?.reload();
-    videoPlayerController?.dispose();
+    _videoPlayerController?.dispose();
 
     _disposeOverlayReaction();
   }

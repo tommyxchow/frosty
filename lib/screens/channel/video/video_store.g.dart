@@ -17,6 +17,25 @@ mixin _$VideoStore on VideoStoreBase, Store {
               name: 'VideoStoreBase.videoUrl'))
           .value;
 
+  late final _$_videoPlayerControllerAtom =
+      Atom(name: 'VideoStoreBase._videoPlayerController', context: context);
+
+  VideoPlayerController? get videoPlayerController {
+    _$_videoPlayerControllerAtom.reportRead();
+    return super._videoPlayerController;
+  }
+
+  @override
+  VideoPlayerController? get _videoPlayerController => videoPlayerController;
+
+  @override
+  set _videoPlayerController(VideoPlayerController? value) {
+    _$_videoPlayerControllerAtom
+        .reportWrite(value, super._videoPlayerController, () {
+      super._videoPlayerController = value;
+    });
+  }
+
   late final _$_pausedAtom =
       Atom(name: 'VideoStoreBase._paused', context: context);
 
@@ -107,12 +126,39 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$_selectedQualityAtom =
+      Atom(name: 'VideoStoreBase._selectedQuality', context: context);
+
+  String get selectedQuality {
+    _$_selectedQualityAtom.reportRead();
+    return super._selectedQuality;
+  }
+
+  @override
+  String get _selectedQuality => selectedQuality;
+
+  @override
+  set _selectedQuality(String value) {
+    _$_selectedQualityAtom.reportWrite(value, super._selectedQuality, () {
+      super._selectedQuality = value;
+    });
+  }
+
   late final _$initVideoAsyncAction =
       AsyncAction('VideoStoreBase.initVideo', context: context);
 
   @override
   Future<void> initVideo() {
     return _$initVideoAsyncAction.run(() => super.initVideo());
+  }
+
+  late final _$handleQualityChangeAsyncAction =
+      AsyncAction('VideoStoreBase.handleQualityChange', context: context);
+
+  @override
+  Future<void> handleQualityChange(String quality) {
+    return _$handleQualityChangeAsyncAction
+        .run(() => super.handleQualityChange(quality));
   }
 
   late final _$updateStreamInfoAsyncAction =
