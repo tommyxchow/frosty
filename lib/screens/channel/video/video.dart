@@ -137,9 +137,11 @@ class _NativeVideoState extends State<NativeVideo> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return AspectRatio(
-          aspectRatio: 16 / 9,
-          child: VideoPlayer(videoPlayerController),
+        return Center(
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: VideoPlayer(videoPlayerController),
+          ),
         );
       },
     );
