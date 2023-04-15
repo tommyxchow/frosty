@@ -21,6 +21,11 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
+          SettingsListSwitch(
+            title: 'Use native player (experimental)',
+            value: settingsStore.useNativePlayer,
+            onChanged: (newValue) => settingsStore.useNativePlayer = newValue,
+          ),
           const SectionHeader('Overlay'),
           SettingsListSwitch(
             title: 'Use custom video overlay',

@@ -89,6 +89,24 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$_streamLinksAtom =
+      Atom(name: 'VideoStoreBase._streamLinks', context: context);
+
+  Map<String, String>? get streamLinks {
+    _$_streamLinksAtom.reportRead();
+    return super._streamLinks;
+  }
+
+  @override
+  Map<String, String>? get _streamLinks => streamLinks;
+
+  @override
+  set _streamLinks(Map<String, String>? value) {
+    _$_streamLinksAtom.reportWrite(value, super._streamLinks, () {
+      super._streamLinks = value;
+    });
+  }
+
   late final _$initVideoAsyncAction =
       AsyncAction('VideoStoreBase.initVideo', context: context);
 

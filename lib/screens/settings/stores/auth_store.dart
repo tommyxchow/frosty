@@ -26,6 +26,9 @@ abstract class AuthBase with Store {
   /// The shared_preferences key for the user token.
   static const _userTokenKey = 'user_token';
 
+  /// The shared_preferences key for the user token.
+  static const _streamLinkTokenKey = 'streamlink_token';
+
   /// The Twitch API service for making requests.
   final TwitchApi twitchApi;
 
@@ -34,6 +37,8 @@ abstract class AuthBase with Store {
 
   /// The MobX store containing information relevant to the current user.
   final UserStore user;
+
+  String? streamLinkToken;
 
   /// The user token used to authenticate with the Twitch API.
   @readonly
@@ -65,8 +70,10 @@ abstract class AuthBase with Store {
     },
   );
 
+  late WebViewController webViewController;
+
   /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
-  FutureOr<NavigationDecision> handleNavigation({required NavigationRequest navigation, Widget? routeAfter}) {
+  FutureOr<NavigationDecision> handleNavigation({required NavigationRequest navigation, Widget? routeAfter}) async {
     // Check if the URL is the redirect URI.
     if (navigation.url.startsWith('https://twitch.tv/login')) {
       // Extract the token from the query parameters.
@@ -81,6 +88,11 @@ abstract class AuthBase with Store {
     // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
     // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
     if (navigation.url == 'https://www.twitch.tv/?no-reload=true') {
+      streamLinkToken = (await webViewController.runJavascriptReturningResult(
+              'document.cookie.split("; ").find(item=>item.startsWith("auth-token="))?.split("=")[1]'))
+          .split('"')[1];
+      await _storage.write(key: _streamLinkTokenKey, value: streamLinkToken);
+
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
         navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => routeAfter));
@@ -147,6 +159,8 @@ abstract class AuthBase with Store {
   @action
   Future<void> init() async {
     try {
+      streamLinkToken = await _storage.read(key: _streamLinkTokenKey);
+
       // Read and set the currently stored user token, if any.
       _token = await _storage.read(key: _userTokenKey);
 
@@ -220,6 +234,9 @@ abstract class AuthBase with Store {
   @action
   Future<void> logout() async {
     try {
+      await _storage.delete(key: _streamLinkTokenKey);
+      streamLinkToken = null;
+
       // Delete the existing user token.
       await _storage.delete(key: _userTokenKey);
       _token = null;

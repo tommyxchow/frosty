@@ -15,6 +15,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
       ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
+      ..useNativePlayer = json['useNativePlayer'] as bool? ?? false
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
@@ -61,6 +62,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'largeStreamCard': instance.largeStreamCard,
       'launchUrlExternal': instance.launchUrlExternal,
       'showVideo': instance.showVideo,
+      'useNativePlayer': instance.useNativePlayer,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
       'overlayOpacity': instance.overlayOpacity,
@@ -196,6 +198,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showVideo(bool value) {
     _$showVideoAtom.reportWrite(value, super.showVideo, () {
       super.showVideo = value;
+    });
+  }
+
+  late final _$useNativePlayerAtom =
+      Atom(name: '_SettingsStoreBase.useNativePlayer', context: context);
+
+  @override
+  bool get useNativePlayer {
+    _$useNativePlayerAtom.reportRead();
+    return super.useNativePlayer;
+  }
+
+  @override
+  set useNativePlayer(bool value) {
+    _$useNativePlayerAtom.reportWrite(value, super.useNativePlayer, () {
+      super.useNativePlayer = value;
     });
   }
 
@@ -734,6 +752,7 @@ showThumbnails: ${showThumbnails},
 largeStreamCard: ${largeStreamCard},
 launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
+useNativePlayer: ${useNativePlayer},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 overlayOpacity: ${overlayOpacity},

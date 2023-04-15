@@ -37,6 +37,7 @@ class ProfileCard extends StatelessWidget {
                         initialUrl: authStore.loginUri.toString(),
                         navigationDelegate: (navigation) => authStore.handleNavigation(navigation: navigation),
                         javascriptMode: JavascriptMode.unrestricted,
+                        onWebViewCreated: (controller) => authStore.webViewController = controller,
                       ),
                     );
                   },

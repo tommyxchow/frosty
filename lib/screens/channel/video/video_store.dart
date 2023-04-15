@@ -10,6 +10,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
+import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part 'video_store.g.dart';
@@ -31,6 +32,8 @@ abstract class VideoStoreBase with Store {
 
   /// The webview controller used for injecting JavaScript to control the webview and video player.
   WebViewController? controller;
+
+  VideoPlayerController? videoPlayerController;
 
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
@@ -84,6 +87,10 @@ abstract class VideoStoreBase with Store {
   @readonly
   StreamTwitch? _streamInfo;
 
+  /// A map of stream qualities to their respective URLs for the current channel.
+  @readonly
+  Map<String, String>? _streamLinks;
+
   /// The video URL to use for the webview. Controls will be disabled when custom overlay is enabled.
   @computed
   String get videoUrl => settingsStore.showOverlay
@@ -118,14 +125,22 @@ abstract class VideoStoreBase with Store {
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
-    // Add event listeners to notify the JavaScript channels when the video plays and pauses.
-    try {
-      controller?.runJavascript(
-          'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
-      controller?.runJavascript(
-          'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
-    } catch (e) {
-      debugPrint(e.toString());
+    if (settingsStore.useNativePlayer) {
+      _streamLinks = await twitchApi.getStreamLinks(userLogin: userLogin, token: authStore.streamLinkToken);
+      videoPlayerController = VideoPlayerController.network(_streamLinks?['best'] ?? '');
+      await videoPlayerController?.initialize();
+      await videoPlayerController?.play();
+      _paused = false;
+    } else {
+      // Add event listeners to notify the JavaScript channels when the video plays and pauses.
+      try {
+        controller?.runJavascript(
+            'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
+        controller?.runJavascript(
+            'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     }
 
     // Determine whether the device is an iPad or not.
@@ -158,8 +173,6 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Updates the stream info from the Twitch API.
-  ///
-  /// If the stream is offline, disables the overlay.
   @action
   Future<void> updateStreamInfo() async {
     try {
@@ -167,6 +180,7 @@ abstract class VideoStoreBase with Store {
     } catch (e) {
       debugPrint(e.toString());
 
+      // If the stream is offline or if there is an error, disable the overlay.
       _overlayTimer.cancel();
       _streamInfo = null;
       _paused = true;
@@ -204,8 +218,14 @@ abstract class VideoStoreBase with Store {
   void handlePausePlay() {
     try {
       if (_paused) {
+        videoPlayerController?.play();
+        if (settingsStore.useNativePlayer) _paused = false;
+
         controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
       } else {
+        videoPlayerController?.pause();
+        if (settingsStore.useNativePlayer) _paused = true;
+
         controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
       }
     } catch (e) {
@@ -241,6 +261,7 @@ abstract class VideoStoreBase with Store {
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
     if (Platform.isIOS) controller?.reload();
+    videoPlayerController?.dispose();
 
     _disposeOverlayReaction();
   }
