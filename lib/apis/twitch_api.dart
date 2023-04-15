@@ -266,6 +266,18 @@ class TwitchApi {
     }
   }
 
+  /// Returns a map containing the stream links associated with the given [userLogin].
+  Future<Map<String, String>> getStreamLinks({required String userLogin, String? token}) async {
+    final uri = Uri.parse('https://z4qz5trca4plcyhcjvld2yhrme0jgdxw.lambda-url.us-east-2.on.aws/?channel=$userLogin');
+
+    final response = await _client.get(uri, headers: token != null ? {'frosty-token': token} : null);
+    if (response.statusCode == 200) {
+      return Map.castFrom(jsonDecode(response.body));
+    } else {
+      return Future.error('Failed to get stream links');
+    }
+  }
+
   /// Returns a [UserTwitch] object containing the user info associated with the given [userLogin].
   Future<UserTwitch> getUser({
     String? userLogin,
