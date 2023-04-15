@@ -59,6 +59,7 @@ dependencies:
   simple_pip_mode:
     git:
       url: https://github.com/tommyxchow/simple_pip_mode_flutter
+  video_player: ^2.6.1
 
 dev_dependencies:
   flutter_test:
