@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -88,10 +89,13 @@ abstract class AuthBase with Store {
     // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
     // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
     if (navigation.url == 'https://www.twitch.tv/?no-reload=true') {
-      streamLinkToken = (await webViewController.runJavascriptReturningResult(
-              'document.cookie.split("; ").find(item=>item.startsWith("auth-token="))?.split("=")[1]'))
-          .split('"')[1];
-      await _storage.write(key: _streamLinkTokenKey, value: streamLinkToken);
+      streamLinkToken = await webViewController.runJavascriptReturningResult(
+        'document.cookie.split("; ").find(item=>item.startsWith("auth-token="))?.split("=")[1]',
+      );
+      // Android returns the token with double quotes around it, so we need to remove them.
+      if (Platform.isAndroid) streamLinkToken = streamLinkToken?.replaceAll('"', '');
+
+      _storage.write(key: _streamLinkTokenKey, value: streamLinkToken);
 
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
