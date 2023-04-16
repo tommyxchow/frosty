@@ -20,16 +20,16 @@ mixin _$VideoStore on VideoStoreBase, Store {
   late final _$_videoPlayerControllerAtom =
       Atom(name: 'VideoStoreBase._videoPlayerController', context: context);
 
-  VideoPlayerController? get videoPlayerController {
+  BetterPlayerController? get videoPlayerController {
     _$_videoPlayerControllerAtom.reportRead();
     return super._videoPlayerController;
   }
 
   @override
-  VideoPlayerController? get _videoPlayerController => videoPlayerController;
+  BetterPlayerController? get _videoPlayerController => videoPlayerController;
 
   @override
-  set _videoPlayerController(VideoPlayerController? value) {
+  set _videoPlayerController(BetterPlayerController? value) {
     _$_videoPlayerControllerAtom
         .reportWrite(value, super._videoPlayerController, () {
       super._videoPlayerController = value;

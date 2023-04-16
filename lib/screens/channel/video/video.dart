@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
-import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class Video extends StatefulWidget {
@@ -140,7 +140,7 @@ class _NativeVideoState extends State<NativeVideo> {
         return Center(
           child: AspectRatio(
             aspectRatio: 16 / 9,
-            child: VideoPlayer(videoPlayerController),
+            child: BetterPlayer(controller: videoPlayerController),
           ),
         );
       },

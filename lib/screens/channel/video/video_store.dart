@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:better_player/better_player.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +11,6 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
-import 'package:video_player/video_player.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part 'video_store.g.dart';
@@ -34,7 +34,7 @@ abstract class VideoStoreBase with Store {
   WebViewController? controller;
 
   @readonly
-  VideoPlayerController? _videoPlayerController;
+  BetterPlayerController? _videoPlayerController;
 
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
@@ -126,14 +126,34 @@ abstract class VideoStoreBase with Store {
     updateStreamInfo();
   }
 
+  BetterPlayerController _createPlayerController({required String source}) {
+    return BetterPlayerController(
+      const BetterPlayerConfiguration(
+        autoPlay: true,
+        controlsConfiguration: BetterPlayerControlsConfiguration(
+          showControls: false,
+        ),
+      ),
+      betterPlayerDataSource: BetterPlayerDataSource(
+        BetterPlayerDataSourceType.network,
+        source,
+        liveStream: true,
+        // bufferingConfiguration: const BetterPlayerBufferingConfiguration(
+        //   bufferForPlaybackAfterRebufferMs: 500,
+        //   bufferForPlaybackMs: 500,
+        // ),
+      ),
+    );
+  }
+
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
     if (settingsStore.useNativePlayer) {
       _streamLinks = await twitchApi.getStreamLinks(userLogin: userLogin, token: authStore.streamLinkToken);
-      _videoPlayerController = VideoPlayerController.network(_streamLinks?[_selectedQuality] ?? '');
-      await _videoPlayerController?.initialize();
-      await _videoPlayerController?.play();
+
+      _videoPlayerController = _createPlayerController(source: _streamLinks?[_selectedQuality] ?? '');
+
       _paused = false;
     } else {
       // Add event listeners to notify the JavaScript channels when the video plays and pauses.
@@ -163,10 +183,8 @@ abstract class VideoStoreBase with Store {
 
   @action
   Future<void> handleQualityChange(String quality) async {
-    await _videoPlayerController?.dispose();
-    _videoPlayerController = VideoPlayerController.network(_streamLinks?[quality] ?? '');
-    await _videoPlayerController?.initialize();
-    await _videoPlayerController?.play();
+    _videoPlayerController?.dispose();
+    _videoPlayerController = _createPlayerController(source: _streamLinks?[quality] ?? '');
     _selectedQuality = quality;
   }
 
