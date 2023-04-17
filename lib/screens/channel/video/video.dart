@@ -129,21 +129,24 @@ class _NativeVideoState extends State<NativeVideo> {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (context) {
-        final videoPlayerController = widget.videoStore.videoPlayerController;
+    return Center(
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: ColoredBox(
+          color: Colors.black,
+          child: Observer(
+            builder: (context) {
+              final videoPlayerController = widget.videoStore.videoPlayerController;
 
-        if (widget.videoStore.streamLinks == null || videoPlayerController == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+              if (widget.videoStore.streamLinks == null || videoPlayerController == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-        return Center(
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: VideoPlayer(videoPlayerController),
+              return VideoPlayer(videoPlayerController);
+            },
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
