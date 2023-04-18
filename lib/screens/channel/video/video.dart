@@ -139,7 +139,7 @@ class _NativeVideoState extends State<NativeVideo> {
               final videoPlayerController = widget.videoStore.videoPlayerController;
 
               if (widget.videoStore.streamLinks == null || videoPlayerController == null) {
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator.adaptive());
               }
 
               return VideoPlayer(videoPlayerController);
