@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -93,7 +94,7 @@ abstract class VideoStoreBase with Store {
   Map<String, String>? _streamLinks;
 
   @readonly
-  var _selectedQuality = 'best';
+  var _selectedQuality = '';
 
   /// The video URL to use for the webview. Controls will be disabled when custom overlay is enabled.
   @computed
@@ -131,6 +132,14 @@ abstract class VideoStoreBase with Store {
   Future<void> initVideo() async {
     if (settingsStore.useNativePlayer) {
       _streamLinks = await twitchApi.getStreamLinks(userLogin: userLogin, token: authStore.streamLinkToken);
+
+      SplayTreeMap<String, String> sortedStreamLinks = SplayTreeMap<String, String>(
+        (a, b) => int.parse(b.split('p').first).compareTo(int.parse(a.split('p').first)),
+      );
+      sortedStreamLinks.addAll(_streamLinks!);
+      _streamLinks = sortedStreamLinks;
+
+      _selectedQuality = _streamLinks!.keys.first;
       _videoPlayerController = VideoPlayerController.network(_streamLinks?[_selectedQuality] ?? '');
       await _videoPlayerController?.initialize();
       await _videoPlayerController?.play();
