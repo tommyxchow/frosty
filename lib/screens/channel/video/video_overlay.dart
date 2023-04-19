@@ -120,6 +120,19 @@ class VideoOverlay extends StatelessWidget {
 
     return Observer(
       builder: (context) {
+        final qualities = videoStore.streamLinks!.keys
+            .map(
+              (quality) => ListTile(
+                title: Text(quality),
+                trailing: videoStore.selectedQuality == quality ? const Icon(Icons.check_rounded) : null,
+                onTap: () {
+                  videoStore.handleQualityChange(quality);
+                  Navigator.of(context).pop();
+                },
+              ),
+            )
+            .toList();
+
         return Stack(
           children: [
             Row(
@@ -153,25 +166,16 @@ class VideoOverlay extends StatelessWidget {
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             ),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.5,
-                              child: ListView(
-                                children: [
-                                  ...videoStore.streamLinks!.keys.map(
-                                    (quality) => ListTile(
-                                      title: Text(quality),
-                                      trailing: videoStore.selectedQuality == quality
-                                          ? const Icon(Icons.check_rounded)
-                                          : null,
-                                      onTap: () {
-                                        videoStore.handleQualityChange(quality);
-                                        Navigator.of(context).pop();
-                                      },
+                            MediaQuery.of(context).orientation == Orientation.landscape
+                                ? SizedBox(
+                                    height: MediaQuery.of(context).size.height * 0.5,
+                                    child: ListView(
+                                      children: qualities,
                                     ),
                                   )
-                                ],
-                              ),
-                            )
+                                : Column(
+                                    children: qualities,
+                                  )
                           ],
                         ),
                       ),
