@@ -38,29 +38,22 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
     return Observer(builder: (context) {
       if (widget.videoStore.settingsStore.useNativePlayer) return NativeVideo(videoStore: widget.videoStore);
 
-      return WebView(
-        backgroundColor: Colors.black,
-        initialUrl: widget.videoStore.videoUrl,
-        javascriptMode: JavascriptMode.unrestricted,
-        allowsInlineMediaPlayback: true,
-        initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-        onWebViewCreated: (controller) => widget.videoStore.controller = controller,
-        onPageFinished: (string) => widget.videoStore.initVideo(),
-        navigationDelegate: widget.videoStore.handleNavigation,
-        javascriptChannels: widget.videoStore.javascriptChannels,
-      );
+      return WebVideo(videoStore: widget.videoStore);
     });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+
+    widget.videoStore.dispose();
+
     super.dispose();
   }
 }
 
 /// Creates a [WebView] widget that shows a channel's video stream.
-class WebVideo extends StatefulWidget {
+class WebVideo extends StatelessWidget {
   final VideoStore videoStore;
 
   const WebVideo({
@@ -69,42 +62,18 @@ class WebVideo extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<WebVideo> createState() => _WebVideoState();
-}
-
-class _WebVideoState extends State<WebVideo> with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) async {
-    if (Platform.isAndroid && !await SimplePip.isAutoPipAvailable && lifecycleState == AppLifecycleState.inactive) {
-      widget.videoStore.requestPictureInPicture();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return WebView(
       backgroundColor: Colors.black,
-      initialUrl: widget.videoStore.videoUrl,
+      initialUrl: videoStore.videoUrl,
       javascriptMode: JavascriptMode.unrestricted,
       allowsInlineMediaPlayback: true,
       initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-      onWebViewCreated: (controller) => widget.videoStore.controller = controller,
-      onPageFinished: (string) => widget.videoStore.initVideo(),
-      navigationDelegate: widget.videoStore.handleNavigation,
-      javascriptChannels: widget.videoStore.javascriptChannels,
+      onWebViewCreated: (controller) => videoStore.controller = controller,
+      onPageFinished: (string) => videoStore.initVideo(),
+      navigationDelegate: videoStore.handleNavigation,
+      javascriptChannels: videoStore.javascriptChannels,
     );
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 }
 
@@ -124,7 +93,14 @@ class _NativeVideoState extends State<NativeVideo> {
   @override
   void initState() {
     super.initState();
-    widget.videoStore.initVideo();
+
+    widget.videoStore.initVideo().then((value) {
+      if (mounted) {
+        widget.videoStore.videoPlayerController?.play();
+      } else {
+        widget.videoStore.videoPlayerController?.dispose();
+      }
+    });
   }
 
   @override

@@ -311,8 +311,6 @@ class _VideoChatState extends State<VideoChat> {
   void dispose() {
     _chatStore.dispose();
 
-    _videoStore.dispose();
-
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: SystemUiOverlay.values,

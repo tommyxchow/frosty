@@ -127,6 +127,25 @@ abstract class VideoStoreBase with Store {
     updateStreamInfo();
   }
 
+  Future<VideoPlayerController> createVideoPlayerController(String url) async {
+    final controller = VideoPlayerController.network(
+      url,
+      videoPlayerOptions: VideoPlayerOptions(allowBackgroundPlayback: true),
+    );
+
+    controller.addListener(() {
+      if (_videoPlayerController?.value.isPlaying == true) {
+        _paused = false;
+      } else {
+        _paused = true;
+      }
+    });
+
+    await controller.initialize();
+
+    return controller;
+  }
+
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
@@ -140,10 +159,7 @@ abstract class VideoStoreBase with Store {
       _streamLinks = sortedStreamLinks;
 
       _selectedQuality = _streamLinks!.keys.first;
-      _videoPlayerController = VideoPlayerController.network(_streamLinks?[_selectedQuality] ?? '');
-      await _videoPlayerController?.initialize();
-      await _videoPlayerController?.play();
-      _paused = false;
+      _videoPlayerController = await createVideoPlayerController(_streamLinks?[_selectedQuality] ?? '');
     } else {
       // Add event listeners to notify the JavaScript channels when the video plays and pauses.
       try {
@@ -173,9 +189,9 @@ abstract class VideoStoreBase with Store {
   @action
   Future<void> handleQualityChange(String quality) async {
     await _videoPlayerController?.dispose();
-    _videoPlayerController = VideoPlayerController.network(_streamLinks?[quality] ?? '');
-    await _videoPlayerController?.initialize();
-    await _videoPlayerController?.play();
+
+    _videoPlayerController = await createVideoPlayerController(_streamLinks?[_selectedQuality] ?? '');
+
     _selectedQuality = quality;
   }
 
@@ -241,12 +257,10 @@ abstract class VideoStoreBase with Store {
     try {
       if (_paused) {
         _videoPlayerController?.play();
-        if (settingsStore.useNativePlayer) _paused = false;
 
         controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
       } else {
         _videoPlayerController?.pause();
-        if (settingsStore.useNativePlayer) _paused = true;
 
         controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
       }
@@ -283,6 +297,7 @@ abstract class VideoStoreBase with Store {
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
     if (Platform.isIOS) controller?.reload();
+
     _videoPlayerController?.dispose();
 
     _disposeOverlayReaction();

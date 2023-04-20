@@ -120,7 +120,7 @@ class VideoOverlay extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final qualities = videoStore.streamLinks!.keys
+        final qualities = videoStore.streamLinks?.keys
             .map(
               (quality) => ListTile(
                 title: Text(quality),
@@ -170,11 +170,11 @@ class VideoOverlay extends StatelessWidget {
                                 ? SizedBox(
                                     height: MediaQuery.of(context).size.height * 0.5,
                                     child: ListView(
-                                      children: qualities,
+                                      children: qualities!,
                                     ),
                                   )
                                 : Column(
-                                    children: qualities,
+                                    children: qualities!,
                                   )
                           ],
                         ),
