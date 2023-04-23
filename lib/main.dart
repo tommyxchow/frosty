@@ -47,7 +47,12 @@ void main() async {
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
   // Initialize Sentry for crash reporting if enabled.
-  if (settingsStore.sendCrashLogs) await SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
+  if (settingsStore.sendCrashLogs) {
+    await SentryFlutter.init((options) => {
+          options.tracesSampleRate = sampleRate,
+          options.dsn = '',
+        });
+  }
 
   /// Initialize API services with a common client.
   /// This will prevent every request from creating a new client instance.
@@ -165,7 +170,8 @@ final darkTheme = ThemeData(
       fontWeight: FontWeight.bold,
     ),
   ),
-  bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: gray),
+  bottomNavigationBarTheme:
+      const BottomNavigationBarThemeData(backgroundColor: gray),
   colorScheme: ColorScheme.fromSwatch(
     brightness: Brightness.dark,
     primarySwatch: Colors.deepPurple,
@@ -220,7 +226,8 @@ class MyApp extends StatelessWidget {
           locale: DevicePreview.locale(context),
           title: 'Frosty',
           theme: lightTheme,
-          darkTheme: settingsStore.themeType == ThemeType.dark || settingsStore.themeType == ThemeType.system
+          darkTheme: settingsStore.themeType == ThemeType.dark ||
+                  settingsStore.themeType == ThemeType.system
               ? darkTheme
               : oledTheme,
           themeMode: settingsStore.themeType == ThemeType.system
