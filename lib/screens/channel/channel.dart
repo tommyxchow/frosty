@@ -95,9 +95,14 @@ class _VideoChatState extends State<VideoChat> {
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
-      onDoubleTap:
-          orientation == Orientation.landscape ? () => settingsStore.fullScreen = !settingsStore.fullScreen : null,
+      onDoubleTap: orientation == Orientation.landscape
+          ? () => settingsStore.fullScreen = !settingsStore.fullScreen
+          : null,
       onTap: () {
+        if (_videoStore.miniVedioMode) {
+          _videoStore.setMiniVedioMode(false);
+          return;
+        }
         if (_chatStore.assetsStore.showEmoteMenu) {
           _chatStore.assetsStore.showEmoteMenu = false;
         } else {
@@ -108,6 +113,9 @@ class _VideoChatState extends State<VideoChat> {
           }
         }
       },
+      onVerticalDragEnd: (details){
+        _videoStore.setMiniVedioMode(true);
+      },
       child: Observer(
         builder: (_) {
           final videoOverlay = VideoOverlay(
@@ -115,7 +123,8 @@ class _VideoChatState extends State<VideoChat> {
             chatStore: _chatStore,
           );
 
-          if (_videoStore.paused || _videoStore.streamInfo == null) return videoOverlay;
+          if (_videoStore.paused || _videoStore.streamInfo == null)
+            return videoOverlay;
 
           return AnimatedOpacity(
             opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
@@ -189,16 +198,20 @@ class _VideoChatState extends State<VideoChat> {
               switchOutCurve: Curves.easeIn,
               child: _chatStore.notification != null
                   ? Align(
-                      alignment:
-                          _chatStore.settings.chatNotificationsOnBottom ? Alignment.bottomCenter : Alignment.topCenter,
+                      alignment: _chatStore.settings.chatNotificationsOnBottom
+                          ? Alignment.bottomCenter
+                          : Alignment.topCenter,
                       child: FrostyNotification(
                         message: _chatStore.notification!,
-                        showPasteButton: _chatStore.notification!.contains('copied'),
+                        showPasteButton:
+                            _chatStore.notification!.contains('copied'),
                         onButtonPressed: () async {
                           // Paste clipboard text into the text controller.
-                          final data = await Clipboard.getData(Clipboard.kTextPlain);
+                          final data =
+                              await Clipboard.getData(Clipboard.kTextPlain);
 
-                          if (data != null) _chatStore.textController.text = data.text!;
+                          if (data != null)
+                            _chatStore.textController.text = data.text!;
 
                           _chatStore.updateNotification('');
                         },
@@ -211,89 +224,137 @@ class _VideoChatState extends State<VideoChat> {
       },
     );
 
-    final videoChat = Scaffold(
-      body: Observer(
-        builder: (context) {
-          if (orientation == Orientation.landscape && !settingsStore.landscapeForceVerticalChat) {
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
-            final landscapeChat = AnimatedContainer(
-              curve: Curves.ease,
-              duration: const Duration(milliseconds: 200),
-              width: _chatStore.expandChat
-                  ? MediaQuery.of(context).size.width / 2
-                  : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
-              color: _chatStore.settings.fullScreen
-                  ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
-                  : Theme.of(context).scaffoldBackgroundColor,
-              child: chat,
-            );
-
-            final overlayChat = Visibility(
-              visible: settingsStore.fullScreenChatOverlay,
-              maintainState: true,
-              child: Theme(
-                data: darkTheme,
-                child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
-                  child: landscapeChat,
+    final videoChat = Observer(builder: (_) {
+      return _videoStore.miniVedioMode
+          ? Positioned(
+              right: 10,
+              bottom: 60,
+              child: SizedBox(
+                width: 180,
+                height: 100,
+                child: Scaffold(
+                  body: Observer(builder: (context) {
+                    SystemChrome.setEnabledSystemUIMode(
+                      SystemUiMode.manual,
+                      overlays: SystemUiOverlay.values,
+                    );
+                    return AspectRatio(aspectRatio: 16 / 9, child: video);
+                  }),
                 ),
               ),
-            );
+            )
+          : Scaffold(
+              body: Observer(
+                builder: (context) {
+                  if (orientation == Orientation.landscape &&
+                      !settingsStore.landscapeForceVerticalChat) {
+                    SystemChrome.setEnabledSystemUIMode(
+                        SystemUiMode.immersiveSticky);
 
-            return ColoredBox(
-              color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
-              child: SafeArea(
-                bottom: false,
-                left: (settingsStore.landscapeCutout == LandscapeCutoutType.both ||
-                        settingsStore.landscapeCutout == LandscapeCutoutType.left)
-                    ? false
-                    : true,
-                right: (settingsStore.landscapeCutout == LandscapeCutoutType.both ||
-                        settingsStore.landscapeCutout == LandscapeCutoutType.right)
-                    ? false
-                    : true,
-                child: settingsStore.showVideo
-                    ? settingsStore.fullScreen
-                        ? Stack(
-                            children: [
-                              player,
-                              if (settingsStore.showOverlay)
-                                Row(
-                                  children: settingsStore.landscapeChatLeftSide
-                                      ? [overlayChat, Expanded(child: overlay)]
-                                      : [Expanded(child: overlay), overlayChat],
-                                )
-                            ],
-                          )
-                        : Row(
-                            children: settingsStore.landscapeChatLeftSide
-                                ? [landscapeChat, Expanded(child: video)]
-                                : [Expanded(child: video), landscapeChat],
-                          )
-                    : Column(
-                        children: [appBar, Expanded(child: chat)],
+                    final landscapeChat = AnimatedContainer(
+                      curve: Curves.ease,
+                      duration: const Duration(milliseconds: 200),
+                      width: _chatStore.expandChat
+                          ? MediaQuery.of(context).size.width / 2
+                          : MediaQuery.of(context).size.width *
+                              _chatStore.settings.chatWidth,
+                      color: _chatStore.settings.fullScreen
+                          ? Colors.black.withOpacity(
+                              _chatStore.settings.fullScreenChatOverlayOpacity)
+                          : Theme.of(context).scaffoldBackgroundColor,
+                      child: chat,
+                    );
+
+                    final overlayChat = Visibility(
+                      visible: settingsStore.fullScreenChatOverlay,
+                      maintainState: true,
+                      child: Theme(
+                        data: darkTheme,
+                        child: DefaultTextStyle(
+                          style: DefaultTextStyle.of(context)
+                              .style
+                              .copyWith(color: Colors.white),
+                          child: landscapeChat,
+                        ),
                       ),
+                    );
+
+                    return ColoredBox(
+                      color: settingsStore.showVideo
+                          ? Colors.black
+                          : Theme.of(context).scaffoldBackgroundColor,
+                      child: SafeArea(
+                        bottom: false,
+                        left: (settingsStore.landscapeCutout ==
+                                    LandscapeCutoutType.both ||
+                                settingsStore.landscapeCutout ==
+                                    LandscapeCutoutType.left)
+                            ? false
+                            : true,
+                        right: (settingsStore.landscapeCutout ==
+                                    LandscapeCutoutType.both ||
+                                settingsStore.landscapeCutout ==
+                                    LandscapeCutoutType.right)
+                            ? false
+                            : true,
+                        child: settingsStore.showVideo
+                            ? settingsStore.fullScreen
+                                ? Stack(
+                                    children: [
+                                      player,
+                                      if (settingsStore.showOverlay)
+                                        Row(
+                                          children: settingsStore
+                                                  .landscapeChatLeftSide
+                                              ? [
+                                                  overlayChat,
+                                                  Expanded(child: overlay)
+                                                ]
+                                              : [
+                                                  Expanded(child: overlay),
+                                                  overlayChat
+                                                ],
+                                        )
+                                    ],
+                                  )
+                                : Row(
+                                    children:
+                                        settingsStore.landscapeChatLeftSide
+                                            ? [
+                                                landscapeChat,
+                                                Expanded(child: video)
+                                              ]
+                                            : [
+                                                Expanded(child: video),
+                                                landscapeChat
+                                              ],
+                                  )
+                            : Column(
+                                children: [appBar, Expanded(child: chat)],
+                              ),
+                      ),
+                    );
+                  }
+
+                  SystemChrome.setEnabledSystemUIMode(
+                    SystemUiMode.manual,
+                    overlays: SystemUiOverlay.values,
+                  );
+                  return SafeArea(
+                    child: Column(
+                      children: [
+                        if (!settingsStore.showVideo)
+                          appBar
+                        else
+                          AspectRatio(aspectRatio: 16 / 9, child: video),
+                        Expanded(child: chat),
+                      ],
+                    ),
+                  );
+                },
               ),
             );
-          }
-
-          SystemChrome.setEnabledSystemUIMode(
-            SystemUiMode.manual,
-            overlays: SystemUiOverlay.values,
-          );
-          return SafeArea(
-            child: Column(
-              children: [
-                if (!settingsStore.showVideo) appBar else AspectRatio(aspectRatio: 16 / 9, child: video),
-                Expanded(child: chat),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-
+    });
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
       return PipWidget(
