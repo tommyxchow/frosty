@@ -23,6 +23,7 @@ class VideoSettings extends StatelessWidget {
           ),
           SettingsListSwitch(
             title: 'Use native player (experimental)',
+            subtitle: const Text('Enables quality options. May cause an inconsistent stream delay.'),
             value: settingsStore.useNativePlayer,
             onChanged: (newValue) => settingsStore.useNativePlayer = newValue,
           ),
