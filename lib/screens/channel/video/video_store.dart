@@ -142,6 +142,7 @@ abstract class VideoStoreBase with Store {
     });
 
     await controller.initialize();
+    await controller.play();
 
     return controller;
   }
@@ -190,9 +191,9 @@ abstract class VideoStoreBase with Store {
   Future<void> handleQualityChange(String quality) async {
     await _videoPlayerController?.dispose();
 
-    _videoPlayerController = await createVideoPlayerController(_streamLinks?[_selectedQuality] ?? '');
-
     _selectedQuality = quality;
+
+    _videoPlayerController = await createVideoPlayerController(_streamLinks?[_selectedQuality] ?? '');
   }
 
   /// Called whenever the video/overlay is tapped.
