@@ -181,16 +181,21 @@ class StreamCard extends StatelessWidget {
     );
 
     return AnimateScale(
-      onTap: () => Navigator.push(
-        context,
-        TranslucentOverlayRoute(
-          builder: (context) => VideoChat(
-            userId: streamInfo.userId,
-            userName: streamInfo.userName,
-            userLogin: streamInfo.userLogin,
+      onTap: () {
+        // remove until this page is the top level
+        Navigator.popUntil(context, (route) => route.isFirst);
+        // push new VedioChat
+        Navigator.push(
+          context,
+          TranslucentOverlayRoute(
+            builder: (context) => VideoChat(
+              userId: streamInfo.userId,
+              userName: streamInfo.userName,
+              userLogin: streamInfo.userLogin,
+            ),
           ),
-        ),
-      ),
+        );
+      },
       onLongPress: () {
         HapticFeedback.mediumImpact();
 
