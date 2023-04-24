@@ -141,7 +141,10 @@ class StreamCard extends StatelessWidget {
           if (showCategory) ...[
             InkWell(
               onTap: streamInfo.gameName.isNotEmpty
-                  ? () => Navigator.push(
+                  ? () {
+                      // remove until this page is the top level
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => CategoryStreams(
@@ -149,7 +152,8 @@ class StreamCard extends StatelessWidget {
                             categoryId: streamInfo.gameId,
                           ),
                         ),
-                      )
+                      );
+                    }
                   : null,
               child: Tooltip(
                 message:

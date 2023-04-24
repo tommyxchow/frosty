@@ -12,6 +12,7 @@ import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/translucent_overlay_route.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,9 @@ class LargeStreamCard extends StatelessWidget {
     // Get a new URL for the thumbnail every 5 minutes so that the image is updated on refresh.
     // This method adds a random value to the end of the URL to override the cached image.
     final time = DateTime.now();
-    final cacheUrlExtension = time.day.toString() + time.hour.toString() + (time.minute ~/ 5).toString();
+    final cacheUrlExtension = time.day.toString() +
+        time.hour.toString() +
+        (time.minute ~/ 5).toString();
 
     // Calculate the width and height of the thumbnail based on the device width and the stream card size setting.
     // Constraint the resolution to 1920x1080 since that's the max resolution of the Twitch API.
@@ -62,10 +65,12 @@ class LargeStreamCard extends StatelessWidget {
             child: AspectRatio(
               aspectRatio: 16 / 9,
               child: FrostyCachedNetworkImage(
-                imageUrl:
-                    streamInfo.thumbnailUrl.replaceFirst('-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
-                        cacheUrlExtension,
-                placeholder: (context, url) => const ColoredBox(color: lightGray, child: LoadingIndicator()),
+                imageUrl: streamInfo.thumbnailUrl.replaceFirst(
+                        '-{width}x{height}',
+                        '-${thumbnailWidth}x$thumbnailHeight') +
+                    cacheUrlExtension,
+                placeholder: (context, url) => const ColoredBox(
+                    color: lightGray, child: LoadingIndicator()),
                 useOldImageOnUrlChange: true,
               ),
             ),
@@ -132,16 +137,21 @@ class LargeStreamCard extends StatelessWidget {
         : '${streamInfo.userName} (${streamInfo.userLogin})';
 
     return AnimateScale(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VideoChat(
-            userId: streamInfo.userId,
-            userName: streamInfo.userName,
-            userLogin: streamInfo.userLogin,
+      onTap: () {
+        // remove until this page is the top level
+        Navigator.popUntil(context, (route) => route.isFirst);
+        // push new VedioChat
+        Navigator.push(
+          context,
+          TranslucentOverlayRoute(
+            builder: (context) => VideoChat(
+              userId: streamInfo.userId,
+              userName: streamInfo.userName,
+              userLogin: streamInfo.userLogin,
+            ),
           ),
-        ),
-      ),
+        );
+      },
       onLongPress: () {
         HapticFeedback.mediumImpact();
 
@@ -157,7 +167,8 @@ class LargeStreamCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: showThumbnail ? 10.0 : 5.0, horizontal: 15.0),
+        padding: EdgeInsets.symmetric(
+            vertical: showThumbnail ? 10.0 : 5.0, horizontal: 15.0),
         child: Column(
           children: [
             if (showThumbnail) thumbnail,
