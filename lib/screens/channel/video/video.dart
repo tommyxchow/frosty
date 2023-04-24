@@ -125,4 +125,11 @@ class _NativeVideoState extends State<NativeVideo> {
       ),
     );
   }
+
+  @override
+  dispose() {
+    widget.videoStore.videoPlayerController?.dispose();
+
+    super.dispose();
+  }
 }
