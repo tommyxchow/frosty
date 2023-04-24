@@ -113,7 +113,12 @@ class _VideoChatState extends State<VideoChat> {
           }
         }
       },
-      onVerticalDragEnd: (details){
+      onHorizontalDragEnd: (details) {
+        if (_videoStore.miniVedioMode) {
+          Navigator.of(context).pop();
+        }
+      },
+      onVerticalDragEnd: (details) {
         _videoStore.setMiniVedioMode(true);
       },
       child: Observer(
