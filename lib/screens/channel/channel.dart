@@ -113,14 +113,6 @@ class _VideoChatState extends State<VideoChat> {
           }
         }
       },
-      onHorizontalDragEnd: (details) {
-        if (_videoStore.miniVedioMode) {
-          Navigator.of(context).pop();
-        }
-      },
-      onVerticalDragEnd: (details) {
-        _videoStore.setMiniVedioMode(true);
-      },
       child: Observer(
         builder: (_) {
           final videoOverlay = VideoOverlay(
@@ -237,126 +229,140 @@ class _VideoChatState extends State<VideoChat> {
               child: SizedBox(
                 width: 180,
                 height: 100,
-                child: Scaffold(
-                  body: Observer(builder: (context) {
+                child: Dismissible(
+                  key: ValueKey('${widget.key}_mini'),
+                  direction: DismissDirection.horizontal,
+                  onDismissed: (direction) {
+                    Navigator.of(context).pop();
+                  },
+                  child: Scaffold(
+                    body: Observer(builder: (context) {
+                      SystemChrome.setEnabledSystemUIMode(
+                        SystemUiMode.manual,
+                        overlays: SystemUiOverlay.values,
+                      );
+                      return AspectRatio(aspectRatio: 16 / 9, child: video);
+                    }),
+                  ),
+                ),
+              ),
+            )
+          : Dismissible(
+              key: ValueKey(widget.key),
+              direction: DismissDirection.vertical,
+              onDismissed: (direction) {
+                _videoStore.setMiniVedioMode(true);
+              },
+              child: Scaffold(
+                body: Observer(
+                  builder: (context) {
+                    if (orientation == Orientation.landscape &&
+                        !settingsStore.landscapeForceVerticalChat) {
+                      SystemChrome.setEnabledSystemUIMode(
+                          SystemUiMode.immersiveSticky);
+
+                      final landscapeChat = AnimatedContainer(
+                        curve: Curves.ease,
+                        duration: const Duration(milliseconds: 200),
+                        width: _chatStore.expandChat
+                            ? MediaQuery.of(context).size.width / 2
+                            : MediaQuery.of(context).size.width *
+                                _chatStore.settings.chatWidth,
+                        color: _chatStore.settings.fullScreen
+                            ? Colors.black.withOpacity(_chatStore
+                                .settings.fullScreenChatOverlayOpacity)
+                            : Theme.of(context).scaffoldBackgroundColor,
+                        child: chat,
+                      );
+
+                      final overlayChat = Visibility(
+                        visible: settingsStore.fullScreenChatOverlay,
+                        maintainState: true,
+                        child: Theme(
+                          data: darkTheme,
+                          child: DefaultTextStyle(
+                            style: DefaultTextStyle.of(context)
+                                .style
+                                .copyWith(color: Colors.white),
+                            child: landscapeChat,
+                          ),
+                        ),
+                      );
+
+                      return ColoredBox(
+                        color: settingsStore.showVideo
+                            ? Colors.black
+                            : Theme.of(context).scaffoldBackgroundColor,
+                        child: SafeArea(
+                          bottom: false,
+                          left: (settingsStore.landscapeCutout ==
+                                      LandscapeCutoutType.both ||
+                                  settingsStore.landscapeCutout ==
+                                      LandscapeCutoutType.left)
+                              ? false
+                              : true,
+                          right: (settingsStore.landscapeCutout ==
+                                      LandscapeCutoutType.both ||
+                                  settingsStore.landscapeCutout ==
+                                      LandscapeCutoutType.right)
+                              ? false
+                              : true,
+                          child: settingsStore.showVideo
+                              ? settingsStore.fullScreen
+                                  ? Stack(
+                                      children: [
+                                        player,
+                                        if (settingsStore.showOverlay)
+                                          Row(
+                                            children: settingsStore
+                                                    .landscapeChatLeftSide
+                                                ? [
+                                                    overlayChat,
+                                                    Expanded(child: overlay)
+                                                  ]
+                                                : [
+                                                    Expanded(child: overlay),
+                                                    overlayChat
+                                                  ],
+                                          )
+                                      ],
+                                    )
+                                  : Row(
+                                      children:
+                                          settingsStore.landscapeChatLeftSide
+                                              ? [
+                                                  landscapeChat,
+                                                  Expanded(child: video)
+                                                ]
+                                              : [
+                                                  Expanded(child: video),
+                                                  landscapeChat
+                                                ],
+                                    )
+                              : Column(
+                                  children: [appBar, Expanded(child: chat)],
+                                ),
+                        ),
+                      );
+                    }
+
                     SystemChrome.setEnabledSystemUIMode(
                       SystemUiMode.manual,
                       overlays: SystemUiOverlay.values,
                     );
-                    return AspectRatio(aspectRatio: 16 / 9, child: video);
-                  }),
+                    return SafeArea(
+                      child: Column(
+                        children: [
+                          if (!settingsStore.showVideo)
+                            appBar
+                          else
+                            AspectRatio(aspectRatio: 16 / 9, child: video),
+                          Expanded(child: chat),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ),
-            )
-          : Scaffold(
-              body: Observer(
-                builder: (context) {
-                  if (orientation == Orientation.landscape &&
-                      !settingsStore.landscapeForceVerticalChat) {
-                    SystemChrome.setEnabledSystemUIMode(
-                        SystemUiMode.immersiveSticky);
-
-                    final landscapeChat = AnimatedContainer(
-                      curve: Curves.ease,
-                      duration: const Duration(milliseconds: 200),
-                      width: _chatStore.expandChat
-                          ? MediaQuery.of(context).size.width / 2
-                          : MediaQuery.of(context).size.width *
-                              _chatStore.settings.chatWidth,
-                      color: _chatStore.settings.fullScreen
-                          ? Colors.black.withOpacity(
-                              _chatStore.settings.fullScreenChatOverlayOpacity)
-                          : Theme.of(context).scaffoldBackgroundColor,
-                      child: chat,
-                    );
-
-                    final overlayChat = Visibility(
-                      visible: settingsStore.fullScreenChatOverlay,
-                      maintainState: true,
-                      child: Theme(
-                        data: darkTheme,
-                        child: DefaultTextStyle(
-                          style: DefaultTextStyle.of(context)
-                              .style
-                              .copyWith(color: Colors.white),
-                          child: landscapeChat,
-                        ),
-                      ),
-                    );
-
-                    return ColoredBox(
-                      color: settingsStore.showVideo
-                          ? Colors.black
-                          : Theme.of(context).scaffoldBackgroundColor,
-                      child: SafeArea(
-                        bottom: false,
-                        left: (settingsStore.landscapeCutout ==
-                                    LandscapeCutoutType.both ||
-                                settingsStore.landscapeCutout ==
-                                    LandscapeCutoutType.left)
-                            ? false
-                            : true,
-                        right: (settingsStore.landscapeCutout ==
-                                    LandscapeCutoutType.both ||
-                                settingsStore.landscapeCutout ==
-                                    LandscapeCutoutType.right)
-                            ? false
-                            : true,
-                        child: settingsStore.showVideo
-                            ? settingsStore.fullScreen
-                                ? Stack(
-                                    children: [
-                                      player,
-                                      if (settingsStore.showOverlay)
-                                        Row(
-                                          children: settingsStore
-                                                  .landscapeChatLeftSide
-                                              ? [
-                                                  overlayChat,
-                                                  Expanded(child: overlay)
-                                                ]
-                                              : [
-                                                  Expanded(child: overlay),
-                                                  overlayChat
-                                                ],
-                                        )
-                                    ],
-                                  )
-                                : Row(
-                                    children:
-                                        settingsStore.landscapeChatLeftSide
-                                            ? [
-                                                landscapeChat,
-                                                Expanded(child: video)
-                                              ]
-                                            : [
-                                                Expanded(child: video),
-                                                landscapeChat
-                                              ],
-                                  )
-                            : Column(
-                                children: [appBar, Expanded(child: chat)],
-                              ),
-                      ),
-                    );
-                  }
-
-                  SystemChrome.setEnabledSystemUIMode(
-                    SystemUiMode.manual,
-                    overlays: SystemUiOverlay.values,
-                  );
-                  return SafeArea(
-                    child: Column(
-                      children: [
-                        if (!settingsStore.showVideo)
-                          appBar
-                        else
-                          AspectRatio(aspectRatio: 16 / 9, child: video),
-                        Expanded(child: chat),
-                      ],
-                    ),
-                  );
-                },
               ),
             );
     });
