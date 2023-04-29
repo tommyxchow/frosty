@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/list_tile.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OtherSettings extends StatefulWidget {
@@ -125,23 +121,17 @@ class _OtherSettingsState extends State<OtherSettings> {
           title: 'Reset settings',
           onTap: () => _showConfirmDialog(context),
         ),
-        Observer(
-          builder: (_) => SettingsListSwitch(
-            title: 'Send anonymous crash logs',
-            subtitle: const Text(
-                'Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
-            value: widget.settingsStore.sendCrashLogs,
-            onChanged: (newValue) {
-              if (newValue == true) {
-                SentryFlutter.init(
-                    (options) => options.tracesSampleRate = sampleRate);
-              } else {
-                Sentry.close();
-              }
-              widget.settingsStore.sendCrashLogs = newValue;
-            },
-          ),
-        ),
+        // Observer(
+        //   builder: (_) => SettingsListSwitch(
+        //     title: 'Send anonymous crash logs',
+        //     subtitle: const Text(
+        //         'Help improve Frosty by sending anonymous crash logs.'),
+        //     value: widget.settingsStore.sendCrashLogs,
+        //     onChanged: (newValue) {
+        //       widget.settingsStore.sendCrashLogs = newValue;
+        //     },
+        //   ),
+        // ),
       ],
     );
   }

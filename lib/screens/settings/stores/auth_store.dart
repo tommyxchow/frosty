@@ -9,7 +9,6 @@ import 'package:frosty/screens/settings/stores/user_store.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:mobx/mobx.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part 'auth_store.g.dart';
@@ -180,13 +179,7 @@ abstract class AuthBase with Store {
       }
 
       _error = null;
-    } catch (e, stackTrace) {
-      // If auth initialization failed, log the error to Sentry.
-      await Sentry.captureException(
-        e,
-        stackTrace: stackTrace,
-      );
-
+    } catch (e) {
       debugPrint(e.toString());
       _error = e.toString();
     }
@@ -211,13 +204,7 @@ abstract class AuthBase with Store {
 
       // Set the login status to logged in.
       if (user.details != null) _isLoggedIn = true;
-    } catch (e, stackTrace) {
-      // If login failed, log the error to Sentry.
-      await Sentry.captureException(
-        e,
-        stackTrace: stackTrace,
-      );
-
+    } catch (e) {
       debugPrint('Login failed due to $e');
     }
   }
@@ -246,13 +233,7 @@ abstract class AuthBase with Store {
       _isLoggedIn = false;
 
       debugPrint('Successfully logged out');
-    } catch (e, stackTrace) {
-      // If logout failed, log the error to Sentry.
-      await Sentry.captureException(
-        e,
-        stackTrace: stackTrace,
-      );
-
+    } catch (e) {
       debugPrint(e.toString());
     }
   }

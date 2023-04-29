@@ -9,7 +9,6 @@ import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -17,7 +16,6 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -47,10 +45,7 @@ void main() async {
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
   // Initialize Sentry for crash reporting if enabled.
-  if (settingsStore.sendCrashLogs) {
-    await SentryFlutter.init(
-        (options) => options.tracesSampleRate = sampleRate);
-  }
+  if (settingsStore.sendCrashLogs) {}
 
   /// Initialize API services with a common client.
   /// This will prevent every request from creating a new client instance.
