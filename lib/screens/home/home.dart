@@ -78,7 +78,6 @@ class _HomeState extends State<Home> {
         ),
         bottomNavigationBar: Observer(
           builder: (_) => BottomNavigationBar(
-            unselectedFontSize: 12.0,
             selectedFontSize: 12.0,
             type: BottomNavigationBarType.fixed,
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),

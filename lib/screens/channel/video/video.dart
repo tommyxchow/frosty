@@ -26,7 +26,7 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) async {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState lifecycleState) async {
     if (Platform.isAndroid && !await SimplePip.isAutoPipAvailable && lifecycleState == AppLifecycleState.inactive) {
       widget.videoStore.requestPictureInPicture();
     }
