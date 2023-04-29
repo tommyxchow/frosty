@@ -16,7 +16,6 @@ jobs:
       KEY_FILE_PATH: android/key.properties
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SECRET: ${{ secrets.SECRET }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
       - name: Checkout Frosty repo
         uses: actions/checkout@v3
@@ -49,7 +48,7 @@ jobs:
       # Build the APK with the environment variables and move/rename it.
       - name: Build for Android
         run: |
-          flutter build apk --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+          flutter build apk --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
           mv build/app/outputs/flutter-apk/app-release.apk frosty-${{ github.ref_name }}.apk
       
       # Create a draft release on GitHub.
