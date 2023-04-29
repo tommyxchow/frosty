@@ -19,7 +19,9 @@ class BTTVApi {
       final decoded = jsonDecode(response.body) as List;
       final emotes = decoded.map((emote) => EmoteBTTV.fromJson(emote)).toList();
 
-      return emotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvGlobal)).toList();
+      return emotes
+          .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvGlobal))
+          .toList();
     } else {
       return Future.error('Failed to get BTTV global emotes');
     }
@@ -27,7 +29,8 @@ class BTTVApi {
 
   /// Returns a map of a channel's BTTV emotes to their URL.
   Future<List<Emote>> getEmotesChannel({required String id}) async {
-    final url = Uri.parse('https://api.betterttv.net/3/cached/users/twitch/$id');
+    final url =
+        Uri.parse('https://api.betterttv.net/3/cached/users/twitch/$id');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {
@@ -35,8 +38,10 @@ class BTTVApi {
       final result = EmoteBTTVChannel.fromJson(decoded);
 
       final emoteToUrl = <Emote>[];
-      emoteToUrl.addAll(result.channelEmotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvChannel)));
-      emoteToUrl.addAll(result.sharedEmotes.map((emote) => Emote.fromBTTV(emote, EmoteType.bttvShared)));
+      emoteToUrl.addAll(result.channelEmotes
+          .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvChannel)));
+      emoteToUrl.addAll(result.sharedEmotes
+          .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvShared)));
 
       return emoteToUrl;
     } else {
@@ -52,9 +57,13 @@ class BTTVApi {
     if (response.statusCode == 200) {
       final badges = jsonDecode(response.body) as List;
 
-      final badgeObjects = badges.map((badge) => BadgeInfoBTTV.fromJson(badge)).toList();
+      final badgeObjects =
+          badges.map((badge) => BadgeInfoBTTV.fromJson(badge)).toList();
 
-      return {for (final badge in badgeObjects) badge.providerId: ChatBadge.fromBTTV(badge)};
+      return {
+        for (final badge in badgeObjects)
+          badge.providerId: ChatBadge.fromBTTV(badge)
+      };
     } else {
       return Future.error('Failed to get BTTV badges');
     }

@@ -18,7 +18,8 @@ class EmoteTwitch {
     this.ownerId,
   );
 
-  factory EmoteTwitch.fromJson(Map<String, dynamic> json) => _$EmoteTwitchFromJson(json);
+  factory EmoteTwitch.fromJson(Map<String, dynamic> json) =>
+      _$EmoteTwitchFromJson(json);
 }
 
 // * BTTV Emotes *
@@ -32,7 +33,8 @@ class EmoteBTTV {
     this.code,
   );
 
-  factory EmoteBTTV.fromJson(Map<String, dynamic> json) => _$EmoteBTTVFromJson(json);
+  factory EmoteBTTV.fromJson(Map<String, dynamic> json) =>
+      _$EmoteBTTVFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -45,7 +47,8 @@ class EmoteBTTVChannel {
     this.sharedEmotes,
   );
 
-  factory EmoteBTTVChannel.fromJson(Map<String, dynamic> json) => _$EmoteBTTVChannelFromJson(json);
+  factory EmoteBTTVChannel.fromJson(Map<String, dynamic> json) =>
+      _$EmoteBTTVChannelFromJson(json);
 }
 
 // * FFZ Emotes *
@@ -61,7 +64,8 @@ class RoomFFZ {
     this.modUrls,
   );
 
-  factory RoomFFZ.fromJson(Map<String, dynamic> json) => _$RoomFFZFromJson(json);
+  factory RoomFFZ.fromJson(Map<String, dynamic> json) =>
+      _$RoomFFZFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -79,7 +83,8 @@ class ImagesFFZ {
     this.url4x,
   );
 
-  factory ImagesFFZ.fromJson(Map<String, dynamic> json) => _$ImagesFFZFromJson(json);
+  factory ImagesFFZ.fromJson(Map<String, dynamic> json) =>
+      _$ImagesFFZFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -96,7 +101,8 @@ class EmoteFFZ {
     this.urls,
   );
 
-  factory EmoteFFZ.fromJson(Map<String, dynamic> json) => _$EmoteFFZFromJson(json);
+  factory EmoteFFZ.fromJson(Map<String, dynamic> json) =>
+      _$EmoteFFZFromJson(json);
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -115,7 +121,8 @@ class Emote7TV {
     this.urls,
   );
 
-  factory Emote7TV.fromJson(Map<String, dynamic> json) => _$Emote7TVFromJson(json);
+  factory Emote7TV.fromJson(Map<String, dynamic> json) =>
+      _$Emote7TVFromJson(json);
 }
 
 /// The common emote class.
@@ -142,7 +149,8 @@ class Emote {
   factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) => Emote(
         name: emote.name,
         zeroWidth: false,
-        url: 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
+        url:
+            'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
         type: type,
         ownerId: emote.ownerId,
       );

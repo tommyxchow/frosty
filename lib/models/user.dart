@@ -17,7 +17,8 @@ class UserTwitch {
     this.profileImageUrl,
   );
 
-  factory UserTwitch.fromJson(Map<String, dynamic> json) => _$UserTwitchFromJson(json);
+  factory UserTwitch.fromJson(Map<String, dynamic> json) =>
+      _$UserTwitchFromJson(json);
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -32,5 +33,6 @@ class UserBlockedTwitch {
     this.displayName,
   );
 
-  factory UserBlockedTwitch.fromJson(Map<String, dynamic> json) => _$UserBlockedTwitchFromJson(json);
+  factory UserBlockedTwitch.fromJson(Map<String, dynamic> json) =>
+      _$UserBlockedTwitchFromJson(json);
 }

@@ -25,7 +25,8 @@ class VideoBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final streamTitle = streamInfo.title.trim();
-    final category = streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category';
+    final category =
+        streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category';
 
     final streamerName = regexEnglish.hasMatch(streamInfo.userName)
         ? streamInfo.userName
@@ -64,7 +65,11 @@ class VideoBar extends StatelessWidget {
                     streamTitle,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: subtitleTextColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                      color: subtitleTextColor ??
+                          Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.8),
                       fontWeight: subtitleTextWeight,
                     ),
                   ),
@@ -84,13 +89,18 @@ class VideoBar extends StatelessWidget {
                             )
                         : null,
                     child: Tooltip(
-                      message: 'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
+                      message:
+                          'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
                       showDuration: const Duration(seconds: 3),
                       child: Text(
                         category,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: subtitleTextColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                          color: subtitleTextColor ??
+                              Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.8),
                           fontWeight: subtitleTextWeight,
                         ),
                       ),

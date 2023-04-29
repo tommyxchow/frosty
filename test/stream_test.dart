@@ -39,6 +39,7 @@ void main() {
     expect(stream.title, 'A shorter title...');
     expect(stream.viewerCount, 50051);
     expect(stream.startedAt, '2021-09-23T20:06:22Z');
-    expect(stream.thumbnailUrl, 'https://static-cdn.jtvnw.net/previews-ttv/live_user_xqcow-{width}x{height}.jpg');
+    expect(stream.thumbnailUrl,
+        'https://static-cdn.jtvnw.net/previews-ttv/live_user_xqcow-{width}x{height}.jpg');
   });
 }

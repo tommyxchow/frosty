@@ -31,13 +31,16 @@ class _ChatSettingsState extends State<ChatSettings> {
         children: [
           const SectionHeader('Message sizing'),
           ExpansionTile(
-            title: const Text('Preview', style: TextStyle(fontWeight: FontWeight.w500)),
+            title: const Text('Preview',
+                style: TextStyle(fontWeight: FontWeight.w500)),
             children: [
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context).style.copyWith(fontSize: settingsStore.fontSize),
+                  style: DefaultTextStyle.of(context)
+                      .style
+                      .copyWith(fontSize: settingsStore.fontSize),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -49,17 +52,22 @@ class _ChatSettingsState extends State<ChatSettings> {
                               child: FrostyCachedNetworkImage(
                                 imageUrl:
                                     'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
-                                height: defaultBadgeSize * settingsStore.badgeScale,
-                                width: defaultBadgeSize * settingsStore.badgeScale,
+                                height:
+                                    defaultBadgeSize * settingsStore.badgeScale,
+                                width:
+                                    defaultBadgeSize * settingsStore.badgeScale,
                               ),
                             ),
                             const TextSpan(text: ' Badge and emote preview. '),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.middle,
                               child: FrostyCachedNetworkImage(
-                                imageUrl: 'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
-                                height: defaultEmoteSize * settingsStore.emoteScale,
-                                width: defaultEmoteSize * settingsStore.emoteScale,
+                                imageUrl:
+                                    'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
+                                height:
+                                    defaultEmoteSize * settingsStore.emoteScale,
+                                width:
+                                    defaultEmoteSize * settingsStore.emoteScale,
                               ),
                             ),
                           ],
@@ -129,27 +137,31 @@ class _ChatSettingsState extends State<ChatSettings> {
           const SectionHeader('Message appearance'),
           SettingsListSwitch(
             title: 'Use readable name colors',
-            subtitle: const Text('Adjusts the lightness value of overly bright and dark names.'),
+            subtitle: const Text(
+                'Adjusts the lightness value of overly bright and dark names.'),
             value: settingsStore.useReadableColors,
             onChanged: (newValue) => settingsStore.useReadableColors = newValue,
           ),
           SettingsListSwitch(
             title: 'Show deleted messages',
-            subtitle: const Text('Restores the original message of deleted messages.'),
+            subtitle: const Text(
+                'Restores the original message of deleted messages.'),
             value: settingsStore.showDeletedMessages,
-            onChanged: (newValue) => settingsStore.showDeletedMessages = newValue,
+            onChanged: (newValue) =>
+                settingsStore.showDeletedMessages = newValue,
           ),
           SettingsListSwitch(
             title: 'Show message dividers',
             value: settingsStore.showChatMessageDividers,
-            onChanged: (newValue) => settingsStore.showChatMessageDividers = newValue,
+            onChanged: (newValue) =>
+                settingsStore.showChatMessageDividers = newValue,
           ),
           SettingsListSelect(
             title: 'Message timestamps',
             selectedOption: timestampNames[settingsStore.timestampType.index],
             options: timestampNames,
-            onChanged: (newValue) =>
-                settingsStore.timestampType = TimestampType.values[timestampNames.indexOf(newValue)],
+            onChanged: (newValue) => settingsStore.timestampType =
+                TimestampType.values[timestampNames.indexOf(newValue)],
           ),
           const SectionHeader('Delay'),
           SettingsListSlider(
@@ -166,11 +178,13 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Highlight first time chatters',
             value: settingsStore.highlightFirstTimeChatter,
-            onChanged: (newValue) => settingsStore.highlightFirstTimeChatter = newValue,
+            onChanged: (newValue) =>
+                settingsStore.highlightFirstTimeChatter = newValue,
           ),
           SettingsListSwitch(
             title: 'Show notices',
-            subtitle: const Text('Shows notices such as subs and re-subs, announcements, and raids.'),
+            subtitle: const Text(
+                'Shows notices such as subs and re-subs, announcements, and raids.'),
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
@@ -182,34 +196,43 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SettingsListSwitch(
             title: 'Move emote menu button left',
-            subtitle: const Text('Places the emote menu button on the left side to avoid accidental presses.'),
+            subtitle: const Text(
+                'Places the emote menu button on the left side to avoid accidental presses.'),
             value: settingsStore.emoteMenuButtonOnLeft,
-            onChanged: (newValue) => settingsStore.emoteMenuButtonOnLeft = newValue,
+            onChanged: (newValue) =>
+                settingsStore.emoteMenuButtonOnLeft = newValue,
           ),
           SettingsListSwitch(
             title: 'Move notifications to bottom',
             value: settingsStore.chatNotificationsOnBottom,
-            onChanged: (newValue) => settingsStore.chatNotificationsOnBottom = newValue,
+            onChanged: (newValue) =>
+                settingsStore.chatNotificationsOnBottom = newValue,
           ),
           const SectionHeader('Landscape mode'),
           SettingsListSwitch(
             title: 'Move chat left',
             value: settingsStore.landscapeChatLeftSide,
-            onChanged: (newValue) => settingsStore.landscapeChatLeftSide = newValue,
+            onChanged: (newValue) =>
+                settingsStore.landscapeChatLeftSide = newValue,
           ),
           SettingsListSwitch(
             title: 'Force vertical chat',
-            subtitle: const Text('Intended for tablets and other larger displays.'),
+            subtitle:
+                const Text('Intended for tablets and other larger displays.'),
             value: settingsStore.landscapeForceVerticalChat,
-            onChanged: (newValue) => settingsStore.landscapeForceVerticalChat = newValue,
+            onChanged: (newValue) =>
+                settingsStore.landscapeForceVerticalChat = newValue,
           ),
           SettingsListSelect(
             title: 'Fill notch side',
-            subtitle: 'Overrides and fills the available space in devices with a display notch.',
-            selectedOption: landscapeCutoutNames[settingsStore.landscapeCutout.index],
+            subtitle:
+                'Overrides and fills the available space in devices with a display notch.',
+            selectedOption:
+                landscapeCutoutNames[settingsStore.landscapeCutout.index],
             options: landscapeCutoutNames,
-            onChanged: (newValue) =>
-                settingsStore.landscapeCutout = LandscapeCutoutType.values[landscapeCutoutNames.indexOf(newValue)],
+            onChanged: (newValue) => settingsStore.landscapeCutout =
+                LandscapeCutoutType
+                    .values[landscapeCutoutNames.indexOf(newValue)],
           ),
           SettingsListSlider(
             title: 'Chat width',
@@ -222,23 +245,29 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SettingsListSlider(
             title: 'Chat overlay opacity',
-            trailing: '${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%',
-            subtitle: 'Sets the opacity (transparency) of the overlay chat in fullscreen mode.',
+            trailing:
+                '${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%',
+            subtitle:
+                'Sets the opacity (transparency) of the overlay chat in fullscreen mode.',
             value: settingsStore.fullScreenChatOverlayOpacity,
             divisions: 10,
-            onChanged: (newValue) => settingsStore.fullScreenChatOverlayOpacity = newValue,
+            onChanged: (newValue) =>
+                settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
           const SectionHeader('Sleep'),
           SettingsListSwitch(
             title: 'Prevent sleep in chat-only mode',
-            subtitle: const Text('Requires restarting the chat in order to take effect.'),
+            subtitle: const Text(
+                'Requires restarting the chat in order to take effect.'),
             value: settingsStore.chatOnlyPreventSleep,
-            onChanged: (newValue) => settingsStore.chatOnlyPreventSleep = newValue,
+            onChanged: (newValue) =>
+                settingsStore.chatOnlyPreventSleep = newValue,
           ),
           const SectionHeader('Autocomplete'),
           SettingsListSwitch(
             title: 'Show autocomplete bar',
-            subtitle: const Text('Shows a bar containing matching emotes and mentions while typing.'),
+            subtitle: const Text(
+                'Shows a bar containing matching emotes and mentions while typing.'),
             value: settingsStore.autocomplete,
             onChanged: (newValue) => settingsStore.autocomplete = newValue,
           ),

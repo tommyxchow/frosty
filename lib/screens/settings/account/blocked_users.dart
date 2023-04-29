@@ -21,7 +21,8 @@ class BlockedUsers extends StatelessWidget {
       onRefresh: () async {
         HapticFeedback.lightImpact();
 
-        await authStore.user.refreshBlockedUsers(headers: authStore.headersTwitch);
+        await authStore.user
+            .refreshBlockedUsers(headers: authStore.headersTwitch);
       },
       child: Observer(
         builder: (context) {
@@ -35,7 +36,8 @@ class BlockedUsers extends StatelessWidget {
           return ListView(
             children: authStore.user.blockedUsers.map(
               (blockedUser) {
-                final displayName = regexEnglish.hasMatch(blockedUser.displayName)
+                final displayName = regexEnglish
+                        .hasMatch(blockedUser.displayName)
                     ? blockedUser.displayName
                     : '${blockedUser.displayName} (${blockedUser.userLogin})';
 

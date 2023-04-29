@@ -49,12 +49,17 @@ class _SearchState extends State<Search> {
                   contentPadding: EdgeInsets.zero,
                   prefixIcon: const Icon(Icons.search_rounded),
                   hintText: 'Find a channel or category',
-                  suffixIcon: _searchStore.textFieldFocusNode.hasFocus || _searchStore.searchText.isNotEmpty
+                  suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
+                          _searchStore.searchText.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.close_rounded),
-                          tooltip: _searchStore.searchText.isEmpty ? 'Cancel' : 'Clear',
+                          tooltip: _searchStore.searchText.isEmpty
+                              ? 'Cancel'
+                              : 'Clear',
                           onPressed: () {
-                            if (_searchStore.searchText.isEmpty) _searchStore.textFieldFocusNode.unfocus();
+                            if (_searchStore.searchText.isEmpty) {
+                              _searchStore.textFieldFocusNode.unfocus();
+                            }
                             _searchStore.textEditingController.clear();
                           },
                         )
@@ -93,14 +98,20 @@ class _SearchState extends State<Search> {
                                   preferBelow: false,
                                   child: IconButton(
                                     icon: const Icon(Icons.close_rounded),
-                                    onPressed: () => _searchStore.searchHistory.removeAt(index),
+                                    onPressed: () => _searchStore.searchHistory
+                                        .removeAt(index),
                                   ),
                                 ),
                                 onTap: () {
-                                  _searchStore.textEditingController.text = searchTerm;
+                                  _searchStore.textEditingController.text =
+                                      searchTerm;
                                   _searchStore.handleQuery(searchTerm);
-                                  _searchStore.textEditingController.selection = TextSelection.fromPosition(
-                                      TextPosition(offset: _searchStore.textEditingController.text.length));
+                                  _searchStore.textEditingController.selection =
+                                      TextSelection.fromPosition(TextPosition(
+                                          offset: _searchStore
+                                              .textEditingController
+                                              .text
+                                              .length));
                                 },
                               ),
                             )

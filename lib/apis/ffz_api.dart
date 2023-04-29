@@ -22,11 +22,14 @@ class FFZApi {
 
       final emotes = <EmoteFFZ>[];
       for (final setId in defaultSets) {
-        final emoticons = decoded['sets'][setId.toString()]['emoticons'] as List;
+        final emoticons =
+            decoded['sets'][setId.toString()]['emoticons'] as List;
         emotes.addAll(emoticons.map((emote) => EmoteFFZ.fromJson(emote)));
       }
 
-      return emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzGlobal)).toList();
+      return emotes
+          .map((emote) => Emote.fromFFZ(emote, EmoteType.ffzGlobal))
+          .toList();
     } else {
       return Future.error('Failed to get FFZ global emotes');
     }
@@ -40,11 +43,16 @@ class FFZApi {
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final roomInfo = RoomFFZ.fromJson(decoded['room']);
-      final emoticons = decoded['sets'][roomInfo.set.toString()]['emoticons'] as List;
+      final emoticons =
+          decoded['sets'][roomInfo.set.toString()]['emoticons'] as List;
 
       final emotes = emoticons.map((emote) => EmoteFFZ.fromJson(emote));
 
-      return Tuple2(roomInfo, emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel)).toList());
+      return Tuple2(
+          roomInfo,
+          emotes
+              .map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel))
+              .toList());
     } else {
       return Future.error('Failed to get FFZ room info');
     }
@@ -58,7 +66,8 @@ class FFZApi {
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
       final badges = decoded['badges'] as List;
-      final badgeObjects = badges.map((badge) => BadgeInfoFFZ.fromJson(badge)).toList();
+      final badgeObjects =
+          badges.map((badge) => BadgeInfoFFZ.fromJson(badge)).toList();
 
       final result = <String, List<ChatBadge>>{};
       for (final badge in badgeObjects.reversed) {

@@ -81,13 +81,19 @@ class _ChattersListState extends State<ChattersList> {
                       contentPadding: EdgeInsets.zero,
                       prefixIcon: const Icon(Icons.filter_list_rounded),
                       hintText: 'Filter chatters',
-                      suffixIcon: widget.chatDetailsStore.textFieldFocusNode.hasFocus ||
+                      suffixIcon: widget.chatDetailsStore.textFieldFocusNode
+                                  .hasFocus ||
                               widget.chatDetailsStore.filterText.isNotEmpty
                           ? IconButton(
-                              tooltip: widget.chatDetailsStore.filterText.isEmpty ? 'Cancel' : 'Clear',
+                              tooltip:
+                                  widget.chatDetailsStore.filterText.isEmpty
+                                      ? 'Cancel'
+                                      : 'Clear',
                               onPressed: () {
-                                if (widget.chatDetailsStore.filterText.isEmpty) {
-                                  widget.chatDetailsStore.textFieldFocusNode.unfocus();
+                                if (widget
+                                    .chatDetailsStore.filterText.isEmpty) {
+                                  widget.chatDetailsStore.textFieldFocusNode
+                                      .unfocus();
                                 }
                                 widget.chatDetailsStore.textController.clear();
                               },
@@ -117,7 +123,8 @@ class _ChattersListState extends State<ChattersList> {
                           slivers: [
                             if (widget.chatDetailsStore.filterText.isEmpty)
                               SliverPadding(
-                                padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+                                padding: const EdgeInsets.only(
+                                    left: 10.0, right: 10.0, top: 20.0),
                                 sliver: SliverToBoxAdapter(
                                   child: Text(
                                     '${NumberFormat().format(widget.chatDetailsStore.chatUsers?.chatterCount)} in chat',
@@ -128,30 +135,39 @@ class _ChattersListState extends State<ChattersList> {
                                   ),
                                 ),
                               ),
-                            if (widget.chatDetailsStore.chatUsers?.chatterCount == 0)
+                            if (widget
+                                    .chatDetailsStore.chatUsers?.chatterCount ==
+                                0)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: Center(
-                                  child: AlertMessage(message: 'No chatters found'),
+                                  child: AlertMessage(
+                                      message: 'No chatters found'),
                                 ),
                               )
-                            else if (widget.chatDetailsStore.filteredUsers.expand((element) => element).isEmpty)
+                            else if (widget.chatDetailsStore.filteredUsers
+                                .expand((element) => element)
+                                .isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: Center(
-                                  child: AlertMessage(message: 'No matching chatters'),
+                                  child: AlertMessage(
+                                      message: 'No matching chatters'),
                                 ),
                               )
                             else
-                              ...widget.chatDetailsStore.filteredUsers.expandIndexed(
+                              ...widget.chatDetailsStore.filteredUsers
+                                  .expandIndexed(
                                 (index, users) => [
                                   if (users.isNotEmpty) ...[
                                     SliverPadding(
-                                      padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+                                      padding: const EdgeInsets.only(
+                                          left: 10.0, right: 10.0, top: 20.0),
                                       sliver: SliverToBoxAdapter(
                                         child: SectionHeader(
                                           headers[index],
-                                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5.0),
                                         ),
                                       ),
                                     ),
@@ -159,27 +175,36 @@ class _ChattersListState extends State<ChattersList> {
                                       delegate: SliverChildBuilderDelegate(
                                         (context, index) => InkWell(
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10.0,
+                                                vertical: 5.0),
                                             child: Text(users[index]),
                                           ),
                                           onLongPress: () async {
                                             HapticFeedback.lightImpact();
 
-                                            final userInfo = await context.read<TwitchApi>().getUser(
-                                                headers: context.read<AuthStore>().headersTwitch,
-                                                userLogin: users[index]);
+                                            final userInfo = await context
+                                                .read<TwitchApi>()
+                                                .getUser(
+                                                    headers: context
+                                                        .read<AuthStore>()
+                                                        .headersTwitch,
+                                                    userLogin: users[index]);
 
                                             if (!mounted) return;
 
                                             showModalBottomSheet(
-                                              backgroundColor: Colors.transparent,
+                                              backgroundColor:
+                                                  Colors.transparent,
                                               isScrollControlled: true,
                                               context: context,
-                                              builder: (context) => ChatUserModal(
+                                              builder: (context) =>
+                                                  ChatUserModal(
                                                 chatStore: widget.chatStore,
                                                 username: userInfo.login,
                                                 userId: userInfo.id,
-                                                displayName: userInfo.displayName,
+                                                displayName:
+                                                    userInfo.displayName,
                                               ),
                                             );
                                           },
@@ -200,7 +225,9 @@ class _ChattersListState extends State<ChattersList> {
                         switchInCurve: Curves.easeOut,
                         switchOutCurve: Curves.easeIn,
                         child: widget.chatDetailsStore.showJumpButton
-                            ? ScrollToTopButton(scrollController: widget.chatDetailsStore.scrollController)
+                            ? ScrollToTopButton(
+                                scrollController:
+                                    widget.chatDetailsStore.scrollController)
                             : null,
                       ),
                     ),

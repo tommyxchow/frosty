@@ -25,14 +25,19 @@ class _UptimeState extends State<Uptime> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) => setState(() {}));
+    _timer =
+        Timer.periodic(const Duration(seconds: 1), (timer) => setState(() {}));
   }
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      DateTime.now().difference(DateTime.parse(widget.startTime)).toString().split('.')[0],
-      style: widget.style?.copyWith(fontFeatures: [const FontFeature.tabularFigures()]),
+      DateTime.now()
+          .difference(DateTime.parse(widget.startTime))
+          .toString()
+          .split('.')[0],
+      style: widget.style
+          ?.copyWith(fontFeatures: [const FontFeature.tabularFigures()]),
     );
   }
 

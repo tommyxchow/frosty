@@ -35,9 +35,11 @@ class VideoOverlay extends StatelessWidget {
 
     final chatOverlayButton = Observer(
       builder: (_) => IconButton(
-        tooltip: videoStore.settingsStore.fullScreenChatOverlay ? 'Hide chat overlay' : 'Show chat overlay',
-        onPressed: () =>
-            videoStore.settingsStore.fullScreenChatOverlay = !videoStore.settingsStore.fullScreenChatOverlay,
+        tooltip: videoStore.settingsStore.fullScreenChatOverlay
+            ? 'Hide chat overlay'
+            : 'Show chat overlay',
+        onPressed: () => videoStore.settingsStore.fullScreenChatOverlay =
+            !videoStore.settingsStore.fullScreenChatOverlay,
         icon: videoStore.settingsStore.fullScreenChatOverlay
             ? const Icon(Icons.chat_rounded)
             : const Icon(Icons.chat_outlined),
@@ -58,19 +60,26 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final fullScreenButton = Tooltip(
-      message: videoStore.settingsStore.fullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode',
+      message: videoStore.settingsStore.fullScreen
+          ? 'Exit fullscreen mode'
+          : 'Enter fullscreen mode',
       preferBelow: false,
       child: IconButton(
         icon: Icon(
-          videoStore.settingsStore.fullScreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded,
+          videoStore.settingsStore.fullScreen
+              ? Icons.fullscreen_exit_rounded
+              : Icons.fullscreen_rounded,
           color: Colors.white,
         ),
-        onPressed: () => videoStore.settingsStore.fullScreen = !videoStore.settingsStore.fullScreen,
+        onPressed: () => videoStore.settingsStore.fullScreen =
+            !videoStore.settingsStore.fullScreen,
       ),
     );
 
     final rotateButton = Tooltip(
-      message: orientation == Orientation.portrait ? 'Enter landscape mode' : 'Exit landscape mode',
+      message: orientation == Orientation.portrait
+          ? 'Enter landscape mode'
+          : 'Exit landscape mode',
       preferBelow: false,
       child: IconButton(
         icon: const Icon(
@@ -84,7 +93,8 @@ class VideoOverlay extends StatelessWidget {
               DeviceOrientation.landscapeRight,
             ]);
           } else {
-            SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.portraitUp]);
             SystemChrome.setPreferredOrientations([]);
           }
         },
@@ -100,7 +110,9 @@ class VideoOverlay extends StatelessWidget {
             children: [
               backButton,
               const Spacer(),
-              if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
+              if (videoStore.settingsStore.fullScreen &&
+                  orientation == Orientation.landscape)
+                chatOverlayButton,
             ],
           ),
           Align(
@@ -135,7 +147,9 @@ class VideoOverlay extends StatelessWidget {
                       subtitleTextWeight: FontWeight.w500,
                     ),
                   ),
-                if (videoStore.settingsStore.fullScreen && orientation == Orientation.landscape) chatOverlayButton,
+                if (videoStore.settingsStore.fullScreen &&
+                    orientation == Orientation.landscape)
+                  chatOverlayButton,
               ],
             ),
             Center(
@@ -145,7 +159,9 @@ class VideoOverlay extends StatelessWidget {
                 child: IconButton(
                   iconSize: 50.0,
                   icon: Icon(
-                    videoStore.paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
+                    videoStore.paused
+                        ? Icons.play_arrow_rounded
+                        : Icons.pause_rounded,
                     color: Colors.white,
                   ),
                   onPressed: videoStore.handlePausePlay,
@@ -197,11 +213,13 @@ class VideoOverlay extends StatelessWidget {
                                 context: context,
                                 builder: (context) => FrostyBottomSheet(
                                   child: SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.8,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.8,
                                     child: GestureDetector(
                                       onTap: FocusScope.of(context).unfocus,
                                       child: ChattersList(
-                                        chatDetailsStore: chatStore.chatDetailsStore,
+                                        chatDetailsStore:
+                                            chatStore.chatDetailsStore,
                                         chatStore: chatStore,
                                         userLogin: streamInfo.userLogin,
                                       ),
@@ -218,7 +236,8 @@ class VideoOverlay extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
-                                    NumberFormat().format(videoStore.streamInfo?.viewerCount),
+                                    NumberFormat().format(
+                                        videoStore.streamInfo?.viewerCount),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,

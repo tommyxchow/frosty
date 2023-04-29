@@ -52,8 +52,10 @@ abstract class VideoStoreBase with Store {
       onMessageReceived: (message) {
         _paused = false;
         if (Platform.isAndroid) pip.setIsPlaying(true);
-        controller?.runJavascript('document.getElementsByTagName("video")[0].muted = false;');
-        controller?.runJavascript('document.getElementsByTagName("video")[0].volume = 1.0;');
+        controller?.runJavascript(
+            'document.getElementsByTagName("video")[0].muted = false;');
+        controller?.runJavascript(
+            'document.getElementsByTagName("video")[0].volume = 1.0;');
       },
     ),
   };
@@ -104,7 +106,8 @@ abstract class VideoStoreBase with Store {
     }
 
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
-    _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+    _overlayTimer =
+        Timer(const Duration(seconds: 5), () => _overlayVisible = false);
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
@@ -153,7 +156,8 @@ abstract class VideoStoreBase with Store {
       updateStreamInfo();
 
       _overlayVisible = true;
-      _overlayTimer = Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+      _overlayTimer =
+          Timer(const Duration(seconds: 5), () => _overlayVisible = false);
     }
   }
 
@@ -163,7 +167,8 @@ abstract class VideoStoreBase with Store {
   @action
   Future<void> updateStreamInfo() async {
     try {
-      _streamInfo = await twitchApi.getStream(userLogin: userLogin, headers: authStore.headersTwitch);
+      _streamInfo = await twitchApi.getStream(
+          userLogin: userLogin, headers: authStore.headersTwitch);
     } catch (e) {
       debugPrint(e.toString());
 
@@ -187,7 +192,8 @@ abstract class VideoStoreBase with Store {
         _overlayVisible = true;
 
         _overlayTimer.cancel();
-        _overlayTimer = Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+        _overlayTimer =
+            Timer(const Duration(seconds: 3), () => _overlayVisible = false);
       }
     }
   }
@@ -204,9 +210,11 @@ abstract class VideoStoreBase with Store {
   void handlePausePlay() {
     try {
       if (_paused) {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].play();');
+        controller?.runJavascript(
+            'document.getElementsByTagName("video")[0].play();');
       } else {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].pause();');
+        controller?.runJavascript(
+            'document.getElementsByTagName("video")[0].pause();');
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -222,7 +230,8 @@ abstract class VideoStoreBase with Store {
       if (Platform.isAndroid) {
         pip.enterPipMode(autoEnter: true);
       } else if (Platform.isIOS) {
-        controller?.runJavascript('document.getElementsByTagName("video")[0].requestPictureInPicture();');
+        controller?.runJavascript(
+            'document.getElementsByTagName("video")[0].requestPictureInPicture();');
       }
     } catch (e) {
       debugPrint(e.toString());

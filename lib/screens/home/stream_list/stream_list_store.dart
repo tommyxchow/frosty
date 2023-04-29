@@ -52,8 +52,9 @@ abstract class ListStoreBase with Store {
   /// The list of the fetched streams with blocked users filtered out.
   @computed
   ObservableList<StreamTwitch> get streams => _allStreams
-      .where((streamInfo) =>
-          !authStore.user.blockedUsers.map((blockedUser) => blockedUser.userId).contains(streamInfo.userId))
+      .where((streamInfo) => !authStore.user.blockedUsers
+          .map((blockedUser) => blockedUser.userId)
+          .contains(streamInfo.userId))
       .toList()
       .asObservable();
 
@@ -70,7 +71,8 @@ abstract class ListStoreBase with Store {
   }) {
     if (scrollController != null) {
       scrollController!.addListener(() {
-        if (scrollController!.position.atEdge || scrollController!.position.outOfRange) {
+        if (scrollController!.position.atEdge ||
+            scrollController!.position.outOfRange) {
           showJumpButton = false;
         } else {
           showJumpButton = true;
