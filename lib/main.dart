@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_preview/device_preview.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -9,6 +10,7 @@ import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/firebase_options.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -44,8 +46,12 @@ void main() async {
   // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
-  // Initialize Sentry for crash reporting if enabled.
-  if (settingsStore.sendCrashLogs) {}
+  // Initialize Firebase for crash reporting if enabled.
+  if (settingsStore.sendCrashLogs) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
 
   /// Initialize API services with a common client.
   /// This will prevent every request from creating a new client instance.
