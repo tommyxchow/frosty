@@ -10,7 +10,8 @@ import 'package:mobx/mobx.dart';
 class SearchResultsCategories extends StatelessWidget {
   final SearchStore searchStore;
 
-  const SearchResultsCategories({Key? key, required this.searchStore}) : super(key: key);
+  const SearchResultsCategories({Key? key, required this.searchStore})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

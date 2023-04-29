@@ -16,7 +16,8 @@ class OnboardingLogin extends StatelessWidget {
 
     return OnboardingScaffold(
       header: 'Log in',
-      subtitle: 'Frosty needs your permission in order to enable the ability to chat, view followed streams, and more.',
+      subtitle:
+          'Frosty needs your permission in order to enable the ability to chat, view followed streams, and more.',
       disclaimer:
           'Frosty only asks for the necessary permissions through the official Twitch API. You\'ll be able to review them before authorizing.',
       buttonText: 'Connect with Twitch',
@@ -28,8 +29,8 @@ class OnboardingLogin extends StatelessWidget {
         ),
         body: WebView(
           initialUrl: authStore.loginUri.toString(),
-          navigationDelegate: (navigation) =>
-              authStore.handleNavigation(navigation: navigation, routeAfter: const OnboardingSetup()),
+          navigationDelegate: (navigation) => authStore.handleNavigation(
+              navigation: navigation, routeAfter: const OnboardingSetup()),
           javascriptMode: JavascriptMode.unrestricted,
         ),
       ),

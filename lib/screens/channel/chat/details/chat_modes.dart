@@ -17,9 +17,12 @@ class ChatModes extends StatelessWidget {
           preferBelow: false,
           triggerMode: TooltipTriggerMode.tap,
           showDuration: const Duration(seconds: 3),
-          message: 'Emote-only mode ${roomState.emoteOnly != '0' ? 'on' : 'off'}',
+          message:
+              'Emote-only mode ${roomState.emoteOnly != '0' ? 'on' : 'off'}',
           child: Icon(
-            roomState.emoteOnly != '0' ? Icons.emoji_emotions_rounded : Icons.emoji_emotions_outlined,
+            roomState.emoteOnly != '0'
+                ? Icons.emoji_emotions_rounded
+                : Icons.emoji_emotions_outlined,
             color: roomState.emoteOnly != '0' ? Colors.yellow : Colors.grey,
           ),
         ),
@@ -33,7 +36,9 @@ class ChatModes extends StatelessWidget {
                   ? 'Followers-only mode on'
                   : 'Followers-only mode on (${roomState.followersOnly} ${pluralize('minute', roomState.followersOnly)})',
           child: Icon(
-            roomState.followersOnly != '-1' ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+            roomState.followersOnly != '-1'
+                ? Icons.favorite_rounded
+                : Icons.favorite_outline_rounded,
             color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
           ),
         ),
@@ -41,7 +46,8 @@ class ChatModes extends StatelessWidget {
           preferBelow: false,
           triggerMode: TooltipTriggerMode.tap,
           showDuration: const Duration(seconds: 3),
-          message: 'R9K (unique-chat) mode ${roomState.r9k != '0' ? 'on' : 'off'}',
+          message:
+              'R9K (unique-chat) mode ${roomState.r9k != '0' ? 'on' : 'off'}',
           child: Text(
             'R9K',
             style: TextStyle(
@@ -57,7 +63,9 @@ class ChatModes extends StatelessWidget {
           message:
               'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
           child: Icon(
-            roomState.slowMode != '0' ? Icons.hourglass_top_rounded : Icons.hourglass_empty_rounded,
+            roomState.slowMode != '0'
+                ? Icons.hourglass_top_rounded
+                : Icons.hourglass_empty_rounded,
             color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,
           ),
         ),
@@ -67,7 +75,9 @@ class ChatModes extends StatelessWidget {
           showDuration: const Duration(seconds: 3),
           message: 'Subs-only mode ${roomState.subMode != '0' ? 'on' : 'off'}',
           child: Icon(
-            roomState.subMode != '0' ? Icons.monetization_on_rounded : Icons.monetization_on_outlined,
+            roomState.subMode != '0'
+                ? Icons.monetization_on_rounded
+                : Icons.monetization_on_outlined,
             color: roomState.subMode != '0' ? Colors.green : Colors.grey,
           ),
         ),

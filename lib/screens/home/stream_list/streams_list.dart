@@ -30,7 +30,8 @@ class StreamsList extends StatefulWidget {
   State<StreamsList> createState() => _StreamsListState();
 }
 
-class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+class _StreamsListState extends State<StreamsList>
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final _listStore = ListStore(
     authStore: context.read<AuthStore>(),
     twitchApi: context.read<TwitchApi>(),
@@ -50,7 +51,9 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    if (state == AppLifecycleState.resumed) _listStore.checkLastTimeRefreshedAndUpdate();
+    if (state == AppLifecycleState.resumed) {
+      _listStore.checkLastTimeRefreshedAndUpdate();
+    }
   }
 
   @override
@@ -85,10 +88,13 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
 
           if (_listStore.streams.isEmpty) {
             if (_listStore.isLoading && _listStore.error == null) {
-              statusWidget = const LoadingIndicator(subtitle: 'Loading streams...');
+              statusWidget =
+                  const LoadingIndicator(subtitle: 'Loading streams...');
             } else {
               statusWidget = AlertMessage(
-                  message: widget.listType == ListType.followed ? 'No followed streams' : 'No top streams');
+                  message: widget.listType == ListType.followed
+                      ? 'No followed streams'
+                      : 'No top streams');
             }
           }
 
@@ -109,23 +115,27 @@ class _StreamsListState extends State<StreamsList> with AutomaticKeepAliveClient
             controller: widget.scrollController,
             itemCount: _listStore.streams.length,
             itemBuilder: (context, index) {
-              if (index > _listStore.streams.length - 10 && _listStore.hasMore) {
+              if (index > _listStore.streams.length - 10 &&
+                  _listStore.hasMore) {
                 debugPrint('$index ${_listStore.streams.length}');
 
                 _listStore.getStreams();
               }
               return Observer(
-                builder: (context) => context.read<SettingsStore>().largeStreamCard
-                    ? LargeStreamCard(
-                        key: ValueKey(_listStore.streams[index].userId),
-                        streamInfo: _listStore.streams[index],
-                        showThumbnail: context.read<SettingsStore>().showThumbnails,
-                      )
-                    : StreamCard(
-                        key: ValueKey(_listStore.streams[index].userId),
-                        streamInfo: _listStore.streams[index],
-                        showThumbnail: context.read<SettingsStore>().showThumbnails,
-                      ),
+                builder: (context) =>
+                    context.read<SettingsStore>().largeStreamCard
+                        ? LargeStreamCard(
+                            key: ValueKey(_listStore.streams[index].userId),
+                            streamInfo: _listStore.streams[index],
+                            showThumbnail:
+                                context.read<SettingsStore>().showThumbnails,
+                          )
+                        : StreamCard(
+                            key: ValueKey(_listStore.streams[index].userId),
+                            streamInfo: _listStore.streams[index],
+                            showThumbnail:
+                                context.read<SettingsStore>().showThumbnails,
+                          ),
               );
             },
           );

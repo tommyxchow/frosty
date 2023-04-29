@@ -31,8 +31,9 @@ class ChatUserModal extends StatefulWidget {
 class _ChatUserModalState extends State<ChatUserModal> {
   @override
   Widget build(BuildContext context) {
-    final name =
-        regexEnglish.hasMatch(widget.displayName) ? widget.displayName : '${widget.displayName} (${widget.username})';
+    final name = regexEnglish.hasMatch(widget.displayName)
+        ? widget.displayName
+        : '${widget.displayName} (${widget.username})';
 
     return FrostyBottomSheet(
       child: SizedBox(
@@ -63,7 +64,8 @@ class _ChatUserModalState extends State<ChatUserModal> {
                   ? Button(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
                       onPressed: () {
-                        widget.chatStore.textController.text = '@${widget.username} ';
+                        widget.chatStore.textController.text =
+                            '@${widget.username} ';
                         Navigator.pop(context);
                         widget.chatStore.textFieldFocusNode.requestFocus();
                       },
@@ -88,17 +90,21 @@ class _ChatUserModalState extends State<ChatUserModal> {
             Expanded(
               child: Observer(
                 builder: (context) {
-                  final userMessages =
-                      widget.chatStore.messages.reversed.where((message) => message.user == widget.username).toList();
+                  final userMessages = widget.chatStore.messages.reversed
+                      .where((message) => message.user == widget.username)
+                      .toList();
 
                   if (userMessages.isEmpty) {
                     return const AlertMessage(message: 'No recent messages');
                   }
 
                   return MediaQuery(
-                    data: MediaQuery.of(context).copyWith(textScaleFactor: widget.chatStore.settings.messageScale),
+                    data: MediaQuery.of(context).copyWith(
+                        textScaleFactor:
+                            widget.chatStore.settings.messageScale),
                     child: DefaultTextStyle(
-                      style: DefaultTextStyle.of(context).style.copyWith(fontSize: widget.chatStore.settings.fontSize),
+                      style: DefaultTextStyle.of(context).style.copyWith(
+                          fontSize: widget.chatStore.settings.fontSize),
                       child: ListView.builder(
                         reverse: true,
                         itemCount: userMessages.length,

@@ -17,11 +17,16 @@ class ChatBottomBar extends StatelessWidget {
       message: 'Emote menu',
       preferBelow: false,
       child: IconButton(
-        color: chatStore.assetsStore.showEmoteMenu ? Theme.of(context).colorScheme.secondary : null,
-        icon: Icon(chatStore.assetsStore.showEmoteMenu ? Icons.emoji_emotions_rounded : Icons.emoji_emotions_outlined),
+        color: chatStore.assetsStore.showEmoteMenu
+            ? Theme.of(context).colorScheme.secondary
+            : null,
+        icon: Icon(chatStore.assetsStore.showEmoteMenu
+            ? Icons.emoji_emotions_rounded
+            : Icons.emoji_emotions_outlined),
         onPressed: () {
           FocusScope.of(context).unfocus();
-          chatStore.assetsStore.showEmoteMenu = !chatStore.assetsStore.showEmoteMenu;
+          chatStore.assetsStore.showEmoteMenu =
+              !chatStore.assetsStore.showEmoteMenu;
         },
       ),
     );
@@ -34,18 +39,23 @@ class ChatBottomBar extends StatelessWidget {
           ...chatStore.assetsStore.ffzEmotes,
           ...chatStore.assetsStore.sevenTVEmotes
         ]
-            .where((emote) =>
-                emote.name.toLowerCase().contains(chatStore.textController.text.split(' ').last.toLowerCase()))
+            .where((emote) => emote.name.toLowerCase().contains(
+                chatStore.textController.text.split(' ').last.toLowerCase()))
             .toList();
 
         final matchingChatters = chatStore.chatDetailsStore.allChatters
-            .where((chatter) =>
-                chatter.contains(chatStore.textController.text.split(' ').last.replaceFirst('@', '').toLowerCase()))
+            .where((chatter) => chatter.contains(chatStore.textController.text
+                .split(' ')
+                .last
+                .replaceFirst('@', '')
+                .toLowerCase()))
             .toList();
 
         return Column(
           children: [
-            if (chatStore.settings.autocomplete && chatStore.showEmoteAutocomplete && matchingEmotes.isNotEmpty) ...[
+            if (chatStore.settings.autocomplete &&
+                chatStore.showEmoteAutocomplete &&
+                matchingEmotes.isNotEmpty) ...[
               const Divider(
                 height: 1.0,
                 thickness: 1.0,
@@ -57,7 +67,8 @@ class ChatBottomBar extends StatelessWidget {
                   itemCount: matchingEmotes.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => InkWell(
-                    onTap: () => chatStore.addEmote(matchingEmotes[index], autocompleteMode: true),
+                    onTap: () => chatStore.addEmote(matchingEmotes[index],
+                        autocompleteMode: true),
                     child: Tooltip(
                       message: matchingEmotes[index].name,
                       preferBelow: false,
@@ -67,7 +78,8 @@ class ChatBottomBar extends StatelessWidget {
                           child: FrostyCachedNetworkImage(
                             imageUrl: matchingEmotes[index].url,
                             useFade: false,
-                            height: matchingEmotes[index].height?.toDouble() ?? defaultEmoteSize,
+                            height: matchingEmotes[index].height?.toDouble() ??
+                                defaultEmoteSize,
                             width: matchingEmotes[index].width?.toDouble(),
                           ),
                         ),
@@ -99,7 +111,8 @@ class ChatBottomBar extends StatelessWidget {
 
                       chatStore.textController.text = split.join(' ');
                       chatStore.textController.selection =
-                          TextSelection.fromPosition(TextPosition(offset: chatStore.textController.text.length));
+                          TextSelection.fromPosition(TextPosition(
+                              offset: chatStore.textController.text.length));
                     },
                     child: Text(matchingChatters[index]),
                   ),
@@ -113,7 +126,8 @@ class ChatBottomBar extends StatelessWidget {
                   if (!chatStore.expandChat &&
                       chatStore.settings.chatWidth < 0.3 &&
                       chatStore.settings.showVideo &&
-                      MediaQuery.of(context).orientation == Orientation.landscape)
+                      MediaQuery.of(context).orientation ==
+                          Orientation.landscape)
                     IconButton(
                       tooltip: 'Enter a message',
                       onPressed: () {
@@ -132,8 +146,12 @@ class ChatBottomBar extends StatelessWidget {
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.only(left: 15.0),
-                          prefixIcon: chatStore.settings.emoteMenuButtonOnLeft ? emoteMenuButton : null,
-                          suffixIcon: chatStore.settings.emoteMenuButtonOnLeft ? null : emoteMenuButton,
+                          prefixIcon: chatStore.settings.emoteMenuButtonOnLeft
+                              ? emoteMenuButton
+                              : null,
+                          suffixIcon: chatStore.settings.emoteMenuButtonOnLeft
+                              ? null
+                              : emoteMenuButton,
                           hintMaxLines: 1,
                           hintText: chatStore.auth.isLoggedIn
                               ? 'Send a message ${chatStore.settings.chatDelay == 0 ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
@@ -146,12 +164,15 @@ class ChatBottomBar extends StatelessWidget {
                   if (chatStore.showSendButton &&
                       (chatStore.settings.chatWidth >= 0.3 ||
                           chatStore.expandChat ||
-                          MediaQuery.of(context).orientation == Orientation.portrait))
+                          MediaQuery.of(context).orientation ==
+                              Orientation.portrait))
                     IconButton(
                       tooltip: 'Send',
                       icon: const Icon(Icons.send_rounded),
-                      onPressed:
-                          chatStore.auth.isLoggedIn ? () => chatStore.sendMessage(chatStore.textController.text) : null,
+                      onPressed: chatStore.auth.isLoggedIn
+                          ? () => chatStore
+                              .sendMessage(chatStore.textController.text)
+                          : null,
                     )
                   else
                     IconButton(

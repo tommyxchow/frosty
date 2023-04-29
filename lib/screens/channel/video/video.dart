@@ -26,8 +26,11 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycleState) async {
-    if (Platform.isAndroid && !await SimplePip.isAutoPipAvailable && lifecycleState == AppLifecycleState.inactive) {
+  Future<void> didChangeAppLifecycleState(
+      AppLifecycleState lifecycleState) async {
+    if (Platform.isAndroid &&
+        !await SimplePip.isAutoPipAvailable &&
+        lifecycleState == AppLifecycleState.inactive) {
       widget.videoStore.requestPictureInPicture();
     }
   }
@@ -40,7 +43,8 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
       javascriptMode: JavascriptMode.unrestricted,
       allowsInlineMediaPlayback: true,
       initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-      onWebViewCreated: (controller) => widget.videoStore.controller = controller,
+      onWebViewCreated: (controller) =>
+          widget.videoStore.controller = controller,
       onPageFinished: (string) => widget.videoStore.initVideo(),
       navigationDelegate: widget.videoStore.handleNavigation,
       javascriptChannels: widget.videoStore.javascriptChannels,

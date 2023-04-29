@@ -20,7 +20,8 @@ class FrostyPageView extends StatefulWidget {
 class _FrostyPageViewState extends State<FrostyPageView> {
   var currentIndex = 0;
 
-  late final PageController _pageContoller = PageController(initialPage: currentIndex);
+  late final PageController _pageContoller =
+      PageController(initialPage: currentIndex);
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +40,16 @@ class _FrostyPageViewState extends State<FrostyPageView> {
                 (index, section) => SizedBox(
                   height: 40,
                   child: Button(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0, vertical: 5.0),
                     onPressed: () => _pageContoller.animateToPage(
                       index,
                       duration: const Duration(milliseconds: 200),
                       curve: Curves.easeOut,
                     ),
-                    color: index == currentIndex ? Theme.of(context).colorScheme.secondary : Colors.grey,
+                    color: index == currentIndex
+                        ? Theme.of(context).colorScheme.secondary
+                        : Colors.grey,
                     child: Text(
                       section,
                       style: const TextStyle(fontWeight: FontWeight.w600),

@@ -4,7 +4,8 @@ import 'package:frosty/widgets/button.dart';
 class ScrollToTopButton extends StatelessWidget {
   final ScrollController scrollController;
 
-  const ScrollToTopButton({Key? key, required this.scrollController}) : super(key: key);
+  const ScrollToTopButton({Key? key, required this.scrollController})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -22,8 +22,9 @@ class ProfilePicture extends StatelessWidget {
 
     return ClipOval(
       child: FutureBuilder(
-        future:
-            context.read<TwitchApi>().getUser(userLogin: userLogin, headers: context.read<AuthStore>().headersTwitch),
+        future: context.read<TwitchApi>().getUser(
+            userLogin: userLogin,
+            headers: context.read<AuthStore>().headersTwitch),
         builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
@@ -34,7 +35,8 @@ class ProfilePicture extends StatelessWidget {
                     width: diameter,
                     height: diameter,
                     imageUrl: snapshot.data!.profileImageUrl,
-                    placeholder: (context, url) => const ColoredBox(color: lightGray),
+                    placeholder: (context, url) =>
+                        const ColoredBox(color: lightGray),
                   )
                 : Container(
                     color: lightGray,

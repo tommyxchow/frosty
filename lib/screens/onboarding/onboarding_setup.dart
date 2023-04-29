@@ -18,7 +18,8 @@ class OnboardingSetup extends StatelessWidget {
 
     return OnboardingScaffold(
       header: 'Setup',
-      subtitle: 'Let\'s tweak some settings before you get started. You can always change these later.',
+      subtitle:
+          'Let\'s tweak some settings before you get started. You can always change these later.',
       content: Observer(
         builder: (context) {
           return ListView(
@@ -27,15 +28,18 @@ class OnboardingSetup extends StatelessWidget {
                 title: 'Theme',
                 selectedOption: themeNames[settingsStore.themeType.index],
                 options: themeNames,
-                onChanged: (newTheme) => settingsStore.themeType = ThemeType.values[themeNames.indexOf(newTheme)],
+                onChanged: (newTheme) => settingsStore.themeType =
+                    ThemeType.values[themeNames.indexOf(newTheme)],
               ),
               SettingsListSwitch(
                 title: 'Send anonymous crash logs',
-                subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
+                subtitle: const Text(
+                    'Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
                 value: settingsStore.sendCrashLogs,
                 onChanged: (newValue) {
                   if (newValue == true) {
-                    SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
+                    SentryFlutter.init(
+                        (options) => options.tracesSampleRate = sampleRate);
                   } else {
                     Sentry.close();
                   }

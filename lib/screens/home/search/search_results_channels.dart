@@ -75,17 +75,18 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
               ),
             );
           case FutureStatus.fulfilled:
-            final results = (future.result as List<ChannelQuery>).where((channel) => !widget
-                .searchStore.authStore.user.blockedUsers
-                .map((blockedUser) => blockedUser.userId)
-                .contains(channel.id));
+            final results = (future.result as List<ChannelQuery>).where(
+                (channel) => !widget.searchStore.authStore.user.blockedUsers
+                    .map((blockedUser) => blockedUser.userId)
+                    .contains(channel.id));
 
             return SliverList(
               delegate: SliverChildListDelegate.fixed(
                 [
                   ...results.map(
                     (channel) {
-                      final displayName = regexEnglish.hasMatch(channel.displayName)
+                      final displayName = regexEnglish
+                              .hasMatch(channel.displayName)
                           ? channel.displayName
                           : '${channel.displayName} (${channel.broadcasterLogin})';
 
@@ -117,7 +118,8 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                         child: FrostyListTile(
                           isThreeLine: false,
                           title: displayName,
-                          leading: ProfilePicture(userLogin: channel.broadcasterLogin),
+                          leading: ProfilePicture(
+                              userLogin: channel.broadcasterLogin),
                           subtitle: channel.isLive
                               ? Row(
                                   children: [

@@ -95,8 +95,9 @@ class _VideoChatState extends State<VideoChat> {
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
-      onDoubleTap:
-          orientation == Orientation.landscape ? () => settingsStore.fullScreen = !settingsStore.fullScreen : null,
+      onDoubleTap: orientation == Orientation.landscape
+          ? () => settingsStore.fullScreen = !settingsStore.fullScreen
+          : null,
       onTap: () {
         if (_chatStore.assetsStore.showEmoteMenu) {
           _chatStore.assetsStore.showEmoteMenu = false;
@@ -115,7 +116,9 @@ class _VideoChatState extends State<VideoChat> {
             chatStore: _chatStore,
           );
 
-          if (_videoStore.paused || _videoStore.streamInfo == null) return videoOverlay;
+          if (_videoStore.paused || _videoStore.streamInfo == null) {
+            return videoOverlay;
+          }
 
           return AnimatedOpacity(
             opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
@@ -189,16 +192,21 @@ class _VideoChatState extends State<VideoChat> {
               switchOutCurve: Curves.easeIn,
               child: _chatStore.notification != null
                   ? Align(
-                      alignment:
-                          _chatStore.settings.chatNotificationsOnBottom ? Alignment.bottomCenter : Alignment.topCenter,
+                      alignment: _chatStore.settings.chatNotificationsOnBottom
+                          ? Alignment.bottomCenter
+                          : Alignment.topCenter,
                       child: FrostyNotification(
                         message: _chatStore.notification!,
-                        showPasteButton: _chatStore.notification!.contains('copied'),
+                        showPasteButton:
+                            _chatStore.notification!.contains('copied'),
                         onButtonPressed: () async {
                           // Paste clipboard text into the text controller.
-                          final data = await Clipboard.getData(Clipboard.kTextPlain);
+                          final data =
+                              await Clipboard.getData(Clipboard.kTextPlain);
 
-                          if (data != null) _chatStore.textController.text = data.text!;
+                          if (data != null) {
+                            _chatStore.textController.text = data.text!;
+                          }
 
                           _chatStore.updateNotification('');
                         },
@@ -214,7 +222,8 @@ class _VideoChatState extends State<VideoChat> {
     final videoChat = Scaffold(
       body: Observer(
         builder: (context) {
-          if (orientation == Orientation.landscape && !settingsStore.landscapeForceVerticalChat) {
+          if (orientation == Orientation.landscape &&
+              !settingsStore.landscapeForceVerticalChat) {
             SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
             final landscapeChat = AnimatedContainer(
@@ -222,9 +231,11 @@ class _VideoChatState extends State<VideoChat> {
               duration: const Duration(milliseconds: 200),
               width: _chatStore.expandChat
                   ? MediaQuery.of(context).size.width / 2
-                  : MediaQuery.of(context).size.width * _chatStore.settings.chatWidth,
+                  : MediaQuery.of(context).size.width *
+                      _chatStore.settings.chatWidth,
               color: _chatStore.settings.fullScreen
-                  ? Colors.black.withOpacity(_chatStore.settings.fullScreenChatOverlayOpacity)
+                  ? Colors.black.withOpacity(
+                      _chatStore.settings.fullScreenChatOverlayOpacity)
                   : Theme.of(context).scaffoldBackgroundColor,
               child: chat,
             );
@@ -235,22 +246,30 @@ class _VideoChatState extends State<VideoChat> {
               child: Theme(
                 data: darkTheme,
                 child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
+                  style: DefaultTextStyle.of(context)
+                      .style
+                      .copyWith(color: Colors.white),
                   child: landscapeChat,
                 ),
               ),
             );
 
             return ColoredBox(
-              color: settingsStore.showVideo ? Colors.black : Theme.of(context).scaffoldBackgroundColor,
+              color: settingsStore.showVideo
+                  ? Colors.black
+                  : Theme.of(context).scaffoldBackgroundColor,
               child: SafeArea(
                 bottom: false,
-                left: (settingsStore.landscapeCutout == LandscapeCutoutType.both ||
-                        settingsStore.landscapeCutout == LandscapeCutoutType.left)
+                left: (settingsStore.landscapeCutout ==
+                            LandscapeCutoutType.both ||
+                        settingsStore.landscapeCutout ==
+                            LandscapeCutoutType.left)
                     ? false
                     : true,
-                right: (settingsStore.landscapeCutout == LandscapeCutoutType.both ||
-                        settingsStore.landscapeCutout == LandscapeCutoutType.right)
+                right: (settingsStore.landscapeCutout ==
+                            LandscapeCutoutType.both ||
+                        settingsStore.landscapeCutout ==
+                            LandscapeCutoutType.right)
                     ? false
                     : true,
                 child: settingsStore.showVideo
@@ -285,7 +304,10 @@ class _VideoChatState extends State<VideoChat> {
           return SafeArea(
             child: Column(
               children: [
-                if (!settingsStore.showVideo) appBar else AspectRatio(aspectRatio: 16 / 9, child: video),
+                if (!settingsStore.showVideo)
+                  appBar
+                else
+                  AspectRatio(aspectRatio: 16 / 9, child: video),
                 Expanded(child: chat),
               ],
             ),

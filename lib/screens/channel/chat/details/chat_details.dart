@@ -40,13 +40,18 @@ class _ChatDetailsState extends State<ChatDetails> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Opacity(
-                opacity: widget.chatStore.sleepTimer != null && widget.chatStore.sleepTimer!.isActive ? 1.0 : 0.5,
+                opacity: widget.chatStore.sleepTimer != null &&
+                        widget.chatStore.sleepTimer!.isActive
+                    ? 1.0
+                    : 0.5,
                 child: Row(
                   children: [
                     const Icon(Icons.timer_rounded),
                     Text(
                       ' ${widget.chatStore.timeRemaining.toString().split('.')[0]}',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()]),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontFeatures: [FontFeature.tabularFigures()]),
                     ),
                     const Spacer(),
                     IconButton(
@@ -62,9 +67,11 @@ class _ChatDetailsState extends State<ChatDetails> {
                   DropdownButton(
                     value: widget.chatStore.sleepHours,
                     items: List.generate(24, (index) => index)
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+                        .map((e) => DropdownMenuItem(
+                            value: e, child: Text(e.toString())))
                         .toList(),
-                    onChanged: (int? hours) => widget.chatStore.sleepHours = hours!,
+                    onChanged: (int? hours) =>
+                        widget.chatStore.sleepHours = hours!,
                     menuMaxHeight: 200,
                   ),
                   const SizedBox(width: 10.0),
@@ -76,9 +83,11 @@ class _ChatDetailsState extends State<ChatDetails> {
                   DropdownButton(
                     value: widget.chatStore.sleepMinutes,
                     items: List.generate(60, (index) => index)
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+                        .map((e) => DropdownMenuItem(
+                            value: e, child: Text(e.toString())))
                         .toList(),
-                    onChanged: (int? minutes) => widget.chatStore.sleepMinutes = minutes!,
+                    onChanged: (int? minutes) =>
+                        widget.chatStore.sleepMinutes = minutes!,
                     menuMaxHeight: 200,
                   ),
                   const SizedBox(width: 10.0),
@@ -91,10 +100,12 @@ class _ChatDetailsState extends State<ChatDetails> {
         actions: [
           Observer(
             builder: (context) => Button(
-              onPressed: widget.chatStore.sleepHours == 0 && widget.chatStore.sleepMinutes == 0
+              onPressed: widget.chatStore.sleepHours == 0 &&
+                      widget.chatStore.sleepMinutes == 0
                   ? null
                   : () => widget.chatStore.updateSleepTimer(
-                        onTimerFinished: () => navigatorKey.currentState?.popUntil((route) => route.isFirst),
+                        onTimerFinished: () => navigatorKey.currentState
+                            ?.popUntil((route) => route.isFirst),
                       ),
               child: const Text('Set timer'),
             ),
@@ -201,7 +212,8 @@ class _ChatDetailsState extends State<ChatDetails> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Settings(settingsStore: widget.chatStore.settings),
+            builder: (context) =>
+                Settings(settingsStore: widget.chatStore.settings),
           ),
         ),
       ),
@@ -215,7 +227,8 @@ class _ChatDetailsState extends State<ChatDetails> {
                 children: children,
               ),
             )
-          : Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
   }
 }

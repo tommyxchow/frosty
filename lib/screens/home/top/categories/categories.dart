@@ -21,7 +21,8 @@ class Categories extends StatefulWidget {
   State<Categories> createState() => _CategoriesState();
 }
 
-class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+class _CategoriesState extends State<Categories>
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final _categoriesStore = CategoriesStore(
     authStore: context.read<AuthStore>(),
     twitchApi: context.read<TwitchApi>(),
@@ -40,7 +41,9 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    if (state == AppLifecycleState.resumed) _categoriesStore.checkLastTimeRefreshedAndUpdate();
+    if (state == AppLifecycleState.resumed) {
+      _categoriesStore.checkLastTimeRefreshedAndUpdate();
+    }
   }
 
   @override
@@ -74,7 +77,8 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
 
           if (_categoriesStore.categories.isEmpty) {
             if (_categoriesStore.isLoading && _categoriesStore.error == null) {
-              statusWidget = const LoadingIndicator(subtitle: 'Loading categories...');
+              statusWidget =
+                  const LoadingIndicator(subtitle: 'Loading categories...');
             } else {
               statusWidget = const AlertMessage(message: 'No top categories');
             }
@@ -100,7 +104,8 @@ class _CategoriesState extends State<Categories> with AutomaticKeepAliveClientMi
             ),
             itemCount: _categoriesStore.categories.length,
             itemBuilder: (context, index) {
-              if (index > _categoriesStore.categories.length - 10 && _categoriesStore.hasMore) {
+              if (index > _categoriesStore.categories.length - 10 &&
+                  _categoriesStore.hasMore) {
                 _categoriesStore.getCategories();
               }
               return CategoryCard(

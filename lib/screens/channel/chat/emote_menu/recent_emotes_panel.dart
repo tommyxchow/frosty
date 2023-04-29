@@ -26,11 +26,12 @@ class RecentEmotesPanel extends StatelessWidget {
         else
           SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
-                  ? 8
-                  : context.read<SettingsStore>().showVideo
-                      ? 6
-                      : 16,
+              crossAxisCount:
+                  MediaQuery.of(context).orientation == Orientation.portrait
+                      ? 8
+                      : context.read<SettingsStore>().showVideo
+                          ? 6
+                          : 16,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
@@ -39,11 +40,14 @@ class RecentEmotesPanel extends StatelessWidget {
                   ...chatStore.assetsStore.emoteToObject.values,
                   ...chatStore.assetsStore.userEmoteToObject.values
                 ];
-                final matchingEmotes = validEmotes
-                    .where((existingEmote) => existingEmote.name == emote.name && existingEmote.type == emote.type);
+                final matchingEmotes = validEmotes.where((existingEmote) =>
+                    existingEmote.name == emote.name &&
+                    existingEmote.type == emote.type);
 
                 return InkWell(
-                  onTap: matchingEmotes.isNotEmpty ? () => chatStore.addEmote(emote) : null,
+                  onTap: matchingEmotes.isNotEmpty
+                      ? () => chatStore.addEmote(emote)
+                      : null,
                   child: Tooltip(
                     message: emote.name,
                     preferBelow: false,
@@ -51,9 +55,15 @@ class RecentEmotesPanel extends StatelessWidget {
                       padding: const EdgeInsets.all(10.0),
                       child: Center(
                         child: FrostyCachedNetworkImage(
-                          imageUrl: matchingEmotes.isNotEmpty ? matchingEmotes.first.url : emote.url,
-                          color: matchingEmotes.isNotEmpty ? null : const Color.fromRGBO(255, 255, 255, 0.5),
-                          colorBlendMode: matchingEmotes.isNotEmpty ? null : BlendMode.modulate,
+                          imageUrl: matchingEmotes.isNotEmpty
+                              ? matchingEmotes.first.url
+                              : emote.url,
+                          color: matchingEmotes.isNotEmpty
+                              ? null
+                              : const Color.fromRGBO(255, 255, 255, 0.5),
+                          colorBlendMode: matchingEmotes.isNotEmpty
+                              ? null
+                              : BlendMode.modulate,
                           height: emote.height?.toDouble() ?? defaultEmoteSize,
                           width: emote.width?.toDouble(),
                         ),

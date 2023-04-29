@@ -14,7 +14,8 @@ class CategoryTwitch {
     this.name,
   );
 
-  factory CategoryTwitch.fromJson(Map<String, dynamic> json) => _$CategoryTwitchFromJson(json);
+  factory CategoryTwitch.fromJson(Map<String, dynamic> json) =>
+      _$CategoryTwitchFromJson(json);
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -27,5 +28,6 @@ class CategoriesTwitch {
     this.pagination,
   );
 
-  factory CategoriesTwitch.fromJson(Map<String, dynamic> json) => _$CategoriesTwitchFromJson(json);
+  factory CategoriesTwitch.fromJson(Map<String, dynamic> json) =>
+      _$CategoriesTwitchFromJson(json);
 }

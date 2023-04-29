@@ -34,9 +34,12 @@ class Chat extends StatelessWidget {
                   alignment: AlignmentDirectional.bottomCenter,
                   children: [
                     MediaQuery(
-                      data: MediaQuery.of(context).copyWith(textScaleFactor: chatStore.settings.messageScale),
+                      data: MediaQuery.of(context).copyWith(
+                          textScaleFactor: chatStore.settings.messageScale),
                       child: DefaultTextStyle(
-                        style: DefaultTextStyle.of(context).style.copyWith(fontSize: chatStore.settings.fontSize),
+                        style: DefaultTextStyle.of(context)
+                            .style
+                            .copyWith(fontSize: chatStore.settings.fontSize),
                         child: Observer(
                           builder: (context) {
                             return ListView.builder(
@@ -46,7 +49,8 @@ class Chat extends StatelessWidget {
                               controller: chatStore.scrollController,
                               itemCount: chatStore.renderMessages.length,
                               itemBuilder: (context, index) => ChatMessage(
-                                ircMessage: chatStore.renderMessages.reversed.toList()[index],
+                                ircMessage: chatStore.renderMessages.reversed
+                                    .toList()[index],
                                 chatStore: chatStore,
                               ),
                             );
@@ -64,9 +68,11 @@ class Chat extends StatelessWidget {
                           child: chatStore.autoScroll
                               ? null
                               : Button(
-                                  padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0, vertical: 10.0),
                                   onPressed: chatStore.resumeScroll,
-                                  icon: const Icon(Icons.keyboard_double_arrow_down_rounded),
+                                  icon: const Icon(
+                                      Icons.keyboard_double_arrow_down_rounded),
                                   child: const Text('Resume scroll'),
                                 ),
                         ),
@@ -76,7 +82,8 @@ class Chat extends StatelessWidget {
                 ),
               ),
             ),
-            if (chatStore.settings.showBottomBar) ChatBottomBar(chatStore: chatStore),
+            if (chatStore.settings.showBottomBar)
+              ChatBottomBar(chatStore: chatStore),
             WillPopScope(
               onWillPop: Platform.isAndroid
                   ? () async {
@@ -94,7 +101,10 @@ class Chat extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 height: chatStore.assetsStore.showEmoteMenu
                     ? MediaQuery.of(context).size.height /
-                        (MediaQuery.of(context).orientation == Orientation.portrait ? 3 : 2)
+                        (MediaQuery.of(context).orientation ==
+                                Orientation.portrait
+                            ? 3
+                            : 2)
                     : 0,
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 100),
@@ -115,7 +125,8 @@ class Chat extends StatelessWidget {
                             ),
                             EmoteMenuPanel(
                               chatStore: chatStore,
-                              twitchEmotes: chatStore.assetsStore.userEmoteSectionToEmotes,
+                              twitchEmotes: chatStore
+                                  .assetsStore.userEmoteSectionToEmotes,
                             ),
                             ...[
                               chatStore.assetsStore.sevenTVEmotes,

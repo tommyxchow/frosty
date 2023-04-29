@@ -51,13 +51,16 @@ class SettingsListSelect extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   'Select ${title.toLowerCase()}',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ),
               ...options
                   .map((option) => ListTile(
                       title: Text(option),
-                      trailing: selectedOption == option ? const Icon(Icons.check_rounded) : null,
+                      trailing: selectedOption == option
+                          ? const Icon(Icons.check_rounded)
+                          : null,
                       onTap: () {
                         onChanged(option);
                         Navigator.of(context).pop();

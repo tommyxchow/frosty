@@ -80,7 +80,8 @@ class _OtherSettingsState extends State<OtherSettings> {
                 height: 80,
               ),
               applicationName: packageInfo.appName,
-              applicationVersion: 'Version ${packageInfo.version} (${packageInfo.buildNumber})',
+              applicationVersion:
+                  'Version ${packageInfo.version} (${packageInfo.buildNumber})',
               applicationLegalese: '\u{a9} 2023 Tommy Chow',
             );
           },
@@ -88,14 +89,19 @@ class _OtherSettingsState extends State<OtherSettings> {
         FrostyListTile(
           leading: const Icon(Icons.launch_rounded),
           title: 'Changelog',
-          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
-              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+          onTap: () => launchUrl(
+              Uri.parse('https://github.com/tommyxchow/frosty/releases'),
+              mode: widget.settingsStore.launchUrlExternal
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.inAppWebView),
         ),
         FrostyListTile(
           leading: const Icon(Icons.launch_rounded),
           title: 'FAQ',
           onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
-              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+              mode: widget.settingsStore.launchUrlExternal
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.inAppWebView),
         ),
         FrostyListTile(
           leading: const Icon(Icons.delete_outline_rounded),
@@ -122,11 +128,13 @@ class _OtherSettingsState extends State<OtherSettings> {
         Observer(
           builder: (_) => SettingsListSwitch(
             title: 'Send anonymous crash logs',
-            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
+            subtitle: const Text(
+                'Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
             value: widget.settingsStore.sendCrashLogs,
             onChanged: (newValue) {
               if (newValue == true) {
-                SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
+                SentryFlutter.init(
+                    (options) => options.tracesSampleRate = sampleRate);
               } else {
                 Sentry.close();
               }

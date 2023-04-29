@@ -20,11 +20,12 @@ class EmoteMenuSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: MediaQuery.of(context).orientation == Orientation.portrait
-            ? 8
-            : context.read<SettingsStore>().showVideo
-                ? 6
-                : 16,
+        crossAxisCount:
+            MediaQuery.of(context).orientation == Orientation.portrait
+                ? 8
+                : context.read<SettingsStore>().showVideo
+                    ? 6
+                    : 16,
       ),
       itemBuilder: (context, index) => InkWell(
         onTap: () => chatStore.addEmote(emotes[index]),

@@ -25,7 +25,8 @@ class ChatMessage extends StatelessWidget {
       if (isModal) return;
 
       // Ignore if long-pressing own username.
-      if (ircMessage.user == null || ircMessage.user == chatStore.auth.user.details?.login) return;
+      if (ircMessage.user == null ||
+          ircMessage.user == chatStore.auth.user.details?.login) return;
 
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
@@ -60,7 +61,8 @@ class ChatMessage extends StatelessWidget {
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
             if (ircMessage.mention == true) color = Colors.red.withOpacity(0.2);
-            if (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1') {
+            if (chatStore.settings.highlightFirstTimeChatter &&
+                ircMessage.tags['first-msg'] == '1') {
               color = Colors.green.withOpacity(0.2);
             }
 
@@ -73,7 +75,8 @@ class ChatMessage extends StatelessWidget {
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
                   useReadableColors: chatStore.settings.useReadableColors,
-                  isLightTheme: Theme.of(context).brightness == Brightness.light,
+                  isLightTheme:
+                      Theme.of(context).brightness == Brightness.light,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                 ),
@@ -85,14 +88,17 @@ class ChatMessage extends StatelessWidget {
             final replyBody = ircMessage.tags['reply-parent-msg-body'];
 
             if ((replyUser != null && replyBody != null) ||
-                (chatStore.settings.highlightFirstTimeChatter && ircMessage.tags['first-msg'] == '1')) {
+                (chatStore.settings.highlightFirstTimeChatter &&
+                    ircMessage.tags['first-msg'] == '1')) {
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
                       Icon(
-                        replyUser != null && replyBody != null ? Icons.reply_rounded : Icons.new_releases_outlined,
+                        replyUser != null && replyBody != null
+                            ? Icons.reply_rounded
+                            : Icons.new_releases_outlined,
                         size: defaultBadgeSize * chatStore.settings.badgeScale,
                         color: defaultTextStyle.color?.withOpacity(0.5),
                         textDirection: TextDirection.rtl,
@@ -110,7 +116,8 @@ class ChatMessage extends StatelessWidget {
                                   maxLines: 1,
                                   style: TextStyle(
                                     overflow: TextOverflow.ellipsis,
-                                    color: defaultTextStyle.color?.withOpacity(0.5),
+                                    color: defaultTextStyle.color
+                                        ?.withOpacity(0.5),
                                   ),
                                 ),
                               )
@@ -118,7 +125,8 @@ class ChatMessage extends StatelessWidget {
                                 'First time chatting',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: defaultTextStyle.color?.withOpacity(0.5),
+                                  color:
+                                      defaultTextStyle.color?.withOpacity(0.5),
                                 ),
                               ),
                       ),
@@ -170,7 +178,8 @@ class ChatMessage extends StatelessWidget {
                         badgeScale: chatStore.settings.badgeScale,
                         showMessage: chatStore.settings.showDeletedMessages,
                         useReadableColors: chatStore.settings.useReadableColors,
-                        isLightTheme: Theme.of(context).brightness == Brightness.light,
+                        isLightTheme:
+                            Theme.of(context).brightness == Brightness.light,
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
                       ),
@@ -196,14 +205,17 @@ class ChatMessage extends StatelessWidget {
                   if (ircMessage.tags.containsKey('system-msg'))
                     Text(
                       ircMessage.tags['system-msg']!,
-                      style: TextStyle(fontWeight: FontWeight.w600, color: defaultTextStyle.color?.withOpacity(0.5)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: defaultTextStyle.color?.withOpacity(0.5)),
                     ),
                   if (ircMessage.tags['msg-id'] == 'announcement')
                     Row(
                       children: [
                         Icon(
                           Icons.announcement_outlined,
-                          size: defaultBadgeSize * chatStore.settings.badgeScale,
+                          size:
+                              defaultBadgeSize * chatStore.settings.badgeScale,
                         ),
                         const SizedBox(width: 5.0),
                         const Text(
@@ -222,8 +234,10 @@ class ChatMessage extends StatelessWidget {
                           assetsStore: chatStore.assetsStore,
                           emoteScale: chatStore.settings.emoteScale,
                           badgeScale: chatStore.settings.badgeScale,
-                          useReadableColors: chatStore.settings.useReadableColors,
-                          isLightTheme: Theme.of(context).brightness == Brightness.light,
+                          useReadableColors:
+                              chatStore.settings.useReadableColors,
+                          isLightTheme:
+                              Theme.of(context).brightness == Brightness.light,
                           launchExternal: chatStore.settings.launchUrlExternal,
                           timestamp: chatStore.settings.timestampType,
                         ),
@@ -240,7 +254,9 @@ class ChatMessage extends StatelessWidget {
         }
 
         final paddedMessage = Padding(
-          padding: EdgeInsets.symmetric(vertical: chatStore.settings.messageSpacing / 2, horizontal: 10.0),
+          padding: EdgeInsets.symmetric(
+              vertical: chatStore.settings.messageSpacing / 2,
+              horizontal: 10.0),
           child: renderMessage,
         );
 
@@ -259,12 +275,16 @@ class ChatMessage extends StatelessWidget {
             : paddedMessage;
 
         // Color the message if the color has been set.
-        final coloredMessage = color == null ? dividedMessage : ColoredBox(color: color, child: dividedMessage);
+        final coloredMessage = color == null
+            ? dividedMessage
+            : ColoredBox(color: color, child: dividedMessage);
 
         return InkWell(
           onTap: () {
             FocusScope.of(context).unfocus();
-            if (chatStore.assetsStore.showEmoteMenu) chatStore.assetsStore.showEmoteMenu = false;
+            if (chatStore.assetsStore.showEmoteMenu) {
+              chatStore.assetsStore.showEmoteMenu = false;
+            }
           },
           onLongPress: onLongPressMessage,
           child: coloredMessage,

@@ -41,7 +41,8 @@ abstract class SearchStoreBase with Store {
     final prefs = await SharedPreferences.getInstance();
 
     // Retrieve the search history from local storage. If it doesn't exist, use an empty list.
-    _searchHistory = prefs.getStringList('search_history')?.asObservable() ?? ObservableList<String>();
+    _searchHistory = prefs.getStringList('search_history')?.asObservable() ??
+        ObservableList<String>();
 
     // Create a reaction that will limit the history to 8 entries and update it to local storage automatically.
     autorun((_) {
@@ -50,7 +51,8 @@ abstract class SearchStoreBase with Store {
     });
 
     // Add a listener to update the cancel button visibility whenever the text changes.
-    textEditingController.addListener(() => _searchText = textEditingController.text);
+    textEditingController
+        .addListener(() => _searchText = textEditingController.text);
   }
 
   /// Obtain the channels and categories that match the provided [query].
@@ -87,8 +89,10 @@ abstract class SearchStoreBase with Store {
   /// Find a specific channel provided the [query].
   /// This is used for channels that may not show up in the search results.
   Future<Channel> searchChannel(String query) async {
-    final user = await twitchApi.getUser(userLogin: query, headers: authStore.headersTwitch);
-    return await twitchApi.getChannel(userId: user.id, headers: authStore.headersTwitch);
+    final user = await twitchApi.getUser(
+        userLogin: query, headers: authStore.headersTwitch);
+    return await twitchApi.getChannel(
+        userId: user.id, headers: authStore.headersTwitch);
   }
 
   void dispose() {
