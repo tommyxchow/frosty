@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>403282332389-gst8k8gl71a7vrhf5k69nl8pnsq19rg8.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.403282332389-gst8k8gl71a7vrhf5k69nl8pnsq19rg8</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBu9PAnTdUBS5M13WaiP7-JtUd6D6LtzCE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>403282332389</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.tommychow.frosty</string>
+	<key>PROJECT_ID</key>
+	<string>frosty-128de</string>
+	<key>STORAGE_BUCKET</key>
+	<string>frosty-128de.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:403282332389:ios:0fc3f8c3d4e80c8b0be20c</string>
+</dict>
+</plist>

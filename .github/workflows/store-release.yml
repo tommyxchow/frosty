@@ -13,7 +13,6 @@ env:
   BUNDLE_GEMFILE: ${{ github.workspace }}/android/Gemfile
   CLIENT_ID: ${{ secrets.CLIENT_ID }}
   SECRET: ${{ secrets.SECRET }}
-  SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 jobs:
   android:
     name: Build and release Frosty on Android
@@ -63,7 +62,7 @@ jobs:
       
       # Build the Android app bundle (AAB) and pass the environment variables.
       - name: Build the Android AAB
-        run: flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+        run: flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
       
       # Deploy to the play store with fastlane.
       - name: Deploy with fastlane
@@ -96,7 +95,7 @@ jobs:
 
       # Setup the iOS project with environment variables without signing (building and signing will happen in fastlane).
       - name: Config the iOS build
-        run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET --dart-define SENTRY_DSN=$SENTRY_DSN
+        run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
 
       # Sign, build the app, and deploy to app store with fastlane.
       - name: Sign, build, and release with fastlane
