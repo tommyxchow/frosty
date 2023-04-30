@@ -5,7 +5,6 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/models/channel.dart';
-import 'package:frosty/models/chatters.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/user.dart';
@@ -418,21 +417,6 @@ class TwitchApi {
       return decoded['total'] as int;
     } else {
       return Future.error('Failed to get sub count');
-    }
-  }
-
-  /// Returns a [ChatUsers] object containing the names of chatters in the given [userLogin]'s chat.
-  Future<ChatUsers> getChatters({required String userLogin}) async {
-    final uri =
-        Uri.parse('https://tmi.twitch.tv/group/user/$userLogin/chatters');
-
-    final response = await _client.get(uri);
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body);
-
-      return ChatUsers.fromJson(decoded);
-    } else {
-      return Future.error('Failed to get chatters');
     }
   }
 

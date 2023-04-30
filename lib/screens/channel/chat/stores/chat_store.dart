@@ -169,7 +169,6 @@ abstract class ChatStoreBase with Store {
         const Duration(milliseconds: 200), (timer) => addMessages());
 
     assetsStore.init();
-    chatDetailsStore.updateChatters();
 
     _messageBuffer
         .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
@@ -197,9 +196,6 @@ abstract class ChatStoreBase with Store {
       if (textFieldFocusNode.hasFocus) {
         // Hide the emote menu if it is currently shown.
         if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
-
-        // Refresh the chatters list to keep autocomplete mentions updated.
-        if (settings.autocomplete) chatDetailsStore.updateChatters();
       }
 
       // Un-expand the chat when unfocusing.
@@ -233,6 +229,10 @@ abstract class ChatStoreBase with Store {
       if (message.startsWith('@')) {
         final parsedIRCMessage =
             IRCMessage.fromString(message, userLogin: auth.user.details?.login);
+
+        if (parsedIRCMessage.user != null) {
+          chatDetailsStore.chatUsers.add(parsedIRCMessage.user!);
+        }
 
         // Filter messages from any blocked users if not a moderator or not the channel owner.
         if (!_userState.mod &&
