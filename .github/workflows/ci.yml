@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: main
+    branches: [main]
 jobs:
   test:
     name: Check and test on ${{ matrix.os }}

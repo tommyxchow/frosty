@@ -1,7 +1,7 @@
 name: Check PR
 on:
   pull_request:
-    branches: main
+    branches: [main]
 jobs:
   check:
     name: Check and test
