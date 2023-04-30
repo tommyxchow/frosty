@@ -43,7 +43,7 @@ class ChatBottomBar extends StatelessWidget {
                 chatStore.textController.text.split(' ').last.toLowerCase()))
             .toList();
 
-        final matchingChatters = chatStore.chatDetailsStore.allChatters
+        final matchingChatters = chatStore.chatDetailsStore.chatUsers
             .where((chatter) => chatter.contains(chatStore.textController.text
                 .split(' ')
                 .last
