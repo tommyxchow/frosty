@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/widgets.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/irc.dart';
@@ -34,7 +36,7 @@ abstract class ChatDetailsStoreBase with Store {
   var _filterText = '';
 
   /// The list and types of chatters in the chat room.
-  final chatUsers = <String>{};
+  final chatUsers = SplayTreeSet<String>();
 
   @computed
   Iterable<String> get filteredUsers =>
