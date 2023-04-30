@@ -259,15 +259,15 @@ abstract class _SettingsStoreBase with Store {
   }
 
   // * Other settings
-  static const defaultSendCrashLogs = true;
+  static const defaultShareCrashLogsAndAnalytics = true;
 
-  @JsonKey(defaultValue: defaultSendCrashLogs)
+  @JsonKey(defaultValue: defaultShareCrashLogsAndAnalytics)
   @observable
-  var sendCrashLogs = defaultSendCrashLogs;
+  var shareCrashLogsAndAnalytics = defaultShareCrashLogsAndAnalytics;
 
   @action
   void resetOtherSettings() {
-    sendCrashLogs = defaultSendCrashLogs;
+    shareCrashLogsAndAnalytics = defaultShareCrashLogsAndAnalytics;
   }
 
   // * Global configs
