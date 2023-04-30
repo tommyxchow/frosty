@@ -1,13 +1,14 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/screens/onboarding/onboarding_scaffold.dart';
 import 'package:frosty/screens/onboarding/onboarding_welcome.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class OnboardingSetup extends StatelessWidget {
   const OnboardingSetup({Key? key}) : super(key: key);
@@ -18,7 +19,8 @@ class OnboardingSetup extends StatelessWidget {
 
     return OnboardingScaffold(
       header: 'Setup',
-      subtitle: 'Let\'s tweak some settings before you get started. You can always change these later.',
+      subtitle:
+          'Let\'s tweak some settings before you get started. You can always change these later.',
       content: Observer(
         builder: (context) {
           return ListView(
@@ -27,19 +29,23 @@ class OnboardingSetup extends StatelessWidget {
                 title: 'Theme',
                 selectedOption: themeNames[settingsStore.themeType.index],
                 options: themeNames,
-                onChanged: (newTheme) => settingsStore.themeType = ThemeType.values[themeNames.indexOf(newTheme)],
+                onChanged: (newTheme) => settingsStore.themeType =
+                    ThemeType.values[themeNames.indexOf(newTheme)],
               ),
               SettingsListSwitch(
-                title: 'Send anonymous crash logs',
-                subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
-                value: settingsStore.sendCrashLogs,
+                title: 'Share crash logs and analytics',
+                subtitle: const Text(
+                    'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.'),
+                value: settingsStore.shareCrashLogsAndAnalytics,
                 onChanged: (newValue) {
-                  if (newValue == true) {
-                    SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
-                  } else {
-                    Sentry.close();
-                  }
-                  settingsStore.sendCrashLogs = newValue;
+                  settingsStore.shareCrashLogsAndAnalytics = newValue;
+
+                  FirebaseCrashlytics.instance
+                      .setCrashlyticsCollectionEnabled(newValue);
+                  FirebaseAnalytics.instance
+                      .setAnalyticsCollectionEnabled(newValue);
+                  FirebasePerformance.instance
+                      .setPerformanceCollectionEnabled(newValue);
                 },
               ),
             ],

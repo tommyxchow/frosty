@@ -221,7 +221,6 @@ class StreamCard extends StatelessWidget {
           children: [
             if (showThumbnail)
               Flexible(
-                flex: 1,
                 child: imageSection,
               ),
             Flexible(

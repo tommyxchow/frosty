@@ -9,7 +9,6 @@ import 'package:frosty/screens/settings/stores/user_store.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:mobx/mobx.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part 'auth_store.g.dart';
@@ -45,7 +44,8 @@ abstract class AuthBase with Store {
 
   /// Authentication headers for Twitch API requests.
   @computed
-  Map<String, String> get headersTwitch => {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
+  Map<String, String> get headersTwitch =>
+      {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
 
   /// Error flag that will be non-null and contain an error message if login failed.
   @readonly
@@ -60,13 +60,15 @@ abstract class AuthBase with Store {
       'client_id': clientId,
       'redirect_uri': 'https://twitch.tv/login',
       'response_type': 'token',
-      'scope': 'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
+      'scope':
+          'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
       'force_verify': 'true',
     },
   );
 
   /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
-  FutureOr<NavigationDecision> handleNavigation({required NavigationRequest navigation, Widget? routeAfter}) {
+  FutureOr<NavigationDecision> handleNavigation(
+      {required NavigationRequest navigation, Widget? routeAfter}) {
     // Check if the URL is the redirect URI.
     if (navigation.url.startsWith('https://twitch.tv/login')) {
       // Extract the token from the query parameters.
@@ -83,7 +85,8 @@ abstract class AuthBase with Store {
     if (navigation.url == 'https://www.twitch.tv/?no-reload=true') {
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
-        navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => routeAfter));
+        navigatorKey.currentState
+            ?.push(MaterialPageRoute(builder: (context) => routeAfter));
       } else {
         // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
         navigatorKey.currentState?.pop();
@@ -101,7 +104,9 @@ abstract class AuthBase with Store {
     required String targetUser,
     required String targetUserId,
   }) {
-    final isBlocked = user.blockedUsers.where((blockedUser) => blockedUser.userId == targetUserId).isNotEmpty;
+    final isBlocked = user.blockedUsers
+        .where((blockedUser) => blockedUser.userId == targetUserId)
+        .isNotEmpty;
 
     final title = isBlocked ? 'Unblock $targetUser' : 'Block $targetUser';
 
@@ -174,13 +179,7 @@ abstract class AuthBase with Store {
       }
 
       _error = null;
-    } catch (e, stackTrace) {
-      // If auth initialization failed, log the error to Sentry.
-      await Sentry.captureException(
-        e,
-        stackTrace: stackTrace,
-      );
-
+    } catch (e) {
       debugPrint(e.toString());
       _error = e.toString();
     }
@@ -205,13 +204,7 @@ abstract class AuthBase with Store {
 
       // Set the login status to logged in.
       if (user.details != null) _isLoggedIn = true;
-    } catch (e, stackTrace) {
-      // If login failed, log the error to Sentry.
-      await Sentry.captureException(
-        e,
-        stackTrace: stackTrace,
-      );
-
+    } catch (e) {
       debugPrint('Login failed due to $e');
     }
   }
@@ -240,13 +233,7 @@ abstract class AuthBase with Store {
       _isLoggedIn = false;
 
       debugPrint('Successfully logged out');
-    } catch (e, stackTrace) {
-      // If logout failed, log the error to Sentry.
-      await Sentry.captureException(
-        e,
-        stackTrace: stackTrace,
-      );
-
+    } catch (e) {
       debugPrint(e.toString());
     }
   }

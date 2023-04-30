@@ -13,7 +13,7 @@ import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/list_tile.dart';
 
-class ChatDetails extends StatefulWidget {
+class ChatDetails extends StatelessWidget {
   final ChatDetailsStore chatDetailsStore;
   final ChatStore chatStore;
   final String userLogin;
@@ -25,11 +25,6 @@ class ChatDetails extends StatefulWidget {
     required this.userLogin,
   }) : super(key: key);
 
-  @override
-  State<ChatDetails> createState() => _ChatDetailsState();
-}
-
-class _ChatDetailsState extends State<ChatDetails> {
   Future<void> _showSleepTimerDialog(BuildContext context) {
     return showDialog(
       context: context,
@@ -40,18 +35,23 @@ class _ChatDetailsState extends State<ChatDetails> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Opacity(
-                opacity: widget.chatStore.sleepTimer != null && widget.chatStore.sleepTimer!.isActive ? 1.0 : 0.5,
+                opacity: chatStore.sleepTimer != null &&
+                        chatStore.sleepTimer!.isActive
+                    ? 1.0
+                    : 0.5,
                 child: Row(
                   children: [
                     const Icon(Icons.timer_rounded),
                     Text(
-                      ' ${widget.chatStore.timeRemaining.toString().split('.')[0]}',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontFeatures: [FontFeature.tabularFigures()]),
+                      ' ${chatStore.timeRemaining.toString().split('.')[0]}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontFeatures: [FontFeature.tabularFigures()]),
                     ),
                     const Spacer(),
                     IconButton(
                       tooltip: 'Cancel sleep timer',
-                      onPressed: widget.chatStore.cancelSleepTimer,
+                      onPressed: chatStore.cancelSleepTimer,
                       icon: const Icon(Icons.cancel_rounded),
                     ),
                   ],
@@ -60,11 +60,12 @@ class _ChatDetailsState extends State<ChatDetails> {
               Row(
                 children: [
                   DropdownButton(
-                    value: widget.chatStore.sleepHours,
+                    value: chatStore.sleepHours,
                     items: List.generate(24, (index) => index)
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+                        .map((e) => DropdownMenuItem(
+                            value: e, child: Text(e.toString())))
                         .toList(),
-                    onChanged: (int? hours) => widget.chatStore.sleepHours = hours!,
+                    onChanged: (int? hours) => chatStore.sleepHours = hours!,
                     menuMaxHeight: 200,
                   ),
                   const SizedBox(width: 10.0),
@@ -74,11 +75,13 @@ class _ChatDetailsState extends State<ChatDetails> {
               Row(
                 children: [
                   DropdownButton(
-                    value: widget.chatStore.sleepMinutes,
+                    value: chatStore.sleepMinutes,
                     items: List.generate(60, (index) => index)
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
+                        .map((e) => DropdownMenuItem(
+                            value: e, child: Text(e.toString())))
                         .toList(),
-                    onChanged: (int? minutes) => widget.chatStore.sleepMinutes = minutes!,
+                    onChanged: (int? minutes) =>
+                        chatStore.sleepMinutes = minutes!,
                     menuMaxHeight: 200,
                   ),
                   const SizedBox(width: 10.0),
@@ -91,11 +94,13 @@ class _ChatDetailsState extends State<ChatDetails> {
         actions: [
           Observer(
             builder: (context) => Button(
-              onPressed: widget.chatStore.sleepHours == 0 && widget.chatStore.sleepMinutes == 0
-                  ? null
-                  : () => widget.chatStore.updateSleepTimer(
-                        onTimerFinished: () => navigatorKey.currentState?.popUntil((route) => route.isFirst),
-                      ),
+              onPressed:
+                  chatStore.sleepHours == 0 && chatStore.sleepMinutes == 0
+                      ? null
+                      : () => chatStore.updateSleepTimer(
+                            onTimerFinished: () => navigatorKey.currentState
+                                ?.popUntil((route) => route.isFirst),
+                          ),
               child: const Text('Set timer'),
             ),
           ),
@@ -109,7 +114,7 @@ class _ChatDetailsState extends State<ChatDetails> {
     );
   }
 
-  Future<void> _showClearDialog() {
+  Future<void> _showClearDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) => FrostyDialog(
@@ -117,10 +122,7 @@ class _ChatDetailsState extends State<ChatDetails> {
         message: 'Are you sure you want to clear your recent emotes?',
         actions: [
           Button(
-            onPressed: () {
-              setState(widget.chatStore.assetsStore.recentEmotes.clear);
-              Navigator.pop(context);
-            },
+            onPressed: Navigator.of(context).pop,
             child: const Text('Yes'),
           ),
           Button(
@@ -134,16 +136,10 @@ class _ChatDetailsState extends State<ChatDetails> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    widget.chatDetailsStore.updateChatters();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final children = [
       ListTile(
-        title: ChatModes(roomState: widget.chatDetailsStore.roomState),
+        title: ChatModes(roomState: chatDetailsStore.roomState),
       ),
       FrostyListTile(
         leading: const Icon(Icons.people_outline),
@@ -158,9 +154,9 @@ class _ChatDetailsState extends State<ChatDetails> {
               child: GestureDetector(
                 onTap: FocusScope.of(context).unfocus,
                 child: ChattersList(
-                  chatDetailsStore: widget.chatDetailsStore,
-                  chatStore: widget.chatStore,
-                  userLogin: widget.userLogin,
+                  chatDetailsStore: chatDetailsStore,
+                  chatStore: chatStore,
+                  userLogin: userLogin,
                 ),
               ),
             ),
@@ -175,24 +171,24 @@ class _ChatDetailsState extends State<ChatDetails> {
       FrostyListTile(
         leading: const Icon(Icons.delete_outline_rounded),
         title: 'Clear recent emotes',
-        onTap: _showClearDialog,
+        onTap: () => _showClearDialog(context),
       ),
       FrostyListTile(
         leading: const Icon(Icons.refresh_rounded),
         title: 'Reconnect to chat',
         onTap: () {
-          widget.chatStore.updateNotification('Reconnecting to chat...');
+          chatStore.updateNotification('Reconnecting to chat...');
 
-          widget.chatStore.connectToChat();
+          chatStore.connectToChat();
         },
       ),
       FrostyListTile(
         leading: const Icon(Icons.refresh_rounded),
         title: 'Refresh badges and emotes',
         onTap: () async {
-          await widget.chatStore.getAssets();
+          await chatStore.getAssets();
 
-          widget.chatStore.updateNotification('Badges and emotes refreshed');
+          chatStore.updateNotification('Badges and emotes refreshed');
         },
       ),
       FrostyListTile(
@@ -201,7 +197,7 @@ class _ChatDetailsState extends State<ChatDetails> {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Settings(settingsStore: widget.chatStore.settings),
+            builder: (context) => Settings(settingsStore: chatStore.settings),
           ),
         ),
       ),
@@ -215,7 +211,8 @@ class _ChatDetailsState extends State<ChatDetails> {
                 children: children,
               ),
             )
-          : Column(crossAxisAlignment: CrossAxisAlignment.start, children: children),
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: children),
     );
   }
 }

@@ -8,7 +8,8 @@ import 'package:frosty/widgets/section_header.dart';
 class GeneralSettings extends StatelessWidget {
   final SettingsStore settingsStore;
 
-  const GeneralSettings({Key? key, required this.settingsStore}) : super(key: key);
+  const GeneralSettings({Key? key, required this.settingsStore})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,8 @@ class GeneralSettings extends StatelessWidget {
             title: 'Theme',
             selectedOption: themeNames[settingsStore.themeType.index],
             options: themeNames,
-            onChanged: (newTheme) => settingsStore.themeType = ThemeType.values[themeNames.indexOf(newTheme)],
+            onChanged: (newTheme) => settingsStore.themeType =
+                ThemeType.values[themeNames.indexOf(newTheme)],
           ),
           const SectionHeader('Stream card'),
           SettingsListSwitch(

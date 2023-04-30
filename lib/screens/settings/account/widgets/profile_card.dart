@@ -24,7 +24,8 @@ class ProfileCard extends StatelessWidget {
         content: Column(
           children: [
             Button(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -35,7 +36,8 @@ class ProfileCard extends StatelessWidget {
                       ),
                       body: WebView(
                         initialUrl: authStore.loginUri.toString(),
-                        navigationDelegate: (navigation) => authStore.handleNavigation(navigation: navigation),
+                        navigationDelegate: (navigation) =>
+                            authStore.handleNavigation(navigation: navigation),
                         javascriptMode: JavascriptMode.unrestricted,
                       ),
                     );
@@ -108,7 +110,8 @@ class ProfileCard extends StatelessWidget {
         return FrostyListTile(
           leading: const Icon(Icons.no_accounts_rounded),
           title: 'Anonymous',
-          subtitle: const Text('Tap to log in and enable the ability to chat, view followed streams, and more.'),
+          subtitle: const Text(
+              'Tap to log in and enable the ability to chat, view followed streams, and more.'),
           trailing: const SizedBox(
             height: double.infinity,
             child: Icon(Icons.chevron_right_rounded),

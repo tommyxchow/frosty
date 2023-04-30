@@ -93,7 +93,8 @@ void main() {
       ''';
 
       final decoded = jsonDecode(sampleJson) as List;
-      final List<EmoteBTTV> emotes = decoded.map((emote) => EmoteBTTV.fromJson(emote)).toList();
+      final List<EmoteBTTV> emotes =
+          decoded.map((emote) => EmoteBTTV.fromJson(emote)).toList();
       expect(emotes.length, 4);
 
       final emoteIds = [

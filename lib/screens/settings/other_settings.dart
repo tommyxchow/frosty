@@ -1,9 +1,11 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
@@ -11,7 +13,6 @@ import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/list_tile.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OtherSettings extends StatefulWidget {
@@ -80,7 +81,8 @@ class _OtherSettingsState extends State<OtherSettings> {
                 height: 80,
               ),
               applicationName: packageInfo.appName,
-              applicationVersion: 'Version ${packageInfo.version} (${packageInfo.buildNumber})',
+              applicationVersion:
+                  'Version ${packageInfo.version} (${packageInfo.buildNumber})',
               applicationLegalese: '\u{a9} 2023 Tommy Chow',
             );
           },
@@ -88,14 +90,19 @@ class _OtherSettingsState extends State<OtherSettings> {
         FrostyListTile(
           leading: const Icon(Icons.launch_rounded),
           title: 'Changelog',
-          onTap: () => launchUrl(Uri.parse('https://github.com/tommyxchow/frosty/releases'),
-              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+          onTap: () => launchUrl(
+              Uri.parse('https://github.com/tommyxchow/frosty/releases'),
+              mode: widget.settingsStore.launchUrlExternal
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.inAppWebView),
         ),
         FrostyListTile(
           leading: const Icon(Icons.launch_rounded),
           title: 'FAQ',
           onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
-              mode: widget.settingsStore.launchUrlExternal ? LaunchMode.externalApplication : LaunchMode.inAppWebView),
+              mode: widget.settingsStore.launchUrlExternal
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.inAppWebView),
         ),
         FrostyListTile(
           leading: const Icon(Icons.delete_outline_rounded),
@@ -121,16 +128,19 @@ class _OtherSettingsState extends State<OtherSettings> {
         ),
         Observer(
           builder: (_) => SettingsListSwitch(
-            title: 'Send anonymous crash logs',
-            subtitle: const Text('Help improve Frosty by sending anonymous crash logs through Sentry.io.'),
-            value: widget.settingsStore.sendCrashLogs,
+            title: 'Share crash logs and analytics',
+            subtitle: const Text(
+                'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.'),
+            value: widget.settingsStore.shareCrashLogsAndAnalytics,
             onChanged: (newValue) {
-              if (newValue == true) {
-                SentryFlutter.init((options) => options.tracesSampleRate = sampleRate);
-              } else {
-                Sentry.close();
-              }
-              widget.settingsStore.sendCrashLogs = newValue;
+              widget.settingsStore.shareCrashLogsAndAnalytics = newValue;
+
+              FirebaseCrashlytics.instance
+                  .setCrashlyticsCollectionEnabled(newValue);
+              FirebaseAnalytics.instance
+                  .setAnalyticsCollectionEnabled(newValue);
+              FirebasePerformance.instance
+                  .setPerformanceCollectionEnabled(newValue);
             },
           ),
         ),

@@ -50,8 +50,11 @@ class EmoteMenuPanel extends StatelessWidget {
       );
     } else {
       return FrostyPageView(
-        headers: twitchEmotes!.keys.map((header) => header.split(' ')[0]).toList(),
-        children: twitchEmotes!.entries.map((e) => EmoteMenuSection(chatStore: chatStore, emotes: e.value)).toList(),
+        headers:
+            twitchEmotes!.keys.map((header) => header.split(' ')[0]).toList(),
+        children: twitchEmotes!.entries
+            .map((e) => EmoteMenuSection(chatStore: chatStore, emotes: e.value))
+            .toList(),
       );
     }
   }

@@ -30,12 +30,15 @@ class SettingsListSlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      contentPadding:
+          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       title: Row(
         children: [
           Text(title, style: _textStyle),
           const Spacer(),
-          Text(trailing, style: _textStyle.copyWith(fontFeatures: [const FontFeature.tabularFigures()])),
+          Text(trailing,
+              style: _textStyle.copyWith(
+                  fontFeatures: [const FontFeature.tabularFigures()])),
         ],
       ),
       subtitle: Column(

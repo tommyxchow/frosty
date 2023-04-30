@@ -73,7 +73,8 @@ class _CategoryStreamsState extends State<CategoryStreams> {
               alignment: AlignmentDirectional.bottomCenter,
               children: [
                 CustomScrollView(
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
                   controller: _listStore.scrollController,
                   slivers: [
                     SliverAppBar(
@@ -92,26 +93,38 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         centerTitle: true,
                         title: Text(
                           widget.categoryName,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         background: FutureBuilder(
                           future: context.read<TwitchApi>().getCategory(
-                                headers: context.read<AuthStore>().headersTwitch,
+                                headers:
+                                    context.read<AuthStore>().headersTwitch,
                                 gameId: _listStore.categoryId!,
                               ),
-                          builder: (context, AsyncSnapshot<CategoriesTwitch> snapshot) {
+                          builder: (context,
+                              AsyncSnapshot<CategoriesTwitch> snapshot) {
                             return snapshot.hasData
                                 ? FrostyCachedNetworkImage(
-                                    imageUrl: snapshot.data!.data.first.boxArtUrl.replaceRange(
-                                      snapshot.data!.data.first.boxArtUrl.lastIndexOf('-') + 1,
+                                    imageUrl: snapshot
+                                        .data!.data.first.boxArtUrl
+                                        .replaceRange(
+                                      snapshot.data!.data.first.boxArtUrl
+                                              .lastIndexOf('-') +
+                                          1,
                                       null,
                                       '${artWidth}x$artHeight.jpg',
                                     ),
                                     placeholder: (context, url) =>
-                                        const ColoredBox(color: lightGray, child: LoadingIndicator()),
-                                    color: const Color.fromRGBO(255, 255, 255, 0.5),
+                                        const ColoredBox(
+                                            color: lightGray,
+                                            child: LoadingIndicator()),
+                                    color: const Color.fromRGBO(
+                                        255, 255, 255, 0.5),
                                     colorBlendMode: BlendMode.modulate,
                                     fit: BoxFit.cover,
                                   )
@@ -146,19 +159,26 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                         sliver: SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              if (index > _listStore.streams.length - 10 && _listStore.hasMore) {
+                              if (index > _listStore.streams.length - 10 &&
+                                  _listStore.hasMore) {
                                 _listStore.getStreams();
                               }
                               return Observer(
-                                builder: (context) => context.read<SettingsStore>().largeStreamCard
+                                builder: (context) => context
+                                        .read<SettingsStore>()
+                                        .largeStreamCard
                                     ? LargeStreamCard(
                                         streamInfo: _listStore.streams[index],
-                                        showThumbnail: context.read<SettingsStore>().showThumbnails,
+                                        showThumbnail: context
+                                            .read<SettingsStore>()
+                                            .showThumbnails,
                                         showCategory: false,
                                       )
                                     : StreamCard(
                                         streamInfo: _listStore.streams[index],
-                                        showThumbnail: context.read<SettingsStore>().showThumbnails,
+                                        showThumbnail: context
+                                            .read<SettingsStore>()
+                                            .showThumbnails,
                                         showCategory: false,
                                       ),
                               );
@@ -176,7 +196,8 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                       switchInCurve: Curves.easeOut,
                       switchOutCurve: Curves.easeIn,
                       child: _listStore.showJumpButton
-                          ? ScrollToTopButton(scrollController: _listStore.scrollController!)
+                          ? ScrollToTopButton(
+                              scrollController: _listStore.scrollController!)
                           : null,
                     ),
                   ),

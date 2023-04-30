@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/widgets.dart';
 import 'package:frosty/apis/twitch_api.dart';
-import 'package:frosty/models/chatters.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:mobx/mobx.dart';
 
@@ -37,37 +34,16 @@ abstract class ChatDetailsStoreBase with Store {
   var _filterText = '';
 
   /// The list and types of chatters in the chat room.
-  @readonly
-  ChatUsers? _chatUsers;
+  final chatUsers = <String>{};
 
   @computed
-  Iterable<List<String>> get filteredUsers => [
-        _chatUsers!.chatters.broadcaster,
-        _chatUsers!.chatters.staff,
-        _chatUsers!.chatters.admins,
-        _chatUsers!.chatters.globalMods,
-        _chatUsers!.chatters.moderators,
-        _chatUsers!.chatters.vips,
-        _chatUsers!.chatters.viewers,
-      ].map((e) => e.where((user) => user.contains(_filterText)).toList());
-
-  @computed
-  List<String> get allChatters => [
-        ...?_chatUsers?.chatters.broadcaster,
-        ...?_chatUsers?.chatters.staff,
-        ...?_chatUsers?.chatters.admins,
-        ...?_chatUsers?.chatters.globalMods,
-        ...?_chatUsers?.chatters.moderators,
-        ...?_chatUsers?.chatters.vips,
-        ...?_chatUsers?.chatters.viewers,
-      ];
-
-  @readonly
-  String? _error;
+  Iterable<String> get filteredUsers =>
+      chatUsers.where((user) => user.contains(_filterText));
 
   ChatDetailsStoreBase({required this.twitchApi, required this.channelName}) {
     scrollController.addListener(() {
-      if (scrollController.position.atEdge || scrollController.position.outOfRange) {
+      if (scrollController.position.atEdge ||
+          scrollController.position.outOfRange) {
         showJumpButton = false;
       } else {
         showJumpButton = true;
@@ -75,21 +51,6 @@ abstract class ChatDetailsStoreBase with Store {
     });
 
     textController.addListener(() => _filterText = textController.text);
-
-    updateChatters();
-  }
-
-  @action
-  Future<void> updateChatters() async {
-    try {
-      _chatUsers = await twitchApi.getChatters(userLogin: channelName);
-      _error = null;
-    } on SocketException {
-      _error = 'Failed to connect';
-    } catch (e) {
-      debugPrint(e.toString());
-      _error = e.toString();
-    }
   }
 
   void dispose() {

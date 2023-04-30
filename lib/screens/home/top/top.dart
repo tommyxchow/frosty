@@ -17,13 +17,15 @@ class TopSection extends StatefulWidget {
   State<TopSection> createState() => _TopSectionState();
 }
 
-class _TopSectionState extends State<TopSection> with SingleTickerProviderStateMixin {
+class _TopSectionState extends State<TopSection>
+    with SingleTickerProviderStateMixin {
   late final _tabBarController = TabController(length: 2, vsync: this);
 
   @override
   void initState() {
     super.initState();
-    _tabBarController.addListener(() => widget.homeStore.topSectionCurrentIndex = _tabBarController.index);
+    _tabBarController.addListener(() =>
+        widget.homeStore.topSectionCurrentIndex = _tabBarController.index);
   }
 
   @override
@@ -50,10 +52,12 @@ class _TopSectionState extends State<TopSection> with SingleTickerProviderStateM
             children: [
               StreamsList(
                 listType: ListType.top,
-                scrollController: widget.homeStore.topSectionScrollControllers[0],
+                scrollController:
+                    widget.homeStore.topSectionScrollControllers[0],
               ),
               Categories(
-                scrollController: widget.homeStore.topSectionScrollControllers[1],
+                scrollController:
+                    widget.homeStore.topSectionScrollControllers[1],
               ),
             ],
           ),

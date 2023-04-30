@@ -58,7 +58,8 @@ abstract class HomeStoreBase with Store {
             duration: duration,
             curve: Curves.easeOut,
           );
-        } else if (index == 1 && topSectionScrollControllers[topSectionCurrentIndex].hasClients) {
+        } else if (index == 1 &&
+            topSectionScrollControllers[topSectionCurrentIndex].hasClients) {
           // If on the top section, scroll to the top of the tab based on the current top tab.
           topSectionScrollControllers[topSectionCurrentIndex].animateTo(
             0.0,
@@ -74,7 +75,8 @@ abstract class HomeStoreBase with Store {
           );
         }
       } else {
-        if (index == 0 && topSectionScrollControllers[topSectionCurrentIndex].hasClients) {
+        if (index == 0 &&
+            topSectionScrollControllers[topSectionCurrentIndex].hasClients) {
           // If on the top section, scroll to the top of the tab based on the current top tab.
           topSectionScrollControllers[topSectionCurrentIndex].animateTo(
             0.0,

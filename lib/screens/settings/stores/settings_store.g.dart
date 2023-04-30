@@ -50,7 +50,8 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? false
       ..autocomplete = json['autocomplete'] as bool? ?? true
-      ..sendCrashLogs = json['sendCrashLogs'] as bool? ?? true
+      ..shareCrashLogsAndAnalytics =
+          json['shareCrashLogsAndAnalytics'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false;
 
@@ -87,7 +88,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
       'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
       'autocomplete': instance.autocomplete,
-      'sendCrashLogs': instance.sendCrashLogs,
+      'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
     };
@@ -608,19 +609,20 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$sendCrashLogsAtom =
-      Atom(name: '_SettingsStoreBase.sendCrashLogs', context: context);
+  late final _$shareCrashLogsAndAnalyticsAtom = Atom(
+      name: '_SettingsStoreBase.shareCrashLogsAndAnalytics', context: context);
 
   @override
-  bool get sendCrashLogs {
-    _$sendCrashLogsAtom.reportRead();
-    return super.sendCrashLogs;
+  bool get shareCrashLogsAndAnalytics {
+    _$shareCrashLogsAndAnalyticsAtom.reportRead();
+    return super.shareCrashLogsAndAnalytics;
   }
 
   @override
-  set sendCrashLogs(bool value) {
-    _$sendCrashLogsAtom.reportWrite(value, super.sendCrashLogs, () {
-      super.sendCrashLogs = value;
+  set shareCrashLogsAndAnalytics(bool value) {
+    _$shareCrashLogsAndAnalyticsAtom
+        .reportWrite(value, super.shareCrashLogsAndAnalytics, () {
+      super.shareCrashLogsAndAnalytics = value;
     });
   }
 
@@ -759,7 +761,7 @@ chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 chatOnlyPreventSleep: ${chatOnlyPreventSleep},
 autocomplete: ${autocomplete},
-sendCrashLogs: ${sendCrashLogs},
+shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay}
     ''';

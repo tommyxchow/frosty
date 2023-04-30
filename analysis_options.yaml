@@ -27,6 +27,13 @@ linter:
   rules:
     - directives_ordering
     - prefer_single_quotes
+    - always_use_package_imports
+    - avoid_void_async
+    - prefer_final_locals
+    - prefer_final_in_for_each
+    - avoid_redundant_argument_values
+    - unnecessary_parenthesis
+    - always_declare_return_types
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

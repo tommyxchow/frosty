@@ -37,24 +37,29 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     final buttonStyle = ElevatedButton.styleFrom(
       foregroundColor: widget.fill ? null : widget.color,
-      backgroundColor: widget.color == null || widget.fill ? widget.color : Colors.transparent,
+      backgroundColor: widget.color == null || widget.fill
+          ? widget.color
+          : Colors.transparent,
       padding: widget.padding,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-      textStyle: DefaultTextStyle.of(context).style.copyWith(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
+      textStyle: DefaultTextStyle.of(context)
+          .style
+          .copyWith(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       elevation: widget.color == null ? 10.0 : 0.0,
     ).copyWith(
-      elevation: (widget.color == null || widget.fill) && widget.onPressed != null
-          ? MaterialStateProperty.resolveWith(
-              (states) {
-                if (states.contains(MaterialState.pressed)) {
-                  return 0.0;
-                } else {
-                  return 5.0;
-                }
-              },
-            )
-          : MaterialStateProperty.all(0.0),
+      elevation:
+          (widget.color == null || widget.fill) && widget.onPressed != null
+              ? MaterialStateProperty.resolveWith(
+                  (states) {
+                    if (states.contains(MaterialState.pressed)) {
+                      return 0.0;
+                    } else {
+                      return 5.0;
+                    }
+                  },
+                )
+              : MaterialStateProperty.all(0.0),
     );
 
     final button = widget.icon == null

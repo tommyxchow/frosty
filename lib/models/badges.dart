@@ -24,7 +24,8 @@ class BadgeInfoTwitch {
     this.description,
   );
 
-  factory BadgeInfoTwitch.fromJson(Map<String, dynamic> json) => _$BadgeInfoTwitchFromJson(json);
+  factory BadgeInfoTwitch.fromJson(Map<String, dynamic> json) =>
+      _$BadgeInfoTwitchFromJson(json);
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -41,7 +42,8 @@ class BadgeInfoFFZ {
     this.urls,
   );
 
-  factory BadgeInfoFFZ.fromJson(Map<String, dynamic> json) => _$BadgeInfoFFZFromJson(json);
+  factory BadgeInfoFFZ.fromJson(Map<String, dynamic> json) =>
+      _$BadgeInfoFFZFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -59,7 +61,8 @@ class BadgeUrlsFFZ {
     this.url4x,
   );
 
-  factory BadgeUrlsFFZ.fromJson(Map<String, dynamic> json) => _$BadgeUrlsFFZFromJson(json);
+  factory BadgeUrlsFFZ.fromJson(Map<String, dynamic> json) =>
+      _$BadgeUrlsFFZFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -74,7 +77,8 @@ class BadgeInfo7TV {
     this.users,
   );
 
-  factory BadgeInfo7TV.fromJson(Map<String, dynamic> json) => _$BadgeInfo7TVFromJson(json);
+  factory BadgeInfo7TV.fromJson(Map<String, dynamic> json) =>
+      _$BadgeInfo7TVFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -87,7 +91,8 @@ class BadgeInfoBTTV {
     this.badge,
   );
 
-  factory BadgeInfoBTTV.fromJson(Map<String, dynamic> json) => _$BadgeInfoBTTVFromJson(json);
+  factory BadgeInfoBTTV.fromJson(Map<String, dynamic> json) =>
+      _$BadgeInfoBTTVFromJson(json);
 }
 
 @JsonSerializable(createToJson: false)
@@ -100,7 +105,8 @@ class BadgeDetailsBTTV {
     this.svg,
   );
 
-  factory BadgeDetailsBTTV.fromJson(Map<String, dynamic> json) => _$BadgeDetailsBTTVFromJson(json);
+  factory BadgeDetailsBTTV.fromJson(Map<String, dynamic> json) =>
+      _$BadgeDetailsBTTVFromJson(json);
 }
 
 class ChatBadge {

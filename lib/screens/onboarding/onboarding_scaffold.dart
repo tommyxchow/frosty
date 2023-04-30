@@ -37,7 +37,10 @@ class OnboardingScaffold extends StatelessWidget {
       DeviceOrientation.portraitDown,
     ]);
 
-    if (isLast) SharedPreferences.getInstance().then((prefs) => prefs.setBool('first_run', false));
+    if (isLast) {
+      SharedPreferences.getInstance()
+          .then((prefs) => prefs.setBool('first_run', false));
+    }
 
     return Scaffold(
       appBar: AppBar(),
@@ -85,13 +88,15 @@ class OnboardingScaffold extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: content == null ? 20.0 : 0.0),
+                  padding: EdgeInsets.symmetric(
+                      vertical: content == null ? 20.0 : 0.0),
                   child: content ?? const SizedBox(),
                 ),
               ),
               if (disclaimer != null)
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5.0),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5.0),
                   child: Opacity(
                     opacity: 0.5,
                     child: Text(

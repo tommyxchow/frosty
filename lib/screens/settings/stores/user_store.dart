@@ -34,7 +34,8 @@ abstract class UserStoreBase with Store {
           .then((blockedUsers) => _blockedUsers = blockedUsers.asObservable());
     }
 
-    _disposeReaction = autorun((_) => _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)));
+    _disposeReaction = autorun((_) =>
+        _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)));
   }
 
   @action
@@ -43,20 +44,28 @@ abstract class UserStoreBase with Store {
     required String displayName,
     required Map<String, String> headers,
   }) async {
-    final success = await twitchApi.blockUser(userId: targetId, headers: headers);
+    final success =
+        await twitchApi.blockUser(userId: targetId, headers: headers);
 
-    if (success) _blockedUsers.add(UserBlockedTwitch(targetId, displayName, displayName));
+    if (success) {
+      _blockedUsers.add(UserBlockedTwitch(targetId, displayName, displayName));
+    }
   }
 
   @action
-  Future<void> unblock({required String targetId, required Map<String, String> headers}) async {
-    final success = await twitchApi.unblockUser(userId: targetId, headers: headers);
+  Future<void> unblock(
+      {required String targetId, required Map<String, String> headers}) async {
+    final success =
+        await twitchApi.unblockUser(userId: targetId, headers: headers);
     if (success) await refreshBlockedUsers(headers: headers);
   }
 
   @action
-  Future<void> refreshBlockedUsers({required Map<String, String> headers}) async =>
-      _blockedUsers = (await twitchApi.getUserBlockedList(id: _details!.id, headers: headers)).asObservable();
+  Future<void> refreshBlockedUsers(
+          {required Map<String, String> headers}) async =>
+      _blockedUsers = (await twitchApi.getUserBlockedList(
+              id: _details!.id, headers: headers))
+          .asObservable();
 
   @action
   void dispose() {

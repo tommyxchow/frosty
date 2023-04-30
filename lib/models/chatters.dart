@@ -12,7 +12,8 @@ class ChatUsers {
     this.chatters,
   );
 
-  factory ChatUsers.fromJson(Map<String, dynamic> json) => _$ChatUsersFromJson(json);
+  factory ChatUsers.fromJson(Map<String, dynamic> json) =>
+      _$ChatUsersFromJson(json);
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -35,5 +36,6 @@ class Chatters {
     this.viewers,
   );
 
-  factory Chatters.fromJson(Map<String, dynamic> json) => _$ChattersFromJson(json);
+  factory Chatters.fromJson(Map<String, dynamic> json) =>
+      _$ChattersFromJson(json);
 }

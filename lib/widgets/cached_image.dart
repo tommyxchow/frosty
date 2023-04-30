@@ -36,8 +36,10 @@ class FrostyCachedNetworkImage extends StatelessWidget {
       colorBlendMode: colorBlendMode,
       placeholder: placeholder,
       useOldImageOnUrlChange: useOldImageOnUrlChange,
-      fadeOutDuration: useFade ? const Duration(milliseconds: 500) : Duration.zero,
-      fadeInDuration: useFade ? const Duration(milliseconds: 500) : Duration.zero,
+      fadeOutDuration:
+          useFade ? const Duration(milliseconds: 500) : Duration.zero,
+      fadeInDuration:
+          useFade ? const Duration(milliseconds: 500) : Duration.zero,
       fadeInCurve: Curves.easeOut,
       fadeOutCurve: Curves.easeIn,
       fit: fit,

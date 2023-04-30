@@ -17,7 +17,8 @@ class AnimateScale extends StatefulWidget {
   State<AnimateScale> createState() => _AnimateScaleState();
 }
 
-class _AnimateScaleState extends State<AnimateScale> with SingleTickerProviderStateMixin {
+class _AnimateScaleState extends State<AnimateScale>
+    with SingleTickerProviderStateMixin {
   late final _animationController = AnimationController(
     vsync: this,
     upperBound: 0.05,

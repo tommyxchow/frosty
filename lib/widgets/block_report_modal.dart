@@ -29,7 +29,8 @@ class BlockReportModal extends StatelessWidget {
             FrostyListTile(
               leading: const Icon(Icons.block_rounded),
               onTap: () => authStore
-                  .showBlockDialog(context, targetUser: name, targetUserId: userId)
+                  .showBlockDialog(context,
+                      targetUser: name, targetUserId: userId)
                   .then((_) => Navigator.pop(context)),
               title: 'Block $name',
             ),

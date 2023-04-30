@@ -113,7 +113,9 @@ abstract class ChatStoreBase with Store {
   List<IRCMessage> get renderMessages {
     // If autoscroll is disabled, render ALL messages in chat.
     // The second condition is to prevent an out of index error with sublist.
-    if (!_autoScroll || _messages.length < _renderMessageLimit) return _messages;
+    if (!_autoScroll || _messages.length < _renderMessageLimit) {
+      return _messages;
+    }
 
     // When autoscroll is enabled, only show the first [_renderMessageLimit] messages.
     // This will improve performance by only rendering a limited amount of messages
@@ -163,12 +165,13 @@ abstract class ChatStoreBase with Store {
     );
 
     // Create a timer that will add messages from the buffer every 200 milliseconds.
-    _messageBufferTimer = Timer.periodic(const Duration(milliseconds: 200), (timer) => addMessages());
+    _messageBufferTimer = Timer.periodic(
+        const Duration(milliseconds: 200), (timer) => addMessages());
 
     assetsStore.init();
-    chatDetailsStore.updateChatters();
 
-    _messageBuffer.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+    _messageBuffer
+        .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.chatDelay > 0) {
       _messageBuffer.add(IRCMessage.createNotice(
@@ -193,9 +196,6 @@ abstract class ChatStoreBase with Store {
       if (textFieldFocusNode.hasFocus) {
         // Hide the emote menu if it is currently shown.
         if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
-
-        // Refresh the chatters list to keep autocomplete mentions updated.
-        if (settings.autocomplete) chatDetailsStore.updateChatters();
       }
 
       // Un-expand the chat when unfocusing.
@@ -205,11 +205,14 @@ abstract class ChatStoreBase with Store {
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
     // Will also rebuild the autocomplete bar when typing, refreshing the results as the user types.
     textController.addListener(() => _showEmoteAutocomplete =
-        !_showMentionAutocomplete && textFieldFocusNode.hasFocus && textController.text.split(' ').last.isNotEmpty);
+        !_showMentionAutocomplete &&
+            textFieldFocusNode.hasFocus &&
+            textController.text.split(' ').last.isNotEmpty);
 
     textController.addListener(() {
       _showSendButton = textController.text.isNotEmpty;
-      _showMentionAutocomplete = textFieldFocusNode.hasFocus && textController.text.split(' ').last.startsWith('@');
+      _showMentionAutocomplete = textFieldFocusNode.hasFocus &&
+          textController.text.split(' ').last.startsWith('@');
     });
   }
 
@@ -224,12 +227,20 @@ abstract class ChatStoreBase with Store {
     for (final message in data.trimRight().split('\r\n')) {
       // debugPrint('$message\n');
       if (message.startsWith('@')) {
-        final parsedIRCMessage = IRCMessage.fromString(message, userLogin: auth.user.details?.login);
+        final parsedIRCMessage =
+            IRCMessage.fromString(message, userLogin: auth.user.details?.login);
+
+        if (parsedIRCMessage.user != null) {
+          chatDetailsStore.chatUsers.add(parsedIRCMessage.user!);
+        }
 
         // Filter messages from any blocked users if not a moderator or not the channel owner.
         if (!_userState.mod &&
             channelName != auth.user.details?.login &&
-            auth.user.blockedUsers.where((blockedUser) => blockedUser.userLogin == parsedIRCMessage.user).isNotEmpty) {
+            auth.user.blockedUsers
+                .where((blockedUser) =>
+                    blockedUser.userLogin == parsedIRCMessage.user)
+                .isNotEmpty) {
           continue;
         }
 
@@ -254,7 +265,8 @@ abstract class ChatStoreBase with Store {
             );
             break;
           case Command.roomState:
-            chatDetailsStore.roomState = chatDetailsStore.roomState.fromIRCMessage(parsedIRCMessage);
+            chatDetailsStore.roomState =
+                chatDetailsStore.roomState.fromIRCMessage(parsedIRCMessage);
             continue;
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
@@ -292,7 +304,9 @@ abstract class ChatStoreBase with Store {
         }
 
         // If the message limit is reached, remove the oldest messages.
-        if (_messages.length >= _messageLimit) _messages = _messages.sublist(_messagesToRemove).asObservable();
+        if (_messages.length >= _messageLimit) {
+          _messages = _messages.sublist(_messagesToRemove).asObservable();
+        }
       } else if (message == 'PING :tmi.twitch.tv') {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
@@ -342,11 +356,13 @@ abstract class ChatStoreBase with Store {
   @action
   void connectToChat() {
     _channel?.sink.close(1001);
-    _channel = WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+    _channel =
+        WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
-      (data) => Future.delayed(Duration(seconds: settings.chatDelay.toInt()), () => _handleIRCData(data.toString())),
+      (data) => Future.delayed(Duration(seconds: settings.chatDelay.toInt()),
+          () => _handleIRCData(data.toString())),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_channel == null) return;
@@ -365,7 +381,8 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        _messageBuffer.add(IRCMessage.createNotice(message: 'Reconnecting to chat (attempt $_retries)...'));
+        _messageBuffer.add(IRCMessage.createNotice(
+            message: 'Reconnecting to chat (attempt $_retries)...'));
         _channelListener?.cancel();
         connectToChat();
       },
@@ -408,7 +425,8 @@ abstract class ChatStoreBase with Store {
     if (message.isEmpty) return;
 
     if (_channel == null || _channel?.closeCode != null) {
-      _messageBuffer.add(IRCMessage.createNotice(message: 'Failed to send message: disconnected from chat.'));
+      _messageBuffer.add(IRCMessage.createNotice(
+          message: 'Failed to send message: disconnected from chat.'));
     } else {
       // Send the message to the IRC chat room.
       _channel?.sink.add('PRIVMSG #$channelName :$message');
@@ -417,14 +435,17 @@ abstract class ChatStoreBase with Store {
       var userStateString = _userState.raw;
       if (userStateString != null) {
         if (message.length > 3 && message.substring(0, 3) == '/me') {
-          userStateString += ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
+          userStateString +=
+              ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
         } else {
           userStateString += ' :${message.trim()}';
         }
 
         final userChatMessage = IRCMessage.fromString(userStateString);
         userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
-        if (auth.isLoggedIn && auth.user.details != null) userChatMessage.tags['user-id'] = auth.user.details!.id;
+        if (auth.isLoggedIn && auth.user.details != null) {
+          userChatMessage.tags['user-id'] = auth.user.details!.id;
+        }
 
         toSend = userChatMessage;
       }
@@ -436,7 +457,9 @@ abstract class ChatStoreBase with Store {
   void addEmote(Emote emote, {bool autocompleteMode = false}) {
     if (textController.text.isEmpty || textController.text.endsWith(' ')) {
       textController.text += '${emote.name} ';
-    } else if (autocompleteMode && _showEmoteAutocomplete && textController.text.endsWith('')) {
+    } else if (autocompleteMode &&
+        _showEmoteAutocomplete &&
+        textController.text.endsWith('')) {
       final split = textController.text.split(' ')
         ..removeLast()
         ..add('${emote.name} ');
@@ -447,10 +470,12 @@ abstract class ChatStoreBase with Store {
     }
 
     assetsStore.recentEmotes
-      ..removeWhere((recentEmote) => recentEmote.name == emote.name && recentEmote.type == emote.type)
+      ..removeWhere((recentEmote) =>
+          recentEmote.name == emote.name && recentEmote.type == emote.type)
       ..insert(0, emote);
 
-    textController.selection = TextSelection.fromPosition(TextPosition(offset: textController.text.length));
+    textController.selection = TextSelection.fromPosition(
+        TextPosition(offset: textController.text.length));
   }
 
   /// Cancels the previous notification/timer and creates a new one with the provided [notificationMessage].
@@ -468,7 +493,8 @@ abstract class ChatStoreBase with Store {
 
     // Set the new notification message and create a new timer that will dismiss it after 2 seconds.
     _notification = notificationMessage;
-    _notificationTimer = Timer(const Duration(seconds: 2), () => _notification = null);
+    _notificationTimer =
+        Timer(const Duration(seconds: 2), () => _notification = null);
   }
 
   /// Updates the sleep timer with [sleepHours] and [sleepMinutes].

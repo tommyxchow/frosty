@@ -120,8 +120,9 @@ class _VideoChatState extends State<VideoChat> {
             chatStore: _chatStore,
           );
 
-          if (_videoStore.paused || _videoStore.streamInfo == null)
+          if (_videoStore.paused || _videoStore.streamInfo == null) {
             return videoOverlay;
+          }
 
           return AnimatedOpacity(
             opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
@@ -366,6 +367,7 @@ class _VideoChatState extends State<VideoChat> {
               ),
             );
     });
+
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
       return PipWidget(
