@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:advanced_in_app_review/advanced_in_app_review.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -214,13 +215,30 @@ final oledTheme = ThemeData(
   snackBarTheme: snackBarTheme,
 );
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final bool firstRun;
 
   const MyApp({
     Key? key,
     this.firstRun = false,
   }) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    AdvancedInAppReview()
+        .setMinDaysBeforeRemind(7)
+        .setMinDaysAfterInstall(1)
+        .setMinLaunchTimes(5)
+        .setMinSecondsBeforeShowDialog(3)
+        .monitor();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -242,7 +260,7 @@ class MyApp extends StatelessWidget {
               : settingsStore.themeType == ThemeType.light
                   ? ThemeMode.light
                   : ThemeMode.dark,
-          home: firstRun ? const OnboardingIntro() : const Home(),
+          home: widget.firstRun ? const OnboardingIntro() : const Home(),
           navigatorKey: navigatorKey,
         );
       },
