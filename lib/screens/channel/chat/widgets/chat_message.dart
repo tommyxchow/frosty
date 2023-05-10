@@ -44,7 +44,7 @@ class ChatMessage extends StatelessWidget {
     Future<void> onLongPressMessage() async {
       HapticFeedback.lightImpact();
 
-      await Clipboard.setData(ClipboardData(text: ircMessage.message));
+      await Clipboard.setData(ClipboardData(text: ircMessage.message ?? ''));
 
       chatStore.updateNotification('Message copied');
     }
