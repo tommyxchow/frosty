@@ -37,8 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   http: ^0.13.3
   web_socket_channel: ^2.1.0
-  flutter_secure_storage: ^7.0.1
-  intl: ^0.17.0
+  flutter_secure_storage: ^8.0.0
+  intl: ^0.18.1
   cached_network_image: ^3.1.0
   webview_flutter: ^3.0.0
   provider: ^6.0.1
@@ -46,14 +46,13 @@ dependencies:
   flutter_mobx: ^2.0.0
   shared_preferences: ^2.0.8
   tuple: ^2.0.0
-  flutter_svg: ^1.0.0
+  flutter_svg: ^2.0.5
   url_launcher: ^6.0.17
   package_info_plus: ^3.0.2
   collection: ^1.16.0
   flutter_cache_manager: ^3.3.0
   device_info_plus: ^8.0.0
   wakelock: ^0.6.2
-  device_preview: ^1.1.0
   simple_icons: ^7.10.0
   simple_pip_mode:
     git:
@@ -78,7 +77,7 @@ dev_dependencies:
   json_serializable: ^6.0.0
   mobx_codegen: ^2.0.6
   flutter_native_splash: ^2.0.5
-  flutter_launcher_icons: ^0.11.0
+  flutter_launcher_icons: ^0.13.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
