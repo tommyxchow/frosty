@@ -271,9 +271,7 @@ abstract class VideoStoreBase with Store {
 
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
-    if (Platform.isIOS) {
-      videoWebViewController.loadRequest(Uri.parse('about:blank'));
-    }
+    if (Platform.isIOS) videoWebViewController.reload();
 
     _disposeOverlayReaction();
   }
