@@ -45,7 +45,6 @@ dependencies:
   mobx: ^2.0.7+4
   flutter_mobx: ^2.0.0
   shared_preferences: ^2.0.8
-  tuple: ^2.0.0
   flutter_svg: ^2.0.5
   url_launcher: ^6.0.17
   package_info_plus: ^3.0.2
