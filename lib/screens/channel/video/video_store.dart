@@ -54,13 +54,6 @@ abstract class VideoStoreBase with Store {
         ..setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (_) => initVideo(),
-            // Used for preventing accidental navigation in the webview.
-            onNavigationRequest: (request) {
-              if (request.url.startsWith('https://player.twitch.tv')) {
-                return NavigationDecision.navigate;
-              }
-              return NavigationDecision.prevent;
-            },
           ),
         )
         ..loadRequest(Uri.parse(videoUrl));
