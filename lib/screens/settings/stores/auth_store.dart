@@ -51,28 +51,13 @@ abstract class AuthBase with Store {
   @readonly
   String? _error;
 
-  /// OAuth URI for the user to login.
-  final loginUri = Uri(
-    scheme: 'https',
-    host: 'id.twitch.tv',
-    path: '/oauth2/authorize',
-    queryParameters: {
-      'client_id': clientId,
-      'redirect_uri': 'https://twitch.tv/login',
-      'response_type': 'token',
-      'scope':
-          'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
-      'force_verify': 'true',
-    },
-  );
-
   /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
   FutureOr<NavigationDecision> handleNavigation(
-      {required NavigationRequest navigation, Widget? routeAfter}) {
+      {required NavigationRequest request, Widget? routeAfter}) {
     // Check if the URL is the redirect URI.
-    if (navigation.url.startsWith('https://twitch.tv/login')) {
+    if (request.url.startsWith('https://twitch.tv/login')) {
       // Extract the token from the query parameters.
-      final uri = Uri.parse(navigation.url.replaceFirst('#', '?'));
+      final uri = Uri.parse(request.url.replaceFirst('#', '?'));
       final token = uri.queryParameters['access_token'];
 
       // Login with the provided token.
@@ -82,7 +67,7 @@ abstract class AuthBase with Store {
     // Check if the the URL has been redirected to "https://www.twitch.tv/?no-reload=true".
     // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
     // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
-    if (navigation.url == 'https://www.twitch.tv/?no-reload=true') {
+    if (request.url == 'https://www.twitch.tv/?no-reload=true') {
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
         navigatorKey.currentState
@@ -96,6 +81,32 @@ abstract class AuthBase with Store {
 
     // Always allow navigation to the next URL.
     return NavigationDecision.navigate;
+  }
+
+  WebViewController createAuthWebViewController({Widget? routeAfter}) {
+    return WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (request) =>
+              handleNavigation(request: request, routeAfter: routeAfter),
+        ),
+      )
+      ..loadRequest(
+        Uri(
+          scheme: 'https',
+          host: 'id.twitch.tv',
+          path: '/oauth2/authorize',
+          queryParameters: {
+            'client_id': clientId,
+            'redirect_uri': 'https://twitch.tv/login',
+            'response_type': 'token',
+            'scope':
+                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
+            'force_verify': 'true',
+          },
+        ),
+      );
   }
 
   /// Shows a dialog verifying that the user is sure they want to block/unblock the target user.

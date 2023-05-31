@@ -37,17 +37,8 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WebView(
-      backgroundColor: Colors.black,
-      initialUrl: widget.videoStore.videoUrl,
-      javascriptMode: JavascriptMode.unrestricted,
-      allowsInlineMediaPlayback: true,
-      initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-      onWebViewCreated: (controller) =>
-          widget.videoStore.controller = controller,
-      onPageFinished: (string) => widget.videoStore.initVideo(),
-      navigationDelegate: widget.videoStore.handleNavigation,
-      javascriptChannels: widget.videoStore.javascriptChannels,
+    return WebViewWidget(
+      controller: widget.videoStore.videoWebViewController,
     );
   }
 

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart';
-import 'package:tuple/tuple.dart';
 
 /// The FFZ service for making API calls.
 class FFZApi {
@@ -36,7 +35,7 @@ class FFZApi {
   }
 
   /// Returns a channel's FFZ room info including custom badges and emote used.
-  Future<Tuple2<RoomFFZ, List<Emote>>> getRoomInfo({required String id}) async {
+  Future<(RoomFFZ, List<Emote>)> getRoomInfo({required String id}) async {
     final url = Uri.parse('https://api.frankerfacez.com/v1/room/id/$id');
 
     final response = await _client.get(url);
@@ -48,11 +47,12 @@ class FFZApi {
 
       final emotes = emoticons.map((emote) => EmoteFFZ.fromJson(emote));
 
-      return Tuple2(
-          roomInfo,
-          emotes
-              .map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel))
-              .toList());
+      return (
+        roomInfo,
+        emotes
+            .map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel))
+            .toList()
+      );
     } else {
       return Future.error('Failed to get FFZ room info');
     }
