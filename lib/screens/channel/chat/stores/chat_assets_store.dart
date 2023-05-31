@@ -157,8 +157,10 @@ abstract class ChatAssetsStoreBase with Store {
         sevenTVApi.getEmotesGlobal().catchError(onError),
         sevenTVApi.getEmotesChannel(id: channelId).catchError(onError),
         ffzApi.getRoomInfo(id: channelId).then((ffzRoom) {
-          ffzRoomInfo = ffzRoom.item1;
-          return ffzRoom.item2;
+          final (roomInfo, emotes) = ffzRoom;
+
+          ffzRoomInfo = roomInfo;
+          return emotes;
         }).catchError(onError),
       ]).then((assets) => assets.expand((list) => list)).then((emotes) =>
           _emoteToObject = {for (final emote in emotes) emote.name: emote});

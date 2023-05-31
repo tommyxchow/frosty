@@ -27,11 +27,10 @@ class OnboardingLogin extends StatelessWidget {
         appBar: const FrostyAppBar(
           title: Text('Connect with Twitch'),
         ),
-        body: WebView(
-          initialUrl: authStore.loginUri.toString(),
-          navigationDelegate: (navigation) => authStore.handleNavigation(
-              navigation: navigation, routeAfter: const OnboardingSetup()),
-          javascriptMode: JavascriptMode.unrestricted,
+        body: WebViewWidget(
+          controller: authStore.createAuthWebViewController(
+            routeAfter: const OnboardingSetup(),
+          ),
         ),
       ),
     );

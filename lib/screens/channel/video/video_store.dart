@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/stream.dart';
@@ -11,6 +11,8 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 part 'video_store.g.dart';
 
@@ -29,44 +31,48 @@ abstract class VideoStoreBase with Store {
   /// The [SimplePip] instance used for initiating PiP on Android.
   final pip = SimplePip();
 
+  /// The video web view params used for enabling auto play.
+  late final PlatformWebViewControllerCreationParams _videoWebViewParams;
+
   /// The webview controller used for injecting JavaScript to control the webview and video player.
-  WebViewController? controller;
+  late final WebViewController videoWebViewController =
+      WebViewController.fromPlatformCreationParams(_videoWebViewParams)
+        ..setBackgroundColor(Colors.black)
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..addJavaScriptChannel('VideoPause', onMessageReceived: (message) {
+          _paused = true;
+          if (Platform.isAndroid) pip.setIsPlaying(false);
+        })
+        ..addJavaScriptChannel('VideoPlaying', onMessageReceived: (message) {
+          _paused = false;
+          if (Platform.isAndroid) pip.setIsPlaying(true);
+          videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].muted = false;');
+          videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].volume = 1.0;');
+        })
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageFinished: (_) => initVideo(),
+            // Used for preventing accidental navigation in the webview.
+            onNavigationRequest: (request) {
+              if (request.url.startsWith('https://player.twitch.tv')) {
+                return NavigationDecision.navigate;
+              }
+              return NavigationDecision.prevent;
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse(videoUrl));
+
+  // allowsInlineMediaPlayback: true,
+  // initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
 
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
 
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
-
-  /// The JavaScript channels used to communicate play/pause from the webview to Flutter.
-  late final javascriptChannels = {
-    JavascriptChannel(
-      name: 'VideoPause',
-      onMessageReceived: (message) {
-        _paused = true;
-        if (Platform.isAndroid) pip.setIsPlaying(false);
-      },
-    ),
-    JavascriptChannel(
-      name: 'VideoPlaying',
-      onMessageReceived: (message) {
-        _paused = false;
-        if (Platform.isAndroid) pip.setIsPlaying(true);
-        controller?.runJavascript(
-            'document.getElementsByTagName("video")[0].muted = false;');
-        controller?.runJavascript(
-            'document.getElementsByTagName("video")[0].volume = 1.0;');
-      },
-    ),
-  };
-
-  /// Used for preventing accidental navigation in the webview.
-  FutureOr<NavigationDecision> handleNavigation(NavigationRequest navigation) {
-    if (navigation.url.startsWith('https://player.twitch.tv')) {
-      return NavigationDecision.navigate;
-    }
-    return NavigationDecision.prevent;
-  }
 
   /// If the video is currently paused.
   ///
@@ -116,8 +122,24 @@ abstract class VideoStoreBase with Store {
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
       (_) => settingsStore.showOverlay,
-      (_) => controller?.loadUrl(videoUrl),
+      (_) => videoWebViewController.loadRequest(Uri.parse(videoUrl)),
     );
+
+    // Initialize the video webview params for iOS to enable video autoplay.
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      _videoWebViewParams = WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+      );
+    } else {
+      _videoWebViewParams = const PlatformWebViewControllerCreationParams();
+    }
+
+    // Initialize the video webview params for Android to enable video autoplay.
+    if (videoWebViewController.platform is AndroidWebViewController) {
+      (videoWebViewController.platform as AndroidWebViewController)
+          .setMediaPlaybackRequiresUserGesture(false);
+    }
 
     updateStreamInfo();
   }
@@ -127,9 +149,9 @@ abstract class VideoStoreBase with Store {
   Future<void> initVideo() async {
     // Add event listeners to notify the JavaScript channels when the video plays and pauses.
     try {
-      controller?.runJavascript(
+      videoWebViewController.runJavaScript(
           'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
-      controller?.runJavascript(
+      videoWebViewController.runJavaScript(
           'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
     } catch (e) {
       debugPrint(e.toString());
@@ -219,7 +241,7 @@ abstract class VideoStoreBase with Store {
   @action
   void handleRefresh() {
     HapticFeedback.lightImpact();
-    controller?.reload();
+    videoWebViewController.reload();
     updateStreamInfo();
   }
 
@@ -227,10 +249,10 @@ abstract class VideoStoreBase with Store {
   void handlePausePlay() {
     try {
       if (_paused) {
-        controller?.runJavascript(
-            'document.getElementsByTagName("video")[0].play();');
+        videoWebViewController
+            .runJavaScript('document.getElementsByTagName("video")[0].play();');
       } else {
-        controller?.runJavascript(
+        videoWebViewController.runJavaScript(
             'document.getElementsByTagName("video")[0].pause();');
       }
     } catch (e) {
@@ -247,7 +269,7 @@ abstract class VideoStoreBase with Store {
       if (Platform.isAndroid) {
         pip.enterPipMode(autoEnter: true);
       } else if (Platform.isIOS) {
-        controller?.runJavascript(
+        videoWebViewController.runJavaScript(
             'document.getElementsByTagName("video")[0].requestPictureInPicture();');
       }
     } catch (e) {
@@ -266,7 +288,7 @@ abstract class VideoStoreBase with Store {
 
     // Not ideal, but seems like the only way of disposing of the video properly.
     // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
-    if (Platform.isIOS) controller?.reload();
+    if (Platform.isIOS) videoWebViewController.reload();
 
     _disposeOverlayReaction();
   }
