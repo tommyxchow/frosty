@@ -1,2 +1,2 @@
 Bug Fixes
-• Fixed chatters not sorted alphabetically
+• Fixed video streams not loading
