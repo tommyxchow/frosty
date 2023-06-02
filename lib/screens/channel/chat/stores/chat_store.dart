@@ -128,6 +128,9 @@ abstract class ChatStoreBase with Store {
   var _autoScroll = true;
 
   @readonly
+  var _inputText = '';
+
+  @readonly
   var _showSendButton = false;
 
   @readonly
@@ -204,12 +207,13 @@ abstract class ChatStoreBase with Store {
 
     // Add a listener to the textfield that will show/hide the autocomplete bar if focused.
     // Will also rebuild the autocomplete bar when typing, refreshing the results as the user types.
-    textController.addListener(() => _showEmoteAutocomplete =
-        !_showMentionAutocomplete &&
-            textFieldFocusNode.hasFocus &&
-            textController.text.split(' ').last.isNotEmpty);
-
     textController.addListener(() {
+      _inputText = textController.text;
+
+      _showEmoteAutocomplete = !_showMentionAutocomplete &&
+          textFieldFocusNode.hasFocus &&
+          textController.text.split(' ').last.isNotEmpty;
+
       _showSendButton = textController.text.isNotEmpty;
       _showMentionAutocomplete = textFieldFocusNode.hasFocus &&
           textController.text.split(' ').last.startsWith('@');
