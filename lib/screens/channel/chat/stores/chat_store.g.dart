@@ -119,6 +119,24 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$_inputTextAtom =
+      Atom(name: 'ChatStoreBase._inputText', context: context);
+
+  String get inputText {
+    _$_inputTextAtom.reportRead();
+    return super._inputText;
+  }
+
+  @override
+  String get _inputText => inputText;
+
+  @override
+  set _inputText(String value) {
+    _$_inputTextAtom.reportWrite(value, super._inputText, () {
+      super._inputText = value;
+    });
+  }
+
   late final _$_showSendButtonAtom =
       Atom(name: 'ChatStoreBase._showSendButton', context: context);
 
