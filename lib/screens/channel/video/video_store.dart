@@ -132,14 +132,16 @@ abstract class VideoStoreBase with Store {
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
-    // Add event listeners to notify the JavaScript channels when the video plays and pauses.
-    try {
-      videoWebViewController.runJavaScript(
-          'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
-      videoWebViewController.runJavaScript(
-          'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
-    } catch (e) {
-      debugPrint(e.toString());
+    if (await videoWebViewController.currentUrl() == videoUrl) {
+      // Add event listeners to notify the JavaScript channels when the video plays and pauses.
+      try {
+        videoWebViewController.runJavaScript(
+            'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
+        videoWebViewController.runJavaScript(
+            'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     }
 
     // Determine whether the device is an iPad or not.
