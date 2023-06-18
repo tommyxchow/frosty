@@ -55,8 +55,7 @@ abstract class VideoStoreBase with Store {
           NavigationDelegate(
             onPageFinished: (_) => initVideo(),
           ),
-        )
-        ..loadRequest(Uri.parse(videoUrl));
+        );
 
   // allowsInlineMediaPlayback: true,
   // initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
@@ -97,6 +96,22 @@ abstract class VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
+    // Initialize the video webview params for iOS to enable video autoplay.
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      _videoWebViewParams = WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+      );
+    } else {
+      _videoWebViewParams = const PlatformWebViewControllerCreationParams();
+    }
+
+    // Initialize the video webview params for Android to enable video autoplay.
+    if (videoWebViewController.platform is AndroidWebViewController) {
+      (videoWebViewController.platform as AndroidWebViewController)
+          .setMediaPlaybackRequiresUserGesture(false);
+    }
+
     // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
     if (Platform.isAndroid) {
       SimplePip.isAutoPipAvailable.then((isAutoPipAvailable) {
@@ -113,22 +128,6 @@ abstract class VideoStoreBase with Store {
       (_) => settingsStore.showOverlay,
       (_) => videoWebViewController.loadRequest(Uri.parse(videoUrl)),
     );
-
-    // Initialize the video webview params for iOS to enable video autoplay.
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      _videoWebViewParams = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-      );
-    } else {
-      _videoWebViewParams = const PlatformWebViewControllerCreationParams();
-    }
-
-    // Initialize the video webview params for Android to enable video autoplay.
-    if (videoWebViewController.platform is AndroidWebViewController) {
-      (videoWebViewController.platform as AndroidWebViewController)
-          .setMediaPlaybackRequiresUserGesture(false);
-    }
 
     updateStreamInfo();
   }

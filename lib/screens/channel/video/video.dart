@@ -22,6 +22,10 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    if (widget.videoStore.settingsStore.showVideo) {
+      widget.videoStore.videoWebViewController
+          .loadRequest(Uri.parse(widget.videoStore.videoUrl));
+    }
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -45,6 +49,9 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    widget.videoStore.videoWebViewController
+        .loadRequest(Uri.parse('about:blank'));
+
     super.dispose();
   }
 }
