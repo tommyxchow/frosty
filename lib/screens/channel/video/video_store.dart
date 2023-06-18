@@ -57,9 +57,6 @@ abstract class VideoStoreBase with Store {
           ),
         );
 
-  // allowsInlineMediaPlayback: true,
-  // initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
 
