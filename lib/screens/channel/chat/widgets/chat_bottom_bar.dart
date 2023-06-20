@@ -39,16 +39,23 @@ class ChatBottomBar extends StatelessWidget {
           ...chatStore.assetsStore.ffzEmotes,
           ...chatStore.assetsStore.sevenTVEmotes
         ]
-            .where((emote) => emote.name.toLowerCase().contains(
-                chatStore.textController.text.split(' ').last.toLowerCase()))
+            .where(
+              (emote) => emote.name.toLowerCase().contains(
+                    chatStore.inputText.split(' ').last.toLowerCase(),
+                  ),
+            )
             .toList();
 
         final matchingChatters = chatStore.chatDetailsStore.chatUsers
-            .where((chatter) => chatter.contains(chatStore.textController.text
-                .split(' ')
-                .last
-                .replaceFirst('@', '')
-                .toLowerCase()))
+            .where(
+              (chatter) => chatter.contains(
+                chatStore.inputText
+                    .split(' ')
+                    .last
+                    .replaceFirst('@', '')
+                    .toLowerCase(),
+              ),
+            )
             .toList();
 
         return Column(

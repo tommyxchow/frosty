@@ -54,19 +54,8 @@ abstract class VideoStoreBase with Store {
         ..setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (_) => initVideo(),
-            // Used for preventing accidental navigation in the webview.
-            onNavigationRequest: (request) {
-              if (request.url.startsWith('https://player.twitch.tv')) {
-                return NavigationDecision.navigate;
-              }
-              return NavigationDecision.prevent;
-            },
           ),
-        )
-        ..loadRequest(Uri.parse(videoUrl));
-
-  // allowsInlineMediaPlayback: true,
-  // initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+        );
 
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
@@ -108,6 +97,22 @@ abstract class VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
+    // Initialize the video webview params for iOS to enable video autoplay.
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      _videoWebViewParams = WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+      );
+    } else {
+      _videoWebViewParams = const PlatformWebViewControllerCreationParams();
+    }
+
+    // Initialize the video webview params for Android to enable video autoplay.
+    if (videoWebViewController.platform is AndroidWebViewController) {
+      (videoWebViewController.platform as AndroidWebViewController)
+          .setMediaPlaybackRequiresUserGesture(false);
+    }
+
     // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
     if (Platform.isAndroid) {
       SimplePip.isAutoPipAvailable.then((isAutoPipAvailable) {
@@ -125,36 +130,22 @@ abstract class VideoStoreBase with Store {
       (_) => videoWebViewController.loadRequest(Uri.parse(videoUrl)),
     );
 
-    // Initialize the video webview params for iOS to enable video autoplay.
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      _videoWebViewParams = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-      );
-    } else {
-      _videoWebViewParams = const PlatformWebViewControllerCreationParams();
-    }
-
-    // Initialize the video webview params for Android to enable video autoplay.
-    if (videoWebViewController.platform is AndroidWebViewController) {
-      (videoWebViewController.platform as AndroidWebViewController)
-          .setMediaPlaybackRequiresUserGesture(false);
-    }
-
     updateStreamInfo();
   }
 
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
-    // Add event listeners to notify the JavaScript channels when the video plays and pauses.
-    try {
-      videoWebViewController.runJavaScript(
-          'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
-      videoWebViewController.runJavaScript(
-          'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
-    } catch (e) {
-      debugPrint(e.toString());
+    if (await videoWebViewController.currentUrl() == videoUrl) {
+      // Add event listeners to notify the JavaScript channels when the video plays and pauses.
+      try {
+        videoWebViewController.runJavaScript(
+            'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
+        videoWebViewController.runJavaScript(
+            'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     }
 
     // Determine whether the device is an iPad or not.
@@ -285,10 +276,6 @@ abstract class VideoStoreBase with Store {
         if (isAutoPipAvailable) pip.setAutoPipMode(autoEnter: false);
       });
     }
-
-    // Not ideal, but seems like the only way of disposing of the video properly.
-    // Will both prevent the video from continuing to play when dismissed and closes PiP on iOS.
-    if (Platform.isIOS) videoWebViewController.reload();
 
     _disposeOverlayReaction();
   }
