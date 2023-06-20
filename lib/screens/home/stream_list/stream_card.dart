@@ -13,6 +13,7 @@ import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/translucent_overlay_route.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -140,7 +141,10 @@ class StreamCard extends StatelessWidget {
           if (showCategory) ...[
             InkWell(
               onTap: streamInfo.gameName.isNotEmpty
-                  ? () => Navigator.push(
+                  ? () {
+                      // remove until this page is the top level
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => CategoryStreams(
@@ -148,7 +152,8 @@ class StreamCard extends StatelessWidget {
                             categoryId: streamInfo.gameId,
                           ),
                         ),
-                      )
+                      );
+                    }
                   : null,
               child: Tooltip(
                 message:
@@ -180,16 +185,21 @@ class StreamCard extends StatelessWidget {
     );
 
     return AnimateScale(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => VideoChat(
-            userId: streamInfo.userId,
-            userName: streamInfo.userName,
-            userLogin: streamInfo.userLogin,
+      onTap: () {
+        // remove until this page is the top level
+        Navigator.popUntil(context, (route) => route.isFirst);
+        // push new VedioChat
+        Navigator.push(
+          context,
+          TranslucentOverlayRoute(
+            builder: (context) => VideoChat(
+              userId: streamInfo.userId,
+              userName: streamInfo.userName,
+              userLogin: streamInfo.userLogin,
+            ),
           ),
-        ),
-      ),
+        );
+      },
       onLongPress: () {
         HapticFeedback.mediumImpact();
 

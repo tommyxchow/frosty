@@ -23,15 +23,19 @@ class CategoryCard extends StatelessWidget {
     final artHeight = (artWidth * (4 / 3)).toInt();
 
     return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CategoryStreams(
-            categoryName: category.name,
-            categoryId: category.id,
+      onTap: () {
+        // remove until this page is the top level
+        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CategoryStreams(
+              categoryName: category.name,
+              categoryId: category.id,
+            ),
           ),
-        ),
-      ),
+        );
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         child: Column(

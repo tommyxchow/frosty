@@ -77,6 +77,10 @@ abstract class VideoStoreBase with Store {
   @readonly
   var _isIPad = false;
 
+  /// For pip mode while in app.
+  @readonly
+  var _miniVedioMode = false;
+
   /// The current stream info, used for displaying relevant info on the overlay.
   @readonly
   StreamTwitch? _streamInfo;
@@ -172,6 +176,19 @@ abstract class VideoStoreBase with Store {
       _overlayTimer =
           Timer(const Duration(seconds: 5), () => _overlayVisible = false);
     }
+  }
+
+  /// Allows to switch between full mode and pip mode.
+  @action
+  void setMiniVedioMode(bool mode) {
+    // close overlay if open for mini vedio mode
+    if (mode) {
+      _overlayTimer.cancel();
+      if (_overlayVisible) {
+        _overlayVisible = false;
+      }
+    }
+    _miniVedioMode = mode;
   }
 
   /// Updates the stream info from the Twitch API.

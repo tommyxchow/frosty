@@ -78,7 +78,11 @@ class VideoBar extends StatelessWidget {
                   const SizedBox(height: 5.0),
                   InkWell(
                     onTap: tappableCategory && streamInfo.gameName.isNotEmpty
-                        ? () => Navigator.push(
+                        ? () {
+                            // remove until this page is the top level
+                            Navigator.popUntil(
+                                context, (route) => route.isFirst);
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => CategoryStreams(
@@ -86,7 +90,8 @@ class VideoBar extends StatelessWidget {
                                   categoryId: streamInfo.gameId,
                                 ),
                               ),
-                            )
+                            );
+                          }
                         : null,
                     child: Tooltip(
                       message:

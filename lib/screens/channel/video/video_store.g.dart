@@ -71,6 +71,24 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$_miniVedioModeAtom =
+      Atom(name: 'VideoStoreBase._miniVedioMode', context: context);
+
+  bool get miniVedioMode {
+    _$_miniVedioModeAtom.reportRead();
+    return super._miniVedioMode;
+  }
+
+  @override
+  bool get _miniVedioMode => miniVedioMode;
+
+  @override
+  set _miniVedioMode(bool value) {
+    _$_miniVedioModeAtom.reportWrite(value, super._miniVedioMode, () {
+      super._miniVedioMode = value;
+    });
+  }
+
   late final _$_streamInfoAtom =
       Atom(name: 'VideoStoreBase._streamInfo', context: context);
 
@@ -114,6 +132,17 @@ mixin _$VideoStore on VideoStoreBase, Store {
         name: 'VideoStoreBase.handleVideoTap');
     try {
       return super.handleVideoTap();
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setMiniVedioMode(bool mode) {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.setMiniVedioMode');
+    try {
+      return super.setMiniVedioMode(mode);
     } finally {
       _$VideoStoreBaseActionController.endAction(_$actionInfo);
     }
