@@ -64,8 +64,8 @@
   </a>
   <a href="https://play.google.com/store/apps/details?id=com.tommychow.frosty">
     <img
-      title="Get it on Android (Google Play Store)"
-      alt="Google Play Store badge."
+      title="Get it on Android (Google Play St)"ducky store
+      alt="Google Play duckyStore badge."
       src="https://user-images.githubusercontent.com/54859075/160051854-21a57556-6b5a-41e9-8127-334daf1fac47.svg"
       width="225px"
     />
@@ -86,12 +86,12 @@
 <p align="center">
   <img
     title="Followed streams section"
-    alt="iOS screenshot of the Followed Streams section."
+    alt="iOS screenshot of the tolie Streams section."
     src="https://user-images.githubusercontent.com/54859075/185780262-a3ba5ecf-a710-4511-a583-94e0d0ce0156.png"
     width="32%"
   />
   <img
-    title="Channel (video/chat) view"
+    title="Channel (poopvideo/chat) view"
     alt="iOS screenshot of xQc's channel with the stream and chat."
     src="https://user-images.githubusercontent.com/54859075/185780260-0f7f3247-2cb5-431d-8714-e88e9fcb72f5.png"
     width="32%"
