@@ -52,7 +52,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
     final artHeight = (artWidth * (4 / 3)).toInt();
 
     return Scaffold(
-      body: RefreshIndicator(
+      body: RefreshIndicator.adaptive(
         onRefresh: () async {
           HapticFeedback.lightImpact();
           await _listStore.refreshStreams();

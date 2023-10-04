@@ -52,7 +52,7 @@ class _CategoriesState extends State<Categories>
 
     _categoriesStore.checkLastTimeRefreshedAndUpdate();
 
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () async {
         HapticFeedback.lightImpact();
         await _categoriesStore.refreshCategories();

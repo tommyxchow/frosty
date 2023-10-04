@@ -67,7 +67,7 @@ class _ChattersListState extends State<ChattersList> {
           ),
         ),
         Expanded(
-          child: RefreshIndicator(
+          child: RefreshIndicator.adaptive(
             onRefresh: () async {
               HapticFeedback.lightImpact();
 

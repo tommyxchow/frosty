@@ -62,7 +62,7 @@ class _StreamsListState extends State<StreamsList>
 
     _listStore.checkLastTimeRefreshedAndUpdate();
 
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () async {
         HapticFeedback.lightImpact();
 
