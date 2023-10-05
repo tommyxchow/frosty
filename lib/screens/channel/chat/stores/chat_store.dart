@@ -80,7 +80,7 @@ abstract class ChatStoreBase with Store {
 
   /// The list of chat messages to add once autoscroll is resumed.
   /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
-  final _messageBuffer = <IRCMessage>[];
+  final messageBuffer = ObservableList<IRCMessage>();
 
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
@@ -173,11 +173,11 @@ abstract class ChatStoreBase with Store {
 
     assetsStore.init();
 
-    _messageBuffer
+    messageBuffer
         .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.chatDelay > 0) {
-      _messageBuffer.add(IRCMessage.createNotice(
+      messageBuffer.add(IRCMessage.createNotice(
           message:
               'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
     }
@@ -252,19 +252,19 @@ abstract class ChatStoreBase with Store {
           case Command.privateMessage:
           case Command.notice:
           case Command.userNotice:
-            _messageBuffer.add(parsedIRCMessage);
+            messageBuffer.add(parsedIRCMessage);
             break;
           case Command.clearChat:
             IRCMessage.clearChat(
               messages: _messages,
-              bufferedMessages: _messageBuffer,
+              bufferedMessages: messageBuffer,
               ircMessage: parsedIRCMessage,
             );
             break;
           case Command.clearMessage:
             IRCMessage.clearMessage(
               messages: _messages,
-              bufferedMessages: _messageBuffer,
+              bufferedMessages: messageBuffer,
               ircMessage: parsedIRCMessage,
             );
             break;
@@ -277,7 +277,7 @@ abstract class ChatStoreBase with Store {
 
             if (toSend != null) {
               textController.clear();
-              _messageBuffer.add(toSend!);
+              messageBuffer.add(toSend!);
               toSend = null;
             }
             break;
@@ -301,9 +301,9 @@ abstract class ChatStoreBase with Store {
 
         if (!_autoScroll) {
           // While autoscroll is disabled, occasionally move messages from the buffer to the messages to prevent a memory leak.
-          if (_messageBuffer.length >= _messagesToRemove) {
-            _messages.addAll(_messageBuffer);
-            _messageBuffer.clear();
+          if (messageBuffer.length >= _messagesToRemove) {
+            _messages.addAll(messageBuffer);
+            messageBuffer.clear();
           }
         }
 
@@ -315,7 +315,7 @@ abstract class ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        _messageBuffer.add(IRCMessage.createNotice(
+        messageBuffer.add(IRCMessage.createNotice(
             message:
                 "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
 
@@ -375,7 +375,7 @@ abstract class ChatStoreBase with Store {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
           final notice =
               'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          _messageBuffer.add(IRCMessage.createNotice(message: notice));
+          messageBuffer.add(IRCMessage.createNotice(message: notice));
         }
 
         await Future.delayed(Duration(seconds: _backoffTime));
@@ -385,7 +385,7 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        _messageBuffer.add(IRCMessage.createNotice(
+        messageBuffer.add(IRCMessage.createNotice(
             message: 'Reconnecting to chat (attempt $_retries)...'));
         _channelListener?.cancel();
         connectToChat();
@@ -416,10 +416,10 @@ abstract class ChatStoreBase with Store {
 
   @action
   void addMessages() {
-    if (!_autoScroll || _messageBuffer.isEmpty) return;
+    if (!_autoScroll || messageBuffer.isEmpty) return;
 
-    _messages.addAll(_messageBuffer);
-    _messageBuffer.clear();
+    _messages.addAll(messageBuffer);
+    messageBuffer.clear();
   }
 
   /// Sends the given string message by the logged-in user and adds it to [_messages].
@@ -429,7 +429,7 @@ abstract class ChatStoreBase with Store {
     if (message.isEmpty) return;
 
     if (_channel == null || _channel?.closeCode != null) {
-      _messageBuffer.add(IRCMessage.createNotice(
+      messageBuffer.add(IRCMessage.createNotice(
           message: 'Failed to send message: disconnected from chat.'));
     } else {
       // Send the message to the IRC chat room.

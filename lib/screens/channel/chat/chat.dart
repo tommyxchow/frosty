@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -71,9 +72,15 @@ class Chat extends StatelessWidget {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 15.0, vertical: 10.0),
                                   onPressed: chatStore.resumeScroll,
-                                  icon: const Icon(
-                                      Icons.keyboard_double_arrow_down_rounded),
-                                  child: const Text('Resume scroll'),
+                                  icon:
+                                      const Icon(Icons.arrow_downward_rounded),
+                                  child: Text(
+                                      chatStore.messageBuffer.isNotEmpty
+                                          ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
+                                          : 'Resume scroll',
+                                      style: const TextStyle(fontFeatures: [
+                                        FontFeature.tabularFigures()
+                                      ])),
                                 ),
                         ),
                       ),
