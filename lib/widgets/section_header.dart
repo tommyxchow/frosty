@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/main.dart';
 
 class SectionHeader extends StatelessWidget {
   final String text;
@@ -20,7 +19,6 @@ class SectionHeader extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: purple,
           fontSize: fontSize ?? 16,
           fontWeight: FontWeight.w600,
         ),

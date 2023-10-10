@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
@@ -52,8 +51,8 @@ class StreamCard extends StatelessWidget {
         imageUrl: streamInfo.thumbnailUrl.replaceFirst(
                 '-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
             cacheUrlExtension,
-        placeholder: (context, url) =>
-            const ColoredBox(color: lightGray, child: LoadingIndicator()),
+        placeholder: (context, url) => ColoredBox(
+            color: Colors.grey.shade900, child: const LoadingIndicator()),
         useOldImageOnUrlChange: true,
       ),
     );
@@ -194,7 +193,7 @@ class StreamCard extends StatelessWidget {
         HapticFeedback.mediumImpact();
 
         showModalBottomSheet(
-          backgroundColor: Colors.transparent,
+          // backgroundColor: Colors.transparent,
           context: context,
           builder: (context) => BlockReportModal(
             authStore: context.read<AuthStore>(),

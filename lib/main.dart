@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:advanced_in_app_review/advanced_in_app_review.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -91,124 +90,6 @@ void main() async {
 // Navigator key for sleep timer. Allows navigation popping without context.
 final navigatorKey = GlobalKey<NavigatorState>();
 
-const gray = Color.fromRGBO(18, 18, 18, 1.0);
-const lightGray = Color.fromRGBO(28, 28, 28, 1.0);
-const purple = Color(0xff9146ff);
-
-const inputTheme = InputDecorationTheme(
-  filled: true,
-  contentPadding: EdgeInsets.all(10.0),
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-    borderSide: BorderSide(style: BorderStyle.none),
-  ),
-  enabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-    borderSide: BorderSide(style: BorderStyle.none),
-  ),
-  disabledBorder: OutlineInputBorder(
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-    borderSide: BorderSide(style: BorderStyle.none),
-  ),
-);
-
-const tooltipTheme = TooltipThemeData(
-  padding: EdgeInsets.all(10.0),
-  margin: EdgeInsets.symmetric(horizontal: 5.0),
-  decoration: BoxDecoration(
-    color: lightGray,
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-  ),
-  textStyle: TextStyle(color: Colors.white),
-);
-
-const snackBarTheme = SnackBarThemeData(
-  backgroundColor: lightGray,
-  contentTextStyle: TextStyle(color: Colors.white),
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-  ),
-);
-
-final lightTheme = ThemeData(
-  canvasColor: Colors.white,
-  splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-  fontFamily: 'Inter',
-  appBarTheme: const AppBarTheme(
-    color: Colors.white,
-    elevation: 0.0,
-    titleTextStyle: TextStyle(
-      fontFamily: 'Inter',
-      fontSize: 24,
-      fontWeight: FontWeight.bold,
-      color: Colors.black,
-    ),
-    iconTheme: IconThemeData(color: Colors.black),
-  ),
-  colorScheme: ColorScheme.fromSwatch(
-    primarySwatch: Colors.deepPurple,
-    accentColor: purple,
-  ),
-  tabBarTheme: const TabBarTheme(
-    labelColor: Colors.black,
-    unselectedLabelColor: Colors.grey,
-  ),
-  inputDecorationTheme: inputTheme,
-  tooltipTheme: tooltipTheme,
-  snackBarTheme: snackBarTheme,
-);
-
-final darkTheme = ThemeData(
-  canvasColor: gray,
-  brightness: Brightness.dark,
-  splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-  fontFamily: 'Inter',
-  appBarTheme: const AppBarTheme(
-    color: gray,
-    elevation: 0.0,
-    titleTextStyle: TextStyle(
-      fontFamily: 'Inter',
-      fontSize: 24,
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-  bottomNavigationBarTheme:
-      const BottomNavigationBarThemeData(backgroundColor: gray),
-  colorScheme: ColorScheme.fromSwatch(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.deepPurple,
-    accentColor: purple,
-  ),
-  dialogBackgroundColor: gray,
-  inputDecorationTheme: inputTheme,
-  tooltipTheme: tooltipTheme,
-  snackBarTheme: snackBarTheme,
-);
-
-final oledTheme = ThemeData(
-  canvasColor: Colors.black,
-  splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
-  fontFamily: 'Inter',
-  appBarTheme: const AppBarTheme(
-    color: Colors.black,
-    elevation: 0.0,
-    titleTextStyle: TextStyle(
-      fontFamily: 'Inter',
-      fontSize: 24,
-      fontWeight: FontWeight.bold,
-    ),
-  ),
-  colorScheme: ColorScheme.fromSwatch(
-    brightness: Brightness.dark,
-    primarySwatch: Colors.deepPurple,
-    accentColor: purple,
-  ),
-  dialogBackgroundColor: Colors.black,
-  inputDecorationTheme: inputTheme,
-  tooltipTheme: tooltipTheme,
-  snackBarTheme: snackBarTheme,
-);
-
 class MyApp extends StatefulWidget {
   final bool firstRun;
 
@@ -238,20 +119,13 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        final settingsStore = context.read<SettingsStore>();
-
         return MaterialApp(
           title: 'Frosty',
-          theme: lightTheme,
-          darkTheme: settingsStore.themeType == ThemeType.dark ||
-                  settingsStore.themeType == ThemeType.system
-              ? darkTheme
-              : oledTheme,
-          themeMode: settingsStore.themeType == ThemeType.system
-              ? ThemeMode.system
-              : settingsStore.themeType == ThemeType.light
-                  ? ThemeMode.light
-                  : ThemeMode.dark,
+          theme: ThemeData(
+            useMaterial3: true,
+            fontFamily: 'Inter',
+            brightness: Brightness.dark,
+          ),
           home: widget.firstRun ? const OnboardingIntro() : const Home(),
           navigatorKey: navigatorKey,
         );

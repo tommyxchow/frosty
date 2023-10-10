@@ -8,7 +8,6 @@ import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
@@ -19,6 +18,7 @@ import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/theme.dart';
 import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/notification.dart';
 import 'package:provider/provider.dart';
@@ -244,7 +244,7 @@ class _VideoChatState extends State<VideoChat> {
               visible: settingsStore.fullScreenChatOverlay,
               maintainState: true,
               child: Theme(
-                data: darkTheme,
+                data: FrostyStyles.darkTheme,
                 child: DefaultTextStyle(
                   style: DefaultTextStyle.of(context)
                       .style

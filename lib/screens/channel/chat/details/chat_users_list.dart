@@ -41,7 +41,6 @@ class _ChattersListState extends State<ChattersList> {
                 focusNode: widget.chatDetailsStore.textFieldFocusNode,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  contentPadding: EdgeInsets.zero,
                   prefixIcon: const Icon(Icons.filter_list_rounded),
                   hintText: 'Filter chatters',
                   suffixIcon: widget

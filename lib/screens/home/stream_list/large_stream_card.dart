@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
@@ -68,8 +67,9 @@ class LargeStreamCard extends StatelessWidget {
                         '-{width}x{height}',
                         '-${thumbnailWidth}x$thumbnailHeight') +
                     cacheUrlExtension,
-                placeholder: (context, url) => const ColoredBox(
-                    color: lightGray, child: LoadingIndicator()),
+                placeholder: (context, url) => ColoredBox(
+                    color: Colors.grey.shade900,
+                    child: const LoadingIndicator()),
                 useOldImageOnUrlChange: true,
               ),
             ),

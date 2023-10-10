@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/main.dart';
+import 'package:frosty/theme.dart';
 import 'package:frosty/widgets/button.dart';
 
 class FrostyNotification extends StatelessWidget {
@@ -18,7 +18,7 @@ class FrostyNotification extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: lightGray,
+        color: Colors.grey.shade900,
         borderRadius: BorderRadius.circular(10.0),
       ),
       margin: const EdgeInsets.all(10),
@@ -51,7 +51,7 @@ class FrostyNotification extends StatelessWidget {
           if (showPasteButton)
             Button(
               onPressed: onButtonPressed,
-              color: purple,
+              color: FrostyStyles.purple,
               child: const Text('Paste'),
             ),
         ],

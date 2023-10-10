@@ -7,30 +7,19 @@ class FrostyBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).dialogBackgroundColor,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(15.0),
-          topRight: Radius.circular(15.0),
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const FractionallySizedBox(
-              widthFactor: 0.2,
-              child: SizedBox(
-                child: Divider(
-                  height: 30.0,
-                  thickness: 2.0,
-                ),
-              ),
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const FractionallySizedBox(
+            widthFactor: 0.1,
+            child: Divider(
+              height: 30.0,
+              thickness: 2.0,
             ),
-            Material(child: child),
-          ],
-        ),
+          ),
+          child,
+        ],
       ),
     );
   }

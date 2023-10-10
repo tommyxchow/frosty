@@ -46,7 +46,6 @@ class _SearchState extends State<Search> {
                 focusNode: _searchStore.textFieldFocusNode,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  contentPadding: EdgeInsets.zero,
                   prefixIcon: const Icon(Icons.search_rounded),
                   hintText: 'Find a channel or category',
                   suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||

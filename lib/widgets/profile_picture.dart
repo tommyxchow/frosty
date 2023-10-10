@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/apis/twitch_api.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -36,10 +35,10 @@ class ProfilePicture extends StatelessWidget {
                     height: diameter,
                     imageUrl: snapshot.data!.profileImageUrl,
                     placeholder: (context, url) =>
-                        const ColoredBox(color: lightGray),
+                        ColoredBox(color: Colors.grey.shade900),
                   )
                 : Container(
-                    color: lightGray,
+                    color: Colors.grey.shade900,
                     width: diameter,
                     height: diameter,
                   ),

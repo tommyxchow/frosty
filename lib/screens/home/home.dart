@@ -78,33 +78,29 @@ class _HomeState extends State<Home> {
           ),
         ),
         bottomNavigationBar: Observer(
-          builder: (_) => BottomNavigationBar(
-            selectedFontSize: 12.0,
-            type: BottomNavigationBarType.fixed,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-            items: [
+          builder: (_) => NavigationBar(
+            destinations: [
               if (_authStore.isLoggedIn)
-                BottomNavigationBarItem(
+                NavigationDestination(
                   icon: _homeStore.selectedIndex == 0
                       ? const Icon(Icons.favorite_rounded)
                       : const Icon(Icons.favorite_border_rounded),
                   label: 'Following',
                   tooltip: 'Followed streams',
                 ),
-              const BottomNavigationBarItem(
+              const NavigationDestination(
                 icon: Icon(Icons.arrow_upward_rounded),
                 label: 'Top',
                 tooltip: 'Top streams and categories',
               ),
-              const BottomNavigationBarItem(
+              const NavigationDestination(
                 icon: Icon(Icons.search_rounded),
                 label: 'Search',
                 tooltip: 'Search for channels and categories',
               ),
             ],
-            currentIndex: _homeStore.selectedIndex,
-            onTap: _homeStore.handleTap,
+            selectedIndex: _homeStore.selectedIndex,
+            onDestinationSelected: _homeStore.handleTap,
           ),
         ),
       ),
