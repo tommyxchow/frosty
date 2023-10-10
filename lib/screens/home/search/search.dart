@@ -32,41 +32,38 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    const headerPadding = EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 10.0);
+    const headerPadding = EdgeInsets.fromLTRB(16, 20, 16, 8);
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          child: Observer(
-            builder: (context) {
-              return TextField(
-                controller: _searchStore.textEditingController,
-                focusNode: _searchStore.textFieldFocusNode,
-                autocorrect: false,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  hintText: 'Find a channel or category',
-                  suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
-                          _searchStore.searchText.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.close_rounded),
-                          tooltip: _searchStore.searchText.isEmpty
-                              ? 'Cancel'
-                              : 'Clear',
-                          onPressed: () {
-                            if (_searchStore.searchText.isEmpty) {
-                              _searchStore.textFieldFocusNode.unfocus();
-                            }
-                            _searchStore.textEditingController.clear();
-                          },
-                        )
-                      : null,
-                ),
-                onSubmitted: _searchStore.handleQuery,
-              );
-            },
-          ),
+        Observer(
+          builder: (context) {
+            return TextField(
+              controller: _searchStore.textEditingController,
+              focusNode: _searchStore.textFieldFocusNode,
+              autocorrect: false,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.search_rounded),
+                hintText: 'Find a channel or category',
+                suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
+                        _searchStore.searchText.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        tooltip: _searchStore.searchText.isEmpty
+                            ? 'Cancel'
+                            : 'Clear',
+                        onPressed: () {
+                          if (_searchStore.searchText.isEmpty) {
+                            _searchStore.textFieldFocusNode.unfocus();
+                          }
+                          _searchStore.textEditingController.clear();
+                        },
+                      )
+                    : null,
+              ),
+              onSubmitted: _searchStore.handleQuery,
+            );
+          },
         ),
         Expanded(
           child: Observer(
@@ -79,9 +76,22 @@ class _SearchState extends State<Search> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SectionHeader(
-                      'History',
-                      padding: headerPadding,
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 16, top: 8, right: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SectionHeader(
+                            'History',
+                            padding: EdgeInsets.zero,
+                          ),
+                          TextButton(
+                            onPressed: _searchStore.searchHistory.clear,
+                            child: const Text('Clear'),
+                          ),
+                        ],
+                      ),
                     ),
                     Expanded(
                       child: ListView(
@@ -91,15 +101,6 @@ class _SearchState extends State<Search> {
                               (index, searchTerm) => ListTile(
                                 leading: const Icon(Icons.history_rounded),
                                 title: Text(searchTerm),
-                                trailing: Tooltip(
-                                  message: 'Remove',
-                                  preferBelow: false,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.close_rounded),
-                                    onPressed: () => _searchStore.searchHistory
-                                        .removeAt(index),
-                                  ),
-                                ),
                                 onTap: () {
                                   _searchStore.textEditingController.text =
                                       searchTerm;
