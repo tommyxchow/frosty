@@ -8,7 +8,6 @@ import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
-import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
@@ -114,9 +113,8 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                             ),
                           );
                         },
-                        child: FrostyListTile(
-                          isThreeLine: false,
-                          title: displayName,
+                        child: ListTile(
+                          title: Text(displayName),
                           leading: ProfilePicture(
                               userLogin: channel.broadcasterLogin),
                           subtitle: channel.isLive
@@ -136,8 +134,8 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                       );
                     },
                   ),
-                  FrostyListTile(
-                    title: 'Go to channel "${widget.query}"',
+                  ListTile(
+                    title: Text('Go to channel "${widget.query}"'),
                     onTap: () => _handleSearch(context, widget.query),
                     trailing: const Icon(Icons.chevron_right_rounded),
                   )

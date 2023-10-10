@@ -11,7 +11,6 @@ import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/list_tile.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -66,9 +65,9 @@ class _OtherSettingsState extends State<OtherSettings> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.info_outline_rounded),
-          title: 'About Frosty',
+          title: const Text('About Frosty'),
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
@@ -87,26 +86,26 @@ class _OtherSettingsState extends State<OtherSettings> {
             );
           },
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.launch_rounded),
-          title: 'Changelog',
+          title: const Text('Changelog'),
           onTap: () => launchUrl(
               Uri.parse('https://github.com/tommyxchow/frosty/releases'),
               mode: widget.settingsStore.launchUrlExternal
                   ? LaunchMode.externalApplication
                   : LaunchMode.inAppWebView),
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.launch_rounded),
-          title: 'FAQ',
+          title: const Text('FAQ'),
           onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
               mode: widget.settingsStore.launchUrlExternal
                   ? LaunchMode.externalApplication
                   : LaunchMode.inAppWebView),
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.delete_outline_rounded),
-          title: 'Clear image cache',
+          title: const Text('Clear image cache'),
           onTap: () async {
             HapticFeedback.mediumImpact();
 
@@ -121,9 +120,9 @@ class _OtherSettingsState extends State<OtherSettings> {
             );
           },
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.restore_rounded),
-          title: 'Reset settings',
+          title: const Text('Reset settings'),
           onTap: () => _showConfirmDialog(context),
         ),
         Observer(

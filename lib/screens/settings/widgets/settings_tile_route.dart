@@ -17,7 +17,7 @@ class SettingsTileRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: leading,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      title: Text(title),
       trailing: const Icon(Icons.chevron_right_rounded),
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(

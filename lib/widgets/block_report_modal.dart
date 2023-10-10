@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/app_bar.dart';
-import 'package:frosty/widgets/list_tile.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class BlockReportModal extends StatelessWidget {
@@ -24,15 +23,15 @@ class BlockReportModal extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (authStore.isLoggedIn)
-          FrostyListTile(
+          ListTile(
             leading: const Icon(Icons.block_rounded),
             onTap: () => authStore
                 .showBlockDialog(context,
                     targetUser: name, targetUserId: userId)
                 .then((_) => Navigator.pop(context)),
-            title: 'Block $name',
+            title: Text('Block $name'),
           ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.outlined_flag_rounded),
           onTap: () => Navigator.push(
             context,
@@ -53,7 +52,7 @@ class BlockReportModal extends StatelessWidget {
               },
             ),
           ),
-          title: 'Report $name',
+          title: Text('Report $name'),
         )
       ],
     );

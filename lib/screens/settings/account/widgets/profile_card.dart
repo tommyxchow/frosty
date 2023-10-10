@@ -6,7 +6,6 @@ import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:simple_icons/simple_icons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -81,12 +80,12 @@ class ProfileCard extends StatelessWidget {
     return Observer(
       builder: (context) {
         if (authStore.error != null) {
-          return FrostyListTile(
+          return ListTile(
             leading: const Icon(
               Icons.error_outline_rounded,
               color: Colors.red,
             ),
-            title: 'Failed to connect',
+            title: const Text('Failed to connect'),
             trailing: Button(
               onPressed: authStore.init,
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -104,9 +103,9 @@ class ProfileCard extends StatelessWidget {
             child: AccountOptions(authStore: authStore),
           );
         }
-        return FrostyListTile(
+        return ListTile(
           leading: const Icon(Icons.no_accounts_rounded),
-          title: 'Anonymous',
+          title: const Text('Anonymous'),
           subtitle: const Text(
               'Tap to log in and enable the ability to chat, view followed streams, and more.'),
           trailing: const SizedBox(

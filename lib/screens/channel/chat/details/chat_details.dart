@@ -10,7 +10,6 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/list_tile.dart';
 
 class ChatDetails extends StatelessWidget {
   final ChatDetailsStore chatDetailsStore;
@@ -140,9 +139,9 @@ class ChatDetails extends StatelessWidget {
       ListTile(
         title: ChatModes(roomState: chatDetailsStore.roomState),
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.people_outline),
-        title: 'Chatters',
+        title: const Text('Chatters'),
         onTap: () => showModalBottomSheet(
           isScrollControlled: true,
           context: context,
@@ -159,37 +158,37 @@ class ChatDetails extends StatelessWidget {
           ),
         ),
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.timer_outlined),
-        title: 'Sleep timer',
+        title: const Text('Sleep timer'),
         onTap: () => _showSleepTimerDialog(context),
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.delete_outline_rounded),
-        title: 'Clear recent emotes',
+        title: const Text('Clear recent emotes'),
         onTap: () => _showClearDialog(context),
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.refresh_rounded),
-        title: 'Reconnect to chat',
+        title: const Text('Reconnect to chat'),
         onTap: () {
           chatStore.updateNotification('Reconnecting to chat...');
 
           chatStore.connectToChat();
         },
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.refresh_rounded),
-        title: 'Refresh badges and emotes',
+        title: const Text('Refresh badges and emotes'),
         onTap: () async {
           await chatStore.getAssets();
 
           chatStore.updateNotification('Badges and emotes refreshed');
         },
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.settings_outlined),
-        title: 'Settings',
+        title: const Text('Settings'),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(

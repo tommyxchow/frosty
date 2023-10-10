@@ -4,7 +4,6 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/list_tile.dart';
 
 class AccountOptions extends StatelessWidget {
   final AuthStore authStore;
@@ -47,9 +46,9 @@ class AccountOptions extends StatelessWidget {
             authStore: authStore,
           ),
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.logout_rounded),
-          title: 'Log out',
+          title: const Text('Log out'),
           trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () => _showLogoutDialog(context),
         )

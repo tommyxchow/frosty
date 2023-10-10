@@ -21,7 +21,7 @@ class SettingsListSelect extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       isThreeLine: subtitle != null,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
+      title: Text(title),
       subtitle: subtitle != null ? Text(subtitle!) : null,
       trailing: SizedBox(
         height: double.infinity,
