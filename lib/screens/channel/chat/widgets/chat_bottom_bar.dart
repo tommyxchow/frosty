@@ -20,9 +20,11 @@ class ChatBottomBar extends StatelessWidget {
         color: chatStore.assetsStore.showEmoteMenu
             ? Theme.of(context).colorScheme.secondary
             : null,
-        icon: Icon(chatStore.assetsStore.showEmoteMenu
-            ? Icons.emoji_emotions_rounded
-            : Icons.emoji_emotions_outlined),
+        icon: Icon(
+          chatStore.assetsStore.showEmoteMenu
+              ? Icons.emoji_emotions_rounded
+              : Icons.emoji_emotions_outlined,
+        ),
         onPressed: () {
           FocusScope.of(context).unfocus();
           chatStore.assetsStore.showEmoteMenu =
@@ -37,7 +39,7 @@ class ChatBottomBar extends StatelessWidget {
           ...chatStore.assetsStore.userEmoteToObject.values,
           ...chatStore.assetsStore.bttvEmotes,
           ...chatStore.assetsStore.ffzEmotes,
-          ...chatStore.assetsStore.sevenTVEmotes
+          ...chatStore.assetsStore.sevenTVEmotes,
         ]
             .where(
               (emote) => emote.name.toLowerCase().contains(
@@ -74,8 +76,10 @@ class ChatBottomBar extends StatelessWidget {
                   itemCount: matchingEmotes.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => InkWell(
-                    onTap: () => chatStore.addEmote(matchingEmotes[index],
-                        autocompleteMode: true),
+                    onTap: () => chatStore.addEmote(
+                      matchingEmotes[index],
+                      autocompleteMode: true,
+                    ),
                     child: Tooltip(
                       message: matchingEmotes[index].name,
                       preferBelow: false,
@@ -118,13 +122,16 @@ class ChatBottomBar extends StatelessWidget {
 
                       chatStore.textController.text = split.join(' ');
                       chatStore.textController.selection =
-                          TextSelection.fromPosition(TextPosition(
-                              offset: chatStore.textController.text.length));
+                          TextSelection.fromPosition(
+                        TextPosition(
+                          offset: chatStore.textController.text.length,
+                        ),
+                      );
                     },
                     child: Text(matchingChatters[index]),
                   ),
                 ),
-              )
+              ),
             ],
             Padding(
               padding: const EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 10.0),

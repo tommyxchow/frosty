@@ -64,12 +64,14 @@ class LargeStreamCard extends StatelessWidget {
               aspectRatio: 16 / 9,
               child: FrostyCachedNetworkImage(
                 imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-                        '-{width}x{height}',
-                        '-${thumbnailWidth}x$thumbnailHeight') +
+                      '-{width}x{height}',
+                      '-${thumbnailWidth}x$thumbnailHeight',
+                    ) +
                     cacheUrlExtension,
                 placeholder: (context, url) => ColoredBox(
-                    color: Colors.grey.shade900,
-                    child: const LoadingIndicator()),
+                  color: Colors.grey.shade900,
+                  child: const LoadingIndicator(),
+                ),
                 useOldImageOnUrlChange: true,
               ),
             ),
@@ -123,7 +125,7 @@ class LargeStreamCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -161,7 +163,9 @@ class LargeStreamCard extends StatelessWidget {
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: showThumbnail ? 10.0 : 5.0, horizontal: 15.0),
+          vertical: showThumbnail ? 10.0 : 5.0,
+          horizontal: 15.0,
+        ),
         child: Column(
           children: [
             if (showThumbnail) thumbnail,

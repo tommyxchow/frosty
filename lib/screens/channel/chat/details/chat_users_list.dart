@@ -120,23 +120,26 @@ class _ChattersListState extends State<ChattersList> {
                               (context, index) => InkWell(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0, vertical: 5.0),
-                                  child: Text(widget
-                                      .chatDetailsStore.filteredUsers
-                                      .elementAt(index)),
+                                    horizontal: 10.0,
+                                    vertical: 5.0,
+                                  ),
+                                  child: Text(
+                                    widget.chatDetailsStore.filteredUsers
+                                        .elementAt(index),
+                                  ),
                                 ),
                                 onLongPress: () async {
                                   HapticFeedback.lightImpact();
 
-                                  final userInfo = await context
-                                      .read<TwitchApi>()
-                                      .getUser(
-                                          headers: context
-                                              .read<AuthStore>()
-                                              .headersTwitch,
-                                          userLogin: widget
-                                              .chatDetailsStore.filteredUsers
-                                              .elementAt(index));
+                                  final userInfo =
+                                      await context.read<TwitchApi>().getUser(
+                                            headers: context
+                                                .read<AuthStore>()
+                                                .headersTwitch,
+                                            userLogin: widget
+                                                .chatDetailsStore.filteredUsers
+                                                .elementAt(index),
+                                          );
 
                                   if (!mounted) return;
 
@@ -168,7 +171,8 @@ class _ChattersListState extends State<ChattersList> {
                     child: widget.chatDetailsStore.showJumpButton
                         ? ScrollToTopButton(
                             scrollController:
-                                widget.chatDetailsStore.scrollController)
+                                widget.chatDetailsStore.scrollController,
+                          )
                         : null,
                   ),
                 ),

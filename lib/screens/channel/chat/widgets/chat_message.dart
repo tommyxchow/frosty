@@ -205,8 +205,9 @@ class ChatMessage extends StatelessWidget {
                     Text(
                       ircMessage.tags['system-msg']!,
                       style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: defaultTextStyle.color?.withOpacity(0.5)),
+                        fontWeight: FontWeight.w600,
+                        color: defaultTextStyle.color?.withOpacity(0.5),
+                      ),
                     ),
                   if (ircMessage.tags['msg-id'] == 'announcement')
                     Row(
@@ -254,8 +255,9 @@ class ChatMessage extends StatelessWidget {
 
         final paddedMessage = Padding(
           padding: EdgeInsets.symmetric(
-              vertical: chatStore.settings.messageSpacing / 2,
-              horizontal: 10.0),
+            vertical: chatStore.settings.messageSpacing / 2,
+            horizontal: 10.0,
+          ),
           child: renderMessage,
         );
 

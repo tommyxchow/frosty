@@ -75,9 +75,10 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
             );
           case FutureStatus.fulfilled:
             final results = (future.result as List<ChannelQuery>).where(
-                (channel) => !widget.searchStore.authStore.user.blockedUsers
-                    .map((blockedUser) => blockedUser.userId)
-                    .contains(channel.id));
+              (channel) => !widget.searchStore.authStore.user.blockedUsers
+                  .map((blockedUser) => blockedUser.userId)
+                  .contains(channel.id),
+            );
 
             return SliverList(
               delegate: SliverChildListDelegate.fixed(
@@ -116,7 +117,8 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                         child: ListTile(
                           title: Text(displayName),
                           leading: ProfilePicture(
-                              userLogin: channel.broadcasterLogin),
+                            userLogin: channel.broadcasterLogin,
+                          ),
                           subtitle: channel.isLive
                               ? Row(
                                   children: [
@@ -138,7 +140,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                     title: Text('Go to channel "${widget.query}"'),
                     onTap: () => _handleSearch(context, widget.query),
                     trailing: const Icon(Icons.chevron_right_rounded),
-                  )
+                  ),
                 ],
               ),
             );

@@ -17,8 +17,9 @@ class TwitchApi {
   const TwitchApi(this._client);
 
   /// Returns a list of all Twitch global emotes.
-  Future<List<Emote>> getEmotesGlobal(
-      {required Map<String, String> headers}) async {
+  Future<List<Emote>> getEmotesGlobal({
+    required Map<String, String> headers,
+  }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/emotes/global');
     final response = await _client.get(url, headers: headers);
 
@@ -72,7 +73,8 @@ class TwitchApi {
     required Map<String, String> headers,
   }) async {
     final url = Uri.parse(
-        'https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=$setId');
+      'https://api.twitch.tv/helix/chat/emotes/set?emote_set_id=$setId',
+    );
 
     final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -97,8 +99,9 @@ class TwitchApi {
   }
 
   /// Returns a map of global Twitch badges to their [Emote] object.
-  Future<Map<String, ChatBadge>> getBadgesGlobal(
-      {required Map<String, String> headers}) async {
+  Future<Map<String, ChatBadge>> getBadgesGlobal({
+    required Map<String, String> headers,
+  }) async {
     final url = Uri.parse('https://api.twitch.tv/helix/chat/badges/global');
 
     final response = await _client.get(url, headers: headers);
@@ -204,9 +207,11 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null
-        ? 'https://api.twitch.tv/helix/streams'
-        : 'https://api.twitch.tv/helix/streams?after=$cursor');
+    final url = Uri.parse(
+      cursor == null
+          ? 'https://api.twitch.tv/helix/streams'
+          : 'https://api.twitch.tv/helix/streams?after=$cursor',
+    );
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -223,9 +228,11 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null
-        ? 'https://api.twitch.tv/helix/streams/followed?user_id=$id'
-        : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor');
+    final url = Uri.parse(
+      cursor == null
+          ? 'https://api.twitch.tv/helix/streams/followed?user_id=$id'
+          : 'https://api.twitch.tv/helix/streams/followed?user_id=$id&after=$cursor',
+    );
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -233,7 +240,8 @@ class TwitchApi {
       return StreamsTwitch.fromJson(decoded);
     } else {
       return Future.error(
-          'Failed to get followed streams: ${decoded['message']}');
+        'Failed to get followed streams: ${decoded['message']}',
+      );
     }
   }
 
@@ -243,9 +251,11 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null
-        ? 'https://api.twitch.tv/helix/streams?game_id=$gameId'
-        : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor');
+    final url = Uri.parse(
+      cursor == null
+          ? 'https://api.twitch.tv/helix/streams?game_id=$gameId'
+          : 'https://api.twitch.tv/helix/streams?game_id=$gameId&after=$cursor',
+    );
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -253,7 +263,8 @@ class TwitchApi {
       return StreamsTwitch.fromJson(decoded);
     } else {
       return Future.error(
-          'Failed to get streams under category: ${decoded['message']}');
+        'Failed to get streams under category: ${decoded['message']}',
+      );
     }
   }
 
@@ -286,9 +297,11 @@ class TwitchApi {
     String? id,
     required Map<String, String> headers,
   }) async {
-    final url = Uri.parse(id != null
-        ? 'https://api.twitch.tv/helix/users?id=$id'
-        : 'https://api.twitch.tv/helix/users?login=$userLogin');
+    final url = Uri.parse(
+      id != null
+          ? 'https://api.twitch.tv/helix/users?id=$id'
+          : 'https://api.twitch.tv/helix/users?login=$userLogin',
+    );
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -312,7 +325,8 @@ class TwitchApi {
     required Map<String, String> headers,
   }) async {
     final url = Uri.parse(
-        'https://api.twitch.tv/helix/channels?broadcaster_id=$userId');
+      'https://api.twitch.tv/helix/channels?broadcaster_id=$userId',
+    );
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -335,7 +349,8 @@ class TwitchApi {
     required Map<String, String> headers,
   }) async {
     final url = Uri.parse(
-        'https://api.twitch.tv/helix/search/channels?first=8&query=$query');
+      'https://api.twitch.tv/helix/search/channels?first=8&query=$query',
+    );
 
     final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -352,9 +367,11 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null
-        ? 'https://api.twitch.tv/helix/games/top'
-        : 'https://api.twitch.tv/helix/games/top?after=$cursor');
+    final url = Uri.parse(
+      cursor == null
+          ? 'https://api.twitch.tv/helix/games/top'
+          : 'https://api.twitch.tv/helix/games/top?after=$cursor',
+    );
 
     final response = await _client.get(url, headers: headers);
     final decoded = jsonDecode(response.body);
@@ -362,7 +379,8 @@ class TwitchApi {
       return CategoriesTwitch.fromJson(decoded);
     } else {
       return Future.error(
-          'Failed to get top categories: ${decoded['message']}');
+        'Failed to get top categories: ${decoded['message']}',
+      );
     }
   }
 
@@ -388,9 +406,11 @@ class TwitchApi {
     required String query,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null
-        ? 'https://api.twitch.tv/helix/search/categories?first=8&query=$query'
-        : 'https://api.twitch.tv/helix/search/categories?first=8&query=$query&after=$cursor');
+    final url = Uri.parse(
+      cursor == null
+          ? 'https://api.twitch.tv/helix/search/categories?first=8&query=$query'
+          : 'https://api.twitch.tv/helix/search/categories?first=8&query=$query&after=$cursor',
+    );
 
     final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -408,7 +428,8 @@ class TwitchApi {
     required Map<String, String> headers,
   }) async {
     final uri = Uri.parse(
-        'https://api.twitch.tv/helix/subscriptions?broadcaster_id=$userId');
+      'https://api.twitch.tv/helix/subscriptions?broadcaster_id=$userId',
+    );
 
     final response = await _client.get(uri, headers: headers);
     if (response.statusCode == 200) {
@@ -426,9 +447,11 @@ class TwitchApi {
     required Map<String, String> headers,
     String? cursor,
   }) async {
-    final url = Uri.parse(cursor == null
-        ? 'https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id'
-        : 'https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id&after=$cursor');
+    final url = Uri.parse(
+      cursor == null
+          ? 'https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id'
+          : 'https://api.twitch.tv/helix/users/blocks?first=100&broadcaster_id=$id&after=$cursor',
+    );
 
     final response = await _client.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -447,8 +470,13 @@ class TwitchApi {
           // With the Twitch API, we can make up to 800 requests per minute.
           // Waiting 150 milliseconds between requests will cap the rate here at 400 requests per minute.
           await Future.delayed(const Duration(milliseconds: 150));
-          result.addAll(await getUserBlockedList(
-              id: id, cursor: cursor, headers: headers));
+          result.addAll(
+            await getUserBlockedList(
+              id: id,
+              cursor: cursor,
+              headers: headers,
+            ),
+          );
         }
 
         return result;
@@ -462,10 +490,13 @@ class TwitchApi {
   }
 
   // Blocks the user with the given ID and returns true on success or false on failure.
-  Future<bool> blockUser(
-      {required String userId, required Map<String, String> headers}) async {
+  Future<bool> blockUser({
+    required String userId,
+    required Map<String, String> headers,
+  }) async {
     final url = Uri.parse(
-        'https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
+      'https://api.twitch.tv/helix/users/blocks?target_user_id=$userId',
+    );
 
     final response = await _client.put(url, headers: headers);
     if (response.statusCode == 204) {
@@ -476,10 +507,13 @@ class TwitchApi {
   }
 
   // Unblocks the user with the given ID and returns true on success or false on failure.
-  Future<bool> unblockUser(
-      {required String userId, required Map<String, String> headers}) async {
+  Future<bool> unblockUser({
+    required String userId,
+    required Map<String, String> headers,
+  }) async {
     final url = Uri.parse(
-        'https://api.twitch.tv/helix/users/blocks?target_user_id=$userId');
+      'https://api.twitch.tv/helix/users/blocks?target_user_id=$userId',
+    );
 
     final response = await _client.delete(url, headers: headers);
     if (response.statusCode == 204) {

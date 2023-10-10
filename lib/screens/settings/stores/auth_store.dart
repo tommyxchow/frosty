@@ -52,8 +52,10 @@ abstract class AuthBase with Store {
   String? _error;
 
   /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
-  FutureOr<NavigationDecision> handleNavigation(
-      {required NavigationRequest request, Widget? routeAfter}) {
+  FutureOr<NavigationDecision> handleNavigation({
+    required NavigationRequest request,
+    Widget? routeAfter,
+  }) {
     // Check if the URL is the redirect URI.
     if (request.url.startsWith('https://twitch.tv/login')) {
       // Extract the token from the query parameters.

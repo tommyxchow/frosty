@@ -29,7 +29,7 @@ class AccountOptions extends StatelessWidget {
             onPressed: Navigator.of(context).pop,
             color: Colors.grey,
             child: const Text('Cancel'),
-          )
+          ),
         ],
       ),
     );
@@ -51,7 +51,7 @@ class AccountOptions extends StatelessWidget {
           title: const Text('Log out'),
           trailing: const Icon(Icons.chevron_right_rounded),
           onTap: () => _showLogoutDialog(context),
-        )
+        ),
       ],
     );
   }

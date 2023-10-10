@@ -23,8 +23,9 @@ class _TopSectionState extends State<TopSection>
   @override
   void initState() {
     super.initState();
-    _tabBarController.addListener(() =>
-        widget.homeStore.topSectionCurrentIndex = _tabBarController.index);
+    _tabBarController.addListener(
+      () => widget.homeStore.topSectionCurrentIndex = _tabBarController.index,
+    );
   }
 
   @override

@@ -92,9 +92,10 @@ class _StreamsListState extends State<StreamsList>
                   const LoadingIndicator(subtitle: 'Loading streams...');
             } else {
               statusWidget = AlertMessage(
-                  message: widget.listType == ListType.followed
-                      ? 'No followed streams'
-                      : 'No top streams');
+                message: widget.listType == ListType.followed
+                    ? 'No followed streams'
+                    : 'No top streams',
+              );
             }
           }
 
@@ -105,7 +106,7 @@ class _StreamsListState extends State<StreamsList>
                   child: Center(
                     child: statusWidget,
                   ),
-                )
+                ),
               ],
             );
           }

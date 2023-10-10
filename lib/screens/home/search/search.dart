@@ -106,11 +106,12 @@ class _SearchState extends State<Search> {
                                       searchTerm;
                                   _searchStore.handleQuery(searchTerm);
                                   _searchStore.textEditingController.selection =
-                                      TextSelection.fromPosition(TextPosition(
-                                          offset: _searchStore
-                                              .textEditingController
-                                              .text
-                                              .length));
+                                      TextSelection.fromPosition(
+                                    TextPosition(
+                                      offset: _searchStore
+                                          .textEditingController.text.length,
+                                    ),
+                                  );
                                 },
                               ),
                             )

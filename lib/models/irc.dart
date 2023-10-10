@@ -46,7 +46,8 @@ class IRCMessage {
       messages.clear();
       bufferedMessages.clear();
       messages.add(
-          IRCMessage.createNotice(message: 'Chat was cleared by a moderator'));
+        IRCMessage.createNotice(message: 'Chat was cleared by a moderator'),
+      );
       return;
     }
 
@@ -282,7 +283,8 @@ class IRCMessage {
     }
 
     var color = Color(
-        int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xFF')));
+      int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xFF')),
+    );
 
     if (useReadableColors) {
       final hsl = HSLColor.fromColor(color);
@@ -385,12 +387,13 @@ class IRCMessage {
                         : emoteSize,
                     useFade: false,
                   ),
-                )
+                ),
               ];
 
               // Create the message for the tooltip
               final message = emoteStack.reversed.map(
-                  (emote) => '${emote.name} - ${emoteType[emote.type.index]}');
+                (emote) => '${emote.name} - ${emoteType[emote.type.index]}',
+              );
               localSpan.add(
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
@@ -414,7 +417,7 @@ class IRCMessage {
                                   height: 80,
                                   useFade: false,
                                 ),
-                              )
+                              ),
                             ],
                           ),
                           const SizedBox(height: 5.0),
@@ -449,10 +452,13 @@ class IRCMessage {
               // If the next word is neither an emote or emoji, add it as a text span.
               if (nextEmote == null && !nextWordIsEmoji) {
                 localSpan.add(const TextSpan(text: ' '));
-                localSpan.add(_createTextSpan(
+                localSpan.add(
+                  _createTextSpan(
                     text: words[index],
                     style: textStyle,
-                    launchExternal: launchExternal));
+                    launchExternal: launchExternal,
+                  ),
+                );
               }
             } else {
               localSpan.add(
@@ -467,14 +473,20 @@ class IRCMessage {
             }
           } else {
             if (regexEmoji.hasMatch(word)) {
-              localSpan.add(_createEmojiSpan(
+              localSpan.add(
+                _createEmojiSpan(
                   emoji: word,
-                  style: textStyle?.copyWith(fontSize: emoteSize - 5)));
+                  style: textStyle?.copyWith(fontSize: emoteSize - 5),
+                ),
+              );
             } else {
-              localSpan.add(_createTextSpan(
+              localSpan.add(
+                _createTextSpan(
                   text: word,
                   style: textStyle,
-                  launchExternal: launchExternal));
+                  launchExternal: launchExternal,
+                ),
+              );
             }
           }
 
@@ -616,20 +628,27 @@ class IRCMessage {
     );
   }
 
-  static TextSpan _createTextSpan(
-      {required String text, required bool launchExternal, TextStyle? style}) {
+  static TextSpan _createTextSpan({
+    required String text,
+    required bool launchExternal,
+    TextStyle? style,
+  }) {
     if (text.startsWith('@')) {
       return TextSpan(
-          text: text, style: style?.copyWith(fontWeight: FontWeight.bold));
+        text: text,
+        style: style?.copyWith(fontWeight: FontWeight.bold),
+      );
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
         text: text,
         style: style?.copyWith(color: Colors.blue),
         recognizer: TapGestureRecognizer()
-          ..onTap = () => launchUrl(Uri.parse(text),
-              mode: launchExternal
-                  ? LaunchMode.externalApplication
-                  : LaunchMode.inAppWebView),
+          ..onTap = () => launchUrl(
+                Uri.parse(text),
+                mode: launchExternal
+                    ? LaunchMode.externalApplication
+                    : LaunchMode.inAppWebView,
+              ),
       );
     } else {
       return TextSpan(text: text, style: style);
@@ -713,7 +732,9 @@ class IRCMessage {
         final String range;
         if (emoteIdAndPosition.contains(',')) {
           range = emoteIdAndPosition.substring(
-              indexBetweenIdAndPositions + 1, emoteIdAndPosition.indexOf(','));
+            indexBetweenIdAndPositions + 1,
+            emoteIdAndPosition.indexOf(','),
+          );
         } else {
           range = emoteIdAndPosition.substring(indexBetweenIdAndPositions + 1);
         }
@@ -780,7 +801,8 @@ class IRCMessage {
 
       if (wordBuffer.isNotEmpty) {
         split.addAll(
-            wordBuffer.toString().split(' ').where((element) => element != ''));
+          wordBuffer.toString().split(' ').where((element) => element != ''),
+        );
       }
       if (emojiBuffer.isNotEmpty) split.add(emojiBuffer.toString());
     }

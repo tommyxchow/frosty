@@ -169,7 +169,9 @@ abstract class ChatStoreBase with Store {
 
     // Create a timer that will add messages from the buffer every 200 milliseconds.
     _messageBufferTimer = Timer.periodic(
-        const Duration(milliseconds: 200), (timer) => addMessages());
+      const Duration(milliseconds: 200),
+      (timer) => addMessages(),
+    );
 
     assetsStore.init();
 
@@ -177,9 +179,12 @@ abstract class ChatStoreBase with Store {
         .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.chatDelay > 0) {
-      messageBuffer.add(IRCMessage.createNotice(
+      messageBuffer.add(
+        IRCMessage.createNotice(
           message:
-              'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...'));
+              'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
+        ),
+      );
     }
 
     connectToChat();
@@ -242,8 +247,10 @@ abstract class ChatStoreBase with Store {
         if (!_userState.mod &&
             channelName != auth.user.details?.login &&
             auth.user.blockedUsers
-                .where((blockedUser) =>
-                    blockedUser.userLogin == parsedIRCMessage.user)
+                .where(
+                  (blockedUser) =>
+                      blockedUser.userLogin == parsedIRCMessage.user,
+                )
                 .isNotEmpty) {
           continue;
         }
@@ -315,9 +322,12 @@ abstract class ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        messageBuffer.add(IRCMessage.createNotice(
+        messageBuffer.add(
+          IRCMessage.createNotice(
             message:
-                "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!"));
+                "Connected to $displayName${regexEnglish.hasMatch(displayName) ? '' : ' ($channelName)'}'s chat!",
+          ),
+        );
 
         getAssets();
 
@@ -365,8 +375,10 @@ abstract class ChatStoreBase with Store {
 
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
-      (data) => Future.delayed(Duration(seconds: settings.chatDelay.toInt()),
-          () => _handleIRCData(data.toString())),
+      (data) => Future.delayed(
+        Duration(seconds: settings.chatDelay.toInt()),
+        () => _handleIRCData(data.toString()),
+      ),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_channel == null) return;
@@ -385,8 +397,11 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        messageBuffer.add(IRCMessage.createNotice(
-            message: 'Reconnecting to chat (attempt $_retries)...'));
+        messageBuffer.add(
+          IRCMessage.createNotice(
+            message: 'Reconnecting to chat (attempt $_retries)...',
+          ),
+        );
         _channelListener?.cancel();
         connectToChat();
       },
@@ -429,8 +444,11 @@ abstract class ChatStoreBase with Store {
     if (message.isEmpty) return;
 
     if (_channel == null || _channel?.closeCode != null) {
-      messageBuffer.add(IRCMessage.createNotice(
-          message: 'Failed to send message: disconnected from chat.'));
+      messageBuffer.add(
+        IRCMessage.createNotice(
+          message: 'Failed to send message: disconnected from chat.',
+        ),
+      );
     } else {
       // Send the message to the IRC chat room.
       _channel?.sink.add('PRIVMSG #$channelName :$message');
@@ -474,12 +492,15 @@ abstract class ChatStoreBase with Store {
     }
 
     assetsStore.recentEmotes
-      ..removeWhere((recentEmote) =>
-          recentEmote.name == emote.name && recentEmote.type == emote.type)
+      ..removeWhere(
+        (recentEmote) =>
+            recentEmote.name == emote.name && recentEmote.type == emote.type,
+      )
       ..insert(0, emote);
 
     textController.selection = TextSelection.fromPosition(
-        TextPosition(offset: textController.text.length));
+      TextPosition(offset: textController.text.length),
+    );
   }
 
   /// Cancels the previous notification/timer and creates a new one with the provided [notificationMessage].

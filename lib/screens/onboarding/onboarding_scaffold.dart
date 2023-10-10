@@ -89,7 +89,8 @@ class OnboardingScaffold extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                      vertical: content == null ? 20.0 : 0.0),
+                    vertical: content == null ? 20.0 : 0.0,
+                  ),
                   child: content ?? const SizedBox(),
                 ),
               ),
@@ -140,7 +141,7 @@ class OnboardingScaffold extends StatelessWidget {
                     ),
                     child: const Text('Skip'),
                   ),
-                )
+                ),
             ],
           ),
         ),

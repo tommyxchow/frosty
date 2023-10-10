@@ -31,8 +31,10 @@ class _ChatSettingsState extends State<ChatSettings> {
         children: [
           const SectionHeader('Message sizing'),
           ExpansionTile(
-            title: const Text('Preview',
-                style: TextStyle(fontWeight: FontWeight.w500)),
+            title: const Text(
+              'Preview',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             children: [
               Container(
                 width: double.infinity,
@@ -138,14 +140,16 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Use readable name colors',
             subtitle: const Text(
-                'Adjusts the lightness value of overly bright and dark names.'),
+              'Adjusts the lightness value of overly bright and dark names.',
+            ),
             value: settingsStore.useReadableColors,
             onChanged: (newValue) => settingsStore.useReadableColors = newValue,
           ),
           SettingsListSwitch(
             title: 'Show deleted messages',
             subtitle: const Text(
-                'Restores the original message of deleted messages.'),
+              'Restores the original message of deleted messages.',
+            ),
             value: settingsStore.showDeletedMessages,
             onChanged: (newValue) =>
                 settingsStore.showDeletedMessages = newValue,
@@ -184,7 +188,8 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Show notices',
             subtitle: const Text(
-                'Shows notices such as subs and re-subs, announcements, and raids.'),
+              'Shows notices such as subs and re-subs, announcements, and raids.',
+            ),
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
@@ -197,7 +202,8 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Move emote menu button left',
             subtitle: const Text(
-                'Places the emote menu button on the left side to avoid accidental presses.'),
+              'Places the emote menu button on the left side to avoid accidental presses.',
+            ),
             value: settingsStore.emoteMenuButtonOnLeft,
             onChanged: (newValue) =>
                 settingsStore.emoteMenuButtonOnLeft = newValue,
@@ -258,7 +264,8 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Prevent sleep in chat-only mode',
             subtitle: const Text(
-                'Requires restarting the chat in order to take effect.'),
+              'Requires restarting the chat in order to take effect.',
+            ),
             value: settingsStore.chatOnlyPreventSleep,
             onChanged: (newValue) =>
                 settingsStore.chatOnlyPreventSleep = newValue,
@@ -267,7 +274,8 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Show autocomplete bar',
             subtitle: const Text(
-                'Shows a bar containing matching emotes and mentions while typing.'),
+              'Shows a bar containing matching emotes and mentions while typing.',
+            ),
             value: settingsStore.autocomplete,
             onChanged: (newValue) => settingsStore.autocomplete = newValue,
           ),

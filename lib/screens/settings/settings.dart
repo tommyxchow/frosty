@@ -30,19 +30,21 @@ class Settings extends StatelessWidget {
             IconButton(
               tooltip: 'Support Frosty',
               onPressed: () => launchUrl(
-                  Uri.parse('https://www.buymeacoffee.com/tommychow'),
-                  mode: settingsStore.launchUrlExternal
-                      ? LaunchMode.externalApplication
-                      : LaunchMode.inAppWebView),
+                Uri.parse('https://www.buymeacoffee.com/tommychow'),
+                mode: settingsStore.launchUrlExternal
+                    ? LaunchMode.externalApplication
+                    : LaunchMode.inAppWebView,
+              ),
               icon: const Icon(SimpleIcons.buymeacoffee),
             ),
           IconButton(
             tooltip: 'View source on GitHub',
             onPressed: () => launchUrl(
-                Uri.parse('https://github.com/tommyxchow/frosty'),
-                mode: settingsStore.launchUrlExternal
-                    ? LaunchMode.externalApplication
-                    : LaunchMode.inAppWebView),
+              Uri.parse('https://github.com/tommyxchow/frosty'),
+              mode: settingsStore.launchUrlExternal
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.inAppWebView,
+            ),
             icon: const Icon(SimpleIcons.github),
           ),
         ],
@@ -70,7 +72,7 @@ class Settings extends StatelessWidget {
               child: ChatSettings(settingsStore: settingsStore),
             ),
             const SectionHeader('Other'),
-            OtherSettings(settingsStore: settingsStore)
+            OtherSettings(settingsStore: settingsStore),
           ],
         ),
       ),

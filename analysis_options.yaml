@@ -31,6 +31,6 @@ linter:
     - avoid_redundant_argument_values
     - unnecessary_parenthesis
     - always_declare_return_types
-
+    - require_trailing_commas
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

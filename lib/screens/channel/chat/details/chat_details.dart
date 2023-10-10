@@ -43,8 +43,9 @@ class ChatDetails extends StatelessWidget {
                     Text(
                       ' ${chatStore.timeRemaining.toString().split('.')[0]}',
                       style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontFeatures: [FontFeature.tabularFigures()]),
+                        fontWeight: FontWeight.w600,
+                        fontFeatures: [FontFeature.tabularFigures()],
+                      ),
                     ),
                     const Spacer(),
                     IconButton(
@@ -60,8 +61,12 @@ class ChatDetails extends StatelessWidget {
                   DropdownButton(
                     value: chatStore.sleepHours,
                     items: List.generate(24, (index) => index)
-                        .map((e) => DropdownMenuItem(
-                            value: e, child: Text(e.toString())))
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(e.toString()),
+                          ),
+                        )
                         .toList(),
                     onChanged: (int? hours) => chatStore.sleepHours = hours!,
                     menuMaxHeight: 200,
@@ -75,8 +80,12 @@ class ChatDetails extends StatelessWidget {
                   DropdownButton(
                     value: chatStore.sleepMinutes,
                     items: List.generate(60, (index) => index)
-                        .map((e) => DropdownMenuItem(
-                            value: e, child: Text(e.toString())))
+                        .map(
+                          (e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(e.toString()),
+                          ),
+                        )
                         .toList(),
                     onChanged: (int? minutes) =>
                         chatStore.sleepMinutes = minutes!,

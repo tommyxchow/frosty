@@ -26,8 +26,11 @@ class BlockReportModal extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.block_rounded),
             onTap: () => authStore
-                .showBlockDialog(context,
-                    targetUser: name, targetUserId: userId)
+                .showBlockDialog(
+                  context,
+                  targetUser: name,
+                  targetUserId: userId,
+                )
                 .then((_) => Navigator.pop(context)),
             title: Text('Block $name'),
           ),
@@ -53,7 +56,7 @@ class BlockReportModal extends StatelessWidget {
             ),
           ),
           title: Text('Report $name'),
-        )
+        ),
       ],
     );
   }

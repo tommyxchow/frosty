@@ -235,7 +235,8 @@ class _VideoChatState extends State<VideoChat> {
                       _chatStore.settings.chatWidth,
               color: _chatStore.settings.fullScreen
                   ? Colors.black.withOpacity(
-                      _chatStore.settings.fullScreenChatOverlayOpacity)
+                      _chatStore.settings.fullScreenChatOverlayOpacity,
+                    )
                   : Theme.of(context).scaffoldBackgroundColor,
               child: chat,
             );
@@ -282,7 +283,7 @@ class _VideoChatState extends State<VideoChat> {
                                   children: settingsStore.landscapeChatLeftSide
                                       ? [overlayChat, Expanded(child: overlay)]
                                       : [Expanded(child: overlay), overlayChat],
-                                )
+                                ),
                             ],
                           )
                         : Row(

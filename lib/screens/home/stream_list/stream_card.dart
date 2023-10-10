@@ -49,10 +49,14 @@ class StreamCard extends StatelessWidget {
       aspectRatio: 16 / 9,
       child: FrostyCachedNetworkImage(
         imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-                '-{width}x{height}', '-${thumbnailWidth}x$thumbnailHeight') +
+              '-{width}x{height}',
+              '-${thumbnailWidth}x$thumbnailHeight',
+            ) +
             cacheUrlExtension,
         placeholder: (context, url) => ColoredBox(
-            color: Colors.grey.shade900, child: const LoadingIndicator()),
+          color: Colors.grey.shade900,
+          child: const LoadingIndicator(),
+        ),
         useOldImageOnUrlChange: true,
       ),
     );
@@ -66,31 +70,32 @@ class StreamCard extends StatelessWidget {
     final fontColor = DefaultTextStyle.of(context).style.color;
 
     final imageSection = ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(5.0)),
-        child: Stack(
-          alignment: AlignmentDirectional.bottomEnd,
-          children: [
-            thumbnail,
-            Container(
-              padding: const EdgeInsets.all(2.0),
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(0, 0, 0, 0.5),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(3.0),
-                ),
+      borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+      child: Stack(
+        alignment: AlignmentDirectional.bottomEnd,
+        children: [
+          thumbnail,
+          Container(
+            padding: const EdgeInsets.all(2.0),
+            decoration: const BoxDecoration(
+              color: Color.fromRGBO(0, 0, 0, 0.5),
+              borderRadius: BorderRadius.all(
+                Radius.circular(3.0),
               ),
-              margin: const EdgeInsets.all(2.0),
-              child: Uptime(
-                startTime: streamInfo.startedAt,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
+            ),
+            margin: const EdgeInsets.all(2.0),
+            child: Uptime(
+              startTime: streamInfo.startedAt,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
               ),
-            )
-          ],
-        ));
+            ),
+          ),
+        ],
+      ),
+    );
 
     final streamInfoSection = Padding(
       padding: const EdgeInsets.only(left: 10.0),
@@ -204,7 +209,9 @@ class StreamCard extends StatelessWidget {
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: 10.0, horizontal: showThumbnail ? 15.0 : 5.0),
+          vertical: 10.0,
+          horizontal: showThumbnail ? 15.0 : 5.0,
+        ),
         child: Row(
           children: [
             if (showThumbnail)

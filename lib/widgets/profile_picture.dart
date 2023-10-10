@@ -22,8 +22,9 @@ class ProfilePicture extends StatelessWidget {
     return ClipOval(
       child: FutureBuilder(
         future: context.read<TwitchApi>().getUser(
-            userLogin: userLogin,
-            headers: context.read<AuthStore>().headersTwitch),
+              userLogin: userLogin,
+              headers: context.read<AuthStore>().headersTwitch,
+            ),
         builder: (context, AsyncSnapshot<UserTwitch> snapshot) {
           return AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),

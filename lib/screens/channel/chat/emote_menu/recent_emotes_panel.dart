@@ -38,11 +38,13 @@ class RecentEmotesPanel extends StatelessWidget {
                 final emote = chatStore.assetsStore.recentEmotes[index];
                 final validEmotes = [
                   ...chatStore.assetsStore.emoteToObject.values,
-                  ...chatStore.assetsStore.userEmoteToObject.values
+                  ...chatStore.assetsStore.userEmoteToObject.values,
                 ];
-                final matchingEmotes = validEmotes.where((existingEmote) =>
-                    existingEmote.name == emote.name &&
-                    existingEmote.type == emote.type);
+                final matchingEmotes = validEmotes.where(
+                  (existingEmote) =>
+                      existingEmote.name == emote.name &&
+                      existingEmote.type == emote.type,
+                );
 
                 return InkWell(
                   onTap: matchingEmotes.isNotEmpty

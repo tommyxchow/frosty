@@ -52,9 +52,11 @@ abstract class ListStoreBase with Store {
   /// The list of the fetched streams with blocked users filtered out.
   @computed
   ObservableList<StreamTwitch> get streams => _allStreams
-      .where((streamInfo) => !authStore.user.blockedUsers
-          .map((blockedUser) => blockedUser.userId)
-          .contains(streamInfo.userId))
+      .where(
+        (streamInfo) => !authStore.user.blockedUsers
+            .map((blockedUser) => blockedUser.userId)
+            .contains(streamInfo.userId),
+      )
       .toList()
       .asObservable();
 

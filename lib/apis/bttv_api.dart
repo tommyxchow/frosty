@@ -38,10 +38,14 @@ class BTTVApi {
       final result = EmoteBTTVChannel.fromJson(decoded);
 
       final emoteToUrl = <Emote>[];
-      emoteToUrl.addAll(result.channelEmotes
-          .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvChannel)));
-      emoteToUrl.addAll(result.sharedEmotes
-          .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvShared)));
+      emoteToUrl.addAll(
+        result.channelEmotes
+            .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvChannel)),
+      );
+      emoteToUrl.addAll(
+        result.sharedEmotes
+            .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvShared)),
+      );
 
       return emoteToUrl;
     } else {
@@ -62,7 +66,7 @@ class BTTVApi {
 
       return {
         for (final badge in badgeObjects)
-          badge.providerId: ChatBadge.fromBTTV(badge)
+          badge.providerId: ChatBadge.fromBTTV(badge),
       };
     } else {
       return Future.error('Failed to get BTTV badges');

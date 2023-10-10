@@ -42,12 +42,14 @@ class CategoryCard extends StatelessWidget {
                   aspectRatio: 3 / 4,
                   child: FrostyCachedNetworkImage(
                     imageUrl: category.boxArtUrl.replaceRange(
-                        category.boxArtUrl.lastIndexOf('-') + 1,
-                        null,
-                        '${artWidth}x$artHeight.jpg'),
+                      category.boxArtUrl.lastIndexOf('-') + 1,
+                      null,
+                      '${artWidth}x$artHeight.jpg',
+                    ),
                     placeholder: (context, url) => ColoredBox(
-                        color: Colors.grey.shade900,
-                        child: const LoadingIndicator()),
+                      color: Colors.grey.shade900,
+                      child: const LoadingIndicator(),
+                    ),
                   ),
                 ),
               ),

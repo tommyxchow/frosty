@@ -90,18 +90,21 @@ class _OtherSettingsState extends State<OtherSettings> {
           leading: const Icon(Icons.launch_rounded),
           title: const Text('Changelog'),
           onTap: () => launchUrl(
-              Uri.parse('https://github.com/tommyxchow/frosty/releases'),
-              mode: widget.settingsStore.launchUrlExternal
-                  ? LaunchMode.externalApplication
-                  : LaunchMode.inAppWebView),
+            Uri.parse('https://github.com/tommyxchow/frosty/releases'),
+            mode: widget.settingsStore.launchUrlExternal
+                ? LaunchMode.externalApplication
+                : LaunchMode.inAppWebView,
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.launch_rounded),
           title: const Text('FAQ'),
-          onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
-              mode: widget.settingsStore.launchUrlExternal
-                  ? LaunchMode.externalApplication
-                  : LaunchMode.inAppWebView),
+          onTap: () => launchUrl(
+            Uri.parse('https://www.frostyapp.io/#faq'),
+            mode: widget.settingsStore.launchUrlExternal
+                ? LaunchMode.externalApplication
+                : LaunchMode.inAppWebView,
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded),
@@ -129,7 +132,8 @@ class _OtherSettingsState extends State<OtherSettings> {
           builder: (_) => SettingsListSwitch(
             title: 'Share crash logs and analytics',
             subtitle: const Text(
-                'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.'),
+              'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.',
+            ),
             value: widget.settingsStore.shareCrashLogsAndAnalytics,
             onChanged: (newValue) {
               widget.settingsStore.shareCrashLogsAndAnalytics = newValue;

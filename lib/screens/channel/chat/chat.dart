@@ -36,7 +36,8 @@ class Chat extends StatelessWidget {
                   children: [
                     MediaQuery(
                       data: MediaQuery.of(context).copyWith(
-                          textScaleFactor: chatStore.settings.messageScale),
+                        textScaleFactor: chatStore.settings.messageScale,
+                      ),
                       child: DefaultTextStyle(
                         style: DefaultTextStyle.of(context)
                             .style
@@ -70,17 +71,22 @@ class Chat extends StatelessWidget {
                               ? null
                               : Button(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 15.0, vertical: 10.0),
+                                    horizontal: 15.0,
+                                    vertical: 10.0,
+                                  ),
                                   onPressed: chatStore.resumeScroll,
                                   icon:
                                       const Icon(Icons.arrow_downward_rounded),
                                   child: Text(
-                                      chatStore.messageBuffer.isNotEmpty
-                                          ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
-                                          : 'Resume scroll',
-                                      style: const TextStyle(fontFeatures: [
-                                        FontFeature.tabularFigures()
-                                      ])),
+                                    chatStore.messageBuffer.isNotEmpty
+                                        ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
+                                        : 'Resume scroll',
+                                    style: const TextStyle(
+                                      fontFeatures: [
+                                        FontFeature.tabularFigures(),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                         ),
                       ),
@@ -138,7 +144,7 @@ class Chat extends StatelessWidget {
                             ...[
                               chatStore.assetsStore.sevenTVEmotes,
                               chatStore.assetsStore.bttvEmotes,
-                              chatStore.assetsStore.ffzEmotes
+                              chatStore.assetsStore.ffzEmotes,
                             ].map(
                               (emotes) => EmoteMenuPanel(
                                 chatStore: chatStore,

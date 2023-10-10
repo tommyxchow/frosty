@@ -93,7 +93,8 @@ class VideoOverlay extends StatelessWidget {
             ]);
           } else {
             SystemChrome.setPreferredOrientations(
-                [DeviceOrientation.portraitUp]);
+              [DeviceOrientation.portraitUp],
+            );
             SystemChrome.setPreferredOrientations([]);
           }
         },
@@ -233,7 +234,8 @@ class VideoOverlay extends StatelessWidget {
                                   const SizedBox(width: 5),
                                   Text(
                                     NumberFormat().format(
-                                        videoStore.streamInfo?.viewerCount),
+                                      videoStore.streamInfo?.viewerCount,
+                                    ),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
@@ -263,7 +265,7 @@ class VideoOverlay extends StatelessWidget {
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
               ),
-            )
+            ),
           ],
         );
       },

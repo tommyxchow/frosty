@@ -54,7 +54,7 @@ class _HomeState extends State<Home> {
                       Settings(settingsStore: context.read<SettingsStore>()),
                 ),
               ),
-            )
+            ),
           ],
         ),
         body: SafeArea(

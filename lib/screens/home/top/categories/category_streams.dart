@@ -73,7 +73,8 @@ class _CategoryStreamsState extends State<CategoryStreams> {
               children: [
                 CustomScrollView(
                   physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics()),
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
                   controller: _listStore.scrollController,
                   slivers: [
                     SliverAppBar(
@@ -105,8 +106,10 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                     context.read<AuthStore>().headersTwitch,
                                 gameId: _listStore.categoryId!,
                               ),
-                          builder: (context,
-                              AsyncSnapshot<CategoriesTwitch> snapshot) {
+                          builder: (
+                            context,
+                            AsyncSnapshot<CategoriesTwitch> snapshot,
+                          ) {
                             return snapshot.hasData
                                 ? FrostyCachedNetworkImage(
                                     imageUrl: snapshot
@@ -119,10 +122,15 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                       '${artWidth}x$artHeight.jpg',
                                     ),
                                     placeholder: (context, url) => ColoredBox(
-                                        color: Colors.grey.shade900,
-                                        child: const LoadingIndicator()),
+                                      color: Colors.grey.shade900,
+                                      child: const LoadingIndicator(),
+                                    ),
                                     color: const Color.fromRGBO(
-                                        255, 255, 255, 0.5),
+                                      255,
+                                      255,
+                                      255,
+                                      0.5,
+                                    ),
                                     colorBlendMode: BlendMode.modulate,
                                     fit: BoxFit.cover,
                                   )
@@ -195,7 +203,8 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                       switchOutCurve: Curves.easeIn,
                       child: _listStore.showJumpButton
                           ? ScrollToTopButton(
-                              scrollController: _listStore.scrollController!)
+                              scrollController: _listStore.scrollController!,
+                            )
                           : null,
                     ),
                   ),

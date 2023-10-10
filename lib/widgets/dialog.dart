@@ -29,19 +29,21 @@ class FrostyDialog extends StatelessWidget {
         textAlign: TextAlign.center,
       ),
       content: SingleChildScrollView(
-        child: Column(children: [
-          content ?? Text(message!, textAlign: TextAlign.center),
-          if (actions != null) ...[
-            const SizedBox(height: 25.0),
-            ...?actions?.map(
-              (action) => Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(top: 5.0),
-                child: action,
+        child: Column(
+          children: [
+            content ?? Text(message!, textAlign: TextAlign.center),
+            if (actions != null) ...[
+              const SizedBox(height: 25.0),
+              ...?actions?.map(
+                (action) => Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: action,
+                ),
               ),
-            ),
+            ],
           ],
-        ]),
+        ),
       ),
     );
   }

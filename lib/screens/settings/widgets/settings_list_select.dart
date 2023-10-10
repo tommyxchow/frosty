@@ -54,7 +54,8 @@ class SettingsListSelect extends StatelessWidget {
               ),
             ),
             ...options
-                .map((option) => ListTile(
+                .map(
+                  (option) => ListTile(
                     title: Text(option),
                     trailing: selectedOption == option
                         ? const Icon(Icons.check_rounded)
@@ -62,8 +63,10 @@ class SettingsListSelect extends StatelessWidget {
                     onTap: () {
                       onChanged(option);
                       Navigator.of(context).pop();
-                    }))
-                .toList()
+                    },
+                  ),
+                )
+                .toList(),
           ],
         ),
       ),

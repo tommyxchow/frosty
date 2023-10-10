@@ -68,7 +68,7 @@ class ProfileCard extends StatelessWidget {
                 authStore.login(token: token);
                 Navigator.pop(context);
               },
-            )
+            ),
           ],
         ),
       ),
@@ -107,7 +107,8 @@ class ProfileCard extends StatelessWidget {
           leading: const Icon(Icons.no_accounts_rounded),
           title: const Text('Anonymous'),
           subtitle: const Text(
-              'Tap to log in and enable the ability to chat, view followed streams, and more.'),
+            'Tap to log in and enable the ability to chat, view followed streams, and more.',
+          ),
           trailing: const SizedBox(
             height: double.infinity,
             child: Icon(Icons.chevron_right_rounded),

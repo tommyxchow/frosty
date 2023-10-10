@@ -91,7 +91,7 @@ class _CategoriesState extends State<Categories>
                   child: Center(
                     child: statusWidget,
                   ),
-                )
+                ),
               ],
             );
           }

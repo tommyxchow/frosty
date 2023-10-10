@@ -34,8 +34,9 @@ abstract class UserStoreBase with Store {
           .then((blockedUsers) => _blockedUsers = blockedUsers.asObservable());
     }
 
-    _disposeReaction = autorun((_) =>
-        _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)));
+    _disposeReaction = autorun(
+      (_) => _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)),
+    );
   }
 
   @action
@@ -53,18 +54,23 @@ abstract class UserStoreBase with Store {
   }
 
   @action
-  Future<void> unblock(
-      {required String targetId, required Map<String, String> headers}) async {
+  Future<void> unblock({
+    required String targetId,
+    required Map<String, String> headers,
+  }) async {
     final success =
         await twitchApi.unblockUser(userId: targetId, headers: headers);
     if (success) await refreshBlockedUsers(headers: headers);
   }
 
   @action
-  Future<void> refreshBlockedUsers(
-          {required Map<String, String> headers}) async =>
+  Future<void> refreshBlockedUsers({
+    required Map<String, String> headers,
+  }) async =>
       _blockedUsers = (await twitchApi.getUserBlockedList(
-              id: _details!.id, headers: headers))
+        id: _details!.id,
+        headers: headers,
+      ))
           .asObservable();
 
   @action

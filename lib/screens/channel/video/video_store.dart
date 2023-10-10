@@ -39,18 +39,26 @@ abstract class VideoStoreBase with Store {
       WebViewController.fromPlatformCreationParams(_videoWebViewParams)
         ..setBackgroundColor(Colors.black)
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..addJavaScriptChannel('VideoPause', onMessageReceived: (message) {
-          _paused = true;
-          if (Platform.isAndroid) pip.setIsPlaying(false);
-        })
-        ..addJavaScriptChannel('VideoPlaying', onMessageReceived: (message) {
-          _paused = false;
-          if (Platform.isAndroid) pip.setIsPlaying(true);
-          videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].muted = false;');
-          videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].volume = 1.0;');
-        })
+        ..addJavaScriptChannel(
+          'VideoPause',
+          onMessageReceived: (message) {
+            _paused = true;
+            if (Platform.isAndroid) pip.setIsPlaying(false);
+          },
+        )
+        ..addJavaScriptChannel(
+          'VideoPlaying',
+          onMessageReceived: (message) {
+            _paused = false;
+            if (Platform.isAndroid) pip.setIsPlaying(true);
+            videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].muted = false;',
+            );
+            videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].volume = 1.0;',
+            );
+          },
+        )
         ..setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (_) => initVideo(),
@@ -136,9 +144,11 @@ abstract class VideoStoreBase with Store {
       // Add event listeners to notify the JavaScript channels when the video plays and pauses.
       try {
         videoWebViewController.runJavaScript(
-            'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));');
+          'document.getElementsByTagName("video")[0].addEventListener("pause", () => VideoPause.postMessage("video paused"));',
+        );
         videoWebViewController.runJavaScript(
-            'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));');
+          'document.getElementsByTagName("video")[0].addEventListener("playing", () => VideoPlaying.postMessage("video playing"));',
+        );
       } catch (e) {
         debugPrint(e.toString());
       }
@@ -181,7 +191,9 @@ abstract class VideoStoreBase with Store {
   Future<void> updateStreamInfo() async {
     try {
       _streamInfo = await twitchApi.getStream(
-          userLogin: userLogin, headers: authStore.headersTwitch);
+        userLogin: userLogin,
+        headers: authStore.headersTwitch,
+      );
     } catch (e) {
       debugPrint(e.toString());
 
@@ -227,7 +239,8 @@ abstract class VideoStoreBase with Store {
             .runJavaScript('document.getElementsByTagName("video")[0].play();');
       } else {
         videoWebViewController.runJavaScript(
-            'document.getElementsByTagName("video")[0].pause();');
+          'document.getElementsByTagName("video")[0].pause();',
+        );
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -244,7 +257,8 @@ abstract class VideoStoreBase with Store {
         pip.enterPipMode(autoEnter: true);
       } else if (Platform.isIOS) {
         videoWebViewController.runJavaScript(
-            'document.getElementsByTagName("video")[0].requestPictureInPicture();');
+          'document.getElementsByTagName("video")[0].requestPictureInPicture();',
+        );
       }
     } catch (e) {
       debugPrint(e.toString());

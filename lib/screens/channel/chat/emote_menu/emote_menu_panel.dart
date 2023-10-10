@@ -20,18 +20,22 @@ class EmoteMenuPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     if (emotes != null) {
       final globalEmotes = emotes!
-          .where((emote) =>
-              emote.type == EmoteType.bttvGlobal ||
-              emote.type == EmoteType.ffzGlobal ||
-              emote.type == EmoteType.sevenTVGlobal)
+          .where(
+            (emote) =>
+                emote.type == EmoteType.bttvGlobal ||
+                emote.type == EmoteType.ffzGlobal ||
+                emote.type == EmoteType.sevenTVGlobal,
+          )
           .toList();
 
       final channelEmotes = emotes!
-          .where((emote) =>
-              emote.type == EmoteType.bttvChannel ||
-              emote.type == EmoteType.bttvShared ||
-              emote.type == EmoteType.ffzChannel ||
-              emote.type == EmoteType.sevenTVChannel)
+          .where(
+            (emote) =>
+                emote.type == EmoteType.bttvChannel ||
+                emote.type == EmoteType.bttvShared ||
+                emote.type == EmoteType.ffzChannel ||
+                emote.type == EmoteType.sevenTVChannel,
+          )
           .toList();
 
       return FrostyPageView(
