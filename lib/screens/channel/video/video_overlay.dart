@@ -5,7 +5,6 @@ import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
-import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 
@@ -208,21 +207,18 @@ class VideoOverlay extends StatelessWidget {
                             preferBelow: false,
                             child: GestureDetector(
                               onTap: () => showModalBottomSheet(
-                                backgroundColor: Colors.transparent,
                                 isScrollControlled: true,
                                 context: context,
-                                builder: (context) => FrostyBottomSheet(
-                                  child: SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.8,
-                                    child: GestureDetector(
-                                      onTap: FocusScope.of(context).unfocus,
-                                      child: ChattersList(
-                                        chatDetailsStore:
-                                            chatStore.chatDetailsStore,
-                                        chatStore: chatStore,
-                                        userLogin: streamInfo.userLogin,
-                                      ),
+                                builder: (context) => SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.8,
+                                  child: GestureDetector(
+                                    onTap: FocusScope.of(context).unfocus,
+                                    child: ChattersList(
+                                      chatDetailsStore:
+                                          chatStore.chatDetailsStore,
+                                      chatStore: chatStore,
+                                      userLogin: streamInfo.userLogin,
                                     ),
                                   ),
                                 ),

@@ -8,7 +8,6 @@ import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
-import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/list_tile.dart';
@@ -145,19 +144,16 @@ class ChatDetails extends StatelessWidget {
         leading: const Icon(Icons.people_outline),
         title: 'Chatters',
         onTap: () => showModalBottomSheet(
-          backgroundColor: Colors.transparent,
           isScrollControlled: true,
           context: context,
-          builder: (context) => FrostyBottomSheet(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: GestureDetector(
-                onTap: FocusScope.of(context).unfocus,
-                child: ChattersList(
-                  chatDetailsStore: chatDetailsStore,
-                  chatStore: chatStore,
-                  userLogin: userLogin,
-                ),
+          builder: (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: GestureDetector(
+              onTap: FocusScope.of(context).unfocus,
+              child: ChattersList(
+                chatDetailsStore: chatDetailsStore,
+                chatStore: chatStore,
+                userLogin: userLogin,
               ),
             ),
           ),
@@ -203,16 +199,10 @@ class ChatDetails extends StatelessWidget {
       ),
     ];
 
-    return FrostyBottomSheet(
-      child: MediaQuery.of(context).orientation == Orientation.landscape
-          ? SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: ListView(
-                children: children,
-              ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start, children: children),
+    return ListView(
+      shrinkWrap: true,
+      primary: false,
+      children: children,
     );
   }
 }

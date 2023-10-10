@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/widgets/bottom_sheet.dart';
 
 /// A custom-styled adaptive [ListTile] with options to select.
 class SettingsListSelect extends StatelessWidget {
@@ -40,34 +39,32 @@ class SettingsListSelect extends StatelessWidget {
         ),
       ),
       onTap: () => showModalBottomSheet(
-        backgroundColor: Colors.transparent,
         isScrollControlled: true,
         context: context,
-        builder: (context) => FrostyBottomSheet(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Select ${title.toLowerCase()}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18),
-                ),
+        builder: (context) => ListView(
+          shrinkWrap: true,
+          primary: false,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Select ${title.toLowerCase()}',
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-              ...options
-                  .map((option) => ListTile(
-                      title: Text(option),
-                      trailing: selectedOption == option
-                          ? const Icon(Icons.check_rounded)
-                          : null,
-                      onTap: () {
-                        onChanged(option);
-                        Navigator.of(context).pop();
-                      }))
-                  .toList()
-            ],
-          ),
+            ),
+            ...options
+                .map((option) => ListTile(
+                    title: Text(option),
+                    trailing: selectedOption == option
+                        ? const Icon(Icons.check_rounded)
+                        : null,
+                    onTap: () {
+                      onChanged(option);
+                      Navigator.of(context).pop();
+                    }))
+                .toList()
+          ],
         ),
       ),
     );

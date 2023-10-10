@@ -105,7 +105,6 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                           HapticFeedback.lightImpact();
 
                           showModalBottomSheet(
-                            backgroundColor: Colors.transparent,
                             context: context,
                             builder: (context) => BlockReportModal(
                               authStore: widget.searchStore.authStore,

@@ -141,7 +141,6 @@ class _ChattersListState extends State<ChattersList> {
                                   if (!mounted) return;
 
                                   showModalBottomSheet(
-                                    backgroundColor: Colors.transparent,
                                     isScrollControlled: true,
                                     context: context,
                                     builder: (context) => ChatUserModal(

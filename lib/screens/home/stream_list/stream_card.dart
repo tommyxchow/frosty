@@ -193,7 +193,6 @@ class StreamCard extends StatelessWidget {
         HapticFeedback.mediumImpact();
 
         showModalBottomSheet(
-          // backgroundColor: Colors.transparent,
           context: context,
           builder: (context) => BlockReportModal(
             authStore: context.read<AuthStore>(),

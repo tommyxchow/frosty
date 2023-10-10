@@ -125,6 +125,7 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
             fontFamily: 'Inter',
             brightness: Brightness.dark,
+            bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
           ),
           home: widget.firstRun ? const OnboardingIntro() : const Home(),
           navigatorKey: navigatorKey,

@@ -29,7 +29,6 @@ class ChatMessage extends StatelessWidget {
           ircMessage.user == chatStore.auth.user.details?.login) return;
 
       showModalBottomSheet(
-        backgroundColor: Colors.transparent,
         isScrollControlled: true,
         context: context,
         builder: (context) => ChatUserModal(

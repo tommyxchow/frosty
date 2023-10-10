@@ -185,7 +185,6 @@ class ChatBottomBar extends StatelessWidget {
                       icon: Icon(Icons.adaptive.more_rounded),
                       tooltip: 'More',
                       onPressed: () => showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
                         isScrollControlled: true,
                         context: context,
                         builder: (_) => ChatDetails(
