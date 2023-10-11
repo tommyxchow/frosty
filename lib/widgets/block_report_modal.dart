@@ -19,8 +19,9 @@ class BlockReportModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return ListView(
+      primary: false,
+      shrinkWrap: true,
       children: [
         if (authStore.isLoggedIn)
           ListTile(
