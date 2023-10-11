@@ -125,7 +125,31 @@ class _MyAppState extends State<MyApp> {
             useMaterial3: true,
             fontFamily: 'Inter',
             brightness: Brightness.dark,
+            // colorSchemeSeed: FrostyStyles.purple,
+            scaffoldBackgroundColor: Colors.black,
+            canvasColor: Colors.black,
             bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
+            appBarTheme: const AppBarTheme(
+              color: Colors.black,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              titleTextStyle: TextStyle(
+                fontFamily: 'Inter',
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            inputDecorationTheme: const InputDecorationTheme(
+              contentPadding: EdgeInsets.only(left: 20),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(width: 10),
+                borderRadius: BorderRadius.all(Radius.circular(100)),
+              ),
+            ),
+            navigationBarTheme: const NavigationBarThemeData(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+            ),
           ),
           home: widget.firstRun ? const OnboardingIntro() : const Home(),
           navigatorKey: navigatorKey,

@@ -38,30 +38,33 @@ class _SearchState extends State<Search> {
       children: [
         Observer(
           builder: (context) {
-            return TextField(
-              controller: _searchStore.textEditingController,
-              focusNode: _searchStore.textFieldFocusNode,
-              autocorrect: false,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search_rounded),
-                hintText: 'Find a channel or category',
-                suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
-                        _searchStore.searchText.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.close_rounded),
-                        tooltip: _searchStore.searchText.isEmpty
-                            ? 'Cancel'
-                            : 'Clear',
-                        onPressed: () {
-                          if (_searchStore.searchText.isEmpty) {
-                            _searchStore.textFieldFocusNode.unfocus();
-                          }
-                          _searchStore.textEditingController.clear();
-                        },
-                      )
-                    : null,
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              child: TextField(
+                controller: _searchStore.textEditingController,
+                focusNode: _searchStore.textFieldFocusNode,
+                autocorrect: false,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  hintText: 'Find a channel or category',
+                  suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
+                          _searchStore.searchText.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.close_rounded),
+                          tooltip: _searchStore.searchText.isEmpty
+                              ? 'Cancel'
+                              : 'Clear',
+                          onPressed: () {
+                            if (_searchStore.searchText.isEmpty) {
+                              _searchStore.textFieldFocusNode.unfocus();
+                            }
+                            _searchStore.textEditingController.clear();
+                          },
+                        )
+                      : null,
+                ),
+                onSubmitted: _searchStore.handleQuery,
               ),
-              onSubmitted: _searchStore.handleQuery,
             );
           },
         ),
