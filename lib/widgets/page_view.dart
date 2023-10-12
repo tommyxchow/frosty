@@ -1,6 +1,5 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:frosty/widgets/button.dart';
 
 class FrostyPageView extends StatefulWidget {
   final List<String> headers;
@@ -29,32 +28,29 @@ class _FrostyPageViewState extends State<FrostyPageView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(
-          height: 5.0,
-          thickness: 1.0,
+          height: 1,
+          thickness: 1,
         ),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: [
               ...widget.headers.mapIndexed(
-                (index, section) => SizedBox(
-                  height: 40,
-                  child: Button(
+                (index, section) => TextButton(
+                  style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                     ),
-                    onPressed: () => _pageContoller.animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOut,
-                    ),
-                    color: index == currentIndex
-                        ? Theme.of(context).colorScheme.secondary
-                        : Colors.grey,
-                    child: Text(
-                      section,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    foregroundColor: index == currentIndex ? null : Colors.grey,
+                  ),
+                  onPressed: () => _pageContoller.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                  ),
+                  child: Text(
+                    section,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),

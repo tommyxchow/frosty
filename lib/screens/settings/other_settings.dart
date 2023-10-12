@@ -9,7 +9,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,10 +30,10 @@ class _OtherSettingsState extends State<OtherSettings> {
     return showDialog(
       context: context,
       builder: (context) => FrostyDialog(
-        title: 'Reset All Settings',
+        title: 'Reset all settings',
         message: 'Are you sure you want to reset all settings?',
         actions: [
-          Button(
+          FilledButton(
             onPressed: () {
               HapticFeedback.heavyImpact();
 
@@ -51,9 +50,8 @@ class _OtherSettingsState extends State<OtherSettings> {
             },
             child: const Text('Yes'),
           ),
-          Button(
+          TextButton(
             onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],

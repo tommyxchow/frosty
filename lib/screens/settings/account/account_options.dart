@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/account/blocked_users.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 
 class AccountOptions extends StatelessWidget {
@@ -14,10 +13,10 @@ class AccountOptions extends StatelessWidget {
     return showDialog(
       context: context,
       builder: (context) => FrostyDialog(
-        title: 'Log Out',
+        title: 'Log out',
         message: 'Are you sure you want to log out?',
         actions: [
-          Button(
+          FilledButton(
             onPressed: () {
               authStore.logout();
               Navigator.pop(context);
@@ -25,9 +24,8 @@ class AccountOptions extends StatelessWidget {
             },
             child: const Text('Yes'),
           ),
-          Button(
+          TextButton(
             onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],

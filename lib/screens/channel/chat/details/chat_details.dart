@@ -8,7 +8,6 @@ import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 
 class ChatDetails extends StatelessWidget {
@@ -100,7 +99,7 @@ class ChatDetails extends StatelessWidget {
         ),
         actions: [
           Observer(
-            builder: (context) => Button(
+            builder: (context) => FilledButton(
               onPressed:
                   chatStore.sleepHours == 0 && chatStore.sleepMinutes == 0
                       ? null
@@ -111,9 +110,8 @@ class ChatDetails extends StatelessWidget {
               child: const Text('Set timer'),
             ),
           ),
-          Button(
+          TextButton(
             onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
             child: const Text('Close'),
           ),
         ],
@@ -125,16 +123,15 @@ class ChatDetails extends StatelessWidget {
     return showDialog(
       context: context,
       builder: (context) => FrostyDialog(
-        title: 'Clear Recent Emotes',
+        title: 'Clear recent emotes',
         message: 'Are you sure you want to clear your recent emotes?',
         actions: [
-          Button(
+          FilledButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Yes'),
           ),
-          Button(
+          TextButton(
             onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],

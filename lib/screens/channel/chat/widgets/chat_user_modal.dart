@@ -5,9 +5,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/profile_picture.dart';
-import 'package:frosty/widgets/section_header.dart';
 
 class ChatUserModal extends StatefulWidget {
   final ChatStore chatStore;
@@ -40,7 +38,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            contentPadding: const EdgeInsets.all(12),
             leading: ProfilePicture(
               userLogin: widget.username,
             ),
@@ -58,31 +56,35 @@ class _ChatUserModalState extends State<ChatUserModal> {
                 ),
               ],
             ),
-            trailing: widget.chatStore.auth.isLoggedIn
-                ? Button(
-                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.chatStore.auth.isLoggedIn)
+                  IconButton.filledTonal(
+                    tooltip: 'Reply',
                     onPressed: () {
                       widget.chatStore.textController.text =
                           '@${widget.username} ';
                       Navigator.pop(context);
                       widget.chatStore.textFieldFocusNode.requestFocus();
                     },
-                    child: const Text('Reply'),
-                  )
-                : null,
-            onTap: () => showModalBottomSheet(
-              context: context,
-              builder: (context) => BlockReportModal(
-                authStore: widget.chatStore.auth,
-                name: name,
-                userLogin: widget.username,
-                userId: widget.userId,
-              ),
+                    icon: const Icon(Icons.reply_rounded),
+                  ),
+                IconButton.filledTonal(
+                  tooltip: 'Reply',
+                  onPressed: () => showModalBottomSheet(
+                    context: context,
+                    builder: (context) => BlockReportModal(
+                      authStore: widget.chatStore.auth,
+                      name: name,
+                      userLogin: widget.username,
+                      userId: widget.userId,
+                    ),
+                  ),
+                  icon: Icon(Icons.adaptive.more_rounded),
+                ),
+              ],
             ),
-          ),
-          const SectionHeader(
-            'Recent messages',
-            padding: EdgeInsets.all(12),
           ),
           Expanded(
             child: Observer(

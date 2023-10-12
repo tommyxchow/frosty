@@ -8,7 +8,6 @@ import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart'
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
@@ -61,7 +60,7 @@ class Chat extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(4),
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
@@ -69,11 +68,11 @@ class Chat extends StatelessWidget {
                           switchOutCurve: Curves.easeIn,
                           child: chatStore.autoScroll
                               ? null
-                              : Button(
+                              : ElevatedButton.icon(
                                   onPressed: chatStore.resumeScroll,
                                   icon:
                                       const Icon(Icons.arrow_downward_rounded),
-                                  child: Text(
+                                  label: Text(
                                     chatStore.messageBuffer.isNotEmpty
                                         ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
                                         : 'Resume scroll',

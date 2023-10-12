@@ -6,7 +6,6 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -121,10 +120,10 @@ abstract class AuthBase with Store {
         .where((blockedUser) => blockedUser.userId == targetUserId)
         .isNotEmpty;
 
-    final title = isBlocked ? 'Unblock $targetUser' : 'Block $targetUser';
+    final title = isBlocked ? 'Unblock' : 'Block';
 
     final message =
-        'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}';
+        'Are you sure you want to ${isBlocked ? 'unblock "$targetUser"?' : 'block "$targetUser"? This will remove them from channel lists, search results, and chat messages.'}';
 
     void onPressed() {
       if (isBlocked) {
@@ -145,13 +144,12 @@ abstract class AuthBase with Store {
         title: title,
         message: message,
         actions: [
-          Button(
+          FilledButton(
             onPressed: onPressed,
             child: const Text('Yes'),
           ),
-          Button(
+          TextButton(
             onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
             child: const Text('Cancel'),
           ),
         ],

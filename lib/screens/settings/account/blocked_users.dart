@@ -4,7 +4,6 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/button.dart';
 
 class BlockedUsers extends StatelessWidget {
   final AuthStore authStore;
@@ -42,8 +41,10 @@ class BlockedUsers extends StatelessWidget {
 
                 return ListTile(
                   title: Text(displayName),
-                  trailing: Button(
-                    color: Colors.red,
+                  trailing: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
                     onPressed: () => authStore.showBlockDialog(
                       context,
                       targetUser: displayName,

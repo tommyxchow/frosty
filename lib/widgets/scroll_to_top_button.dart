@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/widgets/button.dart';
 
 class ScrollToTopButton extends StatelessWidget {
   final ScrollController scrollController;
@@ -14,14 +13,16 @@ class ScrollToTopButton extends StatelessWidget {
       child: Tooltip(
         message: 'Scroll to top',
         preferBelow: false,
-        child: Button(
-          round: true,
+        child: ElevatedButton(
           onPressed: () => scrollController.animateTo(
             0.0,
             curve: Curves.easeOut,
             duration: const Duration(milliseconds: 500),
           ),
-          padding: const EdgeInsets.all(16),
+          style: ElevatedButton.styleFrom(
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(16),
+          ),
           child: const Icon(Icons.arrow_upward_rounded),
         ),
       ),

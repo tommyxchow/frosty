@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/theme.dart';
-import 'package:frosty/widgets/button.dart';
 
 class FrostyNotification extends StatelessWidget {
   final String message;
@@ -19,7 +17,7 @@ class FrostyNotification extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(100),
       ),
       margin: const EdgeInsets.all(10),
       child: Row(
@@ -49,9 +47,8 @@ class FrostyNotification extends StatelessWidget {
             ),
           ),
           if (showPasteButton)
-            Button(
+            TextButton(
               onPressed: onButtonPressed,
-              color: FrostyStyles.purple,
               child: const Text('Paste'),
             ),
         ],

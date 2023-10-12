@@ -4,7 +4,6 @@ import 'package:frosty/screens/settings/account/account_options.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/app_bar.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:simple_icons/simple_icons.dart';
@@ -19,10 +18,10 @@ class ProfileCard extends StatelessWidget {
     return showDialog(
       context: context,
       builder: (context) => FrostyDialog(
-        title: 'Log In',
+        title: 'Log in',
         content: Column(
           children: [
-            Button(
+            FilledButton.icon(
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -39,23 +38,18 @@ class ProfileCard extends StatelessWidget {
                 ),
               ),
               icon: const Icon(SimpleIcons.twitch),
-              child: const Text(
+              label: const Text(
                 'Connect with Twitch',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
             ),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 16),
             const Center(
               child: Text(
-                'Or',
+                'or',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 16),
             TextField(
               autocorrect: false,
               textAlign: TextAlign.center,
@@ -84,7 +78,7 @@ class ProfileCard extends StatelessWidget {
               color: Colors.red,
             ),
             title: const Text('Failed to connect'),
-            trailing: Button(
+            trailing: FilledButton.tonal(
               onPressed: authStore.init,
               child: const Text('Reconnect'),
             ),
