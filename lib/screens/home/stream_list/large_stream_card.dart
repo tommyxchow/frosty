@@ -44,7 +44,7 @@ class LargeStreamCard extends StatelessWidget {
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
 
     final thumbnail = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(10)),
+      borderRadius: const BorderRadius.all(Radius.circular(12)),
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
@@ -77,7 +77,7 @@ class LargeStreamCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 10.0, bottom: 12.0),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 Tooltip(
@@ -85,15 +85,12 @@ class LargeStreamCard extends StatelessWidget {
                   preferBelow: false,
                   child: Row(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Icon(
-                          Icons.circle,
-                          color: Colors.red,
-                          size: 10,
-                        ),
+                      const Icon(
+                        Icons.circle,
+                        color: Colors.red,
+                        size: 10,
                       ),
-                      const SizedBox(width: 3.0),
+                      const SizedBox(width: 4),
                       Uptime(
                         startTime: streamInfo.startedAt,
                         style: const TextStyle(
@@ -104,7 +101,7 @@ class LargeStreamCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 10.0),
+                const SizedBox(width: 12),
                 Tooltip(
                   message: 'Viewer count',
                   preferBelow: false,
@@ -115,7 +112,7 @@ class LargeStreamCard extends StatelessWidget {
                         size: 14,
                         color: Colors.white,
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 4),
                       Text(
                         NumberFormat().format(streamInfo.viewerCount),
                         style: const TextStyle(
@@ -163,8 +160,8 @@ class LargeStreamCard extends StatelessWidget {
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
-          vertical: showThumbnail ? 10.0 : 5.0,
-          horizontal: 15.0,
+          vertical: showThumbnail ? 12 : 4,
+          horizontal: 16,
         ),
         child: Column(
           children: [
@@ -172,6 +169,7 @@ class LargeStreamCard extends StatelessWidget {
             VideoBar(
               streamInfo: streamInfo,
               showCategory: showCategory,
+              padding: const EdgeInsets.symmetric(vertical: 8),
             ),
           ],
         ),

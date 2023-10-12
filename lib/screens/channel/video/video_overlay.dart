@@ -157,7 +157,7 @@ class VideoOverlay extends StatelessWidget {
                 message: videoStore.paused ? 'Play' : 'Pause',
                 preferBelow: false,
                 child: IconButton(
-                  iconSize: 50.0,
+                  iconSize: 56,
                   icon: Icon(
                     videoStore.paused
                         ? Icons.play_arrow_rounded
@@ -175,7 +175,7 @@ class VideoOverlay extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0, bottom: 12.0),
+                      padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
                           Tooltip(
@@ -183,15 +183,12 @@ class VideoOverlay extends StatelessWidget {
                             preferBelow: false,
                             child: Row(
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.all(2.0),
-                                  child: Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
-                                    size: 10,
-                                  ),
+                                const Icon(
+                                  Icons.circle,
+                                  color: Colors.red,
+                                  size: 10,
                                 ),
-                                const SizedBox(width: 3.0),
+                                const SizedBox(width: 4),
                                 Uptime(
                                   startTime: streamInfo.startedAt,
                                   style: const TextStyle(
@@ -202,7 +199,7 @@ class VideoOverlay extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Tooltip(
                             message: 'Viewer count',
                             preferBelow: false,
@@ -231,7 +228,7 @@ class VideoOverlay extends StatelessWidget {
                                     size: 14,
                                     color: Colors.white,
                                   ),
-                                  const SizedBox(width: 5),
+                                  const SizedBox(width: 4),
                                   Text(
                                     NumberFormat().format(
                                       videoStore.streamInfo?.viewerCount,

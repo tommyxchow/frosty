@@ -54,7 +54,7 @@ class RecentEmotesPanel extends StatelessWidget {
                     message: emote.name,
                     preferBelow: false,
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(8),
                       child: Center(
                         child: FrostyCachedNetworkImage(
                           imageUrl: matchingEmotes.isNotEmpty

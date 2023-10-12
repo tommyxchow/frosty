@@ -23,8 +23,6 @@ class ProfileCard extends StatelessWidget {
         content: Column(
           children: [
             Button(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -88,7 +86,6 @@ class ProfileCard extends StatelessWidget {
             title: const Text('Failed to connect'),
             trailing: Button(
               onPressed: authStore.init,
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: const Text('Reconnect'),
             ),
           );
@@ -107,7 +104,7 @@ class ProfileCard extends StatelessWidget {
           leading: const Icon(Icons.no_accounts_rounded),
           title: const Text('Anonymous'),
           subtitle: const Text(
-            'Tap to log in and enable the ability to chat, view followed streams, and more.',
+            'Log in to enable the ability to chat, view followed streams, and more.',
           ),
           trailing: const SizedBox(
             height: double.infinity,

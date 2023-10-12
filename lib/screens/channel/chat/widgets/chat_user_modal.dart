@@ -40,7 +40,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.all(10.0),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
             leading: ProfilePicture(
               userLogin: widget.username,
             ),
@@ -82,7 +82,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
           ),
           const SectionHeader(
             'Recent messages',
-            padding: EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(12),
           ),
           Expanded(
             child: Observer(

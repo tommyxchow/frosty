@@ -8,6 +8,7 @@ class Button extends StatefulWidget {
   final bool fill;
   final EdgeInsets padding;
   final double? fontSize;
+  final bool round;
   final Widget? icon;
   final Function()? onPressed;
   final Widget child;
@@ -16,8 +17,9 @@ class Button extends StatefulWidget {
     Key? key,
     this.color,
     this.fill = false,
-    this.padding = const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
+    this.padding = const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
     this.fontSize,
+    this.round = false,
     this.icon,
     required this.onPressed,
     required this.child,
@@ -45,8 +47,12 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
       textStyle: DefaultTextStyle.of(context)
           .style
           .copyWith(fontWeight: FontWeight.w600, fontSize: widget.fontSize),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      elevation: widget.color == null ? 10.0 : 0.0,
+      shape: widget.round
+          ? const CircleBorder()
+          : RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+      elevation: widget.color == null ? 8 : 0.0,
     ).copyWith(
       elevation:
           (widget.color == null || widget.fill) && widget.onPressed != null

@@ -66,13 +66,13 @@ class ChatBottomBar extends StatelessWidget {
                 chatStore.showEmoteAutocomplete &&
                 matchingEmotes.isNotEmpty) ...[
               const Divider(
-                height: 1.0,
-                thickness: 1.0,
+                height: 1,
+                thickness: 1,
               ),
               SizedBox(
                 height: 50,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   itemCount: matchingEmotes.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => InkWell(
@@ -84,7 +84,7 @@ class ChatBottomBar extends StatelessWidget {
                       message: matchingEmotes[index].name,
                       preferBelow: false,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Center(
                           child: FrostyCachedNetworkImage(
                             imageUrl: matchingEmotes[index].url,
@@ -104,17 +104,18 @@ class ChatBottomBar extends StatelessWidget {
                 chatStore.showMentionAutocomplete &&
                 matchingChatters.isNotEmpty) ...[
               const Divider(
-                height: 1.0,
-                thickness: 1.0,
+                height: 1,
+                thickness: 1,
               ),
               SizedBox(
                 height: 50,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   itemCount: matchingChatters.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => Button(
                     color: Theme.of(context).colorScheme.secondary,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     onPressed: () {
                       final split = chatStore.textController.text.split(' ')
                         ..removeLast()
@@ -134,7 +135,7 @@ class ChatBottomBar extends StatelessWidget {
               ),
             ],
             Padding(
-              padding: const EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 10.0),
+              padding: const EdgeInsets.fromLTRB(12, 12, 0, 12),
               child: Row(
                 children: [
                   if (!chatStore.expandChat &&

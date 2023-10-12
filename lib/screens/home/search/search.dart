@@ -39,7 +39,7 @@ class _SearchState extends State<Search> {
         Observer(
           builder: (context) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+              padding: const EdgeInsets.all(12),
               child: TextField(
                 controller: _searchStore.textEditingController,
                 focusNode: _searchStore.textFieldFocusNode,

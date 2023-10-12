@@ -4,7 +4,7 @@ class LoadingIndicator extends StatelessWidget {
   final String? subtitle;
   final double spacing;
 
-  const LoadingIndicator({Key? key, this.subtitle, this.spacing = 10.0})
+  const LoadingIndicator({Key? key, this.subtitle, this.spacing = 8})
       : super(key: key);
 
   @override

@@ -11,6 +11,7 @@ class VideoBar extends StatelessWidget {
   final Color? titleTextColor;
   final Color? subtitleTextColor;
   final FontWeight? subtitleTextWeight;
+  final EdgeInsets padding;
 
   const VideoBar({
     Key? key,
@@ -20,6 +21,7 @@ class VideoBar extends StatelessWidget {
     this.titleTextColor,
     this.subtitleTextColor,
     this.subtitleTextWeight,
+    this.padding = const EdgeInsets.all(12),
   }) : super(key: key);
 
   @override
@@ -32,13 +34,15 @@ class VideoBar extends StatelessWidget {
         ? streamInfo.userName
         : '${streamInfo.userName} (${streamInfo.userLogin})';
 
-    return Padding(
-      padding: const EdgeInsets.all(10),
+    return Container(
+      padding: padding,
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ProfilePicture(userLogin: streamInfo.userLogin),
-          const SizedBox(width: 10.0),
+          ProfilePicture(
+            userLogin: streamInfo.userLogin,
+            radius: 28,
+          ),
+          const SizedBox(width: 12),
           Flexible(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -57,7 +61,7 @@ class VideoBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 5.0),
+                const SizedBox(height: 2),
                 Tooltip(
                   message: 'Title: ${streamInfo.title.trim()}',
                   showDuration: const Duration(seconds: 5),
@@ -75,7 +79,7 @@ class VideoBar extends StatelessWidget {
                   ),
                 ),
                 if (showCategory) ...[
-                  const SizedBox(height: 5.0),
+                  const SizedBox(height: 2),
                   InkWell(
                     onTap: tappableCategory && streamInfo.gameName.isNotEmpty
                         ? () => Navigator.push(

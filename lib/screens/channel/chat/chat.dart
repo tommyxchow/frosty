@@ -61,7 +61,7 @@ class Chat extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(5.0),
+                      padding: const EdgeInsets.all(8),
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
@@ -70,10 +70,6 @@ class Chat extends StatelessWidget {
                           child: chatStore.autoScroll
                               ? null
                               : Button(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15.0,
-                                    vertical: 10.0,
-                                  ),
                                   onPressed: chatStore.resumeScroll,
                                   icon:
                                       const Icon(Icons.arrow_downward_rounded),

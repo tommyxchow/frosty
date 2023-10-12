@@ -142,7 +142,6 @@ class _MyAppState extends State<MyApp> {
             inputDecorationTheme: const InputDecorationTheme(
               contentPadding: EdgeInsets.only(left: 20),
               border: OutlineInputBorder(
-                borderSide: BorderSide(width: 10),
                 borderRadius: BorderRadius.all(Radius.circular(100)),
               ),
             ),

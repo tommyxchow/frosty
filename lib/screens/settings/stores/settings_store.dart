@@ -94,7 +94,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultBadgeScale = 1.0;
   static const defaultEmoteScale = 1.0;
   static const defaultMessageScale = 1.0;
-  static const defaultMessageSpacing = 10.0;
+  static const defaultMessageSpacing = 12.0;
   static const defaultFontSize = 12.0;
 
   // Message appearance defaults

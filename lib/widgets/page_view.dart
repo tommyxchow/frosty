@@ -41,8 +41,7 @@ class _FrostyPageViewState extends State<FrostyPageView> {
                   height: 40,
                   child: Button(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0,
-                      vertical: 5.0,
+                      horizontal: 12,
                     ),
                     onPressed: () => _pageContoller.animateToPage(
                       index,

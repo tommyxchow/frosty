@@ -256,7 +256,7 @@ class ChatMessage extends StatelessWidget {
         final paddedMessage = Padding(
           padding: EdgeInsets.symmetric(
             vertical: chatStore.settings.messageSpacing / 2,
-            horizontal: 10.0,
+            horizontal: 12,
           ),
           child: renderMessage,
         );

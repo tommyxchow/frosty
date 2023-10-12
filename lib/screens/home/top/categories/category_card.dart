@@ -32,12 +32,12 @@ class CategoryCard extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Expanded(
               child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: AspectRatio(
                   aspectRatio: 3 / 4,
                   child: FrostyCachedNetworkImage(
@@ -54,11 +54,10 @@ class CategoryCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 5.0),
+            const SizedBox(height: 8),
             Tooltip(
               message: category.name,
               preferBelow: false,
-              padding: const EdgeInsets.all(10.0),
               child: Text(
                 category.name,
                 style: const TextStyle(fontWeight: FontWeight.w600),
