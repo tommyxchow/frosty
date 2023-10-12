@@ -9,6 +9,7 @@ import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 class ChatDetails extends StatelessWidget {
   final ChatDetailsStore chatDetailsStore;
@@ -142,8 +143,16 @@ class ChatDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = [
+      const SectionHeader(
+        'Chat modes',
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+      ),
       ListTile(
         title: ChatModes(roomState: chatDetailsStore.roomState),
+      ),
+      const SectionHeader(
+        'More',
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
       ),
       ListTile(
         leading: const Icon(Icons.people_outline),
