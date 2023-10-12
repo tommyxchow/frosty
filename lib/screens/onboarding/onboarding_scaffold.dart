@@ -61,7 +61,7 @@ class OnboardingScaffold extends StatelessWidget {
                             'assets/icons/logo.svg',
                             height: 80,
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                         ],
                         Text(
                           header,
@@ -73,7 +73,7 @@ class OnboardingScaffold extends StatelessWidget {
                       ],
                     ),
                     if (subtitle != null) ...[
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
                       Opacity(
                         opacity: 0.8,
                         child: Text(
@@ -89,7 +89,7 @@ class OnboardingScaffold extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    vertical: content == null ? 20.0 : 0.0,
+                    vertical: content == null ? 20 : 0,
                   ),
                   child: content ?? const SizedBox(),
                 ),
@@ -97,7 +97,7 @@ class OnboardingScaffold extends StatelessWidget {
               if (disclaimer != null)
                 Padding(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5.0),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   child: Opacity(
                     opacity: 0.5,
                     child: Text(
@@ -108,7 +108,7 @@ class OnboardingScaffold extends StatelessWidget {
                   ),
                 ),
               Container(
-                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 width: double.infinity,
                 child: Button(
                   onPressed: () => isLast
@@ -129,7 +129,8 @@ class OnboardingScaffold extends StatelessWidget {
               ),
               if (skipRoute != null)
                 Container(
-                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   width: double.infinity,
                   child: Button(
                     color: Colors.grey,

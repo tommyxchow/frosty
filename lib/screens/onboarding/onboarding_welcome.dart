@@ -20,11 +20,11 @@ class OnboardingWelcome extends StatelessWidget {
       content: Opacity(
         opacity: 0.8,
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           children: text
               .mapIndexed(
                 (index, sentence) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   child: ListTile(
                     leading: Text(
                       '${index + 1}.',
