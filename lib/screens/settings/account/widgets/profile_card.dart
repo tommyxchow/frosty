@@ -1,71 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/account/account_options.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/app_bar.dart';
-import 'package:frosty/widgets/dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
-import 'package:simple_icons/simple_icons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
 
   const ProfileCard({Key? key, required this.authStore}) : super(key: key);
-
-  Future<void> _showLoginDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Log in',
-        content: Column(
-          children: [
-            FilledButton.icon(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return Scaffold(
-                      appBar: const FrostyAppBar(
-                        title: Text('Connect with Twitch'),
-                      ),
-                      body: WebViewWidget(
-                        controller: authStore.createAuthWebViewController(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              icon: const Icon(SimpleIcons.twitch),
-              label: const Text(
-                'Connect with Twitch',
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Center(
-              child: Text(
-                'or',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              autocorrect: false,
-              textAlign: TextAlign.center,
-              decoration: const InputDecoration(
-                hintText: 'Token',
-              ),
-              onSubmitted: (token) {
-                authStore.login(token: token);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +50,29 @@ class ProfileCard extends StatelessWidget {
             height: double.infinity,
             child: Icon(Icons.chevron_right_rounded),
           ),
-          onTap: () => _showLoginDialog(context),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return Scaffold(
+                  appBar: const FrostyAppBar(
+                    title: Text('Connect with Twitch'),
+                  ),
+                  body: WebViewWidget(
+                    controller: authStore.createAuthWebViewController(),
+                  ),
+                );
+              },
+            ),
+          ),
+          onLongPress: () async {
+            final clipboardText =
+                (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+
+            if (clipboardText == null) return;
+
+            authStore.login(token: clipboardText);
+          },
         );
       },
     );
