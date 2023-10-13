@@ -124,7 +124,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             trailing: '${settingsStore.messageSpacing.toStringAsFixed(0)}px',
             value: settingsStore.messageSpacing,
             max: 30.0,
-            divisions: 6,
+            divisions: 15,
             onChanged: (newValue) => settingsStore.messageSpacing = newValue,
           ),
           SettingsListSlider(
