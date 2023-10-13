@@ -3,7 +3,7 @@ description: A Twitch client for iOS and Android.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 3.1.4+40
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,13 +31,12 @@ dependencies:
     sdk: flutter
   json_annotation: ^4.6.0
 
-
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  http: ^0.13.3
+  http: ^1.1.0
   web_socket_channel: ^2.1.0
-  flutter_secure_storage: ^8.0.0
+  flutter_secure_storage: ^9.0.0
   intl: ^0.18.1
   cached_network_image: ^3.1.0
   webview_flutter: ^4.2.0
@@ -47,11 +46,11 @@ dependencies:
   shared_preferences: ^2.0.8
   flutter_svg: ^2.0.5
   url_launcher: ^6.0.17
-  package_info_plus: ^3.0.2
+  package_info_plus: ^4.1.0
   collection: ^1.16.0
   flutter_cache_manager: ^3.3.0
-  device_info_plus: ^8.0.0
-  wakelock: ^0.6.2
+  device_info_plus: ^9.0.3
+  wakelock_plus: ^1.1.2
   simple_icons: ^7.10.0
   simple_pip_mode:
     git:
@@ -85,7 +84,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -139,7 +137,6 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 
 flutter_native_splash:
-
   # This package generates native code to customize Flutter's default white native splash screen
   # with background color and splash image.
   # Customize the parameters below, and run the following command in the terminal:
@@ -215,15 +212,15 @@ flutter_native_splash:
   #       WidgetsFlutterBinding.ensureInitialized();
   #       SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom, SystemUiOverlay.top]);
   #fullscreen: true
-  
-  # If you have changed the name(s) of your info.plist file(s), you can specify the filename(s) 
+
+  # If you have changed the name(s) of your info.plist file(s), you can specify the filename(s)
   # with the info_plist_files parameter.  Remove only the # characters in the three lines below,
   # do not remove any spaces:
   #info_plist_files:
   #  - 'ios/Runner/Info-Debug.plist'
   #  - 'ios/Runner/Info-Release.plist'
 
-flutter_icons:
+flutter_launcher_icons:
   image_path_android: "assets/icons/icon_android.png"
   image_path_ios: "assets/icons/icon_ios.png"
   android: true

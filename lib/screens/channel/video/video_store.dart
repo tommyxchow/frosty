@@ -160,7 +160,7 @@ abstract class VideoStoreBase with Store {
     if (Platform.isIOS) {
       final deviceInfo = DeviceInfoPlugin();
       final info = await deviceInfo.iosInfo;
-      if (info.model?.toLowerCase().contains('ipad') == true) {
+      if (info.model.toLowerCase().contains('ipad')) {
         _isIPad = true;
       } else {
         _isIPad = false;
