@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/account/account_options.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -12,6 +11,15 @@ class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
 
   const ProfileCard({Key? key, required this.authStore}) : super(key: key);
+
+  Future<void> _showAccountOptionsModalBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return AccountOptions(authStore: authStore);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +39,14 @@ class ProfileCard extends StatelessWidget {
           );
         }
         if (authStore.isLoggedIn && authStore.user.details != null) {
-          return SettingsTileRoute(
+          return ListTile(
             leading: ProfilePicture(
               userLogin: authStore.user.details!.login,
               radius: 12,
             ),
-            title: authStore.user.details!.displayName,
-            child: AccountOptions(authStore: authStore),
+            title: Text(authStore.user.details!.displayName),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => _showAccountOptionsModalBottomSheet(context),
           );
         }
         return ListTile(
