@@ -32,8 +32,6 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    const headerPadding = EdgeInsets.fromLTRB(16, 20, 16, 8);
-
     return Column(
       children: [
         Observer(
@@ -80,8 +78,7 @@ class _SearchState extends State<Search> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding:
-                          const EdgeInsets.only(left: 16, top: 8, right: 4),
+                      padding: const EdgeInsets.only(left: 16, right: 4),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -130,7 +127,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Channels',
-                      padding: headerPadding,
+                      padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
                     ),
                   ),
                   SearchResultsChannels(
@@ -140,7 +137,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Categories',
-                      padding: headerPadding,
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
                     ),
                   ),
                   SearchResultsCategories(searchStore: _searchStore),
