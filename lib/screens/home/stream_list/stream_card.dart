@@ -7,7 +7,6 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
@@ -182,7 +181,7 @@ class StreamCard extends StatelessWidget {
       ),
     );
 
-    return AnimateScale(
+    return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(

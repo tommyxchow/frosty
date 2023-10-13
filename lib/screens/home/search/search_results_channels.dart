@@ -6,7 +6,6 @@ import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -90,7 +89,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                           ? channel.displayName
                           : '${channel.displayName} (${channel.broadcasterLogin})';
 
-                      return AnimateScale(
+                      return InkWell(
                         onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
