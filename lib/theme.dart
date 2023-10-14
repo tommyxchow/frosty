@@ -14,12 +14,10 @@ class FrostyThemes {
   }) {
     final baseTheme = ThemeData(
       useMaterial3: true,
-
       brightness: brightness,
       colorSchemeSeed: colorSchemeSeed,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       scaffoldBackgroundColor: backgroundColor,
-      // canvasColor: backgroundColor,
       bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
       appBarTheme: AppBarTheme(
         elevation: 0,
@@ -27,19 +25,9 @@ class FrostyThemes {
         surfaceTintColor: backgroundColor,
       ),
       inputDecorationTheme: const InputDecorationTheme(
-        filled: true,
         contentPadding: EdgeInsets.symmetric(horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(style: BorderStyle.none),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(style: BorderStyle.none),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(style: BorderStyle.none),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
