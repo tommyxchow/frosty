@@ -17,11 +17,11 @@ class FrostyDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return AlertDialog.adaptive(
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold),
-        textAlign: TextAlign.center,
+        // style: const TextStyle(fontWeight: FontWeight.bold),
+        // textAlign: TextAlign.center,
       ),
       content: SingleChildScrollView(
         child: Column(

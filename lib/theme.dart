@@ -66,6 +66,9 @@ class FrostyThemes {
         titleSmall: TextStyle(
           fontWeight: FontWeight.w600,
         ),
+        headlineSmall: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
 

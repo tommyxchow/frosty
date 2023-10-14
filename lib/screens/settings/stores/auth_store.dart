@@ -6,7 +6,6 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
-import 'package:frosty/widgets/dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -140,17 +139,17 @@ abstract class AuthBase with Store {
 
     return showDialog(
       context: context,
-      builder: (context) => FrostyDialog(
-        title: title,
-        message: message,
+      builder: (context) => AlertDialog.adaptive(
+        title: Text(title),
+        content: Text(message),
         actions: [
-          FilledButton(
-            onPressed: onPressed,
-            child: const Text('Yes'),
-          ),
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: onPressed,
+            child: const Text('Yes'),
           ),
         ],
       ),

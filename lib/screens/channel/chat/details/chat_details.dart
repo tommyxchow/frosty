@@ -123,17 +123,18 @@ class ChatDetails extends StatelessWidget {
   Future<void> _showClearDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Clear recent emotes',
-        message: 'Are you sure you want to clear your recent emotes?',
+      builder: (context) => AlertDialog.adaptive(
+        title: const Text('Clear recent emotes'),
+        content:
+            const Text('Are you sure you want to clear your recent emotes?'),
         actions: [
-          FilledButton(
-            onPressed: Navigator.of(context).pop,
-            child: const Text('Yes'),
-          ),
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Yes'),
           ),
         ],
       ),
