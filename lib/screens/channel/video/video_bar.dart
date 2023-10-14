@@ -34,7 +34,7 @@ class VideoBar extends StatelessWidget {
         ? streamInfo.userName
         : '${streamInfo.userName} (${streamInfo.userLogin})';
 
-    return Container(
+    return Padding(
       padding: padding,
       child: Row(
         children: [

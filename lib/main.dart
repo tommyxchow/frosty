@@ -16,6 +16,7 @@ import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
@@ -122,37 +123,20 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
+        final settingsStore = context.read<SettingsStore>();
+        final themes = FrostyThemes();
+
         return MaterialApp(
           title: 'Frosty',
-          theme: ThemeData(
-            useMaterial3: true,
-            fontFamily: 'Inter',
-            brightness: Brightness.dark,
-            // colorSchemeSeed: FrostyStyles.purple,
-            scaffoldBackgroundColor: Colors.black,
-            canvasColor: Colors.black,
-            bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
-            appBarTheme: const AppBarTheme(
-              color: Colors.black,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              titleTextStyle: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            inputDecorationTheme: const InputDecorationTheme(
-              contentPadding: EdgeInsets.symmetric(horizontal: 16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(100)),
-              ),
-            ),
-            navigationBarTheme: const NavigationBarThemeData(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-            ),
-          ),
+          theme: themes.light,
+          darkTheme: settingsStore.themeType == ThemeType.black
+              ? themes.black
+              : themes.dark,
+          themeMode: settingsStore.themeType == ThemeType.system
+              ? ThemeMode.system
+              : settingsStore.themeType == ThemeType.light
+                  ? ThemeMode.light
+                  : ThemeMode.dark,
           home: widget.firstRun ? const OnboardingIntro() : const Home(),
           navigatorKey: navigatorKey,
         );

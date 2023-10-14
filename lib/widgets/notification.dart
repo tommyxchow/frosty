@@ -17,7 +17,7 @@ class FrostyNotification extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: BorderRadius.circular(8),
       ),
       margin: const EdgeInsets.all(10),
       child: Row(

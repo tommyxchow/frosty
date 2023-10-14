@@ -171,7 +171,7 @@ class _VideoChatState extends State<VideoChat> {
                 child: IgnorePointer(
                   ignoring: !videoBarVisible,
                   child: ColoredBox(
-                    color: Theme.of(context).canvasColor,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -245,7 +245,7 @@ class _VideoChatState extends State<VideoChat> {
               visible: settingsStore.fullScreenChatOverlay,
               maintainState: true,
               child: Theme(
-                data: FrostyStyles.darkTheme,
+                data: FrostyThemes().dark,
                 child: DefaultTextStyle(
                   style: DefaultTextStyle.of(context)
                       .style
