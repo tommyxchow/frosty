@@ -58,8 +58,10 @@ class _CategoryStreamsState extends State<CategoryStreams> {
 
           if (_listStore.error != null) {
             final snackBar = SnackBar(
-              content: AlertMessage(message: _listStore.error!),
-              behavior: SnackBarBehavior.floating,
+              content: AlertMessage(
+                message: _listStore.error!,
+                centered: false,
+              ),
             );
 
             if (!mounted) return;

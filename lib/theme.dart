@@ -78,6 +78,7 @@ class FrostyThemes {
           side: BorderSide(color: secondaryBackground, width: 2),
           borderRadius: const BorderRadius.all(Radius.circular(8)),
         ),
+        behavior: SnackBarBehavior.floating,
       ),
       textTheme: const TextTheme(
         // Used in alert dialog title.

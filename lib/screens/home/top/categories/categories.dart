@@ -59,8 +59,10 @@ class _CategoriesState extends State<Categories>
 
         if (_categoriesStore.error != null) {
           final snackBar = SnackBar(
-            content: AlertMessage(message: _categoriesStore.error!),
-            behavior: SnackBarBehavior.floating,
+            content: AlertMessage(
+              message: _categoriesStore.error!,
+              centered: false,
+            ),
           );
 
           if (!mounted) return;

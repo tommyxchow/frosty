@@ -97,17 +97,13 @@ class _ChattersListState extends State<ChattersList> {
                         if (widget.chatDetailsStore.chatUsers.isEmpty)
                           const SliverFillRemaining(
                             hasScrollBody: false,
-                            child: Center(
-                              child: AlertMessage(message: 'No chatters found'),
-                            ),
+                            child: AlertMessage(message: 'No chatters found'),
                           )
                         else if (widget.chatDetailsStore.filteredUsers.isEmpty)
                           const SliverFillRemaining(
                             hasScrollBody: false,
-                            child: Center(
-                              child:
-                                  AlertMessage(message: 'No matching chatters'),
-                            ),
+                            child:
+                                AlertMessage(message: 'No matching chatters'),
                           )
                         else
                           SliverList(

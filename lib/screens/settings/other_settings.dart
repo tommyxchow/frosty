@@ -46,8 +46,10 @@ class _OtherSettingsState extends State<OtherSettings> {
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: AlertMessage(message: 'All settings reset'),
-                  behavior: SnackBarBehavior.floating,
+                  content: AlertMessage(
+                    message: 'All settings reset',
+                    centered: false,
+                  ),
                 ),
               );
             },
@@ -114,8 +116,10 @@ class _OtherSettingsState extends State<OtherSettings> {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: AlertMessage(message: 'Image cache cleared'),
-                behavior: SnackBarBehavior.floating,
+                content: AlertMessage(
+                  message: 'Image cache cleared',
+                  centered: false,
+                ),
               ),
             );
           },

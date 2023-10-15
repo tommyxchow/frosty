@@ -4,23 +4,26 @@ import 'package:flutter/material.dart';
 class AlertMessage extends StatelessWidget {
   final String message;
   final Color? color;
+  final bool centered;
 
   const AlertMessage({
     Key? key,
     required this.message,
+    this.centered = true,
     this.color,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment:
+          centered ? MainAxisAlignment.center : MainAxisAlignment.start,
       children: [
         Icon(
           Icons.info_outline_rounded,
           color: color ?? Colors.grey,
         ),
-        const SizedBox(width: 5.0),
+        const SizedBox(width: 8),
         Flexible(
           child: Text(
             message,

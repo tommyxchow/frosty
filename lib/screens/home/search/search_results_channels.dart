@@ -44,8 +44,10 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
       );
     } catch (error) {
       final snackBar = SnackBar(
-        content: AlertMessage(message: error.toString()),
-        behavior: SnackBarBehavior.floating,
+        content: AlertMessage(
+          message: error.toString(),
+          centered: false,
+        ),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
