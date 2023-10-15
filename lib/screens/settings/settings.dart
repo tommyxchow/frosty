@@ -53,9 +53,9 @@ class Settings extends StatelessWidget {
         bottom: false,
         child: ListView(
           children: [
-            const SectionHeader('Account'),
+            const SectionHeader('Profile'),
             ProfileCard(authStore: context.read<AuthStore>()),
-            const SectionHeader('Customize'),
+            const SectionHeader('Options'),
             SettingsTileRoute(
               leading: const Icon(Icons.settings_outlined),
               title: 'General',

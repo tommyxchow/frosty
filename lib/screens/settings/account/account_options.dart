@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/account/blocked_users.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
-import 'package:frosty/widgets/section_header.dart';
 
 class AccountOptions extends StatelessWidget {
   final AuthStore authStore;
@@ -39,10 +38,6 @@ class AccountOptions extends StatelessWidget {
       shrinkWrap: true,
       primary: false,
       children: [
-        const SectionHeader(
-          'Account',
-          padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
-        ),
         SettingsTileRoute(
           leading: const Icon(Icons.block_rounded),
           title: 'Blocked users',
