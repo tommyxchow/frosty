@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class FrostyThemes {
   static const gray = Color.fromRGBO(18, 18, 18, 1);
@@ -12,22 +11,46 @@ class FrostyThemes {
     required Color colorSchemeSeed,
     Color? backgroundColor,
   }) {
-    final baseTheme = ThemeData(
+    final secondaryBackground = brightness == Brightness.light
+        ? Colors.grey.shade100
+        : Colors.grey.shade900;
+
+    return ThemeData(
       useMaterial3: true,
+      fontFamily: 'Inter',
       brightness: brightness,
       colorSchemeSeed: colorSchemeSeed,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       scaffoldBackgroundColor: backgroundColor,
-      bottomSheetTheme: const BottomSheetThemeData(showDragHandle: true),
+      bottomSheetTheme: BottomSheetThemeData(
+        showDragHandle: true,
+        backgroundColor: backgroundColor,
+        surfaceTintColor: backgroundColor,
+      ),
+      dialogTheme: DialogTheme(
+        backgroundColor: backgroundColor,
+        surfaceTintColor: backgroundColor,
+      ),
       appBarTheme: AppBarTheme(
         elevation: 0,
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
       ),
-      inputDecorationTheme: const InputDecorationTheme(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16),
-        border: OutlineInputBorder(
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: secondaryBackground,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(style: BorderStyle.none),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(style: BorderStyle.none),
+        ),
+        disabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(style: BorderStyle.none),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -36,34 +59,63 @@ class FrostyThemes {
       ),
       tabBarTheme: const TabBarTheme(
         dividerColor: Colors.transparent,
+        tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           color: Colors.grey.shade900,
-          borderRadius: const BorderRadius.all(Radius.circular(4)),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
           border: const Border(),
         ),
         textStyle: const TextStyle(color: Colors.white),
       ),
+      snackBarTheme: SnackBarThemeData(
+        showCloseIcon: true,
+        backgroundColor: backgroundColor,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: secondaryBackground, width: 2),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
+        ),
+      ),
       textTheme: const TextTheme(
-        titleLarge: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-        titleSmall: TextStyle(
-          fontWeight: FontWeight.w600,
-        ),
+        // Used in alert dialog title.
         headlineSmall: TextStyle(
           fontWeight: FontWeight.bold,
         ),
+        // Used in app bar title.
+        titleLarge: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
+        titleMedium: TextStyle(letterSpacing: 0),
+        // Used in tab bar title.
+        titleSmall: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+        labelLarge: TextStyle(
+          letterSpacing: 0,
+        ),
+        labelMedium: TextStyle(
+          letterSpacing: 0,
+        ),
+        labelSmall: TextStyle(
+          letterSpacing: 0,
+        ),
+        // Used in list tile title.
+        bodyLarge: TextStyle(
+          letterSpacing: 0,
+          fontWeight: FontWeight.w500,
+        ),
+        bodyMedium: TextStyle(
+          letterSpacing: 0,
+        ),
+        bodySmall: TextStyle(
+          letterSpacing: 0,
+        ),
       ),
-    );
-
-    final textTheme = GoogleFonts.interTextTheme(baseTheme.textTheme);
-
-    return baseTheme.copyWith(
-      textTheme: textTheme,
     );
   }
 
