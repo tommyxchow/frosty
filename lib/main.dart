@@ -17,7 +17,6 @@ import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +24,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  GoogleFonts.config.allowRuntimeFetching = kDebugMode;
 
   final prefs = await SharedPreferences.getInstance();
 
