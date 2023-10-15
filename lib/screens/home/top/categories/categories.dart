@@ -96,12 +96,9 @@ class _CategoriesState extends State<Categories>
             );
           }
 
-          return GridView.builder(
+          return ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
             controller: widget.scrollController,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-            ),
             itemCount: _categoriesStore.categories.length,
             itemBuilder: (context, index) {
               if (index > _categoriesStore.categories.length - 10 &&

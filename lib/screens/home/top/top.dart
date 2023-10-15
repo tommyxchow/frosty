@@ -34,6 +34,7 @@ class _TopSectionState extends State<TopSection>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TabBar(
+          isScrollable: true,
           controller: _tabBarController,
           tabs: const [
             Tab(

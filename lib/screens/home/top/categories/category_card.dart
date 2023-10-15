@@ -18,7 +18,7 @@ class CategoryCard extends StatelessWidget {
     // Calculate the dimmensions of the box art based on the current dimmensions of the screen.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final artWidth = (size.width * pixelRatio) ~/ 3;
+    final artWidth = (size.width * pixelRatio) ~/ 5;
     final artHeight = (artWidth * (4 / 3)).toInt();
 
     return InkWell(
@@ -32,10 +32,11 @@ class CategoryCard extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
           children: [
-            Expanded(
+            SizedBox(
+              width: 80,
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: AspectRatio(
@@ -54,13 +55,13 @@ class CategoryCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(width: 16),
             Tooltip(
               message: category.name,
               preferBelow: false,
               child: Text(
                 category.name,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: Theme.of(context).textTheme.bodyLarge,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
