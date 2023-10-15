@@ -69,17 +69,17 @@ class StreamCard extends StatelessWidget {
     final fontColor = DefaultTextStyle.of(context).style.color;
 
     final imageSection = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(4)),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
       child: Stack(
         alignment: AlignmentDirectional.bottomEnd,
         children: [
           thumbnail,
           Container(
-            padding: const EdgeInsets.all(2),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             decoration: const BoxDecoration(
               color: Color.fromRGBO(0, 0, 0, 0.5),
               borderRadius: BorderRadius.all(
-                Radius.circular(2),
+                Radius.circular(6),
               ),
             ),
             margin: const EdgeInsets.all(4),
