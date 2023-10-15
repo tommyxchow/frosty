@@ -127,7 +127,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Channels',
-                      padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
                     ),
                   ),
                   SearchResultsChannels(
@@ -137,7 +137,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Categories',
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 4),
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
                     ),
                   ),
                   SearchResultsCategories(searchStore: _searchStore),
