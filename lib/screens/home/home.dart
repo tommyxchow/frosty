@@ -9,6 +9,7 @@ import 'package:frosty/screens/home/top/top.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/profile_picture.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
@@ -26,6 +27,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([]);
+
+    final isLoggedIn = _authStore.isLoggedIn && _authStore.user.details != null;
 
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
@@ -46,7 +49,12 @@ class _HomeState extends State<Home> {
           actions: [
             IconButton(
               tooltip: 'Settings',
-              icon: const Icon(Icons.settings_rounded),
+              icon: isLoggedIn
+                  ? ProfilePicture(
+                      userLogin: _authStore.user.details!.login,
+                      radius: 16,
+                    )
+                  : const Icon(Icons.settings_rounded),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
