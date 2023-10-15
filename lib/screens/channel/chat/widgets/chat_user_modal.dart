@@ -71,7 +71,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                     icon: const Icon(Icons.reply_rounded),
                   ),
                 IconButton.filledTonal(
-                  tooltip: 'Reply',
+                  tooltip: 'More',
                   onPressed: () => showModalBottomSheet(
                     context: context,
                     builder: (context) => BlockReportModal(
