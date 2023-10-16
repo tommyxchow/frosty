@@ -64,7 +64,10 @@ class CategoryCard extends StatelessWidget {
               preferBelow: false,
               child: Text(
                 category.name,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
