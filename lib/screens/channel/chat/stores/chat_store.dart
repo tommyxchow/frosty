@@ -88,14 +88,6 @@ abstract class ChatStoreBase with Store {
   /// The current timer for the sleep timer if active.
   Timer? sleepTimer;
 
-  /// The amount of hours the sleep timer is set to.
-  @observable
-  var sleepHours = 0;
-
-  /// The amount of minutes the sleep timer is set to.
-  @observable
-  var sleepMinutes = 0;
-
   /// The time remaining for the sleep timer.
   @observable
   var timeRemaining = const Duration();
@@ -522,22 +514,18 @@ abstract class ChatStoreBase with Store {
         Timer(const Duration(seconds: 2), () => _notification = null);
   }
 
-  /// Updates the sleep timer with [sleepHours] and [sleepMinutes].
+  /// Updates the sleep timer with the given [duration].
   /// Calls [onTimerFinished] when the sleep timer completes.
   @action
-  void updateSleepTimer({required void Function() onTimerFinished}) {
-    // If hours and minutes are 0, do nothing.
-    if (sleepHours == 0 && sleepMinutes == 0) return;
-
+  void updateSleepTimer({
+    required Duration duration,
+    required VoidCallback onTimerFinished,
+  }) {
     // If there is an ongoing timer, cancel it since it'll be replaced.
     if (sleepTimer != null) cancelSleepTimer();
 
     // Update the new time remaining
-    timeRemaining = Duration(hours: sleepHours, minutes: sleepMinutes);
-
-    // Reset the hours and minutes in the dropdown buttons.
-    sleepHours = 0;
-    sleepMinutes = 0;
+    timeRemaining = duration;
 
     // Set a periodic timer that will update the time remaining every second.
     sleepTimer = Timer.periodic(
