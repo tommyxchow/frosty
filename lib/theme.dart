@@ -98,6 +98,7 @@ class FrostyThemes {
         // Used in tab bar title.
         titleSmall: TextStyle(
           fontSize: 16,
+          letterSpacing: 0,
           fontWeight: FontWeight.w600,
         ),
         labelLarge: TextStyle(
