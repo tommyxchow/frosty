@@ -267,10 +267,7 @@ class ChatMessage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   paddedMessage,
-                  const Divider(
-                    height: 1.0,
-                    thickness: 1.0,
-                  ),
+                  const Divider(),
                 ],
               )
             : paddedMessage;

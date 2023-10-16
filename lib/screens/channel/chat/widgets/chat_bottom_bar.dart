@@ -64,10 +64,7 @@ class ChatBottomBar extends StatelessWidget {
             if (chatStore.settings.autocomplete &&
                 chatStore.showEmoteAutocomplete &&
                 matchingEmotes.isNotEmpty) ...[
-              const Divider(
-                height: 1,
-                thickness: 1,
-              ),
+              const Divider(),
               SizedBox(
                 height: 50,
                 child: ListView.builder(
@@ -102,10 +99,7 @@ class ChatBottomBar extends StatelessWidget {
             if (chatStore.settings.autocomplete &&
                 chatStore.showMentionAutocomplete &&
                 matchingChatters.isNotEmpty) ...[
-              const Divider(
-                height: 1,
-                thickness: 1,
-              ),
+              const Divider(),
               SizedBox(
                 height: 50,
                 child: ListView.builder(

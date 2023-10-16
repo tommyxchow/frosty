@@ -80,6 +80,10 @@ class FrostyThemes {
         ),
         behavior: SnackBarBehavior.floating,
       ),
+      dividerTheme: const DividerThemeData(
+        thickness: 0.5,
+        space: 0.5,
+      ),
       textTheme: const TextTheme(
         // Used in alert dialog title.
         headlineSmall: TextStyle(

@@ -27,10 +27,7 @@ class _FrostyPageViewState extends State<FrostyPageView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(
-          height: 1,
-          thickness: 1,
-        ),
+        const Divider(),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(

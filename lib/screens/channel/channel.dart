@@ -180,7 +180,7 @@ class _VideoChatState extends State<VideoChat> {
                             streamInfo: _videoStore.streamInfo!,
                             tappableCategory: false,
                           ),
-                        const Divider(height: 1, thickness: 1),
+                        const Divider(),
                       ],
                     ),
                   ),
