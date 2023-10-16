@@ -65,11 +65,13 @@ class FrostyThemes {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         margin: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.grey.shade900,
+          color: backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          border: const Border(),
+          border: Border.all(color: secondaryBackground, width: 2),
         ),
-        textStyle: const TextStyle(color: Colors.white),
+        textStyle: TextStyle(
+          color: brightness == Brightness.dark ? Colors.white : Colors.black,
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         showCloseIcon: true,
