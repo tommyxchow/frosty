@@ -47,7 +47,7 @@ abstract class HomeStoreBase with Store {
     if (index != _selectedIndex) {
       _selectedIndex = index;
     } else {
-      const duration = Duration(milliseconds: 500);
+      const duration = Duration(milliseconds: 300);
 
       // Use different logic if logged in/out since there will be one less tab when logged out.
       if (authStore.isLoggedIn) {

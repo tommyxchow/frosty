@@ -7,10 +7,12 @@ import 'package:frosty/widgets/loading_indicator.dart';
 /// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
   final CategoryTwitch category;
+  final bool isTappable;
 
   const CategoryCard({
     Key? key,
     required this.category,
+    this.isTappable = true,
   }) : super(key: key);
 
   @override
@@ -22,15 +24,16 @@ class CategoryCard extends StatelessWidget {
     final artHeight = (artWidth * (4 / 3)).toInt();
 
     return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CategoryStreams(
-            categoryName: category.name,
-            categoryId: category.id,
-          ),
-        ),
-      ),
+      onTap: isTappable
+          ? () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryStreams(
+                    categoryId: category.id,
+                  ),
+                ),
+              )
+          : null,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(

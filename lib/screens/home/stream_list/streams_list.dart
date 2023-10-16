@@ -5,10 +5,12 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/home/stream_list/large_stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
+import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
 
 /// A widget that displays a list of followed or top streams based on the provided [listType].
@@ -17,13 +19,19 @@ class StreamsList extends StatefulWidget {
   /// The type of list to display.
   final ListType listType;
 
+  final String? categoryId;
+
   /// The scroll controller to use for scroll to top functionality.
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
+
+  final bool showJumpButton;
 
   const StreamsList({
     Key? key,
     required this.listType,
-    required this.scrollController,
+    this.categoryId,
+    this.scrollController,
+    this.showJumpButton = false,
   }) : super(key: key);
 
   @override
@@ -36,6 +44,9 @@ class _StreamsListState extends State<StreamsList>
     authStore: context.read<AuthStore>(),
     twitchApi: context.read<TwitchApi>(),
     listType: widget.listType,
+    categoryId: widget.categoryId,
+    scrollController: widget.scrollController ??
+        (widget.showJumpButton ? ScrollController() : null),
   );
 
   @override
@@ -113,34 +124,74 @@ class _StreamsListState extends State<StreamsList>
             );
           }
 
-          return ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
-            controller: widget.scrollController,
-            itemCount: _listStore.streams.length,
-            itemBuilder: (context, index) {
-              if (index > _listStore.streams.length - 10 &&
-                  _listStore.hasMore) {
-                debugPrint('$index ${_listStore.streams.length}');
+          return Stack(
+            alignment: AlignmentDirectional.bottomCenter,
+            children: [
+              Column(
+                children: [
+                  if (widget.categoryId != null &&
+                      _listStore.categoryDetails != null)
+                    CategoryCard(
+                      category: _listStore.categoryDetails!,
+                      isTappable: false,
+                    ),
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: _listStore.scrollController,
+                      itemCount: _listStore.streams.length,
+                      itemBuilder: (context, index) {
+                        if (index > _listStore.streams.length - 10 &&
+                            _listStore.hasMore) {
+                          debugPrint('$index ${_listStore.streams.length}');
 
-                _listStore.getStreams();
-              }
-              return Observer(
-                builder: (context) =>
-                    context.read<SettingsStore>().largeStreamCard
-                        ? LargeStreamCard(
-                            key: ValueKey(_listStore.streams[index].userId),
-                            streamInfo: _listStore.streams[index],
-                            showThumbnail:
-                                context.read<SettingsStore>().showThumbnails,
-                          )
-                        : StreamCard(
-                            key: ValueKey(_listStore.streams[index].userId),
-                            streamInfo: _listStore.streams[index],
-                            showThumbnail:
-                                context.read<SettingsStore>().showThumbnails,
-                          ),
-              );
-            },
+                          _listStore.getStreams();
+                        }
+                        return Observer(
+                          builder: (context) =>
+                              context.read<SettingsStore>().largeStreamCard
+                                  ? LargeStreamCard(
+                                      key: ValueKey(
+                                        _listStore.streams[index].userId,
+                                      ),
+                                      streamInfo: _listStore.streams[index],
+                                      showThumbnail: context
+                                          .read<SettingsStore>()
+                                          .showThumbnails,
+                                      showCategory: widget.categoryId == null,
+                                    )
+                                  : StreamCard(
+                                      key: ValueKey(
+                                        _listStore.streams[index].userId,
+                                      ),
+                                      streamInfo: _listStore.streams[index],
+                                      showThumbnail: context
+                                          .read<SettingsStore>()
+                                          .showThumbnails,
+                                      showCategory: widget.categoryId == null,
+                                    ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              if (widget.showJumpButton)
+                SafeArea(
+                  child: Observer(
+                    builder: (context) => AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      child: _listStore.showJumpButton
+                          ? ScrollToTopButton(
+                              scrollController: _listStore.scrollController!,
+                            )
+                          : null,
+                    ),
+                  ),
+                ),
+            ],
           );
         },
       ),

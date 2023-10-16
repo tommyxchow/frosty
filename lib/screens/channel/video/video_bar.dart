@@ -86,7 +86,6 @@ class VideoBar extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => CategoryStreams(
-                                  categoryName: streamInfo.gameName,
                                   categoryId: streamInfo.gameId,
                                 ),
                               ),
