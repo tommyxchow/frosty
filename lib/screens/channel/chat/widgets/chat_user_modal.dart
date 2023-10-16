@@ -60,7 +60,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (widget.chatStore.auth.isLoggedIn)
-                  IconButton.filledTonal(
+                  IconButton.outlined(
                     tooltip: 'Reply',
                     onPressed: () {
                       widget.chatStore.textController.text =
@@ -70,7 +70,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                     },
                     icon: const Icon(Icons.reply_rounded),
                   ),
-                IconButton.filledTonal(
+                IconButton.outlined(
                   tooltip: 'More',
                   onPressed: () => showModalBottomSheet(
                     context: context,
