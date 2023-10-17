@@ -177,18 +177,16 @@ class _StreamsListState extends State<StreamsList>
                 ],
               ),
               if (widget.showJumpButton)
-                SafeArea(
-                  child: Observer(
-                    builder: (context) => AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      switchInCurve: Curves.easeOut,
-                      switchOutCurve: Curves.easeIn,
-                      child: _listStore.showJumpButton
-                          ? ScrollToTopButton(
-                              scrollController: _listStore.scrollController!,
-                            )
-                          : null,
-                    ),
+                Observer(
+                  builder: (context) => AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    child: _listStore.showJumpButton
+                        ? ScrollToTopButton(
+                            scrollController: _listStore.scrollController!,
+                          )
+                        : null,
                   ),
                 ),
             ],
