@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
@@ -31,58 +32,62 @@ class ReplyThread extends StatelessWidget {
         ? replyDisplayName
         : '$replyDisplayName ($replyUserLogin)';
 
-    return MediaQuery(
-      data: MediaQuery.of(context).copyWith(
-        textScaleFactor: chatStore.settings.messageScale,
-      ),
-      child: DefaultTextStyle(
-        style: DefaultTextStyle.of(context)
-            .style
-            .copyWith(fontSize: chatStore.settings.fontSize),
-        child: ListView(
-          shrinkWrap: true,
-          primary: false,
-          children: [
-            const SectionHeader(
-              'Reply thread',
-              padding: EdgeInsets.fromLTRB(12, 0, 12, 8),
-            ),
-            if (replyParent != null)
-              ChatMessage(
-                isModal: true,
-                ircMessage: replyParent,
-                chatStore: chatStore,
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Text(
-                  'Replies to @$replyName: $replyBody',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                  ),
+    return Observer(
+      builder: (context) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaleFactor: chatStore.settings.messageScale,
+          ),
+          child: DefaultTextStyle(
+            style: DefaultTextStyle.of(context)
+                .style
+                .copyWith(fontSize: chatStore.settings.fontSize),
+            child: ListView(
+              shrinkWrap: true,
+              primary: false,
+              children: [
+                const SectionHeader(
+                  'Reply thread',
+                  padding: EdgeInsets.fromLTRB(12, 0, 12, 8),
                 ),
-              ),
-            const Divider(
-              indent: 12,
-              endIndent: 12,
-            ),
-            ...chatStore.messages
-                .where(
-                  (message) =>
-                      message.tags['reply-parent-msg-id'] ==
-                      selectedMessage.tags['reply-parent-msg-id'],
-                )
-                .map(
-                  (message) => ChatMessage(
+                if (replyParent != null)
+                  ChatMessage(
                     isModal: true,
-                    ircMessage: message,
+                    ircMessage: replyParent,
                     chatStore: chatStore,
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                    child: Text(
+                      'Replies to @$replyName: $replyBody',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
+                const Divider(
+                  indent: 12,
+                  endIndent: 12,
                 ),
-          ],
-        ),
-      ),
+                ...chatStore.messages
+                    .where(
+                      (message) =>
+                          message.tags['reply-parent-msg-id'] ==
+                          selectedMessage.tags['reply-parent-msg-id'],
+                    )
+                    .map(
+                      (message) => ChatMessage(
+                        isModal: true,
+                        ircMessage: message,
+                        chatStore: chatStore,
+                      ),
+                    ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
