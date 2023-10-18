@@ -67,7 +67,7 @@ class FrostyThemes {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          border: Border.all(color: secondaryBackground, width: 2),
+          border: Border.all(color: secondaryBackground),
         ),
         textStyle: TextStyle(
           color: brightness == Brightness.dark ? Colors.white : Colors.black,
@@ -77,7 +77,7 @@ class FrostyThemes {
         showCloseIcon: true,
         backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: secondaryBackground, width: 2),
+          side: BorderSide(color: secondaryBackground),
           borderRadius: const BorderRadius.all(Radius.circular(8)),
         ),
         behavior: SnackBarBehavior.floating,
