@@ -59,7 +59,6 @@ class FrostyThemes {
       ),
       tabBarTheme: const TabBarTheme(
         dividerColor: Colors.transparent,
-        tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

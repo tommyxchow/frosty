@@ -119,31 +119,38 @@ class Chat extends StatelessWidget {
                   switchInCurve: Curves.easeOut,
                   switchOutCurve: Curves.easeIn,
                   child: chatStore.assetsStore.showEmoteMenu
-                      ? FrostyPageView(
-                          headers: const [
-                            'Recent',
-                            'Twitch',
-                            '7TV',
-                            'BTTV',
-                            'FFZ',
-                          ],
+                      ? Column(
                           children: [
-                            RecentEmotesPanel(
-                              chatStore: chatStore,
-                            ),
-                            EmoteMenuPanel(
-                              chatStore: chatStore,
-                              twitchEmotes: chatStore
-                                  .assetsStore.userEmoteSectionToEmotes,
-                            ),
-                            ...[
-                              chatStore.assetsStore.sevenTVEmotes,
-                              chatStore.assetsStore.bttvEmotes,
-                              chatStore.assetsStore.ffzEmotes,
-                            ].map(
-                              (emotes) => EmoteMenuPanel(
-                                chatStore: chatStore,
-                                emotes: emotes,
+                            const Divider(),
+                            Expanded(
+                              child: FrostyPageView(
+                                headers: const [
+                                  'Recent',
+                                  'Twitch',
+                                  '7TV',
+                                  'BTTV',
+                                  'FFZ',
+                                ],
+                                children: [
+                                  RecentEmotesPanel(
+                                    chatStore: chatStore,
+                                  ),
+                                  EmoteMenuPanel(
+                                    chatStore: chatStore,
+                                    twitchEmotes: chatStore
+                                        .assetsStore.userEmoteSectionToEmotes,
+                                  ),
+                                  ...[
+                                    chatStore.assetsStore.sevenTVEmotes,
+                                    chatStore.assetsStore.bttvEmotes,
+                                    chatStore.assetsStore.ffzEmotes,
+                                  ].map(
+                                    (emotes) => EmoteMenuPanel(
+                                      chatStore: chatStore,
+                                      emotes: emotes,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
