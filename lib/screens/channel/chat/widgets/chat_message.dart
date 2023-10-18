@@ -162,17 +162,17 @@ class ChatMessage extends StatelessWidget {
                     if (ircMessage.command == Command.clearMessage)
                       const Text(
                         'Message deleted',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       )
                     else
                       const Text(
                         'Permanently banned',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       )
                   else
                     Text(
                       'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
                   const SizedBox(height: 4),
                   Text.rich(
@@ -213,7 +213,7 @@ class ChatMessage extends StatelessWidget {
                     Text(
                       ircMessage.tags['system-msg']!,
                       style: TextStyle(
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: defaultTextStyle.color?.withOpacity(0.5),
                       ),
                     ),
@@ -228,7 +228,7 @@ class ChatMessage extends StatelessWidget {
                         const SizedBox(width: 4),
                         const Text(
                           'Announcement',
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
