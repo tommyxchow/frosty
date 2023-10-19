@@ -85,6 +85,7 @@ class _SearchState extends State<Search> {
                           const SectionHeader(
                             'History',
                             padding: EdgeInsets.zero,
+                            showDivider: false,
                           ),
                           TextButton(
                             onPressed: _searchStore.searchHistory.clear,
@@ -92,6 +93,10 @@ class _SearchState extends State<Search> {
                           ),
                         ],
                       ),
+                    ),
+                    const Divider(
+                      indent: 16,
+                      endIndent: 16,
                     ),
                     Expanded(
                       child: ListView(
@@ -127,7 +132,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Channels',
-                      padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+                      padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
                     ),
                   ),
                   SearchResultsChannels(
@@ -137,7 +142,7 @@ class _SearchState extends State<Search> {
                   const SliverToBoxAdapter(
                     child: SectionHeader(
                       'Categories',
-                      padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
                     ),
                   ),
                   SearchResultsCategories(searchStore: _searchStore),

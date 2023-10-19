@@ -61,6 +61,7 @@ class ChatBottomBar extends StatelessWidget {
 
         return Column(
           children: [
+            const Divider(),
             if (chatStore.settings.autocomplete &&
                 chatStore.showEmoteAutocomplete &&
                 matchingEmotes.isNotEmpty) ...[

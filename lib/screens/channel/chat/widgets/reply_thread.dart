@@ -42,9 +42,9 @@ class ReplyThread extends StatelessWidget {
             style: DefaultTextStyle.of(context)
                 .style
                 .copyWith(fontSize: chatStore.settings.fontSize),
-            child: ListView(
-              shrinkWrap: true,
-              primary: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SectionHeader(
                   'Reply thread',
@@ -66,23 +66,31 @@ class ReplyThread extends StatelessWidget {
                       ),
                     ),
                   ),
-                const Divider(
-                  indent: 12,
-                  endIndent: 12,
-                ),
-                ...chatStore.messages
-                    .where(
-                      (message) =>
-                          message.tags['reply-parent-msg-id'] ==
-                          selectedMessage.tags['reply-parent-msg-id'],
-                    )
-                    .map(
-                      (message) => ChatMessage(
-                        isModal: true,
-                        ircMessage: message,
-                        chatStore: chatStore,
+                Row(
+                  children: [
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ListView(
+                        shrinkWrap: true,
+                        primary: false,
+                        children: chatStore.messages
+                            .where(
+                              (message) =>
+                                  message.tags['reply-parent-msg-id'] ==
+                                  selectedMessage.tags['reply-parent-msg-id'],
+                            )
+                            .map(
+                              (message) => ChatMessage(
+                                isModal: true,
+                                ircMessage: message,
+                                chatStore: chatStore,
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
+                  ],
+                ),
               ],
             ),
           ),

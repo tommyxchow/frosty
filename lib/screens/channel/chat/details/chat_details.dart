@@ -72,7 +72,7 @@ class ChatDetails extends StatelessWidget {
         children: [
           const SectionHeader(
             'Sleep timer',
-            padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+            padding: EdgeInsets.symmetric(horizontal: 16),
           ),
           Expanded(
             child: ListView(
@@ -145,14 +145,14 @@ class ChatDetails extends StatelessWidget {
     final children = [
       const SectionHeader(
         'Chat modes',
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+        padding: EdgeInsets.symmetric(horizontal: 16),
       ),
       ListTile(
         title: ChatModes(roomState: chatDetailsStore.roomState),
       ),
       const SectionHeader(
         'More',
-        padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
+        padding: EdgeInsets.symmetric(horizontal: 16),
       ),
       ListTile(
         leading: const Icon(Icons.people_outline),
