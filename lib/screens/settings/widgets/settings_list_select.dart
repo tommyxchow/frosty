@@ -20,54 +20,24 @@ class SettingsListSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      isThreeLine: subtitle != null,
       title: Text(title),
-      subtitle: subtitle != null ? Text(subtitle!) : null,
-      trailing: SizedBox(
-        height: double.infinity,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Opacity(
-              opacity: 0.8,
-              child: Text(
-                selectedOption,
-              ),
-            ),
-            const Icon(Icons.chevron_right_rounded),
-          ],
-        ),
-      ),
-      onTap: () => showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (context) => ListView(
-          shrinkWrap: true,
-          primary: false,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                'Select ${title.toLowerCase()}',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ),
-            ...options
-                .map(
-                  (option) => ListTile(
-                    title: Text(option),
-                    trailing: selectedOption == option
-                        ? const Icon(Icons.check_rounded)
-                        : null,
-                    onTap: () {
-                      onChanged(option);
-                      Navigator.of(context).pop();
-                    },
+      subtitle: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: SegmentedButton(
+          style: const ButtonStyle(visualDensity: VisualDensity.compact),
+          segments: options
+              .map(
+                (option) => ButtonSegment(
+                  value: option,
+                  label: Text(
+                    option,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                )
-                .toList(),
-          ],
+                ),
+              )
+              .toList(),
+          selected: {selectedOption},
+          onSelectionChanged: (selection) => onChanged(selection.first),
         ),
       ),
     );
