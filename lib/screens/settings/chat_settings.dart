@@ -136,7 +136,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 15,
             onChanged: (newValue) => settingsStore.fontSize = newValue,
           ),
-          const SectionHeader('Message appearance'),
+          const SectionHeader('Message appearance', showDivider: true),
           SettingsListSwitch(
             title: 'Use readable name colors',
             subtitle: const Text(
@@ -167,7 +167,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay'),
+          const SectionHeader('Delay', showDivider: true),
           SettingsListSlider(
             title: 'Message delay',
             trailing: '${settingsStore.chatDelay.toInt()}s',
@@ -178,7 +178,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 30,
             onChanged: (newValue) => settingsStore.chatDelay = newValue,
           ),
-          const SectionHeader('Alerts'),
+          const SectionHeader('Alerts', showDivider: true),
           SettingsListSwitch(
             title: 'Highlight first time chatters',
             value: settingsStore.highlightFirstTimeChatter,
@@ -193,7 +193,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
-          const SectionHeader('Layout'),
+          const SectionHeader('Layout', showDivider: true),
           SettingsListSwitch(
             title: 'Show bottom bar',
             value: settingsStore.showBottomBar,
@@ -214,7 +214,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.chatNotificationsOnBottom = newValue,
           ),
-          const SectionHeader('Landscape mode'),
+          const SectionHeader('Landscape mode', showDivider: true),
           SettingsListSwitch(
             title: 'Move chat left',
             value: settingsStore.landscapeChatLeftSide,
@@ -260,7 +260,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
-          const SectionHeader('Sleep'),
+          const SectionHeader('Sleep', showDivider: true),
           SettingsListSwitch(
             title: 'Prevent sleep in chat-only mode',
             subtitle: const Text(
@@ -270,7 +270,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.chatOnlyPreventSleep = newValue,
           ),
-          const SectionHeader('Autocomplete'),
+          const SectionHeader('Autocomplete', showDivider: true),
           SettingsListSwitch(
             title: 'Show autocomplete bar',
             subtitle: const Text(

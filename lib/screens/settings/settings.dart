@@ -55,7 +55,7 @@ class Settings extends StatelessWidget {
           children: [
             const SectionHeader('Profile'),
             ProfileCard(authStore: context.read<AuthStore>()),
-            const SectionHeader('Options'),
+            const SectionHeader('Options', showDivider: true),
             SettingsTileRoute(
               leading: const Icon(Icons.settings_outlined),
               title: 'General',
@@ -71,7 +71,7 @@ class Settings extends StatelessWidget {
               title: 'Chat',
               child: ChatSettings(settingsStore: settingsStore),
             ),
-            const SectionHeader('Other'),
+            const SectionHeader('Other', showDivider: true),
             OtherSettings(settingsStore: settingsStore),
           ],
         ),

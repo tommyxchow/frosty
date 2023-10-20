@@ -22,7 +22,7 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
-          const SectionHeader('Overlay'),
+          const SectionHeader('Overlay', showDivider: true),
           SettingsListSwitch(
             title: 'Use custom video overlay',
             subtitle: const Text(
