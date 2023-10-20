@@ -45,7 +45,7 @@ class Chat extends StatelessWidget {
                           builder: (context) {
                             return ListView.builder(
                               reverse: true,
-                              padding: const EdgeInsets.only(bottom: 8),
+                              padding: EdgeInsets.zero,
                               addAutomaticKeepAlives: false,
                               controller: chatStore.scrollController,
                               itemCount: chatStore.renderMessages.length,

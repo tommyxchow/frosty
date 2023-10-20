@@ -86,35 +86,29 @@ class _HomeState extends State<Home> {
           ),
         ),
         bottomNavigationBar: Observer(
-          builder: (_) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Divider(),
-              NavigationBar(
-                destinations: [
-                  if (_authStore.isLoggedIn)
-                    NavigationDestination(
-                      icon: _homeStore.selectedIndex == 0
-                          ? const Icon(Icons.favorite_rounded)
-                          : const Icon(Icons.favorite_border_rounded),
-                      label: 'Following',
-                      tooltip: 'Followed streams',
-                    ),
-                  const NavigationDestination(
-                    icon: Icon(Icons.arrow_upward_rounded),
-                    label: 'Top',
-                    tooltip: 'Top streams and categories',
-                  ),
-                  const NavigationDestination(
-                    icon: Icon(Icons.search_rounded),
-                    label: 'Search',
-                    tooltip: 'Search for channels and categories',
-                  ),
-                ],
-                selectedIndex: _homeStore.selectedIndex,
-                onDestinationSelected: _homeStore.handleTap,
+          builder: (_) => NavigationBar(
+            destinations: [
+              if (_authStore.isLoggedIn)
+                NavigationDestination(
+                  icon: _homeStore.selectedIndex == 0
+                      ? const Icon(Icons.favorite_rounded)
+                      : const Icon(Icons.favorite_border_rounded),
+                  label: 'Following',
+                  tooltip: 'Followed streams',
+                ),
+              const NavigationDestination(
+                icon: Icon(Icons.arrow_upward_rounded),
+                label: 'Top',
+                tooltip: 'Top streams and categories',
+              ),
+              const NavigationDestination(
+                icon: Icon(Icons.search_rounded),
+                label: 'Search',
+                tooltip: 'Search for channels and categories',
               ),
             ],
+            selectedIndex: _homeStore.selectedIndex,
+            onDestinationSelected: _homeStore.handleTap,
           ),
         ),
       ),
