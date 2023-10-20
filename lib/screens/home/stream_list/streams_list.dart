@@ -136,42 +136,45 @@ class _StreamsListState extends State<StreamsList>
                       isTappable: false,
                     ),
                   Expanded(
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
+                    child: Scrollbar(
                       controller: _listStore.scrollController,
-                      itemCount: _listStore.streams.length,
-                      itemBuilder: (context, index) {
-                        if (index > _listStore.streams.length - 10 &&
-                            _listStore.hasMore) {
-                          debugPrint('$index ${_listStore.streams.length}');
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: _listStore.scrollController,
+                        itemCount: _listStore.streams.length,
+                        itemBuilder: (context, index) {
+                          if (index > _listStore.streams.length - 10 &&
+                              _listStore.hasMore) {
+                            debugPrint('$index ${_listStore.streams.length}');
 
-                          _listStore.getStreams();
-                        }
-                        return Observer(
-                          builder: (context) =>
-                              context.read<SettingsStore>().largeStreamCard
-                                  ? LargeStreamCard(
-                                      key: ValueKey(
-                                        _listStore.streams[index].userId,
+                            _listStore.getStreams();
+                          }
+                          return Observer(
+                            builder: (context) =>
+                                context.read<SettingsStore>().largeStreamCard
+                                    ? LargeStreamCard(
+                                        key: ValueKey(
+                                          _listStore.streams[index].userId,
+                                        ),
+                                        streamInfo: _listStore.streams[index],
+                                        showThumbnail: context
+                                            .read<SettingsStore>()
+                                            .showThumbnails,
+                                        showCategory: widget.categoryId == null,
+                                      )
+                                    : StreamCard(
+                                        key: ValueKey(
+                                          _listStore.streams[index].userId,
+                                        ),
+                                        streamInfo: _listStore.streams[index],
+                                        showThumbnail: context
+                                            .read<SettingsStore>()
+                                            .showThumbnails,
+                                        showCategory: widget.categoryId == null,
                                       ),
-                                      streamInfo: _listStore.streams[index],
-                                      showThumbnail: context
-                                          .read<SettingsStore>()
-                                          .showThumbnails,
-                                      showCategory: widget.categoryId == null,
-                                    )
-                                  : StreamCard(
-                                      key: ValueKey(
-                                        _listStore.streams[index].userId,
-                                      ),
-                                      streamInfo: _listStore.streams[index],
-                                      showThumbnail: context
-                                          .read<SettingsStore>()
-                                          .showThumbnails,
-                                      showCategory: widget.categoryId == null,
-                                    ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],

@@ -98,20 +98,23 @@ class _CategoriesState extends State<Categories>
             );
           }
 
-          return ListView.builder(
-            physics: const AlwaysScrollableScrollPhysics(),
+          return Scrollbar(
             controller: widget.scrollController,
-            itemCount: _categoriesStore.categories.length,
-            itemBuilder: (context, index) {
-              if (index > _categoriesStore.categories.length - 10 &&
-                  _categoriesStore.hasMore) {
-                _categoriesStore.getCategories();
-              }
-              return CategoryCard(
-                key: ValueKey(_categoriesStore.categories[index].id),
-                category: _categoriesStore.categories[index],
-              );
-            },
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: widget.scrollController,
+              itemCount: _categoriesStore.categories.length,
+              itemBuilder: (context, index) {
+                if (index > _categoriesStore.categories.length - 10 &&
+                    _categoriesStore.hasMore) {
+                  _categoriesStore.getCategories();
+                }
+                return CategoryCard(
+                  key: ValueKey(_categoriesStore.categories[index].id),
+                  category: _categoriesStore.categories[index],
+                );
+              },
+            ),
           );
         },
       ),

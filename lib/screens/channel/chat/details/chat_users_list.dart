@@ -75,84 +75,88 @@ class _ChattersListState extends State<ChattersList> {
             child: Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: [
-                Observer(
-                  builder: (context) {
-                    return CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: widget.chatDetailsStore.scrollController,
-                      slivers: [
-                        if (widget.chatDetailsStore.filterText.isEmpty)
-                          SliverPadding(
-                            padding: const EdgeInsets.all(12),
-                            sliver: SliverToBoxAdapter(
-                              child: Text(
-                                '${NumberFormat().format(widget.chatDetailsStore.chatUsers.length)} chatters found',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
+                Scrollbar(
+                  controller: widget.chatDetailsStore.scrollController,
+                  child: Observer(
+                    builder: (context) {
+                      return CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: widget.chatDetailsStore.scrollController,
+                        slivers: [
+                          if (widget.chatDetailsStore.filterText.isEmpty)
+                            SliverPadding(
+                              padding: const EdgeInsets.all(12),
+                              sliver: SliverToBoxAdapter(
+                                child: Text(
+                                  '${NumberFormat().format(widget.chatDetailsStore.chatUsers.length)} chatters found',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        if (widget.chatDetailsStore.chatUsers.isEmpty)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: AlertMessage(message: 'No chatters found'),
-                          )
-                        else if (widget.chatDetailsStore.filteredUsers.isEmpty)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child:
-                                AlertMessage(message: 'No matching chatters'),
-                          )
-                        else
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) => InkWell(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  child: Text(
-                                    widget.chatDetailsStore.filteredUsers
-                                        .elementAt(index),
-                                  ),
-                                ),
-                                onLongPress: () async {
-                                  HapticFeedback.lightImpact();
-
-                                  final userInfo =
-                                      await context.read<TwitchApi>().getUser(
-                                            headers: context
-                                                .read<AuthStore>()
-                                                .headersTwitch,
-                                            userLogin: widget
-                                                .chatDetailsStore.filteredUsers
-                                                .elementAt(index),
-                                          );
-
-                                  if (!mounted) return;
-
-                                  showModalBottomSheet(
-                                    isScrollControlled: true,
-                                    context: context,
-                                    builder: (context) => ChatUserModal(
-                                      chatStore: widget.chatStore,
-                                      username: userInfo.login,
-                                      userId: userInfo.id,
-                                      displayName: userInfo.displayName,
+                          if (widget.chatDetailsStore.chatUsers.isEmpty)
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
+                              child: AlertMessage(message: 'No chatters found'),
+                            )
+                          else if (widget
+                              .chatDetailsStore.filteredUsers.isEmpty)
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
+                              child:
+                                  AlertMessage(message: 'No matching chatters'),
+                            )
+                          else
+                            SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) => InkWell(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
                                     ),
-                                  );
-                                },
+                                    child: Text(
+                                      widget.chatDetailsStore.filteredUsers
+                                          .elementAt(index),
+                                    ),
+                                  ),
+                                  onLongPress: () async {
+                                    HapticFeedback.lightImpact();
+
+                                    final userInfo =
+                                        await context.read<TwitchApi>().getUser(
+                                              headers: context
+                                                  .read<AuthStore>()
+                                                  .headersTwitch,
+                                              userLogin: widget.chatDetailsStore
+                                                  .filteredUsers
+                                                  .elementAt(index),
+                                            );
+
+                                    if (!mounted) return;
+
+                                    showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder: (context) => ChatUserModal(
+                                        chatStore: widget.chatStore,
+                                        username: userInfo.login,
+                                        userId: userInfo.id,
+                                        displayName: userInfo.displayName,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                childCount: widget
+                                    .chatDetailsStore.filteredUsers.length,
                               ),
-                              childCount:
-                                  widget.chatDetailsStore.filteredUsers.length,
                             ),
-                          ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
                 Observer(
                   builder: (context) => AnimatedSwitcher(
