@@ -12,8 +12,8 @@ class FrostyThemes {
     Color? backgroundColor,
   }) {
     final secondaryBackground = brightness == Brightness.light
-        ? Colors.grey.shade100
-        : Colors.grey.shade900;
+        ? Colors.grey.shade200
+        : Colors.grey.shade800;
 
     return ThemeData(
       useMaterial3: true,
@@ -37,20 +37,18 @@ class FrostyThemes {
         surfaceTintColor: backgroundColor,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: secondaryBackground,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(style: BorderStyle.none),
+        border: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(color: secondaryBackground),
         ),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(style: BorderStyle.none),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(color: secondaryBackground),
         ),
-        disabledBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(style: BorderStyle.none),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(color: secondaryBackground),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
