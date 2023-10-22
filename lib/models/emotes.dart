@@ -184,22 +184,6 @@ class Emote {
   Map<String, dynamic> toJson() => _$EmoteToJson(this);
 }
 
-const emoteType = [
-  'Twitch (Bits Tier)',
-  'Twitch (Follower)',
-  'Twitch (Subscriber)',
-  'Twitch (Global)',
-  'Twitch (Unlocked)',
-  'Twitch (Channel)',
-  'FFZ (Global)',
-  'FFZ (Channel)',
-  'BTTV (Global)',
-  'BTTV (Channel)',
-  'BTTV (Shared)',
-  '7TV (Global)',
-  '7TV (Channel)',
-];
-
 enum EmoteType {
   twitchBits,
   twitchFollower,
@@ -213,5 +197,37 @@ enum EmoteType {
   bttvChannel,
   bttvShared,
   sevenTVGlobal,
-  sevenTVChannel,
+  sevenTVChannel;
+
+  @override
+  String toString() {
+    switch (this) {
+      case EmoteType.twitchBits:
+        return 'Twitch bits emote';
+      case EmoteType.twitchFollower:
+        return 'Twitch follower emote';
+      case EmoteType.twitchSub:
+        return 'Twitch sub emote';
+      case EmoteType.twitchGlobal:
+        return 'Twitch global emote';
+      case EmoteType.twitchUnlocked:
+        return 'Twitch unlocked emote';
+      case EmoteType.twitchChannel:
+        return 'Twitch channel emote';
+      case EmoteType.ffzGlobal:
+        return 'FrankerFaceZ global emote';
+      case EmoteType.ffzChannel:
+        return 'FrankerFaceZ channel emote';
+      case EmoteType.bttvGlobal:
+        return 'BetterTTV global emote';
+      case EmoteType.bttvChannel:
+        return 'BetterTTV channel emote';
+      case EmoteType.bttvShared:
+        return 'BetterTTV shared emote';
+      case EmoteType.sevenTVGlobal:
+        return '7TV global emote';
+      case EmoteType.sevenTVChannel:
+        return '7TV channel emote';
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
@@ -107,7 +108,8 @@ class IRCMessage {
   }
 
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
-  List<InlineSpan> generateSpan({
+  List<InlineSpan> generateSpan(
+    BuildContext context, {
     required TextStyle? style,
     required ChatAssetsStore assetsStore,
     required double badgeScale,
@@ -192,9 +194,11 @@ class IRCMessage {
 
             span.add(
               _createBadgeSpan(
+                context,
                 badge: newBadge,
                 size: badgeSize,
                 backgroundColor: const Color(0xFF00AD03),
+                launchExternal: launchExternal,
               ),
             );
             span.add(const TextSpan(text: ' '));
@@ -216,8 +220,10 @@ class IRCMessage {
 
           span.add(
             _createBadgeSpan(
+              context,
               badge: newBadge,
               size: badgeSize,
+              launchExternal: launchExternal,
             ),
           );
           span.add(const TextSpan(text: ' '));
@@ -235,9 +241,11 @@ class IRCMessage {
             span.insert(
               0,
               _createBadgeSpan(
+                context,
                 badge: badge,
                 size: badgeSize,
                 backgroundColor: color,
+                launchExternal: launchExternal,
               ),
             );
             span.add(const TextSpan(text: ' '));
@@ -245,9 +253,11 @@ class IRCMessage {
         } else {
           span.add(
             _createBadgeSpan(
+              context,
               badge: badge,
               size: badgeSize,
               backgroundColor: color,
+              launchExternal: launchExternal,
             ),
           );
           span.add(const TextSpan(text: ' '));
@@ -260,9 +270,11 @@ class IRCMessage {
     if (userBTTVBadge != null) {
       span.add(
         _createBadgeSpan(
+          context,
           badge: userBTTVBadge,
           size: badgeSize,
           isSvg: true,
+          launchExternal: launchExternal,
         ),
       );
       span.add(const TextSpan(text: ' '));
@@ -274,8 +286,10 @@ class IRCMessage {
       for (final badge in user7TVBadges) {
         span.add(
           _createBadgeSpan(
+            context,
             badge: badge,
             size: badgeSize,
+            launchExternal: launchExternal,
           ),
         );
         span.add(const TextSpan(text: ' '));
@@ -392,55 +406,39 @@ class IRCMessage {
 
               // Create the message for the tooltip
               final message = emoteStack.reversed.map(
-                (emote) => '${emote.name} - ${emoteType[emote.type.index]}',
+                (emote) => emote.name,
               );
+              final emoji = words[index];
               localSpan.add(
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
-                  child: Tooltip(
-                    triggerMode: TooltipTriggerMode.tap,
-                    showDuration: const Duration(seconds: 3),
-                    richMessage: WidgetSpan(
-                      child: Column(
+                  child: InkWell(
+                    onTap: () => _showDetailsBottomSheet(
+                      context,
+                      leading: Stack(
+                        alignment: AlignmentDirectional.center,
                         children: [
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              if (nextWordIsEmoji)
-                                Text(
-                                  words[index],
-                                  style: textStyle?.copyWith(fontSize: 75),
-                                ),
-                              ...emoteStack.reversed.map(
-                                (emote) => FrostyCachedNetworkImage(
-                                  imageUrl: emote.url,
-                                  height: 80,
-                                  useFade: false,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 5.0),
-                          Column(
-                            children: [
-                              Text(
-                                nextWordIsEmoji
-                                    ? '${words[index]} - Emoji'
-                                    : '${emoteStack.last.name} - ${emoteType[emoteStack.last.type.index]}',
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              Text(
-                                nextWordIsEmoji
-                                    ? message.join(', ')
-                                    : message.skip(1).join(', '),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                            ],
+                          if (nextWordIsEmoji)
+                            Text(
+                              emoji,
+                              style: textStyle?.copyWith(fontSize: 40),
+                            ),
+                          ...emoteStack.reversed.map(
+                            (emote) => FrostyCachedNetworkImage(
+                              imageUrl: emote.url,
+                            ),
                           ),
                         ],
                       ),
+                      url: emoteStack.last.url,
+                      title: nextWordIsEmoji
+                          ? emoji
+                          : '${emoteStack.last.name} (${emoteStack.last.type})',
+                      subtitle: Text(
+                        'with ${nextWordIsEmoji ? message.join(' + ') : message.skip(1).join(' + ')}',
+                      ),
+                      launchExternal: launchExternal,
                     ),
-                    preferBelow: false,
                     child: Stack(
                       alignment: AlignmentDirectional.center,
                       children: children,
@@ -463,11 +461,13 @@ class IRCMessage {
             } else {
               localSpan.add(
                 _createEmoteSpan(
+                  context,
                   emote: emote,
                   height: emote.height != null
                       ? emote.height! * emoteScale
                       : emoteSize,
                   width: emote.width != null ? emote.width! * emoteScale : null,
+                  launchExternal: launchExternal,
                 ),
               );
             }
@@ -517,7 +517,7 @@ class IRCMessage {
 
   static Widget _createBadgeWidget({
     required ChatBadge badge,
-    required double size,
+    double? size,
     Color? backgroundColor,
     bool? isSvg,
   }) {
@@ -547,35 +547,30 @@ class IRCMessage {
     }
   }
 
-  static WidgetSpan _createBadgeSpan({
+  static WidgetSpan _createBadgeSpan(
+    BuildContext context, {
     required ChatBadge badge,
     required double size,
+    required bool launchExternal,
     Color? backgroundColor,
     bool? isSvg,
   }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
-      child: Tooltip(
-        triggerMode: TooltipTriggerMode.tap,
-        showDuration: const Duration(seconds: 3),
-        richMessage: WidgetSpan(
-          child: Column(
-            children: [
-              _createBadgeWidget(
-                badge: badge,
-                size: 80,
-                backgroundColor: backgroundColor,
-                isSvg: isSvg,
-              ),
-              const SizedBox(height: 5.0),
-              Text(
-                badge.name,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ],
+      child: InkWell(
+        onTap: () => _showDetailsBottomSheet(
+          context,
+          leading: _createBadgeWidget(
+            badge: badge,
+            backgroundColor: backgroundColor,
+            isSvg: isSvg,
           ),
+          url: badge.url,
+          title: badge.name,
+          subtitle: Text(badge.type.toString()),
+          launchExternal: launchExternal,
+          showCopyName: false,
         ),
-        preferBelow: false,
         child: _createBadgeWidget(
           badge: badge,
           size: size,
@@ -586,37 +581,26 @@ class IRCMessage {
     );
   }
 
-  static WidgetSpan _createEmoteSpan({
+  static WidgetSpan _createEmoteSpan(
+    BuildContext context, {
     required Emote emote,
     required double height,
     required double? width,
+    required bool launchExternal,
   }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
-      child: Tooltip(
-        triggerMode: TooltipTriggerMode.tap,
-        showDuration: const Duration(seconds: 3),
-        richMessage: WidgetSpan(
-          child: Column(
-            children: [
-              FrostyCachedNetworkImage(
-                imageUrl: emote.url,
-                height: 80,
-                useFade: false,
-              ),
-              const SizedBox(height: 5.0),
-              Text(
-                emote.name,
-                style: const TextStyle(color: Colors.white),
-              ),
-              Text(
-                emoteType[emote.type.index],
-                style: const TextStyle(color: Colors.white),
-              ),
-            ],
+      child: InkWell(
+        onTap: () => _showDetailsBottomSheet(
+          context,
+          leading: FrostyCachedNetworkImage(
+            imageUrl: emote.url,
           ),
+          url: emote.url,
+          title: emote.name,
+          subtitle: Text(emote.type.toString()),
+          launchExternal: launchExternal,
         ),
-        preferBelow: false,
         child: FrostyCachedNetworkImage(
           imageUrl: emote.url,
           height: height,
@@ -653,6 +637,69 @@ class IRCMessage {
     } else {
       return TextSpan(text: text, style: style);
     }
+  }
+
+  static void _showDetailsBottomSheet(
+    BuildContext context, {
+    required Widget leading,
+    required String url,
+    required String title,
+    required Widget subtitle,
+    required bool launchExternal,
+    bool showCopyName = true,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ListView(
+        shrinkWrap: true,
+        primary: false,
+        children: [
+          ListTile(
+            leading: leading,
+            title: Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: subtitle,
+          ),
+          if (showCopyName)
+            ListTile(
+              leading: const Icon(Icons.copy_rounded),
+              title: const Text('Copy name'),
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: title));
+
+                Navigator.pop(context);
+              },
+            ),
+          ListTile(
+            leading: const Icon(Icons.copy_rounded),
+            title: const Text('Copy image URL'),
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: url));
+
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.launch_rounded),
+            title: const Text('Open in browser'),
+            onTap: () {
+              launchUrl(
+                Uri.parse(url),
+                mode: launchExternal
+                    ? LaunchMode.externalApplication
+                    : LaunchMode.inAppWebView,
+              );
+
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   /// Parses an IRC string and returns its corresponding [IRCMessage] object.
