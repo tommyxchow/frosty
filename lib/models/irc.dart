@@ -426,6 +426,7 @@ class IRCMessage {
                           ...emoteStack.reversed.map(
                             (emote) => FrostyCachedNetworkImage(
                               imageUrl: emote.url,
+                              width: 56,
                             ),
                           ),
                         ],
@@ -595,6 +596,7 @@ class IRCMessage {
           context,
           leading: FrostyCachedNetworkImage(
             imageUrl: emote.url,
+            width: 56,
           ),
           url: emote.url,
           title: emote.name,
