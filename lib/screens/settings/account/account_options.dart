@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/account/blocked_users.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
-import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/list_tile.dart';
 
 class AccountOptions extends StatelessWidget {
   final AuthStore authStore;
@@ -14,11 +11,15 @@ class AccountOptions extends StatelessWidget {
   Future<void> _showLogoutDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Log Out',
-        message: 'Are you sure you want to log out?',
+      builder: (context) => AlertDialog.adaptive(
+        title: const Text('Log out'),
+        content: const Text('Are you sure you want to log out?'),
         actions: [
-          Button(
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+          ),
+          TextButton(
             onPressed: () {
               authStore.logout();
               Navigator.pop(context);
@@ -26,11 +27,6 @@ class AccountOptions extends StatelessWidget {
             },
             child: const Text('Yes'),
           ),
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
-            child: const Text('Cancel'),
-          )
         ],
       ),
     );
@@ -39,20 +35,21 @@ class AccountOptions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      shrinkWrap: true,
+      primary: false,
       children: [
         SettingsTileRoute(
           leading: const Icon(Icons.block_rounded),
-          title: 'Blocked',
+          title: 'Blocked users',
           child: BlockedUsers(
             authStore: authStore,
           ),
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.logout_rounded),
-          title: 'Log out',
-          trailing: const Icon(Icons.chevron_right_rounded),
+          title: const Text('Log out'),
           onTap: () => _showLogoutDialog(context),
-        )
+        ),
       ],
     );
   }

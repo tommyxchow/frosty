@@ -9,6 +9,7 @@ import 'package:frosty/screens/home/top/top.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/profile_picture.dart';
 import 'package:provider/provider.dart';
 
 class Home extends StatefulWidget {
@@ -26,6 +27,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([]);
+
+    final isLoggedIn = _authStore.isLoggedIn && _authStore.user.details != null;
 
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
@@ -46,7 +49,12 @@ class _HomeState extends State<Home> {
           actions: [
             IconButton(
               tooltip: 'Settings',
-              icon: const Icon(Icons.settings_rounded),
+              icon: isLoggedIn
+                  ? ProfilePicture(
+                      userLogin: _authStore.user.details!.login,
+                      radius: 16,
+                    )
+                  : const Icon(Icons.settings_rounded),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -54,7 +62,7 @@ class _HomeState extends State<Home> {
                       Settings(settingsStore: context.read<SettingsStore>()),
                 ),
               ),
-            )
+            ),
           ],
         ),
         body: SafeArea(
@@ -78,33 +86,29 @@ class _HomeState extends State<Home> {
           ),
         ),
         bottomNavigationBar: Observer(
-          builder: (_) => BottomNavigationBar(
-            selectedFontSize: 12.0,
-            type: BottomNavigationBarType.fixed,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-            items: [
+          builder: (_) => NavigationBar(
+            destinations: [
               if (_authStore.isLoggedIn)
-                BottomNavigationBarItem(
+                NavigationDestination(
                   icon: _homeStore.selectedIndex == 0
                       ? const Icon(Icons.favorite_rounded)
                       : const Icon(Icons.favorite_border_rounded),
                   label: 'Following',
                   tooltip: 'Followed streams',
                 ),
-              const BottomNavigationBarItem(
+              const NavigationDestination(
                 icon: Icon(Icons.arrow_upward_rounded),
                 label: 'Top',
                 tooltip: 'Top streams and categories',
               ),
-              const BottomNavigationBarItem(
+              const NavigationDestination(
                 icon: Icon(Icons.search_rounded),
                 label: 'Search',
                 tooltip: 'Search for channels and categories',
               ),
             ],
-            currentIndex: _homeStore.selectedIndex,
-            onTap: _homeStore.handleTap,
+            selectedIndex: _homeStore.selectedIndex,
+            onDestinationSelected: _homeStore.handleTap,
           ),
         ),
       ),

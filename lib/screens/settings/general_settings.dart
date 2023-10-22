@@ -24,7 +24,7 @@ class GeneralSettings extends StatelessWidget {
             onChanged: (newTheme) => settingsStore.themeType =
                 ThemeType.values[themeNames.indexOf(newTheme)],
           ),
-          const SectionHeader('Stream card'),
+          const SectionHeader('Stream card', showDivider: true),
           SettingsListSwitch(
             title: 'Use large stream card',
             value: settingsStore.largeStreamCard,
@@ -35,7 +35,7 @@ class GeneralSettings extends StatelessWidget {
             value: settingsStore.showThumbnails,
             onChanged: (newValue) => settingsStore.showThumbnails = newValue,
           ),
-          const SectionHeader('Links'),
+          const SectionHeader('Links', showDivider: true),
           SettingsListSwitch(
             title: 'Open links in external browser',
             value: settingsStore.launchUrlExternal,

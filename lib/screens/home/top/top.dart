@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
@@ -24,8 +23,9 @@ class _TopSectionState extends State<TopSection>
   @override
   void initState() {
     super.initState();
-    _tabBarController.addListener(() =>
-        widget.homeStore.topSectionCurrentIndex = _tabBarController.index);
+    _tabBarController.addListener(
+      () => widget.homeStore.topSectionCurrentIndex = _tabBarController.index,
+    );
   }
 
   @override
@@ -34,15 +34,12 @@ class _TopSectionState extends State<TopSection>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TabBar(
+          isScrollable: true,
           controller: _tabBarController,
-          labelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-          ),
-          indicatorSize: TabBarIndicatorSize.label,
-          indicatorColor: purple,
           tabs: const [
-            Tab(child: Text('Streams')),
+            Tab(
+              child: Text('Streams'),
+            ),
             Tab(child: Text('Categories')),
           ],
         ),

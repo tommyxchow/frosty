@@ -90,9 +90,13 @@ abstract class SearchStoreBase with Store {
   /// This is used for channels that may not show up in the search results.
   Future<Channel> searchChannel(String query) async {
     final user = await twitchApi.getUser(
-        userLogin: query, headers: authStore.headersTwitch);
+      userLogin: query,
+      headers: authStore.headersTwitch,
+    );
     return await twitchApi.getChannel(
-        userId: user.id, headers: authStore.headersTwitch);
+      userId: user.id,
+      headers: authStore.headersTwitch,
+    );
   }
 
   void dispose() {

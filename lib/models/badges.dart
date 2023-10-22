@@ -152,5 +152,19 @@ enum BadgeType {
   twitch,
   bttv,
   ffz,
-  sevenTV,
+  sevenTV;
+
+  @override
+  String toString() {
+    switch (this) {
+      case BadgeType.twitch:
+        return 'Twitch badge';
+      case BadgeType.bttv:
+        return 'BetterTTV badge';
+      case BadgeType.ffz:
+        return 'FrankerFaceZ badge';
+      case BadgeType.sevenTV:
+        return '7TV badge';
+    }
+  }
 }

@@ -31,7 +31,8 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
 
   @override
   Future<void> didChangeAppLifecycleState(
-      AppLifecycleState lifecycleState) async {
+    AppLifecycleState lifecycleState,
+  ) async {
     if (Platform.isAndroid &&
         !await SimplePip.isAutoPipAvailable &&
         lifecycleState == AppLifecycleState.inactive) {

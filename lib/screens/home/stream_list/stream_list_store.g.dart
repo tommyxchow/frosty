@@ -59,6 +59,24 @@ mixin _$ListStore on ListStoreBase, Store {
     });
   }
 
+  late final _$_categoryDetailsAtom =
+      Atom(name: 'ListStoreBase._categoryDetails', context: context);
+
+  CategoryTwitch? get categoryDetails {
+    _$_categoryDetailsAtom.reportRead();
+    return super._categoryDetails;
+  }
+
+  @override
+  CategoryTwitch? get _categoryDetails => categoryDetails;
+
+  @override
+  set _categoryDetails(CategoryTwitch? value) {
+    _$_categoryDetailsAtom.reportWrite(value, super._categoryDetails, () {
+      super._categoryDetails = value;
+    });
+  }
+
   late final _$showJumpButtonAtom =
       Atom(name: 'ListStoreBase.showJumpButton', context: context);
 
@@ -99,6 +117,15 @@ mixin _$ListStore on ListStoreBase, Store {
   @override
   Future<void> getStreams() {
     return _$getStreamsAsyncAction.run(() => super.getStreams());
+  }
+
+  late final _$_getCategoryDetailsAsyncAction =
+      AsyncAction('ListStoreBase._getCategoryDetails', context: context);
+
+  @override
+  Future<void> _getCategoryDetails() {
+    return _$_getCategoryDetailsAsyncAction
+        .run(() => super._getCategoryDetails());
   }
 
   late final _$ListStoreBaseActionController =

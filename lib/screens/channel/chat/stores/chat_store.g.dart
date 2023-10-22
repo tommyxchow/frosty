@@ -17,38 +17,6 @@ mixin _$ChatStore on ChatStoreBase, Store {
               name: 'ChatStoreBase.renderMessages'))
       .value;
 
-  late final _$sleepHoursAtom =
-      Atom(name: 'ChatStoreBase.sleepHours', context: context);
-
-  @override
-  int get sleepHours {
-    _$sleepHoursAtom.reportRead();
-    return super.sleepHours;
-  }
-
-  @override
-  set sleepHours(int value) {
-    _$sleepHoursAtom.reportWrite(value, super.sleepHours, () {
-      super.sleepHours = value;
-    });
-  }
-
-  late final _$sleepMinutesAtom =
-      Atom(name: 'ChatStoreBase.sleepMinutes', context: context);
-
-  @override
-  int get sleepMinutes {
-    _$sleepMinutesAtom.reportRead();
-    return super.sleepMinutes;
-  }
-
-  @override
-  set sleepMinutes(int value) {
-    _$sleepMinutesAtom.reportWrite(value, super.sleepMinutes, () {
-      super.sleepMinutes = value;
-    });
-  }
-
   late final _$timeRemainingAtom =
       Atom(name: 'ChatStoreBase.timeRemaining', context: context);
 
@@ -316,11 +284,13 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
-  void updateSleepTimer({required void Function() onTimerFinished}) {
+  void updateSleepTimer(
+      {required Duration duration, required VoidCallback onTimerFinished}) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
         name: 'ChatStoreBase.updateSleepTimer');
     try {
-      return super.updateSleepTimer(onTimerFinished: onTimerFinished);
+      return super.updateSleepTimer(
+          duration: duration, onTimerFinished: onTimerFinished);
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
@@ -340,8 +310,6 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   String toString() {
     return '''
-sleepHours: ${sleepHours},
-sleepMinutes: ${sleepMinutes},
 timeRemaining: ${timeRemaining},
 expandChat: ${expandChat},
 renderMessages: ${renderMessages}

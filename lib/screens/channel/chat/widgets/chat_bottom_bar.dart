@@ -3,7 +3,6 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
-import 'package:frosty/widgets/button.dart';
 import 'package:frosty/widgets/cached_image.dart';
 
 class ChatBottomBar extends StatelessWidget {
@@ -20,9 +19,11 @@ class ChatBottomBar extends StatelessWidget {
         color: chatStore.assetsStore.showEmoteMenu
             ? Theme.of(context).colorScheme.secondary
             : null,
-        icon: Icon(chatStore.assetsStore.showEmoteMenu
-            ? Icons.emoji_emotions_rounded
-            : Icons.emoji_emotions_outlined),
+        icon: Icon(
+          chatStore.assetsStore.showEmoteMenu
+              ? Icons.emoji_emotions_rounded
+              : Icons.emoji_emotions_outlined,
+        ),
         onPressed: () {
           FocusScope.of(context).unfocus();
           chatStore.assetsStore.showEmoteMenu =
@@ -37,7 +38,7 @@ class ChatBottomBar extends StatelessWidget {
           ...chatStore.assetsStore.userEmoteToObject.values,
           ...chatStore.assetsStore.bttvEmotes,
           ...chatStore.assetsStore.ffzEmotes,
-          ...chatStore.assetsStore.sevenTVEmotes
+          ...chatStore.assetsStore.sevenTVEmotes,
         ]
             .where(
               (emote) => emote.name.toLowerCase().contains(
@@ -63,24 +64,23 @@ class ChatBottomBar extends StatelessWidget {
             if (chatStore.settings.autocomplete &&
                 chatStore.showEmoteAutocomplete &&
                 matchingEmotes.isNotEmpty) ...[
-              const Divider(
-                height: 1.0,
-                thickness: 1.0,
-              ),
+              const Divider(),
               SizedBox(
                 height: 50,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  padding: const EdgeInsets.all(4),
                   itemCount: matchingEmotes.length,
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (context, index) => InkWell(
-                    onTap: () => chatStore.addEmote(matchingEmotes[index],
-                        autocompleteMode: true),
+                    onTap: () => chatStore.addEmote(
+                      matchingEmotes[index],
+                      autocompleteMode: true,
+                    ),
                     child: Tooltip(
                       message: matchingEmotes[index].name,
                       preferBelow: false,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Center(
                           child: FrostyCachedNetworkImage(
                             imageUrl: matchingEmotes[index].url,
@@ -99,18 +99,17 @@ class ChatBottomBar extends StatelessWidget {
             if (chatStore.settings.autocomplete &&
                 chatStore.showMentionAutocomplete &&
                 matchingChatters.isNotEmpty) ...[
-              const Divider(
-                height: 1.0,
-                thickness: 1.0,
-              ),
+              const Divider(),
               SizedBox(
                 height: 50,
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  padding: const EdgeInsets.all(4),
                   itemCount: matchingChatters.length,
                   scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) => Button(
-                    color: Theme.of(context).colorScheme.secondary,
+                  itemBuilder: (context, index) => TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                    ),
                     onPressed: () {
                       final split = chatStore.textController.text.split(' ')
                         ..removeLast()
@@ -118,16 +117,19 @@ class ChatBottomBar extends StatelessWidget {
 
                       chatStore.textController.text = split.join(' ');
                       chatStore.textController.selection =
-                          TextSelection.fromPosition(TextPosition(
-                              offset: chatStore.textController.text.length));
+                          TextSelection.fromPosition(
+                        TextPosition(
+                          offset: chatStore.textController.text.length,
+                        ),
+                      );
                     },
                     child: Text(matchingChatters[index]),
                   ),
                 ),
-              )
+              ),
             ],
             Padding(
-              padding: const EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 10.0),
+              padding: const EdgeInsets.fromLTRB(12, 12, 0, 12),
               child: Row(
                 children: [
                   if (!chatStore.expandChat &&
@@ -152,7 +154,6 @@ class ChatBottomBar extends StatelessWidget {
                         maxLines: 5,
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.only(left: 15.0),
                           prefixIcon: chatStore.settings.emoteMenuButtonOnLeft
                               ? emoteMenuButton
                               : null,
@@ -186,7 +187,6 @@ class ChatBottomBar extends StatelessWidget {
                       icon: Icon(Icons.adaptive.more_rounded),
                       tooltip: 'More',
                       onPressed: () => showModalBottomSheet(
-                        backgroundColor: Colors.transparent,
                         isScrollControlled: true,
                         context: context,
                         builder: (_) => ChatDetails(

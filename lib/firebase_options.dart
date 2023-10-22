@@ -63,7 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '403282332389',
     projectId: 'frosty-128de',
     storageBucket: 'frosty-128de.appspot.com',
-    iosClientId: '403282332389-gst8k8gl71a7vrhf5k69nl8pnsq19rg8.apps.googleusercontent.com',
+    iosClientId:
+        '403282332389-gst8k8gl71a7vrhf5k69nl8pnsq19rg8.apps.googleusercontent.com',
     iosBundleId: 'com.tommychow.frosty',
   );
 }

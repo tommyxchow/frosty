@@ -101,7 +101,7 @@ void main() {
         '54fa903b01e468494b85b53f',
         '54fa909b01e468494b85b542',
         '54fa90ba01e468494b85b543',
-        '54fa90f201e468494b85b545'
+        '54fa90f201e468494b85b545',
       ];
       final emoteCodes = ['DatSauce', 'ForeverAlone', 'GabeN', 'HailHelix'];
 

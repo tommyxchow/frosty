@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/widgets.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/models/category.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:mobx/mobx.dart';
@@ -45,6 +46,9 @@ abstract class ListStoreBase with Store {
   @readonly
   var _allStreams = ObservableList<StreamTwitch>();
 
+  @readonly
+  CategoryTwitch? _categoryDetails;
+
   /// Whether or not the scroll to top button is visible.
   @observable
   var showJumpButton = false;
@@ -52,9 +56,11 @@ abstract class ListStoreBase with Store {
   /// The list of the fetched streams with blocked users filtered out.
   @computed
   ObservableList<StreamTwitch> get streams => _allStreams
-      .where((streamInfo) => !authStore.user.blockedUsers
-          .map((blockedUser) => blockedUser.userId)
-          .contains(streamInfo.userId))
+      .where(
+        (streamInfo) => !authStore.user.blockedUsers
+            .map((blockedUser) => blockedUser.userId)
+            .contains(streamInfo.userId),
+      )
       .toList()
       .asObservable();
 
@@ -81,6 +87,10 @@ abstract class ListStoreBase with Store {
     }
 
     getStreams();
+
+    if (listType == ListType.category && categoryId != null) {
+      _getCategoryDetails();
+    }
   }
 
   /// Fetches the streams based on the type and current cursor.
@@ -136,6 +146,20 @@ abstract class ListStoreBase with Store {
     _streamsCursor = null;
 
     return getStreams();
+  }
+
+  @action
+  Future<void> _getCategoryDetails() async {
+    _isLoading = true;
+
+    final categoryDetails = await twitchApi.getCategory(
+      headers: authStore.headersTwitch,
+      gameId: categoryId!,
+    );
+
+    _categoryDetails = categoryDetails.data.first;
+
+    _isLoading = false;
   }
 
   /// Checks the last time the streams were refreshed and updates them if it has been more than 5 minutes.

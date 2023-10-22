@@ -57,18 +57,11 @@ class SearchResultsCategories extends StatelessWidget {
               );
             }
 
-            return SliverGrid.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 20,
-              children: categories.data
-                  .map(
-                    (category) => GridTile(
-                      child: CategoryCard(
-                        category: category,
-                      ),
-                    ),
-                  )
-                  .toList(),
+            return SliverList.builder(
+              itemCount: categories.data.length,
+              itemBuilder: (context, index) => CategoryCard(
+                category: categories.data[index],
+              ),
             );
         }
       },

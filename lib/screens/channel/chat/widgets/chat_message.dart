@@ -5,6 +5,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
+import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
@@ -29,7 +30,6 @@ class ChatMessage extends StatelessWidget {
           ircMessage.user == chatStore.auth.user.details?.login) return;
 
       showModalBottomSheet(
-        backgroundColor: Colors.transparent,
         isScrollControlled: true,
         context: context,
         builder: (context) => ChatUserModal(
@@ -69,6 +69,7 @@ class ChatMessage extends StatelessWidget {
             final messageSpan = Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
+                  context,
                   onTapName: onTapName,
                   style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
@@ -98,19 +99,26 @@ class ChatMessage extends StatelessWidget {
                       Icon(
                         replyUser != null && replyBody != null
                             ? Icons.reply_rounded
-                            : Icons.new_releases_outlined,
+                            : Icons.star_rounded,
                         size: defaultBadgeSize * chatStore.settings.badgeScale,
                         color: defaultTextStyle.color?.withOpacity(0.5),
                         textDirection: TextDirection.rtl,
                       ),
-                      const SizedBox(width: 5.0),
+                      const SizedBox(width: 4),
                       Flexible(
                         child: replyUser != null && replyBody != null
-                            ? Tooltip(
-                                message: 'Replying to @$replyUser: $replyBody',
-                                preferBelow: false,
-                                triggerMode: TooltipTriggerMode.tap,
-                                showDuration: const Duration(seconds: 5),
+                            ? GestureDetector(
+                                onTap: isModal
+                                    ? null
+                                    : () => showModalBottomSheet(
+                                          context: context,
+                                          builder: (context) {
+                                            return ReplyThread(
+                                              selectedMessage: ircMessage,
+                                              chatStore: chatStore,
+                                            );
+                                          },
+                                        ),
                                 child: Text(
                                   'Replying to @$replyUser: $replyBody',
                                   maxLines: 1,
@@ -124,7 +132,7 @@ class ChatMessage extends StatelessWidget {
                             : Text(
                                 'First time chatting',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w500,
                                   color:
                                       defaultTextStyle.color?.withOpacity(0.5),
                                 ),
@@ -132,7 +140,7 @@ class ChatMessage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 5.0),
+                  const SizedBox(height: 4),
                   messageSpan,
                 ],
               );
@@ -155,22 +163,23 @@ class ChatMessage extends StatelessWidget {
                     if (ircMessage.command == Command.clearMessage)
                       const Text(
                         'Message deleted',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       )
                     else
                       const Text(
                         'Permanently banned',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: FontWeight.w500),
                       )
                   else
                     Text(
                       'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     ),
-                  const SizedBox(height: 5.0),
+                  const SizedBox(height: 4),
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
+                        context,
                         onTapName: onTapName,
                         style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
@@ -206,8 +215,9 @@ class ChatMessage extends StatelessWidget {
                     Text(
                       ircMessage.tags['system-msg']!,
                       style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: defaultTextStyle.color?.withOpacity(0.5)),
+                        fontWeight: FontWeight.w500,
+                        color: defaultTextStyle.color?.withOpacity(0.5),
+                      ),
                     ),
                   if (ircMessage.tags['msg-id'] == 'announcement')
                     Row(
@@ -217,18 +227,19 @@ class ChatMessage extends StatelessWidget {
                           size:
                               defaultBadgeSize * chatStore.settings.badgeScale,
                         ),
-                        const SizedBox(width: 5.0),
+                        const SizedBox(width: 4),
                         const Text(
                           'Announcement',
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                          style: TextStyle(fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
-                  const SizedBox(height: 5.0),
+                  const SizedBox(height: 4),
                   if (ircMessage.message != null)
                     Text.rich(
                       TextSpan(
                         children: ircMessage.generateSpan(
+                          context,
                           onTapName: onTapName,
                           style: defaultTextStyle,
                           assetsStore: chatStore.assetsStore,
@@ -255,8 +266,9 @@ class ChatMessage extends StatelessWidget {
 
         final paddedMessage = Padding(
           padding: EdgeInsets.symmetric(
-              vertical: chatStore.settings.messageSpacing / 2,
-              horizontal: 10.0),
+            vertical: chatStore.settings.messageSpacing / 2,
+            horizontal: 12,
+          ),
           child: renderMessage,
         );
 
@@ -266,10 +278,7 @@ class ChatMessage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   paddedMessage,
-                  const Divider(
-                    height: 1.0,
-                    thickness: 1.0,
-                  ),
+                  const Divider(),
                 ],
               )
             : paddedMessage;

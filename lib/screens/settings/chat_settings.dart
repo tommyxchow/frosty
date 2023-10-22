@@ -31,8 +31,10 @@ class _ChatSettingsState extends State<ChatSettings> {
         children: [
           const SectionHeader('Message sizing'),
           ExpansionTile(
-            title: const Text('Preview',
-                style: TextStyle(fontWeight: FontWeight.w500)),
+            title: const Text(
+              'Preview',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             children: [
               Container(
                 width: double.infinity,
@@ -122,7 +124,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             trailing: '${settingsStore.messageSpacing.toStringAsFixed(0)}px',
             value: settingsStore.messageSpacing,
             max: 30.0,
-            divisions: 6,
+            divisions: 15,
             onChanged: (newValue) => settingsStore.messageSpacing = newValue,
           ),
           SettingsListSlider(
@@ -134,18 +136,20 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 15,
             onChanged: (newValue) => settingsStore.fontSize = newValue,
           ),
-          const SectionHeader('Message appearance'),
+          const SectionHeader('Message appearance', showDivider: true),
           SettingsListSwitch(
             title: 'Use readable name colors',
             subtitle: const Text(
-                'Adjusts the lightness value of overly bright and dark names.'),
+              'Adjusts the lightness value of overly bright and dark names.',
+            ),
             value: settingsStore.useReadableColors,
             onChanged: (newValue) => settingsStore.useReadableColors = newValue,
           ),
           SettingsListSwitch(
             title: 'Show deleted messages',
             subtitle: const Text(
-                'Restores the original message of deleted messages.'),
+              'Restores the original message of deleted messages.',
+            ),
             value: settingsStore.showDeletedMessages,
             onChanged: (newValue) =>
                 settingsStore.showDeletedMessages = newValue,
@@ -163,7 +167,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay'),
+          const SectionHeader('Delay', showDivider: true),
           SettingsListSlider(
             title: 'Message delay',
             trailing: '${settingsStore.chatDelay.toInt()}s',
@@ -174,7 +178,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 30,
             onChanged: (newValue) => settingsStore.chatDelay = newValue,
           ),
-          const SectionHeader('Alerts'),
+          const SectionHeader('Alerts', showDivider: true),
           SettingsListSwitch(
             title: 'Highlight first time chatters',
             value: settingsStore.highlightFirstTimeChatter,
@@ -184,11 +188,12 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Show notices',
             subtitle: const Text(
-                'Shows notices such as subs and re-subs, announcements, and raids.'),
+              'Shows notices such as subs and re-subs, announcements, and raids.',
+            ),
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
-          const SectionHeader('Layout'),
+          const SectionHeader('Layout', showDivider: true),
           SettingsListSwitch(
             title: 'Show bottom bar',
             value: settingsStore.showBottomBar,
@@ -197,7 +202,8 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Move emote menu button left',
             subtitle: const Text(
-                'Places the emote menu button on the left side to avoid accidental presses.'),
+              'Places the emote menu button on the left side to avoid accidental presses.',
+            ),
             value: settingsStore.emoteMenuButtonOnLeft,
             onChanged: (newValue) =>
                 settingsStore.emoteMenuButtonOnLeft = newValue,
@@ -208,7 +214,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.chatNotificationsOnBottom = newValue,
           ),
-          const SectionHeader('Landscape mode'),
+          const SectionHeader('Landscape mode', showDivider: true),
           SettingsListSwitch(
             title: 'Move chat left',
             value: settingsStore.landscapeChatLeftSide,
@@ -254,20 +260,22 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
-          const SectionHeader('Sleep'),
+          const SectionHeader('Sleep', showDivider: true),
           SettingsListSwitch(
             title: 'Prevent sleep in chat-only mode',
             subtitle: const Text(
-                'Requires restarting the chat in order to take effect.'),
+              'Requires restarting the chat in order to take effect.',
+            ),
             value: settingsStore.chatOnlyPreventSleep,
             onChanged: (newValue) =>
                 settingsStore.chatOnlyPreventSleep = newValue,
           ),
-          const SectionHeader('Autocomplete'),
+          const SectionHeader('Autocomplete', showDivider: true),
           SettingsListSwitch(
             title: 'Show autocomplete bar',
             subtitle: const Text(
-                'Shows a bar containing matching emotes and mentions while typing.'),
+              'Shows a bar containing matching emotes and mentions while typing.',
+            ),
             value: settingsStore.autocomplete,
             onChanged: (newValue) => settingsStore.autocomplete = newValue,
           ),

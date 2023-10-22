@@ -11,7 +11,7 @@ class OnboardingWelcome extends StatelessWidget {
     const text = [
       'Check out the GitHub repo at the top-right of the settings page to explore Frosty\'s source code, report bugs, make feature requests, and more.',
       'Links to the full changelog and FAQ are in the settings page under "Other".',
-      'Don\'t forget to leave a rating and/or review on the app store!'
+      'Don\'t forget to leave a rating and/or review on the app store!',
     ];
 
     return OnboardingScaffold(
@@ -20,21 +20,23 @@ class OnboardingWelcome extends StatelessWidget {
       content: Opacity(
         opacity: 0.8,
         child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           children: text
-              .mapIndexed((index, sentence) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: ListTile(
-                      leading: Text(
-                        '${index + 1}.',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
+              .mapIndexed(
+                (index, sentence) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    leading: Text(
+                      '${index + 1}.',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
-                      title: Text(sentence),
                     ),
-                  ))
+                    title: Text(sentence),
+                  ),
+                ),
+              )
               .toList(),
         ),
       ),

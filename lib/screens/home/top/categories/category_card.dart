@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -8,10 +7,12 @@ import 'package:frosty/widgets/loading_indicator.dart';
 /// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
   final CategoryTwitch category;
+  final bool isTappable;
 
   const CategoryCard({
     Key? key,
     required this.category,
+    this.isTappable = true,
   }) : super(key: key);
 
   @override
@@ -19,47 +20,54 @@ class CategoryCard extends StatelessWidget {
     // Calculate the dimmensions of the box art based on the current dimmensions of the screen.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-    final artWidth = (size.width * pixelRatio) ~/ 3;
+    final artWidth = (size.width * pixelRatio) ~/ 5;
     final artHeight = (artWidth * (4 / 3)).toInt();
 
     return InkWell(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CategoryStreams(
-            categoryName: category.name,
-            categoryId: category.id,
-          ),
-        ),
-      ),
+      onTap: isTappable
+          ? () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryStreams(
+                    categoryId: category.id,
+                  ),
+                ),
+              )
+          : null,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-        child: Column(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
           children: [
-            Expanded(
+            SizedBox(
+              width: 80,
               child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: AspectRatio(
                   aspectRatio: 3 / 4,
                   child: FrostyCachedNetworkImage(
                     imageUrl: category.boxArtUrl.replaceRange(
-                        category.boxArtUrl.lastIndexOf('-') + 1,
-                        null,
-                        '${artWidth}x$artHeight.jpg'),
-                    placeholder: (context, url) => const ColoredBox(
-                        color: lightGray, child: LoadingIndicator()),
+                      category.boxArtUrl.lastIndexOf('-') + 1,
+                      null,
+                      '${artWidth}x$artHeight.jpg',
+                    ),
+                    placeholder: (context, url) => ColoredBox(
+                      color: Colors.grey.shade900,
+                      child: const LoadingIndicator(),
+                    ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 5.0),
+            const SizedBox(width: 16),
             Tooltip(
               message: category.name,
               preferBelow: false,
-              padding: const EdgeInsets.all(10.0),
               child: Text(
                 category.name,
-                style: const TextStyle(fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(fontWeight: FontWeight.w600),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

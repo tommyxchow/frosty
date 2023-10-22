@@ -22,18 +22,20 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
-          const SectionHeader('Overlay'),
+          const SectionHeader('Overlay', showDivider: true),
           SettingsListSwitch(
             title: 'Use custom video overlay',
             subtitle: const Text(
-                'Replaces Twitch\'s default web overlay with a mobile-friendly version.'),
+              'Replaces Twitch\'s default web overlay with a mobile-friendly version.',
+            ),
             value: settingsStore.showOverlay,
             onChanged: (newValue) => settingsStore.showOverlay = newValue,
           ),
           SettingsListSwitch(
             title: 'Long-press player to toggle overlay',
             subtitle: const Text(
-                'Allows switching between Twitch\'s overlay and the custom overlay.'),
+              'Allows switching between Twitch\'s overlay and the custom overlay.',
+            ),
             value: settingsStore.toggleableOverlay,
             onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
           ),

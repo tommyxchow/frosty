@@ -163,8 +163,9 @@ abstract class _SettingsStoreBase with Store {
   var showChatMessageDividers = defaultShowChatMessageDividers;
 
   @JsonKey(
-      defaultValue: defaultTimestampType,
-      unknownEnumValue: TimestampType.disabled)
+    defaultValue: defaultTimestampType,
+    unknownEnumValue: TimestampType.disabled,
+  )
   @observable
   var timestampType = defaultTimestampType;
 

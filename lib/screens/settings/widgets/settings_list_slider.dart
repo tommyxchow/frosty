@@ -36,9 +36,12 @@ class SettingsListSlider extends StatelessWidget {
         children: [
           Text(title, style: _textStyle),
           const Spacer(),
-          Text(trailing,
-              style: _textStyle.copyWith(
-                  fontFeatures: [const FontFeature.tabularFigures()])),
+          Text(
+            trailing,
+            style: _textStyle.copyWith(
+              fontFeatures: [const FontFeature.tabularFigures()],
+            ),
+          ),
         ],
       ),
       subtitle: Column(

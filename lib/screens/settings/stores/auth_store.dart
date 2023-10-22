@@ -6,8 +6,6 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
-import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -52,8 +50,10 @@ abstract class AuthBase with Store {
   String? _error;
 
   /// Navigation handler for the login webview. Fires on every navigation request (whenever the URL changes).
-  FutureOr<NavigationDecision> handleNavigation(
-      {required NavigationRequest request, Widget? routeAfter}) {
+  FutureOr<NavigationDecision> handleNavigation({
+    required NavigationRequest request,
+    Widget? routeAfter,
+  }) {
     // Check if the URL is the redirect URI.
     if (request.url.startsWith('https://twitch.tv/login')) {
       // Extract the token from the query parameters.
@@ -119,10 +119,10 @@ abstract class AuthBase with Store {
         .where((blockedUser) => blockedUser.userId == targetUserId)
         .isNotEmpty;
 
-    final title = isBlocked ? 'Unblock $targetUser' : 'Block $targetUser';
+    final title = isBlocked ? 'Unblock' : 'Block';
 
     final message =
-        'Are you sure you want to ${isBlocked ? 'unblock $targetUser?' : 'block $targetUser? This will remove them from channel lists, search results, and chat messages.'}';
+        'Are you sure you want to ${isBlocked ? 'unblock "$targetUser"?' : 'block "$targetUser"? This will remove them from channel lists, search results, and chat messages.'}';
 
     void onPressed() {
       if (isBlocked) {
@@ -139,18 +139,17 @@ abstract class AuthBase with Store {
 
     return showDialog(
       context: context,
-      builder: (context) => FrostyDialog(
-        title: title,
-        message: message,
+      builder: (context) => AlertDialog.adaptive(
+        title: Text(title),
+        content: Text(message),
         actions: [
-          Button(
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+          ),
+          TextButton(
             onPressed: onPressed,
             child: const Text('Yes'),
-          ),
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
-            child: const Text('Cancel'),
           ),
         ],
       ),

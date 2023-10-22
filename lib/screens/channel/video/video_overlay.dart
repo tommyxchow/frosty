@@ -5,7 +5,6 @@ import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
-import 'package:frosty/widgets/bottom_sheet.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 
@@ -94,7 +93,8 @@ class VideoOverlay extends StatelessWidget {
             ]);
           } else {
             SystemChrome.setPreferredOrientations(
-                [DeviceOrientation.portraitUp]);
+              [DeviceOrientation.portraitUp],
+            );
             SystemChrome.setPreferredOrientations([]);
           }
         },
@@ -157,7 +157,7 @@ class VideoOverlay extends StatelessWidget {
                 message: videoStore.paused ? 'Play' : 'Pause',
                 preferBelow: false,
                 child: IconButton(
-                  iconSize: 50.0,
+                  iconSize: 56,
                   icon: Icon(
                     videoStore.paused
                         ? Icons.play_arrow_rounded
@@ -175,7 +175,7 @@ class VideoOverlay extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 10.0, bottom: 12.0),
+                      padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
                           Tooltip(
@@ -183,15 +183,12 @@ class VideoOverlay extends StatelessWidget {
                             preferBelow: false,
                             child: Row(
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.all(2.0),
-                                  child: Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
-                                    size: 10,
-                                  ),
+                                const Icon(
+                                  Icons.circle,
+                                  color: Colors.red,
+                                  size: 10,
                                 ),
-                                const SizedBox(width: 3.0),
+                                const SizedBox(width: 4),
                                 Uptime(
                                   startTime: streamInfo.startedAt,
                                   style: const TextStyle(
@@ -202,27 +199,24 @@ class VideoOverlay extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Tooltip(
                             message: 'Viewer count',
                             preferBelow: false,
                             child: GestureDetector(
                               onTap: () => showModalBottomSheet(
-                                backgroundColor: Colors.transparent,
                                 isScrollControlled: true,
                                 context: context,
-                                builder: (context) => FrostyBottomSheet(
-                                  child: SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.8,
-                                    child: GestureDetector(
-                                      onTap: FocusScope.of(context).unfocus,
-                                      child: ChattersList(
-                                        chatDetailsStore:
-                                            chatStore.chatDetailsStore,
-                                        chatStore: chatStore,
-                                        userLogin: streamInfo.userLogin,
-                                      ),
+                                builder: (context) => SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.8,
+                                  child: GestureDetector(
+                                    onTap: FocusScope.of(context).unfocus,
+                                    child: ChattersList(
+                                      chatDetailsStore:
+                                          chatStore.chatDetailsStore,
+                                      chatStore: chatStore,
+                                      userLogin: streamInfo.userLogin,
                                     ),
                                   ),
                                 ),
@@ -234,10 +228,11 @@ class VideoOverlay extends StatelessWidget {
                                     size: 14,
                                     color: Colors.white,
                                   ),
-                                  const SizedBox(width: 5),
+                                  const SizedBox(width: 4),
                                   Text(
                                     NumberFormat().format(
-                                        videoStore.streamInfo?.viewerCount),
+                                      videoStore.streamInfo?.viewerCount,
+                                    ),
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
@@ -267,7 +262,7 @@ class VideoOverlay extends StatelessWidget {
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
               ),
-            )
+            ),
           ],
         );
       },

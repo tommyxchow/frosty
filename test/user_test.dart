@@ -26,7 +26,9 @@ void main() {
     expect(user.id, '88888888');
     expect(user.login, 'bob');
     expect(user.displayName, 'Bob');
-    expect(user.profileImageUrl,
-        'https://static-cdn.jtvnw.net/user-default-pictures-uv/ead5c8b2-a4c9-4724-b1dd-9f00b46cbd3d-profile_image-300x300.png');
+    expect(
+      user.profileImageUrl,
+      'https://static-cdn.jtvnw.net/user-default-pictures-uv/ead5c8b2-a4c9-4724-b1dd-9f00b46cbd3d-profile_image-300x300.png',
+    );
   });
 }

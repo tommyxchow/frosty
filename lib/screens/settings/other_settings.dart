@@ -9,9 +9,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/list_tile.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -31,11 +28,15 @@ class _OtherSettingsState extends State<OtherSettings> {
   Future<void> _showConfirmDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Reset All Settings',
-        message: 'Are you sure you want to reset all settings?',
+      builder: (context) => AlertDialog.adaptive(
+        title: const Text('Reset all settings'),
+        content: const Text('Are you sure you want to reset all settings?'),
         actions: [
-          Button(
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+          ),
+          TextButton(
             onPressed: () {
               HapticFeedback.heavyImpact();
 
@@ -45,17 +46,14 @@ class _OtherSettingsState extends State<OtherSettings> {
 
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: AlertMessage(message: 'All settings reset'),
-                  behavior: SnackBarBehavior.floating,
+                  content: AlertMessage(
+                    message: 'All settings reset',
+                    centered: false,
+                  ),
                 ),
               );
             },
             child: const Text('Yes'),
-          ),
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
-            child: const Text('Cancel'),
           ),
         ],
       ),
@@ -66,9 +64,9 @@ class _OtherSettingsState extends State<OtherSettings> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.info_outline_rounded),
-          title: 'About Frosty',
+          title: const Text('About Frosty'),
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
@@ -87,26 +85,29 @@ class _OtherSettingsState extends State<OtherSettings> {
             );
           },
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.launch_rounded),
-          title: 'Changelog',
+          title: const Text('Changelog'),
           onTap: () => launchUrl(
-              Uri.parse('https://github.com/tommyxchow/frosty/releases'),
-              mode: widget.settingsStore.launchUrlExternal
-                  ? LaunchMode.externalApplication
-                  : LaunchMode.inAppWebView),
+            Uri.parse('https://github.com/tommyxchow/frosty/releases'),
+            mode: widget.settingsStore.launchUrlExternal
+                ? LaunchMode.externalApplication
+                : LaunchMode.inAppWebView,
+          ),
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.launch_rounded),
-          title: 'FAQ',
-          onTap: () => launchUrl(Uri.parse('https://www.frostyapp.io/#faq'),
-              mode: widget.settingsStore.launchUrlExternal
-                  ? LaunchMode.externalApplication
-                  : LaunchMode.inAppWebView),
+          title: const Text('FAQ'),
+          onTap: () => launchUrl(
+            Uri.parse('https://www.frostyapp.io/#faq'),
+            mode: widget.settingsStore.launchUrlExternal
+                ? LaunchMode.externalApplication
+                : LaunchMode.inAppWebView,
+          ),
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.delete_outline_rounded),
-          title: 'Clear image cache',
+          title: const Text('Clear image cache'),
           onTap: () async {
             HapticFeedback.mediumImpact();
 
@@ -115,22 +116,25 @@ class _OtherSettingsState extends State<OtherSettings> {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: AlertMessage(message: 'Image cache cleared'),
-                behavior: SnackBarBehavior.floating,
+                content: AlertMessage(
+                  message: 'Image cache cleared',
+                  centered: false,
+                ),
               ),
             );
           },
         ),
-        FrostyListTile(
+        ListTile(
           leading: const Icon(Icons.restore_rounded),
-          title: 'Reset settings',
+          title: const Text('Reset settings'),
           onTap: () => _showConfirmDialog(context),
         ),
         Observer(
           builder: (_) => SettingsListSwitch(
             title: 'Share crash logs and analytics',
             subtitle: const Text(
-                'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.'),
+              'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.',
+            ),
             value: widget.settingsStore.shareCrashLogsAndAnalytics,
             onChanged: (newValue) {
               widget.settingsStore.shareCrashLogsAndAnalytics = newValue;

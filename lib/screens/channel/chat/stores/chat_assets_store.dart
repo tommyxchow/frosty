@@ -109,8 +109,10 @@ abstract class ChatAssetsStoreBase with Store {
 
     _disposeReaction = autorun((_) {
       if (_recentEmotes.length > 48) _recentEmotes.removeLast();
-      prefs.setStringList('recent_emotes',
-          _recentEmotes.map((emote) => jsonEncode(emote)).toList());
+      prefs.setStringList(
+        'recent_emotes',
+        _recentEmotes.map((emote) => jsonEncode(emote)).toList(),
+      );
     });
   }
 
@@ -162,8 +164,11 @@ abstract class ChatAssetsStoreBase with Store {
           ffzRoomInfo = roomInfo;
           return emotes;
         }).catchError(onError),
-      ]).then((assets) => assets.expand((list) => list)).then((emotes) =>
-          _emoteToObject = {for (final emote in emotes) emote.name: emote});
+      ]).then((assets) => assets.expand((list) => list)).then(
+            (emotes) => _emoteToObject = {
+              for (final emote in emotes) emote.name: emote,
+            },
+          );
 
   @action
   Future<void> badgesFuture({
@@ -177,10 +182,12 @@ abstract class ChatAssetsStoreBase with Store {
         twitchApi
             .getBadgesGlobal(headers: headers)
             .then((badges) => twitchBadgesToObject.addAll(badges))
-            .then((_) => twitchApi
-                .getBadgesChannel(id: channelId, headers: headers)
-                .then((badges) => twitchBadgesToObject.addAll(badges))
-                .catchError(onError)),
+            .then(
+              (_) => twitchApi
+                  .getBadgesChannel(id: channelId, headers: headers)
+                  .then((badges) => twitchBadgesToObject.addAll(badges))
+                  .catchError(onError),
+            ),
         ffzApi
             .getBadges()
             .then((badges) => _userToFFZBadges = badges)
@@ -201,15 +208,21 @@ abstract class ChatAssetsStoreBase with Store {
     required Map<String, String> headers,
     required Function onError,
   }) async {
-    final userEmotes = await Future.wait(emoteSets.map((setId) => twitchApi
-        .getEmotesSets(setId: setId, headers: headers)
-        .catchError(onError)));
+    final userEmotes = await Future.wait(
+      emoteSets.map(
+        (setId) => twitchApi
+            .getEmotesSets(setId: setId, headers: headers)
+            .catchError(onError),
+      ),
+    );
 
     for (final emoteSet in userEmotes) {
       if (emoteSet.isNotEmpty) {
         if (emoteSet.first.type == EmoteType.twitchSub) {
           final owner = await twitchApi.getUser(
-              id: emoteSet.first.ownerId, headers: headers);
+            id: emoteSet.first.ownerId,
+            headers: headers,
+          );
           _userEmoteSectionToEmotes.update(
             owner.displayName,
             (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],

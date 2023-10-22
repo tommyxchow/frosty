@@ -20,7 +20,7 @@ class OnboardingSetup extends StatelessWidget {
     return OnboardingScaffold(
       header: 'Setup',
       subtitle:
-          'Let\'s tweak some settings before you get started. You can always change these later.',
+          'Let\'s tweak some settings before you get started. You can always change these and more later.',
       content: Observer(
         builder: (context) {
           return ListView(
@@ -35,7 +35,8 @@ class OnboardingSetup extends StatelessWidget {
               SettingsListSwitch(
                 title: 'Share crash logs and analytics',
                 subtitle: const Text(
-                    'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.'),
+                  'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.',
+                ),
                 value: settingsStore.shareCrashLogsAndAnalytics,
                 onChanged: (newValue) {
                   settingsStore.shareCrashLogsAndAnalytics = newValue;

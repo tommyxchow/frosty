@@ -7,7 +7,6 @@ import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/list_tile.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -33,20 +32,17 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    const headerPadding = EdgeInsets.fromLTRB(15.0, 20.0, 15.0, 10.0);
-
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-          child: Observer(
-            builder: (context) {
-              return TextField(
+        Observer(
+          builder: (context) {
+            return Padding(
+              padding: const EdgeInsets.all(12),
+              child: TextField(
                 controller: _searchStore.textEditingController,
                 focusNode: _searchStore.textFieldFocusNode,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  contentPadding: EdgeInsets.zero,
                   prefixIcon: const Icon(Icons.search_rounded),
                   hintText: 'Find a channel or category',
                   suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
@@ -66,84 +62,91 @@ class _SearchState extends State<Search> {
                       : null,
                 ),
                 onSubmitted: _searchStore.handleQuery,
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
         Expanded(
-          child: Observer(
-            builder: (context) {
-              if (_searchStore.textEditingController.text.isEmpty) {
-                if (_searchStore.searchHistory.isEmpty) {
-                  return const AlertMessage(message: 'No recent searches');
-                }
+          child: Scrollbar(
+            controller: widget.scrollController,
+            child: Observer(
+              builder: (context) {
+                if (_searchStore.textEditingController.text.isEmpty) {
+                  if (_searchStore.searchHistory.isEmpty) {
+                    return const AlertMessage(message: 'No recent searches');
+                  }
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SectionHeader(
-                      'History',
-                      padding: headerPadding,
-                    ),
-                    Expanded(
-                      child: ListView(
-                        controller: widget.scrollController,
-                        children: _searchStore.searchHistory
-                            .mapIndexed(
-                              (index, searchTerm) => FrostyListTile(
-                                leading: const Icon(Icons.history_rounded),
-                                title: searchTerm,
-                                trailing: Tooltip(
-                                  message: 'Remove',
-                                  preferBelow: false,
-                                  child: IconButton(
-                                    icon: const Icon(Icons.close_rounded),
-                                    onPressed: () => _searchStore.searchHistory
-                                        .removeAt(index),
-                                  ),
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const SectionHeader(
+                              'History',
+                              padding: EdgeInsets.zero,
+                            ),
+                            TextButton(
+                              onPressed: _searchStore.searchHistory.clear,
+                              child: const Text('Clear'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView(
+                          controller: widget.scrollController,
+                          children: _searchStore.searchHistory
+                              .mapIndexed(
+                                (index, searchTerm) => ListTile(
+                                  leading: const Icon(Icons.history_rounded),
+                                  title: Text(searchTerm),
+                                  onTap: () {
+                                    _searchStore.textEditingController.text =
+                                        searchTerm;
+                                    _searchStore.handleQuery(searchTerm);
+                                    _searchStore.textEditingController
+                                        .selection = TextSelection.fromPosition(
+                                      TextPosition(
+                                        offset: _searchStore
+                                            .textEditingController.text.length,
+                                      ),
+                                    );
+                                  },
                                 ),
-                                onTap: () {
-                                  _searchStore.textEditingController.text =
-                                      searchTerm;
-                                  _searchStore.handleQuery(searchTerm);
-                                  _searchStore.textEditingController.selection =
-                                      TextSelection.fromPosition(TextPosition(
-                                          offset: _searchStore
-                                              .textEditingController
-                                              .text
-                                              .length));
-                                },
-                              ),
-                            )
-                            .toList(),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return CustomScrollView(
+                  controller: widget.scrollController,
+                  slivers: [
+                    const SliverToBoxAdapter(
+                      child: SectionHeader(
+                        'Channels',
+                        padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
                       ),
                     ),
+                    SearchResultsChannels(
+                      searchStore: _searchStore,
+                      query: _searchStore.searchText,
+                    ),
+                    const SliverToBoxAdapter(
+                      child: SectionHeader(
+                        'Categories',
+                        padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      ),
+                    ),
+                    SearchResultsCategories(searchStore: _searchStore),
                   ],
                 );
-              }
-              return CustomScrollView(
-                controller: widget.scrollController,
-                slivers: [
-                  const SliverToBoxAdapter(
-                    child: SectionHeader(
-                      'Channels',
-                      padding: headerPadding,
-                    ),
-                  ),
-                  SearchResultsChannels(
-                    searchStore: _searchStore,
-                    query: _searchStore.searchText,
-                  ),
-                  const SliverToBoxAdapter(
-                    child: SectionHeader(
-                      'Categories',
-                      padding: headerPadding,
-                    ),
-                  ),
-                  SearchResultsCategories(searchStore: _searchStore),
-                ],
-              );
-            },
+              },
+            ),
           ),
         ),
       ],

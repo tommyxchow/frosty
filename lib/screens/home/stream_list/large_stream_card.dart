@@ -3,12 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/widgets/animate_scale.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
@@ -45,7 +43,7 @@ class LargeStreamCard extends StatelessWidget {
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
 
     final thumbnail = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(10)),
+      borderRadius: const BorderRadius.all(Radius.circular(12)),
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
@@ -65,17 +63,20 @@ class LargeStreamCard extends StatelessWidget {
               aspectRatio: 16 / 9,
               child: FrostyCachedNetworkImage(
                 imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-                        '-{width}x{height}',
-                        '-${thumbnailWidth}x$thumbnailHeight') +
+                      '-{width}x{height}',
+                      '-${thumbnailWidth}x$thumbnailHeight',
+                    ) +
                     cacheUrlExtension,
-                placeholder: (context, url) => const ColoredBox(
-                    color: lightGray, child: LoadingIndicator()),
+                placeholder: (context, url) => ColoredBox(
+                  color: Colors.grey.shade900,
+                  child: const LoadingIndicator(),
+                ),
                 useOldImageOnUrlChange: true,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 10.0, bottom: 12.0),
+            padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 Tooltip(
@@ -83,15 +84,12 @@ class LargeStreamCard extends StatelessWidget {
                   preferBelow: false,
                   child: Row(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Icon(
-                          Icons.circle,
-                          color: Colors.red,
-                          size: 10,
-                        ),
+                      const Icon(
+                        Icons.circle,
+                        color: Colors.red,
+                        size: 10,
                       ),
-                      const SizedBox(width: 3.0),
+                      const SizedBox(width: 4),
                       Uptime(
                         startTime: streamInfo.startedAt,
                         style: const TextStyle(
@@ -102,7 +100,7 @@ class LargeStreamCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 10.0),
+                const SizedBox(width: 12),
                 Tooltip(
                   message: 'Viewer count',
                   preferBelow: false,
@@ -113,7 +111,7 @@ class LargeStreamCard extends StatelessWidget {
                         size: 14,
                         color: Colors.white,
                       ),
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 4),
                       Text(
                         NumberFormat().format(streamInfo.viewerCount),
                         style: const TextStyle(
@@ -123,7 +121,7 @@ class LargeStreamCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -135,7 +133,7 @@ class LargeStreamCard extends StatelessWidget {
         ? streamInfo.userName
         : '${streamInfo.userName} (${streamInfo.userLogin})';
 
-    return AnimateScale(
+    return InkWell(
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
@@ -150,7 +148,6 @@ class LargeStreamCard extends StatelessWidget {
         HapticFeedback.mediumImpact();
 
         showModalBottomSheet(
-          backgroundColor: Colors.transparent,
           context: context,
           builder: (context) => BlockReportModal(
             authStore: context.read<AuthStore>(),
@@ -162,13 +159,16 @@ class LargeStreamCard extends StatelessWidget {
       },
       child: Padding(
         padding: EdgeInsets.symmetric(
-            vertical: showThumbnail ? 10.0 : 5.0, horizontal: 15.0),
+          vertical: showThumbnail ? 12 : 4,
+          horizontal: 16,
+        ),
         child: Column(
           children: [
             if (showThumbnail) thumbnail,
             VideoBar(
               streamInfo: streamInfo,
               showCategory: showCategory,
+              padding: const EdgeInsets.symmetric(vertical: 8),
             ),
           ],
         ),

@@ -8,7 +8,6 @@ import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
-import 'package:frosty/main.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
@@ -19,6 +18,7 @@ import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/theme.dart';
 import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/notification.dart';
 import 'package:provider/provider.dart';
@@ -171,7 +171,7 @@ class _VideoChatState extends State<VideoChat> {
                 child: IgnorePointer(
                   ignoring: !videoBarVisible,
                   child: ColoredBox(
-                    color: Theme.of(context).canvasColor,
+                    color: Theme.of(context).scaffoldBackgroundColor,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -180,7 +180,7 @@ class _VideoChatState extends State<VideoChat> {
                             streamInfo: _videoStore.streamInfo!,
                             tappableCategory: false,
                           ),
-                        const Divider(height: 1, thickness: 1),
+                        const Divider(),
                       ],
                     ),
                   ),
@@ -235,7 +235,8 @@ class _VideoChatState extends State<VideoChat> {
                       _chatStore.settings.chatWidth,
               color: _chatStore.settings.fullScreen
                   ? Colors.black.withOpacity(
-                      _chatStore.settings.fullScreenChatOverlayOpacity)
+                      _chatStore.settings.fullScreenChatOverlayOpacity,
+                    )
                   : Theme.of(context).scaffoldBackgroundColor,
               child: chat,
             );
@@ -244,7 +245,7 @@ class _VideoChatState extends State<VideoChat> {
               visible: settingsStore.fullScreenChatOverlay,
               maintainState: true,
               child: Theme(
-                data: darkTheme,
+                data: FrostyThemes().dark,
                 child: DefaultTextStyle(
                   style: DefaultTextStyle.of(context)
                       .style
@@ -282,7 +283,7 @@ class _VideoChatState extends State<VideoChat> {
                                   children: settingsStore.landscapeChatLeftSide
                                       ? [overlayChat, Expanded(child: overlay)]
                                       : [Expanded(child: overlay), overlayChat],
-                                )
+                                ),
                             ],
                           )
                         : Row(

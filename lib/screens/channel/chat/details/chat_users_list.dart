@@ -33,7 +33,7 @@ class _ChattersListState extends State<ChattersList> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
           child: Observer(
             builder: (context) {
               return TextField(
@@ -41,7 +41,6 @@ class _ChattersListState extends State<ChattersList> {
                 focusNode: widget.chatDetailsStore.textFieldFocusNode,
                 autocorrect: false,
                 decoration: InputDecoration(
-                  contentPadding: EdgeInsets.zero,
                   prefixIcon: const Icon(Icons.filter_list_rounded),
                   hintText: 'Filter chatters',
                   suffixIcon: widget
@@ -67,7 +66,7 @@ class _ChattersListState extends State<ChattersList> {
           ),
         ),
         Expanded(
-          child: RefreshIndicator(
+          child: RefreshIndicator.adaptive(
             onRefresh: () async {
               HapticFeedback.lightImpact();
 
@@ -76,91 +75,89 @@ class _ChattersListState extends State<ChattersList> {
             child: Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: [
-                Observer(
-                  builder: (context) {
-                    return CustomScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: widget.chatDetailsStore.scrollController,
-                      slivers: [
-                        if (widget.chatDetailsStore.filterText.isEmpty)
-                          SliverPadding(
-                            padding: const EdgeInsets.only(
-                              left: 10.0,
-                              right: 10.0,
-                              top: 20.0,
-                              bottom: 10.0,
-                            ),
-                            sliver: SliverToBoxAdapter(
-                              child: Text(
-                                '${NumberFormat().format(widget.chatDetailsStore.chatUsers.length)} chatters found',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
+                Scrollbar(
+                  controller: widget.chatDetailsStore.scrollController,
+                  child: Observer(
+                    builder: (context) {
+                      return CustomScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: widget.chatDetailsStore.scrollController,
+                        slivers: [
+                          if (widget.chatDetailsStore.filterText.isEmpty)
+                            SliverPadding(
+                              padding: const EdgeInsets.all(12),
+                              sliver: SliverToBoxAdapter(
+                                child: Text(
+                                  '${NumberFormat().format(widget.chatDetailsStore.chatUsers.length)} chatters found',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        if (widget.chatDetailsStore.chatUsers.isEmpty)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Center(
+                          if (widget.chatDetailsStore.chatUsers.isEmpty)
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
                               child: AlertMessage(message: 'No chatters found'),
-                            ),
-                          )
-                        else if (widget.chatDetailsStore.filteredUsers.isEmpty)
-                          const SliverFillRemaining(
-                            hasScrollBody: false,
-                            child: Center(
+                            )
+                          else if (widget
+                              .chatDetailsStore.filteredUsers.isEmpty)
+                            const SliverFillRemaining(
+                              hasScrollBody: false,
                               child:
                                   AlertMessage(message: 'No matching chatters'),
-                            ),
-                          )
-                        else
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) => InkWell(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0, vertical: 5.0),
-                                  child: Text(widget
-                                      .chatDetailsStore.filteredUsers
-                                      .elementAt(index)),
-                                ),
-                                onLongPress: () async {
-                                  HapticFeedback.lightImpact();
-
-                                  final userInfo = await context
-                                      .read<TwitchApi>()
-                                      .getUser(
-                                          headers: context
-                                              .read<AuthStore>()
-                                              .headersTwitch,
-                                          userLogin: widget
-                                              .chatDetailsStore.filteredUsers
-                                              .elementAt(index));
-
-                                  if (!mounted) return;
-
-                                  showModalBottomSheet(
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: true,
-                                    context: context,
-                                    builder: (context) => ChatUserModal(
-                                      chatStore: widget.chatStore,
-                                      username: userInfo.login,
-                                      userId: userInfo.id,
-                                      displayName: userInfo.displayName,
+                            )
+                          else
+                            SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) => InkWell(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
                                     ),
-                                  );
-                                },
+                                    child: Text(
+                                      widget.chatDetailsStore.filteredUsers
+                                          .elementAt(index),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                  onTap: () async {
+                                    final userInfo =
+                                        await context.read<TwitchApi>().getUser(
+                                              headers: context
+                                                  .read<AuthStore>()
+                                                  .headersTwitch,
+                                              userLogin: widget.chatDetailsStore
+                                                  .filteredUsers
+                                                  .elementAt(index),
+                                            );
+
+                                    if (!mounted) return;
+
+                                    showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder: (context) => ChatUserModal(
+                                        chatStore: widget.chatStore,
+                                        username: userInfo.login,
+                                        userId: userInfo.id,
+                                        displayName: userInfo.displayName,
+                                      ),
+                                    );
+                                  },
+                                ),
+                                childCount: widget
+                                    .chatDetailsStore.filteredUsers.length,
                               ),
-                              childCount:
-                                  widget.chatDetailsStore.filteredUsers.length,
                             ),
-                          ),
-                      ],
-                    );
-                  },
+                        ],
+                      );
+                    },
+                  ),
                 ),
                 Observer(
                   builder: (context) => AnimatedSwitcher(
@@ -170,7 +167,8 @@ class _ChattersListState extends State<ChattersList> {
                     child: widget.chatDetailsStore.showJumpButton
                         ? ScrollToTopButton(
                             scrollController:
-                                widget.chatDetailsStore.scrollController)
+                                widget.chatDetailsStore.scrollController,
+                          )
                         : null,
                   ),
                 ),

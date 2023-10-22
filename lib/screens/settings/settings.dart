@@ -30,19 +30,21 @@ class Settings extends StatelessWidget {
             IconButton(
               tooltip: 'Support Frosty',
               onPressed: () => launchUrl(
-                  Uri.parse('https://www.buymeacoffee.com/tommychow'),
-                  mode: settingsStore.launchUrlExternal
-                      ? LaunchMode.externalApplication
-                      : LaunchMode.inAppWebView),
+                Uri.parse('https://www.buymeacoffee.com/tommychow'),
+                mode: settingsStore.launchUrlExternal
+                    ? LaunchMode.externalApplication
+                    : LaunchMode.inAppWebView,
+              ),
               icon: const Icon(SimpleIcons.buymeacoffee),
             ),
           IconButton(
             tooltip: 'View source on GitHub',
             onPressed: () => launchUrl(
-                Uri.parse('https://github.com/tommyxchow/frosty'),
-                mode: settingsStore.launchUrlExternal
-                    ? LaunchMode.externalApplication
-                    : LaunchMode.inAppWebView),
+              Uri.parse('https://github.com/tommyxchow/frosty'),
+              mode: settingsStore.launchUrlExternal
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.inAppWebView,
+            ),
             icon: const Icon(SimpleIcons.github),
           ),
         ],
@@ -51,9 +53,9 @@ class Settings extends StatelessWidget {
         bottom: false,
         child: ListView(
           children: [
-            const SectionHeader('Account'),
+            const SectionHeader('Profile'),
             ProfileCard(authStore: context.read<AuthStore>()),
-            const SectionHeader('Customize'),
+            const SectionHeader('Options', showDivider: true),
             SettingsTileRoute(
               leading: const Icon(Icons.settings_outlined),
               title: 'General',
@@ -69,8 +71,8 @@ class Settings extends StatelessWidget {
               title: 'Chat',
               child: ChatSettings(settingsStore: settingsStore),
             ),
-            const SectionHeader('Other'),
-            OtherSettings(settingsStore: settingsStore)
+            const SectionHeader('Other', showDivider: true),
+            OtherSettings(settingsStore: settingsStore),
           ],
         ),
       ),

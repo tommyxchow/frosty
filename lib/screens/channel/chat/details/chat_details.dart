@@ -8,10 +8,8 @@ import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
-import 'package:frosty/widgets/bottom_sheet.dart';
-import 'package:frosty/widgets/button.dart';
-import 'package:frosty/widgets/dialog.dart';
-import 'package:frosty/widgets/list_tile.dart';
+import 'package:frosty/widgets/section_header.dart';
+import 'package:intl/intl.dart';
 
 class ChatDetails extends StatelessWidget {
   final ChatDetailsStore chatDetailsStore;
@@ -25,89 +23,96 @@ class ChatDetails extends StatelessWidget {
     required this.userLogin,
   }) : super(key: key);
 
-  Future<void> _showSleepTimerDialog(BuildContext context) {
-    return showDialog(
+  String formatDuration(Duration duration) {
+    if (duration.inMinutes < 60) {
+      return '${duration.inMinutes} ${Intl.plural(duration.inMinutes, one: 'minute', other: 'minutes')}';
+    }
+
+    return '${duration.inHours} ${Intl.plural(duration.inHours, one: 'hour', other: 'hours')}';
+  }
+
+  String formatTimeLeft(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+
+    if (hours > 0) {
+      return '${hours}h ${minutes}m left';
+    } else if (minutes > 0) {
+      return '${minutes}m ${seconds}s left';
+    } else {
+      return '${seconds}s left';
+    }
+  }
+
+  Future<void> _showSleepTimer(BuildContext context) {
+    const durations = [
+      Duration(minutes: 5),
+      Duration(minutes: 10),
+      Duration(minutes: 15),
+      Duration(minutes: 30),
+      Duration(hours: 1),
+      Duration(hours: 2),
+      Duration(hours: 3),
+      Duration(hours: 4),
+      Duration(hours: 5),
+      Duration(hours: 6),
+      Duration(hours: 7),
+      Duration(hours: 8),
+      Duration(hours: 9),
+      Duration(hours: 10),
+      Duration(hours: 11),
+      Duration(hours: 12),
+    ];
+
+    return showModalBottomSheet(
       context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Sleep Timer',
-        content: Observer(
-          builder: (context) => Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Opacity(
-                opacity: chatStore.sleepTimer != null &&
-                        chatStore.sleepTimer!.isActive
-                    ? 1.0
-                    : 0.5,
-                child: Row(
-                  children: [
-                    const Icon(Icons.timer_rounded),
-                    Text(
-                      ' ${chatStore.timeRemaining.toString().split('.')[0]}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontFeatures: [FontFeature.tabularFigures()]),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      tooltip: 'Cancel sleep timer',
-                      onPressed: chatStore.cancelSleepTimer,
-                      icon: const Icon(Icons.cancel_rounded),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                children: [
-                  DropdownButton(
-                    value: chatStore.sleepHours,
-                    items: List.generate(24, (index) => index)
-                        .map((e) => DropdownMenuItem(
-                            value: e, child: Text(e.toString())))
-                        .toList(),
-                    onChanged: (int? hours) => chatStore.sleepHours = hours!,
-                    menuMaxHeight: 200,
-                  ),
-                  const SizedBox(width: 10.0),
-                  const Text('Hours'),
-                ],
-              ),
-              Row(
-                children: [
-                  DropdownButton(
-                    value: chatStore.sleepMinutes,
-                    items: List.generate(60, (index) => index)
-                        .map((e) => DropdownMenuItem(
-                            value: e, child: Text(e.toString())))
-                        .toList(),
-                    onChanged: (int? minutes) =>
-                        chatStore.sleepMinutes = minutes!,
-                    menuMaxHeight: 200,
-                  ),
-                  const SizedBox(width: 10.0),
-                  const Text('Minutes'),
-                ],
-              ),
-            ],
+      builder: (context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SectionHeader(
+            'Sleep timer',
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
           ),
-        ),
-        actions: [
-          Observer(
-            builder: (context) => Button(
-              onPressed:
-                  chatStore.sleepHours == 0 && chatStore.sleepMinutes == 0
-                      ? null
-                      : () => chatStore.updateSleepTimer(
-                            onTimerFinished: () => navigatorKey.currentState
-                                ?.popUntil((route) => route.isFirst),
+          Expanded(
+            child: ListView(
+              children: [
+                if (chatStore.sleepTimer?.isActive == true)
+                  Observer(
+                    builder: (context) {
+                      return ListTile(
+                        leading: const Icon(Icons.close_rounded),
+                        title: Text(
+                          'Turn off (${formatTimeLeft(chatStore.timeRemaining)})',
+                          style: const TextStyle(
+                            fontFeatures: [FontFeature.tabularFigures()],
                           ),
-              child: const Text('Set timer'),
+                        ),
+                        onTap: () {
+                          chatStore.cancelSleepTimer();
+
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  ),
+                ...durations.map(
+                  (duration) => ListTile(
+                    leading: const Icon(Icons.hourglass_top_rounded),
+                    title: Text(formatDuration(duration)),
+                    onTap: () {
+                      chatStore.updateSleepTimer(
+                        duration: duration,
+                        onTimerFinished: () => navigatorKey.currentState
+                            ?.popUntil((route) => route.isFirst),
+                      );
+
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
-            child: const Text('Close'),
           ),
         ],
       ),
@@ -117,18 +122,18 @@ class ChatDetails extends StatelessWidget {
   Future<void> _showClearDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => FrostyDialog(
-        title: 'Clear Recent Emotes',
-        message: 'Are you sure you want to clear your recent emotes?',
+      builder: (context) => AlertDialog.adaptive(
+        title: const Text('Clear recent emotes'),
+        content:
+            const Text('Are you sure you want to clear your recent emotes?'),
         actions: [
-          Button(
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: const Text('Cancel'),
+          ),
+          TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Yes'),
-          ),
-          Button(
-            onPressed: Navigator.of(context).pop,
-            color: Colors.grey,
-            child: const Text('Cancel'),
           ),
         ],
       ),
@@ -138,62 +143,76 @@ class ChatDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = [
+      const SectionHeader(
+        'Chat modes',
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+      ),
       ListTile(
         title: ChatModes(roomState: chatDetailsStore.roomState),
       ),
-      FrostyListTile(
+      const SectionHeader(
+        'More',
+        padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
+      ),
+      ListTile(
         leading: const Icon(Icons.people_outline),
-        title: 'Chatters',
+        title: const Text('Chatters'),
         onTap: () => showModalBottomSheet(
-          backgroundColor: Colors.transparent,
           isScrollControlled: true,
           context: context,
-          builder: (context) => FrostyBottomSheet(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: GestureDetector(
-                onTap: FocusScope.of(context).unfocus,
-                child: ChattersList(
-                  chatDetailsStore: chatDetailsStore,
-                  chatStore: chatStore,
-                  userLogin: userLogin,
-                ),
+          builder: (context) => SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: GestureDetector(
+              onTap: FocusScope.of(context).unfocus,
+              child: ChattersList(
+                chatDetailsStore: chatDetailsStore,
+                chatStore: chatStore,
+                userLogin: userLogin,
               ),
             ),
           ),
         ),
       ),
-      FrostyListTile(
-        leading: const Icon(Icons.timer_outlined),
-        title: 'Sleep timer',
-        onTap: () => _showSleepTimerDialog(context),
+      Observer(
+        builder: (context) {
+          return ListTile(
+            leading: const Icon(Icons.timer_outlined),
+            title: Text(
+              'Sleep timer ${chatStore.timeRemaining.inSeconds > 0 ? 'on (${formatTimeLeft(chatStore.timeRemaining)})' : ''}',
+              style: const TextStyle(
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
+            ),
+            onTap: () => _showSleepTimer(context),
+          );
+        },
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.delete_outline_rounded),
-        title: 'Clear recent emotes',
+        title: const Text('Clear recent emotes'),
         onTap: () => _showClearDialog(context),
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.refresh_rounded),
-        title: 'Reconnect to chat',
+        title: const Text('Reconnect to chat'),
         onTap: () {
           chatStore.updateNotification('Reconnecting to chat...');
 
           chatStore.connectToChat();
         },
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.refresh_rounded),
-        title: 'Refresh badges and emotes',
+        title: const Text('Refresh badges and emotes'),
         onTap: () async {
           await chatStore.getAssets();
 
           chatStore.updateNotification('Badges and emotes refreshed');
         },
       ),
-      FrostyListTile(
+      ListTile(
         leading: const Icon(Icons.settings_outlined),
-        title: 'Settings',
+        title: const Text('Settings'),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -203,16 +222,10 @@ class ChatDetails extends StatelessWidget {
       ),
     ];
 
-    return FrostyBottomSheet(
-      child: MediaQuery.of(context).orientation == Orientation.landscape
-          ? SizedBox(
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: ListView(
-                children: children,
-              ),
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start, children: children),
+    return ListView(
+      shrinkWrap: true,
+      primary: false,
+      children: children,
     );
   }
 }
