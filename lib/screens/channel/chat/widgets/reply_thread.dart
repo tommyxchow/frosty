@@ -66,10 +66,6 @@ class ReplyThread extends StatelessWidget {
                       ),
                     ),
                   ),
-                const Divider(
-                  indent: 12,
-                  endIndent: 12,
-                ),
                 ...chatStore.messages
                     .where(
                       (message) =>
