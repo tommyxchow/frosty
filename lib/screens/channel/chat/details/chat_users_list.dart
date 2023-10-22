@@ -120,11 +120,12 @@ class _ChattersListState extends State<ChattersList> {
                                     child: Text(
                                       widget.chatDetailsStore.filteredUsers
                                           .elementAt(index),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
                                   ),
-                                  onLongPress: () async {
-                                    HapticFeedback.lightImpact();
-
+                                  onTap: () async {
                                     final userInfo =
                                         await context.read<TwitchApi>().getUser(
                                               headers: context
