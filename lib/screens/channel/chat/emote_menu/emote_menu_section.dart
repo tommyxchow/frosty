@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
@@ -42,11 +43,15 @@ class _EmoteMenuSectionState extends State<EmoteMenuSection>
         onTap: widget.disabled
             ? null
             : () => widget.chatStore.addEmote(widget.emotes[index]),
-        onLongPress: () => IRCMessage.showEmoteDetailsBottomSheet(
-          context,
-          emote: widget.emotes[index],
-          launchExternal: widget.chatStore.settings.launchUrlExternal,
-        ),
+        onLongPress: () {
+          HapticFeedback.lightImpact();
+
+          IRCMessage.showEmoteDetailsBottomSheet(
+            context,
+            emote: widget.emotes[index],
+            launchExternal: widget.chatStore.settings.launchUrlExternal,
+          );
+        },
         child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: Center(
