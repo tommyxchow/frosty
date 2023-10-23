@@ -59,16 +59,13 @@ class CategoryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Tooltip(
-              message: category.name,
-              preferBelow: false,
+            Flexible(
               child: Text(
                 category.name,
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge
                     ?.copyWith(fontWeight: FontWeight.w600),
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
