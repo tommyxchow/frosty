@@ -39,25 +39,37 @@ class EmoteMenuPanel extends StatelessWidget {
           .toList();
 
       return FrostyPageView(
-        headers: ['Global', if (channelEmotes.isNotEmpty) 'Channel'],
+        headers: [if (channelEmotes.isNotEmpty) 'Channel', 'Global'],
         children: [
-          EmoteMenuSection(
-            chatStore: chatStore,
-            emotes: globalEmotes,
-          ),
           if (channelEmotes.isNotEmpty)
             EmoteMenuSection(
               chatStore: chatStore,
               emotes: channelEmotes,
             ),
+          EmoteMenuSection(
+            chatStore: chatStore,
+            emotes: globalEmotes,
+          ),
         ],
       );
     } else {
+      final isSubbed = chatStore.userState.subscriber;
+
+      twitchEmotes?.removeWhere(
+        (key, value) => key.toLowerCase() == chatStore.channelName,
+      );
+
       return FrostyPageView(
         headers:
             twitchEmotes!.keys.map((header) => header.split(' ')[0]).toList(),
         children: twitchEmotes!.entries
-            .map((e) => EmoteMenuSection(chatStore: chatStore, emotes: e.value))
+            .map(
+              (e) => EmoteMenuSection(
+                chatStore: chatStore,
+                emotes: e.value,
+                disabled: e.key.contains('Channel') && !isSubbed,
+              ),
+            )
             .toList(),
       );
     }

@@ -9,11 +9,13 @@ import 'package:provider/provider.dart';
 class EmoteMenuSection extends StatefulWidget {
   final ChatStore chatStore;
   final List<Emote> emotes;
+  final bool disabled;
 
   const EmoteMenuSection({
     Key? key,
     required this.chatStore,
     required this.emotes,
+    this.disabled = false,
   }) : super(key: key);
 
   @override
@@ -36,7 +38,9 @@ class _EmoteMenuSectionState extends State<EmoteMenuSection>
                     : 16,
       ),
       itemBuilder: (context, index) => InkWell(
-        onTap: () => widget.chatStore.addEmote(widget.emotes[index]),
+        onTap: widget.disabled
+            ? null
+            : () => widget.chatStore.addEmote(widget.emotes[index]),
         child: Tooltip(
           message: widget.emotes[index].name,
           preferBelow: false,
@@ -48,6 +52,10 @@ class _EmoteMenuSectionState extends State<EmoteMenuSection>
                 height:
                     widget.emotes[index].height?.toDouble() ?? defaultEmoteSize,
                 width: widget.emotes[index].width?.toDouble(),
+                color: widget.disabled
+                    ? const Color.fromRGBO(255, 255, 255, 0.5)
+                    : null,
+                colorBlendMode: widget.disabled ? BlendMode.modulate : null,
               ),
             ),
           ),
