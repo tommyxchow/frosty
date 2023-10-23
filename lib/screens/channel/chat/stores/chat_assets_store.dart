@@ -155,7 +155,15 @@ abstract class ChatAssetsStoreBase with Store {
         twitchApi.getEmotesGlobal(headers: headers).catchError(onError),
         twitchApi
             .getEmotesChannel(id: channelId, headers: headers)
-            .catchError(onError),
+            .then((emotes) {
+          _userEmoteSectionToEmotes.update(
+            'Channel Emotes',
+            (existingEmoteSet) => [...existingEmoteSet, ...emotes],
+            ifAbsent: () => emotes.toList(),
+          );
+
+          return emotes;
+        }).catchError(onError),
         sevenTVApi.getEmotesGlobal().catchError(onError),
         sevenTVApi.getEmotesChannel(id: channelId).catchError(onError),
         ffzApi.getRoomInfo(id: channelId).then((ffzRoom) {
@@ -219,15 +227,26 @@ abstract class ChatAssetsStoreBase with Store {
     for (final emoteSet in userEmotes) {
       if (emoteSet.isNotEmpty) {
         if (emoteSet.first.type == EmoteType.twitchSub) {
-          final owner = await twitchApi.getUser(
-            id: emoteSet.first.ownerId,
-            headers: headers,
-          );
-          _userEmoteSectionToEmotes.update(
-            owner.displayName,
-            (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
-            ifAbsent: () => emoteSet,
-          );
+          final ownerId = emoteSet.first.ownerId;
+
+          // Check for tuurbo emote sets (e.g., monkey set).
+          if (ownerId == 'twitch') {
+            _userEmoteSectionToEmotes.update(
+              'Global Emotes',
+              (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
+              ifAbsent: () => emoteSet,
+            );
+          } else {
+            final owner = await twitchApi.getUser(
+              id: ownerId,
+              headers: headers,
+            );
+            _userEmoteSectionToEmotes.update(
+              owner.displayName,
+              (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
+              ifAbsent: () => emoteSet,
+            );
+          }
         } else if (emoteSet.first.type == EmoteType.twitchGlobal) {
           _userEmoteSectionToEmotes.update(
             'Global Emotes',

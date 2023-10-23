@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frosty/constants.dart';
+import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
@@ -50,25 +52,30 @@ class RecentEmotesPanel extends StatelessWidget {
                   onTap: matchingEmotes.isNotEmpty
                       ? () => chatStore.addEmote(emote)
                       : null,
-                  child: Tooltip(
-                    message: emote.name,
-                    preferBelow: false,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Center(
-                        child: FrostyCachedNetworkImage(
-                          imageUrl: matchingEmotes.isNotEmpty
-                              ? matchingEmotes.first.url
-                              : emote.url,
-                          color: matchingEmotes.isNotEmpty
-                              ? null
-                              : const Color.fromRGBO(255, 255, 255, 0.5),
-                          colorBlendMode: matchingEmotes.isNotEmpty
-                              ? null
-                              : BlendMode.modulate,
-                          height: emote.height?.toDouble() ?? defaultEmoteSize,
-                          width: emote.width?.toDouble(),
-                        ),
+                  onLongPress: () {
+                    HapticFeedback.lightImpact();
+
+                    IRCMessage.showEmoteDetailsBottomSheet(
+                      context,
+                      emote: emote,
+                      launchExternal: chatStore.settings.launchUrlExternal,
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Center(
+                      child: FrostyCachedNetworkImage(
+                        imageUrl: matchingEmotes.isNotEmpty
+                            ? matchingEmotes.first.url
+                            : emote.url,
+                        color: matchingEmotes.isNotEmpty
+                            ? null
+                            : const Color.fromRGBO(255, 255, 255, 0.5),
+                        colorBlendMode: matchingEmotes.isNotEmpty
+                            ? null
+                            : BlendMode.modulate,
+                        height: emote.height?.toDouble() ?? defaultEmoteSize,
+                        width: emote.width?.toDouble(),
                       ),
                     ),
                   ),
