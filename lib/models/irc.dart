@@ -413,7 +413,7 @@ class IRCMessage {
                 WidgetSpan(
                   alignment: PlaceholderAlignment.middle,
                   child: InkWell(
-                    onTap: () => _showDetailsBottomSheet(
+                    onTap: () => _showAssetDetailsBottomSheet(
                       context,
                       leading: Stack(
                         alignment: AlignmentDirectional.center,
@@ -559,7 +559,7 @@ class IRCMessage {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: InkWell(
-        onTap: () => _showDetailsBottomSheet(
+        onTap: () => _showAssetDetailsBottomSheet(
           context,
           leading: _createBadgeWidget(
             badge: badge,
@@ -592,15 +592,9 @@ class IRCMessage {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: InkWell(
-        onTap: () => _showDetailsBottomSheet(
+        onTap: () => showEmoteDetailsBottomSheet(
           context,
-          leading: FrostyCachedNetworkImage(
-            imageUrl: emote.url,
-            width: 56,
-          ),
-          url: emote.url,
-          title: emote.name,
-          subtitle: Text(emote.type.toString()),
+          emote: emote,
           launchExternal: launchExternal,
         ),
         child: FrostyCachedNetworkImage(
@@ -641,7 +635,25 @@ class IRCMessage {
     }
   }
 
-  static void _showDetailsBottomSheet(
+  static void showEmoteDetailsBottomSheet(
+    BuildContext context, {
+    required Emote emote,
+    required bool launchExternal,
+  }) {
+    _showAssetDetailsBottomSheet(
+      context,
+      leading: FrostyCachedNetworkImage(
+        imageUrl: emote.url,
+        width: 56,
+      ),
+      url: emote.url,
+      title: emote.name,
+      subtitle: Text(emote.type.toString()),
+      launchExternal: launchExternal,
+    );
+  }
+
+  static void _showAssetDetailsBottomSheet(
     BuildContext context, {
     required Widget leading,
     required String url,
