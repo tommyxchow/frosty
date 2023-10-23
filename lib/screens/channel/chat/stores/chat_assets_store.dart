@@ -219,15 +219,26 @@ abstract class ChatAssetsStoreBase with Store {
     for (final emoteSet in userEmotes) {
       if (emoteSet.isNotEmpty) {
         if (emoteSet.first.type == EmoteType.twitchSub) {
-          final owner = await twitchApi.getUser(
-            id: emoteSet.first.ownerId,
-            headers: headers,
-          );
-          _userEmoteSectionToEmotes.update(
-            owner.displayName,
-            (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
-            ifAbsent: () => emoteSet,
-          );
+          final ownerId = emoteSet.first.ownerId;
+
+          // Check for tuurbo emote sets (e.g., monkey set)
+          if (ownerId == 'twitch') {
+            _userEmoteSectionToEmotes.update(
+              'Global Emotes',
+              (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
+              ifAbsent: () => emoteSet,
+            );
+          } else {
+            final owner = await twitchApi.getUser(
+              id: ownerId,
+              headers: headers,
+            );
+            _userEmoteSectionToEmotes.update(
+              owner.displayName,
+              (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
+              ifAbsent: () => emoteSet,
+            );
+          }
         } else if (emoteSet.first.type == EmoteType.twitchGlobal) {
           _userEmoteSectionToEmotes.update(
             'Global Emotes',
