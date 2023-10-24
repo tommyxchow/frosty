@@ -565,6 +565,7 @@ class IRCMessage {
             badge: badge,
             backgroundColor: backgroundColor,
             isSvg: isSvg,
+            size: 56,
           ),
           url: badge.url,
           title: badge.name,
