@@ -17,11 +17,11 @@ class ChatDetails extends StatelessWidget {
   final String userLogin;
 
   const ChatDetails({
-    Key? key,
+    super.key,
     required this.chatDetailsStore,
     required this.chatStore,
     required this.userLogin,
-  }) : super(key: key);
+  });
 
   String formatDuration(Duration duration) {
     if (duration.inMinutes < 60) {

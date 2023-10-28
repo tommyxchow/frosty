@@ -9,9 +9,9 @@ class BlockedUsers extends StatelessWidget {
   final AuthStore authStore;
 
   const BlockedUsers({
-    Key? key,
+    super.key,
     required this.authStore,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

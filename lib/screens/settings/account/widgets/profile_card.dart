@@ -10,7 +10,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
 
-  const ProfileCard({Key? key, required this.authStore}) : super(key: key);
+  const ProfileCard({super.key, required this.authStore});
 
   Future<void> _showAccountOptionsModalBottomSheet(BuildContext context) {
     return showModalBottomSheet(

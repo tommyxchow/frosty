@@ -14,11 +14,11 @@ class EmoteMenuSection extends StatefulWidget {
   final bool disabled;
 
   const EmoteMenuSection({
-    Key? key,
+    super.key,
     required this.chatStore,
     required this.emotes,
     this.disabled = false,
-  }) : super(key: key);
+  });
 
   @override
   State<EmoteMenuSection> createState() => _EmoteMenuSectionState();

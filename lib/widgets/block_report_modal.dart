@@ -10,12 +10,12 @@ class BlockReportModal extends StatelessWidget {
   final String userId;
 
   const BlockReportModal({
-    Key? key,
+    super.key,
     required this.authStore,
     required this.name,
     required this.userLogin,
     required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

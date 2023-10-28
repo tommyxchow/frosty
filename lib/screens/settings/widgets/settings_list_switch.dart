@@ -8,12 +8,12 @@ class SettingsListSwitch extends StatelessWidget {
   final ValueChanged<bool>? onChanged;
 
   const SettingsListSwitch({
-    Key? key,
+    super.key,
     required this.title,
     this.subtitle,
     this.onChanged,
     required this.value,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

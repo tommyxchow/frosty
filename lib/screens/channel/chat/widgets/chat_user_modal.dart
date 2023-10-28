@@ -14,12 +14,12 @@ class ChatUserModal extends StatefulWidget {
   final String userId;
 
   const ChatUserModal({
-    Key? key,
+    super.key,
     required this.chatStore,
     required this.username,
     required this.displayName,
     required this.userId,
-  }) : super(key: key);
+  });
 
   @override
   State<ChatUserModal> createState() => _ChatUserModalState();

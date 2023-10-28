@@ -5,11 +5,10 @@ class FrostyPageView extends StatefulWidget {
   final List<Widget> children;
 
   const FrostyPageView({
-    Key? key,
+    super.key,
     required this.headers,
     required this.children,
-  })  : assert(headers.length == children.length),
-        super(key: key);
+  }) : assert(headers.length == children.length);
 
   @override
   State<FrostyPageView> createState() => _FrostyPageViewState();

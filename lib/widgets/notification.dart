@@ -6,11 +6,11 @@ class FrostyNotification extends StatelessWidget {
   final Function() onButtonPressed;
 
   const FrostyNotification({
-    Key? key,
+    super.key,
     required this.message,
     required this.showPasteButton,
     required this.onButtonPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

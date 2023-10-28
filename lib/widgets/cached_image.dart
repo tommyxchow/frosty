@@ -14,7 +14,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
   final BoxFit? fit;
 
   const FrostyCachedNetworkImage({
-    Key? key,
+    super.key,
     required this.imageUrl,
     this.width,
     this.height,
@@ -24,7 +24,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
     this.useFade = true,
     this.useOldImageOnUrlChange = false,
     this.fit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

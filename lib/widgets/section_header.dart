@@ -8,11 +8,11 @@ class SectionHeader extends StatelessWidget {
 
   const SectionHeader(
     this.text, {
-    Key? key,
+    super.key,
     this.padding,
     this.fontSize,
     this.showDivider = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

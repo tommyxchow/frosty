@@ -10,11 +10,11 @@ class EmoteMenuPanel extends StatelessWidget {
   final Map<String, List<Emote>>? twitchEmotes;
 
   const EmoteMenuPanel({
-    Key? key,
+    super.key,
     required this.chatStore,
     this.emotes,
     this.twitchEmotes,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

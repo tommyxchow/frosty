@@ -16,9 +16,9 @@ class OtherSettings extends StatefulWidget {
   final SettingsStore settingsStore;
 
   const OtherSettings({
-    Key? key,
+    super.key,
     required this.settingsStore,
-  }) : super(key: key);
+  });
 
   @override
   State<OtherSettings> createState() => _OtherSettingsState();

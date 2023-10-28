@@ -14,7 +14,7 @@ class VideoBar extends StatelessWidget {
   final EdgeInsets padding;
 
   const VideoBar({
-    Key? key,
+    super.key,
     required this.streamInfo,
     this.showCategory = true,
     this.tappableCategory = true,
@@ -22,7 +22,7 @@ class VideoBar extends StatelessWidget {
     this.subtitleTextColor,
     this.subtitleTextWeight,
     this.padding = const EdgeInsets.all(12),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

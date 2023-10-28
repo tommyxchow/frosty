@@ -18,7 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 class Settings extends StatelessWidget {
   final SettingsStore settingsStore;
 
-  const Settings({Key? key, required this.settingsStore}) : super(key: key);
+  const Settings({super.key, required this.settingsStore});
 
   @override
   Widget build(BuildContext context) {

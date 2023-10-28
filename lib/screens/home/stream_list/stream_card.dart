@@ -22,11 +22,11 @@ class StreamCard extends StatelessWidget {
   final bool showCategory;
 
   const StreamCard({
-    Key? key,
+    super.key,
     required this.streamInfo,
     required this.showThumbnail,
     this.showCategory = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

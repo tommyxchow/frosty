@@ -13,11 +13,11 @@ class ChatMessage extends StatelessWidget {
   final bool isModal;
 
   const ChatMessage({
-    Key? key,
+    super.key,
     required this.ircMessage,
     required this.chatStore,
     this.isModal = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -11,7 +11,7 @@ import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:provider/provider.dart';
 
 class OnboardingSetup extends StatelessWidget {
-  const OnboardingSetup({Key? key}) : super(key: key);
+  const OnboardingSetup({super.key});
 
   @override
   Widget build(BuildContext context) {

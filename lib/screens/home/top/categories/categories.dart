@@ -13,9 +13,9 @@ class Categories extends StatefulWidget {
   final ScrollController scrollController;
 
   const Categories({
-    Key? key,
+    super.key,
     required this.scrollController,
-  }) : super(key: key);
+  });
 
   @override
   State<Categories> createState() => _CategoriesState();

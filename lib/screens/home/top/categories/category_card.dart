@@ -10,10 +10,10 @@ class CategoryCard extends StatelessWidget {
   final bool isTappable;
 
   const CategoryCard({
-    Key? key,
+    super.key,
     required this.category,
     this.isTappable = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

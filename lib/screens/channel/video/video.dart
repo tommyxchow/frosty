@@ -10,9 +10,9 @@ class Video extends StatefulWidget {
   final VideoStore videoStore;
 
   const Video({
-    Key? key,
+    super.key,
     required this.videoStore,
-  }) : super(key: key);
+  });
 
   @override
   State<Video> createState() => _VideoState();

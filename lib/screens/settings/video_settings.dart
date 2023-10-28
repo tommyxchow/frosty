@@ -8,8 +8,7 @@ import 'package:frosty/widgets/section_header.dart';
 class VideoSettings extends StatelessWidget {
   final SettingsStore settingsStore;
 
-  const VideoSettings({Key? key, required this.settingsStore})
-      : super(key: key);
+  const VideoSettings({super.key, required this.settingsStore});
 
   @override
   Widget build(BuildContext context) {

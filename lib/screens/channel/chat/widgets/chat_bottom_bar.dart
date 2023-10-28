@@ -8,7 +8,7 @@ import 'package:frosty/widgets/cached_image.dart';
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
 
-  const ChatBottomBar({Key? key, required this.chatStore}) : super(key: key);
+  const ChatBottomBar({super.key, required this.chatStore});
 
   @override
   Widget build(BuildContext context) {

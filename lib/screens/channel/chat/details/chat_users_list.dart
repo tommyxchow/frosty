@@ -17,11 +17,11 @@ class ChattersList extends StatefulWidget {
   final String userLogin;
 
   const ChattersList({
-    Key? key,
+    super.key,
     required this.chatDetailsStore,
     required this.chatStore,
     required this.userLogin,
-  }) : super(key: key);
+  });
 
   @override
   State<ChattersList> createState() => _ChattersListState();

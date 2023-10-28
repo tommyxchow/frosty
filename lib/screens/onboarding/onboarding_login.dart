@@ -8,7 +8,7 @@ import 'package:simple_icons/simple_icons.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class OnboardingLogin extends StatelessWidget {
-  const OnboardingLogin({Key? key}) : super(key: key);
+  const OnboardingLogin({super.key});
 
   @override
   Widget build(BuildContext context) {

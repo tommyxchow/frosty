@@ -7,11 +7,11 @@ class AlertMessage extends StatelessWidget {
   final bool centered;
 
   const AlertMessage({
-    Key? key,
+    super.key,
     required this.message,
     this.centered = true,
     this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -13,7 +13,7 @@ import 'package:frosty/widgets/section_header.dart';
 class ChatSettings extends StatefulWidget {
   final SettingsStore settingsStore;
 
-  const ChatSettings({Key? key, required this.settingsStore}) : super(key: key);
+  const ChatSettings({super.key, required this.settingsStore});
 
   @override
   State<ChatSettings> createState() => _ChatSettingsState();

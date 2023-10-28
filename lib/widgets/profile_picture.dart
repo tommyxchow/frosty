@@ -10,10 +10,10 @@ class ProfilePicture extends StatelessWidget {
   final double radius;
 
   const ProfilePicture({
-    Key? key,
+    super.key,
     required this.userLogin,
     this.radius = 20,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

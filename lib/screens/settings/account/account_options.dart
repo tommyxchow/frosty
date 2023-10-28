@@ -6,7 +6,7 @@ import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 class AccountOptions extends StatelessWidget {
   final AuthStore authStore;
 
-  const AccountOptions({Key? key, required this.authStore}) : super(key: key);
+  const AccountOptions({super.key, required this.authStore});
 
   Future<void> _showLogoutDialog(BuildContext context) {
     return showDialog(

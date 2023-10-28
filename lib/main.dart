@@ -95,9 +95,9 @@ class MyApp extends StatefulWidget {
   final bool firstRun;
 
   const MyApp({
-    Key? key,
+    super.key,
     this.firstRun = false,
-  }) : super(key: key);
+  });
 
   @override
   State<MyApp> createState() => _MyAppState();

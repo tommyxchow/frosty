@@ -16,9 +16,9 @@ class Search extends StatefulWidget {
   final ScrollController scrollController;
 
   const Search({
-    Key? key,
+    super.key,
     required this.scrollController,
-  }) : super(key: key);
+  });
 
   @override
   State<Search> createState() => _SearchState();

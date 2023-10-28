@@ -16,7 +16,7 @@ class OnboardingScaffold extends StatelessWidget {
   final bool isLast;
 
   const OnboardingScaffold({
-    Key? key,
+    super.key,
     required this.header,
     this.subtitle,
     this.disclaimer,
@@ -27,7 +27,7 @@ class OnboardingScaffold extends StatelessWidget {
     this.skipRoute,
     this.showLogo = false,
     this.isLast = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

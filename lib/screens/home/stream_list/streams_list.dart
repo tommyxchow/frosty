@@ -27,12 +27,12 @@ class StreamsList extends StatefulWidget {
   final bool showJumpButton;
 
   const StreamsList({
-    Key? key,
+    super.key,
     required this.listType,
     this.categoryId,
     this.scrollController,
     this.showJumpButton = false,
-  }) : super(key: key);
+  });
 
   @override
   State<StreamsList> createState() => _StreamsListState();

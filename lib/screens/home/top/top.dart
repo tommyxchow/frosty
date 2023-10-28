@@ -8,9 +8,9 @@ class TopSection extends StatefulWidget {
   final HomeStore homeStore;
 
   const TopSection({
-    Key? key,
+    super.key,
     required this.homeStore,
-  }) : super(key: key);
+  });
 
   @override
   State<TopSection> createState() => _TopSectionState();

@@ -4,7 +4,7 @@ import 'package:frosty/models/irc.dart';
 class ChatModes extends StatelessWidget {
   final ROOMSTATE roomState;
 
-  const ChatModes({Key? key, required this.roomState}) : super(key: key);
+  const ChatModes({super.key, required this.roomState});
 
   String pluralize(String str, String count) => count == '1' ? str : '${str}s';
 

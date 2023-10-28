@@ -32,11 +32,11 @@ class VideoChat extends StatefulWidget {
   final String userLogin;
 
   const VideoChat({
-    Key? key,
+    super.key,
     required this.userId,
     required this.userName,
     required this.userLogin,
-  }) : super(key: key);
+  });
 
   @override
   State<VideoChat> createState() => _VideoChatState();

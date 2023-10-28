@@ -20,11 +20,11 @@ class LargeStreamCard extends StatelessWidget {
   final bool showCategory;
 
   const LargeStreamCard({
-    Key? key,
+    super.key,
     required this.streamInfo,
     required this.showThumbnail,
     this.showCategory = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 class ScrollToTopButton extends StatelessWidget {
   final ScrollController scrollController;
 
-  const ScrollToTopButton({Key? key, required this.scrollController})
-      : super(key: key);
+  const ScrollToTopButton({super.key, required this.scrollController});
 
   @override
   Widget build(BuildContext context) {

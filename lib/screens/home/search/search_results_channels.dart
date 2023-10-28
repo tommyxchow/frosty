@@ -17,10 +17,10 @@ class SearchResultsChannels extends StatefulWidget {
   final String query;
 
   const SearchResultsChannels({
-    Key? key,
+    super.key,
     required this.searchStore,
     required this.query,
-  }) : super(key: key);
+  });
 
   @override
   State<SearchResultsChannels> createState() => _SearchResultsChannelsState();

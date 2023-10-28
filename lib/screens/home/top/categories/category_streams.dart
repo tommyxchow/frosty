@@ -9,9 +9,9 @@ class CategoryStreams extends StatelessWidget {
   final String categoryId;
 
   const CategoryStreams({
-    Key? key,
+    super.key,
     required this.categoryId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

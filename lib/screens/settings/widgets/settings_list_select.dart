@@ -9,13 +9,13 @@ class SettingsListSelect extends StatelessWidget {
   final ValueChanged<String> onChanged;
 
   const SettingsListSelect({
-    Key? key,
+    super.key,
     required this.title,
     this.subtitle,
     required this.selectedOption,
     required this.options,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

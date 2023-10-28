@@ -13,7 +13,7 @@ import 'package:frosty/widgets/page_view.dart';
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
 
-  const Chat({Key? key, required this.chatStore}) : super(key: key);
+  const Chat({super.key, required this.chatStore});
 
   @override
   Widget build(BuildContext context) {

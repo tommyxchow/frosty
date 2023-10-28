@@ -10,10 +10,10 @@ class Uptime extends StatefulWidget {
   final TextStyle? style;
 
   const Uptime({
-    Key? key,
+    super.key,
     required this.startTime,
     this.style,
-  }) : super(key: key);
+  });
 
   @override
   State<Uptime> createState() => _UptimeState();

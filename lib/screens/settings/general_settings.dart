@@ -8,8 +8,7 @@ import 'package:frosty/widgets/section_header.dart';
 class GeneralSettings extends StatelessWidget {
   final SettingsStore settingsStore;
 
-  const GeneralSettings({Key? key, required this.settingsStore})
-      : super(key: key);
+  const GeneralSettings({super.key, required this.settingsStore});
 
   @override
   Widget build(BuildContext context) {

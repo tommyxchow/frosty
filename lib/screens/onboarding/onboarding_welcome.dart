@@ -4,7 +4,7 @@ import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_scaffold.dart';
 
 class OnboardingWelcome extends StatelessWidget {
-  const OnboardingWelcome({Key? key}) : super(key: key);
+  const OnboardingWelcome({super.key});
 
   @override
   Widget build(BuildContext context) {

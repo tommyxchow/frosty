@@ -14,10 +14,10 @@ class VideoOverlay extends StatelessWidget {
   final ChatStore chatStore;
 
   const VideoOverlay({
-    Key? key,
+    super.key,
     required this.videoStore,
     required this.chatStore,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

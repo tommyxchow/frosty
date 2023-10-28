@@ -12,9 +12,9 @@ class RecentEmotesPanel extends StatelessWidget {
   final ChatStore chatStore;
 
   const RecentEmotesPanel({
-    Key? key,
+    super.key,
     required this.chatStore,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
