@@ -18,7 +18,7 @@ jobs:
       SECRET: ${{ secrets.SECRET }}
     steps:
       - name: Checkout Frosty repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       # Setup Java so that we can build the APK.
       - name: Set up Java

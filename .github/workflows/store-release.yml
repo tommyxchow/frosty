@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout Frosty repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
       - name: Set up Ruby and Bundler
@@ -78,7 +78,7 @@ jobs:
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
     steps:
       - name: Checkout Frosty repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         
       # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
       - name: Set up Ruby and Bundler
