@@ -32,7 +32,7 @@ jobs:
       - name: Set up Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1
+          ruby-version: 3.2
           bundler-cache: true
       
       # Setup Java so that we can build the appbundle.
@@ -84,7 +84,7 @@ jobs:
       - name: Set up Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1
+          ruby-version: 3.2
           bundler-cache: true
 
       # Setup and cache Flutter to install packages and build.
