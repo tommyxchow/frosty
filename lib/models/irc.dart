@@ -648,7 +648,9 @@ class IRCMessage {
         width: 56,
       ),
       url: emote.url,
-      title: emote.name,
+      title: emote.realName != null
+          ? '${emote.name} (${emote.realName})'
+          : emote.name,
       subtitle: Text(emote.type.toString()),
       launchExternal: launchExternal,
     );

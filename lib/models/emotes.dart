@@ -108,9 +108,7 @@ class EmoteFFZ {
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class Emote7TV {
   final String id;
-
-  /// Will be non-null if a custom emote name is used.
-  final String? name;
+  final String name;
   final Emote7TVData data;
 
   const Emote7TV(
@@ -177,6 +175,7 @@ class Emote7TVFile {
 @JsonSerializable()
 class Emote {
   final String name;
+  final String? realName;
   final int? width;
   final int? height;
   final bool zeroWidth;
@@ -186,6 +185,7 @@ class Emote {
 
   const Emote({
     required this.name,
+    this.realName,
     this.width,
     this.height,
     required this.zeroWidth,
@@ -227,7 +227,8 @@ class Emote {
     );
 
     return Emote(
-      name: emote.name ?? emote.data.name,
+      name: emote.name,
+      realName: emote.name != emote.data.name ? emote.data.name : null,
       width: emote.data.host.files.first.width,
       height: emote.data.host.files.first.height,
       zeroWidth: emote.data.tags?.contains('zerowidth') ?? false,

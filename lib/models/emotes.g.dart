@@ -53,7 +53,7 @@ EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
 
 Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
       json['id'] as String,
-      json['name'] as String?,
+      json['name'] as String,
       Emote7TVData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
@@ -80,6 +80,7 @@ Emote7TVFile _$Emote7TVFileFromJson(Map<String, dynamic> json) => Emote7TVFile(
 
 Emote _$EmoteFromJson(Map<String, dynamic> json) => Emote(
       name: json['name'] as String,
+      realName: json['realName'] as String?,
       width: json['width'] as int?,
       height: json['height'] as int?,
       zeroWidth: json['zeroWidth'] as bool,
@@ -90,6 +91,7 @@ Emote _$EmoteFromJson(Map<String, dynamic> json) => Emote(
 
 Map<String, dynamic> _$EmoteToJson(Emote instance) => <String, dynamic>{
       'name': instance.name,
+      'realName': instance.realName,
       'width': instance.width,
       'height': instance.height,
       'zeroWidth': instance.zeroWidth,
