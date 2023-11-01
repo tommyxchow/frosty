@@ -109,10 +109,12 @@ class EmoteFFZ {
 class Emote7TV {
   final String id;
   final String name;
+  final int flags;
   final Emote7TVData data;
 
   const Emote7TV(
     this.id,
+    this.flags,
     this.name,
     this.data,
   );
@@ -231,7 +233,7 @@ class Emote {
       realName: emote.name != emote.data.name ? emote.data.name : null,
       width: emote.data.host.files.first.width,
       height: emote.data.host.files.first.height,
-      zeroWidth: emote.data.tags?.contains('zerowidth') ?? false,
+      zeroWidth: emote.flags == 1,
       url: 'https:$url/${file.name}',
       type: type,
     );
