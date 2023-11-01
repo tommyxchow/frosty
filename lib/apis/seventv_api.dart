@@ -12,12 +12,12 @@ class SevenTVApi {
 
   /// Returns a map of global 7TV emotes to their URL.
   Future<List<Emote>> getEmotesGlobal() async {
-    final url = Uri.parse('https://api.7tv.app/v2/emotes/global');
+    final url = Uri.parse('https://7tv.io/v3/emote-sets/global');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body) as List;
-      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
+      final decoded = jsonDecode(response.body)['emotes'] as List;
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote['data']));
 
       return emotes
           .map((emote) => Emote.from7TV(emote, EmoteType.sevenTVGlobal))
@@ -29,12 +29,12 @@ class SevenTVApi {
 
   /// Returns a map of a channel's 7TV emotes to their URL.
   Future<List<Emote>> getEmotesChannel({required String id}) async {
-    final url = Uri.parse('https://api.7tv.app/v2/users/$id/emotes');
+    final url = Uri.parse('https://7tv.io/v3/users/twitch/$id');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body) as List;
-      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
+      final decoded = jsonDecode(response.body)['emote_set']['emotes'] as List;
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote['data']));
 
       return emotes
           .map((emote) => Emote.from7TV(emote, EmoteType.sevenTVChannel))

@@ -124,6 +124,7 @@ class _MyAppState extends State<MyApp> {
         final themes = FrostyThemes();
 
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Frosty',
           theme: themes.light,
           darkTheme: settingsStore.themeType == ThemeType.black

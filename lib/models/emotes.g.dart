@@ -52,15 +52,24 @@ EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
     );
 
 Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
+      json['id'] as String,
       json['name'] as String,
-      (json['visibility_simple'] as List<dynamic>)
-          .map((e) => e as String)
+      (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),
+      Emote7TVHost.fromJson(json['host'] as Map<String, dynamic>),
+    );
+
+Emote7TVHost _$Emote7TVHostFromJson(Map<String, dynamic> json) => Emote7TVHost(
+      json['url'] as String,
+      (json['files'] as List<dynamic>)
+          .map((e) => Emote7TVFile.fromJson(e as Map<String, dynamic>))
           .toList(),
-      (json['width'] as List<dynamic>).map((e) => e as int).toList(),
-      (json['height'] as List<dynamic>).map((e) => e as int).toList(),
-      (json['urls'] as List<dynamic>)
-          .map((e) => (e as List<dynamic>).map((e) => e as String).toList())
-          .toList(),
+    );
+
+Emote7TVFile _$Emote7TVFileFromJson(Map<String, dynamic> json) => Emote7TVFile(
+      json['name'] as String,
+      json['width'] as int,
+      json['height'] as int,
+      json['format'] as String,
     );
 
 Emote _$EmoteFromJson(Map<String, dynamic> json) => Emote(

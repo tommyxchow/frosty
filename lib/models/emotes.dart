@@ -107,22 +107,52 @@ class EmoteFFZ {
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class Emote7TV {
+  final String id;
   final String name;
-  final List<String> visibilitySimple;
-  final List<int> width;
-  final List<int> height;
-  final List<List<String>> urls;
+  final List<String>? tags;
+  final Emote7TVHost host;
 
   const Emote7TV(
+    this.id,
     this.name,
-    this.visibilitySimple,
-    this.width,
-    this.height,
-    this.urls,
+    this.tags,
+    this.host,
   );
 
   factory Emote7TV.fromJson(Map<String, dynamic> json) =>
       _$Emote7TVFromJson(json);
+}
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class Emote7TVHost {
+  final String url;
+  final List<Emote7TVFile> files;
+
+  Emote7TVHost(
+    this.url,
+    this.files,
+  );
+
+  factory Emote7TVHost.fromJson(Map<String, dynamic> json) =>
+      _$Emote7TVHostFromJson(json);
+}
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class Emote7TVFile {
+  final String name;
+  final int width;
+  final int height;
+  final String format;
+
+  Emote7TVFile(
+    this.name,
+    this.width,
+    this.height,
+    this.format,
+  );
+
+  factory Emote7TVFile.fromJson(Map<String, dynamic> json) =>
+      _$Emote7TVFileFromJson(json);
 }
 
 /// The common emote class.
@@ -171,14 +201,22 @@ class Emote {
         type: type,
       );
 
-  factory Emote.from7TV(Emote7TV emote, EmoteType type) => Emote(
-        name: emote.name,
-        width: emote.width.first,
-        height: emote.height.first,
-        zeroWidth: emote.visibilitySimple.contains('ZERO_WIDTH'),
-        url: emote.urls[3][1],
-        type: type,
-      );
+  factory Emote.from7TV(Emote7TV emote, EmoteType type) {
+    final url = emote.host.url;
+    // Flutter doesn't support AVIF yet.
+    final file = emote.host.files.reversed.firstWhere(
+      (file) => file.format != 'AVIF' && file.name.contains('4x'),
+    );
+
+    return Emote(
+      name: emote.name,
+      width: emote.host.files.first.width,
+      height: emote.host.files.first.height,
+      zeroWidth: emote.tags?.contains('zerowidth') ?? false,
+      url: 'https:$url/${file.name}',
+      type: type,
+    );
+  }
 
   factory Emote.fromJson(Map<String, dynamic> json) => _$EmoteFromJson(json);
   Map<String, dynamic> toJson() => _$EmoteToJson(this);
