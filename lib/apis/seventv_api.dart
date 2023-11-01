@@ -17,7 +17,7 @@ class SevenTVApi {
     final response = await _client.get(url);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['emotes'] as List;
-      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote['data']));
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
 
       return emotes
           .map((emote) => Emote.from7TV(emote, EmoteType.sevenTVGlobal))
@@ -34,7 +34,7 @@ class SevenTVApi {
     final response = await _client.get(url);
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body)['emote_set']['emotes'] as List;
-      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote['data']));
+      final emotes = decoded.map((emote) => Emote7TV.fromJson(emote));
 
       return emotes
           .map((emote) => Emote.from7TV(emote, EmoteType.sevenTVChannel))

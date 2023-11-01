@@ -108,19 +108,37 @@ class EmoteFFZ {
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class Emote7TV {
   final String id;
+
+  /// Will be non-null if a custom emote name is used.
+  final String? name;
+  final Emote7TVData data;
+
+  const Emote7TV(
+    this.id,
+    this.name,
+    this.data,
+  );
+
+  factory Emote7TV.fromJson(Map<String, dynamic> json) =>
+      _$Emote7TVFromJson(json);
+}
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class Emote7TVData {
+  final String id;
   final String name;
   final List<String>? tags;
   final Emote7TVHost host;
 
-  const Emote7TV(
+  const Emote7TVData(
     this.id,
     this.name,
     this.tags,
     this.host,
   );
 
-  factory Emote7TV.fromJson(Map<String, dynamic> json) =>
-      _$Emote7TVFromJson(json);
+  factory Emote7TVData.fromJson(Map<String, dynamic> json) =>
+      _$Emote7TVDataFromJson(json);
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -202,17 +220,17 @@ class Emote {
       );
 
   factory Emote.from7TV(Emote7TV emote, EmoteType type) {
-    final url = emote.host.url;
+    final url = emote.data.host.url;
     // Flutter doesn't support AVIF yet.
-    final file = emote.host.files.reversed.firstWhere(
+    final file = emote.data.host.files.reversed.firstWhere(
       (file) => file.format != 'AVIF' && file.name.contains('4x'),
     );
 
     return Emote(
-      name: emote.name,
-      width: emote.host.files.first.width,
-      height: emote.host.files.first.height,
-      zeroWidth: emote.tags?.contains('zerowidth') ?? false,
+      name: emote.name ?? emote.data.name,
+      width: emote.data.host.files.first.width,
+      height: emote.data.host.files.first.height,
+      zeroWidth: emote.data.tags?.contains('zerowidth') ?? false,
       url: 'https:$url/${file.name}',
       type: type,
     );

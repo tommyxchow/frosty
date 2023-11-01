@@ -53,6 +53,12 @@ EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
 
 Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
       json['id'] as String,
+      json['name'] as String?,
+      Emote7TVData.fromJson(json['data'] as Map<String, dynamic>),
+    );
+
+Emote7TVData _$Emote7TVDataFromJson(Map<String, dynamic> json) => Emote7TVData(
+      json['id'] as String,
       json['name'] as String,
       (json['tags'] as List<dynamic>?)?.map((e) => e as String).toList(),
       Emote7TVHost.fromJson(json['host'] as Map<String, dynamic>),
