@@ -109,12 +109,10 @@ class EmoteFFZ {
 class Emote7TV {
   final String id;
   final String name;
-  final int flags;
   final Emote7TVData data;
 
   const Emote7TV(
     this.id,
-    this.flags,
     this.name,
     this.data,
   );
@@ -127,13 +125,13 @@ class Emote7TV {
 class Emote7TVData {
   final String id;
   final String name;
-  final List<String>? tags;
+  final int flags;
   final Emote7TVHost host;
 
   const Emote7TVData(
     this.id,
     this.name,
-    this.tags,
+    this.flags,
     this.host,
   );
 
@@ -228,12 +226,15 @@ class Emote {
       (file) => file.format != 'AVIF' && file.name.contains('4x'),
     );
 
+    // Check if the flag has 1 at the 8th bit.
+    final isZeroWidth = (emote.data.flags & 256) == 256;
+
     return Emote(
       name: emote.name,
       realName: emote.name != emote.data.name ? emote.data.name : null,
       width: emote.data.host.files.first.width,
       height: emote.data.host.files.first.height,
-      zeroWidth: emote.flags == 1,
+      zeroWidth: isZeroWidth,
       url: 'https:$url/${file.name}',
       type: type,
     );
