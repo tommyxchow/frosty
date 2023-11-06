@@ -47,7 +47,7 @@ class SevenTVApi {
   /// Returns a map of user IDS to a list of their 7TV badges.
   Future<Map<String, List<ChatBadge>>> getBadges() async {
     final url =
-        Uri.parse('https://api.7tv.app/v2/badges?user_identifier=twitch_id');
+        Uri.parse('https://7tv.io/v2/cosmetics?user_identifier=twitch_id');
 
     final response = await _client.get(url);
     if (response.statusCode == 200) {
