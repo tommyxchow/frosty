@@ -16,7 +16,6 @@ class FrostyThemes {
         : Colors.grey.shade800;
 
     return ThemeData(
-      useMaterial3: true,
       fontFamily: 'Inter',
       brightness: brightness,
       colorSchemeSeed: colorSchemeSeed,
