@@ -36,7 +36,7 @@ class ReplyThread extends StatelessWidget {
       builder: (context) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
-            textScaleFactor: chatStore.settings.messageScale,
+            textScaler: TextScaler.linear(chatStore.settings.messageScale),
           ),
           child: DefaultTextStyle(
             style: DefaultTextStyle.of(context)
