@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
   # Only run if a semver tag was pushed.
   push:
+    branches:
+      - main
     tags:
       - v*.*.*
 # Setup environment variables for use in all jobs.
@@ -13,10 +15,13 @@ env:
   BUNDLE_GEMFILE: ${{ github.workspace }}/android/Gemfile
   CLIENT_ID: ${{ secrets.CLIENT_ID }}
   SECRET: ${{ secrets.SECRET }}
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
 jobs:
   android:
     name: Build and release Frosty on Android
     runs-on: ubuntu-latest
+    environment: release-android
     env:
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
@@ -70,6 +75,7 @@ jobs:
   ios:
     name: Build and release Frosty on iOS
     runs-on: macos-latest
+    environment: release-ios
     env:
       APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
       APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
