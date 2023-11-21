@@ -686,7 +686,7 @@ class IRCMessage {
               leading: const Icon(Icons.copy_rounded),
               title: const Text('Copy name'),
               onTap: () {
-                Clipboard.setData(ClipboardData(text: title));
+                Clipboard.setData(ClipboardData(text: title.split(' (')[0]));
 
                 Navigator.pop(context);
               },
