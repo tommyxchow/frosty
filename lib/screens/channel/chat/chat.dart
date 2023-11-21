@@ -97,23 +97,16 @@ class Chat extends StatelessWidget {
             if (chatStore.settings.showBottomBar)
               ChatBottomBar(chatStore: chatStore),
             PopScope(
-              canPop: false,
+              canPop: Platform.isIOS,
               onPopInvoked: (didPop) {
                 if (didPop) return;
-
-                final navigator = Navigator.of(context);
-
-                if (!Platform.isAndroid) {
-                  navigator.pop();
-                  return;
-                }
 
                 // If pressing the back button on Android while the emote menu
                 // is open, close it instead of going back to the streams list.
                 if (chatStore.assetsStore.showEmoteMenu) {
                   chatStore.assetsStore.showEmoteMenu = false;
                 } else {
-                  navigator.pop();
+                  Navigator.of(context).pop();
                 }
               },
               child: AnimatedContainer(
