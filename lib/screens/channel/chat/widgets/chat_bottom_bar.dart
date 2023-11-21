@@ -151,7 +151,7 @@ class ChatBottomBar extends StatelessWidget {
                         textInputAction: TextInputAction.send,
                         focusNode: chatStore.textFieldFocusNode,
                         minLines: 1,
-                        maxLines: 5,
+                        maxLines: 3,
                         enabled: chatStore.auth.isLoggedIn ? true : false,
                         decoration: InputDecoration(
                           prefixIcon: chatStore.settings.emoteMenuButtonOnLeft
