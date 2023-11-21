@@ -99,7 +99,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
 
                 return MediaQuery(
                   data: MediaQuery.of(context).copyWith(
-                    textScaleFactor: widget.chatStore.settings.messageScale,
+                    textScaler: TextScaler.linear(widget.chatStore.settings.messageScale),
                   ),
                   child: DefaultTextStyle(
                     style: DefaultTextStyle.of(context)

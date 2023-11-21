@@ -74,17 +74,20 @@ class _ChatSettingsState extends State<ChatSettings> {
                             ),
                           ],
                         ),
-                        textScaleFactor: settingsStore.messageScale,
+                        textScaler:
+                            TextScaler.linear(settingsStore.messageScale),
                       ),
                       SizedBox(height: settingsStore.messageSpacing),
                       Text(
                         'Hello! Here\'s a text preview.',
-                        textScaleFactor: settingsStore.messageScale,
+                        textScaler:
+                            TextScaler.linear(settingsStore.messageScale),
                       ),
                       SizedBox(height: settingsStore.messageSpacing),
                       Text(
                         'And another for spacing without an emote!',
-                        textScaleFactor: settingsStore.messageScale,
+                        textScaler:
+                            TextScaler.linear(settingsStore.messageScale),
                       ),
                     ],
                   ),

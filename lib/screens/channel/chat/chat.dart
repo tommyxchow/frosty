@@ -35,7 +35,8 @@ class Chat extends StatelessWidget {
                   children: [
                     MediaQuery(
                       data: MediaQuery.of(context).copyWith(
-                        textScaleFactor: chatStore.settings.messageScale,
+                        textScaler:
+                            TextScaler.linear(chatStore.settings.messageScale),
                       ),
                       child: DefaultTextStyle(
                         style: DefaultTextStyle.of(context)
@@ -95,18 +96,19 @@ class Chat extends StatelessWidget {
             ),
             if (chatStore.settings.showBottomBar)
               ChatBottomBar(chatStore: chatStore),
-            WillPopScope(
-              onWillPop: Platform.isAndroid
-                  ? () async {
-                      // If pressing the back button on Android while the emote menu is open, close it instead of going back to the streams list.
-                      if (chatStore.assetsStore.showEmoteMenu) {
-                        chatStore.assetsStore.showEmoteMenu = false;
-                        return false;
-                      } else {
-                        return true;
-                      }
-                    }
-                  : null,
+            PopScope(
+              canPop: Platform.isIOS,
+              onPopInvoked: (didPop) {
+                if (didPop) return;
+
+                // If pressing the back button on Android while the emote menu
+                // is open, close it instead of going back to the streams list.
+                if (chatStore.assetsStore.showEmoteMenu) {
+                  chatStore.assetsStore.showEmoteMenu = false;
+                } else {
+                  Navigator.of(context).pop();
+                }
+              },
               child: AnimatedContainer(
                 curve: Curves.ease,
                 duration: const Duration(milliseconds: 200),
