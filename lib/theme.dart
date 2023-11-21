@@ -36,7 +36,7 @@ class FrostyThemes {
         surfaceTintColor: backgroundColor,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
           borderSide: BorderSide(color: secondaryBackground),
