@@ -200,10 +200,6 @@ abstract class ChatAssetsStoreBase with Store {
             .getBadges()
             .then((badges) => _userToFFZBadges = badges)
             .catchError(onError),
-        sevenTVApi
-            .getBadges()
-            .then((badges) => _userTo7TVBadges = badges)
-            .catchError(onError),
         bttvApi
             .getBadges()
             .then((badges) => _userToBTTVBadges = badges)
