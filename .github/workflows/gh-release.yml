@@ -9,6 +9,7 @@ jobs:
   android:
     name: Draft release and attach APK
     runs-on: ubuntu-latest
+    environment: release-android
     env:
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
@@ -58,6 +59,3 @@ jobs:
           draft: true
           generate_release_notes: true
           files: frosty-${{ github.ref_name }}.apk
-          
-
-        

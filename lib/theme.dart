@@ -16,7 +16,6 @@ class FrostyThemes {
         : Colors.grey.shade800;
 
     return ThemeData(
-      useMaterial3: true,
       fontFamily: 'Inter',
       brightness: brightness,
       colorSchemeSeed: colorSchemeSeed,
@@ -37,7 +36,7 @@ class FrostyThemes {
         surfaceTintColor: backgroundColor,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
           borderSide: BorderSide(color: secondaryBackground),
@@ -57,6 +56,7 @@ class FrostyThemes {
       ),
       tabBarTheme: const TabBarTheme(
         dividerColor: Colors.transparent,
+        tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

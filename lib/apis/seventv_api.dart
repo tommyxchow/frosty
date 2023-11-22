@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:http/http.dart';
 
@@ -41,35 +40,6 @@ class SevenTVApi {
           .toList();
     } else {
       return Future.error('Failed to get 7TV channel emotes');
-    }
-  }
-
-  /// Returns a map of user IDS to a list of their 7TV badges.
-  Future<Map<String, List<ChatBadge>>> getBadges() async {
-    final url =
-        Uri.parse('https://api.7tv.app/v2/badges?user_identifier=twitch_id');
-
-    final response = await _client.get(url);
-    if (response.statusCode == 200) {
-      final decoded = jsonDecode(response.body)['badges'] as List;
-      final badges = decoded.map((emote) => BadgeInfo7TV.fromJson(emote));
-
-      final result = <String, List<ChatBadge>>{};
-      for (final badge in badges) {
-        for (final userId in badge.users) {
-          final entry = result[userId];
-          final normalBadge = ChatBadge.from7TV(badge);
-          if (entry == null) {
-            result[userId] = [normalBadge];
-          } else {
-            entry.add(normalBadge);
-          }
-        }
-      }
-
-      return result;
-    } else {
-      return Future.error('Failed to get 7TV badges');
     }
   }
 }
