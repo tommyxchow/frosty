@@ -61,6 +61,40 @@ class ChatBottomBar extends StatelessWidget {
 
         return Column(
           children: [
+            if (chatStore.replyingToMessage != null) ...[
+              const Divider(),
+              ListTile(
+                contentPadding: const EdgeInsets.only(left: 16),
+                leading: const Icon(Icons.reply),
+                title: Text.rich(
+                  TextSpan(
+                    children: chatStore.replyingToMessage!.generateSpan(
+                      context,
+                      assetsStore: chatStore.assetsStore,
+                      emoteScale: chatStore.settings.emoteScale,
+                      badgeScale: chatStore.settings.badgeScale,
+                      useReadableColors: chatStore.settings.useReadableColors,
+                      isLightTheme:
+                          Theme.of(context).brightness == Brightness.light,
+                      launchExternal: chatStore.settings.launchUrlExternal,
+                      timestamp: chatStore.settings.timestampType,
+                    ),
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: DefaultTextStyle.of(context)
+                      .style
+                      .copyWith(fontSize: chatStore.settings.fontSize),
+                ),
+                trailing: IconButton(
+                  tooltip: 'Cancel reply',
+                  onPressed: () {
+                    chatStore.replyingToMessage = null;
+                  },
+                  icon: const Icon(Icons.close),
+                ),
+              ),
+            ],
             if (chatStore.settings.autocomplete &&
                 chatStore.showEmoteAutocomplete &&
                 matchingEmotes.isNotEmpty) ...[
@@ -132,51 +166,6 @@ class ChatBottomBar extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 12, 0, 12),
               child: Column(
                 children: [
-                  if (chatStore.replyingToMessage != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.reply),
-                          Expanded(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              child: Text.rich(
-                                TextSpan(
-                                  children:
-                                      chatStore.replyingToMessage!.generateSpan(
-                                    context,
-                                    assetsStore: chatStore.assetsStore,
-                                    emoteScale: chatStore.settings.emoteScale,
-                                    badgeScale: chatStore.settings.badgeScale,
-                                    useReadableColors:
-                                        chatStore.settings.useReadableColors,
-                                    isLightTheme:
-                                        Theme.of(context).brightness ==
-                                            Brightness.light,
-                                    launchExternal:
-                                        chatStore.settings.launchUrlExternal,
-                                    timestamp: chatStore.settings.timestampType,
-                                    style: null,
-                                    onTapName: null,
-                                  ),
-                                ),
-                                maxLines: 5,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () {
-                              chatStore.replyingToMessage = null;
-                            },
-                            icon: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-                    ),
                   Row(
                     children: [
                       if (!chatStore.expandChat &&

@@ -49,6 +49,8 @@ class ChatMessage extends StatelessWidget {
       chatStore.updateNotification('Message copied');
     }
 
+    final defaultTextStyle = DefaultTextStyle.of(context).style;
+
     void onLongPressMessage() {
       if (ircMessage.command != Command.privateMessage &&
           ircMessage.command != Command.userState) {
@@ -75,9 +77,8 @@ class ChatMessage extends StatelessWidget {
                         Theme.of(context).brightness == Brightness.light,
                     launchExternal: chatStore.settings.launchUrlExternal,
                     timestamp: chatStore.settings.timestampType,
-                    style: null,
-                    onTapName: null,
                   ),
+                  style: defaultTextStyle,
                 ),
               ),
             ),
@@ -112,8 +113,6 @@ class ChatMessage extends StatelessWidget {
         ),
       );
     }
-
-    final defaultTextStyle = DefaultTextStyle.of(context).style;
 
     return Observer(
       builder: (context) {

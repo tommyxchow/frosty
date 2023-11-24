@@ -110,13 +110,13 @@ class IRCMessage {
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
   List<InlineSpan> generateSpan(
     BuildContext context, {
-    required TextStyle? style,
+    TextStyle? style,
     required ChatAssetsStore assetsStore,
     required double badgeScale,
     required double emoteScale,
     required bool isLightTheme,
     required bool launchExternal,
-    required void Function()? onTapName,
+    void Function()? onTapName,
     bool showMessage = true,
     bool useReadableColors = false,
     TimestampType timestamp = TimestampType.disabled,
