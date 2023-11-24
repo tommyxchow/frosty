@@ -200,7 +200,7 @@ class ChatBottomBar extends StatelessWidget {
                                       : emoteMenuButton,
                               hintMaxLines: 1,
                               hintText: chatStore.auth.isLoggedIn
-                                  ? 'Send a message ${chatStore.settings.chatDelay == 0 ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
+                                  ? 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'} ${chatStore.settings.chatDelay == 0 ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
                                   : 'Log in to chat',
                             ),
                             controller: chatStore.textController,
