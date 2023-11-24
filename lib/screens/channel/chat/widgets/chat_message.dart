@@ -84,7 +84,7 @@ class ChatMessage extends StatelessWidget {
               Navigator.pop(context);
             },
             leading: const Icon(Icons.copy),
-            title: const Text('Copy'),
+            title: const Text('Copy message'),
           ),
           ListTile(
             onTap: () {
@@ -93,7 +93,7 @@ class ChatMessage extends StatelessWidget {
               Navigator.pop(context);
             },
             leading: const Icon(Icons.reply),
-            title: const Text('Reply'),
+            title: const Text('Reply to message'),
           ),
         ],
       ),
