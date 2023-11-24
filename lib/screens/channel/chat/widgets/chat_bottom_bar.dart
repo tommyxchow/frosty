@@ -66,23 +66,27 @@ class ChatBottomBar extends StatelessWidget {
               ListTile(
                 contentPadding: const EdgeInsets.only(left: 16),
                 leading: const Icon(Icons.reply),
-                title: Text.rich(
-                  TextSpan(
-                    children: chatStore.replyingToMessage!.generateSpan(
-                      context,
-                      assetsStore: chatStore.assetsStore,
-                      emoteScale: chatStore.settings.emoteScale,
-                      badgeScale: chatStore.settings.badgeScale,
-                      useReadableColors: chatStore.settings.useReadableColors,
-                      launchExternal: chatStore.settings.launchUrlExternal,
-                      timestamp: chatStore.settings.timestampType,
+                title: Tooltip(
+                  message: chatStore.replyingToMessage!.message,
+                  preferBelow: false,
+                  child: Text.rich(
+                    TextSpan(
+                      children: chatStore.replyingToMessage!.generateSpan(
+                        context,
+                        assetsStore: chatStore.assetsStore,
+                        emoteScale: chatStore.settings.emoteScale,
+                        badgeScale: chatStore.settings.badgeScale,
+                        useReadableColors: chatStore.settings.useReadableColors,
+                        launchExternal: chatStore.settings.launchUrlExternal,
+                        timestamp: chatStore.settings.timestampType,
+                      ),
                     ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: DefaultTextStyle.of(context)
+                        .style
+                        .copyWith(fontSize: chatStore.settings.fontSize),
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(fontSize: chatStore.settings.fontSize),
                 ),
                 trailing: IconButton(
                   tooltip: 'Cancel reply',
