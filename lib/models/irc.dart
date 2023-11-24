@@ -114,13 +114,14 @@ class IRCMessage {
     required ChatAssetsStore assetsStore,
     required double badgeScale,
     required double emoteScale,
-    required bool isLightTheme,
     required bool launchExternal,
     void Function()? onTapName,
     bool showMessage = true,
     bool useReadableColors = false,
     TimestampType timestamp = TimestampType.disabled,
   }) {
+    final isLightTheme = Theme.of(context).brightness == Brightness.light;
+
     final emoteToObject = assetsStore.emoteToObject;
     final twitchBadgeToObject = assetsStore.twitchBadgesToObject;
     final ffzUserToBadges = assetsStore.userToFFZBadges;

@@ -69,8 +69,6 @@ class ChatMessage extends StatelessWidget {
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
                   useReadableColors: chatStore.settings.useReadableColors,
-                  isLightTheme:
-                      Theme.of(context).brightness == Brightness.light,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                 ),
@@ -129,8 +127,6 @@ class ChatMessage extends StatelessWidget {
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
                   useReadableColors: chatStore.settings.useReadableColors,
-                  isLightTheme:
-                      Theme.of(context).brightness == Brightness.light,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                 ),
@@ -240,8 +236,6 @@ class ChatMessage extends StatelessWidget {
                         badgeScale: chatStore.settings.badgeScale,
                         showMessage: chatStore.settings.showDeletedMessages,
                         useReadableColors: chatStore.settings.useReadableColors,
-                        isLightTheme:
-                            Theme.of(context).brightness == Brightness.light,
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
                       ),
@@ -300,8 +294,6 @@ class ChatMessage extends StatelessWidget {
                           badgeScale: chatStore.settings.badgeScale,
                           useReadableColors:
                               chatStore.settings.useReadableColors,
-                          isLightTheme:
-                              Theme.of(context).brightness == Brightness.light,
                           launchExternal: chatStore.settings.launchUrlExternal,
                           timestamp: chatStore.settings.timestampType,
                         ),

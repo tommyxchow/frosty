@@ -74,8 +74,6 @@ class ChatBottomBar extends StatelessWidget {
                       emoteScale: chatStore.settings.emoteScale,
                       badgeScale: chatStore.settings.badgeScale,
                       useReadableColors: chatStore.settings.useReadableColors,
-                      isLightTheme:
-                          Theme.of(context).brightness == Brightness.light,
                       launchExternal: chatStore.settings.launchUrlExternal,
                       timestamp: chatStore.settings.timestampType,
                     ),
