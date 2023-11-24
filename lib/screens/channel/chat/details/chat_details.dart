@@ -132,7 +132,11 @@ class ChatDetails extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: Navigator.of(context).pop,
+            onPressed: () {
+              chatStore.assetsStore.recentEmotes.clear();
+
+              Navigator.pop(context);
+            },
             child: const Text('Yes'),
           ),
         ],

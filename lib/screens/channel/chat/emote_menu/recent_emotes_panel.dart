@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
@@ -18,73 +19,78 @@ class RecentEmotesPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        if (chatStore.assetsStore.recentEmotes.isEmpty)
-          const SliverFillRemaining(
-            hasScrollBody: false,
-            child: AlertMessage(message: 'No recent emotes'),
-          )
-        else
-          SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount:
-                  MediaQuery.of(context).orientation == Orientation.portrait
-                      ? 8
-                      : context.read<SettingsStore>().showVideo
-                          ? 6
-                          : 16,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final emote = chatStore.assetsStore.recentEmotes[index];
-                final validEmotes = [
-                  ...chatStore.assetsStore.emoteToObject.values,
-                  ...chatStore.assetsStore.userEmoteToObject.values,
-                ];
-                final matchingEmotes = validEmotes.where(
-                  (existingEmote) =>
-                      existingEmote.name == emote.name &&
-                      existingEmote.type == emote.type,
-                );
+    return Observer(
+      builder: (context) {
+        return CustomScrollView(
+          slivers: [
+            if (chatStore.assetsStore.recentEmotes.isEmpty)
+              const SliverFillRemaining(
+                hasScrollBody: false,
+                child: AlertMessage(message: 'No recent emotes'),
+              )
+            else
+              SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      MediaQuery.of(context).orientation == Orientation.portrait
+                          ? 8
+                          : context.read<SettingsStore>().showVideo
+                              ? 6
+                              : 16,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final emote = chatStore.assetsStore.recentEmotes[index];
+                    final validEmotes = [
+                      ...chatStore.assetsStore.emoteToObject.values,
+                      ...chatStore.assetsStore.userEmoteToObject.values,
+                    ];
+                    final matchingEmotes = validEmotes.where(
+                      (existingEmote) =>
+                          existingEmote.name == emote.name &&
+                          existingEmote.type == emote.type,
+                    );
 
-                return InkWell(
-                  onTap: matchingEmotes.isNotEmpty
-                      ? () => chatStore.addEmote(emote)
-                      : null,
-                  onLongPress: () {
-                    HapticFeedback.lightImpact();
+                    return InkWell(
+                      onTap: matchingEmotes.isNotEmpty
+                          ? () => chatStore.addEmote(emote)
+                          : null,
+                      onLongPress: () {
+                        HapticFeedback.lightImpact();
 
-                    IRCMessage.showEmoteDetailsBottomSheet(
-                      context,
-                      emote: emote,
-                      launchExternal: chatStore.settings.launchUrlExternal,
+                        IRCMessage.showEmoteDetailsBottomSheet(
+                          context,
+                          emote: emote,
+                          launchExternal: chatStore.settings.launchUrlExternal,
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Center(
+                          child: FrostyCachedNetworkImage(
+                            imageUrl: matchingEmotes.isNotEmpty
+                                ? matchingEmotes.first.url
+                                : emote.url,
+                            color: matchingEmotes.isNotEmpty
+                                ? null
+                                : const Color.fromRGBO(255, 255, 255, 0.5),
+                            colorBlendMode: matchingEmotes.isNotEmpty
+                                ? null
+                                : BlendMode.modulate,
+                            height:
+                                emote.height?.toDouble() ?? defaultEmoteSize,
+                            width: emote.width?.toDouble(),
+                          ),
+                        ),
+                      ),
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(
-                      child: FrostyCachedNetworkImage(
-                        imageUrl: matchingEmotes.isNotEmpty
-                            ? matchingEmotes.first.url
-                            : emote.url,
-                        color: matchingEmotes.isNotEmpty
-                            ? null
-                            : const Color.fromRGBO(255, 255, 255, 0.5),
-                        colorBlendMode: matchingEmotes.isNotEmpty
-                            ? null
-                            : BlendMode.modulate,
-                        height: emote.height?.toDouble() ?? defaultEmoteSize,
-                        width: emote.width?.toDouble(),
-                      ),
-                    ),
-                  ),
-                );
-              },
-              childCount: chatStore.assetsStore.recentEmotes.length,
-            ),
-          ),
-      ],
+                  childCount: chatStore.assetsStore.recentEmotes.length,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
