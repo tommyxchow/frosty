@@ -195,6 +195,22 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$replyingToMessageAtom =
+      Atom(name: 'ChatStoreBase.replyingToMessage', context: context);
+
+  @override
+  IRCMessage? get replyingToMessage {
+    _$replyingToMessageAtom.reportRead();
+    return super.replyingToMessage;
+  }
+
+  @override
+  set replyingToMessage(IRCMessage? value) {
+    _$replyingToMessageAtom.reportWrite(value, super.replyingToMessage, () {
+      super.replyingToMessage = value;
+    });
+  }
+
   late final _$getAssetsAsyncAction =
       AsyncAction('ChatStoreBase.getAssets', context: context);
 
@@ -312,6 +328,7 @@ mixin _$ChatStore on ChatStoreBase, Store {
     return '''
 timeRemaining: ${timeRemaining},
 expandChat: ${expandChat},
+replyingToMessage: ${replyingToMessage},
 renderMessages: ${renderMessages}
     ''';
   }

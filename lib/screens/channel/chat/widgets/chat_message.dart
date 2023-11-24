@@ -41,12 +41,76 @@ class ChatMessage extends StatelessWidget {
       );
     }
 
-    Future<void> onLongPressMessage() async {
+    Future<void> copyMessage() async {
       HapticFeedback.lightImpact();
 
       await Clipboard.setData(ClipboardData(text: ircMessage.message ?? ''));
 
       chatStore.updateNotification('Message copied');
+    }
+
+    void onLongPressMessage() {
+      if (ircMessage.command != Command.privateMessage &&
+          ircMessage.command != Command.userState) {
+        copyMessage();
+        return;
+      }
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => ListView(
+          shrinkWrap: true,
+          primary: false,
+          children: [
+            ListTile(
+              title: Text.rich(
+                TextSpan(
+                  children: ircMessage.generateSpan(
+                    context,
+                    assetsStore: chatStore.assetsStore,
+                    emoteScale: chatStore.settings.emoteScale,
+                    badgeScale: chatStore.settings.badgeScale,
+                    useReadableColors: chatStore.settings.useReadableColors,
+                    isLightTheme:
+                        Theme.of(context).brightness == Brightness.light,
+                    launchExternal: chatStore.settings.launchUrlExternal,
+                    timestamp: chatStore.settings.timestampType,
+                    style: null,
+                    onTapName: null,
+                  ),
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                copyMessage();
+                Navigator.pop(context);
+              },
+              leading: const Icon(Icons.copy),
+              title: const Text(
+                'Copy',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                chatStore.replyingToMessage = ircMessage;
+                chatStore.textFieldFocusNode.requestFocus();
+                Navigator.pop(context);
+              },
+              leading: const Icon(Icons.reply),
+              title: const Text(
+                'Reply',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     final defaultTextStyle = DefaultTextStyle.of(context).style;

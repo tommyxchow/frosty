@@ -138,6 +138,9 @@ abstract class ChatStoreBase with Store {
   @observable
   var expandChat = false;
 
+  @observable
+  IRCMessage? replyingToMessage;
+
   ChatStoreBase({
     required this.auth,
     required this.chatDetailsStore,
@@ -274,7 +277,8 @@ abstract class ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
 
-            if (toSend != null) {
+            if (toSend != null && parsedIRCMessage.tags['id'] != null) {
+              toSend!.tags['id'] = parsedIRCMessage.tags['id']!;
               textController.clear();
               messageBuffer.add(toSend!);
               toSend = null;
@@ -443,7 +447,9 @@ abstract class ChatStoreBase with Store {
       );
     } else {
       // Send the message to the IRC chat room.
-      _channel?.sink.add('PRIVMSG #$channelName :$message');
+      _channel?.sink.add(
+        '${replyingToMessage != null ? '@reply-parent-msg-id=${replyingToMessage!.tags['id']} ' : ''}PRIVMSG #$channelName :$message',
+      );
 
       // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
       var userStateString = _userState.raw;
@@ -452,7 +458,8 @@ abstract class ChatStoreBase with Store {
           userStateString +=
               ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
         } else {
-          userStateString += ' :${message.trim()}';
+          userStateString +=
+              ' :${replyingToMessage?.tags['display-name'] != null ? '@${replyingToMessage!.tags['display-name']} ' : ''}${message.trim()}';
         }
 
         final userChatMessage = IRCMessage.fromString(userStateString);
@@ -461,6 +468,17 @@ abstract class ChatStoreBase with Store {
           userChatMessage.tags['user-id'] = auth.user.details!.id;
         }
 
+        if (replyingToMessage != null &&
+            replyingToMessage!.tags['id'] != null) {
+          userChatMessage.tags['reply-parent-msg-id'] =
+              replyingToMessage!.tags['id']!;
+          userChatMessage.tags['reply-parent-display-name'] =
+              replyingToMessage!.tags['display-name']!;
+          userChatMessage.tags['reply-parent-msg-body'] =
+              replyingToMessage!.message!;
+        }
+
+        replyingToMessage = null;
         toSend = userChatMessage;
       }
     }
