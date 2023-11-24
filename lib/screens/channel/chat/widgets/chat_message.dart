@@ -19,100 +19,100 @@ class ChatMessage extends StatelessWidget {
     this.isModal = false,
   });
 
+  void onTapName(BuildContext context) {
+    // Ignore if the message is a recent message in the modal bottom sheet.
+    if (isModal) return;
+
+    // Ignore if long-pressing own username.
+    if (ircMessage.user == null ||
+        ircMessage.user == chatStore.auth.user.details?.login) return;
+
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => ChatUserModal(
+        chatStore: chatStore,
+        username: ircMessage.user!,
+        userId: ircMessage.tags['user-id']!,
+        displayName: ircMessage.tags['display-name']!,
+      ),
+    );
+  }
+
+  Future<void> copyMessage() async {
+    HapticFeedback.lightImpact();
+
+    await Clipboard.setData(ClipboardData(text: ircMessage.message ?? ''));
+
+    chatStore.updateNotification('Message copied');
+  }
+
+  void onLongPressMessage(BuildContext context, TextStyle defaultTextStyle) {
+    if (ircMessage.command != Command.privateMessage &&
+        ircMessage.command != Command.userState) {
+      copyMessage();
+      return;
+    }
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => ListView(
+        shrinkWrap: true,
+        primary: false,
+        children: [
+          ListTile(
+            title: Text.rich(
+              TextSpan(
+                children: ircMessage.generateSpan(
+                  context,
+                  assetsStore: chatStore.assetsStore,
+                  emoteScale: chatStore.settings.emoteScale,
+                  badgeScale: chatStore.settings.badgeScale,
+                  useReadableColors: chatStore.settings.useReadableColors,
+                  isLightTheme:
+                      Theme.of(context).brightness == Brightness.light,
+                  launchExternal: chatStore.settings.launchUrlExternal,
+                  timestamp: chatStore.settings.timestampType,
+                ),
+                style: defaultTextStyle,
+              ),
+            ),
+          ),
+          ListTile(
+            onTap: () {
+              copyMessage();
+              Navigator.pop(context);
+            },
+            leading: const Icon(Icons.copy),
+            title: const Text(
+              'Copy',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ListTile(
+            onTap: () {
+              chatStore.replyingToMessage = ircMessage;
+              chatStore.textFieldFocusNode.requestFocus();
+              Navigator.pop(context);
+            },
+            leading: const Icon(Icons.reply),
+            title: const Text(
+              'Reply',
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    void onTapName() {
-      // Ignore if the message is a recent message in the modal bottom sheet.
-      if (isModal) return;
-
-      // Ignore if long-pressing own username.
-      if (ircMessage.user == null ||
-          ircMessage.user == chatStore.auth.user.details?.login) return;
-
-      showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (context) => ChatUserModal(
-          chatStore: chatStore,
-          username: ircMessage.user!,
-          userId: ircMessage.tags['user-id']!,
-          displayName: ircMessage.tags['display-name']!,
-        ),
-      );
-    }
-
-    Future<void> copyMessage() async {
-      HapticFeedback.lightImpact();
-
-      await Clipboard.setData(ClipboardData(text: ircMessage.message ?? ''));
-
-      chatStore.updateNotification('Message copied');
-    }
-
     final defaultTextStyle = DefaultTextStyle.of(context).style;
-
-    void onLongPressMessage() {
-      if (ircMessage.command != Command.privateMessage &&
-          ircMessage.command != Command.userState) {
-        copyMessage();
-        return;
-      }
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (context) => ListView(
-          shrinkWrap: true,
-          primary: false,
-          children: [
-            ListTile(
-              title: Text.rich(
-                TextSpan(
-                  children: ircMessage.generateSpan(
-                    context,
-                    assetsStore: chatStore.assetsStore,
-                    emoteScale: chatStore.settings.emoteScale,
-                    badgeScale: chatStore.settings.badgeScale,
-                    useReadableColors: chatStore.settings.useReadableColors,
-                    isLightTheme:
-                        Theme.of(context).brightness == Brightness.light,
-                    launchExternal: chatStore.settings.launchUrlExternal,
-                    timestamp: chatStore.settings.timestampType,
-                  ),
-                  style: defaultTextStyle,
-                ),
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                copyMessage();
-                Navigator.pop(context);
-              },
-              leading: const Icon(Icons.copy),
-              title: const Text(
-                'Copy',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                chatStore.replyingToMessage = ircMessage;
-                chatStore.textFieldFocusNode.requestFocus();
-                Navigator.pop(context);
-              },
-              leading: const Icon(Icons.reply),
-              title: const Text(
-                'Reply',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
 
     return Observer(
       builder: (context) {
@@ -133,7 +133,7 @@ class ChatMessage extends StatelessWidget {
               TextSpan(
                 children: ircMessage.generateSpan(
                   context,
-                  onTapName: onTapName,
+                  onTapName: () => onTapName(context),
                   style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
@@ -243,7 +243,7 @@ class ChatMessage extends StatelessWidget {
                     TextSpan(
                       children: ircMessage.generateSpan(
                         context,
-                        onTapName: onTapName,
+                        onTapName: () => onTapName(context),
                         style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
@@ -303,7 +303,7 @@ class ChatMessage extends StatelessWidget {
                       TextSpan(
                         children: ircMessage.generateSpan(
                           context,
-                          onTapName: onTapName,
+                          onTapName: () => onTapName(context),
                           style: defaultTextStyle,
                           assetsStore: chatStore.assetsStore,
                           emoteScale: chatStore.settings.emoteScale,
@@ -358,7 +358,7 @@ class ChatMessage extends StatelessWidget {
               chatStore.assetsStore.showEmoteMenu = false;
             }
           },
-          onLongPress: onLongPressMessage,
+          onLongPress: () => onLongPressMessage(context, defaultTextStyle),
           child: coloredMessage,
         );
       },
