@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -21,12 +23,13 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
-          SettingsListSwitch(
-            title: 'Default to highest quality',
-            value: settingsStore.defaultToHighestQuality,
-            onChanged: (newValue) =>
-                settingsStore.defaultToHighestQuality = newValue,
-          ),
+          if (!Platform.isIOS)
+            SettingsListSwitch(
+              title: 'Default to highest quality',
+              value: settingsStore.defaultToHighestQuality,
+              onChanged: (newValue) =>
+                  settingsStore.defaultToHighestQuality = newValue,
+            ),
           const SectionHeader('Overlay', showDivider: true),
           SettingsListSwitch(
             title: 'Use custom video overlay',

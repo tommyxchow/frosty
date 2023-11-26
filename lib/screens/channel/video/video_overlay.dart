@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -48,7 +50,8 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final videoSettingsButton = IconButton(
-      icon: const Icon(Icons.settings_rounded),
+      icon: const Icon(Icons.settings),
+      color: Colors.white,
       onPressed: () {
         videoStore.updateStreamQualities();
         showModalBottomSheet(
@@ -194,7 +197,7 @@ class VideoOverlay extends StatelessWidget {
                 if (videoStore.settingsStore.fullScreen &&
                     orientation == Orientation.landscape)
                   chatOverlayButton,
-                videoSettingsButton,
+                if (!Platform.isIOS) videoSettingsButton,
               ],
             ),
             Center(
