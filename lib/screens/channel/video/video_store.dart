@@ -32,6 +32,8 @@ abstract class VideoStoreBase with Store {
   /// The [SimplePip] instance used for initiating PiP on Android.
   final pip = SimplePip();
 
+  var _firstTimeSettingQuality = true;
+
   /// The video web view params used for enabling auto play.
   late final PlatformWebViewControllerCreationParams _videoWebViewParams;
 
@@ -57,15 +59,30 @@ abstract class VideoStoreBase with Store {
         )
         ..addJavaScriptChannel(
           'VideoPlaying',
-          onMessageReceived: (message) {
-            _paused = false;
-            if (Platform.isAndroid) pip.setIsPlaying(true);
-            videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].muted = false;',
-            );
-            videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].volume = 1.0;',
-            );
+          onMessageReceived: (message) async {
+            if (settingsStore.defaultToHighestQuality &&
+                _firstTimeSettingQuality) {
+              await updateStreamQualities();
+
+              await setStreamQuality(
+                _availableStreamQualities.firstWhere(
+                  (quality) => quality != 'Auto',
+                  orElse: () => 'Auto',
+                ),
+              );
+
+              _firstTimeSettingQuality = false;
+            } else {
+              _paused = false;
+              if (Platform.isAndroid) pip.setIsPlaying(true);
+
+              videoWebViewController.runJavaScript(
+                'document.getElementsByTagName("video")[0].muted = false;',
+              );
+              videoWebViewController.runJavaScript(
+                'document.getElementsByTagName("video")[0].volume = 1.0;',
+              );
+            }
           },
         )
         ..setNavigationDelegate(

@@ -56,6 +56,7 @@ abstract class _SettingsStoreBase with Store {
   // * Video Settings
   // Player defaults
   static const defaultShowVideo = true;
+  static const defaultDefaultToHighestQuality = false;
 
   // Overlay defaults
   static const defaultShowOverlay = true;
@@ -66,6 +67,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultShowVideo)
   @observable
   var showVideo = defaultShowVideo;
+
+  @JsonKey(defaultValue: defaultDefaultToHighestQuality)
+  @observable
+  var defaultToHighestQuality = defaultDefaultToHighestQuality;
 
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
@@ -83,6 +88,7 @@ abstract class _SettingsStoreBase with Store {
   @action
   void resetVideoSettings() {
     showVideo = defaultShowVideo;
+    defaultToHighestQuality = defaultDefaultToHighestQuality;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;

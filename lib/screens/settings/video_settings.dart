@@ -21,6 +21,12 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
+          SettingsListSwitch(
+            title: 'Default to highest quality',
+            value: settingsStore.defaultToHighestQuality,
+            onChanged: (newValue) =>
+                settingsStore.defaultToHighestQuality = newValue,
+          ),
           const SectionHeader('Overlay', showDivider: true),
           SettingsListSwitch(
             title: 'Use custom video overlay',
