@@ -5,6 +5,7 @@ import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 
@@ -47,34 +48,45 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final videoSettingsButton = IconButton(
+      icon: const Icon(Icons.settings_rounded),
       onPressed: () {
         videoStore.updateStreamQualities();
         showModalBottomSheet(
           context: context,
-          builder: (context) => Observer(
-            builder: (context) => ListView.builder(
-              itemCount: videoStore.availableStreamQualities.length,
-              itemBuilder: (context, index) {
-                final streamQuality =
-                    videoStore.availableStreamQualities[index];
-                return ListTile(
-                  leading: videoStore.streamQuality == streamQuality
-                      ? const Icon(Icons.circle, size: 10)
-                      : const SizedBox(
-                          width: 10,
-                        ),
-                  title: Text(streamQuality),
-                  onTap: () {
-                    videoStore.setStreamQuality(streamQuality);
-                    Navigator.pop(context);
-                  },
-                );
-              },
-            ),
+          builder: (context) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SectionHeader(
+                'Stream quality',
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+              ),
+              Flexible(
+                child: Observer(
+                  builder: (context) => ListView(
+                    shrinkWrap: true,
+                    primary: false,
+                    children: videoStore.availableStreamQualities
+                        .map(
+                          (quality) => ListTile(
+                            trailing: videoStore.streamQuality == quality
+                                ? const Icon(Icons.check_rounded)
+                                : null,
+                            title: Text(quality),
+                            onTap: () {
+                              videoStore.setStreamQuality(quality);
+                              Navigator.pop(context);
+                            },
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },
-      icon: const Icon(Icons.settings),
     );
 
     final refreshButton = Tooltip(
