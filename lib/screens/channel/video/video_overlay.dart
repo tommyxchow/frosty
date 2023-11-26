@@ -46,6 +46,37 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
+    final videoSettingsButton = IconButton(
+      onPressed: () {
+        videoStore.updateStreamQualities();
+        showModalBottomSheet(
+          context: context,
+          builder: (context) => Observer(
+            builder: (context) => ListView.builder(
+              itemCount: videoStore.availableStreamQualities.length,
+              itemBuilder: (context, index) {
+                final streamQuality =
+                    videoStore.availableStreamQualities[index];
+                return ListTile(
+                  leading: videoStore.streamQuality == streamQuality
+                      ? const Icon(Icons.circle, size: 10)
+                      : const SizedBox(
+                          width: 10,
+                        ),
+                  title: Text(streamQuality),
+                  onTap: () {
+                    videoStore.setStreamQuality(streamQuality);
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+      icon: const Icon(Icons.settings),
+    );
+
     final refreshButton = Tooltip(
       message: 'Refresh',
       preferBelow: false,
@@ -135,6 +166,7 @@ class VideoOverlay extends StatelessWidget {
         return Stack(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 backButton,
@@ -150,6 +182,7 @@ class VideoOverlay extends StatelessWidget {
                 if (videoStore.settingsStore.fullScreen &&
                     orientation == Orientation.landscape)
                   chatOverlayButton,
+                videoSettingsButton,
               ],
             ),
             Center(

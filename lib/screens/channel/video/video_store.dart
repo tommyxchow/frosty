@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -39,6 +40,14 @@ abstract class VideoStoreBase with Store {
       WebViewController.fromPlatformCreationParams(_videoWebViewParams)
         ..setBackgroundColor(Colors.black)
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..addJavaScriptChannel(
+          'StreamQualities',
+          onMessageReceived: (message) {
+            final data = jsonDecode(message.message) as List;
+            _availableStreamQualities =
+                data.map((item) => item as String).toList();
+          },
+        )
         ..addJavaScriptChannel(
           'VideoPause',
           onMessageReceived: (message) {
@@ -89,11 +98,16 @@ abstract class VideoStoreBase with Store {
   @readonly
   StreamTwitch? _streamInfo;
 
-  /// The video URL to use for the webview. Controls will be disabled when custom overlay is enabled.
-  @computed
-  String get videoUrl => settingsStore.showOverlay
-      ? 'https://player.twitch.tv/?channel=$userLogin&controls=false&muted=false&parent=frosty'
-      : 'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';
+  @readonly
+  List<String> _availableStreamQualities = [];
+
+  // The current stream quality string
+  @readonly
+  String _streamQuality = 'Auto';
+
+  /// The video URL to use for the webview.
+  String get videoUrl =>
+      'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';
 
   VideoStoreBase({
     required this.userLogin,
@@ -137,6 +151,38 @@ abstract class VideoStoreBase with Store {
     updateStreamInfo();
   }
 
+  @action
+  Future<void> updateStreamQualities() async {
+    try {
+      await videoWebViewController.runJavaScript('''
+        {
+          document.querySelector('[data-a-target="player-settings-button"]').click();
+          document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
+          const qualities = [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] label div')].map((el) => el.textContent);
+          document.querySelector('.tw-drop-down-menu-item-figure').click();
+          document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+          StreamQualities.postMessage(JSON.stringify(qualities));
+        }
+      ''');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  @action
+  Future<void> setStreamQuality(String newStreamQuality) async {
+    final indexOfStreamQuality =
+        _availableStreamQualities.indexOf(newStreamQuality);
+    await videoWebViewController.runJavaScript('''
+        document.querySelector('[data-a-target="player-settings-button"]').click();
+        document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
+        [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$indexOfStreamQuality].click();
+        document.querySelector('.tw-drop-down-menu-item-figure').click();
+        document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+      ''');
+    _streamQuality = newStreamQuality;
+  }
+
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
@@ -155,6 +201,21 @@ abstract class VideoStoreBase with Store {
               document.getElementsByTagName("video")[0].textTracks[0].mode = "hidden";
           });''',
         );
+        if (settingsStore.showOverlay) {
+          videoWebViewController.runJavaScript('''
+            {
+              const observer = new MutationObserver(() => {
+                const classificationGate = document.querySelector('[data-a-target="content-classification-gate-overlay"]');
+                if(classificationGate) return;
+                const overlay = document.querySelector('.video-player__overlay');
+                if(!overlay) return;
+                overlay.style.display = "none";
+                observer.disconnect();
+              });
+              observer.observe(document.body, { childList: true, subtree: true });
+            }
+          ''');
+        }
       } catch (e) {
         debugPrint(e.toString());
       }
