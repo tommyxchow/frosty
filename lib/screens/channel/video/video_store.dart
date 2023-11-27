@@ -311,6 +311,8 @@ abstract class VideoStoreBase with Store {
   @action
   void handleRefresh() {
     HapticFeedback.lightImpact();
+    _paused = true;
+    _firstTimeSettingQuality = true;
     videoWebViewController.reload();
     updateStreamInfo();
   }
