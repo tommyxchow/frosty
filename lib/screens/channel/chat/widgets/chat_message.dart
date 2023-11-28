@@ -6,6 +6,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
+import 'package:frosty/theme.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
@@ -112,10 +113,10 @@ class ChatMessage extends StatelessWidget {
           case Command.privateMessage:
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
-            if (ircMessage.mention == true) color = Colors.red.withOpacity(0.2);
+            if (ircMessage.mention == true) color = Colors.red;
             if (chatStore.settings.highlightFirstTimeChatter &&
                 ircMessage.tags['first-msg'] == '1') {
-              color = Colors.green.withOpacity(0.2);
+              color = Colors.purple;
             }
 
             final messageSpan = Text.rich(
@@ -254,7 +255,7 @@ class ChatMessage extends StatelessWidget {
             break;
           case Command.userNotice:
             if (chatStore.settings.showUserNotices) {
-              color = Colors.deepPurple.withOpacity(0.2);
+              color = FrostyThemes.purple;
 
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,7 +314,7 @@ class ChatMessage extends StatelessWidget {
         final paddedMessage = Padding(
           padding: EdgeInsets.symmetric(
             vertical: chatStore.settings.messageSpacing / 2,
-            horizontal: 12,
+            horizontal: color == null ? 12 : 0,
           ),
           child: renderMessage,
         );
@@ -332,7 +333,16 @@ class ChatMessage extends StatelessWidget {
         // Color the message if the color has been set.
         final coloredMessage = color == null
             ? dividedMessage
-            : ColoredBox(color: color, child: dividedMessage);
+            : Container(
+                padding: const EdgeInsets.only(left: 8, right: 12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  border: Border(
+                    left: BorderSide(color: color, width: 4),
+                  ),
+                ),
+                child: dividedMessage,
+              );
 
         return InkWell(
           onTap: () {
