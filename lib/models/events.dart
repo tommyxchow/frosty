@@ -57,7 +57,7 @@ class SevenTVEventUpdatedEmote {
 
 @JsonSerializable(createToJson: false)
 class SevenTVEventEmoteSetBody {
-  final Emote7TVUser actor;
+  final Owner7TV actor;
   final List<SevenTVEventUpdatedEmote>? pushed;
   final List<SevenTVEventUpdatedEmote>? pulled;
 

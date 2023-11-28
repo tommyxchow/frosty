@@ -44,10 +44,16 @@ ImagesFFZ _$ImagesFFZFromJson(Map<String, dynamic> json) => ImagesFFZ(
       json['4'] as String?,
     );
 
+OwnerFFZ _$OwnerFFZFromJson(Map<String, dynamic> json) => OwnerFFZ(
+      displayName: json['display_name'] as String,
+      name: json['name'] as String,
+    );
+
 EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
       json['name'] as String,
       json['height'] as int,
       json['width'] as int,
+      OwnerFFZ.fromJson(json['owner'] as Map<String, dynamic>),
       ImagesFFZ.fromJson(json['urls'] as Map<String, dynamic>),
     );
 
@@ -59,8 +65,7 @@ Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
           : Emote7TVData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
-Emote7TVUser _$Emote7TVUserFromJson(Map<String, dynamic> json) => Emote7TVUser(
-      id: json['id'] as String,
+Owner7TV _$Owner7TVFromJson(Map<String, dynamic> json) => Owner7TV(
       username: json['username'] as String,
       displayName: json['display_name'] as String,
       avatarUrl: json['avatar_url'] as String,
@@ -70,6 +75,7 @@ Emote7TVData _$Emote7TVDataFromJson(Map<String, dynamic> json) => Emote7TVData(
       json['id'] as String,
       json['name'] as String,
       json['flags'] as int,
+      Owner7TV.fromJson(json['owner'] as Map<String, dynamic>),
       Emote7TVHost.fromJson(json['host'] as Map<String, dynamic>),
     );
 
@@ -95,6 +101,8 @@ Emote _$EmoteFromJson(Map<String, dynamic> json) => Emote(
       zeroWidth: json['zeroWidth'] as bool,
       url: json['url'] as String,
       type: $enumDecode(_$EmoteTypeEnumMap, json['type']),
+      ownerDisplayName: json['ownerDisplayName'] as String?,
+      ownerUsername: json['ownerUsername'] as String?,
       ownerId: json['ownerId'] as String?,
     );
 
@@ -106,6 +114,8 @@ Map<String, dynamic> _$EmoteToJson(Emote instance) => <String, dynamic>{
       'zeroWidth': instance.zeroWidth,
       'url': instance.url,
       'type': _$EmoteTypeEnumMap[instance.type]!,
+      'ownerDisplayName': instance.ownerDisplayName,
+      'ownerUsername': instance.ownerUsername,
       'ownerId': instance.ownerId,
     };
 

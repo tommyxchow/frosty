@@ -651,7 +651,16 @@ class IRCMessage {
       title: emote.realName != null
           ? '${emote.name} (${emote.realName})'
           : emote.name,
-      subtitle: Text(emote.type.toString()),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(emote.type.toString()),
+          if (emote.ownerDisplayName != null && emote.ownerUsername != null)
+            Text(
+              'by ${getReadableName(emote.ownerDisplayName!, emote.ownerUsername!)}',
+            ),
+        ],
+      ),
       launchExternal: launchExternal,
     );
   }
