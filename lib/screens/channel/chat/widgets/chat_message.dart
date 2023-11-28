@@ -181,7 +181,7 @@ class ChatMessage extends StatelessWidget {
                                 ),
                               )
                             : Text(
-                                'First time chatting',
+                                'First message',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   color:
