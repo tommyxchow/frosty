@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
+import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -112,19 +114,24 @@ class ChatBottomBar extends StatelessWidget {
                       matchingEmotes[index],
                       autocompleteMode: true,
                     ),
-                    child: Tooltip(
-                      message: matchingEmotes[index].name,
-                      preferBelow: false,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Center(
-                          child: FrostyCachedNetworkImage(
-                            imageUrl: matchingEmotes[index].url,
-                            useFade: false,
-                            height: matchingEmotes[index].height?.toDouble() ??
-                                defaultEmoteSize,
-                            width: matchingEmotes[index].width?.toDouble(),
-                          ),
+                    onLongPress: () {
+                      HapticFeedback.lightImpact();
+
+                      IRCMessage.showEmoteDetailsBottomSheet(
+                        context,
+                        emote: matchingEmotes[index],
+                        launchExternal: chatStore.settings.launchUrlExternal,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Center(
+                        child: FrostyCachedNetworkImage(
+                          imageUrl: matchingEmotes[index].url,
+                          useFade: false,
+                          height: matchingEmotes[index].height?.toDouble() ??
+                              defaultEmoteSize,
+                          width: matchingEmotes[index].width?.toDouble(),
                         ),
                       ),
                     ),
