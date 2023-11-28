@@ -97,6 +97,8 @@ abstract class VideoStoreBase with Store {
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
 
+  ReactionDisposer? _disposeAndroidAutoPipReaction;
+
   /// If the video is currently paused.
   ///
   /// Does not pause or play the video, only used for rendering state of the overlay.
@@ -148,13 +150,6 @@ abstract class VideoStoreBase with Store {
           .setMediaPlaybackRequiresUserGesture(false);
     }
 
-    // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
-    if (Platform.isAndroid) {
-      SimplePip.isAutoPipAvailable.then((isAutoPipAvailable) {
-        if (isAutoPipAvailable) pip.setAutoPipMode();
-      });
-    }
-
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
     _overlayTimer =
         Timer(const Duration(seconds: 5), () => _overlayVisible = false);
@@ -164,6 +159,19 @@ abstract class VideoStoreBase with Store {
       (_) => settingsStore.showOverlay,
       (_) => videoWebViewController.loadRequest(Uri.parse(videoUrl)),
     );
+
+    // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
+    if (Platform.isAndroid) {
+      _disposeAndroidAutoPipReaction = autorun(
+        (_) async {
+          if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
+            pip.setAutoPipMode();
+          } else {
+            pip.setAutoPipMode(autoEnter: false);
+          }
+        },
+      );
+    }
 
     updateStreamInfo();
   }
@@ -361,5 +369,6 @@ abstract class VideoStoreBase with Store {
     }
 
     _disposeOverlayReaction();
+    _disposeAndroidAutoPipReaction?.call();
   }
 }
