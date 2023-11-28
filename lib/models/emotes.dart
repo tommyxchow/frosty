@@ -87,17 +87,33 @@ class ImagesFFZ {
       _$ImagesFFZFromJson(json);
 }
 
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class OwnerFFZ {
+  final String displayName;
+  final String name;
+
+  const OwnerFFZ({
+    required this.displayName,
+    required this.name,
+  });
+
+  factory OwnerFFZ.fromJson(Map<String, dynamic> json) =>
+      _$OwnerFFZFromJson(json);
+}
+
 @JsonSerializable(createToJson: false)
 class EmoteFFZ {
   final String name;
   final int height;
   final int width;
+  final OwnerFFZ owner;
   final ImagesFFZ urls;
 
   const EmoteFFZ(
     this.name,
     this.height,
     this.width,
+    this.owner,
     this.urls,
   );
 
@@ -122,21 +138,19 @@ class Emote7TV {
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
-class Emote7TVUser {
-  final String id;
+class Owner7TV {
   final String username;
   final String displayName;
   final String avatarUrl;
 
-  const Emote7TVUser({
-    required this.id,
+  const Owner7TV({
     required this.username,
     required this.displayName,
     required this.avatarUrl,
   });
 
-  factory Emote7TVUser.fromJson(Map<String, dynamic> json) =>
-      _$Emote7TVUserFromJson(json);
+  factory Owner7TV.fromJson(Map<String, dynamic> json) =>
+      _$Owner7TVFromJson(json);
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
@@ -144,12 +158,14 @@ class Emote7TVData {
   final String id;
   final String name;
   final int flags;
+  final Owner7TV owner;
   final Emote7TVHost host;
 
   const Emote7TVData(
     this.id,
     this.name,
     this.flags,
+    this.owner,
     this.host,
   );
 
@@ -199,6 +215,8 @@ class Emote {
   final bool zeroWidth;
   final String url;
   final EmoteType type;
+  final String? ownerDisplayName;
+  final String? ownerUsername;
   final String? ownerId;
 
   const Emote({
@@ -209,6 +227,8 @@ class Emote {
     required this.zeroWidth,
     required this.url,
     required this.type,
+    this.ownerDisplayName,
+    this.ownerUsername,
     this.ownerId,
   });
 
@@ -235,6 +255,8 @@ class Emote {
         height: emote.height,
         url: emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x,
         type: type,
+        ownerDisplayName: emote.owner.displayName,
+        ownerUsername: emote.owner.name,
       );
 
   factory Emote.from7TV(Emote7TV emote, EmoteType type) {
@@ -257,6 +279,8 @@ class Emote {
       zeroWidth: isZeroWidth,
       url: 'https:$url/${file.name}',
       type: type,
+      ownerDisplayName: emoteData.owner.displayName,
+      ownerUsername: emoteData.owner.username,
     );
   }
 
