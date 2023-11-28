@@ -323,7 +323,7 @@ class IRCMessage {
     final displayName = tags['display-name']!;
     span.add(
       TextSpan(
-        text: getReadableName(displayName, user!),
+        text: user != null ? getReadableName(displayName, user!) : user,
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.bold,
@@ -772,7 +772,7 @@ class IRCMessage {
     // If the username exists, set it.
     // tmi.twitch.tv means the message was sent by Twitch rather than a user, so will be irrelevant.
     final String? user = splitMessage[0] == 'tmi.twitch.tv'
-        ? null
+        ? mappedTags['login']
         : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
 
     // If there is an associated message, set it.
