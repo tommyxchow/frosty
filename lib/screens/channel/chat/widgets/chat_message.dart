@@ -122,7 +122,7 @@ class ChatMessage extends StatelessWidget {
             final shouldHighlightFirstMessage =
                 chatStore.settings.highlightFirstTimeChatter &&
                     ircMessage.tags['first-msg'] == '1';
-            final shouldHighlightMessage =
+            final shouldHighlightMessage = chatStore.settings.showUserNotices &&
                 ircMessage.tags['msg-id'] == 'highlighted-message';
 
             final messageSpan = Text.rich(
