@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/events.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
@@ -50,6 +52,10 @@ abstract class ChatStoreBase with Store {
 
   /// The subscription that handles the WebSocket connection.
   StreamSubscription? _channelListener;
+
+  WebSocketChannel? _sevenTVChannel;
+
+  StreamSubscription? _sevenTVChannelListener;
 
   // The retry counter for exponential backoff.
   var _retries = 0;
@@ -325,7 +331,11 @@ abstract class ChatStoreBase with Store {
           ),
         );
 
-        getAssets();
+        getAssets().then((_) {
+          if (assetsStore.sevenTvEmoteSetId != null) {
+            listenToSevenTVEmoteSet(emoteSetId: assetsStore.sevenTvEmoteSetId!);
+          }
+        });
 
         // Reset exponential backoff if successfully connected.
         _retries = 0;
@@ -361,6 +371,52 @@ abstract class ChatStoreBase with Store {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.jumpTo(0);
     });
+  }
+
+  @action
+  void listenToSevenTVEmoteSet({required String emoteSetId}) {
+    final subscribePayload = SevenTVEvent(
+      op: 35,
+      d: SevenTVEventData(
+        type: 'emote_set.update',
+        condition: {'object_id': emoteSetId},
+      ),
+    );
+
+    _sevenTVChannel?.sink.close(1001);
+    _sevenTVChannel =
+        WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
+
+    _sevenTVChannelListener = _sevenTVChannel?.stream.listen((data) {
+      debugPrint(data);
+      final decoded = jsonDecode(data);
+
+      final event = SevenTVEvent.fromJson(decoded);
+
+      if (event.d.type != 'emote_set.update') return;
+
+      final body = event.d.body;
+
+      if (body?.pushed != null) {
+        final pushedEmote = body?.pushed?.first.value;
+
+        if (pushedEmote == null) return;
+
+        final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
+
+        assetsStore.emoteToObject[emote.name] = emote;
+      } else if (body?.pulled != null) {
+        final pulledEmote = body?.pulled?.first.oldValue;
+
+        if (pulledEmote == null) return;
+
+        assetsStore.emoteToObject.removeWhere(
+          (name, _) => name == pulledEmote.name,
+        );
+      }
+    });
+
+    _sevenTVChannel?.sink.add(jsonEncode(subscribePayload));
   }
 
   @action
@@ -574,6 +630,10 @@ abstract class ChatStoreBase with Store {
     _messageBufferTimer.cancel();
     _notificationTimer?.cancel();
     sleepTimer?.cancel();
+
+    _sevenTVChannel?.sink.close(1001);
+    _sevenTVChannel = null;
+    _sevenTVChannelListener?.cancel();
 
     _channel?.sink.close(1001);
     _channel = null;

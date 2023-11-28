@@ -245,6 +245,17 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
+  void listenToSevenTVEmoteSet({required String emoteSetId}) {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.listenToSevenTVEmoteSet');
+    try {
+      return super.listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void connectToChat() {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
         name: 'ChatStoreBase.connectToChat');

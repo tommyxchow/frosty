@@ -44,7 +44,7 @@ abstract class ChatAssetsStoreBase with Store {
 
   /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
   @readonly
-  var _emoteToObject = <String, Emote>{};
+  var _emoteToObject = ObservableMap<String, Emote>();
 
   /// The emotes that are "owned" and may be used by the current user.
   @readonly
@@ -181,7 +181,7 @@ abstract class ChatAssetsStoreBase with Store {
       ]).then((assets) => assets.expand((list) => list)).then(
             (emotes) => _emoteToObject = {
               for (final emote in emotes) emote.name: emote,
-            },
+            }.asObservable(),
           );
 
   @action
