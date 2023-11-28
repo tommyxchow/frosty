@@ -156,7 +156,7 @@ class Emote7TVData {
   final String id;
   final String name;
   final int flags;
-  final Owner7TV owner;
+  final Owner7TV? owner;
   final Emote7TVHost host;
 
   const Emote7TVData(
@@ -277,8 +277,8 @@ class Emote {
       zeroWidth: isZeroWidth,
       url: 'https:$url/${file.name}',
       type: type,
-      ownerDisplayName: emoteData.owner.displayName,
-      ownerUsername: emoteData.owner.username,
+      ownerDisplayName: emoteData.owner?.displayName,
+      ownerUsername: emoteData.owner?.username,
     );
   }
 

@@ -74,7 +74,9 @@ Emote7TVData _$Emote7TVDataFromJson(Map<String, dynamic> json) => Emote7TVData(
       json['id'] as String,
       json['name'] as String,
       json['flags'] as int,
-      Owner7TV.fromJson(json['owner'] as Map<String, dynamic>),
+      json['owner'] == null
+          ? null
+          : Owner7TV.fromJson(json['owner'] as Map<String, dynamic>),
       Emote7TVHost.fromJson(json['host'] as Map<String, dynamic>),
     );
 
