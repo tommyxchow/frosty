@@ -68,7 +68,6 @@ Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
 Owner7TV _$Owner7TVFromJson(Map<String, dynamic> json) => Owner7TV(
       username: json['username'] as String,
       displayName: json['display_name'] as String,
-      avatarUrl: json['avatar_url'] as String,
     );
 
 Emote7TVData _$Emote7TVDataFromJson(Map<String, dynamic> json) => Emote7TVData(

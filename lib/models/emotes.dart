@@ -141,12 +141,10 @@ class Emote7TV {
 class Owner7TV {
   final String username;
   final String displayName;
-  final String avatarUrl;
 
   const Owner7TV({
     required this.username,
     required this.displayName,
-    required this.avatarUrl,
   });
 
   factory Owner7TV.fromJson(Map<String, dynamic> json) =>
