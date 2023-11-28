@@ -57,10 +57,12 @@ class SevenTVEventUpdatedEmote {
 
 @JsonSerializable(createToJson: false)
 class SevenTVEventEmoteSetBody {
+  final Emote7TVUser actor;
   final List<SevenTVEventUpdatedEmote>? pushed;
   final List<SevenTVEventUpdatedEmote>? pulled;
 
   const SevenTVEventEmoteSetBody({
+    required this.actor,
     this.pushed,
     this.pulled,
   });

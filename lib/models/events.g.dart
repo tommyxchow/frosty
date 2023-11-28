@@ -60,6 +60,7 @@ SevenTVEventUpdatedEmote _$SevenTVEventUpdatedEmoteFromJson(
 SevenTVEventEmoteSetBody _$SevenTVEventEmoteSetBodyFromJson(
         Map<String, dynamic> json) =>
     SevenTVEventEmoteSetBody(
+      actor: Emote7TVUser.fromJson(json['actor'] as Map<String, dynamic>),
       pushed: (json['pushed'] as List<dynamic>?)
           ?.map((e) =>
               SevenTVEventUpdatedEmote.fromJson(e as Map<String, dynamic>))

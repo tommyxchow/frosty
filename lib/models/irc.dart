@@ -8,6 +8,7 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -322,9 +323,7 @@ class IRCMessage {
     final displayName = tags['display-name']!;
     span.add(
       TextSpan(
-        text: regexEnglish.hasMatch(displayName)
-            ? displayName
-            : '$displayName ($user)',
+        text: getReadableName(displayName, user!),
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.bold,

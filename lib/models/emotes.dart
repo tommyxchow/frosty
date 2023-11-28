@@ -122,6 +122,24 @@ class Emote7TV {
 }
 
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
+class Emote7TVUser {
+  final String id;
+  final String username;
+  final String displayName;
+  final String avatarUrl;
+
+  const Emote7TVUser({
+    required this.id,
+    required this.username,
+    required this.displayName,
+    required this.avatarUrl,
+  });
+
+  factory Emote7TVUser.fromJson(Map<String, dynamic> json) =>
+      _$Emote7TVUserFromJson(json);
+}
+
+@JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class Emote7TVData {
   final String id;
   final String name;

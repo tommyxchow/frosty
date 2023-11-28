@@ -59,6 +59,13 @@ Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
           : Emote7TVData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
+Emote7TVUser _$Emote7TVUserFromJson(Map<String, dynamic> json) => Emote7TVUser(
+      id: json['id'] as String,
+      username: json['username'] as String,
+      displayName: json['display_name'] as String,
+      avatarUrl: json['avatar_url'] as String,
+    );
+
 Emote7TVData _$Emote7TVDataFromJson(Map<String, dynamic> json) => Emote7TVData(
       json['id'] as String,
       json['name'] as String,
