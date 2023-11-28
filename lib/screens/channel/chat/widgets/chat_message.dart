@@ -116,9 +116,6 @@ class ChatMessage extends StatelessWidget {
         switch (ircMessage.command) {
           case Command.privateMessage:
           case Command.userState:
-            // If user is being mentioned in the message, highlight it red.
-            if (ircMessage.mention == true) highlightColor = Colors.red;
-
             final shouldHighlightFirstMessage =
                 chatStore.settings.highlightFirstTimeChatter &&
                     ircMessage.tags['first-msg'] == '1';
@@ -199,6 +196,9 @@ class ChatMessage extends StatelessWidget {
                 ),
               );
             }
+
+            // If user is being mentioned in the message, highlight it red.
+            if (ircMessage.mention == true) highlightColor = Colors.red;
 
             if (messageHeader != null) {
               renderMessage = Column(
