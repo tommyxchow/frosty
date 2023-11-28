@@ -387,7 +387,8 @@ abstract class ChatStoreBase with Store {
     _sevenTVChannel =
         WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
 
-    _sevenTVChannelListener = _sevenTVChannel?.stream.listen((data) {
+    _sevenTVChannelListener = _sevenTVChannel?.stream.listen(
+      (data) {
       debugPrint(data);
       final decoded = jsonDecode(data);
 
@@ -405,6 +406,12 @@ abstract class ChatStoreBase with Store {
         final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
 
         assetsStore.emoteToObject[emote.name] = emote;
+
+          messageBuffer.add(
+            IRCMessage.createNotice(
+              message: '7TV emote "${emote.name}" added to chat',
+            ),
+          );
       } else if (body?.pulled != null) {
         final pulledEmote = body?.pulled?.first.oldValue;
 
@@ -413,8 +420,16 @@ abstract class ChatStoreBase with Store {
         assetsStore.emoteToObject.removeWhere(
           (name, _) => name == pulledEmote.name,
         );
-      }
-    });
+
+          messageBuffer.add(
+            IRCMessage.createNotice(
+              message: '7TV emote "${pulledEmote.name}" removed from chat',
+            ),
+          );
+        }
+      },
+      onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
+    );
 
     _sevenTVChannel?.sink.add(jsonEncode(subscribePayload));
   }
