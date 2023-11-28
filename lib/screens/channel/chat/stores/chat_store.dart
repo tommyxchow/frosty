@@ -57,6 +57,8 @@ abstract class ChatStoreBase with Store {
 
   StreamSubscription? _sevenTVChannelListener;
 
+  static const _maxRetries = 5;
+
   // The retry counter for exponential backoff.
   var _retries = 0;
 
@@ -450,6 +452,15 @@ abstract class ChatStoreBase with Store {
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_channel == null) return;
+
+        if (_retries >= _maxRetries) {
+          messageBuffer.add(
+            IRCMessage.createNotice(
+              message: 'Disconnected from chat',
+            ),
+          );
+          return;
+        }
 
         if (_backoffTime > 0) {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
