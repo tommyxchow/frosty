@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
 
 class BlockedUsers extends StatelessWidget {
@@ -34,10 +34,10 @@ class BlockedUsers extends StatelessWidget {
           return ListView(
             children: authStore.user.blockedUsers.map(
               (blockedUser) {
-                final displayName = regexEnglish
-                        .hasMatch(blockedUser.displayName)
-                    ? blockedUser.displayName
-                    : '${blockedUser.displayName} (${blockedUser.userLogin})';
+                final displayName = getReadableName(
+                  blockedUser.displayName,
+                  blockedUser.userLogin,
+                );
 
                 return ListTile(
                   title: Text(displayName),

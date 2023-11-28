@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class ReplyThread extends StatelessWidget {
@@ -28,9 +28,7 @@ class ReplyThread extends StatelessWidget {
     final replyUserLogin = selectedMessage.tags['reply-parent-user-login'];
     final replyBody = selectedMessage.tags['reply-parent-msg-body'];
 
-    final replyName = regexEnglish.hasMatch(replyDisplayName!)
-        ? replyDisplayName
-        : '$replyDisplayName ($replyUserLogin)';
+    final replyName = getReadableName(replyDisplayName!, replyUserLogin!);
 
     return Observer(
       builder: (context) {

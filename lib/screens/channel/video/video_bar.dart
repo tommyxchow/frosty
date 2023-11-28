@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 
 class VideoBar extends StatelessWidget {
@@ -30,9 +30,8 @@ class VideoBar extends StatelessWidget {
     final category =
         streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category';
 
-    final streamerName = regexEnglish.hasMatch(streamInfo.userName)
-        ? streamInfo.userName
-        : '${streamInfo.userName} (${streamInfo.userLogin})';
+    final streamerName =
+        getReadableName(streamInfo.userName, streamInfo.userLogin);
 
     return Padding(
       padding: padding,

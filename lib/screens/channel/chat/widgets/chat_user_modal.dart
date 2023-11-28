@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -28,9 +28,7 @@ class ChatUserModal extends StatefulWidget {
 class _ChatUserModalState extends State<ChatUserModal> {
   @override
   Widget build(BuildContext context) {
-    final name = regexEnglish.hasMatch(widget.displayName)
-        ? widget.displayName
-        : '${widget.displayName} (${widget.username})';
+    final name = getReadableName(widget.displayName, widget.username);
 
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.5,
@@ -99,7 +97,9 @@ class _ChatUserModalState extends State<ChatUserModal> {
 
                 return MediaQuery(
                   data: MediaQuery.of(context).copyWith(
-                    textScaler: TextScaler.linear(widget.chatStore.settings.messageScale),
+                    textScaler: TextScaler.linear(
+                      widget.chatStore.settings.messageScale,
+                    ),
                   ),
                   child: DefaultTextStyle(
                     style: DefaultTextStyle.of(context)

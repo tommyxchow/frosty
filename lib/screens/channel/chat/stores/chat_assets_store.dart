@@ -22,6 +22,8 @@ abstract class ChatAssetsStoreBase with Store {
   /// Contains any custom FFZ mod and vip badges for the channel.
   RoomFFZ? ffzRoomInfo;
 
+  String? sevenTvEmoteSetId;
+
   @computed
   List<Emote> get bttvEmotes =>
       _emoteToObject.values.where((emote) => isBTTV(emote)).toList();
@@ -42,7 +44,7 @@ abstract class ChatAssetsStoreBase with Store {
 
   /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
   @readonly
-  var _emoteToObject = <String, Emote>{};
+  var _emoteToObject = ObservableMap<String, Emote>();
 
   /// The emotes that are "owned" and may be used by the current user.
   @readonly
@@ -165,7 +167,11 @@ abstract class ChatAssetsStoreBase with Store {
           return emotes;
         }).catchError(onError),
         sevenTVApi.getEmotesGlobal().catchError(onError),
-        sevenTVApi.getEmotesChannel(id: channelId).catchError(onError),
+        sevenTVApi.getEmotesChannel(id: channelId).then((data) {
+          final (setId, emotes) = data;
+          sevenTvEmoteSetId = setId;
+          return emotes;
+        }).catchError(onError),
         ffzApi.getRoomInfo(id: channelId).then((ffzRoom) {
           final (roomInfo, emotes) = ffzRoom;
 
@@ -175,7 +181,7 @@ abstract class ChatAssetsStoreBase with Store {
       ]).then((assets) => assets.expand((list) => list)).then(
             (emotes) => _emoteToObject = {
               for (final emote in emotes) emote.name: emote,
-            },
+            }.asObservable(),
           );
 
   @action

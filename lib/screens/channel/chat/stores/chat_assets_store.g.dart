@@ -52,16 +52,16 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
   late final _$_emoteToObjectAtom =
       Atom(name: 'ChatAssetsStoreBase._emoteToObject', context: context);
 
-  Map<String, Emote> get emoteToObject {
+  ObservableMap<String, Emote> get emoteToObject {
     _$_emoteToObjectAtom.reportRead();
     return super._emoteToObject;
   }
 
   @override
-  Map<String, Emote> get _emoteToObject => emoteToObject;
+  ObservableMap<String, Emote> get _emoteToObject => emoteToObject;
 
   @override
-  set _emoteToObject(Map<String, Emote> value) {
+  set _emoteToObject(ObservableMap<String, Emote> value) {
     _$_emoteToObjectAtom.reportWrite(value, super._emoteToObject, () {
       super._emoteToObject = value;
     });
