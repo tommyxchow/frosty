@@ -183,7 +183,7 @@ class ChatMessage extends StatelessWidget {
                             : Text(
                                 'First message',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w600,
                                   color:
                                       defaultTextStyle.color?.withOpacity(0.5),
                                 ),
@@ -214,17 +214,17 @@ class ChatMessage extends StatelessWidget {
                     if (ircMessage.command == Command.clearMessage)
                       const Text(
                         'Message deleted',
-                        style: TextStyle(fontWeight: FontWeight.w500),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       )
                     else
                       const Text(
                         'Permanently banned',
-                        style: TextStyle(fontWeight: FontWeight.w500),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       )
                   else
                     Text(
                       'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   const SizedBox(height: 4),
                   Text.rich(
@@ -264,7 +264,7 @@ class ChatMessage extends StatelessWidget {
                     Text(
                       ircMessage.tags['system-msg']!,
                       style: TextStyle(
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         color: defaultTextStyle.color?.withOpacity(0.5),
                       ),
                     ),
@@ -279,7 +279,7 @@ class ChatMessage extends StatelessWidget {
                         const SizedBox(width: 4),
                         const Text(
                           'Announcement',
-                          style: TextStyle(fontWeight: FontWeight.w500),
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
