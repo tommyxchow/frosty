@@ -22,6 +22,8 @@ abstract class ChatAssetsStoreBase with Store {
   /// Contains any custom FFZ mod and vip badges for the channel.
   RoomFFZ? ffzRoomInfo;
 
+  String? sevenTvEmoteSetId;
+
   @computed
   List<Emote> get bttvEmotes =>
       _emoteToObject.values.where((emote) => isBTTV(emote)).toList();
@@ -165,7 +167,11 @@ abstract class ChatAssetsStoreBase with Store {
           return emotes;
         }).catchError(onError),
         sevenTVApi.getEmotesGlobal().catchError(onError),
-        sevenTVApi.getEmotesChannel(id: channelId).catchError(onError),
+        sevenTVApi.getEmotesChannel(id: channelId).then((data) {
+          final (setId, emotes) = data;
+          sevenTvEmoteSetId = setId;
+          return emotes;
+        }).catchError(onError),
         ffzApi.getRoomInfo(id: channelId).then((ffzRoom) {
           final (roomInfo, emotes) = ffzRoom;
 
