@@ -103,21 +103,27 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = DefaultTextStyle.of(context).style;
+    final messageHeaderIconSize =
+        defaultBadgeSize * chatStore.settings.badgeScale;
+    final messageHeaderTextColor = defaultTextStyle.color?.withOpacity(0.5);
+    const messageHeaderFontWeight = FontWeight.w600;
 
     return Observer(
       builder: (context) {
-        Color? color;
+        Color? highlightColor;
         final Widget renderMessage;
 
         switch (ircMessage.command) {
           case Command.privateMessage:
           case Command.userState:
             // If user is being mentioned in the message, highlight it red.
-            if (ircMessage.mention == true) color = Colors.red;
-            if (chatStore.settings.highlightFirstTimeChatter &&
-                ircMessage.tags['first-msg'] == '1') {
-              color = Colors.purple;
-            }
+            if (ircMessage.mention == true) highlightColor = Colors.red;
+
+            final shouldHighlightFirstMessage =
+                chatStore.settings.highlightFirstTimeChatter &&
+                    ircMessage.tags['first-msg'] == '1';
+            final shouldHighlightMessage =
+                ircMessage.tags['msg-id'] == 'highlighted-message';
 
             final messageSpan = Text.rich(
               TextSpan(
@@ -139,58 +145,77 @@ class ChatMessage extends StatelessWidget {
             final replyUser = ircMessage.tags['reply-parent-display-name'];
             final replyBody = ircMessage.tags['reply-parent-msg-body'];
 
-            if ((replyUser != null && replyBody != null) ||
-                (chatStore.settings.highlightFirstTimeChatter &&
-                    ircMessage.tags['first-msg'] == '1')) {
+            Widget? messageHeaderIcon;
+            Widget? messageHeader;
+            if (replyUser != null && replyBody != null) {
+              messageHeaderIcon = Icon(
+                Icons.reply_rounded,
+                size: messageHeaderIconSize,
+                color: messageHeaderTextColor,
+                textDirection: TextDirection.rtl,
+              );
+              messageHeader = GestureDetector(
+                onTap: isModal
+                    ? null
+                    : () => showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return ReplyThread(
+                              selectedMessage: ircMessage,
+                              chatStore: chatStore,
+                            );
+                          },
+                        ),
+                child: Text(
+                  'Replying to @$replyUser: $replyBody',
+                  maxLines: 1,
+                  style: TextStyle(
+                    overflow: TextOverflow.ellipsis,
+                    color: messageHeaderTextColor,
+                  ),
+                ),
+              );
+            } else if (shouldHighlightFirstMessage) {
+              highlightColor = Colors.purple;
+              messageHeaderIcon = Icon(
+                Icons.auto_awesome_rounded,
+                size: messageHeaderIconSize,
+                color: messageHeaderTextColor,
+              );
+              messageHeader = Text(
+                'First message',
+                style: TextStyle(
+                  fontWeight: messageHeaderFontWeight,
+                  color: messageHeaderTextColor,
+                ),
+              );
+            } else if (shouldHighlightMessage) {
+              highlightColor = FrostyThemes.purple;
+              messageHeader = Text(
+                'Highlighted message',
+                style: TextStyle(
+                  fontWeight: messageHeaderFontWeight,
+                  color: messageHeaderTextColor,
+                ),
+              );
+            }
+
+            if (messageHeader != null) {
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        replyUser != null && replyBody != null
-                            ? Icons.reply_rounded
-                            : Icons.star_rounded,
-                        size: defaultBadgeSize * chatStore.settings.badgeScale,
-                        color: defaultTextStyle.color?.withOpacity(0.5),
-                        textDirection: TextDirection.rtl,
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: replyUser != null && replyBody != null
-                            ? GestureDetector(
-                                onTap: isModal
-                                    ? null
-                                    : () => showModalBottomSheet(
-                                          context: context,
-                                          builder: (context) {
-                                            return ReplyThread(
-                                              selectedMessage: ircMessage,
-                                              chatStore: chatStore,
-                                            );
-                                          },
-                                        ),
-                                child: Text(
-                                  'Replying to @$replyUser: $replyBody',
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    overflow: TextOverflow.ellipsis,
-                                    color: defaultTextStyle.color
-                                        ?.withOpacity(0.5),
-                                  ),
-                                ),
-                              )
-                            : Text(
-                                'First message',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color:
-                                      defaultTextStyle.color?.withOpacity(0.5),
-                                ),
-                              ),
-                      ),
-                    ],
-                  ),
+                  if (messageHeaderIcon != null)
+                    Row(
+                      children: [
+                        messageHeaderIcon,
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: messageHeader,
+                        ),
+                      ],
+                    )
+                  else
+                    messageHeader,
                   const SizedBox(height: 4),
                   messageSpan,
                 ],
@@ -214,17 +239,18 @@ class ChatMessage extends StatelessWidget {
                     if (ircMessage.command == Command.clearMessage)
                       const Text(
                         'Message deleted',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: messageHeaderFontWeight),
                       )
                     else
                       const Text(
                         'Permanently banned',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        style: TextStyle(fontWeight: messageHeaderFontWeight),
                       )
                   else
                     Text(
                       'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style:
+                          const TextStyle(fontWeight: messageHeaderFontWeight),
                     ),
                   const SizedBox(height: 4),
                   Text.rich(
@@ -250,41 +276,62 @@ class ChatMessage extends StatelessWidget {
           case Command.notice:
             renderMessage = Text.rich(
               TextSpan(text: ircMessage.message),
-              style: TextStyle(color: defaultTextStyle.color?.withOpacity(0.5)),
+              style: TextStyle(color: messageHeaderTextColor),
             );
             break;
           case Command.userNotice:
             if (chatStore.settings.showUserNotices) {
-              color = FrostyThemes.purple;
+              highlightColor = FrostyThemes.purple;
+              Widget? messageHeaderIcon;
+              Widget? messageHeader;
+
+              if (ircMessage.tags.containsKey('system-msg')) {
+                final messageId = ircMessage.tags['msg-id'];
+                final isGift = messageId?.contains('gift') == true;
+                // TODO: Implement Prime sub icons when a crown icon is added.
+                // final isPrime = ircMessage.tags['msg-param-sub-plan'] == 'Prime';
+
+                messageHeaderIcon = Icon(
+                  isGift ? Icons.card_giftcard_rounded : Icons.star_rounded,
+                  size: messageHeaderIconSize,
+                  color: messageHeaderTextColor,
+                );
+                messageHeader = Text(
+                  ircMessage.tags['system-msg']!,
+                  style: TextStyle(
+                    fontWeight: messageHeaderFontWeight,
+                    color: messageHeaderTextColor,
+                  ),
+                );
+              } else if (ircMessage.tags['msg-id'] == 'announcement') {
+                messageHeaderIcon = Icon(
+                  Icons.campaign_rounded,
+                  size: messageHeaderIconSize,
+                );
+                messageHeader = const Text(
+                  'Announcement',
+                  style: TextStyle(fontWeight: messageHeaderFontWeight),
+                );
+              }
 
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (ircMessage.tags.containsKey('system-msg'))
-                    Text(
-                      ircMessage.tags['system-msg']!,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: defaultTextStyle.color?.withOpacity(0.5),
-                      ),
-                    ),
-                  if (ircMessage.tags['msg-id'] == 'announcement')
+                  if (messageHeader != null)
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.announcement_outlined,
-                          size:
-                              defaultBadgeSize * chatStore.settings.badgeScale,
-                        ),
-                        const SizedBox(width: 4),
-                        const Text(
-                          'Announcement',
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                        if (messageHeaderIcon != null) ...[
+                          messageHeaderIcon,
+                          const SizedBox(width: 4),
+                        ],
+                        Expanded(
+                          child: messageHeader,
                         ),
                       ],
                     ),
-                  const SizedBox(height: 4),
-                  if (ircMessage.message != null)
+                  if (ircMessage.message != null) ...[
+                    const SizedBox(height: 4),
                     Text.rich(
                       TextSpan(
                         children: ircMessage.generateSpan(
@@ -301,6 +348,7 @@ class ChatMessage extends StatelessWidget {
                         ),
                       ),
                     ),
+                  ],
                 ],
               );
             } else {
@@ -314,7 +362,7 @@ class ChatMessage extends StatelessWidget {
         final paddedMessage = Padding(
           padding: EdgeInsets.symmetric(
             vertical: chatStore.settings.messageSpacing / 2,
-            horizontal: color == null ? 12 : 0,
+            horizontal: highlightColor == null ? 12 : 0,
           ),
           child: renderMessage,
         );
@@ -331,14 +379,14 @@ class ChatMessage extends StatelessWidget {
             : paddedMessage;
 
         // Color the message if the color has been set.
-        final coloredMessage = color == null
+        final coloredMessage = highlightColor == null
             ? dividedMessage
             : Container(
                 padding: const EdgeInsets.only(left: 8, right: 12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: highlightColor.withOpacity(0.1),
                   border: Border(
-                    left: BorderSide(color: color, width: 4),
+                    left: BorderSide(color: highlightColor, width: 4),
                   ),
                 ),
                 child: dividedMessage,
