@@ -40,19 +40,20 @@ class ChatMessage extends StatelessWidget {
   }
 
   Future<void> copyMessage() async {
-    HapticFeedback.lightImpact();
-
     await Clipboard.setData(ClipboardData(text: ircMessage.message ?? ''));
 
     chatStore.updateNotification('Message copied');
   }
 
   void onLongPressMessage(BuildContext context, TextStyle defaultTextStyle) {
+    HapticFeedback.lightImpact();
+
     if (ircMessage.command != Command.privateMessage &&
         ircMessage.command != Command.userState) {
       copyMessage();
       return;
     }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
