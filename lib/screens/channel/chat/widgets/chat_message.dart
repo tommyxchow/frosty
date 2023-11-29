@@ -288,14 +288,28 @@ class ChatMessage extends StatelessWidget {
               if (ircMessage.tags.containsKey('system-msg')) {
                 final messageId = ircMessage.tags['msg-id'];
                 final isGift = messageId?.contains('gift') == true;
+                final isSub = messageId?.contains('sub') == true;
+                final isRaid = messageId?.contains('raid') == true;
                 // TODO: Implement Prime sub icons when a crown icon is added.
                 // final isPrime = ircMessage.tags['msg-param-sub-plan'] == 'Prime';
 
-                messageHeaderIcon = Icon(
-                  isGift ? Icons.card_giftcard_rounded : Icons.star_rounded,
-                  size: messageHeaderIconSize,
-                  color: messageHeaderTextColor,
-                );
+                IconData? icon;
+                if (isGift) {
+                  icon = Icons.card_giftcard_rounded;
+                } else if (isSub) {
+                  icon = Icons.star_rounded;
+                } else if (isRaid) {
+                  icon = Icons.people_rounded;
+                }
+
+                if (icon != null) {
+                  messageHeaderIcon = Icon(
+                    icon,
+                    size: messageHeaderIconSize,
+                    color: messageHeaderTextColor,
+                  );
+                }
+
                 messageHeader = Text(
                   ircMessage.tags['system-msg']!,
                   style: TextStyle(
