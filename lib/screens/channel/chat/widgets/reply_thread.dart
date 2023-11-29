@@ -41,7 +41,7 @@ class ReplyThread extends StatelessWidget {
                 .style
                 .copyWith(fontSize: chatStore.settings.fontSize),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SectionHeader(
