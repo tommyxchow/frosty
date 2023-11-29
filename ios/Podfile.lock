@@ -16,18 +16,18 @@ PODS:
   - Firebase/Performance (10.18.0):
     - Firebase/CoreOnly
     - FirebasePerformance (~> 10.18.0)
-  - firebase_analytics (10.7.1):
+  - firebase_analytics (10.7.2):
     - Firebase/Analytics (= 10.18.0)
     - firebase_core
     - Flutter
-  - firebase_core (2.23.0):
+  - firebase_core (2.24.0):
     - Firebase/CoreOnly (= 10.18.0)
     - Flutter
-  - firebase_crashlytics (3.4.5):
+  - firebase_crashlytics (3.4.6):
     - Firebase/Crashlytics (= 10.18.0)
     - firebase_core
     - Flutter
-  - firebase_performance (0.9.3-5):
+  - firebase_performance (0.9.3-6):
     - Firebase/Performance (= 10.18.0)
     - firebase_core
     - Flutter
@@ -126,7 +126,7 @@ PODS:
     - GoogleUtilities/Network (~> 7.11)
     - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - GoogleDataTransport (9.2.5):
+  - GoogleDataTransport (9.3.0):
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
@@ -259,10 +259,10 @@ SPEC CHECKSUMS:
   advanced_in_app_review: fe8fd50b8670cb3dbe67e4c26ca643f7aea8dbb8
   device_info_plus: c6fb39579d0f423935b0c9ce7ee2f44b71b9fce6
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
-  firebase_analytics: 3e5dba777bb51d1e0358b5a37adefa69746a94bd
-  firebase_core: 29d66baf806970cda37c93621b27cd369b27db1b
-  firebase_crashlytics: d568dbe2dfb06c3f3ba985c7f6a59f2961288512
-  firebase_performance: 1e20a3545d88a86ba2a50f45f890017f243583ae
+  firebase_analytics: a8c0d8ba83f213c9b775b5f61d36dadaafb1b239
+  firebase_core: f802c5c1f6caff9b8d38b591a36e7b25f8878936
+  firebase_crashlytics: 0db78a5b6badc630f21a833d0c9ab20ab5d81948
+  firebase_performance: e24d96d0be9d67e1adc1a1fdff6e78c2c460b4e6
   FirebaseABTesting: d8b10ff4c6d1a9d6b11f02a08463ad5fd9fc6b1b
   FirebaseAnalytics: 4d310b35c48eaa4a058ddc04bdca6bdb5dc0fe80
   FirebaseCore: 2322423314d92f946219c8791674d2f3345b598f
@@ -279,7 +279,7 @@ SPEC CHECKSUMS:
   flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   GoogleAppMeasurement: 70ce9aa438cff1cfb31ea3e660bcc67734cb716e
-  GoogleDataTransport: 54dee9d48d14580407f8f5fbf2f496e92437a2f2
+  GoogleDataTransport: 57c22343ab29bc686febbf7cbb13bad167c2d8fe
   GoogleUtilities: 0759d1a57ebb953965c2dfe0ba4c82e95ccc2e34
   in_app_review: 318597b3a06c22bb46dc454d56828c85f444f99d
   nanopb: d4d75c12cd1316f4a64e3c6963f879ecd4b5e0d5
