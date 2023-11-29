@@ -1,15 +1,3 @@
-New Features
-• Added support for stream quality options (by @Artiu on GitHub)
-• Added an option to default to the highest available stream quality
-• Added support for live 7TV emote set updates in chat
-• Added 7TV and FFZ emote owners in the emote details bottom sheet
+This update contains support for stream quality options (by @Artiu on GitHub), support for live 7TV emote set updates in chat, updated designs for chat message alerts and highlights, and more improvements and bug fixes.
 
-Improvements
-• Updated designs for chat message alerts and highlights to better match the web/7TV style
-• Long-pressing autocomplete emotes will now show the emote details bottom sheet
-• Limited chat reconnect attempts to 5
-
-Bug Fixes
-• Fixed auto-PiP triggering in chat-only mode
-• Fixed missing haptic feedback when long-pressing chat messages
-• Fixed reply thread message long-press area not stretching to full width
+See the full release notes on GitHub: https://github.com/tommyxchow/frosty/releases
