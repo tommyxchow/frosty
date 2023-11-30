@@ -261,9 +261,10 @@ class Emote {
     final emoteData = emote.data;
 
     final url = emoteData!.host.url;
+
     // Flutter doesn't support AVIF yet.
-    final file = emoteData.host.files.reversed.firstWhere(
-      (file) => file.format != 'AVIF' && file.name.contains('4x'),
+    final file = emoteData.host.files.lastWhere(
+      (file) => file.format != 'AVIF',
     );
 
     // Check if the flag has 1 at the 8th bit.
