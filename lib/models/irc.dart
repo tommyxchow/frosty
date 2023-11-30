@@ -323,7 +323,7 @@ class IRCMessage {
     final displayName = tags['display-name']!;
     span.add(
       TextSpan(
-        text: user != null ? getReadableName(displayName, user!) : user,
+        text: user != null ? getReadableName(displayName, user!) : displayName,
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.bold,
