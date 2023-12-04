@@ -1,5 +1,3 @@
-# frosty
-
 ![Showcase of the Frosty app with screenshots in a masonry grid](https://github.com/tommyxchow/frosty/assets/54859075/09178dcc-2fd2-4618-8076-502719159424)
 
 <p>
@@ -108,4 +106,4 @@ Otherwise, downloading Frosty, leaving a review, or starring this repository is 
 
 ## License
 
-frosty is licensed under [AGPL-3.0-or-later](LICENSE).
+Frosty is licensed under [AGPL-3.0-or-later](LICENSE).
