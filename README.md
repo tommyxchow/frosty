@@ -1,26 +1,8 @@
-<p align="center">
-  <a align="center" href="https://frostyapp.io">
-    <img
-      src="https://user-images.githubusercontent.com/54859075/185783257-228d5c49-015e-4ee6-bf78-41f898cf770a.svg"
-      width="180px"
-      alt="The Frosty rounded logo."
-    />
-    <h1 align="center">Frosty</h1>
-  </a>
-</p>
+# frosty
 
-<p align="center">
-  A mobile
-  <a href="https://www.twitch.tv/">Twitch</a>
-  client for iOS and Android with
-  <a href="https://7tv.app/">7TV</a>, <a href="https://betterttv.com/">BTTV</a>,
-  and
-  <a href="https://www.frankerfacez.com/">FFZ</a>
-  support. Built with
-  <a href="https://flutter.dev/">Flutter</a>.
-</p>
+![Showcase of the Frosty app with screenshots in a masonry grid](https://github.com/tommyxchow/frosty/assets/54859075/09178dcc-2fd2-4618-8076-502719159424)
 
-<p align="center">
+<p>
   <a href="https://github.com/tommyxchow/frosty/actions/workflows/ci.yml">
     <img
       alt="Badge showing the CI status."
@@ -53,7 +35,9 @@
   </a>
 </p>
 
-<p align="center">
+## Download
+
+<p>
   <a href="https://apps.apple.com/us/app/frosty-for-twitch/id1603987585">
     <img
       title="Get it on iOS (Apple App Store)"
@@ -72,41 +56,9 @@
   </a>
 </p>
 
-<p align="center">
-  <a href="https://www.buymeacoffee.com/tommychow">
-    <img
-      title="Donate"
-      alt="Buy Me A Coffee badge."
-      src="https://user-images.githubusercontent.com/54859075/160051848-2e581476-a6c6-4de6-9af7-773d96632de1.svg"
-      width="200px"
-    />
-  </a>
-</p>
+## Why
 
-<p align="center">
-  <img
-    title="Followed streams section"
-    alt="iOS screenshot of the Followed Streams section."
-    src="https://user-images.githubusercontent.com/54859075/185780262-a3ba5ecf-a710-4511-a583-94e0d0ce0156.png"
-    width="32%"
-  />
-  <img
-    title="Channel (video/chat) view"
-    alt="iOS screenshot of xQc's channel with the stream and chat."
-    src="https://user-images.githubusercontent.com/54859075/185780260-0f7f3247-2cb5-431d-8714-e88e9fcb72f5.png"
-    width="32%"
-  />
-  <img
-    title="Search section"
-    alt='iOS screenshot of the search section with results from the query "pokelaw".'
-    src="https://user-images.githubusercontent.com/54859075/185780261-4301f180-04dc-4328-8a4c-4f035a5ec796.png"
-    width="32%"
-  />
-</p>
-
-## Motivation
-
-The official Twitch mobile app doesn't support emotes from [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh), [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), and [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb) — third-party services and extensions for Twitch used by millions of viewers and many top channels. This results in a poor mobile chat experience since only emote codes render rather than their image or GIF counterpart.
+The official Twitch mobile app doesn't support emotes from [7TV](https://chrome.google.com/webstore/detail/7tv/ammjkodgmmoknidbanneddgankgfejfh), [BetterTTV (BTTV)](https://chrome.google.com/webstore/detail/betterttv/ajopnjidmegmdimjlfnijceegpefgped), and [FrankerFaceZ (FFZ)](https://chrome.google.com/webstore/detail/frankerfacez/fadndhdgpmmaapbmfcknlfgcflmmmieb) — third-party extensions for Twitch used by millions. As a result, only emote text names are rendered rather than their actual image or GIF, making the chat unreadable in many channels.
 
 ## Features
 
@@ -129,46 +81,31 @@ For a more detailed overview, visit [frostyapp.io](https://www.frostyapp.io/).
 
 ## Development setup
 
-1. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **Client ID** and **Client Secret**.
+1. [Install Flutter](https://docs.flutter.dev/get-started/install).
 
-2. Clone the repo to a directory (e.g., `git clone https://github.com/tommyxchow/frosty.git`).
+2. Clone this repo (e.g., `git clone https://github.com/tommyxchow/frosty.git`).
 
-3. Navigate to `lib/constants.dart` and replace the `clientId` and `secret` constants with your **client ID** and **client secret** from step 1 (if using VSCode, use `--dart-define` to [define them as environment variables](https://dartcode.org/docs/using-dart-define-in-flutter/)).
+3. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **Client ID** and **Client Secret**.
 
-4. Run `flutter pub get` to fetch all the dependencies.
+4. Use [`--dart-define`](https://dartcode.org/docs/using-dart-define-in-flutter/) to set the `clientId` and `secret` environment variables with your **Client ID** and **Client Secret**.
 
-5. Choose an emulator or device and run the app!
+5. Run `flutter pub get` to fetch all the dependencies.
 
-> **Note**
->
+6. Choose an emulator or device and run the app!
+
+> [!IMPORTANT]
 > Frosty uses [MobX](https://mobx.netlify.app/) for state management. Please refer to the documentation about code generation, otherwise your changes within MobX stores may not be applied.
-
-> **Warning**
->
-> I built Frosty while learning Flutter, so some of the code may not be optimal. I'm working on refactoring, documenting, and cleaning up various parts as much as I can.
-
-## Feature requests and issues
-
-If you have a feature request, found a bug, or have a general issue, you can submit it [here](https://github.com/tommyxchow/frosty/issues/new/choose) on the issues tab. Doing so makes it easier for me to keep track of them and makes it publicly visible for others to review.
-
-> **Note**
->
-> I work on Frosty in my free time and take occasional breaks, so I may not respond immediately.
 
 ## Donate
 
-Downloading Frosty and leaving a review or starring this repository is more than enough to show support.
-
-If you're feeling generous and would like to support me with a donation, you can do so through the following:
+If you appreciate my work and would like to donate/tip, you can through:
 
 - [Buy Me a Coffee](https://www.buymeacoffee.com/tommychow)
 - [GitHub Sponsors](https://github.com/sponsors/tommyxchow)
 - [PayPal](https://www.paypal.com/donate/?business=NF33JDG6KBU6W)
-- BTC: bc1qzpth6gc3vum764lat6a8ul7cmekwles58070a6
-- ETH: 0x317b5930fc2898884f711016dCae79d24910888E
 
-If you decide to support me monetarily, it is extremely appreciated and further motivates me to continue improving and maintaining Frosty ❤️.
+Otherwise, downloading Frosty, leaving a review, or starring this repository is more than enough to show support. Thank you!
 
 ## License
 
-Frosty is licensed under [AGPL-3.0-or-later](LICENSE).
+frosty is licensed under [AGPL-3.0-or-later](LICENSE).
