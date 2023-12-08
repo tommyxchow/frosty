@@ -43,6 +43,12 @@ abstract class VideoStoreBase with Store {
         ..setBackgroundColor(Colors.black)
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..addJavaScriptChannel(
+          'Latency',
+          onMessageReceived: (message) {
+            _latency = message.message;
+          },
+        )
+        ..addJavaScriptChannel(
           'StreamQualities',
           onMessageReceived: (message) {
             final data = jsonDecode(message.message) as List;
@@ -123,6 +129,9 @@ abstract class VideoStoreBase with Store {
   // The current stream quality string
   @readonly
   String _streamQuality = 'Auto';
+
+  @readonly
+  String? _latency;
 
   /// The video URL to use for the webview.
   String get videoUrl =>
@@ -208,6 +217,37 @@ abstract class VideoStoreBase with Store {
     _streamQuality = newStreamQuality;
   }
 
+  void _hideDefaultOverlay() {
+    videoWebViewController.runJavaScript('''
+            {
+              const observer = new MutationObserver(() => {
+                const classificationGate = document.querySelector('[data-a-target="content-classification-gate-overlay"]');
+                if(classificationGate) return;
+                const overlay = document.querySelector('.video-player__overlay');
+                if(!overlay) return;
+                overlay.style.display = "none";
+                observer.disconnect();
+              });
+              observer.observe(document.body, { childList: true, subtree: true });
+            }
+          ''');
+  }
+
+  void _listenOnLatencyChanges() {
+    videoWebViewController.runJavaScript('''
+            {
+              document.querySelector('[data-a-target="player-settings-button"]').click();
+              document.querySelector('[data-a-target="player-settings-menu-item-advanced"]').click();
+              document.querySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input').click();
+              document.querySelector('[data-a-target="player-overlay-video-stats"]').style.display = "none";
+              const observer = new MutationObserver((changes) => {
+                Latency.postMessage(changes[0].target.textContent);
+              })
+              observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true })
+            }
+          ''');
+  }
+
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
@@ -227,19 +267,8 @@ abstract class VideoStoreBase with Store {
           });''',
         );
         if (settingsStore.showOverlay) {
-          videoWebViewController.runJavaScript('''
-            {
-              const observer = new MutationObserver(() => {
-                const classificationGate = document.querySelector('[data-a-target="content-classification-gate-overlay"]');
-                if(classificationGate) return;
-                const overlay = document.querySelector('.video-player__overlay');
-                if(!overlay) return;
-                overlay.style.display = "none";
-                observer.disconnect();
-              });
-              observer.observe(document.body, { childList: true, subtree: true });
-            }
-          ''');
+          _hideDefaultOverlay();
+          _listenOnLatencyChanges();
         }
       } catch (e) {
         debugPrint(e.toString());

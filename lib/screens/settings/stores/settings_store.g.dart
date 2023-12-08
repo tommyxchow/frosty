@@ -17,6 +17,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showVideo = json['showVideo'] as bool? ?? true
       ..defaultToHighestQuality =
           json['defaultToHighestQuality'] as bool? ?? false
+      ..showLatency = json['showLatency'] as bool? ?? true
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
@@ -65,6 +66,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'launchUrlExternal': instance.launchUrlExternal,
       'showVideo': instance.showVideo,
       'defaultToHighestQuality': instance.defaultToHighestQuality,
+      'showLatency': instance.showLatency,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
       'overlayOpacity': instance.overlayOpacity,
@@ -217,6 +219,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$defaultToHighestQualityAtom
         .reportWrite(value, super.defaultToHighestQuality, () {
       super.defaultToHighestQuality = value;
+    });
+  }
+
+  late final _$showLatencyAtom =
+      Atom(name: '_SettingsStoreBase.showLatency', context: context);
+
+  @override
+  bool get showLatency {
+    _$showLatencyAtom.reportRead();
+    return super.showLatency;
+  }
+
+  @override
+  set showLatency(bool value) {
+    _$showLatencyAtom.reportWrite(value, super.showLatency, () {
+      super.showLatency = value;
     });
   }
 
@@ -757,6 +775,7 @@ largeStreamCard: ${largeStreamCard},
 launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
+showLatency: ${showLatency},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 overlayOpacity: ${overlayOpacity},
