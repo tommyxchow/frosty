@@ -620,14 +620,15 @@ class IRCMessage {
   }) {
     if (text.startsWith('@')) {
       return TextSpan(
-          text: text,
-          style: style?.copyWith(fontWeight: FontWeight.bold),
-          recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              if (onTapPingedUser != null) {
-                onTapPingedUser(text.substring(1));
-              }
-            });
+        text: text,
+        style: style?.copyWith(fontWeight: FontWeight.bold),
+        recognizer: TapGestureRecognizer()
+          ..onTap = () {
+            if (onTapPingedUser != null) {
+              onTapPingedUser(text.substring(1));
+            }
+          },
+      );
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
         text: text,
