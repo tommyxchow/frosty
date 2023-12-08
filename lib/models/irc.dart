@@ -117,6 +117,7 @@ class IRCMessage {
     required double emoteScale,
     required bool launchExternal,
     void Function()? onTapName,
+    void Function(String)? onTapPingedUser,
     bool showMessage = true,
     bool useReadableColors = false,
     TimestampType timestamp = TimestampType.disabled,
@@ -456,6 +457,7 @@ class IRCMessage {
                     text: words[index],
                     style: textStyle,
                     launchExternal: launchExternal,
+                    onTapPingedUser: onTapPingedUser,
                   ),
                 );
               }
@@ -486,6 +488,7 @@ class IRCMessage {
                   text: word,
                   style: textStyle,
                   launchExternal: launchExternal,
+                  onTapPingedUser: onTapPingedUser,
                 ),
               );
             }
@@ -613,12 +616,18 @@ class IRCMessage {
     required String text,
     required bool launchExternal,
     TextStyle? style,
+    Function(String)? onTapPingedUser,
   }) {
     if (text.startsWith('@')) {
       return TextSpan(
-        text: text,
-        style: style?.copyWith(fontWeight: FontWeight.bold),
-      );
+          text: text,
+          style: style?.copyWith(fontWeight: FontWeight.bold),
+          recognizer: TapGestureRecognizer()
+            ..onTap = () {
+              if (onTapPingedUser != null) {
+                onTapPingedUser(text.substring(1));
+              }
+            });
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
         text: text,

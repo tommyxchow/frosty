@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/theme.dart';
+import 'package:provider/provider.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
@@ -38,6 +41,34 @@ class ChatMessage extends StatelessWidget {
         displayName: ircMessage.tags['display-name']!,
       ),
     );
+  }
+
+  void onTapPingedUser(
+    BuildContext context, {
+    required String nickname,
+  }) {
+    // Ignore if the message is a recent message in the modal bottom sheet.
+    if (isModal) return;
+
+    final twitchApi = context.read<TwitchApi>();
+    final authStore = context.read<AuthStore>();
+    twitchApi
+        .getUser(
+      headers: authStore.headersTwitch,
+      userLogin: nickname,
+    )
+        .then((user) {
+      showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        builder: (context) => ChatUserModal(
+          chatStore: chatStore,
+          username: user.login,
+          userId: user.id,
+          displayName: user.displayName,
+        ),
+      );
+    });
   }
 
   Future<void> copyMessage() async {
@@ -127,6 +158,8 @@ class ChatMessage extends StatelessWidget {
                 children: ircMessage.generateSpan(
                   context,
                   onTapName: () => onTapName(context),
+                  onTapPingedUser: (nickname) =>
+                      onTapPingedUser(context, nickname: nickname),
                   style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
