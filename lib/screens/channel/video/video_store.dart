@@ -208,29 +208,28 @@ abstract class VideoStoreBase with Store {
     final indexOfStreamQuality =
         _availableStreamQualities.indexOf(newStreamQuality);
     await videoWebViewController.runJavaScript('''
-        document.querySelector('[data-a-target="player-settings-button"]').click();
-        document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
-        [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$indexOfStreamQuality].click();
-        document.querySelector('.tw-drop-down-menu-item-figure').click();
-        document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+        {
+          document.querySelector('.video-player__overlay').childNodes[2].style.display = "none";
+          document.querySelector('.video-player__overlay section').style.display = "none";
+          document.querySelector('.video-player__overlay').childNodes[5].style.display = "none";
+          document.querySelector('[data-a-target="player-settings-button"]').click();
+          document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
+          [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$indexOfStreamQuality].click();
+          document.querySelector('.tw-drop-down-menu-item-figure').click();
+          document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+        }
       ''');
     _streamQuality = newStreamQuality;
   }
 
   void _hideDefaultOverlay() {
     videoWebViewController.runJavaScript('''
-            {
-              const observer = new MutationObserver(() => {
-                const classificationGate = document.querySelector('[data-a-target="content-classification-gate-overlay"]');
-                if(classificationGate) return;
-                const overlay = document.querySelector('.video-player__overlay');
-                if(!overlay) return;
-                overlay.style.display = "none";
-                observer.disconnect();
-              });
-              observer.observe(document.body, { childList: true, subtree: true });
-            }
-          ''');
+        setTimeout(() => {
+          document.querySelector('.video-player__overlay').childNodes[2].style.display = "none";
+          document.querySelector('.video-player__overlay section').style.display = "none";
+          document.querySelector('.video-player__overlay').childNodes[5].style.display = "none";
+      }, 2000);
+    ''');
   }
 
   void _listenOnLatencyChanges() {
@@ -239,11 +238,13 @@ abstract class VideoStoreBase with Store {
               document.querySelector('[data-a-target="player-settings-button"]').click();
               document.querySelector('[data-a-target="player-settings-menu-item-advanced"]').click();
               document.querySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input').click();
+              document.querySelector('.tw-drop-down-menu-item-figure').click();
+              document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
               document.querySelector('[data-a-target="player-overlay-video-stats"]').style.display = "none";
               const observer = new MutationObserver((changes) => {
                 Latency.postMessage(changes[0].target.textContent);
               })
-              observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true })
+              observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
             }
           ''');
   }
