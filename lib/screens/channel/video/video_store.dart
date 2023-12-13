@@ -226,6 +226,7 @@ abstract class VideoStoreBase with Store {
           const videoOverlay = document.querySelector('.video-player__overlay');
           if(!videoOverlay || !videoOverlay.childNodes || !videoOverlay.childNodes[2] || !videoOverlay.childNodes[5]) return;
           const overlayObserver = new MutationObserver(() => {
+            if(document.querySelector(".offline-embeds")) return;
             videoOverlay.childNodes[2].style.display = "none";
             document.querySelector('.video-player__overlay section').style.display = "none";
             videoOverlay.childNodes[5].style.display = "none";
