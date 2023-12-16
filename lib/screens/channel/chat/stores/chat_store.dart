@@ -390,47 +390,50 @@ abstract class ChatStoreBase with Store {
         WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
 
     _sevenTVChannelListener = _sevenTVChannel?.stream.listen(
-      (data) {
-        debugPrint(data);
-        final decoded = jsonDecode(data);
+      (data) => Future.delayed(
+        Duration(seconds: settings.chatDelay.toInt()),
+        () {
+          debugPrint(data);
+          final decoded = jsonDecode(data);
 
-        final event = SevenTVEvent.fromJson(decoded);
+          final event = SevenTVEvent.fromJson(decoded);
 
-        final body = event.d.body;
-        if (event.d.type != 'emote_set.update' || body == null) return;
+          final body = event.d.body;
+          if (event.d.type != 'emote_set.update' || body == null) return;
 
-        if (body.pushed != null) {
-          final pushedEmote = body.pushed?.first.value;
+          if (body.pushed != null) {
+            final pushedEmote = body.pushed?.first.value;
 
-          if (pushedEmote == null) return;
+            if (pushedEmote == null) return;
 
-          final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
+            final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
 
-          assetsStore.emoteToObject[emote.name] = emote;
+            assetsStore.emoteToObject[emote.name] = emote;
 
-          messageBuffer.add(
-            IRCMessage.createNotice(
-              message:
-                  '${getReadableName(body.actor.displayName, body.actor.username)} added 7TV emote "${emote.name}" to chat',
-            ),
-          );
-        } else if (body.pulled != null) {
-          final pulledEmote = body.pulled?.first.oldValue;
+            messageBuffer.add(
+              IRCMessage.createNotice(
+                message:
+                    '${getReadableName(body.actor.displayName, body.actor.username)} added 7TV emote "${emote.name}" to chat',
+              ),
+            );
+          } else if (body.pulled != null) {
+            final pulledEmote = body.pulled?.first.oldValue;
 
-          if (pulledEmote == null) return;
+            if (pulledEmote == null) return;
 
-          assetsStore.emoteToObject.removeWhere(
-            (name, _) => name == pulledEmote.name,
-          );
+            assetsStore.emoteToObject.removeWhere(
+              (name, _) => name == pulledEmote.name,
+            );
 
-          messageBuffer.add(
-            IRCMessage.createNotice(
-              message:
-                  '${getReadableName(body.actor.displayName, body.actor.username)} removed 7TV emote "${pulledEmote.name}" from chat',
-            ),
-          );
-        }
-      },
+            messageBuffer.add(
+              IRCMessage.createNotice(
+                message:
+                    '${getReadableName(body.actor.displayName, body.actor.username)} removed 7TV emote "${pulledEmote.name}" from chat',
+              ),
+            );
+          }
+        },
+      ),
       onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
     );
 
