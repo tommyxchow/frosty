@@ -632,7 +632,11 @@ class IRCMessage {
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
         text: text,
-        style: style?.copyWith(color: Colors.blue),
+        style: style?.copyWith(
+          color: Colors.blue,
+          decoration: TextDecoration.underline,
+          decorationColor: Colors.blue,
+        ),
         recognizer: TapGestureRecognizer()
           ..onTap = () => launchUrl(
                 Uri.parse(text),
