@@ -327,7 +327,7 @@ class IRCMessage {
         text: user != null ? getReadableName(displayName, user!) : displayName,
         style: TextStyle(
           color: color,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
         ),
         recognizer: TapGestureRecognizer()..onTap = onTapName,
       ),
@@ -652,7 +652,7 @@ class IRCMessage {
               child: Text(
                 mention,
                 style: style.copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
