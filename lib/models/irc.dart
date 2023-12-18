@@ -111,7 +111,6 @@ class IRCMessage {
   /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
   List<InlineSpan> generateSpan(
     BuildContext context, {
-    TextStyle? style,
     required ChatAssetsStore assetsStore,
     required double badgeScale,
     required double emoteScale,
@@ -122,6 +121,7 @@ class IRCMessage {
     bool useReadableColors = false,
     TimestampType timestamp = TimestampType.disabled,
   }) {
+    final style = DefaultTextStyle.of(context).style;
     final isLightTheme = Theme.of(context).brightness == Brightness.light;
 
     final emoteToObject = assetsStore.emoteToObject;
@@ -145,7 +145,7 @@ class IRCMessage {
         span.add(
           TextSpan(
             text: '${DateFormat.Hm().format(parsedTime)} ',
-            style: style?.copyWith(color: style.color?.withOpacity(0.5)),
+            style: style.copyWith(color: style.color?.withOpacity(0.5)),
           ),
         );
       }
@@ -154,7 +154,7 @@ class IRCMessage {
         span.add(
           TextSpan(
             text: '${DateFormat('h:mm').format(parsedTime)} ',
-            style: style?.copyWith(color: style.color?.withOpacity(0.5)),
+            style: style.copyWith(color: style.color?.withOpacity(0.5)),
           ),
         );
       }
@@ -338,7 +338,7 @@ class IRCMessage {
 
     // Italicize the text if it was called with an IRC Action (e.g., "/me").
     final textStyle =
-        action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;
+        style.copyWith(fontStyle: action == true ? FontStyle.italic : null);
 
     if (!showMessage) {
       span.add(const TextSpan(text: ' <message deleted>'));
@@ -389,7 +389,7 @@ class IRCMessage {
                 if (nextWordIsEmoji)
                   Text(
                     words[index],
-                    style: textStyle?.copyWith(fontSize: emoteSize - 5),
+                    style: textStyle.copyWith(fontSize: emoteSize - 5),
                   ),
                 ...emoteStack.reversed.map(
                   (emote) => FrostyCachedNetworkImage(
@@ -422,7 +422,7 @@ class IRCMessage {
                           if (nextWordIsEmoji)
                             Text(
                               emoji,
-                              style: textStyle?.copyWith(fontSize: 40),
+                              style: textStyle.copyWith(fontSize: 40),
                             ),
                           ...emoteStack.reversed.map(
                             (emote) => FrostyCachedNetworkImage(
@@ -454,6 +454,7 @@ class IRCMessage {
                 localSpan.add(const TextSpan(text: ' '));
                 localSpan.add(
                   _createTextSpan(
+                    context,
                     text: words[index],
                     style: textStyle,
                     launchExternal: launchExternal,
@@ -477,14 +478,18 @@ class IRCMessage {
           } else {
             if (regexEmoji.hasMatch(word)) {
               localSpan.add(
-                _createEmojiSpan(
-                  emoji: word,
-                  style: textStyle?.copyWith(fontSize: emoteSize - 5),
+                WidgetSpan(
+                  alignment: PlaceholderAlignment.middle,
+                  child: Text(
+                    word,
+                    style: textStyle.copyWith(fontSize: emoteSize - 5),
+                  ),
                 ),
               );
             } else {
               localSpan.add(
                 _createTextSpan(
+                  context,
                   text: word,
                   style: textStyle,
                   launchExternal: launchExternal,
@@ -504,19 +509,6 @@ class IRCMessage {
     }
 
     return span;
-  }
-
-  static WidgetSpan _createEmojiSpan({
-    required String emoji,
-    TextStyle? style,
-  }) {
-    return WidgetSpan(
-      alignment: PlaceholderAlignment.middle,
-      child: Text(
-        emoji,
-        style: style,
-      ),
-    );
   }
 
   static Widget _createBadgeWidget({
@@ -561,27 +553,36 @@ class IRCMessage {
   }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
-      child: InkWell(
-        onTap: () => _showAssetDetailsBottomSheet(
-          context,
-          leading: _createBadgeWidget(
+      child: Stack(
+        children: [
+          _createBadgeWidget(
             badge: badge,
+            size: size,
             backgroundColor: backgroundColor,
             isSvg: isSvg,
-            size: 56,
           ),
-          url: badge.url,
-          title: badge.name,
-          subtitle: Text(badge.type.toString()),
-          launchExternal: launchExternal,
-          showCopyName: false,
-        ),
-        child: _createBadgeWidget(
-          badge: badge,
-          size: size,
-          backgroundColor: backgroundColor,
-          isSvg: isSvg,
-        ),
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _showAssetDetailsBottomSheet(
+                  context,
+                  leading: _createBadgeWidget(
+                    badge: badge,
+                    backgroundColor: backgroundColor,
+                    isSvg: isSvg,
+                    size: 56,
+                  ),
+                  url: badge.url,
+                  title: badge.name,
+                  subtitle: Text(badge.type.toString()),
+                  launchExternal: launchExternal,
+                  showCopyName: false,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -595,44 +596,73 @@ class IRCMessage {
   }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
-      child: InkWell(
-        onTap: () => showEmoteDetailsBottomSheet(
-          context,
-          emote: emote,
-          launchExternal: launchExternal,
-        ),
-        child: FrostyCachedNetworkImage(
-          imageUrl: emote.url,
-          height: height,
-          width: width,
-          useFade: false,
-          placeholder: (context, url) => const SizedBox(),
-        ),
+      child: Stack(
+        children: [
+          FrostyCachedNetworkImage(
+            imageUrl: emote.url,
+            height: height,
+            width: width,
+            useFade: false,
+            placeholder: (context, url) => const SizedBox(),
+          ),
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => showEmoteDetailsBottomSheet(
+                  context,
+                  emote: emote,
+                  launchExternal: launchExternal,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  static TextSpan _createTextSpan({
+  static InlineSpan _createTextSpan(
+    BuildContext context, {
     required String text,
     required bool launchExternal,
-    TextStyle? style,
+    required TextStyle style,
     Function(String)? onTapPingedUser,
   }) {
     if (text.startsWith('@')) {
-      return TextSpan(
-        text: text,
-        style: style?.copyWith(fontWeight: FontWeight.bold),
-        recognizer: TapGestureRecognizer()
-          ..onTap = () {
-            if (onTapPingedUser != null) {
-              onTapPingedUser(text.substring(1));
-            }
-          },
+      final isLight = Theme.of(context).brightness == Brightness.light;
+      final mention = text.split(',')[0];
+
+      final borderRadius = BorderRadius.circular(4);
+      return WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: Material(
+          borderRadius: borderRadius,
+          child: InkWell(
+            borderRadius: borderRadius,
+            onTap: onTapPingedUser != null
+                ? () => onTapPingedUser(mention.substring(1))
+                : null,
+            child: Ink(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(4),
+                color: isLight ? Colors.grey.shade200 : Colors.grey.shade900,
+              ),
+              child: Text(
+                mention,
+                style: style.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
       );
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
         text: text,
-        style: style?.copyWith(
+        style: style.copyWith(
           color: Colors.blue,
           decoration: TextDecoration.underline,
           decorationColor: Colors.blue,

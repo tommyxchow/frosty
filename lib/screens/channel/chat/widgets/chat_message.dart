@@ -77,7 +77,7 @@ class ChatMessage extends StatelessWidget {
     chatStore.updateNotification('Message copied');
   }
 
-  void onLongPressMessage(BuildContext context, TextStyle defaultTextStyle) {
+  void onLongPressMessage(BuildContext context) {
     HapticFeedback.lightImpact();
 
     if (ircMessage.command != Command.privateMessage &&
@@ -105,7 +105,7 @@ class ChatMessage extends StatelessWidget {
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                 ),
-                style: defaultTextStyle,
+                style: DefaultTextStyle.of(context).style,
               ),
             ),
           ),
@@ -160,7 +160,6 @@ class ChatMessage extends StatelessWidget {
                   onTapName: () => onTapName(context),
                   onTapPingedUser: (nickname) =>
                       onTapPingedUser(context, nickname: nickname),
-                  style: defaultTextStyle,
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
@@ -291,7 +290,6 @@ class ChatMessage extends StatelessWidget {
                       children: ircMessage.generateSpan(
                         context,
                         onTapName: () => onTapName(context),
-                        style: defaultTextStyle,
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
                         badgeScale: chatStore.settings.badgeScale,
@@ -384,7 +382,6 @@ class ChatMessage extends StatelessWidget {
                         children: ircMessage.generateSpan(
                           context,
                           onTapName: () => onTapName(context),
-                          style: defaultTextStyle,
                           assetsStore: chatStore.assetsStore,
                           emoteScale: chatStore.settings.emoteScale,
                           badgeScale: chatStore.settings.badgeScale,
@@ -446,7 +443,7 @@ class ChatMessage extends StatelessWidget {
               chatStore.assetsStore.showEmoteMenu = false;
             }
           },
-          onLongPress: () => onLongPressMessage(context, defaultTextStyle),
+          onLongPress: () => onLongPressMessage(context),
           child: coloredMessage,
         );
       },
