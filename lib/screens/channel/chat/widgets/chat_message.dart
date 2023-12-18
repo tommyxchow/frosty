@@ -47,9 +47,6 @@ class ChatMessage extends StatelessWidget {
     BuildContext context, {
     required String nickname,
   }) {
-    // Ignore if the message is a recent message in the modal bottom sheet.
-    if (isModal) return;
-
     final twitchApi = context.read<TwitchApi>();
     final authStore = context.read<AuthStore>();
     twitchApi
@@ -158,8 +155,10 @@ class ChatMessage extends StatelessWidget {
                 children: ircMessage.generateSpan(
                   context,
                   onTapName: () => onTapName(context),
-                  onTapPingedUser: (nickname) =>
-                      onTapPingedUser(context, nickname: nickname),
+                  onTapPingedUser: isModal
+                      ? null
+                      : (nickname) =>
+                          onTapPingedUser(context, nickname: nickname),
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
