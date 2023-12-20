@@ -222,16 +222,23 @@ abstract class VideoStoreBase with Store {
   void _hideDefaultOverlay() {
     videoWebViewController.runJavaScript('''
       {
+        const hideElements = (...el) => {
+          el.forEach((el) => {
+            el?.style.setProperty("display", "none", "important");
+          })
+        }
+        const hide = () => {
+          const topBar = document.querySelector(".top-bar");
+          const playerControls = document.querySelector(".player-controls");
+          const channelDisclosures = document.querySelector("#channel-player-disclosures");
+          hideElements(topBar, playerControls, channelDisclosures);
+        }
         const observer = new MutationObserver(() => {
           const videoOverlay = document.querySelector('.video-player__overlay');
-          if(!videoOverlay || !videoOverlay.childNodes || !videoOverlay.childNodes[2] || !videoOverlay.childNodes[5]) return;
-          const overlayObserver = new MutationObserver(() => {
-            if(document.querySelector(".offline-embeds")) return;
-            videoOverlay.childNodes[2].style.display = "none";
-            document.querySelector('.video-player__overlay section').style.display = "none";
-            videoOverlay.childNodes[5].style.display = "none";
-          });
-          overlayObserver.observe(videoOverlay, { childList: true, subtree: true })
+          if(!videoOverlay) return;
+          hide();
+          const videoOverlayObserver = new MutationObserver(hide);
+          videoOverlayObserver.observe(videoOverlay, { childList: true, subtree: true });
           observer.disconnect();
         });
         observer.observe(document.body, { childList: true, subtree: true });
