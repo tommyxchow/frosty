@@ -625,7 +625,7 @@ class IRCMessage {
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             if (onTapPingedUser != null) {
-              onTapPingedUser(text.substring(1));
+              onTapPingedUser(text.substring(1).split(',')[0]);
             }
           },
       );
