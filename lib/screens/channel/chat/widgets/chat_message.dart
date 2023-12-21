@@ -175,6 +175,7 @@ class ChatMessage extends StatelessWidget {
 
             Widget? messageHeaderIcon;
             Widget? messageHeader;
+            const mentionBorderRadius = BorderRadius.all(Radius.circular(4));
             if (replyUser != null && replyBody != null) {
               messageHeaderIcon = Icon(
                 Icons.reply_rounded,
@@ -194,8 +195,48 @@ class ChatMessage extends StatelessWidget {
                             );
                           },
                         ),
-                child: Text(
-                  'Replying to @$replyUser: $replyBody',
+                child: Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Replying to ',
+                      ),
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: Material(
+                          borderRadius: mentionBorderRadius,
+                          child: InkWell(
+                            borderRadius: mentionBorderRadius,
+                            onTap: () =>
+                                onTapPingedUser(context, nickname: replyUser),
+                            child: Ink(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                color: Theme.of(context).brightness ==
+                                        Brightness.light
+                                    ? Colors.grey.shade200
+                                    : Colors.grey.shade900,
+                              ),
+                              child: Text(
+                                '@$replyUser',
+                                style: defaultTextStyle.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: messageHeaderTextColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      TextSpan(
+                        text: ': $replyBody',
+                      ),
+                    ],
+                  ),
                   maxLines: 1,
                   style: TextStyle(
                     overflow: TextOverflow.ellipsis,

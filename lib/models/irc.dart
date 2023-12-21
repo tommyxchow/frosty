@@ -639,7 +639,7 @@ class IRCMessage {
           fontWeight: FontWeight.w600,
         ),
       );
-      final borderRadius = BorderRadius.circular(4);
+      const borderRadius = BorderRadius.all(Radius.circular(4));
       return WidgetSpan(
         alignment: PlaceholderAlignment.middle,
         child: onTapPingedUser != null
