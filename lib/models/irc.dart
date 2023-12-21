@@ -633,31 +633,34 @@ class IRCMessage {
       final isLight = Theme.of(context).brightness == Brightness.light;
       final mention = text.split(',')[0];
 
+      final mentionTextWidget = Text(
+        mention,
+        style: style.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      );
       final borderRadius = BorderRadius.circular(4);
       return WidgetSpan(
         alignment: PlaceholderAlignment.middle,
-        child: Material(
-          borderRadius: borderRadius,
-          child: InkWell(
-            borderRadius: borderRadius,
-            onTap: onTapPingedUser != null
-                ? () => onTapPingedUser(mention.substring(1))
-                : null,
-            child: Ink(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                color: isLight ? Colors.grey.shade200 : Colors.grey.shade900,
-              ),
-              child: Text(
-                mention,
-                style: style.copyWith(
-                  fontWeight: FontWeight.w600,
+        child: onTapPingedUser != null
+            ? Material(
+                borderRadius: borderRadius,
+                child: InkWell(
+                  borderRadius: borderRadius,
+                  onTap: () => onTapPingedUser(mention.substring(1)),
+                  child: Ink(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color:
+                          isLight ? Colors.grey.shade200 : Colors.grey.shade900,
+                    ),
+                    child: mentionTextWidget,
+                  ),
                 ),
-              ),
-            ),
-          ),
-        ),
+              )
+            : mentionTextWidget,
       );
     } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
       return TextSpan(
