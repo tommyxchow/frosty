@@ -101,6 +101,15 @@ flutter:
         - asset: assets/fonts/Inter-Bold.ttf
         - asset: assets/fonts/Inter-ExtraBold.ttf
         - asset: assets/fonts/Inter-Black.ttf
+        - asset: assets/fonts/Inter-ThinItalic.ttf
+        - asset: assets/fonts/Inter-ExtraLightItalic.ttf
+        - asset: assets/fonts/Inter-LightItalic.ttf
+        - asset: assets/fonts/Inter-Italic.ttf
+        - asset: assets/fonts/Inter-MediumItalic.ttf
+        - asset: assets/fonts/Inter-SemiBoldItalic.ttf
+        - asset: assets/fonts/Inter-BoldItalic.ttf
+        - asset: assets/fonts/Inter-ExtraBoldItalic.ttf
+        - asset: assets/fonts/Inter-BlackItalic.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
