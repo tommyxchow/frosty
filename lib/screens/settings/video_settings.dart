@@ -30,6 +30,11 @@ class VideoSettings extends StatelessWidget {
               onChanged: (newValue) =>
                   settingsStore.defaultToHighestQuality = newValue,
             ),
+          SettingsListSwitch(
+            title: 'Show latency',
+            value: settingsStore.showLatency,
+            onChanged: (newValue) => settingsStore.showLatency = newValue,
+          ),
           const SectionHeader('Overlay', showDivider: true),
           SettingsListSwitch(
             title: 'Use custom video overlay',

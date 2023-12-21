@@ -7,6 +7,7 @@ import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -15,11 +16,13 @@ import 'package:intl/intl.dart';
 class VideoOverlay extends StatelessWidget {
   final VideoStore videoStore;
   final ChatStore chatStore;
+  final SettingsStore settingsStore;
 
   const VideoOverlay({
     super.key,
     required this.videoStore,
     required this.chatStore,
+    required this.settingsStore,
   });
 
   @override
@@ -90,6 +93,33 @@ class VideoOverlay extends StatelessWidget {
           ),
         );
       },
+    );
+
+    final latencyTooltip = Tooltip(
+      message: 'Latency to broadcaster',
+      preferBelow: false,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Observer(
+              builder: (context) => Text(
+                videoStore.latency ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            const Icon(
+              Icons.speed,
+            ),
+          ],
+        ),
+      ),
     );
 
     final refreshButton = Tooltip(
@@ -223,7 +253,7 @@ class VideoOverlay extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       child: Row(
                         children: [
                           Tooltip(
@@ -294,6 +324,9 @@ class VideoOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (orientation == Orientation.landscape &&
+                      settingsStore.showLatency)
+                    latencyTooltip,
                   Tooltip(
                     message: 'Enter picture-in-picture',
                     preferBelow: false,
