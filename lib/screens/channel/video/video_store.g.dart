@@ -118,6 +118,24 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$_latencyAtom =
+      Atom(name: 'VideoStoreBase._latency', context: context);
+
+  String? get latency {
+    _$_latencyAtom.reportRead();
+    return super._latency;
+  }
+
+  @override
+  String? get _latency => latency;
+
+  @override
+  set _latency(String? value) {
+    _$_latencyAtom.reportWrite(value, super._latency, () {
+      super._latency = value;
+    });
+  }
+
   late final _$updateStreamQualitiesAsyncAction =
       AsyncAction('VideoStoreBase.updateStreamQualities', context: context);
 
