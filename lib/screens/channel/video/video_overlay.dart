@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -104,10 +105,11 @@ class VideoOverlay extends StatelessWidget {
           children: [
             Observer(
               builder: (context) => Text(
-                videoStore.latency ?? '',
+                videoStore.latency ?? 'N/A',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
+                  fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
             ),
@@ -249,11 +251,10 @@ class VideoOverlay extends StatelessWidget {
             Align(
               alignment: Alignment.bottomLeft,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
                           Tooltip(
@@ -314,6 +315,9 @@ class VideoOverlay extends StatelessWidget {
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
+                                      fontFeatures: [
+                                        FontFeature.tabularFigures(),
+                                      ],
                                     ),
                                   ),
                                 ],

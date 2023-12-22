@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -173,6 +174,7 @@ class StreamCard extends StatelessWidget {
             style: TextStyle(
               fontSize: subFontSize,
               color: fontColor?.withOpacity(0.8),
+              fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ],
