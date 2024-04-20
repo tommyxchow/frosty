@@ -190,14 +190,27 @@ abstract class VideoStoreBase with Store {
     try {
       await videoWebViewController.runJavaScript('''
         {
-          document.querySelector('[data-a-target="player-settings-button"]').click();
-          document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
-          const qualities = [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] label div')].map((el) => el.textContent);
-          document.querySelector('.tw-drop-down-menu-item-figure').click();
-          document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
-          StreamQualities.postMessage(JSON.stringify(qualities));
+          const delay = () => new Promise(resolve => setTimeout(resolve, 50));
+          (async () => {
+            document.querySelector('[data-a-target="player-settings-button"]').click();
+            await delay();
+            if (!document.querySelector('[data-a-target="player-settings-menu-item-quality"]')) {
+              // sometimes the menu doesn't appear on first tap :/
+              document.querySelector('[data-a-target="player-settings-button"]').click();
+              await delay();
+            }
+            document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
+            await delay();
+            const qualities = [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] label div')].map((el) => el.textContent);
+            StreamQualities.postMessage(JSON.stringify(qualities));
+            document.querySelector('.tw-drop-down-menu-item-figure').click();
+            await delay();
+            document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+          })();
         }
       ''');
+      // extra delay to wait for async javascript
+      await Future.delayed(const Duration(milliseconds: 250));
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -209,13 +222,27 @@ abstract class VideoStoreBase with Store {
         _availableStreamQualities.indexOf(newStreamQuality);
     await videoWebViewController.runJavaScript('''
         {
-          document.querySelector('[data-a-target="player-settings-button"]').click();
-          document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
-          [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$indexOfStreamQuality].click();
-          document.querySelector('.tw-drop-down-menu-item-figure').click();
-          document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+          const delay = () => new Promise(resolve => setTimeout(resolve, 50));
+          (async () => {
+            document.querySelector('[data-a-target="player-settings-button"]').click();
+            await delay();
+            if (!document.querySelector('[data-a-target="player-settings-menu-item-quality"]')) {
+              // sometimes the menu doesn't appear on first tap :/
+              document.querySelector('[data-a-target="player-settings-button"]').click();
+              await delay();
+            }
+            document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
+            await delay();
+            [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$indexOfStreamQuality].click();
+            await delay();
+            document.querySelector('.tw-drop-down-menu-item-figure').click();
+            await delay();
+            document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+          })();
         }
       ''');
+    // extra delay to wait for async javascript
+    await Future.delayed(const Duration(milliseconds: 300));
     _streamQuality = newStreamQuality;
   }
 
