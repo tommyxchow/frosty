@@ -87,7 +87,8 @@ class _StreamsListState extends State<StreamsList>
             ),
           );
 
-          if (!mounted) return;
+          if (!context.mounted) return;
+
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       },

@@ -70,7 +70,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
-            if (!mounted) return;
+            if (!context.mounted) return;
 
             showAboutDialog(
               context: context,
@@ -113,7 +113,8 @@ class _OtherSettingsState extends State<OtherSettings> {
 
             await DefaultCacheManager().emptyCache();
 
-            if (!mounted) return;
+            if (!context.mounted) return;
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: AlertMessage(
