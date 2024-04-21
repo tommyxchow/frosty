@@ -340,8 +340,8 @@ abstract class VideoStoreBase with Store {
           });''',
         );
         if (settingsStore.showOverlay) {
-          _hideDefaultOverlay();
-          _listenOnLatencyChanges();
+          await _hideDefaultOverlay();
+          await _listenOnLatencyChanges();
         }
       } catch (e) {
         debugPrint(e.toString());
