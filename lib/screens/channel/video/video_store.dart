@@ -224,7 +224,8 @@ abstract class VideoStoreBase with Store {
 
   @action
   Future<void> _setStreamQualityIndex(int newStreamQualityIndex) async {
-    await videoWebViewController.runJavaScript('''
+    try {
+      await videoWebViewController.runJavaScript('''
         {
           const asyncQuerySelector = (selector) => new Promise((resolve) => {
             if (document.querySelector(selector)) {
@@ -248,51 +249,76 @@ abstract class VideoStoreBase with Store {
           })();
         }
       ''');
-    _streamQualityIndex = newStreamQualityIndex;
+      _streamQualityIndex = newStreamQualityIndex;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
-  void _hideDefaultOverlay() {
-    videoWebViewController.runJavaScript('''
-      {
-        const hideElements = (...el) => {
-          el.forEach((el) => {
-            el?.style.setProperty("display", "none", "important");
-          })
+  Future<void> _hideDefaultOverlay() async {
+    try {
+      await videoWebViewController.runJavaScript('''
+        {
+          const hideElements = (...el) => {
+            el.forEach((el) => {
+              el?.style.setProperty("display", "none", "important");
+            })
+          }
+          const hide = () => {
+            const topBar = document.querySelector(".top-bar");
+            const playerControls = document.querySelector(".player-controls");
+            const channelDisclosures = document.querySelector("#channel-player-disclosures");
+            hideElements(topBar, playerControls, channelDisclosures);
+          }
+          const observer = new MutationObserver(() => {
+            const videoOverlay = document.querySelector('.video-player__overlay');
+            if(!videoOverlay) return;
+            hide();
+            const videoOverlayObserver = new MutationObserver(hide);
+            videoOverlayObserver.observe(videoOverlay, { childList: true, subtree: true });
+            observer.disconnect();
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
         }
-        const hide = () => {
-          const topBar = document.querySelector(".top-bar");
-          const playerControls = document.querySelector(".player-controls");
-          const channelDisclosures = document.querySelector("#channel-player-disclosures");
-          hideElements(topBar, playerControls, channelDisclosures);
-        }
-        const observer = new MutationObserver(() => {
-          const videoOverlay = document.querySelector('.video-player__overlay');
-          if(!videoOverlay) return;
-          hide();
-          const videoOverlayObserver = new MutationObserver(hide);
-          videoOverlayObserver.observe(videoOverlay, { childList: true, subtree: true });
-          observer.disconnect();
-        });
-        observer.observe(document.body, { childList: true, subtree: true });
-      }
-    ''');
+      ''');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
-  void _listenOnLatencyChanges() {
-    videoWebViewController.runJavaScript('''
-            {
-              document.querySelector('[data-a-target="player-settings-button"]').click();
-              document.querySelector('[data-a-target="player-settings-menu-item-advanced"]').click();
-              document.querySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input').click();
-              document.querySelector('.tw-drop-down-menu-item-figure').click();
-              document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
-              document.querySelector('[data-a-target="player-overlay-video-stats"]').style.display = "none";
-              const observer = new MutationObserver((changes) => {
-                Latency.postMessage(changes[0].target.textContent);
-              })
-              observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
+  Future<void> _listenOnLatencyChanges() async {
+    try {
+      await videoWebViewController.runJavaScript('''
+        {
+          const asyncQuerySelector = (selector) => new Promise((resolve) => {
+            if (document.querySelector(selector)) {
+              return resolve(document.querySelector(selector));
             }
-          ''');
+            const observer = new MutationObserver((mutations) => {
+              if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+              }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+          });
+          (async () => {
+            (await asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+            (await asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]')).click();
+            (await asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
+            (await asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
+            (await asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
+            (await asyncQuerySelector('[data-a-target="player-overlay-video-stats"]')).style.display = "none";
+            const observer = new MutationObserver((changes) => {
+              Latency.postMessage(changes[0].target.textContent);
+            })
+            observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
+          })();
+        }
+      ''');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   /// Initializes the video webview.
