@@ -68,14 +68,7 @@ abstract class VideoStoreBase with Store {
           onMessageReceived: (message) async {
             if (settingsStore.defaultToHighestQuality &&
                 _firstTimeSettingQuality) {
-              await updateStreamQualities();
-
-              await setStreamQuality(
-                _availableStreamQualities.firstWhere(
-                  (quality) => quality != 'Auto',
-                  orElse: () => 'Auto',
-                ),
-              );
+              await _setStreamQualityIndex(1);
 
               _firstTimeSettingQuality = false;
             } else {
@@ -126,9 +119,13 @@ abstract class VideoStoreBase with Store {
   @readonly
   List<String> _availableStreamQualities = [];
 
-  // The current stream quality string
+  // The current stream quality index
   @readonly
-  String _streamQuality = 'Auto';
+  int _streamQualityIndex = 0;
+
+  // The current stream quality string
+  String get streamQuality =>
+      _availableStreamQualities.elementAtOrNull(_streamQualityIndex) ?? 'Auto';
 
   @readonly
   String? _latency;
@@ -190,27 +187,29 @@ abstract class VideoStoreBase with Store {
     try {
       await videoWebViewController.runJavaScript('''
         {
-          const delay = () => new Promise(resolve => setTimeout(resolve, 50));
-          (async () => {
-            document.querySelector('[data-a-target="player-settings-button"]').click();
-            await delay();
-            if (!document.querySelector('[data-a-target="player-settings-menu-item-quality"]')) {
-              // sometimes the menu doesn't appear on first tap :/
-              document.querySelector('[data-a-target="player-settings-button"]').click();
-              await delay();
+          const asyncQuerySelector = (selector) => new Promise((resolve) => {
+            if (document.querySelector(selector)) {
+              return resolve(document.querySelector(selector));
             }
-            document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
-            await delay();
+            const observer = new MutationObserver((mutations) => {
+              if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+              }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+          });
+          (async () => {
+            (await asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+            (await asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
+            await asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] label div');
             const qualities = [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] label div')].map((el) => el.textContent);
             StreamQualities.postMessage(JSON.stringify(qualities));
-            document.querySelector('.tw-drop-down-menu-item-figure').click();
-            await delay();
-            document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+            (await asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
+            (await asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
           })();
         }
       ''');
-      // extra delay to wait for async javascript
-      await Future.delayed(const Duration(milliseconds: 250));
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -220,30 +219,36 @@ abstract class VideoStoreBase with Store {
   Future<void> setStreamQuality(String newStreamQuality) async {
     final indexOfStreamQuality =
         _availableStreamQualities.indexOf(newStreamQuality);
+    await _setStreamQualityIndex(indexOfStreamQuality);
+  }
+
+  @action
+  Future<void> _setStreamQualityIndex(int newStreamQualityIndex) async {
     await videoWebViewController.runJavaScript('''
         {
-          const delay = () => new Promise(resolve => setTimeout(resolve, 50));
-          (async () => {
-            document.querySelector('[data-a-target="player-settings-button"]').click();
-            await delay();
-            if (!document.querySelector('[data-a-target="player-settings-menu-item-quality"]')) {
-              // sometimes the menu doesn't appear on first tap :/
-              document.querySelector('[data-a-target="player-settings-button"]').click();
-              await delay();
+          const asyncQuerySelector = (selector) => new Promise((resolve) => {
+            if (document.querySelector(selector)) {
+              return resolve(document.querySelector(selector));
             }
-            document.querySelector('[data-a-target="player-settings-menu-item-quality"]').click();
-            await delay();
-            [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$indexOfStreamQuality].click();
-            await delay();
-            document.querySelector('.tw-drop-down-menu-item-figure').click();
-            await delay();
-            document.querySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button').click();
+            const observer = new MutationObserver((mutations) => {
+              if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+              }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+          });
+          (async () => {
+            (await asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+            (await asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
+            await asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] input');
+            [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$newStreamQualityIndex].click();
+            (await asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
+            (await asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
           })();
         }
       ''');
-    // extra delay to wait for async javascript
-    await Future.delayed(const Duration(milliseconds: 300));
-    _streamQuality = newStreamQuality;
+    _streamQualityIndex = newStreamQualityIndex;
   }
 
   void _hideDefaultOverlay() {
