@@ -116,7 +116,8 @@ class VideoOverlay extends StatelessWidget {
               width: 8,
             ),
             const Icon(
-              Icons.speed,
+              Icons.speed_rounded,
+              color: Colors.white,
             ),
           ],
         ),
