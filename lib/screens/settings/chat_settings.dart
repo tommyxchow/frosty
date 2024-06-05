@@ -170,17 +170,23 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay', showDivider: true),
-          SettingsListSlider(
-            title: 'Message delay',
-            trailing: '${settingsStore.chatDelay.toInt()}s',
-            subtitle:
-                'Adds a delay (in seconds) before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}',
-            value: settingsStore.chatDelay,
-            max: 30.0,
-            divisions: 30,
-            onChanged: (newValue) => settingsStore.chatDelay = newValue,
+          const SectionHeader('Delay and Latency', showDivider: true),
+          SettingsListSwitch(
+            title: 'Sync message delay with stream latency',
+            value: settingsStore.autoSyncChatDelay,
+            onChanged: (newValue) => settingsStore.autoSyncChatDelay = newValue,
           ),
+          if (!settingsStore.autoSyncChatDelay)
+            SettingsListSlider(
+              title: 'Message delay',
+              trailing: '${settingsStore.chatDelay.toInt()} seconds',
+              subtitle:
+                  'Adds a delay before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}',
+              value: settingsStore.chatDelay,
+              max: 30.0,
+              divisions: 30,
+              onChanged: (newValue) => settingsStore.chatDelay = newValue,
+            ),
           const SectionHeader('Alerts', showDivider: true),
           SettingsListSwitch(
             title: 'Highlight first time chatters',

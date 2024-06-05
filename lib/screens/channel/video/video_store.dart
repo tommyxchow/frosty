@@ -45,7 +45,17 @@ abstract class VideoStoreBase with Store {
         ..addJavaScriptChannel(
           'Latency',
           onMessageReceived: (message) {
-            _latency = message.message;
+            final receivedLatency = message.message;
+            _latency = receivedLatency;
+
+            if (!settingsStore.autoSyncChatDelay) return;
+
+            final trimmedLatency = receivedLatency.split(' ')[0];
+            final latencyAsDouble = double.tryParse(trimmedLatency);
+
+            if (latencyAsDouble != null) {
+              settingsStore.chatDelay = latencyAsDouble;
+            }
           },
         )
         ..addJavaScriptChannel(

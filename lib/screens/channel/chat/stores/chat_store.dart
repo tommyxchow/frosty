@@ -181,13 +181,28 @@ abstract class ChatStoreBase with Store {
     messageBuffer
         .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
+    if (settings.showVideo && settings.chatDelay > 0) {
+      messageBuffer.add(
+        IRCMessage.createNotice(
+          message:
+              'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
+        ),
+      );
+    }
+
     reactions.add(
-      autorun((_) {
-        if (settings.chatDelay > 0 && settings.showVideo) {
+      reaction((_) => settings.showVideo, (showVideo) {
+        if (showVideo && settings.chatDelay > 0) {
           messageBuffer.add(
             IRCMessage.createNotice(
               message:
                   'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
+            ),
+          );
+        } else {
+          messageBuffer.add(
+            IRCMessage.createNotice(
+              message: 'Removing message delay...',
             ),
           );
         }

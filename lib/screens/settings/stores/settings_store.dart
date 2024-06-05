@@ -116,6 +116,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultTimestampType = TimestampType.disabled;
 
   // Delay defaults
+  static const defaultAutoSyncChatDelay = false;
   static const defaultChatDelay = 0.0;
 
   // Alert defaults
@@ -182,6 +183,10 @@ abstract class _SettingsStoreBase with Store {
   var timestampType = defaultTimestampType;
 
   // Delay options
+  @JsonKey(defaultValue: defaultAutoSyncChatDelay)
+  @observable
+  var autoSyncChatDelay = defaultAutoSyncChatDelay;
+
   @JsonKey(defaultValue: defaultChatDelay)
   @observable
   var chatDelay = defaultChatDelay;
@@ -252,6 +257,7 @@ abstract class _SettingsStoreBase with Store {
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
 
+    autoSyncChatDelay = defaultAutoSyncChatDelay;
     chatDelay = defaultChatDelay;
 
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;

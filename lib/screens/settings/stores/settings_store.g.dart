@@ -34,6 +34,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               _$TimestampTypeEnumMap, json['timestampType'],
               unknownValue: TimestampType.disabled) ??
           TimestampType.disabled
+      ..autoSyncChatDelay = json['autoSyncChatDelay'] as bool? ?? false
       ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
       ..highlightFirstTimeChatter =
           json['highlightFirstTimeChatter'] as bool? ?? true
@@ -79,6 +80,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showDeletedMessages': instance.showDeletedMessages,
       'showChatMessageDividers': instance.showChatMessageDividers,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
+      'autoSyncChatDelay': instance.autoSyncChatDelay,
       'chatDelay': instance.chatDelay,
       'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
       'showUserNotices': instance.showUserNotices,
@@ -428,6 +430,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set timestampType(TimestampType value) {
     _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
       super.timestampType = value;
+    });
+  }
+
+  late final _$autoSyncChatDelayAtom =
+      Atom(name: '_SettingsStoreBase.autoSyncChatDelay', context: context);
+
+  @override
+  bool get autoSyncChatDelay {
+    _$autoSyncChatDelayAtom.reportRead();
+    return super.autoSyncChatDelay;
+  }
+
+  @override
+  set autoSyncChatDelay(bool value) {
+    _$autoSyncChatDelayAtom.reportWrite(value, super.autoSyncChatDelay, () {
+      super.autoSyncChatDelay = value;
     });
   }
 
@@ -788,6 +806,7 @@ useReadableColors: ${useReadableColors},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
+autoSyncChatDelay: ${autoSyncChatDelay},
 chatDelay: ${chatDelay},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
