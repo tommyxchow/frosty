@@ -181,14 +181,18 @@ abstract class ChatStoreBase with Store {
     messageBuffer
         .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
-    if (settings.chatDelay > 0) {
-      messageBuffer.add(
-        IRCMessage.createNotice(
-          message:
-              'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
-        ),
-      );
-    }
+    reactions.add(
+      autorun((_) {
+        if (settings.chatDelay > 0 && settings.showVideo) {
+          messageBuffer.add(
+            IRCMessage.createNotice(
+              message:
+                  'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
+            ),
+          );
+        }
+      }),
+    );
 
     connectToChat();
 
@@ -391,7 +395,9 @@ abstract class ChatStoreBase with Store {
 
     _sevenTVChannelListener = _sevenTVChannel?.stream.listen(
       (data) => Future.delayed(
-        Duration(seconds: settings.chatDelay.toInt()),
+        settings.showVideo
+            ? Duration(seconds: settings.chatDelay.toInt())
+            : Duration.zero,
         () {
           debugPrint(data);
           final decoded = jsonDecode(data);
@@ -449,7 +455,9 @@ abstract class ChatStoreBase with Store {
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
       (data) => Future.delayed(
-        Duration(seconds: settings.chatDelay.toInt()),
+        settings.showVideo
+            ? Duration(seconds: settings.chatDelay.toInt())
+            : Duration.zero,
         () => _handleIRCData(data.toString()),
       ),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
