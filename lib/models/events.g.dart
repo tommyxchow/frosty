@@ -7,8 +7,8 @@ part of 'events.dart';
 // **************************************************************************
 
 SevenTVEvent _$SevenTVEventFromJson(Map<String, dynamic> json) => SevenTVEvent(
-      op: json['op'] as int,
-      t: json['t'] as int?,
+      op: (json['op'] as num).toInt(),
+      t: (json['t'] as num?)?.toInt(),
       d: SevenTVEventData.fromJson(json['d'] as Map<String, dynamic>),
     );
 
