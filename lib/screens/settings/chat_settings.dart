@@ -172,7 +172,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader('Delay and Latency', showDivider: true),
           SettingsListSwitch(
-            title: 'Sync message delay with stream latency',
+            title: 'Sync message delay with stream latency (experimental)',
             value: settingsStore.autoSyncChatDelay,
             onChanged: (newValue) => settingsStore.autoSyncChatDelay = newValue,
           ),
