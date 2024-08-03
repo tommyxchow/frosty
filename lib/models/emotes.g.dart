@@ -29,7 +29,7 @@ EmoteBTTVChannel _$EmoteBTTVChannelFromJson(Map<String, dynamic> json) =>
     );
 
 RoomFFZ _$RoomFFZFromJson(Map<String, dynamic> json) => RoomFFZ(
-      json['set'] as int,
+      (json['set'] as num).toInt(),
       json['vip_badge'] == null
           ? null
           : ImagesFFZ.fromJson(json['vip_badge'] as Map<String, dynamic>),
@@ -51,8 +51,8 @@ OwnerFFZ _$OwnerFFZFromJson(Map<String, dynamic> json) => OwnerFFZ(
 
 EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
       json['name'] as String,
-      json['height'] as int,
-      json['width'] as int,
+      (json['height'] as num).toInt(),
+      (json['width'] as num).toInt(),
       OwnerFFZ.fromJson(json['owner'] as Map<String, dynamic>),
       ImagesFFZ.fromJson(json['urls'] as Map<String, dynamic>),
     );
@@ -73,7 +73,7 @@ Owner7TV _$Owner7TVFromJson(Map<String, dynamic> json) => Owner7TV(
 Emote7TVData _$Emote7TVDataFromJson(Map<String, dynamic> json) => Emote7TVData(
       json['id'] as String,
       json['name'] as String,
-      json['flags'] as int,
+      (json['flags'] as num).toInt(),
       json['owner'] == null
           ? null
           : Owner7TV.fromJson(json['owner'] as Map<String, dynamic>),
@@ -89,16 +89,16 @@ Emote7TVHost _$Emote7TVHostFromJson(Map<String, dynamic> json) => Emote7TVHost(
 
 Emote7TVFile _$Emote7TVFileFromJson(Map<String, dynamic> json) => Emote7TVFile(
       json['name'] as String,
-      json['width'] as int,
-      json['height'] as int,
+      (json['width'] as num).toInt(),
+      (json['height'] as num).toInt(),
       json['format'] as String,
     );
 
 Emote _$EmoteFromJson(Map<String, dynamic> json) => Emote(
       name: json['name'] as String,
       realName: json['realName'] as String?,
-      width: json['width'] as int?,
-      height: json['height'] as int?,
+      width: (json['width'] as num?)?.toInt(),
+      height: (json['height'] as num?)?.toInt(),
       zeroWidth: json['zeroWidth'] as bool,
       url: json['url'] as String,
       type: $enumDecode(_$EmoteTypeEnumMap, json['type']),

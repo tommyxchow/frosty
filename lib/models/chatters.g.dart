@@ -7,7 +7,7 @@ part of 'chatters.dart';
 // **************************************************************************
 
 ChatUsers _$ChatUsersFromJson(Map<String, dynamic> json) => ChatUsers(
-      json['chatter_count'] as int,
+      (json['chatter_count'] as num).toInt(),
       Chatters.fromJson(json['chatters'] as Map<String, dynamic>),
     );
 

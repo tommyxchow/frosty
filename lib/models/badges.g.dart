@@ -17,7 +17,7 @@ BadgeInfoTwitch _$BadgeInfoTwitchFromJson(Map<String, dynamic> json) =>
     );
 
 BadgeInfoFFZ _$BadgeInfoFFZFromJson(Map<String, dynamic> json) => BadgeInfoFFZ(
-      json['id'] as int,
+      (json['id'] as num).toInt(),
       json['title'] as String,
       json['color'] as String,
       BadgeUrlsFFZ.fromJson(json['urls'] as Map<String, dynamic>),
