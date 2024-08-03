@@ -170,7 +170,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay and Latency', showDivider: true),
+          const SectionHeader('Delay and latency', showDivider: true),
           SettingsListSwitch(
             title: 'Sync message delay with stream latency (experimental)',
             value: settingsStore.autoSyncChatDelay,
