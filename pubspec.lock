@@ -965,7 +965,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "1acaf4fc25cc87dbc5ce07f341ad4fd2ff086f4f"
+      resolved-ref: "6ba8a7d5d37b08393ad42fd092e56e67b110a575"
       url: "https://github.com/tommyxchow/simple_pip_mode_flutter"
     source: git
     version: "0.8.0"
