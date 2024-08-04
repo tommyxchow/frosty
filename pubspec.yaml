@@ -3,7 +3,7 @@ description: A Twitch client for iOS and Android.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -20,7 +20,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 4.3.1+49
 
 environment:
-  sdk: '>=3.4.4 <4.0.0'
+  sdk: ">=3.4.4 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -57,10 +57,10 @@ dependencies:
   simple_pip_mode:
     git:
       url: https://github.com/tommyxchow/simple_pip_mode_flutter
-  firebase_core: ^3.2.0
-  firebase_crashlytics: ^4.0.3
-  firebase_performance: ^0.10.0+3
-  firebase_analytics: ^11.2.0
+  firebase_core: ^2.10.0
+  firebase_crashlytics: ^3.1.2
+  firebase_performance: ^0.9.1+1
+  firebase_analytics: ^10.2.1
   advanced_in_app_review: ^1.1.3
   webview_flutter_android: ^3.7.0
   webview_flutter_wkwebview: ^3.4.3
@@ -161,7 +161,7 @@ flutter_native_splash:
   # splash screen to a png image.  This is useful for gradients. The image will be stretch to the
   # size of the app. Only one parameter can be used, color and background_image cannot both be set.
   # color: "#000000"
-  background_image: 'assets/icons/bg.png'
+  background_image: "assets/icons/bg.png"
 
   # Optional parameters are listed below.  To enable a parameter, uncomment the line by removing
   # the leading # character.
@@ -233,8 +233,8 @@ flutter_native_splash:
   #  - 'ios/Runner/Info-Release.plist'
 
 flutter_launcher_icons:
-  image_path_android: 'assets/icons/icon_android.png'
-  image_path_ios: 'assets/icons/icon_ios.png'
+  image_path_android: "assets/icons/icon_android.png"
+  image_path_ios: "assets/icons/icon_ios.png"
   android: true
   ios: true
   remove_alpha_ios: true
