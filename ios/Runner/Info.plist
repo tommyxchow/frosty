@@ -48,13 +48,11 @@
 			<string>UIInterfaceOrientationLandscapeLeft</string>
 			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
-		<key>UIViewControllerBasedStatusBarAppearance</key>
-		<true/>
-		<key>UIStatusBarHidden</key>
-		<false/>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
+		<key>UIStatusBarHidden</key>
+		<false/>
 	</dict>
 </plist>
