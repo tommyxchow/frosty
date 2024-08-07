@@ -58,16 +58,18 @@ class ChatMessage extends StatelessWidget {
       userLogin: nickname,
     )
         .then((user) {
-      showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (context) => ChatUserModal(
-          chatStore: chatStore,
-          username: user.login,
-          userId: user.id,
-          displayName: user.displayName,
-        ),
-      );
+      if (context.mounted) {
+        showModalBottomSheet(
+          isScrollControlled: true,
+          context: context,
+          builder: (context) => ChatUserModal(
+            chatStore: chatStore,
+            username: user.login,
+            userId: user.id,
+            displayName: user.displayName,
+          ),
+        );
+      }
     });
   }
 
