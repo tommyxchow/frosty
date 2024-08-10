@@ -166,7 +166,7 @@ abstract class ChatStoreBase with Store {
     reactions.add(
       reaction(
         (_) => auth.isLoggedIn,
-        (_) => _channel?.sink.close(1001),
+        (_) => _channel?.sink.close(1000),
       ),
     );
 
@@ -404,7 +404,7 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
-    _sevenTVChannel?.sink.close(1001);
+    _sevenTVChannel?.sink.close(1000);
     _sevenTVChannel =
         WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
 
@@ -463,7 +463,7 @@ abstract class ChatStoreBase with Store {
 
   @action
   void connectToChat() {
-    _channel?.sink.close(1001);
+    _channel?.sink.close(1000);
     _channel =
         WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
@@ -684,11 +684,11 @@ abstract class ChatStoreBase with Store {
     _notificationTimer?.cancel();
     sleepTimer?.cancel();
 
-    _sevenTVChannel?.sink.close(1001);
+    _sevenTVChannel?.sink.close(1000);
     _sevenTVChannel = null;
     _sevenTVChannelListener?.cancel();
 
-    _channel?.sink.close(1001);
+    _channel?.sink.close(1000);
     _channel = null;
     _channelListener?.cancel();
 
