@@ -108,6 +108,7 @@ class EmoteFFZ {
   final int width;
   final OwnerFFZ owner;
   final ImagesFFZ urls;
+  final ImagesFFZ? animated;
 
   const EmoteFFZ(
     this.name,
@@ -115,6 +116,7 @@ class EmoteFFZ {
     this.width,
     this.owner,
     this.urls,
+    this.animated,
   );
 
   factory EmoteFFZ.fromJson(Map<String, dynamic> json) =>
@@ -251,7 +253,12 @@ class Emote {
         zeroWidth: false,
         width: emote.width,
         height: emote.height,
-        url: emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x,
+        url: emote.animated?.url4x ??
+            emote.animated?.url2x ??
+            emote.animated?.url1x ??
+            emote.urls.url4x ??
+            emote.urls.url2x ??
+            emote.urls.url1x,
         type: type,
         ownerDisplayName: emote.owner.displayName,
         ownerUsername: emote.owner.name,
