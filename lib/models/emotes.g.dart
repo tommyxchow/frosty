@@ -55,6 +55,9 @@ EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
       (json['width'] as num).toInt(),
       OwnerFFZ.fromJson(json['owner'] as Map<String, dynamic>),
       ImagesFFZ.fromJson(json['urls'] as Map<String, dynamic>),
+      json['animated'] == null
+          ? null
+          : ImagesFFZ.fromJson(json['animated'] as Map<String, dynamic>),
     );
 
 Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
