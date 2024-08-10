@@ -58,16 +58,18 @@ class ChatMessage extends StatelessWidget {
       userLogin: nickname,
     )
         .then((user) {
-      showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (context) => ChatUserModal(
-          chatStore: chatStore,
-          username: user.login,
-          userId: user.id,
-          displayName: user.displayName,
-        ),
-      );
+      if (context.mounted) {
+        showModalBottomSheet(
+          isScrollControlled: true,
+          context: context,
+          builder: (context) => ChatUserModal(
+            chatStore: chatStore,
+            username: user.login,
+            userId: user.id,
+            displayName: user.displayName,
+          ),
+        );
+      }
     });
   }
 
@@ -179,10 +181,9 @@ class ChatMessage extends StatelessWidget {
             Widget? messageHeader;
             if (replyUser != null && replyBody != null) {
               messageHeaderIcon = Icon(
-                Icons.reply_rounded,
+                Icons.chat_rounded,
                 size: messageHeaderIconSize,
                 color: messageHeaderTextColor,
-                textDirection: TextDirection.rtl,
               );
               messageHeader = GestureDetector(
                 onTap: isModal

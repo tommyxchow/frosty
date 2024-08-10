@@ -97,7 +97,7 @@ class Chat extends StatelessWidget {
               ChatBottomBar(chatStore: chatStore),
             PopScope(
               canPop: Platform.isIOS,
-              onPopInvoked: (didPop) {
+              onPopInvokedWithResult: (didPop, _) {
                 if (didPop) return;
 
                 // If pressing the back button on Android while the emote menu
