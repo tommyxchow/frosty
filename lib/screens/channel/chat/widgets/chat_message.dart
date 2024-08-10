@@ -181,10 +181,9 @@ class ChatMessage extends StatelessWidget {
             Widget? messageHeader;
             if (replyUser != null && replyBody != null) {
               messageHeaderIcon = Icon(
-                Icons.reply_rounded,
+                Icons.chat_rounded,
                 size: messageHeaderIconSize,
                 color: messageHeaderTextColor,
-                textDirection: TextDirection.rtl,
               );
               messageHeader = GestureDetector(
                 onTap: isModal
