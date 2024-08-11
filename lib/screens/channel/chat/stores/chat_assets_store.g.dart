@@ -199,11 +199,19 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
       ActionController(name: 'ChatAssetsStoreBase', context: context);
 
   @override
-  Future<void> assetsFuture(
-      {required String channelId,
-      required Map<String, String> headers,
-      required Function onEmoteError,
-      required Function onBadgeError}) {
+  Future<void> assetsFuture({
+    required String channelId,
+    required Map<String, String> headers,
+    required Function onEmoteError,
+    required Function onBadgeError,
+    bool showTwitchEmotes = true,
+    bool showTwitchBadges = true,
+    bool show7TVEmotes = true,
+    bool showBTTVEmotes = true,
+    bool showBTTVBadges = true,
+    bool showFFZEmotes = true,
+    bool showFFZBadges = true,
+  }) {
     final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
         name: 'ChatAssetsStoreBase.assetsFuture');
     try {
@@ -211,37 +219,14 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
           channelId: channelId,
           headers: headers,
           onEmoteError: onEmoteError,
-          onBadgeError: onBadgeError);
-    } finally {
-      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  Future<void> emotesFuture(
-      {required String channelId,
-      required Map<String, String> headers,
-      required Function onError}) {
-    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
-        name: 'ChatAssetsStoreBase.emotesFuture');
-    try {
-      return super.emotesFuture(
-          channelId: channelId, headers: headers, onError: onError);
-    } finally {
-      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  Future<void> badgesFuture(
-      {required String channelId,
-      required Map<String, String> headers,
-      required Function onError}) {
-    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
-        name: 'ChatAssetsStoreBase.badgesFuture');
-    try {
-      return super.badgesFuture(
-          channelId: channelId, headers: headers, onError: onError);
+          onBadgeError: onBadgeError,
+          showTwitchEmotes: showTwitchEmotes,
+          showTwitchBadges: showTwitchBadges,
+          show7TVEmotes: show7TVEmotes,
+          showBTTVEmotes: showBTTVEmotes,
+          showBTTVBadges: showBTTVBadges,
+          showFFZEmotes: showFFZEmotes,
+          showFFZBadges: showFFZBadges);
     } finally {
       _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
     }

@@ -141,6 +141,15 @@ abstract class _SettingsStoreBase with Store {
   // Autocomplete defaults
   static const defaultAutocomplete = true;
 
+  // Emotes and badges defaults
+  static const defaultShowTwitchEmotes = true;
+  static const defaultShowTwitchBadges = true;
+  static const defaultShow7TVEmotes = true;
+  static const defaultShowBTTVEmotes = true;
+  static const defaultShowBTTVBadges = true;
+  static const defaultShowFFZEmotes = true;
+  static const defaultShowFFZBadges = true;
+
   // Message sizing options
   @JsonKey(defaultValue: defaultBadgeScale)
   @observable
@@ -244,6 +253,35 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var autocomplete = defaultAutocomplete;
 
+  // Emotes and badges
+  @JsonKey(defaultValue: defaultShowTwitchEmotes)
+  @observable
+  var showTwitchEmotes = defaultShowTwitchEmotes;
+
+  @JsonKey(defaultValue: defaultShowTwitchBadges)
+  @observable
+  var showTwitchBadges = defaultShowTwitchBadges;
+
+  @JsonKey(defaultValue: defaultShow7TVEmotes)
+  @observable
+  var show7TVEmotes = defaultShow7TVEmotes;
+
+  @JsonKey(defaultValue: defaultShowBTTVEmotes)
+  @observable
+  var showBTTVEmotes = defaultShowBTTVEmotes;
+
+  @JsonKey(defaultValue: defaultShowBTTVBadges)
+  @observable
+  var showBTTVBadges = defaultShowBTTVBadges;
+
+  @JsonKey(defaultValue: defaultShowFFZEmotes)
+  @observable
+  var showFFZEmotes = defaultShowFFZEmotes;
+
+  @JsonKey(defaultValue: defaultShowFFZBadges)
+  @observable
+  var showFFZBadges = defaultShowFFZBadges;
+
   @action
   void resetChatSettings() {
     badgeScale = defaultBadgeScale;
@@ -275,6 +313,14 @@ abstract class _SettingsStoreBase with Store {
 
     chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
     autocomplete = defaultAutocomplete;
+
+    showTwitchEmotes = defaultShowTwitchEmotes;
+    showTwitchBadges = defaultShowTwitchBadges;
+    show7TVEmotes = defaultShow7TVEmotes;
+    showBTTVEmotes = defaultShowBTTVEmotes;
+    showBTTVBadges = defaultShowBTTVBadges;
+    showFFZEmotes = defaultShowFFZEmotes;
+    showFFZBadges = defaultShowFFZBadges;
   }
 
   // * Other settings

@@ -288,6 +288,42 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.autocomplete,
             onChanged: (newValue) => settingsStore.autocomplete = newValue,
           ),
+          const SectionHeader('Emotes and badges', showDivider: true),
+          SettingsListSwitch(
+            title: 'Show Twitch emotes',
+            value: settingsStore.showTwitchEmotes,
+            onChanged: (newValue) => settingsStore.showTwitchEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show Twitch badges',
+            value: settingsStore.showTwitchBadges,
+            onChanged: (newValue) => settingsStore.showTwitchBadges = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show 7TV emotes',
+            value: settingsStore.show7TVEmotes,
+            onChanged: (newValue) => settingsStore.show7TVEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show BTTV emotes',
+            value: settingsStore.showBTTVEmotes,
+            onChanged: (newValue) => settingsStore.showBTTVEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show BTTV badges',
+            value: settingsStore.showBTTVBadges,
+            onChanged: (newValue) => settingsStore.showBTTVBadges = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show FFZ emotes',
+            value: settingsStore.showFFZEmotes,
+            onChanged: (newValue) => settingsStore.showFFZEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show FFZ badges',
+            value: settingsStore.showFFZBadges,
+            onChanged: (newValue) => settingsStore.showFFZBadges = newValue,
+          ),
         ],
       ),
     );
