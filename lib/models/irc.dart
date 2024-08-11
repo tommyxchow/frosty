@@ -10,6 +10,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/photo_view.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -695,7 +696,13 @@ class IRCMessage {
         primary: false,
         children: [
           ListTile(
-            leading: leading,
+            leading: InkWell(
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => FrostyPhotoViewDialog(imageUrl: url),
+              ),
+              child: leading,
+            ),
             title: Text(
               title,
               style: const TextStyle(
