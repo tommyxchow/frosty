@@ -14,25 +14,32 @@ class ChatBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final emoteMenuButton = Tooltip(
-      message: 'Emote menu',
-      preferBelow: false,
-      child: IconButton(
-        color: chatStore.assetsStore.showEmoteMenu
-            ? Theme.of(context).colorScheme.secondary
-            : null,
-        icon: Icon(
-          chatStore.assetsStore.showEmoteMenu
-              ? Icons.emoji_emotions_rounded
-              : Icons.emoji_emotions_outlined,
-        ),
-        onPressed: () {
-          FocusScope.of(context).unfocus();
-          chatStore.assetsStore.showEmoteMenu =
-              !chatStore.assetsStore.showEmoteMenu;
-        },
-      ),
-    );
+    final isEmotesEnabled = chatStore.settings.showTwitchEmotes ||
+        chatStore.settings.show7TVEmotes ||
+        chatStore.settings.showBTTVEmotes ||
+        chatStore.settings.showFFZEmotes;
+
+    final emoteMenuButton = isEmotesEnabled
+        ? Tooltip(
+            message: 'Emote menu',
+            preferBelow: false,
+            child: IconButton(
+              color: chatStore.assetsStore.showEmoteMenu
+                  ? Theme.of(context).colorScheme.secondary
+                  : null,
+              icon: Icon(
+                chatStore.assetsStore.showEmoteMenu
+                    ? Icons.emoji_emotions_rounded
+                    : Icons.emoji_emotions_outlined,
+              ),
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                chatStore.assetsStore.showEmoteMenu =
+                    !chatStore.assetsStore.showEmoteMenu;
+              },
+            ),
+          )
+        : null;
 
     return Observer(
       builder: (context) {

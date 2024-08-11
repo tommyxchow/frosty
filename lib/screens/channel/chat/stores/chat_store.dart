@@ -170,6 +170,34 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
+    reactions.add(
+      reaction(
+        (_) => [
+          settings.showTwitchEmotes,
+          settings.showTwitchBadges,
+          settings.show7TVEmotes,
+          settings.showBTTVEmotes,
+          settings.showBTTVBadges,
+          settings.showFFZEmotes,
+          settings.showFFZBadges,
+        ],
+        (_) {
+          if (!settings.show7TVEmotes) {
+            _sevenTVChannel?.sink.close(1000);
+          }
+
+          getAssets().then((_) {
+            if (settings.show7TVEmotes) {
+              final emoteSetId = assetsStore.sevenTvEmoteSetId;
+              if (emoteSetId != null) {
+                listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
+              }
+            }
+          });
+        },
+      ),
+    );
+
     // Create a timer that will add messages from the buffer every 200 milliseconds.
     _messageBufferTimer = Timer.periodic(
       const Duration(milliseconds: 200),
@@ -353,8 +381,11 @@ abstract class ChatStoreBase with Store {
         );
 
         getAssets().then((_) {
-          if (assetsStore.sevenTvEmoteSetId != null) {
-            listenToSevenTVEmoteSet(emoteSetId: assetsStore.sevenTvEmoteSetId!);
+          if (!settings.show7TVEmotes) return;
+
+          final emoteSetId = assetsStore.sevenTvEmoteSetId;
+          if (emoteSetId != null) {
+            listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
           }
         });
 
@@ -378,6 +409,13 @@ abstract class ChatStoreBase with Store {
           debugPrint(error.toString());
           return <Badge>[];
         },
+        showTwitchEmotes: settings.showTwitchEmotes,
+        showTwitchBadges: settings.showTwitchBadges,
+        show7TVEmotes: settings.show7TVEmotes,
+        showBTTVEmotes: settings.showBTTVEmotes,
+        showBTTVBadges: settings.showBTTVBadges,
+        showFFZEmotes: settings.showFFZEmotes,
+        showFFZBadges: settings.showFFZBadges,
       );
 
   /// Re-enables [_autoScroll] and jumps to the latest message.
