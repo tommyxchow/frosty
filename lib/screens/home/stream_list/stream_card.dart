@@ -10,6 +10,7 @@ import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/photo_view.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -72,7 +73,19 @@ class StreamCard extends StatelessWidget {
       child: Stack(
         alignment: AlignmentDirectional.bottomEnd,
         children: [
-          thumbnail,
+          GestureDetector(
+            onLongPress: () => showDialog(
+              context: context,
+              builder: (context) => FrostyPhotoViewDialog(
+                imageUrl: streamInfo.thumbnailUrl.replaceFirst(
+                      '-{width}x{height}',
+                      '',
+                    ) +
+                    cacheUrlExtension,
+              ),
+            ),
+            child: thumbnail,
+          ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             decoration: const BoxDecoration(
