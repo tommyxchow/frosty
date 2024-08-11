@@ -125,91 +125,87 @@ abstract class ChatAssetsStoreBase with Store {
     required Map<String, String> headers,
     required Function onEmoteError,
     required Function onBadgeError,
+    bool showTwitchEmotes = true,
+    bool showTwitchBadges = true,
+    bool show7TVEmotes = true,
+    bool showBTTVEmotes = true,
+    bool showBTTVBadges = true,
+    bool showFFZEmotes = true,
+    bool showFFZBadges = true,
   }) =>
       // Fetch the global and channel's assets (emotes & badges).
       // Async awaits are placed in a list so they are performed in parallel.
+      //
+      // Emotes
       Future.wait([
-        emotesFuture(
-          channelId: channelId,
-          headers: headers,
-          onError: onEmoteError,
-        ),
-        badgesFuture(
-          channelId: channelId,
-          headers: headers,
-          onError: onBadgeError,
-        ),
-      ]);
+        Future.wait([
+          if (showTwitchEmotes) ...[
+            twitchApi
+                .getEmotesGlobal(headers: headers)
+                .catchError(onEmoteError),
+            twitchApi
+                .getEmotesChannel(id: channelId, headers: headers)
+                .then((emotes) {
+              _userEmoteSectionToEmotes.update(
+                'Channel Emotes',
+                (existingEmoteSet) => [...existingEmoteSet, ...emotes],
+                ifAbsent: () => emotes.toList(),
+              );
 
-  @action
-  Future<void> emotesFuture({
-    required String channelId,
-    required Map<String, String> headers,
-    required Function onError,
-  }) =>
-      // Parallel futures look ugly, but are worth the performance improvement.
-      // Each future has it's own catchError so that the entire future is not ended on an error.
-      // This will ensure that other futures complete even if one fails.
-      Future.wait([
-        ffzApi.getEmotesGlobal().catchError(onError),
-        bttvApi.getEmotesGlobal().catchError(onError),
-        bttvApi.getEmotesChannel(id: channelId).catchError(onError),
-        twitchApi.getEmotesGlobal(headers: headers).catchError(onError),
-        twitchApi
-            .getEmotesChannel(id: channelId, headers: headers)
-            .then((emotes) {
-          _userEmoteSectionToEmotes.update(
-            'Channel Emotes',
-            (existingEmoteSet) => [...existingEmoteSet, ...emotes],
-            ifAbsent: () => emotes.toList(),
-          );
+              return emotes;
+            }).catchError(onEmoteError),
+          ],
+          if (show7TVEmotes) ...[
+            sevenTVApi.getEmotesGlobal().catchError(onEmoteError),
+            sevenTVApi.getEmotesChannel(id: channelId).then((data) {
+              final (setId, emotes) = data;
+              sevenTvEmoteSetId = setId;
+              return emotes;
+            }).catchError(onEmoteError),
+          ],
+          if (showBTTVEmotes) ...[
+            bttvApi.getEmotesGlobal().catchError(onEmoteError),
+            bttvApi.getEmotesChannel(id: channelId).catchError(onEmoteError),
+          ],
+          if (showFFZEmotes) ...[
+            ffzApi.getEmotesGlobal().catchError(onEmoteError),
+            ffzApi.getRoomInfo(id: channelId).then((ffzRoom) {
+              final (roomInfo, emotes) = ffzRoom;
 
-          return emotes;
-        }).catchError(onError),
-        sevenTVApi.getEmotesGlobal().catchError(onError),
-        sevenTVApi.getEmotesChannel(id: channelId).then((data) {
-          final (setId, emotes) = data;
-          sevenTvEmoteSetId = setId;
-          return emotes;
-        }).catchError(onError),
-        ffzApi.getRoomInfo(id: channelId).then((ffzRoom) {
-          final (roomInfo, emotes) = ffzRoom;
-
-          ffzRoomInfo = roomInfo;
-          return emotes;
-        }).catchError(onError),
-      ]).then((assets) => assets.expand((list) => list)).then(
-            (emotes) => _emoteToObject = {
-              for (final emote in emotes) emote.name: emote,
-            }.asObservable(),
-          );
-
-  @action
-  Future<void> badgesFuture({
-    required String channelId,
-    required Map<String, String> headers,
-    required Function onError,
-  }) =>
-      Future.wait([
-        // Get global badges first, then channel badges to avoid badge conflicts.
-        // We want the channel badges to override the global badges.
-        twitchApi
-            .getBadgesGlobal(headers: headers)
-            .then((badges) => twitchBadgesToObject.addAll(badges))
-            .then(
-              (_) => twitchApi
-                  .getBadgesChannel(id: channelId, headers: headers)
-                  .then((badges) => twitchBadgesToObject.addAll(badges))
-                  .catchError(onError),
+              ffzRoomInfo = roomInfo;
+              return emotes;
+            }).catchError(onEmoteError),
+          ],
+        ]).then((assets) => assets.expand((list) => list)).then(
+              (emotes) => _emoteToObject = {
+                for (final emote in emotes) emote.name: emote,
+              }.asObservable(),
             ),
-        ffzApi
-            .getBadges()
-            .then((badges) => _userToFFZBadges = badges)
-            .catchError(onError),
-        bttvApi
-            .getBadges()
-            .then((badges) => _userToBTTVBadges = badges)
-            .catchError(onError),
+        //Emotes
+        Future.wait([
+          // Get global badges first, then channel badges to avoid badge conflicts.
+          // We want the channel badges to override the global badges.
+          if (showTwitchBadges)
+            twitchApi
+                .getBadgesGlobal(headers: headers)
+                .then((badges) => twitchBadgesToObject.addAll(badges))
+                .then(
+                  (_) => twitchApi
+                      .getBadgesChannel(id: channelId, headers: headers)
+                      .then((badges) => twitchBadgesToObject.addAll(badges))
+                      .catchError(onBadgeError),
+                ),
+          if (showFFZBadges)
+            ffzApi
+                .getBadges()
+                .then((badges) => _userToFFZBadges = badges)
+                .catchError(onBadgeError),
+          if (showBTTVBadges)
+            bttvApi
+                .getBadges()
+                .then((badges) => _userToBTTVBadges = badges)
+                .catchError(onBadgeError),
+        ]),
       ]);
 
   @action
