@@ -199,19 +199,18 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
       ActionController(name: 'ChatAssetsStoreBase', context: context);
 
   @override
-  Future<void> assetsFuture({
-    required String channelId,
-    required Map<String, String> headers,
-    required Function onEmoteError,
-    required Function onBadgeError,
-    bool showTwitchEmotes = true,
-    bool showTwitchBadges = true,
-    bool show7TVEmotes = true,
-    bool showBTTVEmotes = true,
-    bool showBTTVBadges = true,
-    bool showFFZEmotes = true,
-    bool showFFZBadges = true,
-  }) {
+  Future<void> assetsFuture(
+      {required String channelId,
+      required Map<String, String> headers,
+      required Function onEmoteError,
+      required Function onBadgeError,
+      bool showTwitchEmotes = true,
+      bool showTwitchBadges = true,
+      bool show7TVEmotes = true,
+      bool showBTTVEmotes = true,
+      bool showBTTVBadges = true,
+      bool showFFZEmotes = true,
+      bool showFFZBadges = true}) {
     final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
         name: 'ChatAssetsStoreBase.assetsFuture');
     try {
