@@ -49,7 +49,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..landscapeCutout = $enumDecodeNullable(
               _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
           LandscapeCutoutType.none
-      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
+      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.25
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? false
