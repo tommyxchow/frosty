@@ -11,23 +11,15 @@ class FrostyPhotoViewDialog extends StatelessWidget {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
-        Dismissible(
-          key: const Key('photo_view_dismissible'),
-          direction: DismissDirection.vertical,
-          onDismissed: Navigator.of(context).pop,
-          child: PhotoView(
-            imageProvider: NetworkImage(imageUrl),
-            backgroundDecoration:
-                const BoxDecoration(color: Colors.transparent),
-          ),
+        PhotoView(
+          imageProvider: NetworkImage(imageUrl),
+          backgroundDecoration: const BoxDecoration(color: Colors.transparent),
         ),
-        const Padding(
-          padding: EdgeInsets.only(bottom: 48),
-          child: Text(
-            'Swipe up or down to dismiss',
-            style: TextStyle(
-              color: Colors.white,
-            ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 32),
+          child: IconButton(
+            icon: const Icon(Icons.close, color: Colors.white),
+            onPressed: Navigator.of(context).pop,
           ),
         ),
       ],
