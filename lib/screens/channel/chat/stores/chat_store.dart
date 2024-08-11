@@ -386,7 +386,7 @@ abstract class ChatStoreBase with Store {
           if (!settings.show7TVEmotes) return;
 
           final emoteSetId = assetsStore.sevenTvEmoteSetId;
-          if (emoteSetId != null) {
+          if (emoteSetId != null && !_shouldDisconnect) {
             listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
           }
         });
@@ -551,6 +551,7 @@ abstract class ChatStoreBase with Store {
             message: 'Reconnecting to chat (attempt $_retries)...',
           ),
         );
+        _channelListener?.cancel();
         connectToChat();
       },
     );
