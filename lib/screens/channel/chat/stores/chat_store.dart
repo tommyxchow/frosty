@@ -50,6 +50,8 @@ abstract class ChatStoreBase with Store {
   /// The Twitch IRC WebSocket channel.
   WebSocketChannel? _channel;
 
+  var _shouldDisconnect = false;
+
   /// The subscription that handles the WebSocket connection.
   StreamSubscription? _channelListener;
 
@@ -284,7 +286,7 @@ abstract class ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      // debugPrint('$message\n');
+      debugPrint('$message\n');
       if (message.startsWith('@')) {
         final parsedIRCMessage =
             IRCMessage.fromString(message, userLogin: auth.user.details?.login);
@@ -494,6 +496,7 @@ abstract class ChatStoreBase with Store {
         },
       ),
       onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
+      onDone: () => debugPrint('7TV events done'),
     );
 
     _sevenTVChannel?.sink.add(jsonEncode(subscribePayload));
@@ -515,7 +518,10 @@ abstract class ChatStoreBase with Store {
       ),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
-        if (_channel == null) return;
+        if (_shouldDisconnect) {
+          _sevenTVChannel?.sink.close(1000);
+          return;
+        }
 
         if (_retries >= _maxRetries) {
           messageBuffer.add(
@@ -545,7 +551,6 @@ abstract class ChatStoreBase with Store {
             message: 'Reconnecting to chat (attempt $_retries)...',
           ),
         );
-        _channelListener?.cancel();
         connectToChat();
       },
     );
@@ -718,17 +723,13 @@ abstract class ChatStoreBase with Store {
 
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
+    _shouldDisconnect = true;
+
     _messageBufferTimer.cancel();
     _notificationTimer?.cancel();
     sleepTimer?.cancel();
 
-    _sevenTVChannel?.sink.close(1000);
-    _sevenTVChannel = null;
-    _sevenTVChannelListener?.cancel();
-
     _channel?.sink.close(1000);
-    _channel = null;
-    _channelListener?.cancel();
 
     for (final reactionDisposer in reactions) {
       reactionDisposer();
