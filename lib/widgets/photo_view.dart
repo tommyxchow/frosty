@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
@@ -12,7 +13,7 @@ class FrostyPhotoViewDialog extends StatelessWidget {
       alignment: Alignment.bottomCenter,
       children: [
         PhotoView(
-          imageProvider: NetworkImage(imageUrl),
+          imageProvider: CachedNetworkImageProvider(imageUrl),
           backgroundDecoration: const BoxDecoration(color: Colors.transparent),
         ),
         Padding(
