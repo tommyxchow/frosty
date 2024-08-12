@@ -808,8 +808,6 @@ class IRCMessage {
       }
     }
 
-    splitMessage.length > 3 ? splitMessage.sublist(3).join(' ') : null;
-
     // Now process any Twitch emotes contained in the message tags.
     // The map containing emotes from the user's tags to their URL.
     // This may include sub emotes that they can access but other users cannot.
