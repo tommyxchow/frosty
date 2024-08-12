@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/events.dart';
 import 'package:frosty/models/irc.dart';
@@ -25,6 +26,8 @@ abstract class ChatStoreBase with Store {
 
   /// The maximum ammount of messages to render when autoscroll is enabled.
   static const _renderMessageLimit = 100;
+
+  final TwitchApi twitchApi;
 
   /// The amount of messages to free (remove) when the [_messageLimit] is reached.
   final _messagesToRemove = (_messageLimit * 0.2).toInt();
@@ -150,6 +153,7 @@ abstract class ChatStoreBase with Store {
   IRCMessage? replyingToMessage;
 
   ChatStoreBase({
+    required this.twitchApi,
     required this.auth,
     required this.chatDetailsStore,
     required this.assetsStore,
@@ -198,19 +202,12 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
-    // Create a timer that will add messages from the buffer every 200 milliseconds.
-    _messageBufferTimer = Timer.periodic(
-      const Duration(milliseconds: 200),
-      (timer) => addMessages(),
-    );
-
     assetsStore.init();
 
-    messageBuffer
-        .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+    _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.showVideo && settings.chatDelay > 0) {
-      messageBuffer.add(
+      _messages.add(
         IRCMessage.createNotice(
           message:
               'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
@@ -221,14 +218,14 @@ abstract class ChatStoreBase with Store {
     reactions.add(
       reaction((_) => settings.showVideo, (showVideo) {
         if (showVideo && settings.chatDelay > 0) {
-          messageBuffer.add(
+          _messages.add(
             IRCMessage.createNotice(
               message:
                   'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
             ),
           );
         } else {
-          messageBuffer.add(
+          _messages.add(
             IRCMessage.createNotice(
               message: 'Removing message delay...',
             ),
@@ -373,12 +370,20 @@ abstract class ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        messageBuffer.add(
-          IRCMessage.createNotice(
-            message:
-                "Connected to ${getReadableName(displayName, channelName)}'s chat!",
-          ),
-        );
+        getRecentMessage().then((_) {
+          // Create a timer that will add messages from the buffer every 200 milliseconds.
+          _messageBufferTimer = Timer.periodic(
+            const Duration(milliseconds: 200),
+            (timer) => addMessages(),
+          );
+
+          messageBuffer.add(
+            IRCMessage.createNotice(
+              message:
+                  "Welcome to ${getReadableName(displayName, channelName)}'s chat!",
+            ),
+          );
+        });
 
         getAssets().then((_) {
           if (!settings.show7TVEmotes) return;
@@ -522,7 +527,7 @@ abstract class ChatStoreBase with Store {
         }
 
         if (_retries >= _maxRetries) {
-          messageBuffer.add(
+          _messages.add(
             IRCMessage.createNotice(
               message: 'Disconnected from chat',
             ),
@@ -534,7 +539,7 @@ abstract class ChatStoreBase with Store {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
           final notice =
               'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          messageBuffer.add(IRCMessage.createNotice(message: notice));
+          _messages.add(IRCMessage.createNotice(message: notice));
         }
 
         await Future.delayed(Duration(seconds: _backoffTime));
@@ -544,7 +549,7 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        messageBuffer.add(
+        _messages.add(
           IRCMessage.createNotice(
             message: 'Reconnecting to chat (attempt $_retries)...',
           ),
@@ -718,6 +723,16 @@ abstract class ChatStoreBase with Store {
   void cancelSleepTimer() {
     sleepTimer?.cancel();
     timeRemaining = const Duration();
+  }
+
+  @action
+  Future<void> getRecentMessage() async {
+    final recentMessages =
+        await twitchApi.getRecentMessages(userLogin: channelName);
+
+    for (final message in recentMessages) {
+      _handleIRCData(message);
+    }
   }
 
   /// Closes and disposes all the channels and controllers used by the store.
