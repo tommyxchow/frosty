@@ -35,11 +35,11 @@ class OnboardingSetup extends StatelessWidget {
                     ThemeType.values[themeNames.indexOf(newTheme)],
               ),
               SettingsListSwitch(
-                title: 'Show recent messages',
+                title: 'Show historical recent messages',
                 subtitle: Text.rich(
                   TextSpan(
                     text:
-                        'Loads recent messages when connecting to chat. Messages are loaded from a third-party API service at ',
+                        'Loads historical recent messages in chat through a third-party API service at ',
                     children: [
                       TextSpan(
                         text: 'https://recent-messages.robotty.de/',
