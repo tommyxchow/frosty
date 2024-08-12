@@ -286,7 +286,7 @@ abstract class ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      debugPrint('$message\n');
+      // debugPrint('$message\n');
       if (message.startsWith('@')) {
         final parsedIRCMessage =
             IRCMessage.fromString(message, userLogin: auth.user.details?.login);
@@ -454,7 +454,7 @@ abstract class ChatStoreBase with Store {
             ? Duration(seconds: settings.chatDelay.toInt())
             : Duration.zero,
         () {
-          debugPrint(data);
+          // debugPrint(data);
           final decoded = jsonDecode(data);
 
           final event = SevenTVEvent.fromJson(decoded);
