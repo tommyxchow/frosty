@@ -540,7 +540,7 @@ abstract class ChatStoreBase with Store {
         }
 
         if (_retries >= _maxRetries) {
-          _messages.add(
+          messageBuffer.add(
             IRCMessage.createNotice(
               message: 'Disconnected from chat',
             ),
@@ -552,7 +552,7 @@ abstract class ChatStoreBase with Store {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
           final notice =
               'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          _messages.add(IRCMessage.createNotice(message: notice));
+          messageBuffer.add(IRCMessage.createNotice(message: notice));
         }
 
         await Future.delayed(Duration(seconds: _backoffTime));
@@ -562,7 +562,7 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        _messages.add(
+        messageBuffer.add(
           IRCMessage.createNotice(
             message: 'Reconnecting to chat (attempt $_retries)...',
           ),
