@@ -47,6 +47,8 @@ abstract class ChatStoreBase with Store {
   /// The channel's display name to show on widgets.
   final String displayName;
 
+  var _shouldDisconnect = false;
+
   /// The Twitch IRC WebSocket channel.
   WebSocketChannel? _channel;
 
@@ -54,8 +56,6 @@ abstract class ChatStoreBase with Store {
   StreamSubscription? _channelListener;
 
   WebSocketChannel? _sevenTVChannel;
-
-  StreamSubscription? _sevenTVChannelListener;
 
   static const _maxRetries = 5;
 
@@ -384,7 +384,7 @@ abstract class ChatStoreBase with Store {
           if (!settings.show7TVEmotes) return;
 
           final emoteSetId = assetsStore.sevenTvEmoteSetId;
-          if (emoteSetId != null) {
+          if (emoteSetId != null && !_shouldDisconnect) {
             listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
           }
         });
@@ -446,13 +446,13 @@ abstract class ChatStoreBase with Store {
     _sevenTVChannel =
         WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
 
-    _sevenTVChannelListener = _sevenTVChannel?.stream.listen(
+    _sevenTVChannel?.stream.listen(
       (data) => Future.delayed(
         settings.showVideo
             ? Duration(seconds: settings.chatDelay.toInt())
             : Duration.zero,
         () {
-          debugPrint(data);
+          // debugPrint(data);
           final decoded = jsonDecode(data);
 
           final event = SevenTVEvent.fromJson(decoded);
@@ -494,6 +494,7 @@ abstract class ChatStoreBase with Store {
         },
       ),
       onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
+      onDone: () => debugPrint('7TV events done'),
     );
 
     _sevenTVChannel?.sink.add(jsonEncode(subscribePayload));
@@ -515,7 +516,10 @@ abstract class ChatStoreBase with Store {
       ),
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
-        if (_channel == null) return;
+        if (_shouldDisconnect) {
+          _sevenTVChannel?.sink.close(1000);
+          return;
+        }
 
         if (_retries >= _maxRetries) {
           messageBuffer.add(
@@ -718,17 +722,13 @@ abstract class ChatStoreBase with Store {
 
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
+    _shouldDisconnect = true;
+
     _messageBufferTimer.cancel();
     _notificationTimer?.cancel();
     sleepTimer?.cancel();
 
-    _sevenTVChannel?.sink.close(1000);
-    _sevenTVChannel = null;
-    _sevenTVChannelListener?.cancel();
-
     _channel?.sink.close(1000);
-    _channel = null;
-    _channelListener?.cancel();
 
     for (final reactionDisposer in reactions) {
       reactionDisposer();
