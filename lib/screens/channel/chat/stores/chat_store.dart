@@ -202,12 +202,6 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
-    // Create a timer that will add messages from the buffer every 200 milliseconds.
-    _messageBufferTimer = Timer.periodic(
-      const Duration(milliseconds: 200),
-      (timer) => addMessages(),
-    );
-
     assetsStore.init();
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
@@ -385,6 +379,13 @@ abstract class ChatStoreBase with Store {
             message:
                 "Welcome to ${getReadableName(displayName, channelName)}'s chat!",
           ),
+        );
+
+        // Activate the message buffer.
+        // Create a timer that will add messages from the buffer every 200 milliseconds.
+        _messageBufferTimer = Timer.periodic(
+          const Duration(milliseconds: 200),
+          (timer) => addMessages(),
         );
 
         getAssets().then((_) {
