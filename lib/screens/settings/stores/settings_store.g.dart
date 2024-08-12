@@ -61,6 +61,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showBTTVBadges = json['showBTTVBadges'] as bool? ?? true
       ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
       ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
+      ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
       ..shareCrashLogsAndAnalytics =
           json['shareCrashLogsAndAnalytics'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
@@ -109,6 +110,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showBTTVBadges': instance.showBTTVBadges,
       'showFFZEmotes': instance.showFFZEmotes,
       'showFFZBadges': instance.showFFZBadges,
+      'showRecentMessages': instance.showRecentMessages,
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
@@ -791,6 +793,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$showRecentMessagesAtom =
+      Atom(name: '_SettingsStoreBase.showRecentMessages', context: context);
+
+  @override
+  bool get showRecentMessages {
+    _$showRecentMessagesAtom.reportRead();
+    return super.showRecentMessages;
+  }
+
+  @override
+  set showRecentMessages(bool value) {
+    _$showRecentMessagesAtom.reportWrite(value, super.showRecentMessages, () {
+      super.showRecentMessages = value;
+    });
+  }
+
   late final _$shareCrashLogsAndAnalyticsAtom = Atom(
       name: '_SettingsStoreBase.shareCrashLogsAndAnalytics', context: context);
 
@@ -953,6 +971,7 @@ showBTTVEmotes: ${showBTTVEmotes},
 showBTTVBadges: ${showBTTVBadges},
 showFFZEmotes: ${showFFZEmotes},
 showFFZBadges: ${showFFZBadges},
+showRecentMessages: ${showRecentMessages},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay}

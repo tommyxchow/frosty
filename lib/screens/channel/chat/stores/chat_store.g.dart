@@ -219,6 +219,14 @@ mixin _$ChatStore on ChatStoreBase, Store {
     return _$getAssetsAsyncAction.run(() => super.getAssets());
   }
 
+  late final _$getRecentMessageAsyncAction =
+      AsyncAction('ChatStoreBase.getRecentMessage', context: context);
+
+  @override
+  Future<void> getRecentMessage() {
+    return _$getRecentMessageAsyncAction.run(() => super.getRecentMessage());
+  }
+
   late final _$ChatStoreBaseActionController =
       ActionController(name: 'ChatStoreBase', context: context);
 

@@ -440,15 +440,20 @@ class ChatMessage extends StatelessWidget {
                 child: dividedMessage,
               );
 
-        return InkWell(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-            if (chatStore.assetsStore.showEmoteMenu) {
-              chatStore.assetsStore.showEmoteMenu = false;
-            }
-          },
-          onLongPress: () => onLongPressMessage(context, defaultTextStyle),
-          child: coloredMessage,
+        final isHistorical = ircMessage.tags['historical'] == '1';
+
+        return Opacity(
+          opacity: isHistorical ? 0.5 : 1,
+          child: InkWell(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+              if (chatStore.assetsStore.showEmoteMenu) {
+                chatStore.assetsStore.showEmoteMenu = false;
+              }
+            },
+            onLongPress: () => onLongPressMessage(context, defaultTextStyle),
+            child: coloredMessage,
+          ),
         );
       },
     );

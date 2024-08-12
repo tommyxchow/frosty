@@ -150,6 +150,9 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowFFZEmotes = true;
   static const defaultShowFFZBadges = true;
 
+  // Recent messages defaults
+  static const defaultShowRecentMessages = false;
+
   // Message sizing options
   @JsonKey(defaultValue: defaultBadgeScale)
   @observable
@@ -282,6 +285,11 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showFFZBadges = defaultShowFFZBadges;
 
+  // Recent messages
+  @JsonKey(defaultValue: defaultShowRecentMessages)
+  @observable
+  var showRecentMessages = defaultShowRecentMessages;
+
   @action
   void resetChatSettings() {
     badgeScale = defaultBadgeScale;
@@ -321,6 +329,8 @@ abstract class _SettingsStoreBase with Store {
     showBTTVBadges = defaultShowBTTVBadges;
     showFFZEmotes = defaultShowFFZEmotes;
     showFFZBadges = defaultShowFFZBadges;
+
+    showRecentMessages = defaultShowRecentMessages;
   }
 
   // * Other settings
