@@ -179,37 +179,37 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
-    final streamInfo = videoStore.streamInfo;
-    if (streamInfo == null) {
-      return Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              backButton,
-              const Spacer(),
-              if (videoStore.settingsStore.fullScreen &&
-                  orientation == Orientation.landscape)
-                chatOverlayButton,
-            ],
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                refreshButton,
-                if (!videoStore.isIPad) rotateButton,
-                if (orientation == Orientation.landscape) fullScreenButton,
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
     return Observer(
       builder: (context) {
+        final streamInfo = videoStore.streamInfo;
+        if (streamInfo == null) {
+          return Stack(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  backButton,
+                  const Spacer(),
+                  if (videoStore.settingsStore.fullScreen &&
+                      orientation == Orientation.landscape)
+                    chatOverlayButton,
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    refreshButton,
+                    if (!videoStore.isIPad) rotateButton,
+                    if (orientation == Orientation.landscape) fullScreenButton,
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+
         return Stack(
           children: [
             Row(

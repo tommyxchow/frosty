@@ -338,16 +338,23 @@ abstract class VideoStoreBase with Store {
       // Add event listeners to notify the JavaScript channels when the video plays and pauses.
       try {
         videoWebViewController.runJavaScript(
-          '''document.getElementsByTagName("video")[0].addEventListener("pause", () => {
+          '''
+        (function checkVideoElement() {
+          const videoElement = document.getElementsByTagName("video")[0];
+          if (videoElement) {
+            videoElement.addEventListener("pause", () => {
               VideoPause.postMessage("video paused");
-              document.getElementsByTagName("video")[0].textTracks[0].mode = "hidden";
-          });''',
-        );
-        videoWebViewController.runJavaScript(
-          '''document.getElementsByTagName("video")[0].addEventListener("playing", () => {
-              VideoPlaying.postMessage("video playing")
-              document.getElementsByTagName("video")[0].textTracks[0].mode = "hidden";
-          });''',
+              videoElement.textTracks[0].mode = "hidden";
+            });
+            videoElement.addEventListener("playing", () => {
+              VideoPlaying.postMessage("video playing");
+              videoElement.textTracks[0].mode = "hidden";
+            });
+          } else {
+            setTimeout(checkVideoElement, 100); // Check again after 100ms
+          }
+        })();
+        ''',
         );
         if (settingsStore.showOverlay) {
           await _hideDefaultOverlay();
