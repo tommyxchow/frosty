@@ -454,53 +454,59 @@ abstract class ChatStoreBase with Store {
     _sevenTVChannel =
         WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
 
+    void listener(dynamic data) {
+      // debugPrint(data);
+      final decoded = jsonDecode(data);
+
+      final event = SevenTVEvent.fromJson(decoded);
+
+      final body = event.d.body;
+      if (event.d.type != 'emote_set.update' || body == null) return;
+
+      if (body.pushed != null) {
+        final pushedEmote = body.pushed?.first.value;
+
+        if (pushedEmote == null) return;
+
+        final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
+
+        assetsStore.emoteToObject[emote.name] = emote;
+
+        messageBuffer.add(
+          IRCMessage.createNotice(
+            message:
+                '${getReadableName(body.actor.displayName, body.actor.username)} added 7TV emote "${emote.name}" to chat',
+          ),
+        );
+      } else if (body.pulled != null) {
+        final pulledEmote = body.pulled?.first.oldValue;
+
+        if (pulledEmote == null) return;
+
+        assetsStore.emoteToObject.removeWhere(
+          (name, _) => name == pulledEmote.name,
+        );
+
+        messageBuffer.add(
+          IRCMessage.createNotice(
+            message:
+                '${getReadableName(body.actor.displayName, body.actor.username)} removed 7TV emote "${pulledEmote.name}" from chat',
+          ),
+        );
+      }
+    }
+
     _sevenTVChannel?.stream.listen(
-      (data) => Future.delayed(
-        settings.showVideo
-            ? Duration(seconds: settings.chatDelay.toInt())
-            : Duration.zero,
-        () {
-          // debugPrint(data);
-          final decoded = jsonDecode(data);
-
-          final event = SevenTVEvent.fromJson(decoded);
-
-          final body = event.d.body;
-          if (event.d.type != 'emote_set.update' || body == null) return;
-
-          if (body.pushed != null) {
-            final pushedEmote = body.pushed?.first.value;
-
-            if (pushedEmote == null) return;
-
-            final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
-
-            assetsStore.emoteToObject[emote.name] = emote;
-
-            messageBuffer.add(
-              IRCMessage.createNotice(
-                message:
-                    '${getReadableName(body.actor.displayName, body.actor.username)} added 7TV emote "${emote.name}" to chat',
-              ),
-            );
-          } else if (body.pulled != null) {
-            final pulledEmote = body.pulled?.first.oldValue;
-
-            if (pulledEmote == null) return;
-
-            assetsStore.emoteToObject.removeWhere(
-              (name, _) => name == pulledEmote.name,
-            );
-
-            messageBuffer.add(
-              IRCMessage.createNotice(
-                message:
-                    '${getReadableName(body.actor.displayName, body.actor.username)} removed 7TV emote "${pulledEmote.name}" from chat',
-              ),
-            );
-          }
-        },
-      ),
+      (data) {
+        if (!settings.showVideo || settings.chatDelay == 0) {
+          listener(data);
+        } else {
+          Future.delayed(
+            Duration(seconds: settings.chatDelay.toInt()),
+            () => listener(data),
+          );
+        }
+      },
       onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
       onDone: () => debugPrint('7TV events done'),
     );
@@ -516,12 +522,16 @@ abstract class ChatStoreBase with Store {
 
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
-      (data) => Future.delayed(
-        settings.showVideo
-            ? Duration(seconds: settings.chatDelay.toInt())
-            : Duration.zero,
-        () => _handleIRCData(data.toString()),
-      ),
+      (data) {
+        if (!settings.showVideo || settings.chatDelay == 0) {
+          _handleIRCData(data.toString());
+        } else {
+          Future.delayed(
+            Duration(seconds: settings.chatDelay.toInt()),
+            () => _handleIRCData(data.toString()),
+          );
+        }
+      },
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
         if (_shouldDisconnect) {
