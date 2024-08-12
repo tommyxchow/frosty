@@ -87,7 +87,7 @@ abstract class ChatStoreBase with Store {
   final reactions = <ReactionDisposer>[];
 
   /// The periodic timer used for batching chat message re-renders.
-  late final Timer _messageBufferTimer;
+  Timer? _messageBufferTimer;
 
   /// The list of chat messages to add once autoscroll is resumed.
   /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
@@ -202,6 +202,12 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
+    // Create a timer that will add messages from the buffer every 200 milliseconds.
+    _messageBufferTimer = Timer.periodic(
+      const Duration(milliseconds: 200),
+      (timer) => addMessages(),
+    );
+
     assetsStore.init();
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
@@ -234,7 +240,11 @@ abstract class ChatStoreBase with Store {
       }),
     );
 
-    connectToChat();
+    if (settings.showRecentMessages) {
+      getRecentMessage().then((_) => connectToChat());
+    } else {
+      connectToChat();
+    }
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -370,20 +380,12 @@ abstract class ChatStoreBase with Store {
         _channel?.sink.add('PONG :tmi.twitch.tv');
         return;
       } else if (message.contains('Welcome, GLHF!')) {
-        getRecentMessage().then((_) {
-          // Create a timer that will add messages from the buffer every 200 milliseconds.
-          _messageBufferTimer = Timer.periodic(
-            const Duration(milliseconds: 200),
-            (timer) => addMessages(),
-          );
-
-          messageBuffer.add(
-            IRCMessage.createNotice(
-              message:
-                  "Welcome to ${getReadableName(displayName, channelName)}'s chat!",
-            ),
-          );
-        });
+        messageBuffer.add(
+          IRCMessage.createNotice(
+            message:
+                "Welcome to ${getReadableName(displayName, channelName)}'s chat!",
+          ),
+        );
 
         getAssets().then((_) {
           if (!settings.show7TVEmotes) return;
@@ -739,7 +741,7 @@ abstract class ChatStoreBase with Store {
   void dispose() {
     _shouldDisconnect = true;
 
-    _messageBufferTimer.cancel();
+    _messageBufferTimer?.cancel();
     _notificationTimer?.cancel();
     sleepTimer?.cancel();
 

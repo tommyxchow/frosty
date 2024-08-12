@@ -324,6 +324,16 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.showFFZBadges,
             onChanged: (newValue) => settingsStore.showFFZBadges = newValue,
           ),
+          const SectionHeader('Recent messages', showDivider: true),
+          SettingsListSwitch(
+            title: 'Show recent messages',
+            subtitle: const Text(
+              'Show recent messages when connecting to chat. Third-party service from https://recent-messages.robotty.de/',
+            ),
+            value: settingsStore.showRecentMessages,
+            onChanged: (newValue) =>
+                settingsStore.showRecentMessages = newValue,
+          ),
         ],
       ),
     );
