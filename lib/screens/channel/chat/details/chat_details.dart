@@ -214,7 +214,13 @@ class ChatDetails extends StatelessWidget {
       ),
       ListTile(
         leading: const Icon(Icons.chat_rounded),
-        title: const Text('Toggle chat-only mode'),
+        title: Observer(
+          builder: (context) {
+            return Text(
+              '${chatStore.settings.showVideo ? 'Enter' : 'Exit'} chat-only mode',
+            );
+          },
+        ),
         onTap: () =>
             chatStore.settings.showVideo = !chatStore.settings.showVideo,
       ),
