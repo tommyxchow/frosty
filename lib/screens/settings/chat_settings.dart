@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
@@ -9,6 +10,7 @@ import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatSettings extends StatefulWidget {
   final SettingsStore settingsStore;
@@ -327,8 +329,30 @@ class _ChatSettingsState extends State<ChatSettings> {
           const SectionHeader('Recent messages', showDivider: true),
           SettingsListSwitch(
             title: 'Show recent messages',
-            subtitle: const Text(
-              'Show recent messages when connecting to chat. Third-party service from https://recent-messages.robotty.de/',
+            subtitle: Text.rich(
+              TextSpan(
+                text:
+                    'Loads recent messages when connecting to chat. Messages are loaded from a third-party API service at ',
+                children: [
+                  TextSpan(
+                    text: 'https://recent-messages.robotty.de/',
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.blue,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => launchUrl(
+                            Uri.parse(
+                              'https://recent-messages.robotty.de/',
+                            ),
+                            mode: settingsStore.launchUrlExternal
+                                ? LaunchMode.externalApplication
+                                : LaunchMode.inAppWebView,
+                          ),
+                  ),
+                ],
+              ),
             ),
             value: settingsStore.showRecentMessages,
             onChanged: (newValue) =>
