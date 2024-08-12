@@ -446,7 +446,7 @@ abstract class ChatStoreBase with Store {
     _sevenTVChannel =
         WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
 
-    _sevenTVChannelListener = _sevenTVChannel?.stream.listen(
+    _sevenTVChannel?.stream.listen(
       (data) => Future.delayed(
         settings.showVideo
             ? Duration(seconds: settings.chatDelay.toInt())
