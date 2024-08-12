@@ -47,17 +47,15 @@ abstract class ChatStoreBase with Store {
   /// The channel's display name to show on widgets.
   final String displayName;
 
+  var _shouldDisconnect = false;
+
   /// The Twitch IRC WebSocket channel.
   WebSocketChannel? _channel;
-
-  var _shouldDisconnect = false;
 
   /// The subscription that handles the WebSocket connection.
   StreamSubscription? _channelListener;
 
   WebSocketChannel? _sevenTVChannel;
-
-  StreamSubscription? _sevenTVChannelListener;
 
   static const _maxRetries = 5;
 
