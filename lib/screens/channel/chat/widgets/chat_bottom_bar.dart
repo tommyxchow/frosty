@@ -179,79 +179,73 @@ class ChatBottomBar extends StatelessWidget {
               ),
             ],
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 0, 12),
-              child: Column(
+              padding: const EdgeInsets.only(left: 12, top: 8, bottom: 8),
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      if (!chatStore.expandChat &&
-                          chatStore.settings.chatWidth < 0.3 &&
-                          chatStore.settings.showVideo &&
-                          MediaQuery.of(context).orientation ==
-                              Orientation.landscape)
-                        IconButton(
-                          tooltip: 'Enter a message',
-                          onPressed: () {
-                            chatStore.expandChat = true;
-                            chatStore.textFieldFocusNode.requestFocus();
-                          },
-                          icon: const Icon(Icons.edit),
-                        )
-                      else
-                        Expanded(
-                          child: TextField(
-                            textInputAction: TextInputAction.send,
-                            focusNode: chatStore.textFieldFocusNode,
-                            minLines: 1,
-                            maxLines: 3,
-                            enabled: chatStore.auth.isLoggedIn ? true : false,
-                            decoration: InputDecoration(
-                              prefixIcon:
-                                  chatStore.settings.emoteMenuButtonOnLeft
-                                      ? emoteMenuButton
-                                      : null,
-                              suffixIcon:
-                                  chatStore.settings.emoteMenuButtonOnLeft
-                                      ? null
-                                      : emoteMenuButton,
-                              hintMaxLines: 1,
-                              hintText: chatStore.auth.isLoggedIn
-                                  ? 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'} ${chatStore.settings.chatDelay == 0 || !chatStore.settings.showVideo ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
-                                  : 'Log in to chat',
-                            ),
-                            controller: chatStore.textController,
-                            onSubmitted: chatStore.sendMessage,
-                          ),
-                        ),
-                      if (chatStore.showSendButton &&
-                          (chatStore.settings.chatWidth >= 0.3 ||
-                              chatStore.expandChat ||
-                              MediaQuery.of(context).orientation ==
-                                  Orientation.portrait))
-                        IconButton(
-                          tooltip: 'Send',
-                          icon: const Icon(Icons.send_rounded),
-                          onPressed: chatStore.auth.isLoggedIn
-                              ? () => chatStore
-                                  .sendMessage(chatStore.textController.text)
+                  if (!chatStore.expandChat &&
+                      chatStore.settings.chatWidth < 0.3 &&
+                      chatStore.settings.showVideo &&
+                      MediaQuery.of(context).orientation ==
+                          Orientation.landscape)
+                    IconButton(
+                      tooltip: 'Enter a message',
+                      onPressed: () {
+                        chatStore.expandChat = true;
+                        chatStore.textFieldFocusNode.requestFocus();
+                      },
+                      icon: const Icon(Icons.edit),
+                    )
+                  else
+                    Expanded(
+                      child: TextField(
+                        textInputAction: TextInputAction.send,
+                        focusNode: chatStore.textFieldFocusNode,
+                        minLines: 1,
+                        maxLines: 3,
+                        enabled: chatStore.auth.isLoggedIn ? true : false,
+                        decoration: InputDecoration(
+                          prefixIcon: chatStore.settings.emoteMenuButtonOnLeft
+                              ? emoteMenuButton
                               : null,
-                        )
-                      else
-                        IconButton(
-                          icon: Icon(Icons.adaptive.more_rounded),
-                          tooltip: 'More',
-                          onPressed: () => showModalBottomSheet(
-                            isScrollControlled: true,
-                            context: context,
-                            builder: (_) => ChatDetails(
-                              chatDetailsStore: chatStore.chatDetailsStore,
-                              chatStore: chatStore,
-                              userLogin: chatStore.channelName,
-                            ),
-                          ),
+                          suffixIcon: chatStore.settings.emoteMenuButtonOnLeft
+                              ? null
+                              : emoteMenuButton,
+                          hintMaxLines: 1,
+                          hintText: chatStore.auth.isLoggedIn
+                              ? 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'} ${chatStore.settings.chatDelay == 0 || !chatStore.settings.showVideo ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
+                              : 'Log in to chat',
                         ),
-                    ],
-                  ),
+                        controller: chatStore.textController,
+                        onSubmitted: chatStore.sendMessage,
+                      ),
+                    ),
+                  if (chatStore.showSendButton &&
+                      (chatStore.settings.chatWidth >= 0.3 ||
+                          chatStore.expandChat ||
+                          MediaQuery.of(context).orientation ==
+                              Orientation.portrait))
+                    IconButton(
+                      tooltip: 'Send',
+                      icon: const Icon(Icons.send_rounded),
+                      onPressed: chatStore.auth.isLoggedIn
+                          ? () => chatStore
+                              .sendMessage(chatStore.textController.text)
+                          : null,
+                    )
+                  else
+                    IconButton(
+                      icon: Icon(Icons.adaptive.more_rounded),
+                      tooltip: 'More',
+                      onPressed: () => showModalBottomSheet(
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (_) => ChatDetails(
+                          chatDetailsStore: chatStore.chatDetailsStore,
+                          chatStore: chatStore,
+                          userLogin: chatStore.channelName,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
