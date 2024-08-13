@@ -9,8 +9,11 @@ import 'package:frosty/screens/home/top/top.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/release_notes.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -23,6 +26,31 @@ class _HomeState extends State<Home> {
   late final _authStore = context.read<AuthStore>();
 
   late final _homeStore = HomeStore(authStore: _authStore);
+
+  Future<void> checkAndShowReleaseNotes() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final prefs = await SharedPreferences.getInstance();
+
+    final currentVersion = packageInfo.version;
+    final storedVersion = prefs.getString('last_shown_version');
+
+    if (storedVersion == null || storedVersion != currentVersion) {
+      if (!mounted) return;
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ReleaseNotes()),
+      );
+
+      await prefs.setString('last_shown_version', currentVersion);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkAndShowReleaseNotes();
+  }
 
   @override
   Widget build(BuildContext context) {
