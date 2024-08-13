@@ -643,7 +643,7 @@ class IRCMessage {
                 Uri.parse(text),
                 mode: launchExternal
                     ? LaunchMode.externalApplication
-                    : LaunchMode.inAppWebView,
+                    : LaunchMode.inAppBrowserView,
               ),
       );
     } else {
@@ -738,7 +738,7 @@ class IRCMessage {
                 Uri.parse(url),
                 mode: launchExternal
                     ? LaunchMode.externalApplication
-                    : LaunchMode.inAppWebView,
+                    : LaunchMode.inAppBrowserView,
               );
 
               Navigator.pop(context);

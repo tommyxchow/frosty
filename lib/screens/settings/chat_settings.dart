@@ -348,7 +348,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                             ),
                             mode: settingsStore.launchUrlExternal
                                 ? LaunchMode.externalApplication
-                                : LaunchMode.inAppWebView,
+                                : LaunchMode.inAppBrowserView,
                           ),
                   ),
                 ],

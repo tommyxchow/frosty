@@ -33,7 +33,7 @@ class Settings extends StatelessWidget {
                 Uri.parse('https://www.buymeacoffee.com/tommychow'),
                 mode: settingsStore.launchUrlExternal
                     ? LaunchMode.externalApplication
-                    : LaunchMode.inAppWebView,
+                    : LaunchMode.inAppBrowserView,
               ),
               icon: const Icon(SimpleIcons.buymeacoffee),
             ),
@@ -43,7 +43,7 @@ class Settings extends StatelessWidget {
               Uri.parse('https://github.com/tommyxchow/frosty'),
               mode: settingsStore.launchUrlExternal
                   ? LaunchMode.externalApplication
-                  : LaunchMode.inAppWebView,
+                  : LaunchMode.inAppBrowserView,
             ),
             icon: const Icon(SimpleIcons.github),
           ),

@@ -92,7 +92,7 @@ class _OtherSettingsState extends State<OtherSettings> {
             Uri.parse('https://github.com/tommyxchow/frosty/releases'),
             mode: widget.settingsStore.launchUrlExternal
                 ? LaunchMode.externalApplication
-                : LaunchMode.inAppWebView,
+                : LaunchMode.inAppBrowserView,
           ),
         ),
         ListTile(
@@ -102,7 +102,7 @@ class _OtherSettingsState extends State<OtherSettings> {
             Uri.parse('https://www.frostyapp.io/#faq'),
             mode: widget.settingsStore.launchUrlExternal
                 ? LaunchMode.externalApplication
-                : LaunchMode.inAppWebView,
+                : LaunchMode.inAppBrowserView,
           ),
         ),
         ListTile(
