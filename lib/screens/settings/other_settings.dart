@@ -7,6 +7,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/release_notes.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -86,13 +87,12 @@ class _OtherSettingsState extends State<OtherSettings> {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.launch_rounded),
-          title: const Text('Changelog'),
-          onTap: () => launchUrl(
-            Uri.parse('https://github.com/tommyxchow/frosty/releases'),
-            mode: widget.settingsStore.launchUrlExternal
-                ? LaunchMode.externalApplication
-                : LaunchMode.inAppBrowserView,
+          leading: const Icon(Icons.notes_rounded),
+          title: const Text('Release notes'),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const ReleaseNotes(),
+            ),
           ),
         ),
         ListTile(

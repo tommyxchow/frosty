@@ -65,6 +65,7 @@ dependencies:
   webview_flutter_android: ^3.7.0
   webview_flutter_wkwebview: ^3.4.3
   photo_view: ^0.15.0
+  flutter_markdown: ^0.7.3+1
 
 dev_dependencies:
   flutter_test:
@@ -123,6 +124,7 @@ flutter:
   assets:
     - assets/icons/logo.svg
     - assets/fonts/
+    - assets/release-notes.md
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
