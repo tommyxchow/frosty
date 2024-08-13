@@ -40,12 +40,12 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
             child: Markdown(
               data: releaseNotes,
               styleSheet: MarkdownStyleSheet(
-                h1: const TextStyle(fontSize: 24),
                 h2: const TextStyle(fontSize: 20),
-                h2Padding: const EdgeInsets.only(top: 16),
-                h3: const TextStyle(fontSize: 14),
-                p: const TextStyle(fontSize: 14),
+                h3: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 h3Padding: const EdgeInsets.only(top: 16),
+                h4: const TextStyle(fontSize: 14),
+                h4Padding: const EdgeInsets.only(top: 16),
+                p: const TextStyle(fontSize: 14),
               ),
               onTapLink: (text, href, title) {
                 if (href != null) {
