@@ -40,9 +40,7 @@ class _HomeState extends State<Home> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const ReleaseNotes()),
-      );
-
-      await prefs.setString('last_shown_version', currentVersion);
+      ).then((_) => prefs.setString('last_shown_version', currentVersion));
     }
   }
 
