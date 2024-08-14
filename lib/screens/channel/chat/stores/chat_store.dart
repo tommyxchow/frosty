@@ -216,22 +216,27 @@ abstract class ChatStoreBase with Store {
     }
 
     reactions.add(
-      reaction((_) => settings.showVideo, (showVideo) {
-        if (showVideo && settings.chatDelay > 0) {
-          _messages.add(
-            IRCMessage.createNotice(
-              message:
-                  'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
-            ),
-          );
-        } else {
-          _messages.add(
-            IRCMessage.createNotice(
-              message: 'Removing message delay...',
-            ),
-          );
-        }
-      }),
+      reaction(
+        (_) => settings.showVideo,
+        (showVideo) {
+          if (settings.chatDelay > 0) {
+            if (showVideo) {
+              _messages.add(
+                IRCMessage.createNotice(
+                  message:
+                      'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
+                ),
+              );
+            } else {
+              _messages.add(
+                IRCMessage.createNotice(
+                  message: 'Removing message delay...',
+                ),
+              );
+            }
+          }
+        },
+      ),
     );
 
     if (settings.showRecentMessages) {
