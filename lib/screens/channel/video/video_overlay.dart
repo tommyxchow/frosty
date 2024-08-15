@@ -8,6 +8,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -201,7 +202,9 @@ class VideoOverlay extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     refreshButton,
-                    if (!videoStore.isIPad) rotateButton,
+                    // On iPad, hide the rotate button on the overlay
+                    // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
+                    if (!isIPad()) rotateButton,
                     if (orientation == Orientation.landscape) fullScreenButton,
                   ],
                 ),
@@ -229,7 +232,7 @@ class VideoOverlay extends StatelessWidget {
                 if (videoStore.settingsStore.fullScreen &&
                     orientation == Orientation.landscape)
                   chatOverlayButton,
-                if (!Platform.isIOS) videoSettingsButton,
+                if (!Platform.isIOS || isIPad()) videoSettingsButton,
               ],
             ),
             Center(
@@ -343,7 +346,9 @@ class VideoOverlay extends StatelessWidget {
                     ),
                   ),
                   refreshButton,
-                  if (!videoStore.isIPad) rotateButton,
+                  // On iPad, hide the rotate button on the overlay
+                  // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
+                  if (!isIPad()) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
               ),

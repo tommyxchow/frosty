@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
@@ -117,10 +116,6 @@ abstract class VideoStoreBase with Store {
   /// If the overlay is should be visible.
   @readonly
   var _overlayVisible = true;
-
-  /// If the current device is iPad.
-  @readonly
-  var _isIPad = false;
 
   /// The current stream info, used for displaying relevant info on the overlay.
   @readonly
@@ -362,19 +357,6 @@ abstract class VideoStoreBase with Store {
         }
       } catch (e) {
         debugPrint(e.toString());
-      }
-    }
-
-    // Determine whether the device is an iPad or not.
-    // Used to show or hide the rotate button on the overlay.
-    // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
-    if (Platform.isIOS) {
-      final deviceInfo = DeviceInfoPlugin();
-      final info = await deviceInfo.iosInfo;
-      if (info.model.toLowerCase().contains('ipad')) {
-        _isIPad = true;
-      } else {
-        _isIPad = false;
       }
     }
   }
