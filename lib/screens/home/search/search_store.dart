@@ -83,6 +83,16 @@ abstract class SearchStoreBase with Store {
           query: query,
           headers: authStore.headersTwitch,
         )
+        .then((categories) {
+          // Move exact matches to the first result
+          final matchingIndex = categories.data
+              .indexWhere((c) => c.name.toLowerCase() == query.toLowerCase());
+          if (matchingIndex >= 1) {
+            final matchingCategory = categories.data.removeAt(matchingIndex);
+            categories.data.insert(0, matchingCategory);
+          }
+          return categories;
+        })
         .asObservable();
   }
 
