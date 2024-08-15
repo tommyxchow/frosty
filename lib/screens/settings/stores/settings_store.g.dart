@@ -62,6 +62,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
       ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
       ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
+      ..darkenRecentMessages = json['darkenRecentMessages'] as bool? ?? true
       ..shareCrashLogsAndAnalytics =
           json['shareCrashLogsAndAnalytics'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
@@ -111,6 +112,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showFFZEmotes': instance.showFFZEmotes,
       'showFFZBadges': instance.showFFZBadges,
       'showRecentMessages': instance.showRecentMessages,
+      'darkenRecentMessages': instance.darkenRecentMessages,
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
@@ -809,6 +811,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$darkenRecentMessagesAtom =
+      Atom(name: '_SettingsStoreBase.darkenRecentMessages', context: context);
+
+  @override
+  bool get darkenRecentMessages {
+    _$darkenRecentMessagesAtom.reportRead();
+    return super.darkenRecentMessages;
+  }
+
+  @override
+  set darkenRecentMessages(bool value) {
+    _$darkenRecentMessagesAtom.reportWrite(value, super.darkenRecentMessages,
+        () {
+      super.darkenRecentMessages = value;
+    });
+  }
+
   late final _$shareCrashLogsAndAnalyticsAtom = Atom(
       name: '_SettingsStoreBase.shareCrashLogsAndAnalytics', context: context);
 
@@ -972,6 +991,7 @@ showBTTVBadges: ${showBTTVBadges},
 showFFZEmotes: ${showFFZEmotes},
 showFFZBadges: ${showFFZBadges},
 showRecentMessages: ${showRecentMessages},
+darkenRecentMessages: ${darkenRecentMessages},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay}

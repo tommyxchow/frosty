@@ -358,6 +358,15 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.showRecentMessages = newValue,
           ),
+          SettingsListSwitch(
+            title: 'Darken historical recent messages',
+            subtitle: const Text(
+              'Makes historical recent messages 50% opacity to distinguish them from live messages.',
+            ),
+            value: settingsStore.darkenRecentMessages,
+            onChanged: (newValue) =>
+                settingsStore.darkenRecentMessages = newValue,
+          ),
         ],
       ),
     );
