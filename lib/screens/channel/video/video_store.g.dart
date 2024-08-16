@@ -45,24 +45,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
-  late final _$_isIPadAtom =
-      Atom(name: 'VideoStoreBase._isIPad', context: context);
-
-  bool get isIPad {
-    _$_isIPadAtom.reportRead();
-    return super._isIPad;
-  }
-
-  @override
-  bool get _isIPad => isIPad;
-
-  @override
-  set _isIPad(bool value) {
-    _$_isIPadAtom.reportWrite(value, super._isIPad, () {
-      super._isIPad = value;
-    });
-  }
-
   late final _$_streamInfoAtom =
       Atom(name: 'VideoStoreBase._streamInfo', context: context);
 
