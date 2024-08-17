@@ -2,7 +2,6 @@ New Features
 • Added an option to un-darken historical recent messages in chat
 
 Improvements
-• [iPadOS] Enabled video quality settings on iPad (by @Shingyx on GitHub)
 • Moved exact matches of searched categories to the top (by @Shingyx on GitHub)
 
 Bug Fixes
