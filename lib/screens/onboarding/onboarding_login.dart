@@ -24,8 +24,31 @@ class OnboardingLogin extends StatelessWidget {
       buttonIcon: const Icon(SimpleIcons.twitch),
       skipRoute: const OnboardingSetup(),
       route: Scaffold(
-        appBar: const FrostyAppBar(
-          title: Text('Connect with Twitch'),
+        appBar: FrostyAppBar(
+          title: const Text('Connect with Twitch'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.help_rounded),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title:
+                        const Text('Workaround for the Twitch cookie banner'),
+                    content: const Text(
+                      'If the Twitch cookie banner is still blocking the login, try clicking one of the links in the cookie policy description and navigating until you reach the Twitch home page. From there, you can try logging in on the top right profile icon. Once logged in, go back to the first step of the onboarding and then try again.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: Navigator.of(context).pop,
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
         body: WebViewWidget(
           controller: authStore.createAuthWebViewController(
