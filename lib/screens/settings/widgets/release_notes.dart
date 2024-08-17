@@ -34,32 +34,34 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
       appBar: AppBar(
         title: const Text('Release notes'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Markdown(
-              data: releaseNotes,
-              styleSheet: MarkdownStyleSheet(
-                h2: const TextStyle(fontSize: 20),
-                h3: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                h3Padding: const EdgeInsets.only(top: 16),
-                h4: const TextStyle(fontSize: 14),
-                h4Padding: const EdgeInsets.only(top: 16),
-                p: const TextStyle(fontSize: 14),
+      body: Markdown(
+        data: releaseNotes,
+        styleSheet: MarkdownStyleSheet(
+          h2: const TextStyle(fontSize: 20),
+          h3: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          h3Padding: const EdgeInsets.only(top: 16),
+          h4: const TextStyle(fontSize: 14),
+          h4Padding: const EdgeInsets.only(top: 16),
+          p: const TextStyle(fontSize: 14),
+          horizontalRuleDecoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: Colors.transparent,
+                width: 32,
               ),
-              onTapLink: (text, href, title) {
-                if (href != null) {
-                  launchUrlString(
-                    href,
-                    mode: context.read<SettingsStore>().launchUrlExternal
-                        ? LaunchMode.externalApplication
-                        : LaunchMode.inAppBrowserView,
-                  );
-                }
-              },
             ),
           ),
-        ],
+        ),
+        onTapLink: (text, href, title) {
+          if (href != null) {
+            launchUrlString(
+              href,
+              mode: context.read<SettingsStore>().launchUrlExternal
+                  ? LaunchMode.externalApplication
+                  : LaunchMode.inAppBrowserView,
+            );
+          }
+        },
       ),
     );
   }
