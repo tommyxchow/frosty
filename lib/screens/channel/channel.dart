@@ -47,6 +47,7 @@ class _VideoChatState extends State<VideoChat> {
   final _chatKey = GlobalKey();
 
   late final ChatStore _chatStore = ChatStore(
+    twitchApi: context.read<TwitchApi>(),
     channelName: widget.userLogin,
     channelId: widget.userId,
     displayName: widget.userName,

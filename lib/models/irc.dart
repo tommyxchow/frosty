@@ -10,6 +10,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/photo_view.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -675,7 +676,7 @@ class IRCMessage {
                 Uri.parse(text),
                 mode: launchExternal
                     ? LaunchMode.externalApplication
-                    : LaunchMode.inAppWebView,
+                    : LaunchMode.inAppBrowserView,
               ),
       );
     } else {
@@ -728,7 +729,13 @@ class IRCMessage {
         primary: false,
         children: [
           ListTile(
-            leading: leading,
+            leading: InkWell(
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => FrostyPhotoViewDialog(imageUrl: url),
+              ),
+              child: leading,
+            ),
             title: Text(
               title,
               style: const TextStyle(
@@ -764,7 +771,7 @@ class IRCMessage {
                 Uri.parse(url),
                 mode: launchExternal
                     ? LaunchMode.externalApplication
-                    : LaunchMode.inAppWebView,
+                    : LaunchMode.inAppBrowserView,
               );
 
               Navigator.pop(context);
@@ -823,13 +830,16 @@ class IRCMessage {
         : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
 
     // If there is an associated message, set it.
-    //
-    // Also remove any "INVALID/UNDEFINED" Unicode characters.
-    // Rendering this character on iOS shows a question mark inside a square.
-    // This character is used by some clients to bypass restrictions on repeating message.
-    var message = splitMessage.length > 3
-        ? splitMessage.sublist(3).join(' ').substring(1)
-        : null;
+    String? message;
+    if (splitMessage.length > 3) {
+      final combinedMessage = splitMessage.sublist(3).join(' ');
+
+      if (combinedMessage.startsWith(':')) {
+        message = combinedMessage.substring(1);
+      } else {
+        message = combinedMessage;
+      }
+    }
 
     // Now process any Twitch emotes contained in the message tags.
     // The map containing emotes from the user's tags to their URL.
@@ -837,7 +847,7 @@ class IRCMessage {
     final localEmotes = <String, Emote>{};
 
     final emoteTags = mappedTags['emotes'];
-    if (emoteTags != null) {
+    if (emoteTags != null && message != null) {
       // Emotes and their indices are separated by '/' so split them there.
       final emotes = emoteTags.split('/');
 
@@ -864,7 +874,7 @@ class IRCMessage {
         final startIndex = int.parse(indexSplit[0]);
         final endIndex = int.parse(indexSplit[1]);
 
-        final emoteWord = message!.substring(startIndex, endIndex + 1);
+        final emoteWord = message.substring(startIndex, endIndex + 1);
 
         // Store the emote word and its associated URL for later use.
         localEmotes[emoteWord] = Emote(
@@ -895,6 +905,9 @@ class IRCMessage {
       // Escape the message
       message = message
           .split(' ')
+          // Also remove any "INVALID/UNDEFINED" Unicode characters.
+          // Rendering this character on iOS shows a question mark inside a square.
+          // This character is used by some clients to bypass restrictions on repeating message.
           .map((word) => word.replaceAll('\u{E0000}', '').trim())
           .where((element) => element != '')
           .join(' ');

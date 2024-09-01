@@ -65,7 +65,8 @@ class _CategoriesState extends State<Categories>
             ),
           );
 
-          if (!mounted) return;
+          if (!context.mounted) return;
+
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       },

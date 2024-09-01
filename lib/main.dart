@@ -17,6 +17,7 @@ import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
+import 'package:frosty/utils.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Pass all uncaught "fatal" errors from the framework to Crashlytics
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -38,6 +52,8 @@ void main() async {
     await storage.deleteAll();
   }
 
+  await initUtils();
+
   // With the shared preferences instance, obtain the existing user settings if it exists.
   // If default settings don't exist, use an empty JSON string to use the default values.
   final userSettings = prefs.getString('settings') ?? '{}';
@@ -47,19 +63,6 @@ void main() async {
 
   // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  // Pass all uncaught "fatal" errors from the framework to Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
 
   /// Initialize API services with a common client.
   /// This will prevent every request from creating a new client instance.

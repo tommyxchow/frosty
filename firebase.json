@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "frosty-128de",
+          "appId": "1:403282332389:android:a7ff237168bad4c30be20c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "frosty-128de",
+          "configurations": {
+            "android": "1:403282332389:android:a7ff237168bad4c30be20c",
+            "ios": "1:403282332389:ios:0fc3f8c3d4e80c8b0be20c"
+          }
+        }
+      }
+    }
+  }
+}

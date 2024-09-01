@@ -116,6 +116,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultTimestampType = TimestampType.disabled;
 
   // Delay defaults
+  static const defaultAutoSyncChatDelay = false;
   static const defaultChatDelay = 0.0;
 
   // Alert defaults
@@ -131,7 +132,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultLandscapeChatLeftSide = false;
   static const defaultLandscapeForceVerticalChat = false;
   static const defaultLandscapeCutout = LandscapeCutoutType.none;
-  static const defaultChatWidth = 0.3;
+  static const defaultChatWidth = 0.25;
   static const defaultFullScreenChatOverlayOpacity = 0.5;
 
   // Sleep defaults
@@ -139,6 +140,19 @@ abstract class _SettingsStoreBase with Store {
 
   // Autocomplete defaults
   static const defaultAutocomplete = true;
+
+  // Emotes and badges defaults
+  static const defaultShowTwitchEmotes = true;
+  static const defaultShowTwitchBadges = true;
+  static const defaultShow7TVEmotes = true;
+  static const defaultShowBTTVEmotes = true;
+  static const defaultShowBTTVBadges = true;
+  static const defaultShowFFZEmotes = true;
+  static const defaultShowFFZBadges = true;
+
+  // Recent messages defaults
+  static const defaultShowRecentMessages = false;
+  static const defaultDarkenRecentMessages = true;
 
   // Message sizing options
   @JsonKey(defaultValue: defaultBadgeScale)
@@ -182,6 +196,10 @@ abstract class _SettingsStoreBase with Store {
   var timestampType = defaultTimestampType;
 
   // Delay options
+  @JsonKey(defaultValue: defaultAutoSyncChatDelay)
+  @observable
+  var autoSyncChatDelay = defaultAutoSyncChatDelay;
+
   @JsonKey(defaultValue: defaultChatDelay)
   @observable
   var chatDelay = defaultChatDelay;
@@ -239,6 +257,44 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var autocomplete = defaultAutocomplete;
 
+  // Emotes and badges
+  @JsonKey(defaultValue: defaultShowTwitchEmotes)
+  @observable
+  var showTwitchEmotes = defaultShowTwitchEmotes;
+
+  @JsonKey(defaultValue: defaultShowTwitchBadges)
+  @observable
+  var showTwitchBadges = defaultShowTwitchBadges;
+
+  @JsonKey(defaultValue: defaultShow7TVEmotes)
+  @observable
+  var show7TVEmotes = defaultShow7TVEmotes;
+
+  @JsonKey(defaultValue: defaultShowBTTVEmotes)
+  @observable
+  var showBTTVEmotes = defaultShowBTTVEmotes;
+
+  @JsonKey(defaultValue: defaultShowBTTVBadges)
+  @observable
+  var showBTTVBadges = defaultShowBTTVBadges;
+
+  @JsonKey(defaultValue: defaultShowFFZEmotes)
+  @observable
+  var showFFZEmotes = defaultShowFFZEmotes;
+
+  @JsonKey(defaultValue: defaultShowFFZBadges)
+  @observable
+  var showFFZBadges = defaultShowFFZBadges;
+
+  // Recent messages
+  @JsonKey(defaultValue: defaultShowRecentMessages)
+  @observable
+  var showRecentMessages = defaultShowRecentMessages;
+
+  @JsonKey(defaultValue: defaultDarkenRecentMessages)
+  @observable
+  var darkenRecentMessages = defaultDarkenRecentMessages;
+
   @action
   void resetChatSettings() {
     badgeScale = defaultBadgeScale;
@@ -252,6 +308,7 @@ abstract class _SettingsStoreBase with Store {
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
 
+    autoSyncChatDelay = defaultAutoSyncChatDelay;
     chatDelay = defaultChatDelay;
 
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
@@ -269,6 +326,17 @@ abstract class _SettingsStoreBase with Store {
 
     chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
     autocomplete = defaultAutocomplete;
+
+    showTwitchEmotes = defaultShowTwitchEmotes;
+    showTwitchBadges = defaultShowTwitchBadges;
+    show7TVEmotes = defaultShow7TVEmotes;
+    showBTTVEmotes = defaultShowBTTVEmotes;
+    showBTTVBadges = defaultShowBTTVBadges;
+    showFFZEmotes = defaultShowFFZEmotes;
+    showFFZBadges = defaultShowFFZBadges;
+
+    showRecentMessages = defaultShowRecentMessages;
+    darkenRecentMessages = defaultDarkenRecentMessages;
   }
 
   // * Other settings

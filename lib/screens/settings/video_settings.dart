@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class VideoSettings extends StatelessWidget {
@@ -23,7 +24,7 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
-          if (!Platform.isIOS)
+          if (!Platform.isIOS || isIPad())
             SettingsListSwitch(
               title: 'Default to highest quality',
               value: settingsStore.defaultToHighestQuality,

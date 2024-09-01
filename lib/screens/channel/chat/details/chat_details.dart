@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/main.dart';
@@ -213,6 +211,18 @@ class ChatDetails extends StatelessWidget {
 
           chatStore.updateNotification('Badges and emotes refreshed');
         },
+      ),
+      ListTile(
+        leading: const Icon(Icons.chat_rounded),
+        title: Observer(
+          builder: (context) {
+            return Text(
+              '${chatStore.settings.showVideo ? 'Enter' : 'Exit'} chat-only mode',
+            );
+          },
+        ),
+        onTap: () =>
+            chatStore.settings.showVideo = !chatStore.settings.showVideo,
       ),
       ListTile(
         leading: const Icon(Icons.settings_outlined),

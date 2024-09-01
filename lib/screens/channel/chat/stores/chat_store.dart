@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/events.dart';
 import 'package:frosty/models/irc.dart';
@@ -26,6 +27,8 @@ abstract class ChatStoreBase with Store {
   /// The maximum ammount of messages to render when autoscroll is enabled.
   static const _renderMessageLimit = 100;
 
+  final TwitchApi twitchApi;
+
   /// The amount of messages to free (remove) when the [_messageLimit] is reached.
   final _messagesToRemove = (_messageLimit * 0.2).toInt();
 
@@ -47,6 +50,8 @@ abstract class ChatStoreBase with Store {
   /// The channel's display name to show on widgets.
   final String displayName;
 
+  var _shouldDisconnect = false;
+
   /// The Twitch IRC WebSocket channel.
   WebSocketChannel? _channel;
 
@@ -54,8 +59,6 @@ abstract class ChatStoreBase with Store {
   StreamSubscription? _channelListener;
 
   WebSocketChannel? _sevenTVChannel;
-
-  StreamSubscription? _sevenTVChannelListener;
 
   static const _maxRetries = 5;
 
@@ -84,7 +87,7 @@ abstract class ChatStoreBase with Store {
   final reactions = <ReactionDisposer>[];
 
   /// The periodic timer used for batching chat message re-renders.
-  late final Timer _messageBufferTimer;
+  Timer? _messageBufferTimer;
 
   /// The list of chat messages to add once autoscroll is resumed.
   /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
@@ -150,6 +153,7 @@ abstract class ChatStoreBase with Store {
   IRCMessage? replyingToMessage;
 
   ChatStoreBase({
+    required this.twitchApi,
     required this.auth,
     required this.chatDetailsStore,
     required this.assetsStore,
@@ -166,23 +170,44 @@ abstract class ChatStoreBase with Store {
     reactions.add(
       reaction(
         (_) => auth.isLoggedIn,
-        (_) => _channel?.sink.close(1001),
+        (_) => _channel?.sink.close(1000),
       ),
     );
 
-    // Create a timer that will add messages from the buffer every 200 milliseconds.
-    _messageBufferTimer = Timer.periodic(
-      const Duration(milliseconds: 200),
-      (timer) => addMessages(),
+    reactions.add(
+      reaction(
+        (_) => [
+          settings.showTwitchEmotes,
+          settings.showTwitchBadges,
+          settings.show7TVEmotes,
+          settings.showBTTVEmotes,
+          settings.showBTTVBadges,
+          settings.showFFZEmotes,
+          settings.showFFZBadges,
+        ],
+        (_) {
+          if (!settings.show7TVEmotes) {
+            _sevenTVChannel?.sink.close(1000);
+          }
+
+          getAssets().then((_) {
+            if (settings.show7TVEmotes) {
+              final emoteSetId = assetsStore.sevenTvEmoteSetId;
+              if (emoteSetId != null) {
+                listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
+              }
+            }
+          });
+        },
+      ),
     );
 
     assetsStore.init();
 
-    messageBuffer
-        .add(IRCMessage.createNotice(message: 'Connecting to chat...'));
+    _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
-    if (settings.chatDelay > 0) {
-      messageBuffer.add(
+    if (settings.showVideo && settings.chatDelay > 0) {
+      _messages.add(
         IRCMessage.createNotice(
           message:
               'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
@@ -190,7 +215,35 @@ abstract class ChatStoreBase with Store {
       );
     }
 
-    connectToChat();
+    reactions.add(
+      reaction(
+        (_) => settings.showVideo,
+        (showVideo) {
+          if (settings.chatDelay > 0) {
+            if (showVideo) {
+              _messages.add(
+                IRCMessage.createNotice(
+                  message:
+                      'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
+                ),
+              );
+            } else {
+              _messages.add(
+                IRCMessage.createNotice(
+                  message: 'Removing message delay...',
+                ),
+              );
+            }
+          }
+        },
+      ),
+    );
+
+    if (settings.showRecentMessages) {
+      getRecentMessage().then((_) => connectToChat());
+    } else {
+      connectToChat();
+    }
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -329,13 +382,23 @@ abstract class ChatStoreBase with Store {
         messageBuffer.add(
           IRCMessage.createNotice(
             message:
-                "Connected to ${getReadableName(displayName, channelName)}'s chat!",
+                "Welcome to ${getReadableName(displayName, channelName)}'s chat!",
           ),
         );
 
+        // Activate the message buffer.
+        // Create a timer that will add messages from the buffer every 200 milliseconds.
+        _messageBufferTimer = Timer.periodic(
+          const Duration(milliseconds: 200),
+          (timer) => addMessages(),
+        );
+
         getAssets().then((_) {
-          if (assetsStore.sevenTvEmoteSetId != null) {
-            listenToSevenTVEmoteSet(emoteSetId: assetsStore.sevenTvEmoteSetId!);
+          if (!settings.show7TVEmotes) return;
+
+          final emoteSetId = assetsStore.sevenTvEmoteSetId;
+          if (emoteSetId != null && !_shouldDisconnect) {
+            listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
           }
         });
 
@@ -359,6 +422,13 @@ abstract class ChatStoreBase with Store {
           debugPrint(error.toString());
           return <Badge>[];
         },
+        showTwitchEmotes: settings.showTwitchEmotes,
+        showTwitchBadges: settings.showTwitchBadges,
+        show7TVEmotes: settings.show7TVEmotes,
+        showBTTVEmotes: settings.showBTTVEmotes,
+        showBTTVBadges: settings.showBTTVBadges,
+        showFFZEmotes: settings.showFFZEmotes,
+        showFFZBadges: settings.showFFZBadges,
       );
 
   /// Re-enables [_autoScroll] and jumps to the latest message.
@@ -385,56 +455,65 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
-    _sevenTVChannel?.sink.close(1001);
+    _sevenTVChannel?.sink.close(1000);
     _sevenTVChannel =
         WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
 
-    _sevenTVChannelListener = _sevenTVChannel?.stream.listen(
-      (data) => Future.delayed(
-        Duration(seconds: settings.chatDelay.toInt()),
-        () {
-          debugPrint(data);
-          final decoded = jsonDecode(data);
+    void listener(dynamic data) {
+      // debugPrint(data);
+      final decoded = jsonDecode(data);
 
-          final event = SevenTVEvent.fromJson(decoded);
+      final event = SevenTVEvent.fromJson(decoded);
 
-          final body = event.d.body;
-          if (event.d.type != 'emote_set.update' || body == null) return;
+      final body = event.d.body;
+      if (event.d.type != 'emote_set.update' || body == null) return;
 
-          if (body.pushed != null) {
-            final pushedEmote = body.pushed?.first.value;
+      if (body.pushed != null) {
+        final pushedEmote = body.pushed?.first.value;
 
-            if (pushedEmote == null) return;
+        if (pushedEmote == null) return;
 
-            final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
+        final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
 
-            assetsStore.emoteToObject[emote.name] = emote;
+        assetsStore.emoteToObject[emote.name] = emote;
 
-            messageBuffer.add(
-              IRCMessage.createNotice(
-                message:
-                    '${getReadableName(body.actor.displayName, body.actor.username)} added 7TV emote "${emote.name}" to chat',
-              ),
-            );
-          } else if (body.pulled != null) {
-            final pulledEmote = body.pulled?.first.oldValue;
+        messageBuffer.add(
+          IRCMessage.createNotice(
+            message:
+                '${getReadableName(body.actor.displayName, body.actor.username)} added 7TV emote "${emote.name}" to chat',
+          ),
+        );
+      } else if (body.pulled != null) {
+        final pulledEmote = body.pulled?.first.oldValue;
 
-            if (pulledEmote == null) return;
+        if (pulledEmote == null) return;
 
-            assetsStore.emoteToObject.removeWhere(
-              (name, _) => name == pulledEmote.name,
-            );
+        assetsStore.emoteToObject.removeWhere(
+          (name, _) => name == pulledEmote.name,
+        );
 
-            messageBuffer.add(
-              IRCMessage.createNotice(
-                message:
-                    '${getReadableName(body.actor.displayName, body.actor.username)} removed 7TV emote "${pulledEmote.name}" from chat',
-              ),
-            );
-          }
-        },
-      ),
+        messageBuffer.add(
+          IRCMessage.createNotice(
+            message:
+                '${getReadableName(body.actor.displayName, body.actor.username)} removed 7TV emote "${pulledEmote.name}" from chat',
+          ),
+        );
+      }
+    }
+
+    _sevenTVChannel?.stream.listen(
+      (data) {
+        if (!settings.showVideo || settings.chatDelay == 0) {
+          listener(data);
+        } else {
+          Future.delayed(
+            Duration(seconds: settings.chatDelay.toInt()),
+            () => listener(data),
+          );
+        }
+      },
       onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
+      onDone: () => debugPrint('7TV events done'),
     );
 
     _sevenTVChannel?.sink.add(jsonEncode(subscribePayload));
@@ -442,19 +521,28 @@ abstract class ChatStoreBase with Store {
 
   @action
   void connectToChat() {
-    _channel?.sink.close(1001);
+    _channel?.sink.close(1000);
     _channel =
         WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
 
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
-      (data) => Future.delayed(
-        Duration(seconds: settings.chatDelay.toInt()),
-        () => _handleIRCData(data.toString()),
-      ),
+      (data) {
+        if (!settings.showVideo || settings.chatDelay == 0) {
+          _handleIRCData(data.toString());
+        } else {
+          Future.delayed(
+            Duration(seconds: settings.chatDelay.toInt()),
+            () => _handleIRCData(data.toString()),
+          );
+        }
+      },
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
-        if (_channel == null) return;
+        if (_shouldDisconnect) {
+          _sevenTVChannel?.sink.close(1000);
+          return;
+        }
 
         if (_retries >= _maxRetries) {
           messageBuffer.add(
@@ -655,19 +743,25 @@ abstract class ChatStoreBase with Store {
     timeRemaining = const Duration();
   }
 
+  @action
+  Future<void> getRecentMessage() async {
+    final recentMessages =
+        await twitchApi.getRecentMessages(userLogin: channelName);
+
+    for (final message in recentMessages) {
+      _handleIRCData(message);
+    }
+  }
+
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
-    _messageBufferTimer.cancel();
+    _shouldDisconnect = true;
+
+    _messageBufferTimer?.cancel();
     _notificationTimer?.cancel();
     sleepTimer?.cancel();
 
-    _sevenTVChannel?.sink.close(1001);
-    _sevenTVChannel = null;
-    _sevenTVChannelListener?.cancel();
-
-    _channel?.sink.close(1001);
-    _channel = null;
-    _channelListener?.cancel();
+    _channel?.sink.close(1000);
 
     for (final reactionDisposer in reactions) {
       reactionDisposer();

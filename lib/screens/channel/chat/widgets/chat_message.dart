@@ -55,16 +55,18 @@ class ChatMessage extends StatelessWidget {
       userLogin: nickname,
     )
         .then((user) {
-      showModalBottomSheet(
-        isScrollControlled: true,
-        context: context,
-        builder: (context) => ChatUserModal(
-          chatStore: chatStore,
-          username: user.login,
-          userId: user.id,
-          displayName: user.displayName,
-        ),
-      );
+      if (context.mounted) {
+        showModalBottomSheet(
+          isScrollControlled: true,
+          context: context,
+          builder: (context) => ChatUserModal(
+            chatStore: chatStore,
+            username: user.login,
+            userId: user.id,
+            displayName: user.displayName,
+          ),
+        );
+      }
     });
   }
 
@@ -178,10 +180,9 @@ class ChatMessage extends StatelessWidget {
             const mentionBorderRadius = BorderRadius.all(Radius.circular(4));
             if (replyUser != null && replyBody != null) {
               messageHeaderIcon = Icon(
-                Icons.reply_rounded,
+                Icons.chat_rounded,
                 size: messageHeaderIconSize,
                 color: messageHeaderTextColor,
-                textDirection: TextDirection.rtl,
               );
               messageHeader = GestureDetector(
                 onTap: isModal
@@ -476,7 +477,7 @@ class ChatMessage extends StatelessWidget {
                 child: dividedMessage,
               );
 
-        return InkWell(
+        final finalMessage = InkWell(
           onTap: () {
             FocusScope.of(context).unfocus();
             if (chatStore.assetsStore.showEmoteMenu) {
@@ -486,6 +487,17 @@ class ChatMessage extends StatelessWidget {
           onLongPress: () => onLongPressMessage(context),
           child: coloredMessage,
         );
+
+        final isHistorical = ircMessage.tags['historical'] == '1';
+
+        if (chatStore.settings.darkenRecentMessages && isHistorical) {
+          return Opacity(
+            opacity: 0.5,
+            child: finalMessage,
+          );
+        }
+
+        return finalMessage;
       },
     );
   }

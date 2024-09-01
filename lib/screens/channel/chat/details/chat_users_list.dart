@@ -136,7 +136,7 @@ class _ChattersListState extends State<ChattersList> {
                                                   .elementAt(index),
                                             );
 
-                                    if (!mounted) return;
+                                    if (!context.mounted) return;
 
                                     showModalBottomSheet(
                                       isScrollControlled: true,

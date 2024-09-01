@@ -8,6 +8,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -104,10 +105,11 @@ class VideoOverlay extends StatelessWidget {
           children: [
             Observer(
               builder: (context) => Text(
-                videoStore.latency ?? '',
+                videoStore.latency ?? 'N/A',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
+                  fontFeatures: [FontFeature.tabularFigures()],
                 ),
               ),
             ),
@@ -115,7 +117,8 @@ class VideoOverlay extends StatelessWidget {
               width: 8,
             ),
             const Icon(
-              Icons.speed,
+              Icons.speed_rounded,
+              color: Colors.white,
             ),
           ],
         ),
@@ -177,37 +180,39 @@ class VideoOverlay extends StatelessWidget {
       ),
     );
 
-    final streamInfo = videoStore.streamInfo;
-    if (streamInfo == null) {
-      return Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              backButton,
-              const Spacer(),
-              if (videoStore.settingsStore.fullScreen &&
-                  orientation == Orientation.landscape)
-                chatOverlayButton,
-            ],
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                refreshButton,
-                if (!videoStore.isIPad) rotateButton,
-                if (orientation == Orientation.landscape) fullScreenButton,
-              ],
-            ),
-          ),
-        ],
-      );
-    }
-
     return Observer(
       builder: (context) {
+        final streamInfo = videoStore.streamInfo;
+        if (streamInfo == null) {
+          return Stack(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  backButton,
+                  const Spacer(),
+                  if (videoStore.settingsStore.fullScreen &&
+                      orientation == Orientation.landscape)
+                    chatOverlayButton,
+                ],
+              ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    refreshButton,
+                    // On iPad, hide the rotate button on the overlay
+                    // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
+                    if (!isIPad()) rotateButton,
+                    if (orientation == Orientation.landscape) fullScreenButton,
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+
         return Stack(
           children: [
             Row(
@@ -227,7 +232,7 @@ class VideoOverlay extends StatelessWidget {
                 if (videoStore.settingsStore.fullScreen &&
                     orientation == Orientation.landscape)
                   chatOverlayButton,
-                if (!Platform.isIOS) videoSettingsButton,
+                if (!Platform.isIOS || isIPad()) videoSettingsButton,
               ],
             ),
             Center(
@@ -249,11 +254,10 @@ class VideoOverlay extends StatelessWidget {
             Align(
               alignment: Alignment.bottomLeft,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(12),
                       child: Row(
                         children: [
                           Tooltip(
@@ -314,6 +318,9 @@ class VideoOverlay extends StatelessWidget {
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
+                                      fontFeatures: [
+                                        FontFeature.tabularFigures(),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -339,7 +346,9 @@ class VideoOverlay extends StatelessWidget {
                     ),
                   ),
                   refreshButton,
-                  if (!videoStore.isIPad) rotateButton,
+                  // On iPad, hide the rotate button on the overlay
+                  // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
+                  if (!isIPad()) rotateButton,
                   if (orientation == Orientation.landscape) fullScreenButton,
                 ],
               ),

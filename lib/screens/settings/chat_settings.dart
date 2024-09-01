@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
@@ -9,6 +10,7 @@ import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatSettings extends StatefulWidget {
   final SettingsStore settingsStore;
@@ -170,17 +172,23 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay', showDivider: true),
-          SettingsListSlider(
-            title: 'Message delay',
-            trailing: '${settingsStore.chatDelay.toInt()}s',
-            subtitle:
-                'Adds a delay (in seconds) before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}',
-            value: settingsStore.chatDelay,
-            max: 30.0,
-            divisions: 30,
-            onChanged: (newValue) => settingsStore.chatDelay = newValue,
+          const SectionHeader('Delay and latency', showDivider: true),
+          SettingsListSwitch(
+            title: 'Sync message delay with stream latency (experimental)',
+            value: settingsStore.autoSyncChatDelay,
+            onChanged: (newValue) => settingsStore.autoSyncChatDelay = newValue,
           ),
+          if (!settingsStore.autoSyncChatDelay)
+            SettingsListSlider(
+              title: 'Message delay',
+              trailing: '${settingsStore.chatDelay.toInt()} seconds',
+              subtitle:
+                  'Adds a delay before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}',
+              value: settingsStore.chatDelay,
+              max: 30.0,
+              divisions: 30,
+              onChanged: (newValue) => settingsStore.chatDelay = newValue,
+            ),
           const SectionHeader('Alerts', showDivider: true),
           SettingsListSwitch(
             title: 'Highlight first time chatters',
@@ -281,6 +289,83 @@ class _ChatSettingsState extends State<ChatSettings> {
             ),
             value: settingsStore.autocomplete,
             onChanged: (newValue) => settingsStore.autocomplete = newValue,
+          ),
+          const SectionHeader('Emotes and badges', showDivider: true),
+          SettingsListSwitch(
+            title: 'Show Twitch emotes',
+            value: settingsStore.showTwitchEmotes,
+            onChanged: (newValue) => settingsStore.showTwitchEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show Twitch badges',
+            value: settingsStore.showTwitchBadges,
+            onChanged: (newValue) => settingsStore.showTwitchBadges = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show 7TV emotes',
+            value: settingsStore.show7TVEmotes,
+            onChanged: (newValue) => settingsStore.show7TVEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show BTTV emotes',
+            value: settingsStore.showBTTVEmotes,
+            onChanged: (newValue) => settingsStore.showBTTVEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show BTTV badges',
+            value: settingsStore.showBTTVBadges,
+            onChanged: (newValue) => settingsStore.showBTTVBadges = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show FFZ emotes',
+            value: settingsStore.showFFZEmotes,
+            onChanged: (newValue) => settingsStore.showFFZEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Show FFZ badges',
+            value: settingsStore.showFFZBadges,
+            onChanged: (newValue) => settingsStore.showFFZBadges = newValue,
+          ),
+          const SectionHeader('Recent messages', showDivider: true),
+          SettingsListSwitch(
+            title: 'Show historical recent messages',
+            subtitle: Text.rich(
+              TextSpan(
+                text:
+                    'Loads historical recent messages in chat through a third-party API service at ',
+                children: [
+                  TextSpan(
+                    text: 'https://recent-messages.robotty.de/',
+                    style: const TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.blue,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => launchUrl(
+                            Uri.parse(
+                              'https://recent-messages.robotty.de/',
+                            ),
+                            mode: settingsStore.launchUrlExternal
+                                ? LaunchMode.externalApplication
+                                : LaunchMode.inAppBrowserView,
+                          ),
+                  ),
+                ],
+              ),
+            ),
+            value: settingsStore.showRecentMessages,
+            onChanged: (newValue) =>
+                settingsStore.showRecentMessages = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Darken historical recent messages',
+            subtitle: const Text(
+              'Makes historical recent messages 50% opacity to distinguish them from live messages.',
+            ),
+            value: settingsStore.darkenRecentMessages,
+            onChanged: (newValue) =>
+                settingsStore.darkenRecentMessages = newValue,
           ),
         ],
       ),

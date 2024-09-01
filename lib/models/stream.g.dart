@@ -13,7 +13,7 @@ StreamTwitch _$StreamTwitchFromJson(Map<String, dynamic> json) => StreamTwitch(
       json['game_id'] as String,
       json['game_name'] as String,
       json['title'] as String,
-      json['viewer_count'] as int,
+      (json['viewer_count'] as num).toInt(),
       json['started_at'] as String,
       json['thumbnail_url'] as String,
     );

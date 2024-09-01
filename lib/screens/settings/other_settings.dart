@@ -7,6 +7,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/release_notes.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -70,7 +71,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           onTap: () async {
             final packageInfo = await PackageInfo.fromPlatform();
 
-            if (!mounted) return;
+            if (!context.mounted) return;
 
             showAboutDialog(
               context: context,
@@ -81,18 +82,17 @@ class _OtherSettingsState extends State<OtherSettings> {
               applicationName: packageInfo.appName,
               applicationVersion:
                   'Version ${packageInfo.version} (${packageInfo.buildNumber})',
-              applicationLegalese: '\u{a9} 2023 Tommy Chow',
+              applicationLegalese: '\u{a9} 2024 Tommy Chow',
             );
           },
         ),
         ListTile(
-          leading: const Icon(Icons.launch_rounded),
-          title: const Text('Changelog'),
-          onTap: () => launchUrl(
-            Uri.parse('https://github.com/tommyxchow/frosty/releases'),
-            mode: widget.settingsStore.launchUrlExternal
-                ? LaunchMode.externalApplication
-                : LaunchMode.inAppWebView,
+          leading: const Icon(Icons.notes_rounded),
+          title: const Text('Release notes'),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const ReleaseNotes(),
+            ),
           ),
         ),
         ListTile(
@@ -102,7 +102,7 @@ class _OtherSettingsState extends State<OtherSettings> {
             Uri.parse('https://www.frostyapp.io/#faq'),
             mode: widget.settingsStore.launchUrlExternal
                 ? LaunchMode.externalApplication
-                : LaunchMode.inAppWebView,
+                : LaunchMode.inAppBrowserView,
           ),
         ),
         ListTile(
@@ -113,7 +113,8 @@ class _OtherSettingsState extends State<OtherSettings> {
 
             await DefaultCacheManager().emptyCache();
 
-            if (!mounted) return;
+            if (!context.mounted) return;
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: AlertMessage(

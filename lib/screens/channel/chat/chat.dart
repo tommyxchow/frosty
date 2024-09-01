@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -98,7 +97,7 @@ class Chat extends StatelessWidget {
               ChatBottomBar(chatStore: chatStore),
             PopScope(
               canPop: Platform.isIOS,
-              onPopInvoked: (didPop) {
+              onPopInvokedWithResult: (didPop, _) {
                 if (didPop) return;
 
                 // If pressing the back button on Android while the emote menu
@@ -129,26 +128,31 @@ class Chat extends StatelessWidget {
                             const Divider(),
                             Expanded(
                               child: FrostyPageView(
-                                headers: const [
+                                headers: [
                                   'Recent',
-                                  'Twitch',
-                                  '7TV',
-                                  'BTTV',
-                                  'FFZ',
+                                  if (chatStore.settings.showTwitchEmotes)
+                                    'Twitch',
+                                  if (chatStore.settings.show7TVEmotes) '7TV',
+                                  if (chatStore.settings.showBTTVEmotes) 'BTTV',
+                                  if (chatStore.settings.showFFZEmotes) 'FFZ',
                                 ],
                                 children: [
                                   RecentEmotesPanel(
                                     chatStore: chatStore,
                                   ),
-                                  EmoteMenuPanel(
-                                    chatStore: chatStore,
-                                    twitchEmotes: chatStore
-                                        .assetsStore.userEmoteSectionToEmotes,
-                                  ),
+                                  if (chatStore.settings.showTwitchEmotes)
+                                    EmoteMenuPanel(
+                                      chatStore: chatStore,
+                                      twitchEmotes: chatStore
+                                          .assetsStore.userEmoteSectionToEmotes,
+                                    ),
                                   ...[
-                                    chatStore.assetsStore.sevenTVEmotes,
-                                    chatStore.assetsStore.bttvEmotes,
-                                    chatStore.assetsStore.ffzEmotes,
+                                    if (chatStore.settings.show7TVEmotes)
+                                      chatStore.assetsStore.sevenTVEmotes,
+                                    if (chatStore.settings.showBTTVEmotes)
+                                      chatStore.assetsStore.bttvEmotes,
+                                    if (chatStore.settings.showFFZEmotes)
+                                      chatStore.assetsStore.ffzEmotes,
                                   ].map(
                                     (emotes) => EmoteMenuPanel(
                                       chatStore: chatStore,

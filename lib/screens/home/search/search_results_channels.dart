@@ -31,7 +31,8 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
     try {
       final channelInfo = await widget.searchStore.searchChannel(search);
 
-      if (!mounted) return;
+      if (!context.mounted) return;
+
       Navigator.push(
         context,
         MaterialPageRoute(

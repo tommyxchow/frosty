@@ -522,4 +522,20 @@ class TwitchApi {
       return false;
     }
   }
+
+  // Unblocks the user with the given ID and returns true on success or false on failure.
+  Future<List<dynamic>> getRecentMessages({
+    required String userLogin,
+  }) async {
+    final url = Uri.parse(
+      'https://recent-messages.robotty.de/api/v2/recent-messages/$userLogin',
+    );
+
+    final response = await _client.get(url);
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['messages'] as List;
+    } else {
+      return Future.error('Failed to get recent messages for $userLogin');
+    }
+  }
 }

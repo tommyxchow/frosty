@@ -34,6 +34,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
               _$TimestampTypeEnumMap, json['timestampType'],
               unknownValue: TimestampType.disabled) ??
           TimestampType.disabled
+      ..autoSyncChatDelay = json['autoSyncChatDelay'] as bool? ?? false
       ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
       ..highlightFirstTimeChatter =
           json['highlightFirstTimeChatter'] as bool? ?? true
@@ -48,11 +49,20 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..landscapeCutout = $enumDecodeNullable(
               _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
           LandscapeCutoutType.none
-      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.3
+      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.25
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
       ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? false
       ..autocomplete = json['autocomplete'] as bool? ?? true
+      ..showTwitchEmotes = json['showTwitchEmotes'] as bool? ?? true
+      ..showTwitchBadges = json['showTwitchBadges'] as bool? ?? true
+      ..show7TVEmotes = json['show7TVEmotes'] as bool? ?? true
+      ..showBTTVEmotes = json['showBTTVEmotes'] as bool? ?? true
+      ..showBTTVBadges = json['showBTTVBadges'] as bool? ?? true
+      ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
+      ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
+      ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
+      ..darkenRecentMessages = json['darkenRecentMessages'] as bool? ?? true
       ..shareCrashLogsAndAnalytics =
           json['shareCrashLogsAndAnalytics'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
@@ -79,6 +89,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showDeletedMessages': instance.showDeletedMessages,
       'showChatMessageDividers': instance.showChatMessageDividers,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
+      'autoSyncChatDelay': instance.autoSyncChatDelay,
       'chatDelay': instance.chatDelay,
       'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
       'showUserNotices': instance.showUserNotices,
@@ -93,6 +104,15 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
       'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
       'autocomplete': instance.autocomplete,
+      'showTwitchEmotes': instance.showTwitchEmotes,
+      'showTwitchBadges': instance.showTwitchBadges,
+      'show7TVEmotes': instance.show7TVEmotes,
+      'showBTTVEmotes': instance.showBTTVEmotes,
+      'showBTTVBadges': instance.showBTTVBadges,
+      'showFFZEmotes': instance.showFFZEmotes,
+      'showFFZBadges': instance.showFFZBadges,
+      'showRecentMessages': instance.showRecentMessages,
+      'darkenRecentMessages': instance.darkenRecentMessages,
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
@@ -431,6 +451,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$autoSyncChatDelayAtom =
+      Atom(name: '_SettingsStoreBase.autoSyncChatDelay', context: context);
+
+  @override
+  bool get autoSyncChatDelay {
+    _$autoSyncChatDelayAtom.reportRead();
+    return super.autoSyncChatDelay;
+  }
+
+  @override
+  set autoSyncChatDelay(bool value) {
+    _$autoSyncChatDelayAtom.reportWrite(value, super.autoSyncChatDelay, () {
+      super.autoSyncChatDelay = value;
+    });
+  }
+
   late final _$chatDelayAtom =
       Atom(name: '_SettingsStoreBase.chatDelay', context: context);
 
@@ -647,6 +683,151 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$showTwitchEmotesAtom =
+      Atom(name: '_SettingsStoreBase.showTwitchEmotes', context: context);
+
+  @override
+  bool get showTwitchEmotes {
+    _$showTwitchEmotesAtom.reportRead();
+    return super.showTwitchEmotes;
+  }
+
+  @override
+  set showTwitchEmotes(bool value) {
+    _$showTwitchEmotesAtom.reportWrite(value, super.showTwitchEmotes, () {
+      super.showTwitchEmotes = value;
+    });
+  }
+
+  late final _$showTwitchBadgesAtom =
+      Atom(name: '_SettingsStoreBase.showTwitchBadges', context: context);
+
+  @override
+  bool get showTwitchBadges {
+    _$showTwitchBadgesAtom.reportRead();
+    return super.showTwitchBadges;
+  }
+
+  @override
+  set showTwitchBadges(bool value) {
+    _$showTwitchBadgesAtom.reportWrite(value, super.showTwitchBadges, () {
+      super.showTwitchBadges = value;
+    });
+  }
+
+  late final _$show7TVEmotesAtom =
+      Atom(name: '_SettingsStoreBase.show7TVEmotes', context: context);
+
+  @override
+  bool get show7TVEmotes {
+    _$show7TVEmotesAtom.reportRead();
+    return super.show7TVEmotes;
+  }
+
+  @override
+  set show7TVEmotes(bool value) {
+    _$show7TVEmotesAtom.reportWrite(value, super.show7TVEmotes, () {
+      super.show7TVEmotes = value;
+    });
+  }
+
+  late final _$showBTTVEmotesAtom =
+      Atom(name: '_SettingsStoreBase.showBTTVEmotes', context: context);
+
+  @override
+  bool get showBTTVEmotes {
+    _$showBTTVEmotesAtom.reportRead();
+    return super.showBTTVEmotes;
+  }
+
+  @override
+  set showBTTVEmotes(bool value) {
+    _$showBTTVEmotesAtom.reportWrite(value, super.showBTTVEmotes, () {
+      super.showBTTVEmotes = value;
+    });
+  }
+
+  late final _$showBTTVBadgesAtom =
+      Atom(name: '_SettingsStoreBase.showBTTVBadges', context: context);
+
+  @override
+  bool get showBTTVBadges {
+    _$showBTTVBadgesAtom.reportRead();
+    return super.showBTTVBadges;
+  }
+
+  @override
+  set showBTTVBadges(bool value) {
+    _$showBTTVBadgesAtom.reportWrite(value, super.showBTTVBadges, () {
+      super.showBTTVBadges = value;
+    });
+  }
+
+  late final _$showFFZEmotesAtom =
+      Atom(name: '_SettingsStoreBase.showFFZEmotes', context: context);
+
+  @override
+  bool get showFFZEmotes {
+    _$showFFZEmotesAtom.reportRead();
+    return super.showFFZEmotes;
+  }
+
+  @override
+  set showFFZEmotes(bool value) {
+    _$showFFZEmotesAtom.reportWrite(value, super.showFFZEmotes, () {
+      super.showFFZEmotes = value;
+    });
+  }
+
+  late final _$showFFZBadgesAtom =
+      Atom(name: '_SettingsStoreBase.showFFZBadges', context: context);
+
+  @override
+  bool get showFFZBadges {
+    _$showFFZBadgesAtom.reportRead();
+    return super.showFFZBadges;
+  }
+
+  @override
+  set showFFZBadges(bool value) {
+    _$showFFZBadgesAtom.reportWrite(value, super.showFFZBadges, () {
+      super.showFFZBadges = value;
+    });
+  }
+
+  late final _$showRecentMessagesAtom =
+      Atom(name: '_SettingsStoreBase.showRecentMessages', context: context);
+
+  @override
+  bool get showRecentMessages {
+    _$showRecentMessagesAtom.reportRead();
+    return super.showRecentMessages;
+  }
+
+  @override
+  set showRecentMessages(bool value) {
+    _$showRecentMessagesAtom.reportWrite(value, super.showRecentMessages, () {
+      super.showRecentMessages = value;
+    });
+  }
+
+  late final _$darkenRecentMessagesAtom =
+      Atom(name: '_SettingsStoreBase.darkenRecentMessages', context: context);
+
+  @override
+  bool get darkenRecentMessages {
+    _$darkenRecentMessagesAtom.reportRead();
+    return super.darkenRecentMessages;
+  }
+
+  @override
+  set darkenRecentMessages(bool value) {
+    _$darkenRecentMessagesAtom.reportWrite(value, super.darkenRecentMessages,
+        () {
+      super.darkenRecentMessages = value;
+    });
+  }
+
   late final _$shareCrashLogsAndAnalyticsAtom = Atom(
       name: '_SettingsStoreBase.shareCrashLogsAndAnalytics', context: context);
 
@@ -788,6 +969,7 @@ useReadableColors: ${useReadableColors},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
+autoSyncChatDelay: ${autoSyncChatDelay},
 chatDelay: ${chatDelay},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
@@ -801,6 +983,15 @@ chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 chatOnlyPreventSleep: ${chatOnlyPreventSleep},
 autocomplete: ${autocomplete},
+showTwitchEmotes: ${showTwitchEmotes},
+showTwitchBadges: ${showTwitchBadges},
+show7TVEmotes: ${show7TVEmotes},
+showBTTVEmotes: ${showBTTVEmotes},
+showBTTVBadges: ${showBTTVBadges},
+showFFZEmotes: ${showFFZEmotes},
+showFFZBadges: ${showFFZBadges},
+showRecentMessages: ${showRecentMessages},
+darkenRecentMessages: ${darkenRecentMessages},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay}

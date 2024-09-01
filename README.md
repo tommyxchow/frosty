@@ -98,9 +98,8 @@ For a more detailed overview, visit [frostyapp.io](https://www.frostyapp.io/).
 
 If you appreciate my work and would like to donate/tip, you can through:
 
-- [Buy Me a Coffee](https://www.buymeacoffee.com/tommychow)
 - [GitHub Sponsors](https://github.com/sponsors/tommyxchow)
-- [PayPal](https://www.paypal.com/donate/?business=NF33JDG6KBU6W)
+- [Buy Me a Coffee](https://www.buymeacoffee.com/tommychow)
 
 Otherwise, downloading Frosty, leaving a review, or starring this repository is more than enough to show support. Thank you!
 

@@ -84,12 +84,42 @@ abstract class AuthBase with Store {
   }
 
   WebViewController createAuthWebViewController({Widget? routeAfter}) {
-    return WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    final webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted);
+
+    return webViewController
       ..setNavigationDelegate(
         NavigationDelegate(
           onNavigationRequest: (request) =>
               handleNavigation(request: request, routeAfter: routeAfter),
+          onPageFinished: (_) => webViewController.runJavaScript(
+            '''
+            {
+              function modifyElement(element) {
+                element.style.maxHeight = '20vh';
+                element.style.overflow = 'auto';
+              }
+
+              const observer = new MutationObserver((mutations) => {
+                for (let mutation of mutations) {
+                  if (mutation.type === 'childList') {
+                    const element = document.querySelector('.fAVISI');
+                    if (element) {
+                      modifyElement(element);
+                      observer.disconnect();
+                      break;
+                    }
+                  }
+                }
+              });
+
+              observer.observe(document.body, {
+                childList: true,
+                subtree: true
+              });
+            }
+            ''',
+          ),
         ),
       )
       ..loadRequest(

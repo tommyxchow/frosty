@@ -45,24 +45,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
-  late final _$_isIPadAtom =
-      Atom(name: 'VideoStoreBase._isIPad', context: context);
-
-  bool get isIPad {
-    _$_isIPadAtom.reportRead();
-    return super._isIPad;
-  }
-
-  @override
-  bool get _isIPad => isIPad;
-
-  @override
-  set _isIPad(bool value) {
-    _$_isIPadAtom.reportWrite(value, super._isIPad, () {
-      super._isIPad = value;
-    });
-  }
-
   late final _$_streamInfoAtom =
       Atom(name: 'VideoStoreBase._streamInfo', context: context);
 
@@ -100,21 +82,21 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
-  late final _$_streamQualityAtom =
-      Atom(name: 'VideoStoreBase._streamQuality', context: context);
+  late final _$_streamQualityIndexAtom =
+      Atom(name: 'VideoStoreBase._streamQualityIndex', context: context);
 
-  String get streamQuality {
-    _$_streamQualityAtom.reportRead();
-    return super._streamQuality;
+  int get streamQualityIndex {
+    _$_streamQualityIndexAtom.reportRead();
+    return super._streamQualityIndex;
   }
 
   @override
-  String get _streamQuality => streamQuality;
+  int get _streamQualityIndex => streamQualityIndex;
 
   @override
-  set _streamQuality(String value) {
-    _$_streamQualityAtom.reportWrite(value, super._streamQuality, () {
-      super._streamQuality = value;
+  set _streamQualityIndex(int value) {
+    _$_streamQualityIndexAtom.reportWrite(value, super._streamQualityIndex, () {
+      super._streamQualityIndex = value;
     });
   }
 
@@ -152,6 +134,15 @@ mixin _$VideoStore on VideoStoreBase, Store {
   Future<void> setStreamQuality(String newStreamQuality) {
     return _$setStreamQualityAsyncAction
         .run(() => super.setStreamQuality(newStreamQuality));
+  }
+
+  late final _$_setStreamQualityIndexAsyncAction =
+      AsyncAction('VideoStoreBase._setStreamQualityIndex', context: context);
+
+  @override
+  Future<void> _setStreamQualityIndex(int newStreamQualityIndex) {
+    return _$_setStreamQualityIndexAsyncAction
+        .run(() => super._setStreamQualityIndex(newStreamQualityIndex));
   }
 
   late final _$initVideoAsyncAction =
