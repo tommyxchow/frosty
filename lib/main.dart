@@ -129,9 +129,7 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
           title: 'Frosty',
           theme: themes.light,
-          darkTheme: settingsStore.themeType == ThemeType.black
-              ? themes.black
-              : themes.dark,
+          darkTheme: themes.dark,
           themeMode: settingsStore.themeType == ThemeType.system
               ? ThemeMode.system
               : settingsStore.themeType == ThemeType.light

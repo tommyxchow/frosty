@@ -122,7 +122,6 @@ const _$ThemeTypeEnumMap = {
   ThemeType.system: 'system',
   ThemeType.light: 'light',
   ThemeType.dark: 'dark',
-  ThemeType.black: 'black',
 };
 
 const _$TimestampTypeEnumMap = {

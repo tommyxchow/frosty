@@ -138,16 +138,6 @@ class FrostyThemes {
     final theme = createBaseTheme(
       brightness: Brightness.dark,
       colorSchemeSeed: purple,
-      backgroundColor: gray,
-    );
-
-    return theme;
-  }
-
-  ThemeData get black {
-    final theme = createBaseTheme(
-      brightness: Brightness.dark,
-      colorSchemeSeed: purple,
       backgroundColor: Colors.black,
     );
 

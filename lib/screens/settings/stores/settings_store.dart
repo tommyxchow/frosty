@@ -379,13 +379,12 @@ abstract class _SettingsStoreBase with Store {
   }
 }
 
-const themeNames = ['System', 'Light', 'Dark', 'Black'];
+const themeNames = ['System', 'Light', 'Dark'];
 
 enum ThemeType {
   system,
   light,
   dark,
-  black,
 }
 
 const timestampNames = ['Disabled', '12-hour', '24-hour'];
