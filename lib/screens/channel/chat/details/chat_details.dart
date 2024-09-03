@@ -147,14 +147,14 @@ class ChatDetails extends StatelessWidget {
     final children = [
       const SectionHeader(
         'Chat modes',
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        isFirst: true,
       ),
       ListTile(
         title: ChatModes(roomState: chatDetailsStore.roomState),
       ),
       const SectionHeader(
         'More',
-        padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
       ),
       ListTile(
         leading: const Icon(Icons.people_outline),

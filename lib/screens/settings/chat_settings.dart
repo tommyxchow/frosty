@@ -30,8 +30,12 @@ class _ChatSettingsState extends State<ChatSettings> {
 
     return Observer(
       builder: (context) => ListView(
+        padding: const EdgeInsets.only(top: 16),
         children: [
-          const SectionHeader('Message sizing'),
+          const SectionHeader(
+            'Message sizing',
+            isFirst: true,
+          ),
           ExpansionTile(
             title: const Text(
               'Preview',
@@ -141,7 +145,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 15,
             onChanged: (newValue) => settingsStore.fontSize = newValue,
           ),
-          const SectionHeader('Message appearance', showDivider: true),
+          const SectionHeader('Message appearance'),
           SettingsListSwitch(
             title: 'Use readable name colors',
             subtitle: const Text(
@@ -172,7 +176,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay and latency', showDivider: true),
+          const SectionHeader('Delay and latency'),
           SettingsListSwitch(
             title: 'Sync message delay with stream latency (experimental)',
             value: settingsStore.autoSyncChatDelay,
@@ -189,7 +193,7 @@ class _ChatSettingsState extends State<ChatSettings> {
               divisions: 30,
               onChanged: (newValue) => settingsStore.chatDelay = newValue,
             ),
-          const SectionHeader('Alerts', showDivider: true),
+          const SectionHeader('Alerts'),
           SettingsListSwitch(
             title: 'Highlight first time chatters',
             value: settingsStore.highlightFirstTimeChatter,
@@ -204,7 +208,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
-          const SectionHeader('Layout', showDivider: true),
+          const SectionHeader('Layout'),
           SettingsListSwitch(
             title: 'Show bottom bar',
             value: settingsStore.showBottomBar,
@@ -225,7 +229,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.chatNotificationsOnBottom = newValue,
           ),
-          const SectionHeader('Landscape mode', showDivider: true),
+          const SectionHeader('Landscape mode'),
           SettingsListSwitch(
             title: 'Move chat left',
             value: settingsStore.landscapeChatLeftSide,
@@ -271,7 +275,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
-          const SectionHeader('Sleep', showDivider: true),
+          const SectionHeader('Sleep'),
           SettingsListSwitch(
             title: 'Prevent sleep in chat-only mode',
             subtitle: const Text(
@@ -281,7 +285,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.chatOnlyPreventSleep = newValue,
           ),
-          const SectionHeader('Autocomplete', showDivider: true),
+          const SectionHeader('Autocomplete'),
           SettingsListSwitch(
             title: 'Show autocomplete bar',
             subtitle: const Text(
@@ -290,7 +294,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.autocomplete,
             onChanged: (newValue) => settingsStore.autocomplete = newValue,
           ),
-          const SectionHeader('Emotes and badges', showDivider: true),
+          const SectionHeader('Emotes and badges'),
           SettingsListSwitch(
             title: 'Show Twitch emotes',
             value: settingsStore.showTwitchEmotes,
@@ -326,7 +330,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.showFFZBadges,
             onChanged: (newValue) => settingsStore.showFFZBadges = newValue,
           ),
-          const SectionHeader('Recent messages', showDivider: true),
+          const SectionHeader('Recent messages'),
           SettingsListSwitch(
             title: 'Show historical recent messages',
             subtitle: Text.rich(

@@ -14,16 +14,19 @@ class GeneralSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) => ListView(
+        padding: const EdgeInsets.only(top: 16),
         children: [
-          const SectionHeader('Display'),
+          const SectionHeader(
+            'Theme',
+            isFirst: true,
+          ),
           SettingsListSelect(
-            title: 'Theme',
             selectedOption: themeNames[settingsStore.themeType.index],
             options: themeNames,
             onChanged: (newTheme) => settingsStore.themeType =
                 ThemeType.values[themeNames.indexOf(newTheme)],
           ),
-          const SectionHeader('Stream card', showDivider: true),
+          const SectionHeader('Stream card'),
           SettingsListSwitch(
             title: 'Use large stream card',
             value: settingsStore.largeStreamCard,
@@ -34,7 +37,7 @@ class GeneralSettings extends StatelessWidget {
             value: settingsStore.showThumbnails,
             onChanged: (newValue) => settingsStore.showThumbnails = newValue,
           ),
-          const SectionHeader('Links', showDivider: true),
+          const SectionHeader('Links'),
           SettingsListSwitch(
             title: 'Open links in external browser',
             value: settingsStore.launchUrlExternal,

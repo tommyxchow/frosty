@@ -17,8 +17,12 @@ class VideoSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) => ListView(
+        padding: const EdgeInsets.only(top: 16),
         children: [
-          const SectionHeader('Player'),
+          const SectionHeader(
+            'Player',
+            isFirst: true,
+          ),
           SettingsListSwitch(
             title: 'Enable video',
             value: settingsStore.showVideo,
@@ -36,7 +40,7 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showLatency,
             onChanged: (newValue) => settingsStore.showLatency = newValue,
           ),
-          const SectionHeader('Overlay', showDivider: true),
+          const SectionHeader('Overlay'),
           SettingsListSwitch(
             title: 'Use custom video overlay',
             subtitle: const Text(

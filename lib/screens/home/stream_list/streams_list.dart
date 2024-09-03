@@ -9,6 +9,7 @@ import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:provider/provider.dart';
@@ -135,6 +136,10 @@ class _StreamsListState extends State<StreamsList>
                     CategoryCard(
                       category: _listStore.categoryDetails!,
                       isTappable: false,
+                    ),
+                  if (_listStore.scrollController != null)
+                    AnimatedScrollBorder(
+                      scrollController: _listStore.scrollController!,
                     ),
                   Expanded(
                     child: Scrollbar(

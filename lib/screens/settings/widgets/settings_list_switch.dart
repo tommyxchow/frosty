@@ -18,7 +18,6 @@ class SettingsListSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SwitchListTile.adaptive(
-      isThreeLine: subtitle != null,
       title: Text(title),
       subtitle: subtitle,
       value: value,

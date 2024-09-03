@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 /// A custom-styled adaptive [Slider].
@@ -24,37 +23,37 @@ class SettingsListSlider extends StatelessWidget {
     this.divisions,
   });
 
-  static const _textStyle = TextStyle(fontWeight: FontWeight.w500);
-
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding:
-          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       title: Row(
         children: [
-          Text(title, style: _textStyle),
+          Text(title),
           const Spacer(),
           Text(
             trailing,
-            style: _textStyle.copyWith(
-              fontFeatures: [const FontFeature.tabularFigures()],
+            style: const TextStyle(
+              fontFeatures: [FontFeature.tabularFigures()],
             ),
           ),
         ],
       ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Slider.adaptive(
-            value: value,
-            min: min,
-            max: max,
-            divisions: divisions,
-            onChanged: onChanged,
-          ),
-          if (subtitle != null) Text(subtitle!),
-        ],
+      subtitle: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Slider.adaptive(
+              value: value,
+              min: min,
+              max: max,
+              divisions: divisions,
+              onChanged: onChanged,
+            ),
+            if (subtitle != null) Text(subtitle!),
+          ],
+        ),
       ),
     );
   }
