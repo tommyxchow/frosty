@@ -281,15 +281,31 @@ class _VideoChatState extends State<VideoChat> {
                               if (settingsStore.showOverlay)
                                 Row(
                                   children: settingsStore.landscapeChatLeftSide
-                                      ? [overlayChat, Expanded(child: overlay)]
-                                      : [Expanded(child: overlay), overlayChat],
+                                      ? [
+                                          overlayChat,
+                                          const VerticalDivider(),
+                                          Expanded(child: overlay),
+                                        ]
+                                      : [
+                                          Expanded(child: overlay),
+                                          const VerticalDivider(),
+                                          overlayChat,
+                                        ],
                                 ),
                             ],
                           )
                         : Row(
                             children: settingsStore.landscapeChatLeftSide
-                                ? [landscapeChat, Expanded(child: video)]
-                                : [Expanded(child: video), landscapeChat],
+                                ? [
+                                    landscapeChat,
+                                    const VerticalDivider(),
+                                    Expanded(child: video),
+                                  ]
+                                : [
+                                    Expanded(child: video),
+                                    const VerticalDivider(),
+                                    landscapeChat,
+                                  ],
                           )
                     : Column(
                         children: [appBar, Expanded(child: chat)],
@@ -307,8 +323,10 @@ class _VideoChatState extends State<VideoChat> {
               children: [
                 if (!settingsStore.showVideo)
                   appBar
-                else
+                else ...[
                   AspectRatio(aspectRatio: 16 / 9, child: video),
+                  const Divider(),
+                ],
                 Expanded(child: chat),
               ],
             ),
