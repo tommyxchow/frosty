@@ -289,17 +289,13 @@ class VideoOverlay extends StatelessWidget {
                               onTap: () => showModalBottomSheet(
                                 isScrollControlled: true,
                                 context: context,
-                                builder: (context) => SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.8,
-                                  child: GestureDetector(
-                                    onTap: FocusScope.of(context).unfocus,
-                                    child: ChattersList(
-                                      chatDetailsStore:
-                                          chatStore.chatDetailsStore,
-                                      chatStore: chatStore,
-                                      userLogin: streamInfo.userLogin,
-                                    ),
+                                builder: (context) => GestureDetector(
+                                  onTap: FocusScope.of(context).unfocus,
+                                  child: ChattersList(
+                                    chatDetailsStore:
+                                        chatStore.chatDetailsStore,
+                                    chatStore: chatStore,
+                                    userLogin: streamInfo.userLogin,
                                   ),
                                 ),
                               ),
