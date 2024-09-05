@@ -15,12 +15,14 @@ class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
   final ChatStore chatStore;
   final bool isModal;
+  final bool showReplyHeader;
 
   const ChatMessage({
     super.key,
     required this.ircMessage,
     required this.chatStore,
     this.isModal = false,
+    this.showReplyHeader = true,
   });
 
   void onTapName(BuildContext context) {
@@ -179,7 +181,7 @@ class ChatMessage extends StatelessWidget {
 
             Widget? messageHeaderIcon;
             Widget? messageHeader;
-            if (replyUser != null && replyBody != null) {
+            if (replyUser != null && replyBody != null && showReplyHeader) {
               messageHeaderIcon = Icon(
                 Icons.chat_rounded,
                 size: messageHeaderIconSize,
