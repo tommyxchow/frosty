@@ -18,7 +18,7 @@ class FrostyThemes {
 
     final hintColor = isDark ? Colors.grey.shade600 : Colors.grey.shade600;
 
-    final borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade400;
+    final borderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
 
     const borderWidth = 0.25;
 
