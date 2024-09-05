@@ -23,7 +23,7 @@ class FrostyThemes {
 
     final borderColor = colorScheme.outlineVariant;
 
-    const borderWidth = 0.25;
+    const borderWidth = 0.5;
 
     return ThemeData(
       fontFamily: 'Inter',
@@ -102,12 +102,6 @@ class FrostyThemes {
         thickness: borderWidth,
         space: borderWidth,
         color: borderColor,
-      ),
-      listTileTheme: ListTileThemeData(
-        subtitleTextStyle: TextStyle(
-          color: hintColor,
-          fontSize: 14,
-        ),
       ),
       textTheme: const TextTheme(
         // Used in alert dialog title.
