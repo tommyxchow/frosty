@@ -10,22 +10,25 @@ class FrostyThemes {
     required Color colorSchemeSeed,
     Color? backgroundColor,
   }) {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: colorSchemeSeed,
+      brightness: brightness,
+    );
+
     final isDark = brightness == Brightness.dark;
 
-    final secondaryBackgroundColor = isDark
-        ? const Color.fromRGBO(18, 18, 18, 1)
-        : const Color.fromRGBO(238, 238, 238, 1);
+    final secondaryBackgroundColor = colorScheme.surfaceContainerLow;
 
-    final hintColor = isDark ? Colors.grey.shade600 : Colors.grey.shade600;
+    final hintColor = colorScheme.onSurfaceVariant;
 
-    final borderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
+    final borderColor = colorScheme.outlineVariant;
 
     const borderWidth = 0.25;
 
     return ThemeData(
       fontFamily: 'Inter',
       brightness: brightness,
-      colorSchemeSeed: colorSchemeSeed,
+      colorScheme: colorScheme,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       scaffoldBackgroundColor: backgroundColor,
       bottomSheetTheme: BottomSheetThemeData(
