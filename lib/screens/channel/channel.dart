@@ -245,7 +245,9 @@ class _VideoChatState extends State<VideoChat> {
               visible: settingsStore.fullScreenChatOverlay,
               maintainState: true,
               child: Theme(
-                data: FrostyThemes().dark,
+                data: FrostyThemes(
+                  colorSchemeSeed: Color(settingsStore.accentColor),
+                ).dark,
                 child: DefaultTextStyle(
                   style: DefaultTextStyle.of(context)
                       .style

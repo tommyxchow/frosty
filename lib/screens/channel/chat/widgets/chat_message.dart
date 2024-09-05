@@ -8,7 +8,6 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/theme.dart';
 import 'package:provider/provider.dart';
 
 class ChatMessage extends StatelessWidget {
@@ -223,7 +222,7 @@ class ChatMessage extends StatelessWidget {
                 ),
               );
             } else if (shouldHighlightMessage) {
-              highlightColor = FrostyThemes.purple;
+              highlightColor = Color(chatStore.settings.accentColor);
               messageHeader = Text(
                 'Highlighted message',
                 style: TextStyle(
@@ -317,7 +316,7 @@ class ChatMessage extends StatelessWidget {
             break;
           case Command.userNotice:
             if (chatStore.settings.showUserNotices) {
-              highlightColor = FrostyThemes.purple;
+              highlightColor = Color(chatStore.settings.accentColor);
               Widget? messageHeaderIcon;
               Widget? messageHeader;
 

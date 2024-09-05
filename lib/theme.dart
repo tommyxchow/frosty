@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class FrostyThemes {
-  static const purple = Color(0xff9146ff);
+  final Color colorSchemeSeed;
+
+  const FrostyThemes({required this.colorSchemeSeed});
 
   ThemeData createBaseTheme({
     required Brightness brightness,
@@ -146,7 +148,7 @@ class FrostyThemes {
   ThemeData get light {
     final theme = createBaseTheme(
       brightness: Brightness.light,
-      colorSchemeSeed: purple,
+      colorSchemeSeed: colorSchemeSeed,
       backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
     );
 
@@ -156,7 +158,7 @@ class FrostyThemes {
   ThemeData get dark {
     final theme = createBaseTheme(
       brightness: Brightness.dark,
-      colorSchemeSeed: purple,
+      colorSchemeSeed: colorSchemeSeed,
       backgroundColor: Colors.black,
     );
 

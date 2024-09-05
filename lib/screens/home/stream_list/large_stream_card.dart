@@ -43,7 +43,7 @@ class LargeStreamCard extends StatelessWidget {
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
 
     final thumbnail = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(12)),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [

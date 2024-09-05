@@ -66,6 +66,7 @@ dependencies:
   webview_flutter_wkwebview: ^3.4.3
   photo_view: ^0.15.0
   flutter_markdown: ^0.7.3+1
+  flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
   flutter_test:

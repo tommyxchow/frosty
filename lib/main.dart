@@ -124,7 +124,8 @@ class _MyAppState extends State<MyApp> {
     return Observer(
       builder: (context) {
         final settingsStore = context.read<SettingsStore>();
-        final themes = FrostyThemes();
+        final themes =
+            FrostyThemes(colorSchemeSeed: Color(settingsStore.accentColor));
 
         return MaterialApp(
           title: 'Frosty',
