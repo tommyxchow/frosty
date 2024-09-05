@@ -18,9 +18,8 @@ class LoadingIndicator extends StatelessWidget {
         SizedBox(height: spacing),
         Text(
           subtitle!,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.grey,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
           ),
         ),
       ],

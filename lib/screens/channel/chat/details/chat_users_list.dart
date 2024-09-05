@@ -124,9 +124,6 @@ class _ChattersListState extends State<ChattersList> {
                                       child: Text(
                                         widget.chatDetailsStore.filteredUsers
                                             .elementAt(index),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                        ),
                                       ),
                                     ),
                                     onTap: () async {

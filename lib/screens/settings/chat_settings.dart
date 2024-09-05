@@ -39,7 +39,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ExpansionTile(
             title: const Text(
               'Preview',
-              style: TextStyle(fontWeight: FontWeight.w500),
             ),
             children: [
               Container(

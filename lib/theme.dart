@@ -19,7 +19,7 @@ class FrostyThemes {
 
     final isDark = brightness == Brightness.dark;
 
-    final secondaryBackgroundColor = colorScheme.surfaceContainerLow;
+    final secondaryBackgroundColor = colorScheme.surfaceContainer;
 
     final hintColor = colorScheme.onSurfaceVariant;
 

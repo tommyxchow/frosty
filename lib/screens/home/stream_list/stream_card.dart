@@ -54,7 +54,7 @@ class StreamCard extends StatelessWidget {
             ) +
             cacheUrlExtension,
         placeholder: (context, url) => ColoredBox(
-          color: Colors.grey.shade900,
+          color: Theme.of(context).colorScheme.surfaceContainer,
           child: const LoadingIndicator(),
         ),
         useOldImageOnUrlChange: true,
