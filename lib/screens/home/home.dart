@@ -126,7 +126,6 @@ class _HomeState extends State<Home> {
                     const NavigationDestination(
                       icon: Icon(
                         Icons.favorite_border_rounded,
-                        color: Colors.grey,
                       ),
                       selectedIcon: Icon(Icons.favorite_rounded),
                       label: 'Following',
@@ -135,7 +134,6 @@ class _HomeState extends State<Home> {
                   const NavigationDestination(
                     icon: Icon(
                       Icons.arrow_upward_rounded,
-                      color: Colors.grey,
                     ),
                     selectedIcon: Icon(Icons.arrow_upward_rounded),
                     label: 'Top',
@@ -144,7 +142,6 @@ class _HomeState extends State<Home> {
                   const NavigationDestination(
                     icon: Icon(
                       Icons.search_rounded,
-                      color: Colors.grey,
                     ),
                     selectedIcon: Icon(Icons.search_rounded),
                     label: 'Search',

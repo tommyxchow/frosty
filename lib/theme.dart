@@ -71,7 +71,6 @@ class FrostyThemes {
         elevation: 0,
         backgroundColor: backgroundColor,
         height: 64,
-        indicatorColor: Colors.transparent,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       ),
       tabBarTheme: const TabBarTheme(
