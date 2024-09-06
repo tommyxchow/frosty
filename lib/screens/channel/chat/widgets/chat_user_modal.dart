@@ -84,10 +84,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Divider(),
-          ),
+          const Divider(),
           Expanded(
             child: Observer(
               builder: (context) {

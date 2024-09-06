@@ -7,6 +7,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -66,6 +67,9 @@ class _ChattersListState extends State<ChattersList> {
                 );
               },
             ),
+          ),
+          AnimatedScrollBorder(
+            scrollController: widget.chatDetailsStore.scrollController,
           ),
           Expanded(
             child: RefreshIndicator.adaptive(

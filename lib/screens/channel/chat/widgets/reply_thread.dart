@@ -68,10 +68,7 @@ class ReplyThread extends StatelessWidget {
                         ),
                       ),
                     ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Divider(),
-                  ),
+                  const Divider(),
                   Flexible(
                     child: ListView(
                       primary: false,
