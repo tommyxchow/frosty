@@ -36,7 +36,7 @@ class _ChattersListState extends State<ChattersList> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
             child: Observer(
               builder: (context) {
                 return TextField(
@@ -91,7 +91,10 @@ class _ChattersListState extends State<ChattersList> {
                           slivers: [
                             if (widget.chatDetailsStore.filterText.isEmpty)
                               SliverPadding(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
                                 sliver: SliverToBoxAdapter(
                                   child: Text(
                                     '${NumberFormat().format(widget.chatDetailsStore.chatUsers.length)} chatters found',
