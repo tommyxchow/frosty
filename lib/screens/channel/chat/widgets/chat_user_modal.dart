@@ -31,7 +31,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
     final name = getReadableName(widget.displayName, widget.username);
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.4,
+      height: MediaQuery.of(context).size.height * 0.5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -83,6 +83,10 @@ class _ChatUserModalState extends State<ChatUserModal> {
                 ),
               ],
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: Divider(),
           ),
           Expanded(
             child: Observer(

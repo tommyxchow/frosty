@@ -33,7 +33,7 @@ class ReplyThread extends StatelessWidget {
         : replyDisplayName;
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.4,
+      height: MediaQuery.of(context).size.height * 0.5,
       child: Observer(
         builder: (context) {
           return MediaQuery(
