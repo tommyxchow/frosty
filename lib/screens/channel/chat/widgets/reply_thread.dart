@@ -24,8 +24,6 @@ class ReplyThread extends StatelessWidget {
           message.tags['id'] == selectedMessage.tags['reply-parent-msg-id'],
     );
 
-    print(selectedMessage.tags);
-
     final replyDisplayName = selectedMessage.tags['reply-parent-display-name'];
     final replyUserLogin = selectedMessage.tags['reply-parent-user-login'];
     final replyBody = selectedMessage.tags['reply-parent-msg-body'];
