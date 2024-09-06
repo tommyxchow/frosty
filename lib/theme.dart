@@ -21,8 +21,6 @@ class FrostyThemes {
 
     final secondaryBackgroundColor = colorScheme.surfaceContainer;
 
-    final hintColor = colorScheme.onSurfaceVariant;
-
     final borderColor = colorScheme.outlineVariant;
 
     const borderWidth = 0.5;
@@ -64,9 +62,6 @@ class FrostyThemes {
         disabledBorder: const OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.all(Radius.circular(100)),
-        ),
-        hintStyle: TextStyle(
-          color: hintColor,
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(

@@ -222,7 +222,7 @@ class ChatMessage extends StatelessWidget {
                 ),
               );
             } else if (shouldHighlightMessage) {
-              highlightColor = Color(chatStore.settings.accentColor);
+              highlightColor = const Color(0xff9146ff);
               messageHeader = Text(
                 'Highlighted message',
                 style: TextStyle(
@@ -316,7 +316,7 @@ class ChatMessage extends StatelessWidget {
             break;
           case Command.userNotice:
             if (chatStore.settings.showUserNotices) {
-              highlightColor = Color(chatStore.settings.accentColor);
+              highlightColor = const Color(0xff9146ff);
               Widget? messageHeaderIcon;
               Widget? messageHeader;
 
