@@ -8,10 +8,12 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
@@ -30,11 +32,14 @@ class VideoOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     final orientation = MediaQuery.of(context).orientation;
 
+    final surfaceColor =
+        context.watch<FrostyThemes>().dark.colorScheme.onSurface;
+
     final backButton = IconButton(
       tooltip: 'Back',
       icon: Icon(
         Icons.adaptive.arrow_back_rounded,
-        color: Colors.white,
+        color: surfaceColor,
       ),
       onPressed: Navigator.of(context).pop,
     );
@@ -49,13 +54,13 @@ class VideoOverlay extends StatelessWidget {
         icon: videoStore.settingsStore.fullScreenChatOverlay
             ? const Icon(Icons.chat_rounded)
             : const Icon(Icons.chat_outlined),
-        color: Colors.white,
+        color: surfaceColor,
       ),
     );
 
     final videoSettingsButton = IconButton(
       icon: const Icon(Icons.settings),
-      color: Colors.white,
+      color: surfaceColor,
       onPressed: () {
         videoStore.updateStreamQualities();
         showModalBottomSheet(
@@ -106,19 +111,19 @@ class VideoOverlay extends StatelessWidget {
             Observer(
               builder: (context) => Text(
                 videoStore.latency ?? 'N/A',
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: surfaceColor,
                   fontWeight: FontWeight.w500,
-                  fontFeatures: [FontFeature.tabularFigures()],
+                  fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
             ),
             const SizedBox(
               width: 8,
             ),
-            const Icon(
+            Icon(
               Icons.speed_rounded,
-              color: Colors.white,
+              color: surfaceColor,
             ),
           ],
         ),
@@ -129,9 +134,9 @@ class VideoOverlay extends StatelessWidget {
       message: 'Refresh',
       preferBelow: false,
       child: IconButton(
-        icon: const Icon(
+        icon: Icon(
           Icons.refresh_rounded,
-          color: Colors.white,
+          color: surfaceColor,
         ),
         onPressed: videoStore.handleRefresh,
       ),
@@ -147,7 +152,7 @@ class VideoOverlay extends StatelessWidget {
           videoStore.settingsStore.fullScreen
               ? Icons.fullscreen_exit_rounded
               : Icons.fullscreen_rounded,
-          color: Colors.white,
+          color: surfaceColor,
         ),
         onPressed: () => videoStore.settingsStore.fullScreen =
             !videoStore.settingsStore.fullScreen,
@@ -160,9 +165,9 @@ class VideoOverlay extends StatelessWidget {
           : 'Exit landscape mode',
       preferBelow: false,
       child: IconButton(
-        icon: const Icon(
+        icon: Icon(
           Icons.screen_rotation_rounded,
-          color: Colors.white,
+          color: surfaceColor,
         ),
         onPressed: () {
           if (orientation == Orientation.portrait) {
@@ -224,8 +229,8 @@ class VideoOverlay extends StatelessWidget {
                   Expanded(
                     child: VideoBar(
                       streamInfo: streamInfo,
-                      titleTextColor: Colors.white,
-                      subtitleTextColor: Colors.white,
+                      titleTextColor: surfaceColor,
+                      subtitleTextColor: surfaceColor,
                       subtitleTextWeight: FontWeight.w500,
                     ),
                   ),
@@ -245,7 +250,7 @@ class VideoOverlay extends StatelessWidget {
                     videoStore.paused
                         ? Icons.play_arrow_rounded
                         : Icons.pause_rounded,
-                    color: Colors.white,
+                    color: surfaceColor,
                   ),
                   onPressed: videoStore.handlePausePlay,
                 ),
@@ -273,8 +278,8 @@ class VideoOverlay extends StatelessWidget {
                                 const SizedBox(width: 4),
                                 Uptime(
                                   startTime: streamInfo.startedAt,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: surfaceColor,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -301,20 +306,20 @@ class VideoOverlay extends StatelessWidget {
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.visibility,
                                     size: 14,
-                                    color: Colors.white,
+                                    color: surfaceColor,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     NumberFormat().format(
                                       videoStore.streamInfo?.viewerCount,
                                     ),
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: surfaceColor,
                                       fontWeight: FontWeight.w500,
-                                      fontFeatures: [
+                                      fontFeatures: const [
                                         FontFeature.tabularFigures(),
                                       ],
                                     ),
@@ -334,9 +339,9 @@ class VideoOverlay extends StatelessWidget {
                     message: 'Enter picture-in-picture',
                     preferBelow: false,
                     child: IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.picture_in_picture_alt_rounded,
-                        color: Colors.white,
+                        color: surfaceColor,
                       ),
                       onPressed: videoStore.requestPictureInPicture,
                     ),

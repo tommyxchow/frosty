@@ -6,6 +6,7 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -97,10 +98,10 @@ class StreamCard extends StatelessWidget {
             margin: const EdgeInsets.all(4),
             child: Uptime(
               startTime: streamInfo.startedAt,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Colors.white,
+                color: context.watch<FrostyThemes>().dark.colorScheme.onSurface,
               ),
             ),
           ),

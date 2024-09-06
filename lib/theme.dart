@@ -17,8 +17,6 @@ class FrostyThemes {
       brightness: brightness,
     );
 
-    final isDark = brightness == Brightness.dark;
-
     final secondaryBackgroundColor = colorScheme.surfaceContainerLow;
 
     final borderColor = colorScheme.outlineVariant;
@@ -83,7 +81,7 @@ class FrostyThemes {
           border: Border.all(color: borderColor, width: borderWidth),
         ),
         textStyle: TextStyle(
-          color: isDark ? Colors.white : Colors.black,
+          color: colorScheme.onSurface,
         ),
       ),
       snackBarTheme: SnackBarThemeData(

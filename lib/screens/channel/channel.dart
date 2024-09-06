@@ -249,9 +249,13 @@ class _VideoChatState extends State<VideoChat> {
                   colorSchemeSeed: Color(settingsStore.accentColor),
                 ).dark,
                 child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(color: Colors.white),
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                        color: context
+                            .watch<FrostyThemes>()
+                            .dark
+                            .colorScheme
+                            .onSurface,
+                      ),
                   child: landscapeChat,
                 ),
               ),
