@@ -266,7 +266,7 @@ class ChatMessage extends StatelessWidget {
             final banDuration = ircMessage.tags['ban-duration'];
 
             renderMessage = Opacity(
-              opacity: 0.4,
+              opacity: 0.5,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
