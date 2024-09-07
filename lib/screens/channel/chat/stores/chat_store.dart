@@ -703,7 +703,7 @@ abstract class ChatStoreBase with Store {
     // Set the new notification message and create a new timer that will dismiss it after 2 seconds.
     _notification = notificationMessage;
     _notificationTimer =
-        Timer(const Duration(seconds: 2), () => _notification = null);
+        Timer(const Duration(seconds: 3), () => _notification = null);
   }
 
   /// Updates the sleep timer with the given [duration].

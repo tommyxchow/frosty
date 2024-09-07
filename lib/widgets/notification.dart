@@ -16,28 +16,25 @@ class FrostyNotification extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade900,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
       ),
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
                   const Icon(
                     Icons.info_outline_rounded,
-                    color: Colors.white,
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       message,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w500,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

@@ -10,6 +10,9 @@ class ChatModes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final disabledColor =
+        Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -23,7 +26,7 @@ class ChatModes extends StatelessWidget {
             roomState.emoteOnly != '0'
                 ? Icons.emoji_emotions_rounded
                 : Icons.emoji_emotions_outlined,
-            color: roomState.emoteOnly != '0' ? Colors.yellow : Colors.grey,
+            color: roomState.emoteOnly != '0' ? Colors.yellow : disabledColor,
           ),
         ),
         Tooltip(
@@ -39,7 +42,7 @@ class ChatModes extends StatelessWidget {
             roomState.followersOnly != '-1'
                 ? Icons.favorite_rounded
                 : Icons.favorite_outline_rounded,
-            color: roomState.followersOnly != '-1' ? Colors.red : Colors.grey,
+            color: roomState.followersOnly != '-1' ? Colors.red : disabledColor,
           ),
         ),
         Tooltip(
@@ -51,7 +54,7 @@ class ChatModes extends StatelessWidget {
           child: Text(
             'R9K',
             style: TextStyle(
-              color: roomState.r9k != '0' ? Colors.purple : Colors.grey,
+              color: roomState.r9k != '0' ? Colors.purple : disabledColor,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -66,7 +69,7 @@ class ChatModes extends StatelessWidget {
             roomState.slowMode != '0'
                 ? Icons.hourglass_top_rounded
                 : Icons.hourglass_empty_rounded,
-            color: roomState.slowMode != '0' ? Colors.blue : Colors.grey,
+            color: roomState.slowMode != '0' ? Colors.blue : disabledColor,
           ),
         ),
         Tooltip(
@@ -78,7 +81,7 @@ class ChatModes extends StatelessWidget {
             roomState.subMode != '0'
                 ? Icons.monetization_on_rounded
                 : Icons.monetization_on_outlined,
-            color: roomState.subMode != '0' ? Colors.green : Colors.grey,
+            color: roomState.subMode != '0' ? Colors.green : disabledColor,
           ),
         ),
       ],

@@ -147,14 +147,14 @@ class ChatDetails extends StatelessWidget {
     final children = [
       const SectionHeader(
         'Chat modes',
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+        isFirst: true,
       ),
       ListTile(
         title: ChatModes(roomState: chatDetailsStore.roomState),
       ),
       const SectionHeader(
         'More',
-        padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
       ),
       ListTile(
         leading: const Icon(Icons.people_outline),
@@ -162,15 +162,12 @@ class ChatDetails extends StatelessWidget {
         onTap: () => showModalBottomSheet(
           isScrollControlled: true,
           context: context,
-          builder: (context) => SizedBox(
-            height: MediaQuery.of(context).size.height * 0.8,
-            child: GestureDetector(
-              onTap: FocusScope.of(context).unfocus,
-              child: ChattersList(
-                chatDetailsStore: chatDetailsStore,
-                chatStore: chatStore,
-                userLogin: userLogin,
-              ),
+          builder: (context) => GestureDetector(
+            onTap: FocusScope.of(context).unfocus,
+            child: ChattersList(
+              chatDetailsStore: chatDetailsStore,
+              chatStore: chatStore,
+              userLogin: userLogin,
             ),
           ),
         ),

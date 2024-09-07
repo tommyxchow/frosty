@@ -37,25 +37,32 @@ class Settings extends StatelessWidget {
               ),
               icon: const Icon(SimpleIcons.buymeacoffee),
             ),
-          IconButton(
-            tooltip: 'View source on GitHub',
-            onPressed: () => launchUrl(
-              Uri.parse('https://github.com/tommyxchow/frosty'),
-              mode: settingsStore.launchUrlExternal
-                  ? LaunchMode.externalApplication
-                  : LaunchMode.inAppBrowserView,
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              tooltip: 'View source on GitHub',
+              onPressed: () => launchUrl(
+                Uri.parse('https://github.com/tommyxchow/frosty'),
+                mode: settingsStore.launchUrlExternal
+                    ? LaunchMode.externalApplication
+                    : LaunchMode.inAppBrowserView,
+              ),
+              icon: const Icon(SimpleIcons.github),
             ),
-            icon: const Icon(SimpleIcons.github),
           ),
         ],
       ),
       body: SafeArea(
         bottom: false,
         child: ListView(
+          padding: const EdgeInsets.only(top: 16),
           children: [
-            const SectionHeader('Profile'),
+            const SectionHeader(
+              'Profile',
+              isFirst: true,
+            ),
             ProfileCard(authStore: context.read<AuthStore>()),
-            const SectionHeader('Options', showDivider: true),
+            const SectionHeader('Customize'),
             SettingsTileRoute(
               leading: const Icon(Icons.settings_outlined),
               title: 'General',
@@ -71,7 +78,7 @@ class Settings extends StatelessWidget {
               title: 'Chat',
               child: ChatSettings(settingsStore: settingsStore),
             ),
-            const SectionHeader('Other', showDivider: true),
+            const SectionHeader('Other'),
             OtherSettings(settingsStore: settingsStore),
           ],
         ),

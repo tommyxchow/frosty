@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A custom-styled adaptive [ListTile] with options to select.
 class SettingsListSelect extends StatelessWidget {
-  final String title;
+  final String? title;
   final String? subtitle;
   final String selectedOption;
   final List<String> options;
@@ -10,7 +10,7 @@ class SettingsListSelect extends StatelessWidget {
 
   const SettingsListSelect({
     super.key,
-    required this.title,
+    this.title,
     this.subtitle,
     required this.selectedOption,
     required this.options,
@@ -20,9 +20,11 @@ class SettingsListSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(title),
+      title: title != null ? Text(title!) : null,
       subtitle: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: title != null
+            ? const EdgeInsets.symmetric(vertical: 8)
+            : EdgeInsets.zero,
         child: SegmentedButton(
           style: const ButtonStyle(visualDensity: VisualDensity.compact),
           segments: options

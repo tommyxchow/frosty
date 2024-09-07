@@ -19,6 +19,8 @@ class ProfilePicture extends StatelessWidget {
   Widget build(BuildContext context) {
     final diameter = radius * 2;
 
+    final placeholderColor = Theme.of(context).colorScheme.surfaceContainer;
+
     return ClipOval(
       child: FutureBuilder(
         future: context.read<TwitchApi>().getUser(
@@ -32,10 +34,10 @@ class ProfilePicture extends StatelessWidget {
                   height: diameter,
                   imageUrl: snapshot.data!.profileImageUrl,
                   placeholder: (context, url) =>
-                      ColoredBox(color: Colors.grey.shade900),
+                      ColoredBox(color: placeholderColor),
                 )
               : Container(
-                  color: Colors.grey.shade900,
+                  color: placeholderColor,
                   width: diameter,
                   height: diameter,
                 );

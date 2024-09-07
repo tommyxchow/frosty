@@ -11,6 +11,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..themeType = $enumDecodeNullable(_$ThemeTypeEnumMap, json['themeType'],
               unknownValue: ThemeType.system) ??
           ThemeType.system
+      ..accentColor = (json['accentColor'] as num?)?.toInt() ?? 4287710975
       ..showThumbnails = json['showThumbnails'] as bool? ?? true
       ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
       ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
@@ -71,6 +72,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
       'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
+      'accentColor': instance.accentColor,
       'showThumbnails': instance.showThumbnails,
       'largeStreamCard': instance.largeStreamCard,
       'launchUrlExternal': instance.launchUrlExternal,
@@ -122,7 +124,6 @@ const _$ThemeTypeEnumMap = {
   ThemeType.system: 'system',
   ThemeType.light: 'light',
   ThemeType.dark: 'dark',
-  ThemeType.black: 'black',
 };
 
 const _$TimestampTypeEnumMap = {
@@ -158,6 +159,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set themeType(ThemeType value) {
     _$themeTypeAtom.reportWrite(value, super.themeType, () {
       super.themeType = value;
+    });
+  }
+
+  late final _$accentColorAtom =
+      Atom(name: '_SettingsStoreBase.accentColor', context: context);
+
+  @override
+  int get accentColor {
+    _$accentColorAtom.reportRead();
+    return super.accentColor;
+  }
+
+  @override
+  set accentColor(int value) {
+    _$accentColorAtom.reportWrite(value, super.accentColor, () {
+      super.accentColor = value;
     });
   }
 
@@ -951,6 +968,7 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   String toString() {
     return '''
 themeType: ${themeType},
+accentColor: ${accentColor},
 showThumbnails: ${showThumbnails},
 largeStreamCard: ${largeStreamCard},
 launchUrlExternal: ${launchUrlExternal},

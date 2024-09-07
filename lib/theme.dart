@@ -3,22 +3,28 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class FrostyThemes {
-  static const gray = Color.fromRGBO(18, 18, 18, 1);
-  static const purple = Color(0xff9146ff);
+  final Color colorSchemeSeed;
+
+  const FrostyThemes({required this.colorSchemeSeed});
 
   ThemeData createBaseTheme({
     required Brightness brightness,
     required Color colorSchemeSeed,
     Color? backgroundColor,
   }) {
-    final secondaryBackground = brightness == Brightness.light
-        ? Colors.grey.shade200
-        : Colors.grey.shade800;
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: colorSchemeSeed,
+      brightness: brightness,
+    );
+
+    final borderColor = colorScheme.outlineVariant;
+
+    const borderWidth = 0.5;
 
     return ThemeData(
       fontFamily: 'Inter',
       brightness: brightness,
-      colorSchemeSeed: colorSchemeSeed,
+      colorScheme: colorScheme,
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       scaffoldBackgroundColor: backgroundColor,
       bottomSheetTheme: BottomSheetThemeData(
@@ -34,25 +40,31 @@ class FrostyThemes {
         elevation: 0,
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
+        shape: Border(
+          bottom: BorderSide(color: borderColor, width: borderWidth),
+        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        border: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(color: secondaryBackground),
+        filled: true,
+        fillColor: colorScheme.surfaceContainer,
+        border: const OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(100)),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(color: secondaryBackground),
+        enabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.all(Radius.circular(100)),
         ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(color: secondaryBackground),
+        disabledBorder: const OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.all(Radius.circular(100)),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         elevation: 0,
         backgroundColor: backgroundColor,
+        height: 64,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       ),
       tabBarTheme: const TabBarTheme(
         dividerColor: Colors.transparent,
@@ -60,28 +72,29 @@ class FrostyThemes {
       ),
       tooltipTheme: TooltipThemeData(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 8),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          border: Border.all(color: secondaryBackground),
+          border: Border.all(color: borderColor, width: borderWidth),
         ),
         textStyle: TextStyle(
-          color: brightness == Brightness.dark ? Colors.white : Colors.black,
+          color: colorScheme.onSurface,
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         showCloseIcon: true,
         backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: secondaryBackground),
+          side: BorderSide(color: borderColor),
           borderRadius: const BorderRadius.all(Radius.circular(8)),
         ),
         behavior: SnackBarBehavior.floating,
       ),
-      dividerTheme: const DividerThemeData(
-        thickness: 0.5,
-        space: 0.5,
+      dividerTheme: DividerThemeData(
+        thickness: borderWidth,
+        space: borderWidth,
+        color: borderColor,
       ),
       textTheme: const TextTheme(
         // Used in alert dialog title.
@@ -112,7 +125,6 @@ class FrostyThemes {
         // Used in list tile title.
         bodyLarge: TextStyle(
           letterSpacing: 0,
-          fontWeight: FontWeight.w500,
         ),
         bodyMedium: TextStyle(
           letterSpacing: 0,
@@ -127,8 +139,8 @@ class FrostyThemes {
   ThemeData get light {
     final theme = createBaseTheme(
       brightness: Brightness.light,
-      colorSchemeSeed: purple,
-      backgroundColor: Colors.white,
+      colorSchemeSeed: colorSchemeSeed,
+      backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
     );
 
     return theme;
@@ -137,17 +149,7 @@ class FrostyThemes {
   ThemeData get dark {
     final theme = createBaseTheme(
       brightness: Brightness.dark,
-      colorSchemeSeed: purple,
-      backgroundColor: gray,
-    );
-
-    return theme;
-  }
-
-  ThemeData get black {
-    final theme = createBaseTheme(
-      brightness: Brightness.dark,
-      colorSchemeSeed: purple,
+      colorSchemeSeed: colorSchemeSeed,
       backgroundColor: Colors.black,
     );
 

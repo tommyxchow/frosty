@@ -61,6 +61,7 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: false,
+          shape: const Border(),
           title: Observer(
             builder: (_) {
               final titles = [
@@ -73,19 +74,22 @@ class _HomeState extends State<Home> {
             },
           ),
           actions: [
-            IconButton(
-              tooltip: 'Settings',
-              icon: isLoggedIn
-                  ? ProfilePicture(
-                      userLogin: _authStore.user.details!.login,
-                      radius: 16,
-                    )
-                  : const Icon(Icons.settings_rounded),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      Settings(settingsStore: context.read<SettingsStore>()),
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton(
+                tooltip: 'Settings',
+                icon: isLoggedIn
+                    ? ProfilePicture(
+                        userLogin: _authStore.user.details!.login,
+                        radius: 16,
+                      )
+                    : const Icon(Icons.settings_rounded),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        Settings(settingsStore: context.read<SettingsStore>()),
+                  ),
                 ),
               ),
             ),
@@ -111,31 +115,44 @@ class _HomeState extends State<Home> {
             ),
           ),
         ),
-        bottomNavigationBar: Observer(
-          builder: (_) => NavigationBar(
-            destinations: [
-              if (_authStore.isLoggedIn)
-                NavigationDestination(
-                  icon: _homeStore.selectedIndex == 0
-                      ? const Icon(Icons.favorite_rounded)
-                      : const Icon(Icons.favorite_border_rounded),
-                  label: 'Following',
-                  tooltip: 'Followed streams',
-                ),
-              const NavigationDestination(
-                icon: Icon(Icons.arrow_upward_rounded),
-                label: 'Top',
-                tooltip: 'Top streams and categories',
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Divider(),
+            Observer(
+              builder: (_) => NavigationBar(
+                destinations: [
+                  if (_authStore.isLoggedIn)
+                    const NavigationDestination(
+                      icon: Icon(
+                        Icons.favorite_border_rounded,
+                      ),
+                      selectedIcon: Icon(Icons.favorite_rounded),
+                      label: 'Following',
+                      tooltip: 'Following',
+                    ),
+                  const NavigationDestination(
+                    icon: Icon(
+                      Icons.arrow_upward_rounded,
+                    ),
+                    selectedIcon: Icon(Icons.arrow_upward_rounded),
+                    label: 'Top',
+                    tooltip: 'Top',
+                  ),
+                  const NavigationDestination(
+                    icon: Icon(
+                      Icons.search_rounded,
+                    ),
+                    selectedIcon: Icon(Icons.search_rounded),
+                    label: 'Search',
+                    tooltip: 'Search',
+                  ),
+                ],
+                selectedIndex: _homeStore.selectedIndex,
+                onDestinationSelected: _homeStore.handleTap,
               ),
-              const NavigationDestination(
-                icon: Icon(Icons.search_rounded),
-                label: 'Search',
-                tooltip: 'Search for channels and categories',
-              ),
-            ],
-            selectedIndex: _homeStore.selectedIndex,
-            onDestinationSelected: _homeStore.handleTap,
-          ),
+            ),
+          ],
         ),
       ),
     );

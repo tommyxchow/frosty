@@ -51,7 +51,7 @@ class CategoryCard extends StatelessWidget {
                       '${artWidth}x$artHeight.jpg',
                     ),
                     placeholder: (context, url) => ColoredBox(
-                      color: Colors.grey.shade900,
+                      color: Theme.of(context).colorScheme.surfaceContainer,
                       child: const LoadingIndicator(),
                     ),
                   ),

@@ -16,6 +16,7 @@ abstract class _SettingsStoreBase with Store {
   // * General Settings
   // Theme defaults
   static const defaultThemeType = ThemeType.system;
+  static const defaultAccentColor = 0xff9146ff;
 
   // Stream card defaults
   static const defaultShowThumbnails = true;
@@ -28,6 +29,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultThemeType, unknownEnumValue: ThemeType.system)
   @observable
   var themeType = defaultThemeType;
+
+  @JsonKey(defaultValue: defaultAccentColor)
+  @observable
+  var accentColor = defaultAccentColor;
 
   // Stream card options
   @JsonKey(defaultValue: defaultShowThumbnails)
@@ -46,6 +51,7 @@ abstract class _SettingsStoreBase with Store {
   @action
   void resetGeneralSettings() {
     themeType = defaultThemeType;
+    accentColor = defaultAccentColor;
 
     largeStreamCard = defaultLargeStreamCard;
     showThumbnails = defaultShowThumbnails;
@@ -379,13 +385,12 @@ abstract class _SettingsStoreBase with Store {
   }
 }
 
-const themeNames = ['System', 'Light', 'Dark', 'Black'];
+const themeNames = ['System', 'Light', 'Dark'];
 
 enum ThemeType {
   system,
   light,
   dark,
-  black,
 }
 
 const timestampNames = ['Disabled', '12-hour', '24-hour'];

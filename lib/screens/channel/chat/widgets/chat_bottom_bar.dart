@@ -5,6 +5,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/cached_image.dart';
 
 class ChatBottomBar extends StatelessWidget {
@@ -70,6 +71,7 @@ class ChatBottomBar extends StatelessWidget {
 
         return Column(
           children: [
+            AnimatedScrollBorder(scrollController: chatStore.scrollController),
             if (chatStore.replyingToMessage != null) ...[
               const Divider(),
               ListTile(

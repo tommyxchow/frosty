@@ -17,7 +17,7 @@ class FrostyDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog.adaptive(
+    return AlertDialog(
       title: Text(
         title,
         // style: const TextStyle(fontWeight: FontWeight.bold),

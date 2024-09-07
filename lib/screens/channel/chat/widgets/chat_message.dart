@@ -8,19 +8,20 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/theme.dart';
 import 'package:provider/provider.dart';
 
 class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
   final ChatStore chatStore;
   final bool isModal;
+  final bool showReplyHeader;
 
   const ChatMessage({
     super.key,
     required this.ircMessage,
     required this.chatStore,
     this.isModal = false,
+    this.showReplyHeader = true,
   });
 
   void onTapName(BuildContext context) {
@@ -179,7 +180,7 @@ class ChatMessage extends StatelessWidget {
 
             Widget? messageHeaderIcon;
             Widget? messageHeader;
-            if (replyUser != null && replyBody != null) {
+            if (replyUser != null && replyBody != null && showReplyHeader) {
               messageHeaderIcon = Icon(
                 Icons.chat_rounded,
                 size: messageHeaderIconSize,
@@ -221,7 +222,7 @@ class ChatMessage extends StatelessWidget {
                 ),
               );
             } else if (shouldHighlightMessage) {
-              highlightColor = FrostyThemes.purple;
+              highlightColor = const Color(0xff9146ff);
               messageHeader = Text(
                 'Highlighted message',
                 style: TextStyle(
@@ -265,7 +266,7 @@ class ChatMessage extends StatelessWidget {
             final banDuration = ircMessage.tags['ban-duration'];
 
             renderMessage = Opacity(
-              opacity: 0.4,
+              opacity: 0.5,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -315,7 +316,7 @@ class ChatMessage extends StatelessWidget {
             break;
           case Command.userNotice:
             if (chatStore.settings.showUserNotices) {
-              highlightColor = FrostyThemes.purple;
+              highlightColor = const Color(0xff9146ff);
               Widget? messageHeaderIcon;
               Widget? messageHeader;
 

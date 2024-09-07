@@ -6,6 +6,7 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -41,9 +42,11 @@ class LargeStreamCard extends StatelessWidget {
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
     final thumbnailWidth = min((size.width * pixelRatio) ~/ 1, 1920);
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
+    final surfaceColor =
+        context.watch<FrostyThemes>().dark.colorScheme.onSurface;
 
     final thumbnail = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(12)),
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
       child: Stack(
         alignment: Alignment.bottomLeft,
         children: [
@@ -68,7 +71,7 @@ class LargeStreamCard extends StatelessWidget {
                     ) +
                     cacheUrlExtension,
                 placeholder: (context, url) => ColoredBox(
-                  color: Colors.grey.shade900,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   child: const LoadingIndicator(),
                 ),
                 useOldImageOnUrlChange: true,
@@ -92,8 +95,8 @@ class LargeStreamCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Uptime(
                         startTime: streamInfo.startedAt,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: surfaceColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -106,16 +109,16 @@ class LargeStreamCard extends StatelessWidget {
                   preferBelow: false,
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.visibility,
                         size: 14,
-                        color: Colors.white,
+                        color: surfaceColor,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         NumberFormat().format(streamInfo.viewerCount),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: surfaceColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

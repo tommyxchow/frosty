@@ -7,6 +7,7 @@ import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +38,7 @@ class _SearchState extends State<Search> {
         Observer(
           builder: (context) {
             return Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               child: TextField(
                 controller: _searchStore.textEditingController,
                 focusNode: _searchStore.textFieldFocusNode,
@@ -66,6 +67,7 @@ class _SearchState extends State<Search> {
             );
           },
         ),
+        AnimatedScrollBorder(scrollController: widget.scrollController),
         Expanded(
           child: Scrollbar(
             controller: widget.scrollController,
@@ -87,6 +89,7 @@ class _SearchState extends State<Search> {
                             const SectionHeader(
                               'History',
                               padding: EdgeInsets.zero,
+                              isFirst: true,
                             ),
                             TextButton(
                               onPressed: _searchStore.searchHistory.clear,
@@ -129,7 +132,7 @@ class _SearchState extends State<Search> {
                     const SliverToBoxAdapter(
                       child: SectionHeader(
                         'Channels',
-                        padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+                        isFirst: true,
                       ),
                     ),
                     SearchResultsChannels(
@@ -139,7 +142,6 @@ class _SearchState extends State<Search> {
                     const SliverToBoxAdapter(
                       child: SectionHeader(
                         'Categories',
-                        padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
                       ),
                     ),
                     SearchResultsCategories(searchStore: _searchStore),

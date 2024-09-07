@@ -6,6 +6,7 @@ import 'package:frosty/screens/home/top/categories/categories_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:provider/provider.dart';
 
@@ -99,23 +100,32 @@ class _CategoriesState extends State<Categories>
             );
           }
 
-          return Scrollbar(
-            controller: widget.scrollController,
-            child: ListView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              controller: widget.scrollController,
-              itemCount: _categoriesStore.categories.length,
-              itemBuilder: (context, index) {
-                if (index > _categoriesStore.categories.length - 10 &&
-                    _categoriesStore.hasMore) {
-                  _categoriesStore.getCategories();
-                }
-                return CategoryCard(
-                  key: ValueKey(_categoriesStore.categories[index].id),
-                  category: _categoriesStore.categories[index],
-                );
-              },
-            ),
+          return Column(
+            children: [
+              AnimatedScrollBorder(
+                scrollController: widget.scrollController,
+              ),
+              Expanded(
+                child: Scrollbar(
+                  controller: widget.scrollController,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: widget.scrollController,
+                    itemCount: _categoriesStore.categories.length,
+                    itemBuilder: (context, index) {
+                      if (index > _categoriesStore.categories.length - 10 &&
+                          _categoriesStore.hasMore) {
+                        _categoriesStore.getCategories();
+                      }
+                      return CategoryCard(
+                        key: ValueKey(_categoriesStore.categories[index].id),
+                        category: _categoriesStore.categories[index],
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),

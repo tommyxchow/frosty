@@ -84,6 +84,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
               ],
             ),
           ),
+          const Divider(),
           Expanded(
             child: Observer(
               builder: (context) {

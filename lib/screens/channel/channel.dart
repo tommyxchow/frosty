@@ -245,11 +245,17 @@ class _VideoChatState extends State<VideoChat> {
               visible: settingsStore.fullScreenChatOverlay,
               maintainState: true,
               child: Theme(
-                data: FrostyThemes().dark,
+                data: FrostyThemes(
+                  colorSchemeSeed: Color(settingsStore.accentColor),
+                ).dark,
                 child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(color: Colors.white),
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                        color: context
+                            .watch<FrostyThemes>()
+                            .dark
+                            .colorScheme
+                            .onSurface,
+                      ),
                   child: landscapeChat,
                 ),
               ),
@@ -281,15 +287,31 @@ class _VideoChatState extends State<VideoChat> {
                               if (settingsStore.showOverlay)
                                 Row(
                                   children: settingsStore.landscapeChatLeftSide
-                                      ? [overlayChat, Expanded(child: overlay)]
-                                      : [Expanded(child: overlay), overlayChat],
+                                      ? [
+                                          overlayChat,
+                                          const VerticalDivider(),
+                                          Expanded(child: overlay),
+                                        ]
+                                      : [
+                                          Expanded(child: overlay),
+                                          const VerticalDivider(),
+                                          overlayChat,
+                                        ],
                                 ),
                             ],
                           )
                         : Row(
                             children: settingsStore.landscapeChatLeftSide
-                                ? [landscapeChat, Expanded(child: video)]
-                                : [Expanded(child: video), landscapeChat],
+                                ? [
+                                    landscapeChat,
+                                    const VerticalDivider(),
+                                    Expanded(child: video),
+                                  ]
+                                : [
+                                    Expanded(child: video),
+                                    const VerticalDivider(),
+                                    landscapeChat,
+                                  ],
                           )
                     : Column(
                         children: [appBar, Expanded(child: chat)],
@@ -307,8 +329,10 @@ class _VideoChatState extends State<VideoChat> {
               children: [
                 if (!settingsStore.showVideo)
                   appBar
-                else
+                else ...[
                   AspectRatio(aspectRatio: 16 / 9, child: video),
+                  const Divider(),
+                ],
                 Expanded(child: chat),
               ],
             ),

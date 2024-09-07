@@ -21,7 +21,7 @@ class ScrollToTopButton extends StatelessWidget {
             ),
             style: ElevatedButton.styleFrom(
               shape: const CircleBorder(),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
             ),
             child: const Icon(Icons.arrow_upward_rounded),
           ),
