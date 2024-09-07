@@ -17,8 +17,6 @@ class FrostyThemes {
       brightness: brightness,
     );
 
-    final secondaryBackgroundColor = colorScheme.surfaceContainerLow;
-
     final borderColor = colorScheme.outlineVariant;
 
     const borderWidth = 0.5;
@@ -49,7 +47,7 @@ class FrostyThemes {
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         filled: true,
-        fillColor: secondaryBackgroundColor,
+        fillColor: colorScheme.surfaceContainer,
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(100)),
         ),
