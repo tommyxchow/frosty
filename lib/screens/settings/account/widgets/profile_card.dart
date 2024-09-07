@@ -27,9 +27,9 @@ class ProfileCard extends StatelessWidget {
       builder: (context) {
         if (authStore.error != null) {
           return ListTile(
-            leading: const Icon(
+            leading: Icon(
               Icons.error_outline_rounded,
-              color: Colors.red,
+              color: Theme.of(context).colorScheme.error,
             ),
             title: const Text('Failed to connect'),
             trailing: FilledButton.tonal(
