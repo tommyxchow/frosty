@@ -19,8 +19,7 @@ class ProfilePicture extends StatelessWidget {
   Widget build(BuildContext context) {
     final diameter = radius * 2;
 
-    final placeholderColor =
-        Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
+    final placeholderColor = Theme.of(context).colorScheme.surfaceContainer;
 
     return ClipOval(
       child: FutureBuilder(
