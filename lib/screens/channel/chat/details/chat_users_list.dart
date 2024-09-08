@@ -120,48 +120,45 @@ class _ChattersListState extends State<ChattersList> {
                                 ),
                               )
                             else
-                              SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) => InkWell(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 4,
-                                      ),
-                                      child: Text(
-                                        widget.chatDetailsStore.filteredUsers
-                                            .elementAt(index),
-                                      ),
+                              SliverList.builder(
+                                itemBuilder: (context, index) => InkWell(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
                                     ),
-                                    onTap: () async {
-                                      final userInfo = await context
-                                          .read<TwitchApi>()
-                                          .getUser(
-                                            headers: context
-                                                .read<AuthStore>()
-                                                .headersTwitch,
-                                            userLogin: widget
-                                                .chatDetailsStore.filteredUsers
-                                                .elementAt(index),
-                                          );
-
-                                      if (!context.mounted) return;
-
-                                      showModalBottomSheet(
-                                        isScrollControlled: true,
-                                        context: context,
-                                        builder: (context) => ChatUserModal(
-                                          chatStore: widget.chatStore,
-                                          username: userInfo.login,
-                                          userId: userInfo.id,
-                                          displayName: userInfo.displayName,
-                                        ),
-                                      );
-                                    },
+                                    child: Text(
+                                      widget.chatDetailsStore.filteredUsers
+                                          .elementAt(index),
+                                    ),
                                   ),
-                                  childCount: widget
-                                      .chatDetailsStore.filteredUsers.length,
+                                  onTap: () async {
+                                    final userInfo =
+                                        await context.read<TwitchApi>().getUser(
+                                              headers: context
+                                                  .read<AuthStore>()
+                                                  .headersTwitch,
+                                              userLogin: widget.chatDetailsStore
+                                                  .filteredUsers
+                                                  .elementAt(index),
+                                            );
+
+                                    if (!context.mounted) return;
+
+                                    showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder: (context) => ChatUserModal(
+                                        chatStore: widget.chatStore,
+                                        username: userInfo.login,
+                                        userId: userInfo.id,
+                                        displayName: userInfo.displayName,
+                                      ),
+                                    );
+                                  },
                                 ),
+                                itemCount: widget
+                                    .chatDetailsStore.filteredUsers.length,
                               ),
                           ],
                         );

@@ -29,7 +29,7 @@ class RecentEmotesPanel extends StatelessWidget {
                 child: AlertMessage(message: 'No recent emotes'),
               )
             else
-              SliverGrid(
+              SliverGrid.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount:
                       MediaQuery.of(context).orientation == Orientation.portrait
@@ -38,55 +38,52 @@ class RecentEmotesPanel extends StatelessWidget {
                               ? 6
                               : 16,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final emote = chatStore.assetsStore.recentEmotes[index];
-                    final validEmotes = [
-                      ...chatStore.assetsStore.emoteToObject.values,
-                      ...chatStore.assetsStore.userEmoteToObject.values,
-                    ];
-                    final matchingEmotes = validEmotes.where(
-                      (existingEmote) =>
-                          existingEmote.name == emote.name &&
-                          existingEmote.type == emote.type,
-                    );
+                itemBuilder: (context, index) {
+                  final emote = chatStore.assetsStore.recentEmotes[index];
+                  final validEmotes = [
+                    ...chatStore.assetsStore.emoteToObject.values,
+                    ...chatStore.assetsStore.userEmoteToObject.values,
+                  ];
+                  final matchingEmotes = validEmotes.where(
+                    (existingEmote) =>
+                        existingEmote.name == emote.name &&
+                        existingEmote.type == emote.type,
+                  );
 
-                    return InkWell(
-                      onTap: matchingEmotes.isNotEmpty
-                          ? () => chatStore.addEmote(emote)
-                          : null,
-                      onLongPress: () {
-                        HapticFeedback.lightImpact();
+                  return InkWell(
+                    onTap: matchingEmotes.isNotEmpty
+                        ? () => chatStore.addEmote(emote)
+                        : null,
+                    onLongPress: () {
+                      HapticFeedback.lightImpact();
 
-                        IRCMessage.showEmoteDetailsBottomSheet(
-                          context,
-                          emote: emote,
-                          launchExternal: chatStore.settings.launchUrlExternal,
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Center(
-                          child: FrostyCachedNetworkImage(
-                            imageUrl: matchingEmotes.isNotEmpty
-                                ? matchingEmotes.first.url
-                                : emote.url,
-                            color: matchingEmotes.isNotEmpty
-                                ? null
-                                : const Color.fromRGBO(255, 255, 255, 0.5),
-                            colorBlendMode: matchingEmotes.isNotEmpty
-                                ? null
-                                : BlendMode.modulate,
-                            height:
-                                emote.height?.toDouble() ?? defaultEmoteSize,
-                            width: emote.width?.toDouble(),
-                          ),
+                      IRCMessage.showEmoteDetailsBottomSheet(
+                        context,
+                        emote: emote,
+                        launchExternal: chatStore.settings.launchUrlExternal,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Center(
+                        child: FrostyCachedNetworkImage(
+                          imageUrl: matchingEmotes.isNotEmpty
+                              ? matchingEmotes.first.url
+                              : emote.url,
+                          color: matchingEmotes.isNotEmpty
+                              ? null
+                              : const Color.fromRGBO(255, 255, 255, 0.5),
+                          colorBlendMode: matchingEmotes.isNotEmpty
+                              ? null
+                              : BlendMode.modulate,
+                          height: emote.height?.toDouble() ?? defaultEmoteSize,
+                          width: emote.width?.toDouble(),
                         ),
                       ),
-                    );
-                  },
-                  childCount: chatStore.assetsStore.recentEmotes.length,
-                ),
+                    ),
+                  );
+                },
+                itemCount: chatStore.assetsStore.recentEmotes.length,
               ),
           ],
         );

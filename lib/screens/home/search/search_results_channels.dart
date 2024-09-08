@@ -82,70 +82,68 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                   .contains(channel.id),
             );
 
-            return SliverList(
-              delegate: SliverChildListDelegate.fixed(
-                [
-                  ...results.map(
-                    (channel) {
-                      final displayName = getReadableName(
-                        channel.displayName,
-                        channel.broadcasterLogin,
-                      );
+            return SliverList.list(
+              children: [
+                ...results.map(
+                  (channel) {
+                    final displayName = getReadableName(
+                      channel.displayName,
+                      channel.broadcasterLogin,
+                    );
 
-                      return InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VideoChat(
-                              userId: channel.id,
-                              userName: channel.displayName,
-                              userLogin: channel.broadcasterLogin,
-                            ),
-                          ),
-                        ),
-                        onLongPress: () {
-                          HapticFeedback.lightImpact();
-
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) => BlockReportModal(
-                              authStore: widget.searchStore.authStore,
-                              name: displayName,
-                              userLogin: channel.broadcasterLogin,
-                              userId: channel.id,
-                            ),
-                          );
-                        },
-                        child: ListTile(
-                          title: Text(displayName),
-                          leading: ProfilePicture(
+                    return InkWell(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VideoChat(
+                            userId: channel.id,
+                            userName: channel.displayName,
                             userLogin: channel.broadcasterLogin,
-                            radius: 16,
                           ),
-                          subtitle: channel.isLive
-                              ? Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.circle,
-                                      color: Colors.red,
-                                      size: 10,
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Uptime(startTime: channel.startedAt),
-                                  ],
-                                )
-                              : null,
                         ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    title: Text('Go to channel "${widget.query}"'),
-                    onTap: () => _handleSearch(context, widget.query),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                  ),
-                ],
-              ),
+                      ),
+                      onLongPress: () {
+                        HapticFeedback.lightImpact();
+
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => BlockReportModal(
+                            authStore: widget.searchStore.authStore,
+                            name: displayName,
+                            userLogin: channel.broadcasterLogin,
+                            userId: channel.id,
+                          ),
+                        );
+                      },
+                      child: ListTile(
+                        title: Text(displayName),
+                        leading: ProfilePicture(
+                          userLogin: channel.broadcasterLogin,
+                          radius: 16,
+                        ),
+                        subtitle: channel.isLive
+                            ? Row(
+                                children: [
+                                  const Icon(
+                                    Icons.circle,
+                                    color: Colors.red,
+                                    size: 10,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Uptime(startTime: channel.startedAt),
+                                ],
+                              )
+                            : null,
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  title: Text('Go to channel "${widget.query}"'),
+                  onTap: () => _handleSearch(context, widget.query),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                ),
+              ],
             );
         }
       },
