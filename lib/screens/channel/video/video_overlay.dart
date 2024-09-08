@@ -71,7 +71,8 @@ class VideoOverlay extends StatelessWidget {
             children: [
               const SectionHeader(
                 'Stream quality',
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+                isFirst: true,
               ),
               Flexible(
                 child: Observer(
