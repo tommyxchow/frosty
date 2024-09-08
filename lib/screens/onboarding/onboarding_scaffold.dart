@@ -42,7 +42,9 @@ class OnboardingScaffold extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        shape: const Border(),
+      ),
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
