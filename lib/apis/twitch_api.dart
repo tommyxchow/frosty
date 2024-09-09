@@ -291,6 +291,23 @@ class TwitchApi {
     }
   }
 
+  Future<StreamsTwitch> getStreamsByIds({
+    required List<String> userIds,
+    required Map<String, String> headers,
+  }) async {
+    final uri = Uri.parse(
+      'https://api.twitch.tv/helix/streams?${userIds.map((e) => 'user_id=$e').join('&')}&first=100',
+    );
+
+    final response = await _client.get(uri, headers: headers);
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      return StreamsTwitch.fromJson(decoded);
+    } else {
+      return Future.error('Failed to get stream info');
+    }
+  }
+
   /// Returns a [UserTwitch] object containing the user info associated with the given [userLogin].
   Future<UserTwitch> getUser({
     String? userLogin,

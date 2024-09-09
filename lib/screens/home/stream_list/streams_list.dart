@@ -44,6 +44,7 @@ class _StreamsListState extends State<StreamsList>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   late final _listStore = ListStore(
     authStore: context.read<AuthStore>(),
+    settingsStore: context.read<SettingsStore>(),
     twitchApi: context.read<TwitchApi>(),
     listType: widget.listType,
     categoryId: widget.categoryId,
@@ -127,16 +128,7 @@ class _StreamsListState extends State<StreamsList>
             );
           }
 
-          final settingsStore = context.read<SettingsStore>();
-
-          final isFollowingTab = widget.listType == ListType.followed;
-
-          final pinnedStreams = _listStore.streams
-              .where(
-                (stream) =>
-                    settingsStore.pinnedChannels.contains(stream.userId),
-              )
-              .toList();
+          final settingsStore = context.watch<SettingsStore>();
 
           final unpinnedStreams = _listStore.streams
               .where(
@@ -144,6 +136,8 @@ class _StreamsListState extends State<StreamsList>
                     !settingsStore.pinnedChannels.contains(stream.userId),
               )
               .toList();
+
+          final isFollowingTab = widget.listType == ListType.followed;
 
           return Stack(
             alignment: AlignmentDirectional.bottomCenter,
@@ -167,7 +161,8 @@ class _StreamsListState extends State<StreamsList>
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: _listStore.scrollController,
                         slivers: [
-                          if (isFollowingTab) ...[
+                          if (isFollowingTab &&
+                              _listStore.pinnedStreams.isNotEmpty) ...[
                             const SliverToBoxAdapter(
                               child: SectionHeader(
                                 'Pinnned',
@@ -181,40 +176,40 @@ class _StreamsListState extends State<StreamsList>
                               ),
                             ),
                             SliverList.builder(
-                              itemCount: pinnedStreams.length,
+                              itemCount: _listStore.pinnedStreams.length,
                               itemBuilder: (context, index) {
                                 return Observer(
                                   builder: (context) {
-                                    final isPinned = settingsStore
-                                        .pinnedChannels
-                                        .contains(pinnedStreams[index].userId);
-
                                     return settingsStore.largeStreamCard
                                         ? LargeStreamCard(
                                             key: ValueKey(
-                                              pinnedStreams[index].userId,
+                                              _listStore
+                                                  .pinnedStreams[index].userId,
                                             ),
-                                            streamInfo: pinnedStreams[index],
+                                            streamInfo:
+                                                _listStore.pinnedStreams[index],
                                             showThumbnail: context
                                                 .read<SettingsStore>()
                                                 .showThumbnails,
                                             showCategory:
                                                 widget.categoryId == null,
                                             showPinOption: true,
-                                            isPinned: isPinned,
+                                            isPinned: true,
                                           )
                                         : StreamCard(
                                             key: ValueKey(
-                                              pinnedStreams[index].userId,
+                                              _listStore
+                                                  .pinnedStreams[index].userId,
                                             ),
-                                            streamInfo: pinnedStreams[index],
+                                            streamInfo:
+                                                _listStore.pinnedStreams[index],
                                             showThumbnail: context
                                                 .read<SettingsStore>()
                                                 .showThumbnails,
                                             showCategory:
                                                 widget.categoryId == null,
                                             showPinOption: true,
-                                            isPinned: isPinned,
+                                            isPinned: true,
                                           );
                                   },
                                 );

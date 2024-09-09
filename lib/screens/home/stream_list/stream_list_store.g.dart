@@ -15,6 +15,13 @@ mixin _$ListStore on ListStoreBase, Store {
   bool get hasMore => (_$hasMoreComputed ??=
           Computed<bool>(() => super.hasMore, name: 'ListStoreBase.hasMore'))
       .value;
+  Computed<bool>? _$isLoadingComputed;
+
+  @override
+  bool get isLoading =>
+      (_$isLoadingComputed ??= Computed<bool>(() => super.isLoading,
+              name: 'ListStoreBase.isLoading'))
+          .value;
   Computed<ObservableList<StreamTwitch>>? _$streamsComputed;
 
   @override
@@ -22,24 +29,6 @@ mixin _$ListStore on ListStoreBase, Store {
           Computed<ObservableList<StreamTwitch>>(() => super.streams,
               name: 'ListStoreBase.streams'))
       .value;
-
-  late final _$_isLoadingAtom =
-      Atom(name: 'ListStoreBase._isLoading', context: context);
-
-  bool get isLoading {
-    _$_isLoadingAtom.reportRead();
-    return super._isLoading;
-  }
-
-  @override
-  bool get _isLoading => isLoading;
-
-  @override
-  set _isLoading(bool value) {
-    _$_isLoadingAtom.reportWrite(value, super._isLoading, () {
-      super._isLoading = value;
-    });
-  }
 
   late final _$_allStreamsAtom =
       Atom(name: 'ListStoreBase._allStreams', context: context);
@@ -59,6 +48,62 @@ mixin _$ListStore on ListStoreBase, Store {
     });
   }
 
+  late final _$_isAllStreamsLoadingAtom =
+      Atom(name: 'ListStoreBase._isAllStreamsLoading', context: context);
+
+  bool get isAllStreamsLoading {
+    _$_isAllStreamsLoadingAtom.reportRead();
+    return super._isAllStreamsLoading;
+  }
+
+  @override
+  bool get _isAllStreamsLoading => isAllStreamsLoading;
+
+  @override
+  set _isAllStreamsLoading(bool value) {
+    _$_isAllStreamsLoadingAtom.reportWrite(value, super._isAllStreamsLoading,
+        () {
+      super._isAllStreamsLoading = value;
+    });
+  }
+
+  late final _$_pinnedStreamsAtom =
+      Atom(name: 'ListStoreBase._pinnedStreams', context: context);
+
+  ObservableList<StreamTwitch> get pinnedStreams {
+    _$_pinnedStreamsAtom.reportRead();
+    return super._pinnedStreams;
+  }
+
+  @override
+  ObservableList<StreamTwitch> get _pinnedStreams => pinnedStreams;
+
+  @override
+  set _pinnedStreams(ObservableList<StreamTwitch> value) {
+    _$_pinnedStreamsAtom.reportWrite(value, super._pinnedStreams, () {
+      super._pinnedStreams = value;
+    });
+  }
+
+  late final _$_isPinnedStreamsLoadingAtom =
+      Atom(name: 'ListStoreBase._isPinnedStreamsLoading', context: context);
+
+  bool get isPinnedStreamsLoading {
+    _$_isPinnedStreamsLoadingAtom.reportRead();
+    return super._isPinnedStreamsLoading;
+  }
+
+  @override
+  bool get _isPinnedStreamsLoading => isPinnedStreamsLoading;
+
+  @override
+  set _isPinnedStreamsLoading(bool value) {
+    _$_isPinnedStreamsLoadingAtom
+        .reportWrite(value, super._isPinnedStreamsLoading, () {
+      super._isPinnedStreamsLoading = value;
+    });
+  }
+
   late final _$_categoryDetailsAtom =
       Atom(name: 'ListStoreBase._categoryDetails', context: context);
 
@@ -74,6 +119,25 @@ mixin _$ListStore on ListStoreBase, Store {
   set _categoryDetails(CategoryTwitch? value) {
     _$_categoryDetailsAtom.reportWrite(value, super._categoryDetails, () {
       super._categoryDetails = value;
+    });
+  }
+
+  late final _$_isCategoryDetailsLoadingAtom =
+      Atom(name: 'ListStoreBase._isCategoryDetailsLoading', context: context);
+
+  bool get isCategoryDetailsLoading {
+    _$_isCategoryDetailsLoadingAtom.reportRead();
+    return super._isCategoryDetailsLoading;
+  }
+
+  @override
+  bool get _isCategoryDetailsLoading => isCategoryDetailsLoading;
+
+  @override
+  set _isCategoryDetailsLoading(bool value) {
+    _$_isCategoryDetailsLoadingAtom
+        .reportWrite(value, super._isCategoryDetailsLoading, () {
+      super._isCategoryDetailsLoading = value;
     });
   }
 
@@ -119,6 +183,22 @@ mixin _$ListStore on ListStoreBase, Store {
     return _$getStreamsAsyncAction.run(() => super.getStreams());
   }
 
+  late final _$getPinnedStreamsAsyncAction =
+      AsyncAction('ListStoreBase.getPinnedStreams', context: context);
+
+  @override
+  Future<void> getPinnedStreams() {
+    return _$getPinnedStreamsAsyncAction.run(() => super.getPinnedStreams());
+  }
+
+  late final _$refreshStreamsAsyncAction =
+      AsyncAction('ListStoreBase.refreshStreams', context: context);
+
+  @override
+  Future<void> refreshStreams() {
+    return _$refreshStreamsAsyncAction.run(() => super.refreshStreams());
+  }
+
   late final _$_getCategoryDetailsAsyncAction =
       AsyncAction('ListStoreBase._getCategoryDetails', context: context);
 
@@ -128,25 +208,12 @@ mixin _$ListStore on ListStoreBase, Store {
         .run(() => super._getCategoryDetails());
   }
 
-  late final _$ListStoreBaseActionController =
-      ActionController(name: 'ListStoreBase', context: context);
-
-  @override
-  Future<void> refreshStreams() {
-    final _$actionInfo = _$ListStoreBaseActionController.startAction(
-        name: 'ListStoreBase.refreshStreams');
-    try {
-      return super.refreshStreams();
-    } finally {
-      _$ListStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
   @override
   String toString() {
     return '''
 showJumpButton: ${showJumpButton},
 hasMore: ${hasMore},
+isLoading: ${isLoading},
 streams: ${streams}
     ''';
   }
