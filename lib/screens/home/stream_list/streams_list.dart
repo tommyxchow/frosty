@@ -169,7 +169,7 @@ class _StreamsListState extends State<StreamsList>
                                 isFirst: true,
                                 padding: EdgeInsets.fromLTRB(
                                   16,
-                                  16,
+                                  8,
                                   16,
                                   8,
                                 ),
@@ -221,7 +221,7 @@ class _StreamsListState extends State<StreamsList>
                                 isFirst: true,
                                 padding: EdgeInsets.fromLTRB(
                                   16,
-                                  16,
+                                  8,
                                   16,
                                   8,
                                 ),
