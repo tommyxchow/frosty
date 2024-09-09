@@ -210,7 +210,7 @@ class ChatDetails extends StatelessWidget {
         },
       ),
       ListTile(
-        leading: const Icon(Icons.chat_rounded),
+        leading: const Icon(Icons.chat_outlined),
         title: Observer(
           builder: (context) {
             return Text(
