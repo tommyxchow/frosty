@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/app_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-class BlockReportModal extends StatelessWidget {
+class UserActionsModal extends StatelessWidget {
   final AuthStore authStore;
   final String name;
   final String userLogin;
   final String userId;
+  final bool showPinOption;
+  final bool? isPinned;
 
-  const BlockReportModal({
+  const UserActionsModal({
     super.key,
     required this.authStore,
     required this.name,
     required this.userLogin,
     required this.userId,
+    this.showPinOption = false,
+    this.isPinned,
   });
 
   @override
@@ -23,6 +29,26 @@ class BlockReportModal extends StatelessWidget {
       primary: false,
       shrinkWrap: true,
       children: [
+        if (showPinOption)
+          ListTile(
+            leading: const Icon(Icons.push_pin_outlined),
+            title: Text('${isPinned == true ? 'Unin' : 'Pin'} $name'),
+            onTap: () {
+              if (isPinned == true) {
+                context.read<SettingsStore>().pinnedChannels = [
+                  ...context.read<SettingsStore>().pinnedChannels
+                    ..remove(userId),
+                ];
+              } else {
+                context.read<SettingsStore>().pinnedChannels = [
+                  ...context.read<SettingsStore>().pinnedChannels,
+                  userId,
+                ];
+              }
+
+              Navigator.pop(context);
+            },
+          ),
         if (authStore.isLoggedIn)
           ListTile(
             leading: const Icon(Icons.block_rounded),

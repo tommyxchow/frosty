@@ -8,10 +8,10 @@ import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
-import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/uptime.dart';
+import 'package:frosty/widgets/user_actions_modal.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -19,12 +19,16 @@ class LargeStreamCard extends StatelessWidget {
   final StreamTwitch streamInfo;
   final bool showThumbnail;
   final bool showCategory;
+  final bool showPinOption;
+  final bool? isPinned;
 
   const LargeStreamCard({
     super.key,
     required this.streamInfo,
     required this.showThumbnail,
     this.showCategory = true,
+    this.showPinOption = false,
+    this.isPinned,
   });
 
   @override
@@ -151,11 +155,13 @@ class LargeStreamCard extends StatelessWidget {
 
         showModalBottomSheet(
           context: context,
-          builder: (context) => BlockReportModal(
+          builder: (context) => UserActionsModal(
             authStore: context.read<AuthStore>(),
             name: streamerName,
             userLogin: streamInfo.userLogin,
             userId: streamInfo.userId,
+            showPinOption: showPinOption,
+            isPinned: isPinned,
           ),
         );
       },

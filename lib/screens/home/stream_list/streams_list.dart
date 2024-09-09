@@ -12,6 +12,7 @@ import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
+import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
 /// A widget that displays a list of followed or top streams based on the provided [listType].
@@ -126,6 +127,24 @@ class _StreamsListState extends State<StreamsList>
             );
           }
 
+          final settingsStore = context.read<SettingsStore>();
+
+          final isFollowingTab = widget.listType == ListType.followed;
+
+          final pinnedStreams = _listStore.streams
+              .where(
+                (stream) =>
+                    settingsStore.pinnedChannels.contains(stream.userId),
+              )
+              .toList();
+
+          final unpinnedStreams = _listStore.streams
+              .where(
+                (stream) =>
+                    !settingsStore.pinnedChannels.contains(stream.userId),
+              )
+              .toList();
+
           return Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: [
@@ -144,42 +163,112 @@ class _StreamsListState extends State<StreamsList>
                   Expanded(
                     child: Scrollbar(
                       controller: _listStore.scrollController,
-                      child: ListView.builder(
+                      child: CustomScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: _listStore.scrollController,
-                        itemCount: _listStore.streams.length,
-                        itemBuilder: (context, index) {
-                          if (index > _listStore.streams.length - 10 &&
-                              _listStore.hasMore) {
-                            debugPrint('$index ${_listStore.streams.length}');
+                        slivers: [
+                          if (isFollowingTab) ...[
+                            const SliverToBoxAdapter(
+                              child: SectionHeader(
+                                'Pinnned',
+                                isFirst: true,
+                                padding: EdgeInsets.fromLTRB(
+                                  16,
+                                  16,
+                                  16,
+                                  8,
+                                ),
+                              ),
+                            ),
+                            SliverList.builder(
+                              itemCount: pinnedStreams.length,
+                              itemBuilder: (context, index) {
+                                return Observer(
+                                  builder: (context) {
+                                    final isPinned = settingsStore
+                                        .pinnedChannels
+                                        .contains(pinnedStreams[index].userId);
 
-                            _listStore.getStreams();
-                          }
-                          return Observer(
-                            builder: (context) =>
-                                context.read<SettingsStore>().largeStreamCard
+                                    return settingsStore.largeStreamCard
+                                        ? LargeStreamCard(
+                                            key: ValueKey(
+                                              pinnedStreams[index].userId,
+                                            ),
+                                            streamInfo: pinnedStreams[index],
+                                            showThumbnail: context
+                                                .read<SettingsStore>()
+                                                .showThumbnails,
+                                            showCategory:
+                                                widget.categoryId == null,
+                                            showPinOption: true,
+                                            isPinned: isPinned,
+                                          )
+                                        : StreamCard(
+                                            key: ValueKey(
+                                              pinnedStreams[index].userId,
+                                            ),
+                                            streamInfo: pinnedStreams[index],
+                                            showThumbnail: context
+                                                .read<SettingsStore>()
+                                                .showThumbnails,
+                                            showCategory:
+                                                widget.categoryId == null,
+                                            showPinOption: true,
+                                            isPinned: isPinned,
+                                          );
+                                  },
+                                );
+                              },
+                            ),
+                            const SliverToBoxAdapter(
+                              child: SectionHeader(
+                                'All',
+                                isFirst: true,
+                                padding: EdgeInsets.fromLTRB(
+                                  16,
+                                  16,
+                                  16,
+                                  8,
+                                ),
+                              ),
+                            ),
+                          ],
+                          SliverList.builder(
+                            itemCount: unpinnedStreams.length,
+                            itemBuilder: (context, index) {
+                              if (index > unpinnedStreams.length - 10 &&
+                                  _listStore.hasMore) {
+                                _listStore.getStreams();
+                              }
+                              return Observer(
+                                builder: (context) => settingsStore
+                                        .largeStreamCard
                                     ? LargeStreamCard(
                                         key: ValueKey(
-                                          _listStore.streams[index].userId,
+                                          unpinnedStreams[index].userId,
                                         ),
-                                        streamInfo: _listStore.streams[index],
-                                        showThumbnail: context
-                                            .read<SettingsStore>()
-                                            .showThumbnails,
+                                        streamInfo: unpinnedStreams[index],
+                                        showThumbnail:
+                                            settingsStore.showThumbnails,
                                         showCategory: widget.categoryId == null,
+                                        showPinOption: isFollowingTab,
+                                        isPinned: false,
                                       )
                                     : StreamCard(
                                         key: ValueKey(
-                                          _listStore.streams[index].userId,
+                                          unpinnedStreams[index].userId,
                                         ),
-                                        streamInfo: _listStore.streams[index],
-                                        showThumbnail: context
-                                            .read<SettingsStore>()
-                                            .showThumbnails,
+                                        streamInfo: unpinnedStreams[index],
+                                        showThumbnail:
+                                            settingsStore.showThumbnails,
                                         showCategory: widget.categoryId == null,
+                                        showPinOption: isFollowingTab,
+                                        isPinned: false,
                                       ),
-                          );
-                        },
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ),
