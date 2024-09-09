@@ -67,7 +67,11 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..shareCrashLogsAndAnalytics =
           json['shareCrashLogsAndAnalytics'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
-      ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false;
+      ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false
+      ..pinnedChannels = (json['pinnedChannels'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [];
 
 Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
     <String, dynamic>{
@@ -118,6 +122,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
+      'pinnedChannels': instance.pinnedChannels,
     };
 
 const _$ThemeTypeEnumMap = {
@@ -895,6 +900,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$pinnedChannelsAtom =
+      Atom(name: '_SettingsStoreBase.pinnedChannels', context: context);
+
+  @override
+  List<String> get pinnedChannels {
+    _$pinnedChannelsAtom.reportRead();
+    return super.pinnedChannels;
+  }
+
+  @override
+  set pinnedChannels(List<String> value) {
+    _$pinnedChannelsAtom.reportWrite(value, super.pinnedChannels, () {
+      super.pinnedChannels = value;
+    });
+  }
+
   late final _$_SettingsStoreBaseActionController =
       ActionController(name: '_SettingsStoreBase', context: context);
 
@@ -1012,7 +1033,8 @@ showRecentMessages: ${showRecentMessages},
 darkenRecentMessages: ${darkenRecentMessages},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
-fullScreenChatOverlay: ${fullScreenChatOverlay}
+fullScreenChatOverlay: ${fullScreenChatOverlay},
+pinnedChannels: ${pinnedChannels}
     ''';
   }
 }
