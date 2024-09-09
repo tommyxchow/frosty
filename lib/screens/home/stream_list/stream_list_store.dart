@@ -110,7 +110,7 @@ abstract class ListStoreBase with Store {
 
     if (listType == ListType.followed) {
       _pinnedStreamsReactioniDisposer = reaction(
-        (_) => settingsStore.pinnedChannels,
+        (_) => settingsStore.pinnedChannelIds,
         (_) => getPinnedStreams(),
       );
 
@@ -173,7 +173,7 @@ abstract class ListStoreBase with Store {
 
   @action
   Future<void> getPinnedStreams() async {
-    if (settingsStore.pinnedChannels.isEmpty) {
+    if (settingsStore.pinnedChannelIds.isEmpty) {
       _pinnedStreams.clear();
       return;
     }
@@ -182,7 +182,7 @@ abstract class ListStoreBase with Store {
 
     try {
       _pinnedStreams = (await twitchApi.getStreamsByIds(
-        userIds: settingsStore.pinnedChannels,
+        userIds: settingsStore.pinnedChannelIds,
         headers: authStore.headersTwitch,
       ))
           .data

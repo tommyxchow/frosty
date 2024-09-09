@@ -68,7 +68,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           json['shareCrashLogsAndAnalytics'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
       ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false
-      ..pinnedChannels = (json['pinnedChannels'] as List<dynamic>?)
+      ..pinnedChannelIds = (json['pinnedChannelIds'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
           [];
@@ -122,7 +122,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
-      'pinnedChannels': instance.pinnedChannels,
+      'pinnedChannelIds': instance.pinnedChannelIds,
     };
 
 const _$ThemeTypeEnumMap = {
@@ -900,19 +900,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$pinnedChannelsAtom =
-      Atom(name: '_SettingsStoreBase.pinnedChannels', context: context);
+  late final _$pinnedChannelIdsAtom =
+      Atom(name: '_SettingsStoreBase.pinnedChannelIds', context: context);
 
   @override
-  List<String> get pinnedChannels {
-    _$pinnedChannelsAtom.reportRead();
-    return super.pinnedChannels;
+  List<String> get pinnedChannelIds {
+    _$pinnedChannelIdsAtom.reportRead();
+    return super.pinnedChannelIds;
   }
 
   @override
-  set pinnedChannels(List<String> value) {
-    _$pinnedChannelsAtom.reportWrite(value, super.pinnedChannels, () {
-      super.pinnedChannels = value;
+  set pinnedChannelIds(List<String> value) {
+    _$pinnedChannelIdsAtom.reportWrite(value, super.pinnedChannelIds, () {
+      super.pinnedChannelIds = value;
     });
   }
 
@@ -1034,7 +1034,7 @@ darkenRecentMessages: ${darkenRecentMessages},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay},
-pinnedChannels: ${pinnedChannels}
+pinnedChannelIds: ${pinnedChannelIds}
     ''';
   }
 }

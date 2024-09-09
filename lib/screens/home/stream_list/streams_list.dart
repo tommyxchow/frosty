@@ -133,7 +133,7 @@ class _StreamsListState extends State<StreamsList>
           final unpinnedStreams = _listStore.streams
               .where(
                 (stream) =>
-                    !settingsStore.pinnedChannels.contains(stream.userId),
+                    !settingsStore.pinnedChannelIds.contains(stream.userId),
               )
               .toList();
 

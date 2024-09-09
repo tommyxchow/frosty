@@ -35,13 +35,13 @@ class UserActionsModal extends StatelessWidget {
             title: Text('${isPinned == true ? 'Unin' : 'Pin'} $name'),
             onTap: () {
               if (isPinned == true) {
-                context.read<SettingsStore>().pinnedChannels = [
-                  ...context.read<SettingsStore>().pinnedChannels
+                context.read<SettingsStore>().pinnedChannelIds = [
+                  ...context.read<SettingsStore>().pinnedChannelIds
                     ..remove(userId),
                 ];
               } else {
-                context.read<SettingsStore>().pinnedChannels = [
-                  ...context.read<SettingsStore>().pinnedChannels,
+                context.read<SettingsStore>().pinnedChannelIds = [
+                  ...context.read<SettingsStore>().pinnedChannelIds,
                   userId,
                 ];
               }

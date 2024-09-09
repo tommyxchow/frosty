@@ -360,7 +360,7 @@ abstract class _SettingsStoreBase with Store {
   // * Global configs
   static const defaultFullScreen = false;
   static const defaultFullScreenChatOverlay = false;
-  static const defaultPinnedChannels = <String>[];
+  static const defaultPinnedChannelIds = <String>[];
 
   @JsonKey(defaultValue: defaultFullScreen)
   @observable
@@ -370,15 +370,15 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var fullScreenChatOverlay = defaultFullScreenChatOverlay;
 
-  @JsonKey(defaultValue: defaultPinnedChannels)
+  @JsonKey(defaultValue: defaultPinnedChannelIds)
   @observable
-  var pinnedChannels = defaultPinnedChannels;
+  var pinnedChannelIds = defaultPinnedChannelIds;
 
   @action
   void resetGlobalConfigs() {
     fullScreen = defaultFullScreen;
     fullScreenChatOverlay = defaultFullScreenChatOverlay;
-    pinnedChannels = defaultPinnedChannels;
+    pinnedChannelIds = defaultPinnedChannelIds;
   }
 
   @action
