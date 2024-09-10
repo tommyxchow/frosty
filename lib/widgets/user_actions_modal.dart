@@ -32,7 +32,7 @@ class UserActionsModal extends StatelessWidget {
         if (showPinOption)
           ListTile(
             leading: const Icon(Icons.push_pin_outlined),
-            title: Text('${isPinned == true ? 'Unin' : 'Pin'} $name'),
+            title: Text('${isPinned == true ? 'Unpin' : 'Pin'} $name'),
             onTap: () {
               if (isPinned == true) {
                 context.read<SettingsStore>().pinnedChannelIds = [
