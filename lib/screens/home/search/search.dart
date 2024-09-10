@@ -133,6 +133,7 @@ class _SearchState extends State<Search> {
                       child: SectionHeader(
                         'Channels',
                         isFirst: true,
+                        padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
                       ),
                     ),
                     SearchResultsChannels(
