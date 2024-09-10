@@ -6,10 +6,10 @@ import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
+import 'package:frosty/widgets/user_actions_modal.dart';
 import 'package:mobx/mobx.dart';
 
 class SearchResultsChannels extends StatefulWidget {
@@ -107,7 +107,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
 
                         showModalBottomSheet(
                           context: context,
-                          builder: (context) => BlockReportModal(
+                          builder: (context) => UserActionsModal(
                             authStore: widget.searchStore.authStore,
                             name: displayName,
                             userLogin: channel.broadcasterLogin,

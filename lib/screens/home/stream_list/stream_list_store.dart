@@ -5,6 +5,7 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
 
 part 'stream_list_store.g.dart';
@@ -14,6 +15,8 @@ class ListStore = ListStoreBase with _$ListStore;
 abstract class ListStoreBase with Store {
   /// The authentication store.
   final AuthStore authStore;
+
+  final SettingsStore settingsStore;
 
   /// Twitch API service class for making requests.
   final TwitchApi twitchApi;
@@ -36,18 +39,34 @@ abstract class ListStoreBase with Store {
 
   /// Returns whether or not there are more streams and loading status for pagination.
   @computed
-  bool get hasMore => _isLoading == false && _streamsCursor != null;
+  bool get hasMore => isLoading == false && _streamsCursor != null;
+
+  @computed
+  bool get isLoading =>
+      _isAllStreamsLoading ||
+      _isPinnedStreamsLoading ||
+      _isCategoryDetailsLoading;
 
   /// The loading status for pagination.
-  @readonly
-  bool _isLoading = false;
 
   /// The list of the fetched streams.
   @readonly
   var _allStreams = ObservableList<StreamTwitch>();
 
   @readonly
+  bool _isAllStreamsLoading = false;
+
+  @readonly
+  var _pinnedStreams = ObservableList<StreamTwitch>();
+
+  @readonly
+  var _isPinnedStreamsLoading = false;
+
+  @readonly
   CategoryTwitch? _categoryDetails;
+
+  @readonly
+  var _isCategoryDetailsLoading = false;
 
   /// Whether or not the scroll to top button is visible.
   @observable
@@ -68,8 +87,11 @@ abstract class ListStoreBase with Store {
   @readonly
   String? _error;
 
+  ReactionDisposer? _pinnedStreamsReactioniDisposer;
+
   ListStoreBase({
     required this.authStore,
+    required this.settingsStore,
     required this.twitchApi,
     required this.listType,
     this.categoryId,
@@ -86,17 +108,26 @@ abstract class ListStoreBase with Store {
       });
     }
 
-    getStreams();
+    if (listType == ListType.followed) {
+      _pinnedStreamsReactioniDisposer = reaction(
+        (_) => settingsStore.pinnedChannelIds,
+        (_) => getPinnedStreams(),
+      );
 
-    if (listType == ListType.category && categoryId != null) {
+      getPinnedStreams();
+    }
+
+    if (listType == ListType.category) {
       _getCategoryDetails();
     }
+
+    getStreams();
   }
 
   /// Fetches the streams based on the type and current cursor.
   @action
   Future<void> getStreams() async {
-    _isLoading = true;
+    _isAllStreamsLoading = true;
 
     try {
       final StreamsTwitch newStreams;
@@ -137,20 +168,50 @@ abstract class ListStoreBase with Store {
       _error = e.toString();
     }
 
-    _isLoading = false;
+    _isAllStreamsLoading = false;
+  }
+
+  @action
+  Future<void> getPinnedStreams() async {
+    if (settingsStore.pinnedChannelIds.isEmpty) {
+      _pinnedStreams.clear();
+      return;
+    }
+
+    _isPinnedStreamsLoading = true;
+
+    try {
+      _pinnedStreams = (await twitchApi.getStreamsByIds(
+        userIds: settingsStore.pinnedChannelIds,
+        headers: authStore.headersTwitch,
+      ))
+          .data
+          .asObservable();
+
+      _error = null;
+    } on SocketException {
+      _error = 'Failed to connect';
+    } catch (e) {
+      _error = e.toString();
+    }
+
+    _isPinnedStreamsLoading = false;
   }
 
   /// Resets the cursor and then fetches the streams.
   @action
-  Future<void> refreshStreams() {
-    _streamsCursor = null;
+  Future<void> refreshStreams() async {
+    if (listType == ListType.followed) await getPinnedStreams();
 
-    return getStreams();
+    _streamsCursor = null;
+    await getStreams();
   }
 
   @action
   Future<void> _getCategoryDetails() async {
-    _isLoading = true;
+    if (categoryId == null) return;
+
+    _isCategoryDetailsLoading = true;
 
     final categoryDetails = await twitchApi.getCategory(
       headers: authStore.headersTwitch,
@@ -159,7 +220,7 @@ abstract class ListStoreBase with Store {
 
     _categoryDetails = categoryDetails.data.first;
 
-    _isLoading = false;
+    _isCategoryDetailsLoading = false;
   }
 
   /// Checks the last time the streams were refreshed and updates them if it has been more than 5 minutes.
@@ -172,7 +233,11 @@ abstract class ListStoreBase with Store {
     lastTimeRefreshed = now;
   }
 
-  void dispose() => scrollController?.dispose();
+  void dispose() {
+    _pinnedStreamsReactioniDisposer?.call();
+
+    scrollController?.dispose();
+  }
 }
 
 /// The possible types of lists that can be displayed.

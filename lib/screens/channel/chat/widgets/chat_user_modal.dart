@@ -4,8 +4,8 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/block_report_modal.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/user_actions_modal.dart';
 
 class ChatUserModal extends StatefulWidget {
   final ChatStore chatStore;
@@ -72,7 +72,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                   tooltip: 'More',
                   onPressed: () => showModalBottomSheet(
                     context: context,
-                    builder: (context) => BlockReportModal(
+                    builder: (context) => UserActionsModal(
                       authStore: widget.chatStore.auth,
                       name: name,
                       userLogin: widget.username,
