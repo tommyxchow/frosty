@@ -549,8 +549,11 @@ class TwitchApi {
     );
 
     final response = await _client.get(url);
+
+    final decodedBody = utf8.decode(response.bodyBytes);
+
     if (response.statusCode == 200) {
-      return jsonDecode(response.body)['messages'] as List;
+      return jsonDecode(decodedBody)['messages'] as List;
     } else {
       return Future.error('Failed to get recent messages for $userLogin');
     }
