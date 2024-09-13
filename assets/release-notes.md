@@ -1,3 +1,23 @@
+## v4.6.0
+
+September 12, 2024
+
+### New Features
+
+- Added a theme accent color picker in general settings
+- Added the ability to pin streams in the "Following" tab by long-pressing
+- Added a "My channel" shortcut in profile settings
+
+### Improvements
+
+- Refreshed and updated the overall design to utilize the accent color
+
+### Bug Fixes
+
+- Fixed certain historical recent messages not rendering properly
+
+---
+
 ## v4.5.0
 
 August 16, 2024
