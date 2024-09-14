@@ -165,7 +165,7 @@ class _StreamsListState extends State<StreamsList>
                               _listStore.pinnedStreams.isNotEmpty) ...[
                             const SliverToBoxAdapter(
                               child: SectionHeader(
-                                'Pinnned',
+                                'Pinned',
                                 isFirst: true,
                                 padding: EdgeInsets.fromLTRB(
                                   16,
