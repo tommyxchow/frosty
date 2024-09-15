@@ -151,10 +151,10 @@ export default function Home() {
         <div className='w-full divide-y divide-neutral-300 rounded-xl border border-neutral-300 dark:divide-neutral-900 dark:border-neutral-900'>
           {faqs.map((faq, index) => (
             <details key={index}>
-              <summary className='p-8 font-medium transition hover:cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-950 sm:text-lg'>
+              <summary className='p-8 font-medium transition hover:cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-950'>
                 {faq.question}
               </summary>
-              <p className='mb-8 mt-4 px-8 text-neutral-600 dark:text-neutral-300'>
+              <p className='border-t border-neutral-300 p-8 text-neutral-600 dark:border-neutral-900 dark:text-neutral-300'>
                 {faq.answer}
               </p>
             </details>
