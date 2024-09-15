@@ -1,0 +1,19 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="paint0_linear_2_12" x1="50" y1="0" x2="50" y2="100" gradientUnits="userSpaceOnUse">
+<stop stop-color="#9146FF"/>
+<stop offset="1"/>
+</linearGradient>
+</defs>
+<circle cx="50" cy="50" r="50" fill="url(#paint0_linear_2_12)"/>
+<mask id="mask0_2_12" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="15" y="32" width="70" height="33">
+<rect x="15" y="32" width="69.7793" height="33" fill="white"/>
+</mask>
+<g mask="url(#mask0_2_12)">
+<path d="M6.24302 73.762L44.1917 35.8133C46.1718 33.8332 47.1619 32.8431 48.3035 32.4722C49.3077 32.1459 50.3895 32.1459 51.3937 32.4722C52.5353 32.8431 53.5254 33.8332 55.5054 35.8133L56.3666 36.6744L12.761 80.28L6.24302 73.762Z" fill="white"/>
+<path d="M44.2383 35.8133C46.2184 33.8332 47.2085 32.8432 48.3501 32.4722C49.3543 32.1459 50.4361 32.1459 51.4403 32.4722C52.5819 32.8432 53.572 33.8332 55.552 35.8133L93.5008 73.762L86.9827 80.28L43.3772 36.6745L44.2383 35.8133Z" fill="white"/>
+<g style="mix-blend-mode:lighten">
+<rect x="38.6633" y="42.4162" width="61.6676" height="9.21788" transform="rotate(45 38.6633 42.4162)" fill="white"/>
+</g>
+</g>
+</svg>
