@@ -25,7 +25,7 @@ const coreFeatures = [
     screenshot: screenshotChannel,
   },
   {
-    caption: 'Customizable settings',
+    caption: 'Customize a variety of settings',
     screenshot: screenshotSettings,
   },
 ];
