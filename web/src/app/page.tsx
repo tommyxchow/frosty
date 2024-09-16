@@ -6,7 +6,9 @@ import { FeatureCard } from '@/components/FeatureCard';
 import {
   appStoreLink,
   bttvLink,
+  emailLink,
   ffzLink,
+  githubLink,
   playStoreLink,
   sevenTvLink,
   twitchLink,
@@ -41,12 +43,7 @@ const faqs = [
   {
     question: 'Why are some Twitch features not in Frosty?',
     answer:
-      'Features are usually limited by what is allowed in the official Twitch API, so some features (e.g., voting on predictions and total view count for categories) are not yet available.',
-  },
-  {
-    question: "Why can't I change the stream quality?",
-    answer:
-      'There is currently no straightforward official API for getting the raw stream URLs, so streams rely on the auto setting for now.',
+      'The Twitch API only exposes a limited set of functionality to developers. Features like predictions, polls, pinned messages, VODs with chat, stream qualities, total view count for categories and more are not available.',
   },
   {
     question: 'Why is the stream delayed on iOS?',
@@ -59,23 +56,35 @@ const faqs = [
       'Ad block is not planned because it would probably violate the Twitch terms of service.',
   },
   {
-    question: 'Will Frosty support TVs (Apple/Android TV)?',
+    question: 'Will Frosty support Apple/Android TV?',
     answer:
-      "Not yet, because Flutter (the framework that Frosty is built upon) doesn't officially support TVs just yet. Hopefully, this changes in the future!",
-  },
-  {
-    question: 'Can I watch VODs with chat?',
-    answer:
-      'Twitch does not provide VOD chat messages with their current API, so VODs with chat are not possible yet.',
-  },
-  {
-    question: 'Why is feature "X" from Twitch not in the app as well?',
-    answer:
-      "I'm limited to what is available in the Twitch API, so certain features from the Twitch web or mobile app (e.g., voting on predictions and category viewer counts) are not available at the moment.",
+      "Not yet, because Flutter (the framework that Frosty is built upon) doesn't officially support TVs.",
   },
   {
     question: 'Where can I report a bug or request a new feature?',
-    answer: 'You can open a new issue on the GitHub repo.',
+    answer: (
+      <>
+        You can open a new issue on the{' '}
+        <a
+          className='underline'
+          href={githubLink}
+          target='_blank'
+          rel='noreferrer'
+        >
+          GitHub repo
+        </a>{' '}
+        or email{' '}
+        <a
+          className='underline'
+          href={emailLink}
+          target='_blank'
+          rel='noreferrer'
+        >
+          contact@frostyapp.io
+        </a>
+        .
+      </>
+    ),
   },
 ];
 
