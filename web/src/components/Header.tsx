@@ -1,3 +1,4 @@
+import { donateLink, githubLink } from '@/lib/constants';
 import Link from 'next/link';
 import { SiBuymeacoffee, SiGithub } from 'react-icons/si';
 import { ThemeToggle } from './ThemeToggle';
@@ -12,8 +13,23 @@ export function Header() {
       </Link>
 
       <div className='flex items-center gap-4'>
-        <SiBuymeacoffee className='size-6' />
-        <SiGithub className='size-6' />
+        <a
+          className='transition-opacity hover:opacity-50'
+          href={donateLink}
+          target='_blank'
+          rel='noreferrer'
+        >
+          <SiBuymeacoffee className='size-6' />
+        </a>
+
+        <a
+          className='transition-opacity hover:opacity-50'
+          href={githubLink}
+          target='_blank'
+          rel='noreferrer'
+        >
+          <SiGithub className='size-6' />
+        </a>
 
         <ThemeToggle />
       </div>

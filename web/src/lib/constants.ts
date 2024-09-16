@@ -1,4 +1,4 @@
-export const repoLink = 'https://github.com/tommyxchow/frosty';
+export const githubLink = 'https://github.com/tommyxchow/frosty';
 export const appStoreLink =
   'https://apps.apple.com/us/app/frosty-for-twitch/id1603987585';
 export const playStoreLink =
