@@ -3,7 +3,14 @@ import screenshotChannel from '@/assets/screenshot-channel.png';
 import screenshotFollowing from '@/assets/screenshot-following.png';
 import screenshotSettings from '@/assets/screenshot-settings.png';
 import { FeatureCard } from '@/components/FeatureCard';
-import { appStoreLink, playStoreLink } from '@/lib/constants';
+import {
+  appStoreLink,
+  bttvLink,
+  ffzLink,
+  playStoreLink,
+  sevenTvLink,
+  twitchLink,
+} from '@/lib/constants';
 import Image from 'next/image';
 import Marquee from 'react-fast-marquee';
 import { SiApple, SiGoogleplay } from 'react-icons/si';
@@ -130,8 +137,44 @@ export default function Home() {
       </section>
 
       <section className='flex flex-col gap-4 md:gap-8'>
-        <h1 className='text-pretty text-center text-xl font-bold md:text-2xl'>
-          Frosty lets you watch Twitch with 7TV, BTTV, and FFZ emotes
+        <h1 className='text-pretty text-center text-xl font-semibold decoration-2 underline-offset-4 md:text-2xl'>
+          Frosty lets you watch{' '}
+          <a
+            className='text-twitch-purple underline'
+            href={twitchLink}
+            target='_blank'
+            rel='noreferrer'
+          >
+            Twitch
+          </a>{' '}
+          with{' '}
+          <a
+            className='text-twitch-purple underline'
+            href={sevenTvLink}
+            target='_blank'
+            rel='noreferrer'
+          >
+            7TV
+          </a>
+          ,{' '}
+          <a
+            className='text-twitch-purple underline'
+            href={bttvLink}
+            target='_blank'
+            rel='noreferrer'
+          >
+            BTTV
+          </a>
+          , and{' '}
+          <a
+            className='text-twitch-purple underline'
+            href={ffzLink}
+            target='_blank'
+            rel='noreferrer'
+          >
+            FFZ
+          </a>{' '}
+          emotes
         </h1>
 
         {downloadButtons}
