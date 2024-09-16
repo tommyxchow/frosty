@@ -10,7 +10,7 @@ export function FeatureCard({ caption, screenshot }: FeatureCardProps) {
     <figure className='grid items-end overflow-clip rounded-2xl border border-neutral-300 dark:border-neutral-900 [&>*]:col-start-1 [&>*]:row-start-1'>
       <div className='justify-self-center px-12 pt-12'>
         <Image
-          className='max-h-[75dvh] w-fit rounded-xl border dark:border-neutral-900'
+          className='max-h-[75vh] w-fit rounded-xl border dark:border-neutral-900'
           src={screenshot}
           alt={caption}
           placeholder='blur'

@@ -134,7 +134,7 @@ export default function Home() {
 
         <div className='z-10 justify-self-center p-8'>
           <video
-            className='h-[75dvh] max-h-[800px] rounded-xl border border-neutral-300 bg-black object-contain py-4 dark:border-neutral-900'
+            className='h-[75vh] max-h-[800px] rounded-xl border border-neutral-300 bg-black object-contain py-4 dark:border-neutral-900'
             src='/video.webm'
             autoPlay
             loop
