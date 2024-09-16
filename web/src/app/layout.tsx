@@ -10,7 +10,7 @@ const fontSans = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: 'Frosty for Twitch',
-  description: 'next-template',
+  description: 'Frosty lets you watch Twitch with 7TV, BTTV, and FFZ emotes',
 };
 
 export default function RootLayout({
