@@ -74,7 +74,7 @@ const faqs = [
 
 export default function Home() {
   const downloadButtons = (
-    <div className='grid w-full grid-cols-2 gap-4 font-semibold text-neutral-100'>
+    <div className='grid w-full grid-cols-2 gap-4 font-semibold text-neutral-100 md:gap-8'>
       <a
         className='flex items-center justify-center gap-2 rounded-xl bg-blue-800 p-4 transition hover:bg-blue-900'
         href={appStoreLink}
@@ -97,7 +97,7 @@ export default function Home() {
   );
 
   return (
-    <article className='mt-24 flex flex-col gap-16'>
+    <article className='mt-24 flex flex-col gap-8 md:gap-16'>
       <section className='grid w-full items-center rounded-2xl border border-neutral-300 dark:border-neutral-900 [&>*]:col-start-1 [&>*]:row-start-1'>
         <div className='flex flex-col gap-4'>
           {Array.from({ length: NUM_ROWS }).map((_, rowIndex) => (
@@ -118,7 +118,7 @@ export default function Home() {
 
         <div className='z-10 justify-self-center p-8'>
           <video
-            className='max-h-[800px] rounded-xl border border-neutral-300 object-contain dark:border-neutral-900'
+            className='h-[75dvh] max-h-[800px] rounded-xl border border-neutral-300 object-contain py-4 dark:border-neutral-900'
             src='/video.webm'
             autoPlay
             loop
@@ -129,26 +129,29 @@ export default function Home() {
         </div>
       </section>
 
-      <div className='flex flex-col gap-8 self-center'>
+      <section className='flex flex-col gap-4 md:gap-8'>
         <h1 className='text-pretty text-center text-xl font-bold md:text-2xl'>
           Frosty lets you watch Twitch with 7TV, BTTV, and FFZ emotes
         </h1>
 
         {downloadButtons}
-      </div>
+      </section>
 
-      <section className='flex flex-col gap-8 sm:grid sm:grid-cols-2'>
+      <div className='flex flex-col gap-8 md:grid md:grid-cols-2'>
         {coreFeatures.map((feature, index) => (
           <FeatureCard key={index} {...feature} />
         ))}
-      </section>
+      </div>
 
-      <section className='flex flex-col items-center gap-8' id='faq'>
-        <h2 className='text-lg font-semibold sm:text-xl'>
+      <section
+        className='mt-8 flex flex-col items-center gap-8 sm:mt-0'
+        id='faq'
+      >
+        <h2 className='text-lg font-semibold md:text-xl'>
           Frequently asked questions
         </h2>
 
-        <div className='w-full divide-y divide-neutral-300 rounded-xl border border-neutral-300 dark:divide-neutral-900 dark:border-neutral-900'>
+        <div className='w-full divide-y divide-neutral-300 overflow-clip rounded-xl border border-neutral-300 dark:divide-neutral-900 dark:border-neutral-900'>
           {faqs.map((faq, index) => (
             <details key={index}>
               <summary className='p-8 font-medium transition hover:cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-950'>
