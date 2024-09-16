@@ -289,12 +289,10 @@ class _VideoChatState extends State<VideoChat> {
                                   children: settingsStore.landscapeChatLeftSide
                                       ? [
                                           overlayChat,
-                                          const VerticalDivider(),
                                           Expanded(child: overlay),
                                         ]
                                       : [
                                           Expanded(child: overlay),
-                                          const VerticalDivider(),
                                           overlayChat,
                                         ],
                                 ),
