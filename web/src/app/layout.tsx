@@ -23,13 +23,13 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body
         className={twJoin(
-          'mx-auto min-h-screen max-w-screen-lg bg-neutral-100 font-sans text-neutral-950 dark:bg-black dark:text-neutral-100',
+          'mx-auto min-h-screen max-w-screen-lg border-neutral-300 bg-neutral-100 font-sans text-neutral-950 dark:border-neutral-900 dark:bg-black dark:text-neutral-100 lg:border-x',
           fontSans.variable,
         )}
       >
         <Providers>
           <Header />
-          <main className='grow px-4 lg:px-0'>{children}</main>
+          <main className='grow'>{children}</main>
           <Footer />
         </Providers>
       </body>

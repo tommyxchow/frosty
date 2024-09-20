@@ -90,63 +90,65 @@ const faqs = [
 
 export default function Home() {
   const downloadButtons = (
-    <div className='grid w-full grid-cols-2 gap-4 font-semibold text-neutral-100 md:gap-8'>
+    <div className='grid w-full grid-cols-2 divide-x divide-neutral-300 border-y border-neutral-300 font-semibold dark:divide-neutral-900 dark:border-neutral-900'>
       <a
-        className='flex items-center justify-center gap-2 rounded-xl bg-blue-800 p-4 transition hover:bg-blue-900'
+        className='flex items-center justify-center gap-2 p-4 transition hover:bg-blue-700 hover:text-neutral-100 dark:hover:bg-blue-800'
         href={appStoreLink}
         target='_blank'
         rel='noreferrer'
       >
-        <SiApple />
+        <SiApple className='text-blue-500 dark:text-blue-500' />
         App Store
       </a>
       <a
-        className='flex items-center justify-center gap-2 rounded-xl bg-green-800 p-4 transition hover:bg-green-900'
+        className='flex items-center justify-center gap-2 p-4 transition hover:bg-green-700 hover:text-neutral-100 dark:hover:bg-green-800'
         href={playStoreLink}
         target='_blank'
         rel='noreferrer'
       >
-        <SiGoogleplay />
+        <SiGoogleplay className='text-green-500 dark:text-green-400' />
         Google Play
       </a>
     </div>
   );
 
   return (
-    <article className='mt-24 flex flex-col gap-8 md:gap-16'>
-      <section className='grid w-full items-center rounded-2xl border border-neutral-300 dark:border-neutral-900 [&>*]:col-start-1 [&>*]:row-start-1'>
-        <div className='flex flex-col gap-4'>
-          {Array.from({ length: NUM_ROWS }).map((_, rowIndex) => (
-            <Marquee key={rowIndex} direction={rowIndex % 2 ? 'left' : 'right'}>
-              {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => (
-                <Image
-                  key={colIndex}
-                  width={32}
-                  height={32}
-                  alt='pepeD'
-                  unoptimized
-                  src='https://cdn.7tv.app/emote/6072a16fdcae02001b44e614/4x.webp'
-                />
-              ))}
-            </Marquee>
-          ))}
+    <article className='flex flex-col'>
+      <section>
+        <div className='grid w-full items-center [&>*]:col-start-1 [&>*]:row-start-1'>
+          <div className='flex flex-col gap-4'>
+            {Array.from({ length: NUM_ROWS }).map((_, rowIndex) => (
+              <Marquee
+                key={rowIndex}
+                direction={rowIndex % 2 ? 'left' : 'right'}
+              >
+                {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => (
+                  <Image
+                    key={colIndex}
+                    width={32}
+                    height={32}
+                    alt='pepeD'
+                    unoptimized
+                    src='https://cdn.7tv.app/emote/6072a16fdcae02001b44e614/4x.webp'
+                  />
+                ))}
+              </Marquee>
+            ))}
+          </div>
+          <div className='z-10 justify-self-center p-8 pt-16'>
+            <video
+              className='h-[75vh] max-h-[800px] border border-neutral-300 bg-black object-contain py-4 dark:border-neutral-900'
+              src='/video.webm'
+              autoPlay
+              loop
+              muted
+              playsInline
+              disableRemotePlayback
+            />
+          </div>
         </div>
 
-        <div className='z-10 justify-self-center p-8'>
-          <video
-            className='h-[75vh] max-h-[800px] rounded-xl border border-neutral-300 bg-black object-contain py-4 dark:border-neutral-900'
-            src='/video.webm'
-            autoPlay
-            loop
-            muted
-            playsInline
-            disableRemotePlayback
-          />
-        </div>
-      </section>
-
-      <section className='flex flex-col gap-4 md:gap-8'>
-        <h1 className='text-pretty text-center text-xl font-semibold decoration-2 underline-offset-4 md:text-2xl'>
+        <h1 className='text-pretty p-8 pb-16 text-center text-xl font-semibold decoration-2 underline-offset-4 md:text-2xl'>
           Frosty lets you watch{' '}
           <a
             className='text-twitch-purple underline'
@@ -185,31 +187,30 @@ export default function Home() {
           </a>{' '}
           emotes
         </h1>
-
-        {downloadButtons}
       </section>
 
-      <div className='flex flex-col gap-8 md:grid md:grid-cols-2'>
+      {downloadButtons}
+
+      <section className='flex flex-col gap-16 p-16 md:grid md:grid-cols-2'>
         {coreFeatures.map((feature, index) => (
           <FeatureCard key={index} {...feature} />
         ))}
-      </div>
+      </section>
 
-      <section
-        className='mt-8 flex flex-col items-center gap-8 sm:mt-0'
-        id='faq'
-      >
-        <h2 className='text-lg font-semibold md:text-xl'>
+      {downloadButtons}
+
+      <section className='flex flex-col items-center' id='faq'>
+        <h2 className='p-8 text-lg font-semibold md:text-xl'>
           Frequently asked questions
         </h2>
 
-        <div className='w-full divide-y divide-neutral-300 overflow-clip rounded-xl border border-neutral-300 dark:divide-neutral-900 dark:border-neutral-900'>
+        <div className='w-full divide-y divide-neutral-300 border-y border-neutral-300 dark:divide-neutral-900 dark:border-neutral-900'>
           {faqs.map((faq, index) => (
             <details key={index}>
               <summary className='p-8 font-medium transition hover:cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-950'>
                 {faq.question}
               </summary>
-              <p className='border-t border-neutral-300 p-8 text-neutral-600 dark:border-neutral-900 dark:text-neutral-300'>
+              <p className='border-t border-neutral-300 px-12 py-8 text-neutral-600 dark:border-neutral-900 dark:text-neutral-300'>
                 {faq.answer}
               </p>
             </details>
