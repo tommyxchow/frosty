@@ -207,7 +207,7 @@ export default function Home() {
         <div className='w-full divide-y divide-neutral-300 border-y border-neutral-300 dark:divide-neutral-900 dark:border-neutral-900'>
           {faqs.map((faq, index) => (
             <details key={index}>
-              <summary className='p-8 font-medium transition hover:cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-950'>
+              <summary className='p-8 font-medium transition hover:cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-900'>
                 {faq.question}
               </summary>
               <p className='border-t border-neutral-300 px-12 py-8 text-neutral-600 dark:border-neutral-900 dark:text-neutral-300'>

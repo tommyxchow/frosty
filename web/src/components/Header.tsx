@@ -6,18 +6,19 @@ import { ThemeToggle } from './ThemeToggle';
 
 export function Header() {
   return (
-    <header className='sticky top-0 z-50 flex w-full max-w-screen-lg items-center justify-between gap-4 border-b border-inherit bg-inherit p-4 dark:from-black'>
-      <Link className='flex items-center gap-2' href='/'>
+    <header className='sticky top-0 z-50 flex w-full max-w-screen-lg justify-between gap-4 divide-x divide-neutral-300 border-b border-inherit bg-inherit dark:divide-neutral-900 dark:from-black'>
+      <Link
+        className='flex items-center gap-2 border-r border-inherit px-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
+        href='/'
+      >
         <div className='relative size-8'>
           <Image alt='Logo' src={`/logo.svg`} layout='fill' priority />
         </div>
-
-        <h1 className='text-xl font-semibold'>Frosty</h1>
       </Link>
 
-      <div className='flex items-center gap-4'>
+      <div className='flex items-center divide-x divide-inherit'>
         <a
-          className='transition-opacity hover:opacity-50'
+          className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
           href={donateLink}
           target='_blank'
           rel='noreferrer'
@@ -26,7 +27,7 @@ export function Header() {
         </a>
 
         <a
-          className='transition-opacity hover:opacity-50'
+          className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
           href={githubLink}
           target='_blank'
           rel='noreferrer'

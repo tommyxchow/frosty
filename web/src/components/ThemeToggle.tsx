@@ -19,7 +19,7 @@ export function ThemeToggle() {
 
   return (
     <button
-      className='transition-opacity hover:opacity-50'
+      className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
       aria-label={`Toggle ${isDarkMode ? 'light mode' : 'dark mode'}`}
       onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
     >
