@@ -95,7 +95,10 @@ abstract class VideoStoreBase with Store {
         )
         ..setNavigationDelegate(
           NavigationDelegate(
-            onPageFinished: (_) => initVideo(),
+            onPageFinished: (_) {
+              initVideo();
+              _acceptContentWarning();
+            },
           ),
         );
 
@@ -284,6 +287,45 @@ abstract class VideoStoreBase with Store {
             observer.disconnect();
           });
           observer.observe(document.body, { childList: true, subtree: true });
+        }
+      ''');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> _acceptContentWarning() async {
+    try {
+      await videoWebViewController.runJavaScript('''
+        {
+          const asyncQuerySelector = (selector, timeout = undefined) => new Promise((resolve) => {
+            if (document.querySelector(selector)) {
+              return resolve(document.querySelector(selector));
+            }
+            const observer = new MutationObserver((mutations) => {
+              if (document.querySelector(selector)) {
+                observer.disconnect();
+                resolve(document.querySelector(selector));
+              }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
+
+            if (timeout) {
+              setTimeout(() => {
+                observer.disconnect();
+                resolve(undefined);
+              }, timeout);
+            }
+          });
+
+
+          (async () => {
+            const warningBtn = await asyncQuerySelector('button[data-a-target*="content-classification-gate"]', 10000);
+
+            if (warningBtn) {
+              warningBtn.click();
+            }
+          })();
         }
       ''');
     } catch (e) {
