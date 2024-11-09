@@ -311,21 +311,17 @@ abstract class VideoStoreBase with Store {
             observer.observe(document.body, { childList: true, subtree: true });
           });
 
-          (function checkVideoElement() {
-            const videoElement = document.getElementsByTagName("video")[0];
-            if (videoElement) {
-              videoElement.addEventListener("pause", () => {
-                VideoPause.postMessage("video paused");
-                videoElement.textTracks[0].mode = "hidden";
-              });
-              videoElement.addEventListener("playing", () => {
-                VideoPlaying.postMessage("video playing");
-                videoElement.textTracks[0].mode = "hidden";
-              });
-            } else {
-              setTimeout(checkVideoElement, 100); // Check again after 100ms
-            }
-          })();
+          _queuePromise(async () => {
+            const videoElement = await _asyncQuerySelector("video");
+            videoElement.addEventListener("pause", () => {
+              VideoPause.postMessage("video paused");
+              videoElement.textTracks[0].mode = "hidden";
+            });
+            videoElement.addEventListener("playing", () => {
+              VideoPlaying.postMessage("video playing");
+              videoElement.textTracks[0].mode = "hidden";
+            });
+          });
         ''');
         if (settingsStore.showOverlay) {
           await _hideDefaultOverlay();
