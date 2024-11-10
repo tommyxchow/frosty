@@ -64,6 +64,11 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
       ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
       ..darkenRecentMessages = json['darkenRecentMessages'] as bool? ?? true
+      ..mutedWords = (json['mutedWords'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          []
+      ..matchWholeWord = json['matchWholeWord'] as bool? ?? false
       ..shareCrashLogsAndAnalytics =
           json['shareCrashLogsAndAnalytics'] as bool? ?? true
       ..fullScreen = json['fullScreen'] as bool? ?? false
@@ -119,6 +124,8 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showFFZBadges': instance.showFFZBadges,
       'showRecentMessages': instance.showRecentMessages,
       'darkenRecentMessages': instance.darkenRecentMessages,
+      'mutedWords': instance.mutedWords,
+      'matchWholeWord': instance.matchWholeWord,
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
       'fullScreenChatOverlay': instance.fullScreenChatOverlay,
@@ -151,6 +158,21 @@ const _$LandscapeCutoutTypeEnumMap = {
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SettingsStore on _SettingsStoreBase, Store {
+  Computed<String>? _$textControllerTextComputed;
+
+  @override
+  String get textControllerText => (_$textControllerTextComputed ??=
+          Computed<String>(() => super.textControllerText,
+              name: '_SettingsStoreBase.textControllerText'))
+      .value;
+  Computed<bool>? _$textControllerTextIsEmptyComputed;
+
+  @override
+  bool get textControllerTextIsEmpty => (_$textControllerTextIsEmptyComputed ??=
+          Computed<bool>(() => super.textControllerTextIsEmpty,
+              name: '_SettingsStoreBase.textControllerTextIsEmpty'))
+      .value;
+
   late final _$themeTypeAtom =
       Atom(name: '_SettingsStoreBase.themeType', context: context);
 
@@ -850,6 +872,38 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$mutedWordsAtom =
+      Atom(name: '_SettingsStoreBase.mutedWords', context: context);
+
+  @override
+  List<String> get mutedWords {
+    _$mutedWordsAtom.reportRead();
+    return super.mutedWords;
+  }
+
+  @override
+  set mutedWords(List<String> value) {
+    _$mutedWordsAtom.reportWrite(value, super.mutedWords, () {
+      super.mutedWords = value;
+    });
+  }
+
+  late final _$matchWholeWordAtom =
+      Atom(name: '_SettingsStoreBase.matchWholeWord', context: context);
+
+  @override
+  bool get matchWholeWord {
+    _$matchWholeWordAtom.reportRead();
+    return super.matchWholeWord;
+  }
+
+  @override
+  set matchWholeWord(bool value) {
+    _$matchWholeWordAtom.reportWrite(value, super.matchWholeWord, () {
+      super.matchWholeWord = value;
+    });
+  }
+
   late final _$shareCrashLogsAndAnalyticsAtom = Atom(
       name: '_SettingsStoreBase.shareCrashLogsAndAnalytics', context: context);
 
@@ -936,6 +990,17 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
         name: '_SettingsStoreBase.resetVideoSettings');
     try {
       return super.resetVideoSettings();
+    } finally {
+      _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void addMutedWord(String text) {
+    final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
+        name: '_SettingsStoreBase.addMutedWord');
+    try {
+      return super.addMutedWord(text);
     } finally {
       _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
     }
@@ -1031,10 +1096,14 @@ showFFZEmotes: ${showFFZEmotes},
 showFFZBadges: ${showFFZBadges},
 showRecentMessages: ${showRecentMessages},
 darkenRecentMessages: ${darkenRecentMessages},
+mutedWords: ${mutedWords},
+matchWholeWord: ${matchWholeWord},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay},
-pinnedChannelIds: ${pinnedChannelIds}
+pinnedChannelIds: ${pinnedChannelIds},
+textControllerText: ${textControllerText},
+textControllerTextIsEmpty: ${textControllerTextIsEmpty}
     ''';
   }
 }

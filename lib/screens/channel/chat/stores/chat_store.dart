@@ -311,6 +311,21 @@ abstract class ChatStoreBase with Store {
           continue;
         }
 
+        // Filter messages containing any muted words.
+        if (parsedIRCMessage.message != null) {
+          final List<String> mutedWords = settings.mutedWords;
+
+          // check if the message contains any of the muted words
+          for (String word in mutedWords) {
+            if (parsedIRCMessage.message!
+                .toLowerCase()
+                .split(settings.matchWholeWord ? ' ' : '')
+                .contains(word.toLowerCase())) {
+              return;
+            }
+          }
+        }
+
         switch (parsedIRCMessage.command) {
           case Command.privateMessage:
           case Command.notice:

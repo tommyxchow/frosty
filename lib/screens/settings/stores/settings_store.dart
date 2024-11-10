@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
 
@@ -143,6 +144,10 @@ abstract class _SettingsStoreBase with Store {
 
   // Sleep defaults
   static const defaultChatOnlyPreventSleep = false;
+
+  // mute words defaults
+  static const defaultMutedWords = <String>[];
+  static const defaultMatchWholeWord = false;
 
   // Autocomplete defaults
   static const defaultAutocomplete = true;
@@ -301,6 +306,45 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var darkenRecentMessages = defaultDarkenRecentMessages;
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  TextEditingController textController = TextEditingController();
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @computed
+  String get textControllerText => textController.text;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @computed
+  bool get textControllerTextIsEmpty => textController.text.isEmpty;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  FocusNode textFieldFocusNode = FocusNode();
+
+  @JsonKey(defaultValue: defaultMutedWords)
+  @observable
+  List<String> mutedWords = List.from(defaultMutedWords);
+
+  @JsonKey(defaultValue: defaultMatchWholeWord)
+  @observable
+  bool matchWholeWord = defaultMatchWholeWord;
+
+  @action
+  void addMutedWord(String text) {
+    mutedWords.add(text);
+
+    // update the list: this is necessary because the list is not an ObservableList
+    // we cannot really have an ObservableList because it's hard to serialize
+    mutedWords = List.from(mutedWords);
+
+    textController.clear();
+    textFieldFocusNode.unfocus();
+  }
+
+  void removeMutedWord(int index) {
+    mutedWords.removeAt(index);
+    mutedWords = List.from(mutedWords);
+  }
+
   @action
   void resetChatSettings() {
     badgeScale = defaultBadgeScale;
@@ -331,6 +375,10 @@ abstract class _SettingsStoreBase with Store {
     fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
     chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
+
+    mutedWords = defaultMutedWords;
+    matchWholeWord = defaultMatchWholeWord;
+
     autocomplete = defaultAutocomplete;
 
     showTwitchEmotes = defaultShowTwitchEmotes;
