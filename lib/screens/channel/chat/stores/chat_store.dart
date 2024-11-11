@@ -316,7 +316,7 @@ abstract class ChatStoreBase with Store {
           final List<String> mutedWords = settings.mutedWords;
 
           // check if the message contains any of the muted words
-          for (String word in mutedWords) {
+          for (final word in mutedWords) {
             if (parsedIRCMessage.message!
                 .toLowerCase()
                 .split(settings.matchWholeWord ? ' ' : '')

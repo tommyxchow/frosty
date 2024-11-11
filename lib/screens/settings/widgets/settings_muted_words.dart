@@ -2,10 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:mobx/mobx.dart';
 
-class SettingsMutedWords extends StatelessWidget {
+class SettingsMutedWords extends StatefulWidget {
   final SettingsStore settingsStore;
   const SettingsMutedWords({super.key, required this.settingsStore});
+
+  @override
+  State<SettingsMutedWords> createState() => _SettingsMutedWordsState();
+}
+
+class _SettingsMutedWordsState extends State<SettingsMutedWords> {
+  late final SettingsStore settingsStore;
+  final TextEditingController textController = TextEditingController();
+  final FocusNode textFieldFocusNode = FocusNode();
+
+  @override
+  void initState() {
+    settingsStore = widget.settingsStore;
+    super.initState();
+  }
+
+  void addMutedWord(String text) {
+    settingsStore.mutedWords.add(text);
+
+    textController.clear();
+    textFieldFocusNode.unfocus();
+  }
+
+  void removeMutedWord(int index) {
+    settingsStore.mutedWords.removeAt(index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,36 +51,32 @@ class SettingsMutedWords extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                     child: TextField(
-                      controller: settingsStore.textController,
-                      focusNode: settingsStore.textFieldFocusNode,
+                      controller: textController,
+                      focusNode: textFieldFocusNode,
                       onChanged: (value) {
-                        settingsStore.textController.text = value;
+                        textController.text = value;
                       },
                       onSubmitted: (value) {
-                        settingsStore.addMutedWord(value);
+                        addMutedWord(value);
                       },
                       autocorrect: false,
                       decoration: InputDecoration(
                         hintText: 'Enter keywords to mute',
-                        suffixIcon: settingsStore.textControllerTextIsEmpty
-                            ? IconButton(
-                                tooltip:
-                                    settingsStore.textController.text.isEmpty
-                                        ? 'Cancel'
-                                        : 'Add keyword',
-                                onPressed: () {
-                                  if (settingsStore
-                                      .textController.text.isEmpty) {
-                                    settingsStore.textFieldFocusNode.unfocus();
-                                  } else {
-                                    settingsStore.addMutedWord(
-                                      settingsStore.textController.text,
-                                    );
-                                  }
-                                },
-                                icon: const Icon(Icons.check),
-                              )
-                            : null,
+                        suffixIcon: IconButton(
+                          tooltip: textController.text.isEmpty
+                              ? 'Cancel'
+                              : 'Add keyword',
+                          onPressed: () {
+                            if (textController.text.isEmpty) {
+                              textFieldFocusNode.unfocus();
+                            } else {
+                              addMutedWord(
+                                textController.text,
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.check),
+                        ),
                       ),
                     ),
                   ),
@@ -90,7 +113,7 @@ class SettingsMutedWords extends StatelessWidget {
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        settingsStore.removeMutedWord(index);
+                                        removeMutedWord(index);
                                         Navigator.of(context).pop();
                                       },
                                       child: const Text('Delete'),
