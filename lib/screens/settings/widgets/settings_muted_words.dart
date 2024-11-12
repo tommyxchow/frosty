@@ -24,14 +24,19 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
   }
 
   void addMutedWord(String text) {
-    settingsStore.mutedWords.add(text);
+    settingsStore.mutedWords = [
+      ...settingsStore.mutedWords,
+      text,
+    ];
 
     textController.clear();
     textFieldFocusNode.unfocus();
   }
 
   void removeMutedWord(int index) {
-    settingsStore.mutedWords.removeAt(index);
+    settingsStore.mutedWords = [
+      ...settingsStore.mutedWords..removeAt(index),
+    ];
   }
 
   @override

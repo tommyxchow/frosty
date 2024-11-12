@@ -146,11 +146,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultChatOnlyPreventSleep = false;
 
   // mute words defaults
-  // This static function is required to create a new instance of ObservableList for the JSON serialization
-  static ObservableList<String> getDefaultMutedWords() {
-    return ObservableList<String>();
-  }
-
+  static const defaultMutedWords = <String>[];
   static const defaultMatchWholeWord = true;
 
   // Autocomplete defaults
@@ -310,10 +306,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var darkenRecentMessages = defaultDarkenRecentMessages;
 
-  @JsonKey(defaultValue: getDefaultMutedWords)
-  @ObservableMutedWordsListConverter()
+  @JsonKey(defaultValue: defaultMutedWords)
   @observable
-  ObservableList<String> mutedWords = getDefaultMutedWords();
+  List<String> mutedWords = defaultMutedWords;
 
   @JsonKey(defaultValue: defaultMatchWholeWord)
   @observable
@@ -350,7 +345,7 @@ abstract class _SettingsStoreBase with Store {
 
     chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
 
-    mutedWords = getDefaultMutedWords();
+    mutedWords = defaultMutedWords;
     matchWholeWord = defaultMatchWholeWord;
 
     autocomplete = defaultAutocomplete;
@@ -436,18 +431,4 @@ enum LandscapeCutoutType {
   left,
   right,
   both,
-}
-
-/// A [JsonConverter] that serializes [ObservableList<String>] to a list of strings.
-class ObservableMutedWordsListConverter
-    extends JsonConverter<ObservableList<String>, List<dynamic>> {
-  const ObservableMutedWordsListConverter();
-
-  @override
-  ObservableList<String> fromJson(List<dynamic> json) =>
-      ObservableList.of(json.map((e) => e['word'] as String));
-
-  @override
-  List<Map<String, dynamic>> toJson(ObservableList<String> object) =>
-      object.map((element) => {'word': element}).toList();
 }

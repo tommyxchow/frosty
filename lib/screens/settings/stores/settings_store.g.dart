@@ -64,10 +64,10 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
       ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
       ..darkenRecentMessages = json['darkenRecentMessages'] as bool? ?? true
-      ..mutedWords = json['mutedWords'] == null
-          ? _SettingsStoreBase.getDefaultMutedWords()
-          : const ObservableMutedWordsListConverter()
-              .fromJson(json['mutedWords'] as List)
+      ..mutedWords = (json['mutedWords'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          []
       ..matchWholeWord = json['matchWholeWord'] as bool? ?? true
       ..shareCrashLogsAndAnalytics =
           json['shareCrashLogsAndAnalytics'] as bool? ?? true
@@ -124,8 +124,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showFFZBadges': instance.showFFZBadges,
       'showRecentMessages': instance.showRecentMessages,
       'darkenRecentMessages': instance.darkenRecentMessages,
-      'mutedWords':
-          const ObservableMutedWordsListConverter().toJson(instance.mutedWords),
+      'mutedWords': instance.mutedWords,
       'matchWholeWord': instance.matchWholeWord,
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
       'fullScreen': instance.fullScreen,
@@ -862,13 +861,13 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
       Atom(name: '_SettingsStoreBase.mutedWords', context: context);
 
   @override
-  ObservableList<String> get mutedWords {
+  List<String> get mutedWords {
     _$mutedWordsAtom.reportRead();
     return super.mutedWords;
   }
 
   @override
-  set mutedWords(ObservableList<String> value) {
+  set mutedWords(List<String> value) {
     _$mutedWordsAtom.reportWrite(value, super.mutedWords, () {
       super.mutedWords = value;
     });
