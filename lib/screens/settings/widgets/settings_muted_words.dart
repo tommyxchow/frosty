@@ -139,4 +139,11 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    textFieldFocusNode.dispose();
+    super.dispose();
+  }
 }
