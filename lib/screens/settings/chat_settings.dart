@@ -8,6 +8,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
+import 'package:frosty/screens/settings/widgets/settings_muted_words.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -283,6 +284,16 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.chatOnlyPreventSleep,
             onChanged: (newValue) =>
                 settingsStore.chatOnlyPreventSleep = newValue,
+          ),
+          const SectionHeader('Muted keywords'),
+          SettingsMutedWords(settingsStore: settingsStore),
+          SettingsListSwitch(
+            title: 'Match whole words',
+            subtitle: const Text(
+              'Only matches whole words instead of partial matches.',
+            ),
+            value: settingsStore.matchWholeWord,
+            onChanged: (newValue) => settingsStore.matchWholeWord = newValue,
           ),
           const SectionHeader('Autocomplete'),
           SettingsListSwitch(

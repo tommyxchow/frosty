@@ -144,6 +144,10 @@ abstract class _SettingsStoreBase with Store {
   // Sleep defaults
   static const defaultChatOnlyPreventSleep = false;
 
+  // mute words defaults
+  static const defaultMutedWords = <String>[];
+  static const defaultMatchWholeWord = true;
+
   // Autocomplete defaults
   static const defaultAutocomplete = true;
 
@@ -301,6 +305,14 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var darkenRecentMessages = defaultDarkenRecentMessages;
 
+  @JsonKey(defaultValue: defaultMutedWords)
+  @observable
+  List<String> mutedWords = defaultMutedWords;
+
+  @JsonKey(defaultValue: defaultMatchWholeWord)
+  @observable
+  bool matchWholeWord = defaultMatchWholeWord;
+
   @action
   void resetChatSettings() {
     badgeScale = defaultBadgeScale;
@@ -331,6 +343,10 @@ abstract class _SettingsStoreBase with Store {
     fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
     chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
+
+    mutedWords = defaultMutedWords;
+    matchWholeWord = defaultMatchWholeWord;
+
     autocomplete = defaultAutocomplete;
 
     showTwitchEmotes = defaultShowTwitchEmotes;
