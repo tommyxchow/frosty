@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:mobx/mobx.dart';
 
 class SettingsMutedWords extends StatefulWidget {
   final SettingsStore settingsStore;
