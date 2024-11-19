@@ -363,6 +363,10 @@ abstract class VideoStoreBase with Store {
               VideoPlaying.postMessage("video playing");
               videoElement.textTracks[0].mode = "hidden";
             });
+            if (!videoElement.paused) {
+              VideoPlaying.postMessage("video playing");
+              videoElement.textTracks[0].mode = "hidden";
+            }
           });
         ''');
         if (settingsStore.showOverlay) {
