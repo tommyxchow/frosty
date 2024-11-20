@@ -1,3 +1,13 @@
+## v4.7.1
+
+November 19, 2024
+
+### Bug Fixes
+
+- Further improve initial playback stability (by @Shingyx on GitHub)
+
+---
+
 ## v4.7.0
 
 November 17, 2024
