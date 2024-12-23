@@ -6,6 +6,7 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/events.dart';
 import 'package:frosty/models/irc.dart';
+import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -152,7 +153,8 @@ abstract class ChatStoreBase with Store {
   @observable
   IRCMessage? replyingToMessage;
 
-  final channelIdToProfilePictureUrl = ObservableMap<String, String>();
+
+  final channelIdToUserTwitch = ObservableMap<String, UserTwitch>();
 
   ChatStoreBase({
     required this.twitchApi,
@@ -218,8 +220,7 @@ abstract class ChatStoreBase with Store {
         twitchApi
             .getUser(id: participant.broadcasterId, headers: auth.headersTwitch)
             .then((user) {
-          channelIdToProfilePictureUrl[participant.broadcasterId] =
-              user.profileImageUrl;
+          channelIdToUserTwitch[participant.broadcasterId] = user;
         });
       }
     });

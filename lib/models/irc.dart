@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
@@ -122,7 +123,7 @@ class IRCMessage {
     void Function(String)? onTapPingedUser,
     bool showMessage = true,
     bool useReadableColors = false,
-    Map<String, String>? channelIdToProfilePictureUrl,
+    Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
   }) {
     final isLightTheme = Theme.of(context).brightness == Brightness.light;
@@ -164,28 +165,34 @@ class IRCMessage {
     }
 
     final sourceChannelId = tags['source-room-id'] ?? tags['room-id'];
-    final profilePictureUrl = channelIdToProfilePictureUrl != null
-        ? channelIdToProfilePictureUrl[sourceChannelId]
+    final sourceChannelUser = channelIdToUserTwitch != null
+        ? channelIdToUserTwitch[sourceChannelId]
         : null;
-    if (profilePictureUrl != null) {
+    if (sourceChannelUser != null) {
       span.add(
         WidgetSpan(
-          child: CachedNetworkImage(
-            imageUrl: profilePictureUrl,
-            imageBuilder: (context, imageProvider) => Container(
-              width: badgeSize,
-              height: badgeSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+          child: Tooltip(
+            triggerMode: TooltipTriggerMode.tap,
+            preferBelow: false,
+            message: sourceChannelUser.displayName,
+            child: CachedNetworkImage(
+              imageUrl: sourceChannelUser.profileImageUrl,
+              imageBuilder: (context, imageProvider) => Container(
+                width: badgeSize,
+                height: badgeSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image:
+                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                ),
               ),
-            ),
-            placeholder: (context, url) => Container(
-              width: badgeSize,
-              height: badgeSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey,
+              placeholder: (context, url) => Container(
+                width: badgeSize,
+                height: badgeSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),

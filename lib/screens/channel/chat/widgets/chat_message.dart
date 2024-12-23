@@ -172,8 +172,7 @@ class ChatMessage extends StatelessWidget {
                   useReadableColors: chatStore.settings.useReadableColors,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
-                  channelIdToProfilePictureUrl:
-                      chatStore.channelIdToProfilePictureUrl,
+                  channelIdToUserTwitch: chatStore.channelIdToUserTwitch,
                 ),
               ),
             );
