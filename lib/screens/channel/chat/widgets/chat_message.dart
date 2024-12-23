@@ -30,7 +30,9 @@ class ChatMessage extends StatelessWidget {
 
     // Ignore if long-pressing own username.
     if (ircMessage.user == null ||
-        ircMessage.user == chatStore.auth.user.details?.login) return;
+        ircMessage.user == chatStore.auth.user.details?.login) {
+      return;
+    }
 
     showModalBottomSheet(
       isScrollControlled: true,
@@ -170,6 +172,8 @@ class ChatMessage extends StatelessWidget {
                   useReadableColors: chatStore.settings.useReadableColors,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
+                  channelIdToProfilePictureUrl:
+                      chatStore.channelIdToProfilePictureUrl,
                 ),
               ),
             );

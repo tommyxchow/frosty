@@ -6,6 +6,7 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/shared_chat_session.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/user.dart';
 import 'package:http/http.dart';
@@ -537,6 +538,28 @@ class TwitchApi {
       return true;
     } else {
       return false;
+    }
+  }
+
+  Future<SharedChatSession> getSharedChatSession({
+    required String broadcasterId,
+    required Map<String, String> headers,
+  }) async {
+    final url = Uri.parse(
+      'https://api.twitch.tv/helix/shared_chat/session?broadcaster_id=$broadcasterId',
+    );
+
+    final response = await _client.get(url, headers: headers);
+    if (response.statusCode == 200) {
+      final sessionData = jsonDecode(response.body)['data'] as List;
+
+      if (sessionData.isEmpty) {
+        return Future.error('No shared chat session data available');
+      }
+
+      return SharedChatSession.fromJson(sessionData.first);
+    } else {
+      return Future.error('Failed to get shared chat session info');
     }
   }
 

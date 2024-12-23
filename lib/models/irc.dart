@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -121,6 +122,7 @@ class IRCMessage {
     void Function(String)? onTapPingedUser,
     bool showMessage = true,
     bool useReadableColors = false,
+    Map<String, String>? channelIdToProfilePictureUrl,
     TimestampType timestamp = TimestampType.disabled,
   }) {
     final isLightTheme = Theme.of(context).brightness == Brightness.light;
@@ -159,6 +161,37 @@ class IRCMessage {
           ),
         );
       }
+    }
+
+    final sourceChannelId = tags['source-room-id'] ?? tags['room-id'];
+    final profilePictureUrl = channelIdToProfilePictureUrl != null
+        ? channelIdToProfilePictureUrl[sourceChannelId]
+        : null;
+    if (profilePictureUrl != null) {
+      span.add(
+        WidgetSpan(
+          child: CachedNetworkImage(
+            imageUrl: profilePictureUrl,
+            imageBuilder: (context, imageProvider) => Container(
+              width: badgeSize,
+              height: badgeSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+              ),
+            ),
+            placeholder: (context, url) => Container(
+              width: badgeSize,
+              height: badgeSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+      );
+      span.add(const TextSpan(text: ' '));
     }
 
     // Indicator to skip adding the bot badges later when adding the rest of FFZ badges.

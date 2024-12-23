@@ -152,6 +152,8 @@ abstract class ChatStoreBase with Store {
   @observable
   IRCMessage? replyingToMessage;
 
+  final channelIdToProfilePictureUrl = ObservableMap<String, String>();
+
   ChatStoreBase({
     required this.twitchApi,
     required this.auth,
@@ -203,6 +205,24 @@ abstract class ChatStoreBase with Store {
     );
 
     assetsStore.init();
+
+    // Get the shared chat session and the profile pictures of the participants.
+    twitchApi
+        .getSharedChatSession(
+      broadcasterId: channelId,
+      headers: auth.headersTwitch,
+    )
+        .then((sharedChatSession) {
+      for (final participant in sharedChatSession.participants) {
+        sharedChatChannels.add(participant.broadcasterId);
+        twitchApi
+            .getUser(id: participant.broadcasterId, headers: auth.headersTwitch)
+            .then((user) {
+          channelIdToProfilePictureUrl[participant.broadcasterId] =
+              user.profileImageUrl;
+        });
+      }
+    });
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
