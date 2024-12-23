@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 /// Creates a [WebView] widget that shows a channel's video stream.
 class Video extends StatefulWidget {
@@ -43,9 +44,18 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WebViewWidget(
-      controller: widget.videoStore.videoWebViewController,
-    );
+    if (WebViewPlatform.instance is AndroidWebViewPlatform) {
+      return WebViewWidget.fromPlatformCreationParams(
+        params: AndroidWebViewWidgetCreationParams(
+          controller: widget.videoStore.videoWebViewController.platform,
+          displayWithHybridComposition: true,
+        ),
+      );
+    } else {
+      return WebViewWidget(
+        controller: widget.videoStore.videoWebViewController,
+      );
+    }
   }
 
   @override
