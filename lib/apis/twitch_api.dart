@@ -541,7 +541,7 @@ class TwitchApi {
     }
   }
 
-  Future<SharedChatSession> getSharedChatSession({
+  Future<SharedChatSession?> getSharedChatSession({
     required String broadcasterId,
     required Map<String, String> headers,
   }) async {
@@ -554,7 +554,7 @@ class TwitchApi {
       final sessionData = jsonDecode(response.body)['data'] as List;
 
       if (sessionData.isEmpty) {
-        return Future.error('No shared chat session data available');
+        return null;
       }
 
       return SharedChatSession.fromJson(sessionData.first);

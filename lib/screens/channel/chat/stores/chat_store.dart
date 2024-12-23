@@ -215,6 +215,8 @@ abstract class ChatStoreBase with Store {
       headers: auth.headersTwitch,
     )
         .then((sharedChatSession) {
+      if (sharedChatSession == null) return;
+
       for (final participant in sharedChatSession.participants) {
         sharedChatChannels.add(participant.broadcasterId);
         twitchApi
