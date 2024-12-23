@@ -16,7 +16,7 @@ class AlertMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultColor =
-        Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
     return Row(
       mainAxisAlignment:

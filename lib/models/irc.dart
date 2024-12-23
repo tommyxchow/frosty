@@ -146,7 +146,7 @@ class IRCMessage {
         span.add(
           TextSpan(
             text: '${DateFormat.Hm().format(parsedTime)} ',
-            style: style?.copyWith(color: style.color?.withOpacity(0.5)),
+            style: style?.copyWith(color: style.color?.withValues(alpha: 0.5)),
           ),
         );
       }
@@ -155,7 +155,7 @@ class IRCMessage {
         span.add(
           TextSpan(
             text: '${DateFormat('h:mm').format(parsedTime)} ',
-            style: style?.copyWith(color: style.color?.withOpacity(0.5)),
+            style: style?.copyWith(color: style.color?.withValues(alpha: 0.5)),
           ),
         );
       }
