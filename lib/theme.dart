@@ -71,8 +71,6 @@ class FrostyThemes {
         tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
