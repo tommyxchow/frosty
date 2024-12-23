@@ -63,7 +63,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
       ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
       ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
-      ..darkenRecentMessages = json['darkenRecentMessages'] as bool? ?? true
       ..mutedWords = (json['mutedWords'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -123,7 +122,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showFFZEmotes': instance.showFFZEmotes,
       'showFFZBadges': instance.showFFZBadges,
       'showRecentMessages': instance.showRecentMessages,
-      'darkenRecentMessages': instance.darkenRecentMessages,
       'mutedWords': instance.mutedWords,
       'matchWholeWord': instance.matchWholeWord,
       'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
@@ -840,23 +838,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$darkenRecentMessagesAtom =
-      Atom(name: '_SettingsStoreBase.darkenRecentMessages', context: context);
-
-  @override
-  bool get darkenRecentMessages {
-    _$darkenRecentMessagesAtom.reportRead();
-    return super.darkenRecentMessages;
-  }
-
-  @override
-  set darkenRecentMessages(bool value) {
-    _$darkenRecentMessagesAtom.reportWrite(value, super.darkenRecentMessages,
-        () {
-      super.darkenRecentMessages = value;
-    });
-  }
-
   late final _$mutedWordsAtom =
       Atom(name: '_SettingsStoreBase.mutedWords', context: context);
 
@@ -1069,7 +1050,6 @@ showBTTVBadges: ${showBTTVBadges},
 showFFZEmotes: ${showFFZEmotes},
 showFFZBadges: ${showFFZBadges},
 showRecentMessages: ${showRecentMessages},
-darkenRecentMessages: ${darkenRecentMessages},
 mutedWords: ${mutedWords},
 matchWholeWord: ${matchWholeWord},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},

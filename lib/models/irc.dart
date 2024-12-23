@@ -170,6 +170,21 @@ class IRCMessage {
       }
     }
 
+    final isHistorical = tags['historical'] == '1';
+    if (isHistorical) {
+      span.add(
+        WidgetSpan(
+          child: Tooltip(
+            message: 'Historical message',
+            preferBelow: false,
+            triggerMode: TooltipTriggerMode.tap,
+            child: Icon(Icons.history_rounded, size: badgeSize),
+          ),
+        ),
+      );
+      span.add(const TextSpan(text: ' '));
+    }
+
     final sourceChannelId = tags['source-room-id'] ?? tags['room-id'];
     final sourceChannelUser = channelIdToUserTwitch != null
         ? channelIdToUserTwitch[sourceChannelId]

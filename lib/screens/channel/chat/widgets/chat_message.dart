@@ -456,15 +456,6 @@ class ChatMessage extends StatelessWidget {
           child: coloredMessage,
         );
 
-        final isHistorical = ircMessage.tags['historical'] == '1';
-
-        if (chatStore.settings.darkenRecentMessages && isHistorical) {
-          return Opacity(
-            opacity: 0.5,
-            child: finalMessage,
-          );
-        }
-
         return finalMessage;
       },
     );

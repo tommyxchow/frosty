@@ -162,7 +162,6 @@ abstract class _SettingsStoreBase with Store {
 
   // Recent messages defaults
   static const defaultShowRecentMessages = false;
-  static const defaultDarkenRecentMessages = true;
 
   // Message sizing options
   @JsonKey(defaultValue: defaultBadgeScale)
@@ -301,10 +300,6 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showRecentMessages = defaultShowRecentMessages;
 
-  @JsonKey(defaultValue: defaultDarkenRecentMessages)
-  @observable
-  var darkenRecentMessages = defaultDarkenRecentMessages;
-
   @JsonKey(defaultValue: defaultMutedWords)
   @observable
   List<String> mutedWords = defaultMutedWords;
@@ -358,7 +353,6 @@ abstract class _SettingsStoreBase with Store {
     showFFZBadges = defaultShowFFZBadges;
 
     showRecentMessages = defaultShowRecentMessages;
-    darkenRecentMessages = defaultDarkenRecentMessages;
   }
 
   // * Other settings
