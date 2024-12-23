@@ -487,6 +487,8 @@ abstract class VideoStoreBase with Store {
       });
     }
 
+    _overlayTimer.cancel();
+
     _disposeOverlayReaction();
     _disposeAndroidAutoPipReaction?.call();
   }

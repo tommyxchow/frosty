@@ -6,6 +6,7 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/events.dart';
 import 'package:frosty/models/irc.dart';
+import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -152,6 +153,8 @@ abstract class ChatStoreBase with Store {
   @observable
   IRCMessage? replyingToMessage;
 
+  final channelIdToUserTwitch = ObservableMap<String, UserTwitch>();
+
   ChatStoreBase({
     required this.twitchApi,
     required this.auth,
@@ -203,6 +206,24 @@ abstract class ChatStoreBase with Store {
     );
 
     assetsStore.init();
+
+    // Get the shared chat session and the profile pictures of the participants.
+    twitchApi
+        .getSharedChatSession(
+      broadcasterId: channelId,
+      headers: auth.headersTwitch,
+    )
+        .then((sharedChatSession) {
+      if (sharedChatSession == null) return;
+
+      for (final participant in sharedChatSession.participants) {
+        twitchApi
+            .getUser(id: participant.broadcasterId, headers: auth.headersTwitch)
+            .then((user) {
+          channelIdToUserTwitch[participant.broadcasterId] = user;
+        });
+      }
+    });
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 

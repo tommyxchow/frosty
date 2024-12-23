@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
@@ -121,6 +123,7 @@ class IRCMessage {
     void Function(String)? onTapPingedUser,
     bool showMessage = true,
     bool useReadableColors = false,
+    Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
   }) {
     final isLightTheme = Theme.of(context).brightness == Brightness.light;
@@ -165,6 +168,43 @@ class IRCMessage {
           ),
         );
       }
+    }
+
+    final sourceChannelId = tags['source-room-id'] ?? tags['room-id'];
+    final sourceChannelUser = channelIdToUserTwitch != null
+        ? channelIdToUserTwitch[sourceChannelId]
+        : null;
+    if (sourceChannelUser != null) {
+      span.add(
+        WidgetSpan(
+          child: Tooltip(
+            triggerMode: TooltipTriggerMode.tap,
+            preferBelow: false,
+            message: sourceChannelUser.displayName,
+            child: CachedNetworkImage(
+              imageUrl: sourceChannelUser.profileImageUrl,
+              imageBuilder: (context, imageProvider) => Container(
+                width: badgeSize,
+                height: badgeSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image:
+                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                ),
+              ),
+              placeholder: (context, url) => Container(
+                width: badgeSize,
+                height: badgeSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      span.add(const TextSpan(text: ' '));
     }
 
     // Indicator to skip adding the bot badges later when adding the rest of FFZ badges.
