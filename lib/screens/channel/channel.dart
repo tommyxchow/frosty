@@ -342,7 +342,7 @@ class _VideoChatState extends State<VideoChat> {
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
       return PipWidget(
-        pipLayout: PipActionsLayout.media_only_pause,
+        pipLayout: PipActionsLayout.mediaOnlyPause,
         onPipAction: (_) => _videoStore.handlePausePlay(),
         pipChild: player,
         child: videoChat,
