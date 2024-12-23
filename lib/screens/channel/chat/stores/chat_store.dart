@@ -153,7 +153,6 @@ abstract class ChatStoreBase with Store {
   @observable
   IRCMessage? replyingToMessage;
 
-
   final channelIdToUserTwitch = ObservableMap<String, UserTwitch>();
 
   ChatStoreBase({
@@ -218,7 +217,6 @@ abstract class ChatStoreBase with Store {
       if (sharedChatSession == null) return;
 
       for (final participant in sharedChatSession.participants) {
-        sharedChatChannels.add(participant.broadcasterId);
         twitchApi
             .getUser(id: participant.broadcasterId, headers: auth.headersTwitch)
             .then((user) {
