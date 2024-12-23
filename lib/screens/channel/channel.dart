@@ -126,7 +126,8 @@ class _VideoChatState extends State<VideoChat> {
             duration: const Duration(milliseconds: 200),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(settingsStore.overlayOpacity),
+                color: Colors.black
+                    .withValues(alpha: settingsStore.overlayOpacity),
               ),
               child: IgnorePointer(
                 ignoring: !_videoStore.overlayVisible,
@@ -234,8 +235,8 @@ class _VideoChatState extends State<VideoChat> {
                   : MediaQuery.of(context).size.width *
                       _chatStore.settings.chatWidth,
               color: _chatStore.settings.fullScreen
-                  ? Colors.black.withOpacity(
-                      _chatStore.settings.fullScreenChatOverlayOpacity,
+                  ? Colors.black.withValues(
+                      alpha: _chatStore.settings.fullScreenChatOverlayOpacity,
                     )
                   : Theme.of(context).scaffoldBackgroundColor,
               child: chat,

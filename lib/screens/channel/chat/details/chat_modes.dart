@@ -11,7 +11,7 @@ class ChatModes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final disabledColor =
-        Theme.of(context).colorScheme.onSurface.withOpacity(0.5);
+        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

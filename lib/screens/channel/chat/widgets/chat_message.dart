@@ -141,7 +141,8 @@ class ChatMessage extends StatelessWidget {
     final defaultTextStyle = DefaultTextStyle.of(context).style;
     final messageHeaderIconSize =
         defaultBadgeSize * chatStore.settings.badgeScale;
-    final messageHeaderTextColor = defaultTextStyle.color?.withOpacity(0.5);
+    final messageHeaderTextColor =
+        defaultTextStyle.color?.withValues(alpha: 0.5);
     const messageHeaderFontWeight = FontWeight.w600;
 
     return Observer(
@@ -436,7 +437,7 @@ class ChatMessage extends StatelessWidget {
             : Container(
                 padding: const EdgeInsets.only(left: 8, right: 12),
                 decoration: BoxDecoration(
-                  color: highlightColor.withOpacity(0.1),
+                  color: highlightColor.withValues(alpha: 0.1),
                   border: Border(
                     left: BorderSide(color: highlightColor, width: 4),
                   ),

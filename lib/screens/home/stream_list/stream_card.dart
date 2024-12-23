@@ -151,7 +151,7 @@ class StreamCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: subFontSize,
-                color: fontColor?.withOpacity(0.8),
+                color: fontColor?.withValues(alpha: 0.8),
               ),
             ),
           ),
@@ -179,7 +179,7 @@ class StreamCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: subFontSize,
-                    color: fontColor?.withOpacity(0.8),
+                    color: fontColor?.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -190,7 +190,7 @@ class StreamCard extends StatelessWidget {
             '${NumberFormat().format(streamInfo.viewerCount)} viewers',
             style: TextStyle(
               fontSize: subFontSize,
-              color: fontColor?.withOpacity(0.8),
+              color: fontColor?.withValues(alpha: 0.8),
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
