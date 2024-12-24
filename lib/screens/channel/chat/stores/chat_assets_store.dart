@@ -6,6 +6,7 @@ import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/user.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,6 +24,8 @@ abstract class ChatAssetsStoreBase with Store {
   RoomFFZ? ffzRoomInfo;
 
   String? sevenTvEmoteSetId;
+
+  final channelIdToUserTwitch = ObservableMap<String, UserTwitch>();
 
   @computed
   List<Emote> get bttvEmotes =>
@@ -138,6 +141,22 @@ abstract class ChatAssetsStoreBase with Store {
       //
       // Emotes
       Future.wait([
+        twitchApi
+            .getSharedChatSession(
+          broadcasterId: channelId,
+          headers: headers,
+        )
+            .then((sharedChatSession) {
+          if (sharedChatSession == null) return;
+
+          for (final participant in sharedChatSession.participants) {
+            twitchApi
+                .getUser(id: participant.broadcasterId, headers: headers)
+                .then((user) {
+              channelIdToUserTwitch[participant.broadcasterId] = user;
+            });
+          }
+        }).catchError(onBadgeError),
         Future.wait([
           if (showTwitchEmotes) ...[
             twitchApi
@@ -161,7 +180,7 @@ abstract class ChatAssetsStoreBase with Store {
               final (setId, emotes) = data;
               sevenTvEmoteSetId = setId;
               return emotes;
-            }).catchError(onEmoteError),
+            }).catchError(onBadgeError),
           ],
           if (showBTTVEmotes) ...[
             bttvApi.getEmotesGlobal().catchError(onEmoteError),

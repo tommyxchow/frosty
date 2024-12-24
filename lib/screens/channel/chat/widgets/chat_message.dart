@@ -109,6 +109,8 @@ class ChatMessage extends StatelessWidget {
                   useReadableColors: chatStore.settings.useReadableColors,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
+                  channelIdToUserTwitch:
+                      chatStore.assetsStore.channelIdToUserTwitch,
                 ),
                 style: defaultTextStyle,
               ),
@@ -173,7 +175,8 @@ class ChatMessage extends StatelessWidget {
                   useReadableColors: chatStore.settings.useReadableColors,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
-                  channelIdToUserTwitch: chatStore.channelIdToUserTwitch,
+                  channelIdToUserTwitch:
+                      chatStore.assetsStore.channelIdToUserTwitch,
                 ),
               ),
             );
@@ -305,6 +308,8 @@ class ChatMessage extends StatelessWidget {
                         useReadableColors: chatStore.settings.useReadableColors,
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
+                        channelIdToUserTwitch:
+                            chatStore.assetsStore.channelIdToUserTwitch,
                       ),
                     ),
                   ),
@@ -398,6 +403,8 @@ class ChatMessage extends StatelessWidget {
                               chatStore.settings.useReadableColors,
                           launchExternal: chatStore.settings.launchUrlExternal,
                           timestamp: chatStore.settings.timestampType,
+                          channelIdToUserTwitch:
+                              chatStore.assetsStore.channelIdToUserTwitch,
                         ),
                       ),
                     ),
