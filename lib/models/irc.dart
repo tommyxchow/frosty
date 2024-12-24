@@ -174,6 +174,7 @@ class IRCMessage {
     if (isHistorical) {
       span.add(
         WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
           child: Tooltip(
             message: 'Historical message',
             preferBelow: false,
@@ -192,6 +193,7 @@ class IRCMessage {
     if (sourceChannelUser != null) {
       span.add(
         WidgetSpan(
+          alignment: PlaceholderAlignment.middle,
           child: Tooltip(
             triggerMode: TooltipTriggerMode.tap,
             preferBelow: false,
