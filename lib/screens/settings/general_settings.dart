@@ -54,6 +54,9 @@ class GeneralSettings extends StatelessWidget {
                       child: ColorPicker(
                         pickerColor: Color(settingsStore.accentColor),
                         onColorChanged: (newColor) =>
+                            // TODO: Update when new method arrives in stable:
+                            // https://github.com/flutter/flutter/issues/160184#issuecomment-2560184639
+                            // ignore: deprecated_member_use
                             settingsStore.accentColor = newColor.value,
                         enableAlpha: false,
                         pickerAreaBorderRadius:
