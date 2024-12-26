@@ -1,3 +1,21 @@
+## v4.8.0
+
+December 26, 2024
+
+### New Features
+
+- Added initial support for shared chat sessions
+
+### Improvements
+
+- Changed historical recent message indicator to chat message badge icon
+
+### Bug Fixes
+
+- [Android] Fixed video causing random crashes on some devices
+
+---
+
 ## v4.7.1
 
 November 19, 2024
@@ -45,25 +63,3 @@ September 12, 2024
 ### Bug Fixes
 
 - Fixed certain historical recent messages not rendering properly
-
----
-
-## v4.5.0
-
-August 16, 2024
-
-### New Features
-
-- Added an option to un-darken historical recent messages in chat
-
-### Improvements
-
-- [iPadOS] Enabled video quality settings on iPad (by @Shingyx on GitHub)
-- Moved exact matches of searched categories to the top (by @Shingyx on GitHub)
-
-### Bug Fixes
-
-- Fixed extraneous notices when toggling chat-only mode
-- Fixed cookie banner blocking login and added backup workaround instructions in the login screen toolbar (instructions by @UmmonTeal on GitHub)
-
-#### See all release notes at https://github.com/tommyxchow/frosty/releases
