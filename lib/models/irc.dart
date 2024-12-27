@@ -197,7 +197,7 @@ class IRCMessage {
           child: Tooltip(
             triggerMode: TooltipTriggerMode.tap,
             preferBelow: false,
-            message: sourceChannelUser.displayName,
+            message: 'Sent from ${sourceChannelUser.displayName}',
             child: CachedNetworkImage(
               imageUrl: sourceChannelUser.profileImageUrl,
               imageBuilder: (context, imageProvider) => Container(
