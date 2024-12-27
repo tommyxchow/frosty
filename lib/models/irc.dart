@@ -305,8 +305,9 @@ class IRCMessage {
 
         if (badge.name == 'Bot') {
           if (!skipBot) {
+            final indexToInsert = isHistorical ? 2 : 0;
             span.insert(
-              0,
+              indexToInsert,
               _createBadgeSpan(
                 context,
                 badge: badge,
@@ -315,7 +316,7 @@ class IRCMessage {
                 launchExternal: launchExternal,
               ),
             );
-            span.add(const TextSpan(text: ' '));
+            span.insert(indexToInsert + 1, const TextSpan(text: ' '));
           }
         } else {
           span.add(
