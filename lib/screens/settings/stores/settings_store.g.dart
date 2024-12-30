@@ -19,6 +19,7 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..defaultToHighestQuality =
           json['defaultToHighestQuality'] as bool? ?? false
       ..showLatency = json['showLatency'] as bool? ?? true
+      ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? false
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
       ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.5
@@ -87,6 +88,7 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'showVideo': instance.showVideo,
       'defaultToHighestQuality': instance.defaultToHighestQuality,
       'showLatency': instance.showLatency,
+      'useEnhancedRendering': instance.useEnhancedRendering,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
       'overlayOpacity': instance.overlayOpacity,
@@ -282,6 +284,23 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showLatency(bool value) {
     _$showLatencyAtom.reportWrite(value, super.showLatency, () {
       super.showLatency = value;
+    });
+  }
+
+  late final _$useEnhancedRenderingAtom =
+      Atom(name: '_SettingsStoreBase.useEnhancedRendering', context: context);
+
+  @override
+  bool get useEnhancedRendering {
+    _$useEnhancedRenderingAtom.reportRead();
+    return super.useEnhancedRendering;
+  }
+
+  @override
+  set useEnhancedRendering(bool value) {
+    _$useEnhancedRenderingAtom.reportWrite(value, super.useEnhancedRendering,
+        () {
+      super.useEnhancedRendering = value;
     });
   }
 
@@ -1016,6 +1035,7 @@ launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
 showLatency: ${showLatency},
+useEnhancedRendering: ${useEnhancedRendering},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 overlayOpacity: ${overlayOpacity},

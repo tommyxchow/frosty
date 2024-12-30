@@ -40,6 +40,16 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.showLatency,
             onChanged: (newValue) => settingsStore.showLatency = newValue,
           ),
+          if (Platform.isAndroid)
+            SettingsListSwitch(
+              title: 'Use enhanced rendering',
+              subtitle: const Text(
+                'Enables a newer WebView rendering method that improves performance. May cause random crashes on some devices.',
+              ),
+              value: settingsStore.useEnhancedRendering,
+              onChanged: (newValue) =>
+                  settingsStore.useEnhancedRendering = newValue,
+            ),
           const SectionHeader('Overlay'),
           SettingsListSwitch(
             title: 'Use custom video overlay',

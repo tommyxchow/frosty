@@ -64,6 +64,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowVideo = true;
   static const defaultDefaultToHighestQuality = false;
   static const defaultShowLatency = true;
+  static const defaultUseEnhancedRendering = false;
 
   // Overlay defaults
   static const defaultShowOverlay = true;
@@ -83,6 +84,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showLatency = defaultShowLatency;
 
+  @JsonKey(defaultValue: defaultUseEnhancedRendering)
+  @observable
+  var useEnhancedRendering = defaultUseEnhancedRendering;
+
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
   @observable
@@ -101,6 +106,7 @@ abstract class _SettingsStoreBase with Store {
     showVideo = defaultShowVideo;
     defaultToHighestQuality = defaultDefaultToHighestQuality;
     showLatency = defaultShowLatency;
+    useEnhancedRendering = defaultUseEnhancedRendering;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
