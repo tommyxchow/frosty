@@ -1,3 +1,18 @@
+## v4.9.0
+
+December 30, 2024
+
+### New Features
+
+- [Android] Added new "Use enhanced rendering" option in video settings
+
+### Bug Fixes
+
+- Fixed incorrect badge order and spacing for FFZ bots
+- Fixed missing emotes on channels that don't have 7TV enabled
+
+---
+
 ## v4.8.0
 
 December 26, 2024
@@ -44,22 +59,6 @@ November 17, 2024
 
 - Fixed "Pinned" header typo
 
+#### See all release notes at https://github.com/tommyxchow/frosty/releases
+
 ---
-
-## v4.6.0
-
-September 12, 2024
-
-### New Features
-
-- Added a theme accent color picker in general settings
-- Added the ability to pin streams in the "Following" tab by long-pressing
-- Added a "My channel" shortcut in profile settings
-
-### Improvements
-
-- Refreshed and updated the overall design to utilize the accent color
-
-### Bug Fixes
-
-- Fixed certain historical recent messages not rendering properly
