@@ -141,22 +141,6 @@ abstract class ChatAssetsStoreBase with Store {
       //
       // Emotes
       Future.wait([
-        twitchApi
-            .getSharedChatSession(
-          broadcasterId: channelId,
-          headers: headers,
-        )
-            .then((sharedChatSession) {
-          if (sharedChatSession == null) return;
-
-          for (final participant in sharedChatSession.participants) {
-            twitchApi
-                .getUser(id: participant.broadcasterId, headers: headers)
-                .then((user) {
-              channelIdToUserTwitch[participant.broadcasterId] = user;
-            });
-          }
-        }).catchError(onBadgeError),
         Future.wait([
           if (showTwitchEmotes) ...[
             twitchApi
@@ -180,7 +164,7 @@ abstract class ChatAssetsStoreBase with Store {
               final (setId, emotes) = data;
               sevenTvEmoteSetId = setId;
               return emotes;
-            }).catchError(onBadgeError),
+            }).catchError(onEmoteError),
           ],
           if (showBTTVEmotes) ...[
             bttvApi.getEmotesGlobal().catchError(onEmoteError),
@@ -200,8 +184,24 @@ abstract class ChatAssetsStoreBase with Store {
                 for (final emote in emotes) emote.name: emote,
               }.asObservable(),
             ),
-        //Emotes
+        // Badges
         Future.wait([
+          twitchApi
+              .getSharedChatSession(
+            broadcasterId: channelId,
+            headers: headers,
+          )
+              .then((sharedChatSession) {
+            if (sharedChatSession == null) return;
+
+            for (final participant in sharedChatSession.participants) {
+              twitchApi
+                  .getUser(id: participant.broadcasterId, headers: headers)
+                  .then((user) {
+                channelIdToUserTwitch[participant.broadcasterId] = user;
+              });
+            }
+          }).catchError(onBadgeError),
           // Get global badges first, then channel badges to avoid badge conflicts.
           // We want the channel badges to override the global badges.
           if (showTwitchBadges)

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/events.dart';
 import 'package:frosty/models/irc.dart';
@@ -435,7 +436,7 @@ abstract class ChatStoreBase with Store {
         },
         onBadgeError: (error) {
           debugPrint(error.toString());
-          return <Badge>[];
+          return <ChatBadge>[];
         },
         showTwitchEmotes: settings.showTwitchEmotes,
         showTwitchBadges: settings.showTwitchBadges,
