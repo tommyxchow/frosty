@@ -61,6 +61,9 @@ abstract class ChatStoreBase with Store {
 
   WebSocketChannel? _sevenTVChannel;
 
+  /// The subscription that handles the 7TV WebSocket connection.
+  StreamSubscription? _sevenTVChannelListener;
+
   static const _maxRetries = 5;
 
   // The retry counter for exponential backoff.
@@ -517,7 +520,9 @@ abstract class ChatStoreBase with Store {
       }
     }
 
-    _sevenTVChannel?.stream.listen(
+    // Cancel previous subscription if exists
+    _sevenTVChannelListener?.cancel();
+    _sevenTVChannelListener = _sevenTVChannel?.stream.listen(
       (data) {
         if (!settings.showVideo || settings.chatDelay == 0) {
           listener(data);
@@ -777,7 +782,13 @@ abstract class ChatStoreBase with Store {
     _notificationTimer?.cancel();
     sleepTimer?.cancel();
 
+    // Cancel WebSocket subscriptions
+    _channelListener?.cancel();
+    _sevenTVChannelListener?.cancel();
+
+    // Close WebSocket channels
     _channel?.sink.close(1000);
+    _sevenTVChannel?.sink.close(1000);
 
     for (final reactionDisposer in reactions) {
       reactionDisposer();
