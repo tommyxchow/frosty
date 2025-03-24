@@ -694,7 +694,7 @@ class IRCMessage {
             }
           },
       );
-    } else if (RegExp(r'https?:\/\/').hasMatch(text)) {
+    } else if (regexLink.hasMatch(text)) {
       return TextSpan(
         text: text,
         style: style?.copyWith(
