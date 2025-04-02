@@ -95,8 +95,16 @@ abstract class VideoStoreBase with Store {
         )
         ..setNavigationDelegate(
           NavigationDelegate(
-            onPageFinished: (_) {
-              initVideo();
+            onPageFinished: (url) async {
+              if (url != videoUrl) return;
+              final injected =
+                  (await videoWebViewController.runJavaScriptReturningResult(
+                'window._injected ? true : false',
+              )) as bool;
+              if (injected) return;
+              await videoWebViewController
+                  .runJavaScript('window._injected = true;');
+              await initVideo();
               _acceptContentWarning();
             },
           ),
@@ -194,7 +202,7 @@ abstract class VideoStoreBase with Store {
   Future<void> updateStreamQualities() async {
     try {
       await videoWebViewController.runJavaScript('''
-        _queuePromise(async () => {
+        (async () => {
           (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
           (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
           await _asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] label div');
@@ -202,7 +210,7 @@ abstract class VideoStoreBase with Store {
           StreamQualities.postMessage(JSON.stringify(qualities));
           (await _asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
           (await _asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
-        });
+        })();
       ''');
     } catch (e) {
       debugPrint(e.toString());
@@ -220,14 +228,14 @@ abstract class VideoStoreBase with Store {
   Future<void> _setStreamQualityIndex(int newStreamQualityIndex) async {
     try {
       await videoWebViewController.runJavaScript('''
-        _queuePromise(async () => {
+        (async () => {
           (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
           (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
           await _asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] input');
           [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$newStreamQualityIndex].click();
           (await _asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
           (await _asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
-        });
+        })();
       ''');
       _streamQualityIndex = newStreamQualityIndex;
     } catch (e) {
@@ -270,29 +278,8 @@ abstract class VideoStoreBase with Store {
     try {
       await videoWebViewController.runJavaScript('''
         {
-          const asyncQuerySelector = (selector, timeout = undefined) => new Promise((resolve) => {
-            if (document.querySelector(selector)) {
-              return resolve(document.querySelector(selector));
-            }
-            const observer = new MutationObserver((mutations) => {
-              if (document.querySelector(selector)) {
-                observer.disconnect();
-                resolve(document.querySelector(selector));
-              }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-
-            if (timeout) {
-              setTimeout(() => {
-                observer.disconnect();
-                resolve(undefined);
-              }, timeout);
-            }
-          });
-
-
           (async () => {
-            const warningBtn = await asyncQuerySelector('button[data-a-target*="content-classification-gate"]', 10000);
+            const warningBtn = await _asyncQuerySelector('button[data-a-target*="content-classification-gate"]', 10000);
 
             if (warningBtn) {
               warningBtn.click();
@@ -308,7 +295,7 @@ abstract class VideoStoreBase with Store {
   Future<void> _listenOnLatencyChanges() async {
     try {
       await videoWebViewController.runJavaScript('''
-        _queuePromise(async () => {
+        (async () => {
           (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
           (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]')).click();
           (await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
@@ -319,7 +306,7 @@ abstract class VideoStoreBase with Store {
             Latency.postMessage(changes[0].target.textContent);
           })
           observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
-        });
+        })();
       ''');
     } catch (e) {
       debugPrint(e.toString());
@@ -332,13 +319,8 @@ abstract class VideoStoreBase with Store {
     if (await videoWebViewController.currentUrl() == videoUrl) {
       // Declare `window` level utility methods and add event listeners to notify the JavaScript channels when the video plays and pauses.
       try {
-        videoWebViewController.runJavaScript('''
-          window._PROMISE_QUEUE = Promise.resolve();
-          window._queuePromise = (method) => {
-            window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(method, method);
-            return window._PROMISE_QUEUE;
-          };
-          window._asyncQuerySelector = (selector) => new Promise((resolve) => {
+        await videoWebViewController.runJavaScript('''
+          window._asyncQuerySelector = (selector, timeout = undefined) => new Promise((resolve) => {
             let element = document.querySelector(selector);
             if (element) {
               return resolve(element);
@@ -351,9 +333,15 @@ abstract class VideoStoreBase with Store {
               }
             });
             observer.observe(document.body, { childList: true, subtree: true });
+            if (timeout) {
+              setTimeout(() => {
+                observer.disconnect();
+                resolve(undefined);
+              }, timeout);
+            }
           });
 
-          _queuePromise(async () => {
+          (async () => {
             const videoElement = await _asyncQuerySelector("video");
             videoElement.addEventListener("pause", () => {
               VideoPause.postMessage("video paused");
@@ -367,7 +355,7 @@ abstract class VideoStoreBase with Store {
               VideoPlaying.postMessage("video playing");
               videoElement.textTracks[0].mode = "hidden";
             }
-          });
+          })();
         ''');
         if (settingsStore.showOverlay) {
           await _hideDefaultOverlay();
