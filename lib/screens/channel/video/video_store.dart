@@ -9,6 +9,7 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -75,21 +76,24 @@ abstract class VideoStoreBase with Store {
         ..addJavaScriptChannel(
           'VideoPlaying',
           onMessageReceived: (message) async {
+            _paused = false;
+            if (Platform.isAndroid) pip.setIsPlaying(true);
+            videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].muted = false;',
+            );
+            videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].volume = 1.0;',
+            );
             if (settingsStore.defaultToHighestQuality &&
                 _firstTimeSettingQuality) {
               await _setStreamQualityIndex(1);
-
               _firstTimeSettingQuality = false;
-            } else {
-              _paused = false;
-              if (Platform.isAndroid) pip.setIsPlaying(true);
-
-              videoWebViewController.runJavaScript(
-                'document.getElementsByTagName("video")[0].muted = false;',
-              );
-              videoWebViewController.runJavaScript(
-                'document.getElementsByTagName("video")[0].volume = 1.0;',
-              );
+            } else if (_firstTimeSettingQuality) {
+              final prefs = await SharedPreferences.getInstance();
+              final lastStreamQuality = prefs.getString('last_stream_quality');
+              if (lastStreamQuality == null) return;
+              setStreamQuality(lastStreamQuality);
+              _firstTimeSettingQuality = false;
             }
           },
         )
@@ -221,6 +225,7 @@ abstract class VideoStoreBase with Store {
   Future<void> setStreamQuality(String newStreamQuality) async {
     final indexOfStreamQuality =
         _availableStreamQualities.indexOf(newStreamQuality);
+    if (indexOfStreamQuality == -1) return;
     await _setStreamQualityIndex(indexOfStreamQuality);
   }
 
@@ -360,6 +365,7 @@ abstract class VideoStoreBase with Store {
         if (settingsStore.showOverlay) {
           await _hideDefaultOverlay();
           await _listenOnLatencyChanges();
+          await updateStreamQualities();
         }
       } catch (e) {
         debugPrint(e.toString());
