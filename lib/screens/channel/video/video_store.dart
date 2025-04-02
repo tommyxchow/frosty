@@ -60,10 +60,21 @@ abstract class VideoStoreBase with Store {
         )
         ..addJavaScriptChannel(
           'StreamQualities',
-          onMessageReceived: (message) {
+          onMessageReceived: (message) async {
             final data = jsonDecode(message.message) as List;
             _availableStreamQualities =
                 data.map((item) => item as String).toList();
+            if (_firstTimeSettingQuality) {
+              _firstTimeSettingQuality = false;
+              if (settingsStore.defaultToHighestQuality) {
+                await _setStreamQualityIndex(1);
+                return;
+              }
+              final prefs = await SharedPreferences.getInstance();
+              final lastStreamQuality = prefs.getString('last_stream_quality');
+              if (lastStreamQuality == null) return;
+              setStreamQuality(lastStreamQuality);
+            }
           },
         )
         ..addJavaScriptChannel(
@@ -75,7 +86,7 @@ abstract class VideoStoreBase with Store {
         )
         ..addJavaScriptChannel(
           'VideoPlaying',
-          onMessageReceived: (message) async {
+          onMessageReceived: (message) {
             _paused = false;
             if (Platform.isAndroid) pip.setIsPlaying(true);
             videoWebViewController.runJavaScript(
@@ -84,17 +95,6 @@ abstract class VideoStoreBase with Store {
             videoWebViewController.runJavaScript(
               'document.getElementsByTagName("video")[0].volume = 1.0;',
             );
-            if (settingsStore.defaultToHighestQuality &&
-                _firstTimeSettingQuality) {
-              await _setStreamQualityIndex(1);
-              _firstTimeSettingQuality = false;
-            } else if (_firstTimeSettingQuality) {
-              final prefs = await SharedPreferences.getInstance();
-              final lastStreamQuality = prefs.getString('last_stream_quality');
-              if (lastStreamQuality == null) return;
-              setStreamQuality(lastStreamQuality);
-              _firstTimeSettingQuality = false;
-            }
           },
         )
         ..setNavigationDelegate(
