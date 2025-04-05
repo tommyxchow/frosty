@@ -9,6 +9,7 @@ import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -59,10 +60,21 @@ abstract class VideoStoreBase with Store {
         )
         ..addJavaScriptChannel(
           'StreamQualities',
-          onMessageReceived: (message) {
+          onMessageReceived: (message) async {
             final data = jsonDecode(message.message) as List;
             _availableStreamQualities =
                 data.map((item) => item as String).toList();
+            if (_firstTimeSettingQuality) {
+              _firstTimeSettingQuality = false;
+              if (settingsStore.defaultToHighestQuality) {
+                await _setStreamQualityIndex(1);
+                return;
+              }
+              final prefs = await SharedPreferences.getInstance();
+              final lastStreamQuality = prefs.getString('last_stream_quality');
+              if (lastStreamQuality == null) return;
+              setStreamQuality(lastStreamQuality);
+            }
           },
         )
         ..addJavaScriptChannel(
@@ -74,29 +86,29 @@ abstract class VideoStoreBase with Store {
         )
         ..addJavaScriptChannel(
           'VideoPlaying',
-          onMessageReceived: (message) async {
-            if (settingsStore.defaultToHighestQuality &&
-                _firstTimeSettingQuality) {
-              await _setStreamQualityIndex(1);
-
-              _firstTimeSettingQuality = false;
-            } else {
-              _paused = false;
-              if (Platform.isAndroid) pip.setIsPlaying(true);
-
-              videoWebViewController.runJavaScript(
-                'document.getElementsByTagName("video")[0].muted = false;',
-              );
-              videoWebViewController.runJavaScript(
-                'document.getElementsByTagName("video")[0].volume = 1.0;',
-              );
-            }
+          onMessageReceived: (message) {
+            _paused = false;
+            if (Platform.isAndroid) pip.setIsPlaying(true);
+            videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].muted = false;',
+            );
+            videoWebViewController.runJavaScript(
+              'document.getElementsByTagName("video")[0].volume = 1.0;',
+            );
           },
         )
         ..setNavigationDelegate(
           NavigationDelegate(
-            onPageFinished: (_) {
-              initVideo();
+            onPageFinished: (url) async {
+              if (url != videoUrl) return;
+              final injected =
+                  (await videoWebViewController.runJavaScriptReturningResult(
+                'window._injected ? true : false',
+              )) as bool;
+              if (injected) return;
+              await videoWebViewController
+                  .runJavaScript('window._injected = true;');
+              await initVideo();
               _acceptContentWarning();
             },
           ),
@@ -213,6 +225,7 @@ abstract class VideoStoreBase with Store {
   Future<void> setStreamQuality(String newStreamQuality) async {
     final indexOfStreamQuality =
         _availableStreamQualities.indexOf(newStreamQuality);
+    if (indexOfStreamQuality == -1) return;
     await _setStreamQualityIndex(indexOfStreamQuality);
   }
 
@@ -270,29 +283,8 @@ abstract class VideoStoreBase with Store {
     try {
       await videoWebViewController.runJavaScript('''
         {
-          const asyncQuerySelector = (selector, timeout = undefined) => new Promise((resolve) => {
-            if (document.querySelector(selector)) {
-              return resolve(document.querySelector(selector));
-            }
-            const observer = new MutationObserver((mutations) => {
-              if (document.querySelector(selector)) {
-                observer.disconnect();
-                resolve(document.querySelector(selector));
-              }
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
-
-            if (timeout) {
-              setTimeout(() => {
-                observer.disconnect();
-                resolve(undefined);
-              }, timeout);
-            }
-          });
-
-
           (async () => {
-            const warningBtn = await asyncQuerySelector('button[data-a-target*="content-classification-gate"]', 10000);
+            const warningBtn = await _asyncQuerySelector('button[data-a-target*="content-classification-gate"]', 10000);
 
             if (warningBtn) {
               warningBtn.click();
@@ -332,13 +324,14 @@ abstract class VideoStoreBase with Store {
     if (await videoWebViewController.currentUrl() == videoUrl) {
       // Declare `window` level utility methods and add event listeners to notify the JavaScript channels when the video plays and pauses.
       try {
-        videoWebViewController.runJavaScript('''
+        await videoWebViewController.runJavaScript('''
           window._PROMISE_QUEUE = Promise.resolve();
+
           window._queuePromise = (method) => {
             window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(method, method);
             return window._PROMISE_QUEUE;
           };
-          window._asyncQuerySelector = (selector) => new Promise((resolve) => {
+          window._asyncQuerySelector = (selector, timeout = undefined) => new Promise((resolve) => {
             let element = document.querySelector(selector);
             if (element) {
               return resolve(element);
@@ -351,6 +344,12 @@ abstract class VideoStoreBase with Store {
               }
             });
             observer.observe(document.body, { childList: true, subtree: true });
+            if (timeout) {
+              setTimeout(() => {
+                observer.disconnect();
+                resolve(undefined);
+              }, timeout);
+            }
           });
 
           _queuePromise(async () => {
@@ -372,6 +371,7 @@ abstract class VideoStoreBase with Store {
         if (settingsStore.showOverlay) {
           await _hideDefaultOverlay();
           await _listenOnLatencyChanges();
+          await updateStreamQualities();
         }
       } catch (e) {
         debugPrint(e.toString());

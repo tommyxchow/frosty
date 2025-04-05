@@ -14,6 +14,7 @@ import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
@@ -88,6 +89,12 @@ class VideoOverlay extends StatelessWidget {
                             title: Text(quality),
                             onTap: () {
                               videoStore.setStreamQuality(quality);
+                              SharedPreferences.getInstance().then(
+                                (prefs) => prefs.setString(
+                                  'last_stream_quality',
+                                  quality,
+                                ),
+                              );
                               Navigator.pop(context);
                             },
                           ),
