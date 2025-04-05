@@ -1,3 +1,13 @@
+## v4.9.1
+
+April 4, 2025
+
+### Bug Fixes
+
+- [Android] Fix overlay latency and stream qualities, persist last chosen stream quality (by @Artiu on GitHub)
+
+---
+
 ## v4.9.0
 
 December 30, 2024
@@ -28,36 +38,6 @@ December 26, 2024
 ### Bug Fixes
 
 - [Android] Fixed video causing random crashes on some devices
-
----
-
-## v4.7.1
-
-November 19, 2024
-
-### Bug Fixes
-
-- Further improve initial playback stability (by @Shingyx on GitHub)
-
----
-
-## v4.7.0
-
-November 17, 2024
-
-### New Features
-
-- Added the ability to mute keywords from chat in chat settings (by @zeykafx on GitHub)
-
-### Improvements
-
-- Improved initial playback stability (by @Shingyx on GitHub)
-- Content warning is now accepted automatically (by @joaopjrn on GitHub)
-- Updated Inter font to v4.1
-
-### Bug Fixes
-
-- Fixed "Pinned" header typo
 
 #### See all release notes at https://github.com/tommyxchow/frosty/releases
 
