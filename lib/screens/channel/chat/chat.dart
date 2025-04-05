@@ -52,8 +52,10 @@ class Chat extends StatelessWidget {
                                 controller: chatStore.scrollController,
                                 itemCount: chatStore.renderMessages.length,
                                 itemBuilder: (context, index) => ChatMessage(
-                                  ircMessage: chatStore.renderMessages.reversed
-                                      .toList()[index],
+                                  ircMessage: chatStore.renderMessages[
+                                      chatStore.renderMessages.length -
+                                          1 -
+                                          index],
                                   chatStore: chatStore,
                                 ),
                               );
