@@ -3,9 +3,9 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frosty/cache_manager.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
@@ -111,7 +111,7 @@ class _OtherSettingsState extends State<OtherSettings> {
           onTap: () async {
             HapticFeedback.mediumImpact();
 
-            await DefaultCacheManager().emptyCache();
+            await CustomCacheManager.instance.emptyCache();
 
             if (!context.mounted) return;
 

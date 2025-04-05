@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:frosty/cache_manager.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
@@ -199,6 +200,7 @@ class IRCMessage {
             preferBelow: false,
             message: 'Sent from ${sourceChannelUser.displayName}',
             child: CachedNetworkImage(
+              cacheManager: CustomCacheManager.instance,
               imageUrl: sourceChannelUser.profileImageUrl,
               imageBuilder: (context, imageProvider) => Container(
                 width: badgeSize,
