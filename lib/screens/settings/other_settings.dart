@@ -82,7 +82,7 @@ class _OtherSettingsState extends State<OtherSettings> {
               applicationName: packageInfo.appName,
               applicationVersion:
                   'Version ${packageInfo.version} (${packageInfo.buildNumber})',
-              applicationLegalese: '\u{a9} 2024 Tommy Chow',
+              applicationLegalese: '\u{a9} 2025 Tommy Chow',
             );
           },
         ),
