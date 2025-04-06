@@ -112,6 +112,7 @@ class _OtherSettingsState extends State<OtherSettings> {
             HapticFeedback.mediumImpact();
 
             await CustomCacheManager.instance.emptyCache();
+            await CustomCacheManager.removeOrphanedCacheFiles();
 
             if (!context.mounted) return;
 

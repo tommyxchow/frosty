@@ -6,11 +6,12 @@ import 'package:path_provider/path_provider.dart';
 class CustomCacheManager {
   static const key = 'libCachedImageData';
   static final repo = CacheObjectProvider(databaseName: key);
+  //TODO: Change to 30 days and 500 objects
   static final instance = CacheManager(
     Config(
       key,
       stalePeriod: const Duration(days: 1),
-      maxNrOfCacheObjects: 50,
+      maxNrOfCacheObjects: 200,
       repo: repo,
     ),
   );
@@ -24,22 +25,17 @@ class CustomCacheManager {
       return;
     }
 
-    // 1. Get list of files in file system
-    final allFiles =
-        cacheDir.listSync(recursive: true).whereType<File>().toList();
+    final allFiles = cacheDir.listSync(recursive: true).toList();
 
-    // 2. Get all cached file paths from DB
     await repo.open();
     final cachedObjects = await repo.getAllObjects();
     final dbFiles = cachedObjects.map((e) => e.relativePath).toSet();
 
-    // 3. Find orphaned files (on disk but not in DB)
     final orphanedFiles = allFiles.where((file) {
       final relativePath = file.path.split('$key/').last;
       return !dbFiles.contains(relativePath);
     }).toList();
 
-    // 4. Delete them
     for (final file in orphanedFiles) {
       try {
         await file.delete();
