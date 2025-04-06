@@ -11,6 +11,7 @@ import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/cache_manager.dart';
 import 'package:frosty/firebase_options.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
@@ -25,6 +26,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  CustomCacheManager.removeOrphanedCacheFiles();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

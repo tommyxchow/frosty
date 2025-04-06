@@ -5,14 +5,13 @@ import 'package:path_provider/path_provider.dart';
 
 class CustomCacheManager {
   static const key = 'libCachedImageData';
-  static final repo = CacheObjectProvider(databaseName: key);
-  //TODO: Change to 30 days and 500 objects
+  static final _repo = CacheObjectProvider(databaseName: key);
   static final instance = CacheManager(
     Config(
       key,
-      stalePeriod: const Duration(days: 1),
-      maxNrOfCacheObjects: 200,
-      repo: repo,
+      stalePeriod: const Duration(days: 30),
+      maxNrOfCacheObjects: 500,
+      repo: _repo,
     ),
   );
 
@@ -21,14 +20,13 @@ class CustomCacheManager {
     final cacheDir = Directory('${tempDir.path}/$key');
 
     if (!await cacheDir.exists()) {
-      print("No cache directory found.");
       return;
     }
 
     final allFiles = cacheDir.listSync(recursive: true).toList();
 
-    await repo.open();
-    final cachedObjects = await repo.getAllObjects();
+    await _repo.open();
+    final cachedObjects = await _repo.getAllObjects();
     final dbFiles = cachedObjects.map((e) => e.relativePath).toSet();
 
     final orphanedFiles = allFiles.where((file) {
@@ -36,15 +34,11 @@ class CustomCacheManager {
       return !dbFiles.contains(relativePath);
     }).toList();
 
-    for (final file in orphanedFiles) {
-      try {
-        await file.delete();
-        print('Deleted orphaned file: ${file.path}');
-      } catch (e) {
-        print('Failed to delete: ${file.path} — $e');
-      }
-    }
+    final deletions = orphanedFiles.map((file) => file.delete()).toList();
 
-    print('Cleanup complete. Removed ${orphanedFiles.length} orphaned files.');
+    try {
+      await Future.wait(deletions);
+      // ignore: empty_catches
+    } catch (e) {}
   }
 }
