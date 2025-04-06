@@ -3,9 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:frosty/cache_manager.dart';
 
 /// A wrapper around [CachedNetworkImage] that adds custom defaults for Frosty.
-
-CacheManagerLogLevel logLevel = CacheManagerLogLevel.debug;
-
 class FrostyCachedNetworkImage extends StatelessWidget {
   final String imageUrl;
   final double? width;
