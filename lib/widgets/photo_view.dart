@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:frosty/cache_manager.dart';
 import 'package:frosty/theme.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,10 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog> {
               : DismissDirection.none,
           onDismissed: Navigator.of(context).pop,
           child: PhotoView(
-            imageProvider: CachedNetworkImageProvider(widget.imageUrl),
+            imageProvider: CachedNetworkImageProvider(
+              widget.imageUrl,
+              cacheManager: CustomCacheManager.instance,
+            ),
             scaleStateChangedCallback: (value) =>
                 setState(() => photoViewScaleState = value),
             backgroundDecoration:

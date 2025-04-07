@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frosty/cache_manager.dart';
 
 /// A wrapper around [CachedNetworkImage] that adds custom defaults for Frosty.
 class FrostyCachedNetworkImage extends StatelessWidget {
@@ -43,6 +44,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
       fadeInCurve: Curves.easeOut,
       fadeOutCurve: Curves.easeIn,
       fit: fit,
+      cacheManager: CustomCacheManager.instance,
     );
   }
 }
