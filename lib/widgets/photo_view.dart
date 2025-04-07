@@ -7,8 +7,13 @@ import 'package:provider/provider.dart';
 
 class FrostyPhotoViewDialog extends StatefulWidget {
   final String imageUrl;
+  final String? cacheKey;
 
-  const FrostyPhotoViewDialog({super.key, required this.imageUrl});
+  const FrostyPhotoViewDialog({
+    super.key,
+    required this.imageUrl,
+    this.cacheKey,
+  });
 
   @override
   State<FrostyPhotoViewDialog> createState() => _FrostyPhotoViewDialogState();
@@ -31,6 +36,7 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog> {
           child: PhotoView(
             imageProvider: CachedNetworkImageProvider(
               widget.imageUrl,
+              cacheKey: widget.cacheKey,
               cacheManager: CustomCacheManager.instance,
             ),
             scaleStateChangedCallback: (value) =>
