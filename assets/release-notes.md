@@ -1,3 +1,13 @@
+## v4.9.2
+
+April 7, 2025
+
+### Bug Fixes
+
+- Fix large cache size (by @Artiu on GitHub)
+
+---
+
 ## v4.9.1
 
 April 4, 2025
