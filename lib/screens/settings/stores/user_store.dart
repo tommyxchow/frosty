@@ -17,6 +17,10 @@ abstract class UserStoreBase with Store {
   @readonly
   var _blockedUsers = ObservableList<UserBlockedTwitch>();
 
+  /// The list of channel IDs the user moderates.
+  @readonly
+  var _moderatedChannels = ObservableList<String>();
+
   ReactionDisposer? _disposeReaction;
 
   UserStoreBase({required this.twitchApi});
@@ -26,12 +30,15 @@ abstract class UserStoreBase with Store {
     // Get and update the current user's info.
     _details = await twitchApi.getUserInfo(headers: headers);
 
-    // Get and update the current user's list of blocked users.
+    // Get and update non-critical user info.
     // Don't use await because having a huge list of blocked users will block the UI.
     if (_details?.id != null) {
       twitchApi
           .getUserBlockedList(id: _details!.id, headers: headers)
           .then((blockedUsers) => _blockedUsers = blockedUsers.asObservable());
+      twitchApi
+          .getModeratedChannels(id: _details!.id, headers: headers)
+          .then((channels) => _moderatedChannels = channels.asObservable());
     }
 
     _disposeReaction = autorun(
@@ -73,10 +80,61 @@ abstract class UserStoreBase with Store {
       ))
           .asObservable();
 
+  bool isModerator(String channelId) {
+    return _moderatedChannels.contains(channelId);
+  }
+
+  @action
+  Future<bool> deleteMessage({
+    required String broadcasterId,
+    required String messageId,
+    required Map<String, String> headers,
+  }) async {
+    if (_details?.id == null) {
+      throw Exception('User details not available, cannot get moderator ID.');
+    }
+    if (!isModerator(broadcasterId)) {
+      // User is not a moderator of this channel
+      return false;
+    }
+    return twitchApi.deleteChatMessage(
+      broadcasterId: broadcasterId,
+      moderatorId: _details!.id,
+      messageId: messageId,
+      headers: headers,
+    );
+  }
+
+  @action
+  Future<bool> banOrTimeoutUser({
+    required String broadcasterId,
+    required String userIdToBan,
+    required Map<String, String> headers,
+    int? duration,
+    String? reason,
+  }) async {
+    if (_details?.id == null) {
+      throw Exception('User details not available, cannot get moderator ID.');
+    }
+    if (!isModerator(broadcasterId)) {
+      // User is not a moderator of this channel
+      return false;
+    }
+    return twitchApi.banUser(
+      broadcasterId: broadcasterId,
+      moderatorId: _details!.id,
+      userIdToBan: userIdToBan,
+      headers: headers,
+      duration: duration,
+      reason: reason,
+    );
+  }
+
   @action
   void dispose() {
     _details = null;
     _blockedUsers.clear();
+    _moderatedChannels.clear();
     if (_disposeReaction != null) _disposeReaction!();
   }
 }
