@@ -63,9 +63,7 @@ EmoteFFZ _$EmoteFFZFromJson(Map<String, dynamic> json) => EmoteFFZ(
 Emote7TV _$Emote7TVFromJson(Map<String, dynamic> json) => Emote7TV(
       json['id'] as String,
       json['name'] as String,
-      json['data'] == null
-          ? null
-          : Emote7TVData.fromJson(json['data'] as Map<String, dynamic>),
+      Emote7TVData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Owner7TV _$Owner7TVFromJson(Map<String, dynamic> json) => Owner7TV(

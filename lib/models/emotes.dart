@@ -127,7 +127,7 @@ class EmoteFFZ {
 class Emote7TV {
   final String id;
   final String name;
-  final Emote7TVData? data;
+  final Emote7TVData data;
 
   const Emote7TV(
     this.id,
@@ -267,7 +267,7 @@ class Emote {
   factory Emote.from7TV(Emote7TV emote, EmoteType type) {
     final emoteData = emote.data;
 
-    final url = emoteData!.host.url;
+    final url = emoteData.host.url;
 
     // Flutter doesn't support AVIF yet.
     final file = emoteData.host.files.lastWhere(
