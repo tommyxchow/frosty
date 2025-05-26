@@ -1,3 +1,14 @@
+## v4.9.3
+
+May 26, 2025
+
+### Bug Fixes
+
+- Fix missing 7TV emotes on some channels
+- Fix sleep timer menu border styling
+
+---
+
 ## v4.9.2
 
 April 7, 2025
@@ -30,24 +41,6 @@ December 30, 2024
 
 - Fixed incorrect badge order and spacing for FFZ bots
 - Fixed missing emotes on channels that don't have 7TV enabled
-
----
-
-## v4.8.0
-
-December 26, 2024
-
-### New Features
-
-- Added initial support for shared chat sessions
-
-### Improvements
-
-- Changed historical recent message indicator to chat message badge icon
-
-### Bug Fixes
-
-- [Android] Fixed video causing random crashes on some devices
 
 #### See all release notes at https://github.com/tommyxchow/frosty/releases
 
