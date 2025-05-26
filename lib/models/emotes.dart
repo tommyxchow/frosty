@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:frosty/constants.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -269,8 +270,8 @@ class Emote {
 
     final url = emoteData.host.url;
 
-    // Flutter doesn't support AVIF yet.
-    final file = emoteData.host.files.lastWhere(
+    // TODO: Remove if/when Flutter natively supports AVIF.
+    final file = emoteData.host.files.lastWhereOrNull(
       (file) => file.format != 'AVIF',
     );
 
@@ -280,10 +281,10 @@ class Emote {
     return Emote(
       name: emote.name,
       realName: emote.name != emoteData.name ? emoteData.name : null,
-      width: emoteData.host.files.first.width,
-      height: emoteData.host.files.first.height,
+      width: emoteData.host.files.firstOrNull?.width,
+      height: emoteData.host.files.firstOrNull?.height,
       zeroWidth: isZeroWidth,
-      url: 'https:$url/${file.name}',
+      url: file != null ? 'https:$url/${file.name}' : '',
       type: type,
       ownerDisplayName: emoteData.owner?.displayName,
       ownerUsername: emoteData.owner?.username,
