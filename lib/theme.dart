@@ -32,7 +32,7 @@ class FrostyThemes {
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
       ),
@@ -66,7 +66,7 @@ class FrostyThemes {
         height: 64,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
       ),
-      tabBarTheme: const TabBarTheme(
+      tabBarTheme: const TabBarThemeData(
         dividerColor: Colors.transparent,
         tabAlignment: TabAlignment.start,
       ),
