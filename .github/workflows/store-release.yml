@@ -30,31 +30,31 @@ jobs:
     steps:
       - name: Checkout Frosty repo
         uses: actions/checkout@v4
-      
+
       # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
       - name: Set up Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.2
           bundler-cache: true
-      
+
       # Setup Java so that we can build the appbundle.
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 21
-      
+
       # Setup and cache Flutter to install packages and build.
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           cache: true
-      
+
       # Decode and create the upload-keystore.jks file, used for signing the app.
       - name: Decode and create upload-keystore.jks
         run: echo $UPLOAD_KEYSTORE | base64 --decode > $GITHUB_WORKSPACE/android/upload-keystore.jks
-      
+
       # Create the key.properties file, used for signing the app.
       - name: Create key.properties
         run: |
@@ -62,11 +62,11 @@ jobs:
           echo keyPassword=$KEY_PASSWORD >> $KEY_FILE_PATH
           echo keyAlias=upload >> $KEY_FILE_PATH
           echo storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks >> $KEY_FILE_PATH
-      
+
       # Build the Android app bundle (AAB) and pass the environment variables.
       - name: Build the Android AAB
         run: flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
-      
+
       # Deploy to the play store with fastlane.
       - name: Deploy with fastlane
         run: cd android && bundle exec fastlane deploy
@@ -83,7 +83,12 @@ jobs:
     steps:
       - name: Checkout Frosty repo
         uses: actions/checkout@v4
-        
+
+        # Always pick the newest production Xcode on the runner
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
       # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
       - name: Set up Ruby and Bundler
         uses: ruby/setup-ruby@v1
