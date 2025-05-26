@@ -42,6 +42,7 @@ class SevenTVApi {
         emoteSetId,
         emotes
             .map((emote) => Emote.from7TV(emote, EmoteType.sevenTVChannel))
+            .where((emote) => emote.url.isNotEmpty)
             .toList()
       );
     } else {
