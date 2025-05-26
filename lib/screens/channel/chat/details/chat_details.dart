@@ -6,10 +6,11 @@ import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
 
-class ChatDetails extends StatelessWidget {
+class ChatDetails extends StatefulWidget {
   final ChatDetailsStore chatDetailsStore;
   final ChatStore chatStore;
   final String userLogin;
@@ -20,6 +21,13 @@ class ChatDetails extends StatelessWidget {
     required this.chatStore,
     required this.userLogin,
   });
+
+  @override
+  State<ChatDetails> createState() => _ChatDetailsState();
+}
+
+class _ChatDetailsState extends State<ChatDetails> {
+  late final _scrollController = ScrollController();
 
   String formatDuration(Duration duration) {
     if (duration.inMinutes < 60) {
@@ -71,23 +79,26 @@ class ChatDetails extends StatelessWidget {
           const SectionHeader(
             'Sleep timer',
             padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+            isFirst: true,
           ),
+          AnimatedScrollBorder(scrollController: _scrollController),
           Expanded(
             child: ListView(
+              controller: _scrollController,
               children: [
-                if (chatStore.sleepTimer?.isActive == true)
+                if (widget.chatStore.sleepTimer?.isActive == true)
                   Observer(
                     builder: (context) {
                       return ListTile(
                         leading: const Icon(Icons.close_rounded),
                         title: Text(
-                          'Turn off (${formatTimeLeft(chatStore.timeRemaining)})',
+                          'Turn off (${formatTimeLeft(widget.chatStore.timeRemaining)})',
                           style: const TextStyle(
                             fontFeatures: [FontFeature.tabularFigures()],
                           ),
                         ),
                         onTap: () {
-                          chatStore.cancelSleepTimer();
+                          widget.chatStore.cancelSleepTimer();
 
                           Navigator.of(context).pop();
                         },
@@ -99,7 +110,7 @@ class ChatDetails extends StatelessWidget {
                     leading: const Icon(Icons.hourglass_top_rounded),
                     title: Text(formatDuration(duration)),
                     onTap: () {
-                      chatStore.updateSleepTimer(
+                      widget.chatStore.updateSleepTimer(
                         duration: duration,
                         onTimerFinished: () => navigatorKey.currentState
                             ?.popUntil((route) => route.isFirst),
@@ -131,7 +142,7 @@ class ChatDetails extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              chatStore.assetsStore.recentEmotes.clear();
+              widget.chatStore.assetsStore.recentEmotes.clear();
 
               Navigator.pop(context);
             },
@@ -151,7 +162,7 @@ class ChatDetails extends StatelessWidget {
         isFirst: true,
       ),
       ListTile(
-        title: ChatModes(roomState: chatDetailsStore.roomState),
+        title: ChatModes(roomState: widget.chatDetailsStore.roomState),
       ),
       const SectionHeader(
         'More',
@@ -165,9 +176,9 @@ class ChatDetails extends StatelessWidget {
           builder: (context) => GestureDetector(
             onTap: FocusScope.of(context).unfocus,
             child: ChattersList(
-              chatDetailsStore: chatDetailsStore,
-              chatStore: chatStore,
-              userLogin: userLogin,
+              chatDetailsStore: widget.chatDetailsStore,
+              chatStore: widget.chatStore,
+              userLogin: widget.userLogin,
             ),
           ),
         ),
@@ -177,7 +188,7 @@ class ChatDetails extends StatelessWidget {
           return ListTile(
             leading: const Icon(Icons.timer_outlined),
             title: Text(
-              'Sleep timer ${chatStore.timeRemaining.inSeconds > 0 ? 'on (${formatTimeLeft(chatStore.timeRemaining)})' : ''}',
+              'Sleep timer ${widget.chatStore.timeRemaining.inSeconds > 0 ? 'on (${formatTimeLeft(widget.chatStore.timeRemaining)})' : ''}',
               style: const TextStyle(
                 fontFeatures: [FontFeature.tabularFigures()],
               ),
@@ -195,18 +206,18 @@ class ChatDetails extends StatelessWidget {
         leading: const Icon(Icons.refresh_rounded),
         title: const Text('Reconnect to chat'),
         onTap: () {
-          chatStore.updateNotification('Reconnecting to chat...');
+          widget.chatStore.updateNotification('Reconnecting to chat...');
 
-          chatStore.connectToChat();
+          widget.chatStore.connectToChat();
         },
       ),
       ListTile(
         leading: const Icon(Icons.refresh_rounded),
         title: const Text('Refresh badges and emotes'),
         onTap: () async {
-          await chatStore.getAssets();
+          await widget.chatStore.getAssets();
 
-          chatStore.updateNotification('Badges and emotes refreshed');
+          widget.chatStore.updateNotification('Badges and emotes refreshed');
         },
       ),
       ListTile(
@@ -214,12 +225,12 @@ class ChatDetails extends StatelessWidget {
         title: Observer(
           builder: (context) {
             return Text(
-              '${chatStore.settings.showVideo ? 'Enter' : 'Exit'} chat-only mode',
+              '${widget.chatStore.settings.showVideo ? 'Enter' : 'Exit'} chat-only mode',
             );
           },
         ),
-        onTap: () =>
-            chatStore.settings.showVideo = !chatStore.settings.showVideo,
+        onTap: () => widget.chatStore.settings.showVideo =
+            !widget.chatStore.settings.showVideo,
       ),
       ListTile(
         leading: const Icon(Icons.settings_outlined),
@@ -227,7 +238,8 @@ class ChatDetails extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Settings(settingsStore: chatStore.settings),
+            builder: (context) =>
+                Settings(settingsStore: widget.chatStore.settings),
           ),
         ),
       ),
@@ -238,5 +250,11 @@ class ChatDetails extends StatelessWidget {
       primary: false,
       children: children,
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
