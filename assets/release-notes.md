@@ -1,3 +1,13 @@
+## v4.9.4
+
+June 6, 2025
+
+### Bug Fixes
+
+- Fix video stats blocking when using custom overlay
+
+---
+
 ## v4.9.3
 
 May 26, 2025
