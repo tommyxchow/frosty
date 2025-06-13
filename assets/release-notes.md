@@ -1,3 +1,13 @@
+## v4.9.5
+
+June 13, 2025
+
+### Bug Fixes
+
+- Fix stream latency no longer updating
+
+---
+
 ## v4.9.4
 
 June 6, 2025
