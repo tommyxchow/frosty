@@ -34,7 +34,11 @@ class _HomeState extends State<Home> {
     final currentVersion = packageInfo.version;
     final storedVersion = prefs.getString('last_shown_version');
 
-    if (storedVersion == null || storedVersion != currentVersion) {
+    // Extract major.minor version (ignore patch)
+    final currentMajorMinor = currentVersion.split('.').take(2).join('.');
+    final storedMajorMinor = storedVersion?.split('.').take(2).join('.');
+
+    if (storedMajorMinor == null || storedMajorMinor != currentMajorMinor) {
       if (!mounted) return;
 
       Navigator.push(
