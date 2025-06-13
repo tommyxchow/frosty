@@ -297,26 +297,24 @@ abstract class VideoStoreBase with Store {
     }
   }
 
-  // Future<void> _listenOnLatencyChanges() async {
-  //   try {
-  //     await videoWebViewController.runJavaScript('''
-  //       _queuePromise(async () => {
-  //         (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
-  //         (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]')).click();
-  //         (await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
-  //         (await _asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
-  //         (await _asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
-  //         (await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]')).style.display = "none";
-  //         const observer = new MutationObserver((changes) => {
-  //           Latency.postMessage(changes[0].target.textContent);
-  //         })
-  //         observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
-  //       });
-  //     ''');
-  //   } catch (e) {
-  //     debugPrint(e.toString());
-  //   }
-  // }
+  Future<void> _listenOnLatencyChanges() async {
+    try {
+      await videoWebViewController.runJavaScript('''
+        _queuePromise(async () => {
+          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+          (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]')).click();
+          (await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
+          (await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]')).style.display = "none";
+          const observer = new MutationObserver((changes) => {
+            Latency.postMessage(changes[0].target.textContent);
+          })
+          observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
+        });
+      ''');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 
   /// Initializes the video webview.
   @action
@@ -370,7 +368,7 @@ abstract class VideoStoreBase with Store {
         ''');
         if (settingsStore.showOverlay) {
           await _hideDefaultOverlay();
-          // await _listenOnLatencyChanges();
+          await _listenOnLatencyChanges();
           await updateStreamQualities();
         }
       } catch (e) {
