@@ -245,7 +245,19 @@ class VideoOverlay extends StatelessWidget {
                 if (videoStore.settingsStore.fullScreen &&
                     orientation == Orientation.landscape)
                   chatOverlayButton,
-                if (!Platform.isIOS || isIPad()) videoSettingsButton,
+                if (!Platform.isIOS || isIPad())
+                  Row(
+                    children: [
+                      Text(
+                        videoStore.streamQuality,
+                        style: TextStyle(
+                          color: surfaceColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      videoSettingsButton,
+                    ],
+                  ),
               ],
             ),
             Center(
