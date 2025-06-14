@@ -23,14 +23,15 @@ class CustomCacheManager {
       return;
     }
 
-    final allFiles = cacheDir.listSync(recursive: true).toList();
+    final allFiles =
+        cacheDir.listSync(recursive: true).whereType<File>().toList();
 
     await _repo.open();
     final cachedObjects = await _repo.getAllObjects();
     final dbFiles = cachedObjects.map((e) => e.relativePath).toSet();
 
     final orphanedFiles = allFiles.where((file) {
-      final relativePath = file.path.split('$key/').last;
+      final relativePath = file.path.replaceFirst('${cacheDir.path}/', '');
       return !dbFiles.contains(relativePath);
     }).toList();
 
