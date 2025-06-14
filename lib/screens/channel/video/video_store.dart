@@ -205,17 +205,30 @@ abstract class VideoStoreBase with Store {
   @action
   Future<void> updateStreamQualities() async {
     try {
-      await videoWebViewController.runJavaScript('''
-        _queuePromise(async () => {
-          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
-          (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
-          await _asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] label div');
-          const qualities = [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] label div')].map((el) => el.textContent);
-          StreamQualities.postMessage(JSON.stringify(qualities));
-          (await _asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
-          (await _asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
-        });
-      ''');
+      await videoWebViewController.runJavaScript(r'''
+      _queuePromise(async () => {
+        // Open the settings → quality submenu
+        (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+        (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
+
+        // Wait until at least one quality option is rendered
+        await _asyncQuerySelector(
+          '[data-a-target="player-settings-menu"] input[name="player-settings-submenu-quality-option"] + label'
+        );
+
+        // Grab every label, normalise whitespace, return as array
+        const qualities = Array.from(
+          document.querySelectorAll(
+            '[data-a-target="player-settings-menu"] input[name="player-settings-submenu-quality-option"] + label'
+          )
+        ).map(l => l.textContent.replace(/\s+/g, ' ').trim());
+
+        StreamQualities.postMessage(JSON.stringify(qualities));
+
+        // Close the settings panel again
+        (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+      });
+    ''');
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -238,8 +251,7 @@ abstract class VideoStoreBase with Store {
           (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
           await _asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] input');
           [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$newStreamQualityIndex].click();
-          (await _asyncQuerySelector('.tw-drop-down-menu-item-figure')).click();
-          (await _asyncQuerySelector('[data-a-target="player-settings-menu"] [role="menuitem"] button')).click();
+          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
         });
       ''');
       _streamQualityIndex = newStreamQualityIndex;
@@ -305,6 +317,7 @@ abstract class VideoStoreBase with Store {
           (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]')).click();
           (await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
           (await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]')).style.display = "none";
+          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
           const observer = new MutationObserver((changes) => {
             Latency.postMessage(changes[0].target.textContent);
           })
