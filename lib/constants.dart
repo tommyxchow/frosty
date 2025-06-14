@@ -19,9 +19,22 @@ const zeroWidthEmotes = [
 /// Regex for matching strings that contain lower or upper case English characters.
 final regexEnglish = RegExp(r'[a-zA-Z]');
 
+/// Regex for matching URLs and file names in text.
 final regexLink = RegExp(
-  r'(?:https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)',
-  caseSensitive: false, // Make it case-insensitive
+  r'(?<![A-Za-z0-9_.-])' // left boundary
+  r'(?:' // ───────── URL ─────────
+  r'(?:www\.)?' // optional www.
+  r'(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+'
+  r'[A-Za-z]{2,63}' // TLD
+  r'(?::\d{1,5})?' // optional :port
+  r'(?:/[^\s]*)?' // optional path / query / hash
+  r'|' // ───── file names ──────
+  r'[A-Za-z0-9_-]+\.(?:' // bare `doom.exe`, `logo.png`, …
+  r'exe|png|jpe?g|gif|bmp|webp|mp4|avi|zip|rar|pdf'
+  r')'
+  r')'
+  r'(?![A-Za-z0-9-])', // right boundary
+  caseSensitive: false,
 );
 
 /// The default badge width and height.
