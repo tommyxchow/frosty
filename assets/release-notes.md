@@ -1,3 +1,13 @@
+## v4.9.6
+
+June 14, 2025
+
+### Bug Fixes
+
+- [Android] Fix missing stream quality options
+
+---
+
 ## v4.9.5
 
 June 13, 2025
