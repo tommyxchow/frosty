@@ -156,6 +156,8 @@ abstract class ChatStoreBase with Store {
   @observable
   IRCMessage? replyingToMessage;
 
+  bool _wasAutoScrollingBeforeInteraction = true;
+
   ChatStoreBase({
     required this.twitchApi,
     required this.auth,
@@ -462,6 +464,29 @@ abstract class ChatStoreBase with Store {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       scrollController.jumpTo(0);
     });
+  }
+
+  @action
+  void pauseAutoScrollForInteraction() {
+    _wasAutoScrollingBeforeInteraction = _autoScroll;
+    _autoScroll = false;
+  }
+
+  @action
+  void resumeAutoScrollAfterInteraction() {
+    // Restore the auto-scroll *intent* based on its state before the interaction.
+    _autoScroll = _wasAutoScrollingBeforeInteraction;
+
+    // If the user was auto-scrolling (i.e., at the bottom) before the interaction,
+    // ensure they return to the bottom by jumping.
+    // The scrollController.addListener will then ensure _autoScroll remains true.
+    if (_wasAutoScrollingBeforeInteraction) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (scrollController.hasClients) {
+          scrollController.jumpTo(0);
+        }
+      });
+    }
   }
 
   @action
