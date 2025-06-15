@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class FrostyPageView extends StatefulWidget {
+class FrostyPageView extends StatelessWidget {
   final List<String> headers;
   final List<Widget> children;
 
@@ -11,14 +11,9 @@ class FrostyPageView extends StatefulWidget {
   }) : assert(headers.length == children.length);
 
   @override
-  State<FrostyPageView> createState() => _FrostyPageViewState();
-}
-
-class _FrostyPageViewState extends State<FrostyPageView> {
-  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: widget.headers.length,
+      length: headers.length,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -31,7 +26,7 @@ class _FrostyPageViewState extends State<FrostyPageView> {
             labelPadding: const EdgeInsets.symmetric(
               horizontal: 12,
             ),
-            tabs: widget.headers
+            tabs: headers
                 .map(
                   (header) => Tab(
                     text: header,
@@ -40,7 +35,7 @@ class _FrostyPageViewState extends State<FrostyPageView> {
                 .toList(),
           ),
           const Divider(),
-          Expanded(child: TabBarView(children: widget.children)),
+          Expanded(child: TabBarView(children: children)),
         ],
       ),
     );
