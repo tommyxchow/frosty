@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 
 class FrostyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget title;
-  final bool? centerTitle;
   final List<Widget>? actions;
 
   const FrostyAppBar({
     super.key,
     required this.title,
-    this.centerTitle,
     this.actions,
   });
 
@@ -21,8 +19,8 @@ class FrostyAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: Navigator.of(context).pop,
       ),
       title: title,
-      centerTitle: centerTitle,
       actions: actions,
+      centerTitle: false,
     );
   }
 

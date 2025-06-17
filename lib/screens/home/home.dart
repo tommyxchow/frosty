@@ -64,7 +64,6 @@ class _HomeState extends State<Home> {
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: false,
           shape: const Border(),
           title: Observer(
             builder: (_) {
