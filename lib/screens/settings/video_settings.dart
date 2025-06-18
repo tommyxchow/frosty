@@ -34,11 +34,6 @@ class VideoSettings extends StatelessWidget {
               value: settingsStore.defaultToHighestQuality,
               onChanged: (newValue) =>
                   settingsStore.defaultToHighestQuality = newValue,
-            ),
-          SettingsListSwitch(
-            title: 'Show latency',
-            value: settingsStore.showLatency,
-            onChanged: (newValue) => settingsStore.showLatency = newValue,
           ),
           if (Platform.isAndroid)
             SettingsListSwitch(

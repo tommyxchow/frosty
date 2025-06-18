@@ -123,7 +123,6 @@ class IRCMessage {
     void Function()? onTapName,
     void Function(String)? onTapPingedUser,
     bool showMessage = true,
-    bool useReadableColors = false,
     Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
   }) {
@@ -370,20 +369,18 @@ class IRCMessage {
       int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xFF')),
     );
 
-    if (useReadableColors) {
-      final hsl = HSLColor.fromColor(color);
-      if (isLightTheme == true) {
-        if (hsl.lightness >= 0.5) {
-          color = hsl
-              .withLightness(hsl.lightness + ((0 - hsl.lightness) * 0.5))
-              .toColor();
-        }
-      } else {
-        if (hsl.lightness <= 0.5) {
-          color = hsl
-              .withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5))
-              .toColor();
-        }
+    final hsl = HSLColor.fromColor(color);
+    if (isLightTheme == true) {
+      if (hsl.lightness >= 0.5) {
+        color = hsl
+            .withLightness(hsl.lightness + ((0 - hsl.lightness) * 0.5))
+            .toColor();
+      }
+    } else {
+      if (hsl.lightness <= 0.5) {
+        color = hsl
+            .withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5))
+            .toColor();
       }
     }
 

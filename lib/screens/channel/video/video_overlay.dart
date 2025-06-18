@@ -352,9 +352,7 @@ class VideoOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (orientation == Orientation.landscape &&
-                      settingsStore.showLatency)
-                    latencyTooltip,
+                  if (orientation == Orientation.landscape) latencyTooltip,
                   Tooltip(
                     message: 'Enter picture-in-picture',
                     preferBelow: false,
