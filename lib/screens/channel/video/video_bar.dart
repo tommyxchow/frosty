@@ -48,7 +48,7 @@ class VideoBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Tooltip(
-                  message: 'Streamer: $streamerName',
+                  message: streamerName,
                   showDuration: const Duration(seconds: 3),
                   child: Text(
                     streamerName,
@@ -62,7 +62,7 @@ class VideoBar extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Tooltip(
-                  message: 'Title: ${streamInfo.title.trim()}',
+                  message: streamTitle,
                   showDuration: const Duration(seconds: 5),
                   child: Text(
                     streamTitle,
@@ -91,8 +91,7 @@ class VideoBar extends StatelessWidget {
                             )
                         : null,
                     child: Tooltip(
-                      message:
-                          'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
+                      message: category,
                       showDuration: const Duration(seconds: 3),
                       child: Text(
                         category,
