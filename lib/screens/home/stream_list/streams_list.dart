@@ -130,12 +130,14 @@ class _StreamsListState extends State<StreamsList>
 
           final settingsStore = context.watch<SettingsStore>();
 
-          final unpinnedStreams = _listStore.streams
-              .where(
-                (stream) =>
-                    !settingsStore.pinnedChannelIds.contains(stream.userId),
-              )
-              .toList();
+          final unpinnedStreams = widget.listType == ListType.followed
+              ? _listStore.streams
+                  .where(
+                    (stream) =>
+                        !settingsStore.pinnedChannelIds.contains(stream.userId),
+                  )
+                  .toList()
+              : _listStore.streams;
 
           final isFollowingTab = widget.listType == ListType.followed;
 
