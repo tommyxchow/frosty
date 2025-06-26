@@ -16,7 +16,6 @@ class GeneralSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) => ListView(
-        padding: const EdgeInsets.only(top: 16),
         children: [
           const SectionHeader(
             'Theme',

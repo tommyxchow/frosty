@@ -7,24 +7,29 @@ class FrostyThemes {
 
   const FrostyThemes({required this.colorSchemeSeed});
 
+  ThemeData get light => createBaseTheme(
+        colorScheme: ColorScheme.fromSeed(seedColor: colorSchemeSeed),
+        backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
+      );
+
+  ThemeData get dark => createBaseTheme(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: colorSchemeSeed,
+          brightness: Brightness.dark,
+        ),
+        backgroundColor: Colors.black,
+      );
+
   ThemeData createBaseTheme({
-    required Brightness brightness,
-    required Color colorSchemeSeed,
+    required ColorScheme colorScheme,
     Color? backgroundColor,
   }) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: colorSchemeSeed,
-      brightness: brightness,
-    );
-
     final borderColor = colorScheme.outlineVariant;
-
     const borderWidth = 0.5;
 
     return ThemeData(
-      fontFamily: 'Inter',
-      brightness: brightness,
       colorScheme: colorScheme,
+      fontFamily: 'Inter',
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       scaffoldBackgroundColor: backgroundColor,
       bottomSheetTheme: BottomSheetThemeData(
@@ -37,11 +42,14 @@ class FrostyThemes {
         surfaceTintColor: backgroundColor,
       ),
       appBarTheme: AppBarTheme(
-        elevation: 0,
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.transparent,
         surfaceTintColor: backgroundColor,
-        shape: Border(
-          bottom: BorderSide(color: borderColor, width: borderWidth),
+      ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -61,7 +69,6 @@ class FrostyThemes {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        elevation: 0,
         backgroundColor: backgroundColor,
         height: 64,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
@@ -71,6 +78,7 @@ class FrostyThemes {
         tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -132,25 +140,5 @@ class FrostyThemes {
         ),
       ),
     );
-  }
-
-  ThemeData get light {
-    final theme = createBaseTheme(
-      brightness: Brightness.light,
-      colorSchemeSeed: colorSchemeSeed,
-      backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
-    );
-
-    return theme;
-  }
-
-  ThemeData get dark {
-    final theme = createBaseTheme(
-      brightness: Brightness.dark,
-      colorSchemeSeed: colorSchemeSeed,
-      backgroundColor: Colors.black,
-    );
-
-    return theme;
   }
 }

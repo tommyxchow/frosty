@@ -23,6 +23,7 @@ class Settings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: FrostyAppBar(
         title: const Text('Settings'),
         actions: [
@@ -53,12 +54,12 @@ class Settings extends StatelessWidget {
         ],
       ),
       body: SafeArea(
+        top: false,
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.only(top: 16),
           children: [
             const SectionHeader(
-              'Profile',
+              'Account',
               isFirst: true,
             ),
             ProfileCard(authStore: context.read<AuthStore>()),

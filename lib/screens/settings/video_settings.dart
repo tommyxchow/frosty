@@ -17,7 +17,6 @@ class VideoSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) => ListView(
-        padding: const EdgeInsets.only(top: 16),
         children: [
           const SectionHeader(
             'Player',
@@ -34,7 +33,7 @@ class VideoSettings extends StatelessWidget {
               value: settingsStore.defaultToHighestQuality,
               onChanged: (newValue) =>
                   settingsStore.defaultToHighestQuality = newValue,
-          ),
+            ),
           if (Platform.isAndroid)
             SettingsListSwitch(
               title: 'Use enhanced rendering',

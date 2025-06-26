@@ -54,6 +54,7 @@ class _CategoriesState extends State<Categories>
     _categoriesStore.checkLastTimeRefreshedAndUpdate();
 
     return RefreshIndicator.adaptive(
+      edgeOffset: MediaQuery.of(context).padding.top,
       onRefresh: () async {
         HapticFeedback.lightImpact();
         await _categoriesStore.refreshCategories();

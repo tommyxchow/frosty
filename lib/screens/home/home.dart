@@ -5,11 +5,12 @@ import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/search/search.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
-import 'package:frosty/screens/home/top/top.dart';
+import 'package:frosty/screens/home/top/categories/categories.dart';
 import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
+import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -63,13 +64,15 @@ class _HomeState extends State<Home> {
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
-        appBar: AppBar(
-          shape: const Border(),
+        extendBodyBehindAppBar: true,
+        appBar: FrostyAppBar(
+          showBackButton: false,
           title: Observer(
             builder: (_) {
               final titles = [
                 if (_authStore.isLoggedIn) 'Following',
-                'Top',
+                'Top Streams',
+                'Top Categories',
                 'Search',
               ];
 
@@ -99,6 +102,7 @@ class _HomeState extends State<Home> {
           ],
         ),
         body: SafeArea(
+          top: false,
           child: Observer(
             builder: (_) => IndexedStack(
               index: _homeStore.selectedIndex,
@@ -107,9 +111,15 @@ class _HomeState extends State<Home> {
                   StreamsList(
                     listType: ListType.followed,
                     scrollController: _homeStore.followedScrollController,
+                    addTopPadding: true,
                   ),
-                TopSection(
-                  homeStore: _homeStore,
+                StreamsList(
+                  listType: ListType.top,
+                  scrollController: _homeStore.topSectionScrollControllers[0],
+                  addTopPadding: true,
+                ),
+                Categories(
+                  scrollController: _homeStore.topSectionScrollControllers[1],
                 ),
                 Search(
                   scrollController: _homeStore.searchScrollController,
@@ -139,8 +149,16 @@ class _HomeState extends State<Home> {
                       Icons.arrow_upward_rounded,
                     ),
                     selectedIcon: Icon(Icons.arrow_upward_rounded),
-                    label: 'Top',
-                    tooltip: 'Top',
+                    label: 'Top streams',
+                    tooltip: 'Top streams',
+                  ),
+                  const NavigationDestination(
+                    icon: Icon(
+                      Icons.gamepad_outlined,
+                    ),
+                    selectedIcon: Icon(Icons.gamepad_rounded),
+                    label: 'Top categories',
+                    tooltip: 'Top categories',
                   ),
                   const NavigationDestination(
                     icon: Icon(

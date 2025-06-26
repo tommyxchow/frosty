@@ -33,126 +33,133 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Observer(
-          builder: (context) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchStore.textEditingController,
-                focusNode: _searchStore.textFieldFocusNode,
-                autocorrect: false,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  hintText: 'Find a channel or category',
-                  suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
-                          _searchStore.searchText.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.close_rounded),
-                          tooltip: _searchStore.searchText.isEmpty
-                              ? 'Cancel'
-                              : 'Clear',
-                          onPressed: () {
-                            if (_searchStore.searchText.isEmpty) {
-                              _searchStore.textFieldFocusNode.unfocus();
-                            }
-                            _searchStore.textEditingController.clear();
-                          },
-                        )
-                      : null,
+    return SafeArea(
+      child: Column(
+        children: [
+          Observer(
+            builder: (context) {
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: TextField(
+                  controller: _searchStore.textEditingController,
+                  focusNode: _searchStore.textFieldFocusNode,
+                  autocorrect: false,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search_rounded),
+                    hintText: 'Find a channel or category',
+                    suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
+                            _searchStore.searchText.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            tooltip: _searchStore.searchText.isEmpty
+                                ? 'Cancel'
+                                : 'Clear',
+                            onPressed: () {
+                              if (_searchStore.searchText.isEmpty) {
+                                _searchStore.textFieldFocusNode.unfocus();
+                              }
+                              _searchStore.textEditingController.clear();
+                            },
+                          )
+                        : null,
+                  ),
+                  onSubmitted: _searchStore.handleQuery,
                 ),
-                onSubmitted: _searchStore.handleQuery,
-              ),
-            );
-          },
-        ),
-        AnimatedScrollBorder(scrollController: widget.scrollController),
-        Expanded(
-          child: Scrollbar(
-            controller: widget.scrollController,
-            child: Observer(
-              builder: (context) {
-                if (_searchStore.textEditingController.text.isEmpty) {
-                  if (_searchStore.searchHistory.isEmpty) {
-                    return const AlertMessage(message: 'No recent searches');
-                  }
+              );
+            },
+          ),
+          AnimatedScrollBorder(scrollController: widget.scrollController),
+          Expanded(
+            child: Scrollbar(
+              controller: widget.scrollController,
+              child: Observer(
+                builder: (context) {
+                  if (_searchStore.textEditingController.text.isEmpty) {
+                    if (_searchStore.searchHistory.isEmpty) {
+                      return const AlertMessage(
+                        message: 'No recent searches',
+                      );
+                    }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 4),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SectionHeader(
-                              'History',
-                              padding: EdgeInsets.zero,
-                              isFirst: true,
-                            ),
-                            TextButton(
-                              onPressed: _searchStore.searchHistory.clear,
-                              child: const Text('Clear'),
-                            ),
-                          ],
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 16, right: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const SectionHeader(
+                                'History',
+                                padding: EdgeInsets.zero,
+                                isFirst: true,
+                              ),
+                              TextButton(
+                                onPressed: _searchStore.searchHistory.clear,
+                                child: const Text('Clear'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView(
+                            controller: widget.scrollController,
+                            children: _searchStore.searchHistory
+                                .mapIndexed(
+                                  (index, searchTerm) => ListTile(
+                                    leading: const Icon(Icons.history_rounded),
+                                    title: Text(searchTerm),
+                                    onTap: () {
+                                      _searchStore.textEditingController.text =
+                                          searchTerm;
+                                      _searchStore.handleQuery(searchTerm);
+                                      _searchStore
+                                              .textEditingController.selection =
+                                          TextSelection.fromPosition(
+                                        TextPosition(
+                                          offset: _searchStore
+                                              .textEditingController
+                                              .text
+                                              .length,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  return CustomScrollView(
+                    controller: widget.scrollController,
+                    slivers: [
+                      const SliverToBoxAdapter(
+                        child: SectionHeader(
+                          'Channels',
+                          isFirst: true,
+                          padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
                         ),
                       ),
-                      Expanded(
-                        child: ListView(
-                          controller: widget.scrollController,
-                          children: _searchStore.searchHistory
-                              .mapIndexed(
-                                (index, searchTerm) => ListTile(
-                                  leading: const Icon(Icons.history_rounded),
-                                  title: Text(searchTerm),
-                                  onTap: () {
-                                    _searchStore.textEditingController.text =
-                                        searchTerm;
-                                    _searchStore.handleQuery(searchTerm);
-                                    _searchStore.textEditingController
-                                        .selection = TextSelection.fromPosition(
-                                      TextPosition(
-                                        offset: _searchStore
-                                            .textEditingController.text.length,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                              .toList(),
+                      SearchResultsChannels(
+                        searchStore: _searchStore,
+                        query: _searchStore.searchText,
+                      ),
+                      const SliverToBoxAdapter(
+                        child: SectionHeader(
+                          'Categories',
                         ),
                       ),
+                      SearchResultsCategories(searchStore: _searchStore),
                     ],
                   );
-                }
-                return CustomScrollView(
-                  controller: widget.scrollController,
-                  slivers: [
-                    const SliverToBoxAdapter(
-                      child: SectionHeader(
-                        'Channels',
-                        isFirst: true,
-                        padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
-                      ),
-                    ),
-                    SearchResultsChannels(
-                      searchStore: _searchStore,
-                      query: _searchStore.searchText,
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SectionHeader(
-                        'Categories',
-                      ),
-                    ),
-                    SearchResultsCategories(searchStore: _searchStore),
-                  ],
-                );
-              },
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

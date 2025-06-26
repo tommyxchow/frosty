@@ -31,7 +31,6 @@ class _ChatSettingsState extends State<ChatSettings> {
 
     return Observer(
       builder: (context) => ListView(
-        padding: const EdgeInsets.only(top: 16),
         children: [
           const SectionHeader(
             'Message sizing',

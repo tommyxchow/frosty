@@ -9,7 +9,6 @@ import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
@@ -27,6 +26,7 @@ class StreamsList extends StatefulWidget {
   final ScrollController? scrollController;
 
   final bool showJumpButton;
+  final bool addTopPadding;
 
   const StreamsList({
     super.key,
@@ -34,6 +34,7 @@ class StreamsList extends StatefulWidget {
     this.categoryId,
     this.scrollController,
     this.showJumpButton = false,
+    this.addTopPadding = false,
   });
 
   @override
@@ -74,9 +75,13 @@ class _StreamsListState extends State<StreamsList>
   Widget build(BuildContext context) {
     super.build(context);
 
+    final double topPadding =
+        widget.addTopPadding ? MediaQuery.of(context).padding.top : 0;
+
     _listStore.checkLastTimeRefreshedAndUpdate();
 
     return RefreshIndicator.adaptive(
+      edgeOffset: topPadding,
       onRefresh: () async {
         HapticFeedback.lightImpact();
 
@@ -152,10 +157,6 @@ class _StreamsListState extends State<StreamsList>
                       category: _listStore.categoryDetails!,
                       isTappable: false,
                     ),
-                  if (_listStore.scrollController != null)
-                    AnimatedScrollBorder(
-                      scrollController: _listStore.scrollController!,
-                    ),
                   Expanded(
                     child: Scrollbar(
                       controller: _listStore.scrollController,
@@ -163,6 +164,12 @@ class _StreamsListState extends State<StreamsList>
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: _listStore.scrollController,
                         slivers: [
+                          if (widget.addTopPadding)
+                            SliverPadding(
+                              padding: EdgeInsets.only(
+                                top: topPadding,
+                              ),
+                            ),
                           if (isFollowingTab &&
                               _listStore.pinnedStreams.isNotEmpty) ...[
                             const SliverToBoxAdapter(
