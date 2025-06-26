@@ -20,6 +20,8 @@ class FrostyAppBar extends StatelessWidget implements PreferredSizeWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: AppBar(
+          backgroundColor:
+              Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
           leading: showBackButton
               ? IconButton(
                   tooltip: 'Back',

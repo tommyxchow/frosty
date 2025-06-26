@@ -20,7 +20,7 @@ class SectionHeader extends StatelessWidget {
       padding: padding ??
           (isFirst
               ? const EdgeInsets.fromLTRB(16, 16, 16, 8)
-              : const EdgeInsets.fromLTRB(16, 48, 16, 8)),
+              : const EdgeInsets.fromLTRB(16, 32, 16, 8)),
       child: Text(
         text.toUpperCase(),
         style: TextStyle(

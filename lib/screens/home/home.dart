@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -65,6 +67,7 @@ class _HomeState extends State<Home> {
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
         extendBodyBehindAppBar: true,
+        extendBody: true,
         appBar: FrostyAppBar(
           showBackButton: false,
           title: Observer(
@@ -103,6 +106,7 @@ class _HomeState extends State<Home> {
         ),
         body: SafeArea(
           top: false,
+          bottom: false,
           child: Observer(
             builder: (_) => IndexedStack(
               index: _homeStore.selectedIndex,
@@ -128,12 +132,15 @@ class _HomeState extends State<Home> {
             ),
           ),
         ),
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Divider(),
-            Observer(
+        bottomNavigationBar: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Observer(
               builder: (_) => NavigationBar(
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surface
+                    .withValues(alpha: 0.6),
                 destinations: [
                   if (_authStore.isLoggedIn)
                     const NavigationDestination(
@@ -173,7 +180,7 @@ class _HomeState extends State<Home> {
                 onDestinationSelected: _homeStore.handleTap,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

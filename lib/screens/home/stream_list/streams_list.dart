@@ -272,6 +272,11 @@ class _StreamsListState extends State<StreamsList>
                               );
                             },
                           ),
+                          SliverPadding(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).padding.bottom,
+                            ),
+                          ),
                         ],
                       ),
                     ),
