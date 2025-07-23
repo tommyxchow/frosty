@@ -219,6 +219,9 @@ class ChatBottomBar extends StatelessWidget {
                         ),
                         controller: chatStore.textController,
                         onSubmitted: chatStore.sendMessage,
+                        onTapOutside: (_) {
+                          chatStore.textFieldFocusNode.unfocus();
+                        },
                       ),
                     ),
                   if (chatStore.showSendButton &&
