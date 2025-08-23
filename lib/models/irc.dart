@@ -17,6 +17,16 @@ import 'package:frosty/widgets/photo_view.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// Constants for IRC message rendering
+const String _ircActionPrefix = '\x01';
+const String _ircActionSuffix = '\x01';
+const int _ircActionPrefixLength = 8;
+const String _invalidUnicodeChar = '\u{E0000}';
+const String _twitchEmoteBaseUrl = 'https://static-cdn.jtvnw.net/emoticons/v2';
+const String _twitchIrcServer = 'tmi.twitch.tv';
+const String _emoteModeSuffix = '/default/dark/3.0';
+const double _emojiSizeOffset = 5.0;
+
 /// The object representation of a Twitch IRC message.
 class IRCMessage {
   final String raw;
@@ -112,65 +122,39 @@ class IRCMessage {
     }
   }
 
-  /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
-  List<InlineSpan> generateSpan(
-    BuildContext context, {
+  /// Adds timestamp to the span if enabled
+  void _addTimestamp(
+    List<InlineSpan> span,
     TextStyle? style,
-    required ChatAssetsStore assetsStore,
-    required double badgeScale,
-    required double emoteScale,
-    required bool launchExternal,
-    void Function()? onTapName,
-    void Function(String)? onTapPingedUser,
-    bool showMessage = true,
-    bool useReadableColors = false,
+    TimestampType timestamp,
+  ) {
+    if (timestamp == TimestampType.disabled) return;
+
+    final time =
+        tags['tmi-sent-ts'] ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final parsedTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+
+    final timeText = timestamp == TimestampType.twentyFour
+        ? '${DateFormat.Hm().format(parsedTime)} '
+        : '${DateFormat('h:mm').format(parsedTime)} ';
+
+    span.add(
+      TextSpan(
+        text: timeText,
+        style: style?.copyWith(
+          color: style.color?.withValues(alpha: 0.5),
+          fontFeatures: [FontFeature.tabularFigures()],
+        ),
+      ),
+    );
+  }
+
+  /// Adds historical and channel source badges to the span
+  void _addHistoricalAndChannelBadges(
+    List<InlineSpan> span,
+    double badgeSize,
     Map<String, UserTwitch>? channelIdToUserTwitch,
-    TimestampType timestamp = TimestampType.disabled,
-  }) {
-    final isLightTheme = Theme.of(context).brightness == Brightness.light;
-
-    final emoteToObject = assetsStore.emoteToObject;
-    final twitchBadgeToObject = assetsStore.twitchBadgesToObject;
-    final ffzUserToBadges = assetsStore.userToFFZBadges;
-    final sevenTVUserToBadges = assetsStore.userTo7TVBadges;
-    final bttvUserToBadge = assetsStore.userToBTTVBadges;
-    final ffzRoomInfo = assetsStore.ffzRoomInfo;
-    final badgeSize = defaultBadgeSize * badgeScale;
-    final emoteSize = defaultEmoteSize * emoteScale;
-
-    // The span list that will be used to render the chat message
-    final span = <InlineSpan>[];
-
-    if (timestamp != TimestampType.disabled) {
-      final time = tags['tmi-sent-ts'] ??
-          DateTime.now().millisecondsSinceEpoch.toString();
-      final parsedTime = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
-
-      if (timestamp == TimestampType.twentyFour) {
-        span.add(
-          TextSpan(
-            text: '${DateFormat.Hm().format(parsedTime)} ',
-            style: style?.copyWith(
-              color: style.color?.withValues(alpha: 0.5),
-              fontFeatures: [FontFeature.tabularFigures()],
-            ),
-          ),
-        );
-      }
-
-      if (timestamp == TimestampType.twelve) {
-        span.add(
-          TextSpan(
-            text: '${DateFormat('h:mm').format(parsedTime)} ',
-            style: style?.copyWith(
-              color: style.color?.withValues(alpha: 0.5),
-              fontFeatures: [FontFeature.tabularFigures()],
-            ),
-          ),
-        );
-      }
-    }
-
+  ) {
     final isHistorical = tags['historical'] == '1';
     if (isHistorical) {
       span.add(
@@ -188,9 +172,7 @@ class IRCMessage {
     }
 
     final sourceChannelId = tags['source-room-id'] ?? tags['room-id'];
-    final sourceChannelUser = channelIdToUserTwitch != null
-        ? channelIdToUserTwitch[sourceChannelId]
-        : null;
+    final sourceChannelUser = channelIdToUserTwitch?[sourceChannelId];
     if (sourceChannelUser != null) {
       span.add(
         WidgetSpan(
@@ -225,27 +207,40 @@ class IRCMessage {
       );
       span.add(const TextSpan(text: ' '));
     }
+  }
 
-    // Indicator to skip adding the bot badges later when adding the rest of FFZ badges.
+  /// Adds all user badges (Twitch, FFZ, BTTV, 7TV) to the span
+  bool _addUserBadges(
+    BuildContext context,
+    List<InlineSpan> span,
+    ChatAssetsStore assetsStore,
+    double badgeSize,
+    bool launchExternal,
+    bool isHistorical,
+  ) {
     var skipBot = false;
+    final twitchBadgeToObject = assetsStore.twitchBadgesToObject;
+    final ffzUserToBadges = assetsStore.userToFFZBadges;
+    final sevenTVUserToBadges = assetsStore.userTo7TVBadges;
+    final bttvUserToBadge = assetsStore.userToBTTVBadges;
+    final ffzRoomInfo = assetsStore.ffzRoomInfo;
 
     final ffzUserBadges = ffzUserToBadges[tags['user-id']];
     final twitchBadges = tags['badges']?.split(',');
-    // Pasrse and add the Twitch badges to the span if they exist.
+
+    // Add Twitch badges
     if (twitchBadges != null) {
       for (final badge in twitchBadges) {
         final badgeInfo = twitchBadgeToObject[badge];
         if (badgeInfo != null) {
           var badgeUrl = badgeInfo.url;
 
-          // Add custom FFZ mod badge if it exists.
+          // Handle custom FFZ mod badge
           if (badgeInfo.name == 'Moderator' &&
               (ffzUserBadges != null || ffzRoomInfo?.modUrls != null)) {
-            // Check if mod is bot.
             final botBadge = ffzUserBadges
                 ?.firstWhereOrNull((element) => element.name == 'Bot');
 
-            // Check if user has bot badge or room has custom FFZ mod badges
             if (botBadge != null) {
               badgeUrl = botBadge.url;
               skipBot = true;
@@ -274,7 +269,7 @@ class IRCMessage {
             continue;
           }
 
-          // Add custom FFZ vip badge if it exists
+          // Handle custom FFZ VIP badge
           if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
             badgeUrl = ffzRoomInfo!.vipBadge?.url4x ??
                 ffzRoomInfo.vipBadge?.url2x ??
@@ -300,7 +295,7 @@ class IRCMessage {
       }
     }
 
-    // Add FFZ badges to span
+    // Add FFZ badges
     if (ffzUserBadges != null) {
       for (final badge in ffzUserBadges) {
         final color = Color(int.parse(badge.color!.replaceFirst('#', '0xFF')));
@@ -335,7 +330,7 @@ class IRCMessage {
       }
     }
 
-    // Add BTTV badges to span
+    // Add BTTV badges
     final userBTTVBadge = bttvUserToBadge[tags['user-id']];
     if (userBTTVBadge != null) {
       span.add(
@@ -350,7 +345,7 @@ class IRCMessage {
       span.add(const TextSpan(text: ' '));
     }
 
-    // Add 7TV badges to end of badges span
+    // Add 7TV badges
     final user7TVBadges = sevenTVUserToBadges[tags['user-id']];
     if (user7TVBadges != null) {
       for (final badge in user7TVBadges) {
@@ -366,11 +361,22 @@ class IRCMessage {
       }
     }
 
+    return skipBot;
+  }
+
+  /// Adds the username to the span with proper color and styling
+  void _addUsername(
+    List<InlineSpan> span,
+    BuildContext context,
+    bool useReadableColors,
+    void Function()? onTapName,
+  ) {
     var color = Color(
       int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xFF')),
     );
 
     if (useReadableColors) {
+      final isLightTheme = Theme.of(context).brightness == Brightness.light;
       final hsl = HSLColor.fromColor(color);
       if (isLightTheme == true) {
         if (hsl.lightness >= 0.5) {
@@ -387,7 +393,6 @@ class IRCMessage {
       }
     }
 
-    // Add the display name (username) to the span and apply the onLongPressName callback.
     final displayName = tags['display-name']!;
     span.add(
       TextSpan(
@@ -400,175 +405,260 @@ class IRCMessage {
       ),
     );
 
-    // Add the colon separator between the username and their message to the span.
+    // Add the colon separator between the username and their message
     if (action == false) span.add(const TextSpan(text: ':'));
+  }
+
+  /// Adds message content with emotes, emojis and text processing
+  void _addMessageContent(
+    BuildContext context,
+    List<InlineSpan> span,
+    Map<String, Emote> emoteToObject,
+    double emoteSize,
+    double emoteScale,
+    bool showMessage,
+    bool launchExternal,
+    TextStyle? textStyle,
+    void Function(String)? onTapPingedUser,
+  ) {
+    if (!showMessage) {
+      span.add(const TextSpan(text: ' <message deleted>'));
+      return;
+    }
+
+    // Check if the message is a reply. If it is, remove the reply username from the message.
+    final words = tags.containsKey('reply-parent-display-name')
+        ? split?.sublist(1)
+        : split;
+
+    if (words != null) {
+      // Keep a local span which will be reversed and added to the final span.
+      final localSpan = <InlineSpan>[];
+
+      // Iterate through the words in reverse-order.
+      var index = words.length - 1;
+
+      // Terminate after the first word in the message reached.
+      while (index != -1) {
+        final word = words[index];
+        final emote = emoteToObject[word] ?? localEmotes?[word];
+
+        if (emote != null) {
+          // If the emote is zero-width and not the first word, process the stack.
+          if (emote.zeroWidth && index != 0) {
+            index = _processZeroWidthEmoteStack(
+              context,
+              localSpan,
+              words,
+              index,
+              emote,
+              emoteToObject,
+              emoteSize,
+              emoteScale,
+              textStyle,
+              launchExternal,
+            );
+          } else {
+            localSpan.add(
+              _createEmoteSpan(
+                context,
+                emote: emote,
+                height: emote.height != null
+                    ? emote.height! * emoteScale
+                    : emoteSize,
+                width: emote.width != null ? emote.width! * emoteScale : null,
+                launchExternal: launchExternal,
+              ),
+            );
+            localSpan.add(const TextSpan(text: ' '));
+            index--;
+          }
+        } else {
+          if (regexEmoji.hasMatch(word)) {
+            localSpan.add(
+              _createEmojiSpan(
+                emoji: word,
+                style:
+                    textStyle?.copyWith(fontSize: emoteSize - _emojiSizeOffset),
+              ),
+            );
+          } else {
+            localSpan.add(
+              _createTextSpan(
+                text: word,
+                style: textStyle,
+                launchExternal: launchExternal,
+                onTapPingedUser: onTapPingedUser,
+              ),
+            );
+          }
+          localSpan.add(const TextSpan(text: ' '));
+          index--;
+        }
+      }
+
+      // Add the local span reversed to the final span.
+      span.addAll(localSpan.reversed);
+    }
+  }
+
+  /// Handles zero-width emote stacking logic and returns updated index
+  int _processZeroWidthEmoteStack(
+    BuildContext context,
+    List<InlineSpan> localSpan,
+    List<String> words,
+    int startIndex,
+    Emote startEmote,
+    Map<String, Emote> emoteToObject,
+    double emoteSize,
+    double emoteScale,
+    TextStyle? textStyle,
+    bool launchExternal,
+  ) {
+    final emoteStack = <Emote>[];
+    var index = startIndex;
+
+    // Handle stacking consecutive zero-width emotes.
+    Emote? nextEmote = startEmote;
+    while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
+      emoteStack.add(nextEmote);
+      index--;
+      nextEmote = emoteToObject[words[index]] ?? localEmotes?[words[index]];
+    }
+
+    // If there's one more emote that's NOT zero-width, add it to the base of the stack.
+    if (nextEmote != null) emoteStack.add(nextEmote);
+
+    // Check if the next word is an emoji to be added to the stack.
+    final nextWordIsEmoji = regexEmoji.hasMatch(words[index]);
+
+    // Create the stack of emotes with the base emoji if there is one.
+    final children = [
+      if (nextWordIsEmoji)
+        Text(
+          words[index],
+          style: textStyle?.copyWith(fontSize: emoteSize - _emojiSizeOffset),
+        ),
+      ...emoteStack.reversed.map(
+        (emote) => FrostyCachedNetworkImage(
+          imageUrl: emote.url,
+          height: emote.height != null ? emote.height! * emoteScale : emoteSize,
+          width: emote.width != null ? emote.width! * emoteScale : emoteSize,
+          useFade: false,
+        ),
+      ),
+    ];
+
+    // Create the message for the tooltip
+    final message = emoteStack.reversed.map((emote) => emote.name);
+    final emoji = words[index];
+
+    localSpan.add(
+      WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: InkWell(
+          onTap: () => _showAssetDetailsBottomSheet(
+            context,
+            leading: Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                if (nextWordIsEmoji)
+                  Text(emoji, style: textStyle?.copyWith(fontSize: 40)),
+                ...emoteStack.reversed.map(
+                  (emote) => FrostyCachedNetworkImage(
+                    imageUrl: emote.url,
+                    width: 56,
+                  ),
+                ),
+              ],
+            ),
+            url: emoteStack.last.url,
+            title: nextWordIsEmoji
+                ? emoji
+                : '${emoteStack.last.name} (${emoteStack.last.type})',
+            subtitle: Text(
+              'with ${nextWordIsEmoji ? message.join(' + ') : message.skip(1).join(' + ')}',
+            ),
+            launchExternal: launchExternal,
+          ),
+          child: Stack(
+            alignment: AlignmentDirectional.center,
+            children: children,
+          ),
+        ),
+      ),
+    );
+
+    // If the next word is neither an emote nor emoji, add it as a text span.
+    if (nextEmote == null && !nextWordIsEmoji) {
+      localSpan.add(const TextSpan(text: ' '));
+      localSpan.add(
+        _createTextSpan(
+          text: words[index],
+          style: textStyle,
+          launchExternal: launchExternal,
+        ),
+      );
+    }
+
+    // Add space after the zero-width emote stack (like all other elements)
+    localSpan.add(const TextSpan(text: ' '));
+
+    return index - 1;
+  }
+
+  /// Returns an [InlineSpan] list that corresponds to the badges, username, words, and emotes of the given [IRCMessage].
+  List<InlineSpan> generateSpan(
+    BuildContext context, {
+    TextStyle? style,
+    required ChatAssetsStore assetsStore,
+    required double badgeScale,
+    required double emoteScale,
+    required bool launchExternal,
+    void Function()? onTapName,
+    void Function(String)? onTapPingedUser,
+    bool showMessage = true,
+    bool useReadableColors = false,
+    Map<String, UserTwitch>? channelIdToUserTwitch,
+    TimestampType timestamp = TimestampType.disabled,
+  }) {
+    final emoteToObject = assetsStore.emoteToObject;
+    final badgeSize = defaultBadgeSize * badgeScale;
+    final emoteSize = defaultEmoteSize * emoteScale;
+
+    // The span list that will be used to render the chat message
+    final span = <InlineSpan>[];
+
+    _addTimestamp(span, style, timestamp);
+    _addHistoricalAndChannelBadges(span, badgeSize, channelIdToUserTwitch);
+
+    final isHistorical = tags['historical'] == '1';
+    _addUserBadges(
+      context,
+      span,
+      assetsStore,
+      badgeSize,
+      launchExternal,
+      isHistorical,
+    );
+
+    _addUsername(span, context, useReadableColors, onTapName);
 
     // Italicize the text if it was called with an IRC Action (e.g., "/me").
     final textStyle =
         action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;
 
-    if (!showMessage) {
-      span.add(const TextSpan(text: ' <message deleted>'));
-    } else {
-      // Check if the message is a reply. If it is, remove the reply username (first word) from the message.
-      final words = tags.containsKey('reply-parent-display-name')
-          ? split?.sublist(1)
-          : split;
-
-      // Add the message and any emotes to the span.
-      if (words != null) {
-        // Keep a local span which will be reversed and added to the final span.
-        final localSpan = <InlineSpan>[];
-
-        // Iterate through the words in reverse-order.
-        // Index starts at the last word in the message.
-        var index = words.length - 1;
-
-        // Terminate after the first word in the message reached.
-        while (index != -1) {
-          // Check if current word is a valid emote.
-          final word = words[index];
-          final emote = emoteToObject[word] ?? localEmotes?[word];
-
-          if (emote != null) {
-            // If the emote is zero-width and not the first word, process the stack.
-            if (emote.zeroWidth && index != 0) {
-              final emoteStack = <Emote>[];
-
-              // Handle stacking consecutive zero-width emotes.
-              Emote? nextEmote = emote;
-              while (nextEmote != null && nextEmote.zeroWidth && index != 0) {
-                emoteStack.add(nextEmote);
-                index--;
-                nextEmote =
-                    emoteToObject[words[index]] ?? localEmotes?[words[index]];
-              }
-
-              // If there's one more emote thats NOT zero-width, add it to the base of the stack.
-              if (nextEmote != null) emoteStack.add(nextEmote);
-
-              // Check if the next word is an emoji to be added to the stack.
-              final nextWordIsEmoji = regexEmoji.hasMatch(words[index]);
-
-              // Create the stack of emotes with the base emoji if there is one.
-              // Will be used as the children of the Stack widget.
-              final children = [
-                if (nextWordIsEmoji)
-                  Text(
-                    words[index],
-                    style: textStyle?.copyWith(fontSize: emoteSize - 5),
-                  ),
-                ...emoteStack.reversed.map(
-                  (emote) => FrostyCachedNetworkImage(
-                    imageUrl: emote.url,
-                    height: emote.height != null
-                        ? emote.height! * emoteScale
-                        : emoteSize,
-                    width: emote.width != null
-                        ? emote.width! * emoteScale
-                        : emoteSize,
-                    useFade: false,
-                  ),
-                ),
-              ];
-
-              // Create the message for the tooltip
-              final message = emoteStack.reversed.map(
-                (emote) => emote.name,
-              );
-              final emoji = words[index];
-              localSpan.add(
-                WidgetSpan(
-                  alignment: PlaceholderAlignment.middle,
-                  child: InkWell(
-                    onTap: () => _showAssetDetailsBottomSheet(
-                      context,
-                      leading: Stack(
-                        alignment: AlignmentDirectional.center,
-                        children: [
-                          if (nextWordIsEmoji)
-                            Text(
-                              emoji,
-                              style: textStyle?.copyWith(fontSize: 40),
-                            ),
-                          ...emoteStack.reversed.map(
-                            (emote) => FrostyCachedNetworkImage(
-                              imageUrl: emote.url,
-                              width: 56,
-                            ),
-                          ),
-                        ],
-                      ),
-                      url: emoteStack.last.url,
-                      title: nextWordIsEmoji
-                          ? emoji
-                          : '${emoteStack.last.name} (${emoteStack.last.type})',
-                      subtitle: Text(
-                        'with ${nextWordIsEmoji ? message.join(' + ') : message.skip(1).join(' + ')}',
-                      ),
-                      launchExternal: launchExternal,
-                    ),
-                    child: Stack(
-                      alignment: AlignmentDirectional.center,
-                      children: children,
-                    ),
-                  ),
-                ),
-              );
-
-              // If the next word is neither an emote or emoji, add it as a text span.
-              if (nextEmote == null && !nextWordIsEmoji) {
-                localSpan.add(const TextSpan(text: ' '));
-                localSpan.add(
-                  _createTextSpan(
-                    text: words[index],
-                    style: textStyle,
-                    launchExternal: launchExternal,
-                    onTapPingedUser: onTapPingedUser,
-                  ),
-                );
-              }
-            } else {
-              localSpan.add(
-                _createEmoteSpan(
-                  context,
-                  emote: emote,
-                  height: emote.height != null
-                      ? emote.height! * emoteScale
-                      : emoteSize,
-                  width: emote.width != null ? emote.width! * emoteScale : null,
-                  launchExternal: launchExternal,
-                ),
-              );
-            }
-          } else {
-            if (regexEmoji.hasMatch(word)) {
-              localSpan.add(
-                _createEmojiSpan(
-                  emoji: word,
-                  style: textStyle?.copyWith(fontSize: emoteSize - 5),
-                ),
-              );
-            } else {
-              localSpan.add(
-                _createTextSpan(
-                  text: word,
-                  style: textStyle,
-                  launchExternal: launchExternal,
-                  onTapPingedUser: onTapPingedUser,
-                ),
-              );
-            }
-          }
-
-          localSpan.add(const TextSpan(text: ' '));
-          index--;
-        }
-
-        // Add the the local span reversed to the final span.
-        span.addAll(localSpan.reversed);
-      }
-    }
+    _addMessageContent(
+      context,
+      span,
+      emoteToObject,
+      emoteSize,
+      emoteScale,
+      showMessage,
+      launchExternal,
+      textStyle,
+      onTapPingedUser,
+    );
 
     return span;
   }
@@ -858,7 +948,7 @@ class IRCMessage {
 
     // If the username exists, set it.
     // tmi.twitch.tv means the message was sent by Twitch rather than a user, so will be irrelevant.
-    final String? user = splitMessage[0] == 'tmi.twitch.tv'
+    final String? user = splitMessage[0] == _twitchIrcServer
         ? mappedTags['login']
         : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
 
@@ -913,8 +1003,7 @@ class IRCMessage {
         localEmotes[emoteWord] = Emote(
           name: emoteWord,
           zeroWidth: false,
-          url:
-              'https://static-cdn.jtvnw.net/emoticons/v2/$emoteId/default/dark/3.0',
+          url: '$_twitchEmoteBaseUrl/$emoteId$_emoteModeSuffix',
           type: EmoteType.twitchSub,
         );
       }
@@ -925,9 +1014,10 @@ class IRCMessage {
     List<String>? split;
     if (message != null) {
       // Check if IRC actions like "/me" were called.
-      if (message.startsWith('\x01') && message.endsWith('\x01')) {
+      if (message.startsWith(_ircActionPrefix) &&
+          message.endsWith(_ircActionSuffix)) {
         action = true;
-        message = message.substring(8, message.length - 1);
+        message = message.substring(_ircActionPrefixLength, message.length - 1);
       }
 
       // Check if the message mentions the logged-in user
@@ -941,7 +1031,7 @@ class IRCMessage {
           // Also remove any "INVALID/UNDEFINED" Unicode characters.
           // Rendering this character on iOS shows a question mark inside a square.
           // This character is used by some clients to bypass restrictions on repeating message.
-          .map((word) => word.replaceAll('\u{E0000}', '').trim())
+          .map((word) => word.replaceAll(_invalidUnicodeChar, '').trim())
           .where((element) => element != '')
           .join(' ');
 
