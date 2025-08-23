@@ -12,6 +12,7 @@ import 'package:frosty/apis/dio_client.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/apis/twitch_auth_interceptor.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/firebase_options.dart';
 import 'package:frosty/screens/home/home.dart';
@@ -70,6 +71,8 @@ void main() async {
   /// Initialize API services with a common Dio client.
   /// This will prevent every request from creating a new client instance.
   final dioClient = DioClient.createClient();
+  
+  // Create API services
   final twitchApiService = TwitchApi(dioClient);
   final bttvApiService = BTTVApi(dioClient);
   final ffzApiService = FFZApi(dioClient);
@@ -77,6 +80,10 @@ void main() async {
 
   // Create and initialize the authentication store
   final authStore = AuthStore(twitchApi: twitchApiService);
+  
+  // Add the auth interceptor to the Dio client after AuthStore creation
+  dioClient.interceptors.add(TwitchAuthInterceptor(authStore));
+  
   await authStore.init();
 
   runApp(

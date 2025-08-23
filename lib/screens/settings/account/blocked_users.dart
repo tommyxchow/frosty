@@ -19,8 +19,7 @@ class BlockedUsers extends StatelessWidget {
       onRefresh: () async {
         HapticFeedback.lightImpact();
 
-        await authStore.user
-            .refreshBlockedUsers(headers: authStore.headersTwitch);
+        await authStore.user.refreshBlockedUsers();
       },
       child: Observer(
         builder: (context) {

@@ -5,7 +5,6 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
-import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
@@ -135,9 +134,6 @@ class _ChattersListState extends State<ChattersList> {
                                   onTap: () async {
                                     final userInfo =
                                         await context.read<TwitchApi>().getUser(
-                                              headers: context
-                                                  .read<AuthStore>()
-                                                  .headersTwitch,
                                               userLogin: widget.chatDetailsStore
                                                   .filteredUsers
                                                   .elementAt(index),

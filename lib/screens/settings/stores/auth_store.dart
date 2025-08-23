@@ -156,12 +156,11 @@ abstract class AuthBase with Store {
 
     void onPressed() {
       if (isBlocked) {
-        user.unblock(targetId: targetUserId, headers: headersTwitch);
+        user.unblock(targetId: targetUserId);
       } else {
         user.block(
           targetId: targetUserId,
           displayName: targetUser,
-          headers: headersTwitch,
         );
       }
       Navigator.pop(context);
@@ -213,7 +212,7 @@ abstract class AuthBase with Store {
         if (!_tokenIsValid) return await logout();
 
         // Initialize the user store.
-        await user.init(headers: headersTwitch);
+        await user.init();
 
         if (user.details != null) _isLoggedIn = true;
       }
@@ -240,7 +239,7 @@ abstract class AuthBase with Store {
       await _storage.write(key: _userTokenKey, value: token);
 
       // Initialize the user with the new token.
-      await user.init(headers: headersTwitch);
+      await user.init();
 
       // Set the login status to logged in.
       if (user.details != null) _isLoggedIn = true;

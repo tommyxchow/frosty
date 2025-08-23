@@ -135,20 +135,17 @@ abstract class ListStoreBase with Store {
         case ListType.followed:
           newStreams = await twitchApi.getFollowedStreams(
             id: authStore.user.details!.id,
-            headers: authStore.headersTwitch,
             cursor: _streamsCursor,
           );
           break;
         case ListType.top:
           newStreams = await twitchApi.getTopStreams(
-            headers: authStore.headersTwitch,
             cursor: _streamsCursor,
           );
           break;
         case ListType.category:
           newStreams = await twitchApi.getStreamsUnderCategory(
             gameId: categoryId!,
-            headers: authStore.headersTwitch,
             cursor: _streamsCursor,
           );
           break;
@@ -183,7 +180,6 @@ abstract class ListStoreBase with Store {
     try {
       _pinnedStreams = (await twitchApi.getStreamsByIds(
         userIds: settingsStore.pinnedChannelIds,
-        headers: authStore.headersTwitch,
       ))
           .data
           .asObservable();
@@ -214,7 +210,6 @@ abstract class ListStoreBase with Store {
     _isCategoryDetailsLoading = true;
 
     final categoryDetails = await twitchApi.getCategory(
-      headers: authStore.headersTwitch,
       gameId: categoryId!,
     );
 

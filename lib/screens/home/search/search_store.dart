@@ -68,7 +68,6 @@ abstract class SearchStoreBase with Store {
     _channelFuture = twitchApi
         .searchChannels(
       query: query,
-      headers: authStore.headersTwitch,
     )
         .then(
       (channels) {
@@ -81,7 +80,6 @@ abstract class SearchStoreBase with Store {
     _categoryFuture = twitchApi
         .searchCategories(
       query: query,
-      headers: authStore.headersTwitch,
     )
         .then((categories) {
       // Move exact matches to the first result
@@ -100,11 +98,9 @@ abstract class SearchStoreBase with Store {
   Future<Channel> searchChannel(String query) async {
     final user = await twitchApi.getUser(
       userLogin: query,
-      headers: authStore.headersTwitch,
     );
     return await twitchApi.getChannel(
       userId: user.id,
-      headers: authStore.headersTwitch,
     );
   }
 

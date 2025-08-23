@@ -49,7 +49,6 @@ abstract class CategoriesStoreBase with Store {
 
     try {
       final result = await twitchApi.getTopCategories(
-        headers: authStore.headersTwitch,
         cursor: _categoriesCursor,
       );
 

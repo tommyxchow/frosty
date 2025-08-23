@@ -7,7 +7,6 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
-import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:provider/provider.dart';
 
 class ChatMessage extends StatelessWidget {
@@ -54,10 +53,8 @@ class ChatMessage extends StatelessWidget {
     if (isModal) return;
 
     final twitchApi = context.read<TwitchApi>();
-    final authStore = context.read<AuthStore>();
     twitchApi
         .getUser(
-      headers: authStore.headersTwitch,
       userLogin: nickname,
     )
         .then((user) {

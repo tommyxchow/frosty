@@ -414,7 +414,6 @@ abstract class VideoStoreBase with Store {
     try {
       _streamInfo = await twitchApi.getStream(
         userLogin: userLogin,
-        headers: authStore.headersTwitch,
       );
     } catch (e) {
       debugPrint(e.toString());

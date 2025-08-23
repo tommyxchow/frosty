@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 
 /// Centralized Dio client configuration with interceptors and error handling
 class DioClient {
-  static Dio createClient() {
+  static Dio createClient({List<Interceptor>? additionalInterceptors}) {
     final dio = Dio();
 
     // Optimized configuration based on 2024-2025 best practices
@@ -208,6 +208,13 @@ class DioClient {
           },
         ),
       );
+    }
+
+    // Add any additional interceptors provided
+    if (additionalInterceptors != null) {
+      for (final interceptor in additionalInterceptors) {
+        dio.interceptors.add(interceptor);
+      }
     }
 
     return dio;

@@ -144,10 +144,10 @@ abstract class ChatAssetsStoreBase with Store {
         Future.wait([
           if (showTwitchEmotes) ...[
             twitchApi
-                .getEmotesGlobal(headers: headers)
+                .getEmotesGlobal()
                 .catchError(onEmoteError),
             twitchApi
-                .getEmotesChannel(id: channelId, headers: headers)
+                .getEmotesChannel(id: channelId)
                 .then((emotes) {
               _userEmoteSectionToEmotes.update(
                 'Channel Emotes',
@@ -189,14 +189,13 @@ abstract class ChatAssetsStoreBase with Store {
           twitchApi
               .getSharedChatSession(
             broadcasterId: channelId,
-            headers: headers,
           )
               .then((sharedChatSession) {
             if (sharedChatSession == null) return;
 
             for (final participant in sharedChatSession.participants) {
               twitchApi
-                  .getUser(id: participant.broadcasterId, headers: headers)
+                  .getUser(id: participant.broadcasterId)
                   .then((user) {
                 channelIdToUserTwitch[participant.broadcasterId] = user;
               });
@@ -206,11 +205,11 @@ abstract class ChatAssetsStoreBase with Store {
           // We want the channel badges to override the global badges.
           if (showTwitchBadges)
             twitchApi
-                .getBadgesGlobal(headers: headers)
+                .getBadgesGlobal()
                 .then((badges) => twitchBadgesToObject.addAll(badges))
                 .then(
                   (_) => twitchApi
-                      .getBadgesChannel(id: channelId, headers: headers)
+                      .getBadgesChannel(id: channelId)
                       .then((badges) => twitchBadgesToObject.addAll(badges))
                       .catchError(onBadgeError),
                 ),
@@ -236,7 +235,7 @@ abstract class ChatAssetsStoreBase with Store {
     final userEmotes = await Future.wait(
       emoteSets.map(
         (setId) => twitchApi
-            .getEmotesSets(setId: setId, headers: headers)
+            .getEmotesSets(setId: setId)
             .catchError(onError),
       ),
     );
@@ -256,7 +255,6 @@ abstract class ChatAssetsStoreBase with Store {
           } else {
             final owner = await twitchApi.getUser(
               id: ownerId,
-              headers: headers,
             );
             _userEmoteSectionToEmotes.update(
               owner.displayName,

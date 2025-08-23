@@ -49,39 +49,34 @@ mixin _$UserStore on UserStoreBase, Store {
       AsyncAction('UserStoreBase.init', context: context);
 
   @override
-  Future<void> init({required Map<String, String> headers}) {
-    return _$initAsyncAction.run(() => super.init(headers: headers));
+  Future<void> init() {
+    return _$initAsyncAction.run(() => super.init());
   }
 
   late final _$blockAsyncAction =
       AsyncAction('UserStoreBase.block', context: context);
 
   @override
-  Future<void> block(
-      {required String targetId,
-      required String displayName,
-      required Map<String, String> headers}) {
-    return _$blockAsyncAction.run(() => super
-        .block(targetId: targetId, displayName: displayName, headers: headers));
+  Future<void> block({required String targetId, required String displayName}) {
+    return _$blockAsyncAction
+        .run(() => super.block(targetId: targetId, displayName: displayName));
   }
 
   late final _$unblockAsyncAction =
       AsyncAction('UserStoreBase.unblock', context: context);
 
   @override
-  Future<void> unblock(
-      {required String targetId, required Map<String, String> headers}) {
-    return _$unblockAsyncAction
-        .run(() => super.unblock(targetId: targetId, headers: headers));
+  Future<void> unblock({required String targetId}) {
+    return _$unblockAsyncAction.run(() => super.unblock(targetId: targetId));
   }
 
   late final _$refreshBlockedUsersAsyncAction =
       AsyncAction('UserStoreBase.refreshBlockedUsers', context: context);
 
   @override
-  Future<void> refreshBlockedUsers({required Map<String, String> headers}) {
+  Future<void> refreshBlockedUsers() {
     return _$refreshBlockedUsersAsyncAction
-        .run(() => super.refreshBlockedUsers(headers: headers));
+        .run(() => super.refreshBlockedUsers());
   }
 
   late final _$UserStoreBaseActionController =
