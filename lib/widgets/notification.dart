@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 
 class FrostyNotification extends StatelessWidget {
   final String message;
-  final bool showPasteButton;
-  final Function() onButtonPressed;
+  final VoidCallback? onDismissed;
 
   const FrostyNotification({
     super.key,
     required this.message,
-    required this.showPasteButton,
-    required this.onButtonPressed,
+    this.onDismissed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final Widget notificationContent = Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(8),
@@ -27,29 +25,46 @@ class FrostyNotification extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.info_outline_rounded,
+                    size: 16,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurfaceVariant
+                        .withValues(alpha: 0.7),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       message,
-                      style: const TextStyle(
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          if (showPasteButton)
-            TextButton(
-              onPressed: onButtonPressed,
-              child: const Text('Paste'),
+          if (onDismissed != null)
+            IconButton(
+              onPressed: onDismissed,
+              icon: const Icon(Icons.close_rounded, size: 20),
+              visualDensity: VisualDensity.compact,
+              tooltip: 'Dismiss',
             ),
         ],
       ),
     );
+
+    // Make it dismissible with swipe gesture if onDismissed is provided
+    if (onDismissed != null) {
+      return Dismissible(
+        key: ValueKey(message),
+        onDismissed: (_) => onDismissed!(),
+        child: notificationContent,
+      );
+    }
+
+    return notificationContent;
   }
 }

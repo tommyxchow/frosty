@@ -337,6 +337,17 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
+  void clearNotification() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.clearNotification');
+    try {
+      return super.clearNotification();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void updateSleepTimer(
       {required Duration duration, required VoidCallback onTimerFinished}) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(

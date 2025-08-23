@@ -198,19 +198,7 @@ class _VideoChatState extends State<VideoChat> {
                           : Alignment.topCenter,
                       child: FrostyNotification(
                         message: _chatStore.notification!,
-                        showPasteButton:
-                            _chatStore.notification!.contains('copied'),
-                        onButtonPressed: () async {
-                          // Paste clipboard text into the text controller.
-                          final data =
-                              await Clipboard.getData(Clipboard.kTextPlain);
-
-                          if (data != null) {
-                            _chatStore.textController.text = data.text!;
-                          }
-
-                          _chatStore.updateNotification('');
-                        },
+                        onDismissed: () => _chatStore.clearNotification(),
                       ),
                     )
                   : null,

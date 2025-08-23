@@ -754,16 +754,17 @@ abstract class ChatStoreBase with Store {
     // when copying messages repeatedly.
     _notificationTimer?.cancel();
 
-    // If empty, clear the notification and don't make a new timer (empty message means cancelling the notification).
-    if (notificationMessage.isEmpty) {
-      _notification = null;
-      return;
-    }
-
-    // Set the new notification message and create a new timer that will dismiss it after 2 seconds.
+    // Set the new notification message and create a new timer that will dismiss it after 3 seconds.
     _notification = notificationMessage;
     _notificationTimer =
         Timer(const Duration(seconds: 3), () => _notification = null);
+  }
+
+  /// Clears the current notification immediately.
+  @action
+  void clearNotification() {
+    _notificationTimer?.cancel();
+    _notification = null;
   }
 
   /// Updates the sleep timer with the given [duration].
