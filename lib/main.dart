@@ -89,12 +89,12 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        Provider<AuthStore>(create: (_) => authStore),
-        Provider<SettingsStore>(create: (_) => settingsStore),
-        Provider<TwitchApi>(create: (_) => twitchApiService),
-        Provider<BTTVApi>(create: (_) => bttvApiService),
-        Provider<FFZApi>(create: (_) => ffzApiService),
-        Provider<SevenTVApi>(create: (_) => sevenTVApiService),
+        Provider<AuthStore>.value(value: authStore),
+        Provider<SettingsStore>.value(value: settingsStore),
+        Provider<TwitchApi>.value(value: twitchApiService),
+        Provider<BTTVApi>.value(value: bttvApiService),
+        Provider<FFZApi>.value(value: ffzApiService),
+        Provider<SevenTVApi>.value(value: sevenTVApiService),
       ],
       child: MyApp(firstRun: firstRun),
     ),
