@@ -12,12 +12,21 @@ SevenTVEvent _$SevenTVEventFromJson(Map<String, dynamic> json) => SevenTVEvent(
       d: SevenTVEventData.fromJson(json['d'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$SevenTVEventToJson(SevenTVEvent instance) =>
-    <String, dynamic>{
-      'op': instance.op,
-      if (instance.t case final value?) 't': value,
-      'd': instance.d,
-    };
+Map<String, dynamic> _$SevenTVEventToJson(SevenTVEvent instance) {
+  final val = <String, dynamic>{
+    'op': instance.op,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('t', instance.t);
+  val['d'] = instance.d;
+  return val;
+}
 
 SevenTVEventData _$SevenTVEventDataFromJson(Map<String, dynamic> json) =>
     SevenTVEventData(
