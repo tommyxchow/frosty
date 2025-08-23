@@ -161,6 +161,24 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$_isSendingMessageAtom =
+      Atom(name: 'ChatStoreBase._isSendingMessage', context: context);
+
+  bool get isSendingMessage {
+    _$_isSendingMessageAtom.reportRead();
+    return super._isSendingMessage;
+  }
+
+  @override
+  bool get _isSendingMessage => isSendingMessage;
+
+  @override
+  set _isSendingMessage(bool value) {
+    _$_isSendingMessageAtom.reportWrite(value, super._isSendingMessage, () {
+      super._isSendingMessage = value;
+    });
+  }
+
   late final _$_userStateAtom =
       Atom(name: 'ChatStoreBase._userState', context: context);
 

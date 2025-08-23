@@ -100,6 +100,9 @@ abstract class ChatStoreBase with Store {
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
 
+  /// Timer used for resetting the sending state if no USERSTATE is received.
+  Timer? _sendingTimeoutTimer;
+
   /// The current timer for the sleep timer if active.
   Timer? sleepTimer;
 
@@ -146,6 +149,10 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _showMentionAutocomplete = false;
 
+  /// Whether a message is currently being sent and waiting for server confirmation.
+  @readonly
+  var _isSendingMessage = false;
+
   /// The logged-in user's appearance in chat.
   @readonly
   var _userState = const USERSTATE();
@@ -155,6 +162,9 @@ abstract class ChatStoreBase with Store {
 
   @observable
   IRCMessage? replyingToMessage;
+
+  /// Public getter for whether a message is currently being sent.
+  bool get isSendingMessage => _isSendingMessage;
 
   ChatStoreBase({
     required this.twitchApi,
@@ -362,6 +372,9 @@ abstract class ChatStoreBase with Store {
               textController.clear();
               messageBuffer.add(toSend!);
               toSend = null;
+              // Reset sending state since message was successfully sent
+              _sendingTimeoutTimer?.cancel();
+              _isSendingMessage = false;
             }
             break;
           case Command.globalUserState:
@@ -634,6 +647,20 @@ abstract class ChatStoreBase with Store {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) return;
 
+    // Prevent sending messages when message delay is enabled
+    if (settings.showVideo && settings.chatDelay > 0) {
+      updateNotification(
+        'Cannot send message while message delay is enabled (${settings.chatDelay.toInt()}s delay)',
+      );
+      return;
+    }
+
+    // Prevent sending multiple messages simultaneously
+    if (_isSendingMessage) {
+      updateNotification('Please wait, sending previous message...');
+      return;
+    }
+
     if (_channel == null || _channel?.closeCode != null) {
       messageBuffer.add(
         IRCMessage.createNotice(
@@ -641,6 +668,18 @@ abstract class ChatStoreBase with Store {
         ),
       );
     } else {
+      // Set sending state to true
+      _isSendingMessage = true;
+
+      // Start a timeout timer to reset sending state if no USERSTATE is received
+      _sendingTimeoutTimer?.cancel();
+      _sendingTimeoutTimer = Timer(const Duration(seconds: 10), () {
+        if (_isSendingMessage) {
+          _isSendingMessage = false;
+          updateNotification('Message sending timed out');
+        }
+      });
+
       // Send the message to the IRC chat room.
       _channel?.sink.add(
         '${replyingToMessage != null ? '@reply-parent-msg-id=${replyingToMessage!.tags['id']} ' : ''}PRIVMSG #$channelName :$message',
@@ -780,6 +819,7 @@ abstract class ChatStoreBase with Store {
 
     _messageBufferTimer?.cancel();
     _notificationTimer?.cancel();
+    _sendingTimeoutTimer?.cancel();
     sleepTimer?.cancel();
 
     // Cancel WebSocket subscriptions

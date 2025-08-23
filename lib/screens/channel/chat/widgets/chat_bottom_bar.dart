@@ -199,26 +199,36 @@ class ChatBottomBar extends StatelessWidget {
                     )
                   else
                     Expanded(
-                      child: TextField(
-                        textInputAction: TextInputAction.send,
-                        focusNode: chatStore.textFieldFocusNode,
-                        minLines: 1,
-                        maxLines: 3,
-                        enabled: chatStore.auth.isLoggedIn ? true : false,
-                        decoration: InputDecoration(
-                          prefixIcon: chatStore.settings.emoteMenuButtonOnLeft
-                              ? emoteMenuButton
-                              : null,
-                          suffixIcon: chatStore.settings.emoteMenuButtonOnLeft
-                              ? null
-                              : emoteMenuButton,
-                          hintMaxLines: 1,
-                          hintText: chatStore.auth.isLoggedIn
-                              ? 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'} ${chatStore.settings.chatDelay == 0 || !chatStore.settings.showVideo ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
-                              : 'Log in to chat',
-                        ),
-                        controller: chatStore.textController,
-                        onSubmitted: chatStore.sendMessage,
+                      child: Observer(
+                        builder: (context) {
+                          return TextField(
+                            textInputAction: TextInputAction.send,
+                            focusNode: chatStore.textFieldFocusNode,
+                            minLines: 1,
+                            maxLines: 3,
+                            // Disable text field when sending message or when not logged in
+                            enabled: chatStore.auth.isLoggedIn &&
+                                !chatStore.isSendingMessage,
+                            decoration: InputDecoration(
+                              prefixIcon:
+                                  chatStore.settings.emoteMenuButtonOnLeft
+                                      ? emoteMenuButton
+                                      : null,
+                              suffixIcon:
+                                  chatStore.settings.emoteMenuButtonOnLeft
+                                      ? null
+                                      : emoteMenuButton,
+                              hintMaxLines: 1,
+                              hintText: chatStore.auth.isLoggedIn
+                                  ? chatStore.isSendingMessage
+                                      ? 'Sending message...'
+                                      : 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'} ${chatStore.settings.chatDelay == 0 || !chatStore.settings.showVideo ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
+                                  : 'Log in to chat',
+                            ),
+                            controller: chatStore.textController,
+                            onSubmitted: chatStore.sendMessage,
+                          );
+                        },
                       ),
                     ),
                   if (chatStore.showSendButton &&
@@ -226,13 +236,28 @@ class ChatBottomBar extends StatelessWidget {
                           chatStore.expandChat ||
                           MediaQuery.of(context).orientation ==
                               Orientation.portrait))
-                    IconButton(
-                      tooltip: 'Send',
-                      icon: const Icon(Icons.send_rounded),
-                      onPressed: chatStore.auth.isLoggedIn
-                          ? () => chatStore
-                              .sendMessage(chatStore.textController.text)
-                          : null,
+                    Observer(
+                      builder: (context) {
+                        return IconButton(
+                          tooltip: chatStore.isSendingMessage
+                              ? 'Sending message...'
+                              : 'Send',
+                          icon: chatStore.isSendingMessage
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.send_rounded),
+                          onPressed: chatStore.auth.isLoggedIn &&
+                                  !chatStore.isSendingMessage
+                              ? () => chatStore
+                                  .sendMessage(chatStore.textController.text)
+                              : null,
+                        );
+                      },
                     )
                   else
                     IconButton(
