@@ -62,3 +62,6 @@ random/
 
 # potentially sensitive review information
 **/fastlane/metadata/review_information
+
+# ai
+.claude
