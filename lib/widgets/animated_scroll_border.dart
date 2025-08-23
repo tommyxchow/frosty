@@ -19,6 +19,17 @@ class _AnimatedScrollBorderState extends State<AnimatedScrollBorder> {
   void initState() {
     super.initState();
     widget.scrollController.addListener(_updateScrollState);
+    _updateScrollState(); // Initial check
+  }
+
+  @override
+  void didUpdateWidget(AnimatedScrollBorder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.scrollController != oldWidget.scrollController) {
+      oldWidget.scrollController.removeListener(_updateScrollState);
+      widget.scrollController.addListener(_updateScrollState);
+      _updateScrollState(); // Initial check for new controller
+    }
   }
 
   @override
@@ -28,8 +39,10 @@ class _AnimatedScrollBorderState extends State<AnimatedScrollBorder> {
   }
 
   void _updateScrollState() {
+    if (!mounted) return;
     setState(() {
-      _isScrolled = widget.scrollController.offset > 0;
+      _isScrolled = widget.scrollController.hasClients &&
+          widget.scrollController.offset > 0;
     });
   }
 

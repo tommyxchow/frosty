@@ -42,15 +42,8 @@ class StreamsList extends StatefulWidget {
 
 class _StreamsListState extends State<StreamsList>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
-  late final _listStore = ListStore(
-    authStore: context.read<AuthStore>(),
-    settingsStore: context.read<SettingsStore>(),
-    twitchApi: context.read<TwitchApi>(),
-    listType: widget.listType,
-    categoryId: widget.categoryId,
-    scrollController: widget.scrollController ??
-        (widget.showJumpButton ? ScrollController() : null),
-  );
+  late final ListStore _listStore;
+  ScrollController? _scrollController;
 
   @override
   bool get wantKeepAlive => true;
@@ -59,6 +52,26 @@ class _StreamsListState extends State<StreamsList>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    if (widget.scrollController == null && widget.showJumpButton) {
+      _scrollController = ScrollController();
+    }
+
+    _listStore = ListStore(
+      authStore: context.read<AuthStore>(),
+      settingsStore: context.read<SettingsStore>(),
+      twitchApi: context.read<TwitchApi>(),
+      listType: widget.listType,
+      categoryId: widget.categoryId,
+      scrollController: widget.scrollController ?? _scrollController,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController?.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -287,12 +300,5 @@ class _StreamsListState extends State<StreamsList>
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _listStore.dispose();
-    super.dispose();
   }
 }
