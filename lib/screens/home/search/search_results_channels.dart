@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
@@ -43,10 +45,21 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
           ),
         ),
       );
-    } catch (error) {
+    } on ApiException catch (e) {
+      debugPrint('Search channels ApiException: $e');
       final snackBar = SnackBar(
         content: AlertMessage(
-          message: error.toString(),
+          message: e.message,
+          centered: false,
+        ),
+      );
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } catch (error) {
+      debugPrint('Search channels error: $error');
+      final snackBar = SnackBar(
+        content: AlertMessage(
+          message: 'Unable to follow channel',
           centered: false,
         ),
       );
@@ -73,7 +86,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
               child: SizedBox(
                 height: 100.0,
                 child: AlertMessage(
-                  message: 'Failed to get channels',
+                  message: 'Unable to load channels',
                   vertical: true,
                 ),
               ),

@@ -31,7 +31,7 @@ class ProfileCard extends StatelessWidget {
               Icons.error_outline_rounded,
               color: Theme.of(context).colorScheme.error,
             ),
-            title: const Text('Failed to connect'),
+            title: const Text('Unable to connect to Twitch'),
             trailing: FilledButton.tonal(
               onPressed: authStore.init,
               child: const Text('Reconnect'),

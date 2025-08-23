@@ -33,7 +33,7 @@ class SearchResultsCategories extends StatelessWidget {
               child: SizedBox(
                 height: 100.0,
                 child: AlertMessage(
-                  message: 'Failed to get categories',
+                  message: 'Unable to load categories',
                   vertical: true,
                 ),
               ),

@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/models/stream.dart';
@@ -160,9 +162,14 @@ abstract class ListStoreBase with Store {
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect';
+      _error = 'Unable to connect to Twitch';
+      debugPrint('Streams SocketException: No internet connection');
+    } on ApiException catch (e) {
+      _error = e.message;
+      debugPrint('Streams ApiException: $e');
     } catch (e) {
-      _error = e.toString();
+      _error = 'Something went wrong loading streams';
+      debugPrint('Streams error: $e');
     }
 
     _isAllStreamsLoading = false;
@@ -186,9 +193,14 @@ abstract class ListStoreBase with Store {
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect';
+      _error = 'Unable to connect to Twitch';
+      debugPrint('Pinned streams SocketException: No internet connection');
+    } on ApiException catch (e) {
+      _error = e.message;
+      debugPrint('Pinned streams ApiException: $e');
     } catch (e) {
-      _error = e.toString();
+      _error = 'Something went wrong loading pinned streams';
+      debugPrint('Pinned streams error: $e');
     }
 
     _isPinnedStreamsLoading = false;
