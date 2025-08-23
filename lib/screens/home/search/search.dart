@@ -75,7 +75,10 @@ class _SearchState extends State<Search> {
               builder: (context) {
                 if (_searchStore.textEditingController.text.isEmpty) {
                   if (_searchStore.searchHistory.isEmpty) {
-                    return const AlertMessage(message: 'No recent searches');
+                    return const AlertMessage(
+                      message: 'No recent searches',
+                      vertical: true,
+                    );
                   }
 
                   return Column(

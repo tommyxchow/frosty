@@ -27,6 +27,7 @@ class BlockedUsers extends StatelessWidget {
             return const Center(
               child: AlertMessage(
                 message: 'No blocked users',
+                vertical: true,
               ),
             );
           }

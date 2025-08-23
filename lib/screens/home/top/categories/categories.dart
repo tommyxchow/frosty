@@ -76,7 +76,10 @@ class _CategoriesState extends State<Categories>
           Widget? statusWidget;
 
           if (_categoriesStore.error != null) {
-            statusWidget = AlertMessage(message: _categoriesStore.error!);
+            statusWidget = AlertMessage(
+              message: _categoriesStore.error!,
+              vertical: true,
+            );
           }
 
           if (_categoriesStore.categories.isEmpty) {
@@ -84,7 +87,10 @@ class _CategoriesState extends State<Categories>
               statusWidget =
                   const LoadingIndicator(subtitle: 'Loading categories...');
             } else {
-              statusWidget = const AlertMessage(message: 'No top categories');
+              statusWidget = const AlertMessage(
+                message: 'No top categories',
+                vertical: true,
+              );
             }
           }
 

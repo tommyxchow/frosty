@@ -88,6 +88,7 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                     const Expanded(
                       child: AlertMessage(
                         message: 'No muted keywords',
+                        vertical: true,
                       ),
                     ),
                   Expanded(

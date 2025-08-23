@@ -113,7 +113,10 @@ class _StreamsListState extends State<StreamsList>
           Widget? statusWidget;
 
           if (_listStore.error != null) {
-            statusWidget = AlertMessage(message: _listStore.error!);
+            statusWidget = AlertMessage(
+              message: _listStore.error!,
+              vertical: true,
+            );
           }
 
           if (_listStore.streams.isEmpty) {
@@ -125,6 +128,7 @@ class _StreamsListState extends State<StreamsList>
                 message: widget.listType == ListType.followed
                     ? 'No followed streams'
                     : 'No top streams',
+                vertical: true,
               );
             }
           }

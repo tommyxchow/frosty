@@ -72,7 +72,10 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
             return const SliverToBoxAdapter(
               child: SizedBox(
                 height: 100.0,
-                child: AlertMessage(message: 'Failed to get channels'),
+                child: AlertMessage(
+                  message: 'Failed to get channels',
+                  vertical: true,
+                ),
               ),
             );
           case FutureStatus.fulfilled:
