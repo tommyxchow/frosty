@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frosty/apis/bttv_api.dart';
+import 'package:frosty/apis/dio_client.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
@@ -19,7 +20,6 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
-import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -67,13 +67,13 @@ void main() async {
   // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
-  /// Initialize API services with a common client.
+  /// Initialize API services with a common Dio client.
   /// This will prevent every request from creating a new client instance.
-  final client = Client();
-  final twitchApiService = TwitchApi(client);
-  final bttvApiService = BTTVApi(client);
-  final ffzApiService = FFZApi(client);
-  final sevenTVApiService = SevenTVApi(client);
+  final dioClient = DioClient.createClient();
+  final twitchApiService = TwitchApi(dioClient);
+  final bttvApiService = BTTVApi(dioClient);
+  final ffzApiService = FFZApi(dioClient);
+  final sevenTVApiService = SevenTVApi(dioClient);
 
   // Create and initialize the authentication store
   final authStore = AuthStore(twitchApi: twitchApiService);
