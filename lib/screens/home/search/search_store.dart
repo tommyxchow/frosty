@@ -80,20 +80,19 @@ abstract class SearchStoreBase with Store {
     // Fetch and set the categories that match the query.
     _categoryFuture = twitchApi
         .searchCategories(
-          query: query,
-          headers: authStore.headersTwitch,
-        )
+      query: query,
+      headers: authStore.headersTwitch,
+    )
         .then((categories) {
-          // Move exact matches to the first result
-          final matchingIndex = categories.data
-              .indexWhere((c) => c.name.toLowerCase() == query.toLowerCase());
-          if (matchingIndex >= 1) {
-            final matchingCategory = categories.data.removeAt(matchingIndex);
-            categories.data.insert(0, matchingCategory);
-          }
-          return categories;
-        })
-        .asObservable();
+      // Move exact matches to the first result
+      final matchingIndex = categories.data
+          .indexWhere((c) => c.name.toLowerCase() == query.toLowerCase());
+      if (matchingIndex >= 1) {
+        final matchingCategory = categories.data.removeAt(matchingIndex);
+        categories.data.insert(0, matchingCategory);
+      }
+      return categories;
+    }).asObservable();
   }
 
   /// Find a specific channel provided the [query].
