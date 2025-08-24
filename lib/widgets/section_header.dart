@@ -16,8 +16,17 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
     return Padding(
-      padding: padding ?? const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      padding: padding ??
+          EdgeInsets.fromLTRB(
+            isLandscape ? MediaQuery.of(context).padding.left : 16,
+            0,
+            isLandscape ? MediaQuery.of(context).padding.right : 16,
+            8,
+          ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
