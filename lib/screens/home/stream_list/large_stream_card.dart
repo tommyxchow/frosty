@@ -48,38 +48,40 @@ class LargeStreamCard extends StatelessWidget {
     final surfaceColor =
         context.watch<FrostyThemes>().dark.colorScheme.onSurface;
 
-    final thumbnail = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
-      child: Stack(
-        alignment: Alignment.bottomLeft,
-        children: [
-          Container(
-            foregroundDecoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.8, 1.0],
-                colors: [
-                  Colors.transparent,
-                  Colors.black,
-                ],
+    final thumbnail = SizedBox(
+      width: double.infinity,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        child: Stack(
+          alignment: Alignment.bottomLeft,
+          children: [
+            Container(
+              foregroundDecoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.8, 1.0],
+                  colors: [
+                    Colors.transparent,
+                    Colors.black,
+                  ],
+                ),
+              ),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: FrostyCachedNetworkImage(
+                  imageUrl: streamInfo.thumbnailUrl.replaceFirst(
+                    '-{width}x{height}',
+                    '-${thumbnailWidth}x$thumbnailHeight',
+                  ),
+                  cacheKey: cacheKey,
+                  placeholder: (context, url) => const SkeletonLoader(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
+                  useOldImageOnUrlChange: true,
+                ),
               ),
             ),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: FrostyCachedNetworkImage(
-                imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-                  '-{width}x{height}',
-                  '-${thumbnailWidth}x$thumbnailHeight',
-                ),
-                cacheKey: cacheKey,
-                placeholder: (context, url) => const SkeletonLoader(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                ),
-                useOldImageOnUrlChange: true,
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -130,7 +132,8 @@ class LargeStreamCard extends StatelessWidget {
               ],
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
 
