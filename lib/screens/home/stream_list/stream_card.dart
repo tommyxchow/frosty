@@ -9,9 +9,9 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/cached_image.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/photo_view.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
 import 'package:intl/intl.dart';
@@ -57,9 +57,8 @@ class StreamCard extends StatelessWidget {
           '-${thumbnailWidth}x$thumbnailHeight',
         ),
         cacheKey: cacheKey,
-        placeholder: (context, url) => ColoredBox(
-          color: Theme.of(context).colorScheme.surfaceContainer,
-          child: const LoadingIndicator(),
+        placeholder: (context, url) => const SkeletonLoader(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
         useOldImageOnUrlChange: true,
       ),

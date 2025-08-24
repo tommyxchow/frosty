@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -8,8 +7,8 @@ import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
 import 'package:mobx/mobx.dart';
@@ -82,10 +81,9 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
 
         switch (future.status) {
           case FutureStatus.pending:
-            return const SliverToBoxAdapter(
-              child: LoadingIndicator(
-                subtitle: 'Loading channels...',
-              ),
+            return SliverList.builder(
+              itemCount: 6,
+              itemBuilder: (context, index) => const ChannelSkeletonLoader(),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/widgets/cached_image.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 
 /// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
@@ -50,9 +50,8 @@ class CategoryCard extends StatelessWidget {
                       null,
                       '${artWidth}x$artHeight.jpg',
                     ),
-                    placeholder: (context, url) => ColoredBox(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      child: const LoadingIndicator(),
+                    placeholder: (context, url) => const SkeletonLoader(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                   ),
                 ),

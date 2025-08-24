@@ -10,9 +10,9 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:provider/provider.dart';
 
 /// A widget that displays a list of followed or top streams based on the provided [listType].
@@ -121,8 +121,26 @@ class _StreamsListState extends State<StreamsList>
 
           if (_listStore.streams.isEmpty) {
             if (_listStore.isLoading && _listStore.error == null) {
-              statusWidget =
-                  const LoadingIndicator(subtitle: 'Loading streams...');
+              // Show skeleton loaders while loading
+              final settingsStore = context.watch<SettingsStore>();
+              final isLargeCard = settingsStore.largeStreamCard;
+
+              return CustomScrollView(
+                slivers: [
+                  SliverList.builder(
+                    itemCount: 8,
+                    itemBuilder: (context, index) {
+                      if (isLargeCard) {
+                        return const LargeStreamCardSkeletonLoader();
+                      } else {
+                        return StreamCardSkeletonLoader(
+                          showThumbnail: settingsStore.showThumbnails,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              );
             } else {
               statusWidget = AlertMessage(
                 message: widget.listType == ListType.followed

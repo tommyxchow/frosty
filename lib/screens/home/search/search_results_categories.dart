@@ -4,7 +4,7 @@ import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:mobx/mobx.dart';
 
 class SearchResultsCategories extends StatelessWidget {
@@ -26,13 +26,9 @@ class SearchResultsCategories extends StatelessWidget {
 
         switch (future.status) {
           case FutureStatus.pending:
-            return const SliverToBoxAdapter(
-              child: SizedBox(
-                height: 100.0,
-                child: LoadingIndicator(
-                  subtitle: 'Loading categories...',
-                ),
-              ),
+            return SliverList.builder(
+              itemCount: 4,
+              itemBuilder: (context, index) => const CategorySkeletonLoader(),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(

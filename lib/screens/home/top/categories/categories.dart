@@ -7,7 +7,7 @@ import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:provider/provider.dart';
 
 class Categories extends StatefulWidget {
@@ -84,8 +84,23 @@ class _CategoriesState extends State<Categories>
 
           if (_categoriesStore.categories.isEmpty) {
             if (_categoriesStore.isLoading && _categoriesStore.error == null) {
-              statusWidget =
-                  const LoadingIndicator(subtitle: 'Loading categories...');
+              // Show skeleton loaders while loading
+              return Column(
+                children: [
+                  AnimatedScrollBorder(
+                    scrollController: widget.scrollController,
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: widget.scrollController,
+                      itemCount: 8,
+                      itemBuilder: (context, index) =>
+                          const CategorySkeletonLoader(),
+                    ),
+                  ),
+                ],
+              );
             } else {
               statusWidget = const AlertMessage(
                 message: 'No top categories',
