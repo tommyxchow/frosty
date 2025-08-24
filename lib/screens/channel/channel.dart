@@ -20,6 +20,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/app_bar.dart';
+import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/notification.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
@@ -287,18 +288,56 @@ class _VideoChatState extends State<VideoChat> {
                                 ),
                             ],
                           )
-                        : Row(
-                            children: settingsStore.landscapeChatLeftSide
-                                ? [
-                                    landscapeChat,
-                                    const VerticalDivider(),
-                                    Expanded(child: video),
-                                  ]
-                                : [
-                                    Expanded(child: video),
-                                    const VerticalDivider(),
-                                    landscapeChat,
-                                  ],
+                        : LayoutBuilder(
+                            builder: (context, constraints) {
+                              final totalWidth = constraints.maxWidth;
+                              final chatWidth = _chatStore.expandChat
+                                  ? 0.5
+                                  : _chatStore.settings.chatWidth;
+
+                              // Create the landscape chat container with proper styling
+                              final chatContainer = AnimatedContainer(
+                                curve: Curves.ease,
+                                duration: const Duration(milliseconds: 200),
+                                width: totalWidth * chatWidth,
+                                color: _chatStore.settings.fullScreen
+                                    ? Colors.black.withValues(
+                                        alpha: _chatStore.settings
+                                            .fullScreenChatOverlayOpacity,
+                                      )
+                                    : Theme.of(context).scaffoldBackgroundColor,
+                                child: chat,
+                              );
+
+                              final draggableDivider = Observer(
+                                builder: (_) => DraggableDivider(
+                                  currentWidth: chatWidth,
+                                  maxWidth: 0.6,
+                                  isResizableOnLeft:
+                                      settingsStore.landscapeChatLeftSide,
+                                  showHandle: _videoStore.overlayVisible,
+                                  onDrag: (newWidth) {
+                                    if (!_chatStore.expandChat) {
+                                      _chatStore.settings.chatWidth = newWidth;
+                                    }
+                                  },
+                                ),
+                              );
+
+                              return Row(
+                                children: settingsStore.landscapeChatLeftSide
+                                    ? [
+                                        chatContainer,
+                                        draggableDivider,
+                                        Expanded(child: video),
+                                      ]
+                                    : [
+                                        Expanded(child: video),
+                                        draggableDivider,
+                                        chatContainer,
+                                      ],
+                              );
+                            },
                           )
                     : Column(
                         children: [appBar, Expanded(child: chat)],

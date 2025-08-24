@@ -256,15 +256,6 @@ class _ChatSettingsState extends State<ChatSettings> {
                     .values[landscapeCutoutNames.indexOf(newValue)],
           ),
           SettingsListSlider(
-            title: 'Chat width',
-            trailing: '${(settingsStore.chatWidth * 100).toStringAsFixed(0)}%',
-            value: settingsStore.chatWidth,
-            min: 0.2,
-            max: 0.6,
-            divisions: 8,
-            onChanged: (newValue) => settingsStore.chatWidth = newValue,
-          ),
-          SettingsListSlider(
             title: 'Chat overlay opacity',
             trailing:
                 '${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%',

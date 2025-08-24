@@ -144,7 +144,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultLandscapeChatLeftSide = false;
   static const defaultLandscapeForceVerticalChat = false;
   static const defaultLandscapeCutout = LandscapeCutoutType.none;
-  static const defaultChatWidth = 0.25;
+  static const defaultChatWidth = 0.2;
   static const defaultFullScreenChatOverlayOpacity = 0.5;
 
   // Sleep defaults
