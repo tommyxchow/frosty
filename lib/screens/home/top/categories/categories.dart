@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/home/top/categories/categories_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -87,19 +88,17 @@ class _CategoriesState extends State<Categories>
           if (_categoriesStore.categories.isEmpty) {
             if (_categoriesStore.isLoading && _categoriesStore.error == null) {
               // Show skeleton loaders while loading
-              return Scrollbar(
+              return CustomScrollView(
                 controller: widget.scrollController,
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: widget.scrollController,
-                  padding: EdgeInsets.only(
-                    top: topPadding,
-                    bottom: MediaQuery.of(context).padding.bottom,
+                slivers: [
+                  const SliverTopPadding(extraTopPadding: kToolbarHeight),
+                  SliverList.builder(
+                    itemCount: 10,
+                    itemBuilder: (context, index) =>
+                        const CategorySkeletonLoader(),
                   ),
-                  itemCount: 10,
-                  itemBuilder: (context, index) =>
-                      const CategorySkeletonLoader(),
-                ),
+                  const SliverBottomPadding(),
+                ],
               );
             } else {
               statusWidget = const AlertMessage(
@@ -123,24 +122,26 @@ class _CategoriesState extends State<Categories>
 
           return Scrollbar(
             controller: widget.scrollController,
-            child: ListView.builder(
+            child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               controller: widget.scrollController,
-              padding: EdgeInsets.only(
-                top: topPadding,
-                bottom: MediaQuery.of(context).padding.bottom,
-              ),
-              itemCount: _categoriesStore.categories.length,
-              itemBuilder: (context, index) {
-                if (index > _categoriesStore.categories.length - 10 &&
-                    _categoriesStore.hasMore) {
-                  _categoriesStore.getCategories();
-                }
-                return CategoryCard(
-                  key: ValueKey(_categoriesStore.categories[index].id),
-                  category: _categoriesStore.categories[index],
-                );
-              },
+              slivers: [
+                const SliverTopPadding(extraTopPadding: kToolbarHeight),
+                SliverList.builder(
+                  itemCount: _categoriesStore.categories.length,
+                  itemBuilder: (context, index) {
+                    if (index > _categoriesStore.categories.length - 10 &&
+                        _categoriesStore.hasMore) {
+                      _categoriesStore.getCategories();
+                    }
+                    return CategoryCard(
+                      key: ValueKey(_categoriesStore.categories[index].id),
+                      category: _categoriesStore.categories[index],
+                    );
+                  },
+                ),
+                const SliverBottomPadding(),
+              ],
             ),
           );
         },

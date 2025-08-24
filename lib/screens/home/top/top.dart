@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/home/top/categories/categories.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 
 class TopSection extends StatefulWidget {
   final HomeStore homeStore;
@@ -32,8 +31,6 @@ class _TopSectionState extends State<TopSection>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Stack(
       children: [
         Positioned.fill(
@@ -56,29 +53,21 @@ class _TopSectionState extends State<TopSection>
           top: 0,
           left: 0,
           right: 0,
-          child: ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-              child: Container(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top,
-                  left: MediaQuery.of(context).padding.left,
-                  right: MediaQuery.of(context).padding.right,
+          child: BlurredContainer(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: MediaQuery.of(context).padding.left,
+              right: MediaQuery.of(context).padding.right,
+            ),
+            child: TabBar(
+              isScrollable: true,
+              controller: _tabBarController,
+              tabs: const [
+                Tab(
+                  child: Text('Streams'),
                 ),
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
-                ),
-                child: TabBar(
-                  isScrollable: true,
-                  controller: _tabBarController,
-                  tabs: const [
-                    Tab(
-                      child: Text('Streams'),
-                    ),
-                    Tab(child: Text('Categories')),
-                  ],
-                ),
-              ),
+                Tab(child: Text('Categories')),
+              ],
             ),
           ),
         ),

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -7,8 +5,10 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/home/search/search_results_categories.dart';
 import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
+import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -26,6 +26,9 @@ class Search extends StatefulWidget {
   State<Search> createState() => _SearchState();
 }
 
+// Constants for consistent sizing
+const double _kSearchBarHeight = 80.0;
+
 class _SearchState extends State<Search> {
   late final _searchStore = SearchStore(
     authStore: context.read<AuthStore>(),
@@ -34,8 +37,6 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Stack(
       children: [
         // Content behind the search bar
@@ -46,10 +47,8 @@ class _SearchState extends State<Search> {
                 if (_searchStore.searchHistory.isEmpty) {
                   return Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top +
-                          80, // Search bar height only
-                      bottom: kBottomNavigationBarHeight +
-                          MediaQuery.of(context).padding.bottom,
+                      top: MediaQuery.of(context).padding.top + _kSearchBarHeight,
+                      bottom: MediaQuery.of(context).padding.bottom,
                     ),
                     child: const AlertMessage(
                       message: 'No recent searches',
@@ -63,10 +62,8 @@ class _SearchState extends State<Search> {
                   child: ListView(
                     controller: widget.scrollController,
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top +
-                          80, // Search bar height only
-                      bottom: kBottomNavigationBarHeight +
-                          MediaQuery.of(context).padding.bottom,
+                      top: MediaQuery.of(context).padding.top + _kSearchBarHeight,
+                      bottom: MediaQuery.of(context).padding.bottom,
                     ),
                     children: [
                       Padding(
@@ -114,13 +111,8 @@ class _SearchState extends State<Search> {
               return CustomScrollView(
                 controller: widget.scrollController,
                 slivers: [
-                  // Add padding for app bar and search bar
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).padding.top +
-                          80, // Search bar height only
-                    ),
-                  ),
+                  // Add padding for app bar and search bar  
+                  _SearchTopPadding(),
                   SliverToBoxAdapter(
                     child: Builder(
                       builder: (context) => SectionHeader(
@@ -154,11 +146,7 @@ class _SearchState extends State<Search> {
                   ),
                   SearchResultsCategories(searchStore: _searchStore),
                   // Add padding for bottom navigation bar
-                  SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).padding.bottom,
-                    ),
-                  ),
+                  const SliverBottomPadding(),
                 ],
               );
             },
@@ -169,52 +157,44 @@ class _SearchState extends State<Search> {
           top: 0,
           left: 0,
           right: 0,
-          child: ClipRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-              child: Container(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).padding.top,
-                  left: MediaQuery.of(context).padding.left,
-                  right: MediaQuery.of(context).padding.right,
-                ),
-                decoration: BoxDecoration(
-                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
-                ),
-                child: Observer(
-                  builder: (context) {
-                    return Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: TextField(
-                        controller: _searchStore.textEditingController,
-                        focusNode: _searchStore.textFieldFocusNode,
-                        autocorrect: false,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search_rounded),
-                          hintText: 'Find a channel or category',
-                          suffixIcon: _searchStore
-                                      .textFieldFocusNode.hasFocus ||
-                                  _searchStore.searchText.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.close_rounded),
-                                  tooltip: _searchStore.searchText.isEmpty
-                                      ? 'Cancel'
-                                      : 'Clear',
-                                  onPressed: () {
-                                    if (_searchStore.searchText.isEmpty) {
-                                      _searchStore.textFieldFocusNode.unfocus();
-                                    }
-                                    _searchStore.textEditingController.clear();
-                                  },
-                                )
-                              : null,
-                        ),
-                        onSubmitted: _searchStore.handleQuery,
-                      ),
-                    );
-                  },
-                ),
-              ),
+          child: BlurredContainer(
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: MediaQuery.of(context).padding.left,
+              right: MediaQuery.of(context).padding.right,
+            ),
+            child: Observer(
+              builder: (context) {
+                return Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextField(
+                    controller: _searchStore.textEditingController,
+                    focusNode: _searchStore.textFieldFocusNode,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search_rounded),
+                      hintText: 'Find a channel or category',
+                      suffixIcon: _searchStore
+                                  .textFieldFocusNode.hasFocus ||
+                              _searchStore.searchText.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.close_rounded),
+                              tooltip: _searchStore.searchText.isEmpty
+                                  ? 'Cancel'
+                                  : 'Clear',
+                              onPressed: () {
+                                if (_searchStore.searchText.isEmpty) {
+                                  _searchStore.textFieldFocusNode.unfocus();
+                                }
+                                _searchStore.textEditingController.clear();
+                              },
+                            )
+                          : null,
+                    ),
+                    onSubmitted: _searchStore.handleQuery,
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -226,5 +206,19 @@ class _SearchState extends State<Search> {
   void dispose() {
     _searchStore.dispose();
     super.dispose();
+  }
+}
+
+/// Helper widget for consistent top padding in search slivers
+class _SearchTopPadding extends StatelessWidget {
+  const _SearchTopPadding();
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: MediaQuery.of(context).padding.top + _kSearchBarHeight,
+      ),
+    );
   }
 }

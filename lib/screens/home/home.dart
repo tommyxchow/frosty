@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -12,6 +10,7 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -88,16 +87,8 @@ class _HomeState extends State<Home> {
               // Only show flexible space when on Following tab
               if (!isOnFollowingTab) return const SizedBox.shrink();
 
-              return ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color:
-                          theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ),
+              return const BlurredContainer(
+                child: SizedBox.expand(),
               );
             },
           ),
@@ -152,55 +143,47 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        bottomNavigationBar: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Observer(
-                    builder: (_) => NavigationBar(
-                      backgroundColor: Colors.transparent,
-                      surfaceTintColor: Colors.transparent,
-                      elevation: 0,
-                      destinations: [
-                        if (_authStore.isLoggedIn)
-                          const NavigationDestination(
-                            icon: Icon(
-                              Icons.favorite_border_rounded,
-                            ),
-                            selectedIcon: Icon(Icons.favorite_rounded),
-                            label: 'Following',
-                            tooltip: 'Following',
-                          ),
-                        const NavigationDestination(
-                          icon: Icon(
-                            Icons.arrow_upward_rounded,
-                          ),
-                          selectedIcon: Icon(Icons.arrow_upward_rounded),
-                          label: 'Top',
-                          tooltip: 'Top',
+        bottomNavigationBar: BlurredContainer(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Observer(
+                builder: (_) => NavigationBar(
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  destinations: [
+                    if (_authStore.isLoggedIn)
+                      const NavigationDestination(
+                        icon: Icon(
+                          Icons.favorite_border_rounded,
                         ),
-                        const NavigationDestination(
-                          icon: Icon(
-                            Icons.search_rounded,
-                          ),
-                          selectedIcon: Icon(Icons.search_rounded),
-                          label: 'Search',
-                          tooltip: 'Search',
-                        ),
-                      ],
-                      selectedIndex: _homeStore.selectedIndex,
-                      onDestinationSelected: _homeStore.handleTap,
+                        selectedIcon: Icon(Icons.favorite_rounded),
+                        label: 'Following',
+                        tooltip: 'Following',
+                      ),
+                    const NavigationDestination(
+                      icon: Icon(
+                        Icons.arrow_upward_rounded,
+                      ),
+                      selectedIcon: Icon(Icons.arrow_upward_rounded),
+                      label: 'Top',
+                      tooltip: 'Top',
                     ),
-                  ),
-                ],
+                    const NavigationDestination(
+                      icon: Icon(
+                        Icons.search_rounded,
+                      ),
+                      selectedIcon: Icon(Icons.search_rounded),
+                      label: 'Search',
+                      tooltip: 'Search',
+                    ),
+                  ],
+                  selectedIndex: _homeStore.selectedIndex,
+                  onDestinationSelected: _homeStore.handleTap,
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
