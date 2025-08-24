@@ -1,9 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:frosty/services/shared_timer_service.dart';
 
 /// A widget that displays a timer representing the time since the given start time.
-/// The timer is updated every second.
+/// Uses a shared timer service to keep all uptime displays synchronized.
 class Uptime extends StatefulWidget {
   final String startTime;
   final TextStyle? style;
@@ -19,19 +18,25 @@ class Uptime extends StatefulWidget {
 }
 
 class _UptimeState extends State<Uptime> {
-  Timer? _timer;
+  late final SharedTimerService _timerService;
 
   @override
   void initState() {
     super.initState();
-    _timer =
-        Timer.periodic(const Duration(seconds: 1), (timer) => setState(() {}));
+    _timerService = SharedTimerService.instance;
+    _timerService.addListener(_onTick);
+  }
+
+  void _onTick() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      DateTime.now()
+      _timerService.currentTime
           .difference(DateTime.parse(widget.startTime))
           .toString()
           .split('.')[0],
@@ -42,7 +47,7 @@ class _UptimeState extends State<Uptime> {
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _timerService.removeListener(_onTick);
     super.dispose();
   }
 }
