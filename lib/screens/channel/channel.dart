@@ -47,6 +47,12 @@ class _VideoChatState extends State<VideoChat> {
   final _videoKey = GlobalKey();
   final _chatKey = GlobalKey();
 
+  // PiP drag state
+  double _pipDragDistance = 0;
+  bool _isPipDragging = false;
+  static const double _pipTriggerDistance = 100;
+  static const double _pipMaxDragDistance = 150;
+
   late final ChatStore _chatStore = ChatStore(
     twitchApi: context.read<TwitchApi>(),
     channelName: widget.userLogin,
@@ -72,6 +78,45 @@ class _VideoChatState extends State<VideoChat> {
     authStore: context.read<AuthStore>(),
     settingsStore: context.read<SettingsStore>(),
   );
+
+  void _handlePipDragStart(DragStartDetails details) {
+    setState(() {
+      _isPipDragging = true;
+      _pipDragDistance = 0;
+    });
+  }
+
+  void _handlePipDragUpdate(DragUpdateDetails details) {
+    if (!_isPipDragging) return;
+
+    setState(() {
+      _pipDragDistance += details.delta.dy;
+      _pipDragDistance = _pipDragDistance.clamp(0, _pipMaxDragDistance);
+    });
+  }
+
+  void _handlePipDragEnd(DragEndDetails details) {
+    if (!_isPipDragging) return;
+
+    final shouldTriggerPip = _pipDragDistance >= _pipTriggerDistance;
+
+    if (shouldTriggerPip) {
+      _videoStore.requestPictureInPicture();
+    }
+
+    // Reset drag state
+    setState(() {
+      _isPipDragging = false;
+      _pipDragDistance = 0;
+    });
+  }
+
+  void _handlePipDragCancel() {
+    setState(() {
+      _isPipDragging = false;
+      _pipDragDistance = 0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -351,15 +396,41 @@ class _VideoChatState extends State<VideoChat> {
             overlays: SystemUiOverlay.values,
           );
           return SafeArea(
-            child: Column(
+            child: Stack(
               children: [
-                if (!settingsStore.showVideo)
-                  appBar
-                else ...[
-                  AspectRatio(aspectRatio: 16 / 9, child: video),
-                  const Divider(),
-                ],
-                Expanded(child: chat),
+                Column(
+                  children: [
+                    if (!settingsStore.showVideo)
+                      appBar
+                    else ...[
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Container(), // Placeholder for video space
+                      ),
+                      const Divider(),
+                    ],
+                    Expanded(child: chat),
+                  ],
+                ),
+                if (settingsStore.showVideo)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Transform.translate(
+                      offset: Offset(0, _pipDragDistance),
+                      child: GestureDetector(
+                        onPanStart: _handlePipDragStart,
+                        onPanUpdate: _handlePipDragUpdate,
+                        onPanEnd: _handlePipDragEnd,
+                        onPanCancel: _handlePipDragCancel,
+                        child: AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: video,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           );
