@@ -40,9 +40,6 @@ class FrostyThemes {
         elevation: 0,
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
-        shape: Border(
-          bottom: BorderSide(color: borderColor, width: borderWidth),
-        ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),

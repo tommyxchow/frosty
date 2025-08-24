@@ -107,26 +107,41 @@ class SkeletonText extends StatelessWidget {
 
 /// A skeleton loader for channel list items
 class ChannelSkeletonLoader extends StatelessWidget {
-  const ChannelSkeletonLoader({super.key});
+  final bool showSubtitle;
+  final int index;
+
+  const ChannelSkeletonLoader({
+    super.key,
+    this.showSubtitle = true,
+    this.index = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Show subtitle for first 3-4 items (simulating live channels at top)
+    // then single line for the rest
+    final shouldShowSubtitle = showSubtitle && index < 4;
+
     return ListTile(
+      dense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: const SkeletonLoader(
         width: 32,
         height: 32,
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
       title: SkeletonText(
-        height: 18,
-        minWidth: 80,
-        maxWidth: 160,
+        height: 16,
+        minWidth: 60,
+        maxWidth: 140,
       ),
-      subtitle: SkeletonText(
-        height: 14,
-        minWidth: 40,
-        maxWidth: 100,
-      ),
+      subtitle: shouldShowSubtitle
+          ? SkeletonText(
+              height: 14,
+              minWidth: 30,
+              maxWidth: 80,
+            )
+          : null,
     );
   }
 }
@@ -138,7 +153,12 @@ class CategorySkeletonLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: 8,
+        left: 16 + MediaQuery.of(context).padding.left,
+        right: 16 + MediaQuery.of(context).padding.right,
+      ),
       child: Row(
         children: [
           // Category box art skeleton (3:4 aspect ratio, 80px wide)
@@ -152,12 +172,12 @@ class CategorySkeletonLoader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          // Category name skeleton with random width
-          Expanded(
+          // Category name skeleton with random width (matches bodyLarge text)
+          Flexible(
             child: SkeletonText(
-              height: 20,
-              minWidth: 100,
-              maxWidth: 200,
+              height: 18,
+              minWidth: 80,
+              maxWidth: 180,
             ),
           ),
         ],
@@ -169,10 +189,12 @@ class CategorySkeletonLoader extends StatelessWidget {
 /// A skeleton loader for stream cards with thumbnail
 class StreamCardSkeletonLoader extends StatelessWidget {
   final bool showThumbnail;
+  final bool showCategory;
 
   const StreamCardSkeletonLoader({
     super.key,
     this.showThumbnail = true,
+    this.showCategory = true,
   });
 
   @override
@@ -228,13 +250,15 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                     minWidth: 100,
                     maxWidth: 200,
                   ),
-                  const SizedBox(height: 4),
-                  // Category skeleton with random width
-                  SkeletonText(
-                    height: 14,
-                    minWidth: 60,
-                    maxWidth: 120,
-                  ),
+                  if (showCategory) ...[
+                    const SizedBox(height: 4),
+                    // Category skeleton with random width
+                    SkeletonText(
+                      height: 14,
+                      minWidth: 60,
+                      maxWidth: 120,
+                    ),
+                  ],
                   const SizedBox(height: 4),
                   // Viewer count skeleton with random width
                   SkeletonText(
@@ -254,7 +278,12 @@ class StreamCardSkeletonLoader extends StatelessWidget {
 
 /// A skeleton loader for large stream cards (grid layout)
 class LargeStreamCardSkeletonLoader extends StatelessWidget {
-  const LargeStreamCardSkeletonLoader({super.key});
+  final bool showCategory;
+
+  const LargeStreamCardSkeletonLoader({
+    super.key,
+    this.showCategory = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -300,13 +329,15 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
                       minWidth: 120,
                       maxWidth: 200,
                     ),
-                    const SizedBox(height: 4),
-                    // Category skeleton with random width
-                    SkeletonText(
-                      height: 14,
-                      minWidth: 70,
-                      maxWidth: 130,
-                    ),
+                    if (showCategory) ...[
+                      const SizedBox(height: 4),
+                      // Category skeleton with random width
+                      SkeletonText(
+                        height: 14,
+                        minWidth: 70,
+                        maxWidth: 130,
+                      ),
+                    ],
                   ],
                 ),
               ),

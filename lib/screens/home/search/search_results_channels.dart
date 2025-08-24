@@ -82,8 +82,10 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
         switch (future.status) {
           case FutureStatus.pending:
             return SliverList.builder(
-              itemCount: 6,
-              itemBuilder: (context, index) => const ChannelSkeletonLoader(),
+              itemCount: 8,
+              itemBuilder: (context, index) => ChannelSkeletonLoader(
+                index: index,
+              ),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(

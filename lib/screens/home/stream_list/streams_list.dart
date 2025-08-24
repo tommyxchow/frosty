@@ -5,11 +5,9 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/home/stream_list/large_stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
-import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
@@ -89,7 +87,16 @@ class _StreamsListState extends State<StreamsList>
 
     _listStore.checkLastTimeRefreshedAndUpdate();
 
+    final extraTopPadding = widget.listType == ListType.top
+        ? kToolbarHeight
+        : widget.listType == ListType.category
+            ? kToolbarHeight + 122
+            : 0.0;
+
+    final topPadding = MediaQuery.of(context).padding.top + extraTopPadding;
+
     return RefreshIndicator.adaptive(
+      edgeOffset: topPadding,
       onRefresh: () async {
         HapticFeedback.lightImpact();
 
@@ -127,18 +134,24 @@ class _StreamsListState extends State<StreamsList>
 
               return CustomScrollView(
                 slivers: [
+                  // Add padding for app bar
+                  SliverTopPadding(extraTopPadding: extraTopPadding),
                   SliverList.builder(
                     itemCount: 8,
                     itemBuilder: (context, index) {
                       if (isLargeCard) {
-                        return const LargeStreamCardSkeletonLoader();
+                        return LargeStreamCardSkeletonLoader(
+                          showCategory: widget.listType != ListType.category,
+                        );
                       } else {
                         return StreamCardSkeletonLoader(
                           showThumbnail: settingsStore.showThumbnails,
+                          showCategory: widget.listType != ListType.category,
                         );
                       }
                     },
                   ),
+                  SliverBottomPadding(),
                 ],
               );
             } else {
@@ -179,16 +192,6 @@ class _StreamsListState extends State<StreamsList>
             children: [
               Column(
                 children: [
-                  if (widget.categoryId != null &&
-                      _listStore.categoryDetails != null)
-                    CategoryCard(
-                      category: _listStore.categoryDetails!,
-                      isTappable: false,
-                    ),
-                  if (_listStore.scrollController != null)
-                    AnimatedScrollBorder(
-                      scrollController: _listStore.scrollController!,
-                    ),
                   Expanded(
                     child: Scrollbar(
                       controller: _listStore.scrollController,
@@ -196,17 +199,22 @@ class _StreamsListState extends State<StreamsList>
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: _listStore.scrollController,
                         slivers: [
+                          SliverTopPadding(
+                            extraTopPadding: extraTopPadding,
+                          ),
                           if (isFollowingTab &&
                               _listStore.pinnedStreams.isNotEmpty) ...[
-                            const SliverToBoxAdapter(
-                              child: SectionHeader(
-                                'Pinned',
-                                isFirst: true,
-                                padding: EdgeInsets.fromLTRB(
-                                  16,
-                                  12,
-                                  16,
-                                  8,
+                            SliverToBoxAdapter(
+                              child: Builder(
+                                builder: (context) => SectionHeader(
+                                  'Pinned',
+                                  isFirst: true,
+                                  padding: EdgeInsets.fromLTRB(
+                                    16 + MediaQuery.of(context).padding.left,
+                                    12,
+                                    16 + MediaQuery.of(context).padding.right,
+                                    8,
+                                  ),
                                 ),
                               ),
                             ),
@@ -250,15 +258,17 @@ class _StreamsListState extends State<StreamsList>
                                 );
                               },
                             ),
-                            const SliverToBoxAdapter(
-                              child: SectionHeader(
-                                'All',
-                                isFirst: true,
-                                padding: EdgeInsets.fromLTRB(
-                                  16,
-                                  8,
-                                  16,
-                                  8,
+                            SliverToBoxAdapter(
+                              child: Builder(
+                                builder: (context) => SectionHeader(
+                                  'All',
+                                  isFirst: true,
+                                  padding: EdgeInsets.fromLTRB(
+                                    16 + MediaQuery.of(context).padding.left,
+                                    8,
+                                    16 + MediaQuery.of(context).padding.right,
+                                    8,
+                                  ),
                                 ),
                               ),
                             ),
@@ -298,6 +308,8 @@ class _StreamsListState extends State<StreamsList>
                               );
                             },
                           ),
+                          // Add padding for bottom navigation bar
+                          const SliverBottomPadding(),
                         ],
                       ),
                     ),
@@ -320,6 +332,41 @@ class _StreamsListState extends State<StreamsList>
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// Helper widget for consistent top padding in sliver lists
+class SliverTopPadding extends StatelessWidget {
+  final double extraTopPadding;
+
+  const SliverTopPadding({
+    super.key,
+    this.extraTopPadding = 0.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: MediaQuery.of(context).padding.top + extraTopPadding,
+      ),
+    );
+  }
+}
+
+/// Helper widget for consistent bottom padding in sliver lists
+class SliverBottomPadding extends StatelessWidget {
+  const SliverBottomPadding({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: SizedBox(
+        height: MediaQuery.of(context).padding.bottom,
       ),
     );
   }

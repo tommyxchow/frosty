@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
@@ -30,20 +32,11 @@ class _TopSectionState extends State<TopSection>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final theme = Theme.of(context);
+
+    return Stack(
       children: [
-        TabBar(
-          isScrollable: true,
-          controller: _tabBarController,
-          tabs: const [
-            Tab(
-              child: Text('Streams'),
-            ),
-            Tab(child: Text('Categories')),
-          ],
-        ),
-        Expanded(
+        Positioned.fill(
           child: TabBarView(
             controller: _tabBarController,
             children: [
@@ -57,6 +50,36 @@ class _TopSectionState extends State<TopSection>
                     widget.homeStore.topSectionScrollControllers[1],
               ),
             ],
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top,
+                  left: MediaQuery.of(context).padding.left,
+                  right: MediaQuery.of(context).padding.right,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
+                ),
+                child: TabBar(
+                  isScrollable: true,
+                  controller: _tabBarController,
+                  tabs: const [
+                    Tab(
+                      child: Text('Streams'),
+                    ),
+                    Tab(child: Text('Categories')),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ],

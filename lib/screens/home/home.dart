@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -59,13 +61,46 @@ class _HomeState extends State<Home> {
     SystemChrome.setPreferredOrientations([]);
 
     final isLoggedIn = _authStore.isLoggedIn && _authStore.user.details != null;
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        extendBody: true,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           centerTitle: false,
-          shape: const Border(),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: theme.brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+          ),
+          flexibleSpace: Observer(
+            builder: (_) {
+              // Only show flexible space on Following tab
+              final isOnFollowingTab = isLoggedIn && _homeStore.selectedIndex == 0;
+
+              // Only show flexible space when on Following tab
+              if (!isOnFollowingTab) return const SizedBox.shrink();
+
+              return ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color:
+                          theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
           title: Observer(
             builder: (_) {
               final titles = [
@@ -99,64 +134,74 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-        body: SafeArea(
-          child: Observer(
-            builder: (_) => IndexedStack(
-              index: _homeStore.selectedIndex,
-              children: [
-                if (_authStore.isLoggedIn)
-                  StreamsList(
-                    listType: ListType.followed,
-                    scrollController: _homeStore.followedScrollController,
-                  ),
-                TopSection(
-                  homeStore: _homeStore,
+        body: Observer(
+          builder: (_) => IndexedStack(
+            index: _homeStore.selectedIndex,
+            children: [
+              if (_authStore.isLoggedIn)
+                StreamsList(
+                  listType: ListType.followed,
+                  scrollController: _homeStore.followedScrollController,
                 ),
-                Search(
-                  scrollController: _homeStore.searchScrollController,
-                ),
-              ],
-            ),
+              TopSection(
+                homeStore: _homeStore,
+              ),
+              Search(
+                scrollController: _homeStore.searchScrollController,
+              ),
+            ],
           ),
         ),
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Divider(),
-            Observer(
-              builder: (_) => NavigationBar(
-                destinations: [
-                  if (_authStore.isLoggedIn)
-                    const NavigationDestination(
-                      icon: Icon(
-                        Icons.favorite_border_rounded,
-                      ),
-                      selectedIcon: Icon(Icons.favorite_rounded),
-                      label: 'Following',
-                      tooltip: 'Following',
+        bottomNavigationBar: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Observer(
+                    builder: (_) => NavigationBar(
+                      backgroundColor: Colors.transparent,
+                      surfaceTintColor: Colors.transparent,
+                      elevation: 0,
+                      destinations: [
+                        if (_authStore.isLoggedIn)
+                          const NavigationDestination(
+                            icon: Icon(
+                              Icons.favorite_border_rounded,
+                            ),
+                            selectedIcon: Icon(Icons.favorite_rounded),
+                            label: 'Following',
+                            tooltip: 'Following',
+                          ),
+                        const NavigationDestination(
+                          icon: Icon(
+                            Icons.arrow_upward_rounded,
+                          ),
+                          selectedIcon: Icon(Icons.arrow_upward_rounded),
+                          label: 'Top',
+                          tooltip: 'Top',
+                        ),
+                        const NavigationDestination(
+                          icon: Icon(
+                            Icons.search_rounded,
+                          ),
+                          selectedIcon: Icon(Icons.search_rounded),
+                          label: 'Search',
+                          tooltip: 'Search',
+                        ),
+                      ],
+                      selectedIndex: _homeStore.selectedIndex,
+                      onDestinationSelected: _homeStore.handleTap,
                     ),
-                  const NavigationDestination(
-                    icon: Icon(
-                      Icons.arrow_upward_rounded,
-                    ),
-                    selectedIcon: Icon(Icons.arrow_upward_rounded),
-                    label: 'Top',
-                    tooltip: 'Top',
-                  ),
-                  const NavigationDestination(
-                    icon: Icon(
-                      Icons.search_rounded,
-                    ),
-                    selectedIcon: Icon(Icons.search_rounded),
-                    label: 'Search',
-                    tooltip: 'Search',
                   ),
                 ],
-                selectedIndex: _homeStore.selectedIndex,
-                onDestinationSelected: _homeStore.handleTap,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -164,9 +164,11 @@ class LargeStreamCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: showThumbnail ? 12 : 4,
-          horizontal: 16,
+        padding: EdgeInsets.only(
+          top: showThumbnail ? 12 : 4,
+          bottom: showThumbnail ? 12 : 4,
+          left: 16 + MediaQuery.of(context).padding.left,
+          right: 16 + MediaQuery.of(context).padding.right,
         ),
         child: Column(
           children: [

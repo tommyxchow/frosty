@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -7,7 +9,6 @@ import 'package:frosty/screens/home/search/search_results_channels.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -33,59 +34,46 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final theme = Theme.of(context);
+
+    return Stack(
       children: [
-        Observer(
-          builder: (context) {
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchStore.textEditingController,
-                focusNode: _searchStore.textFieldFocusNode,
-                autocorrect: false,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search_rounded),
-                  hintText: 'Find a channel or category',
-                  suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
-                          _searchStore.searchText.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.close_rounded),
-                          tooltip: _searchStore.searchText.isEmpty
-                              ? 'Cancel'
-                              : 'Clear',
-                          onPressed: () {
-                            if (_searchStore.searchText.isEmpty) {
-                              _searchStore.textFieldFocusNode.unfocus();
-                            }
-                            _searchStore.textEditingController.clear();
-                          },
-                        )
-                      : null,
-                ),
-                onSubmitted: _searchStore.handleQuery,
-              ),
-            );
-          },
-        ),
-        AnimatedScrollBorder(scrollController: widget.scrollController),
-        Expanded(
-          child: Scrollbar(
-            controller: widget.scrollController,
-            child: Observer(
-              builder: (context) {
-                if (_searchStore.textEditingController.text.isEmpty) {
-                  if (_searchStore.searchHistory.isEmpty) {
-                    return const AlertMessage(
+        // Content behind the search bar
+        Positioned.fill(
+          child: Observer(
+            builder: (context) {
+              if (_searchStore.textEditingController.text.isEmpty) {
+                if (_searchStore.searchHistory.isEmpty) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top +
+                          80, // Search bar height only
+                      bottom: kBottomNavigationBarHeight +
+                          MediaQuery.of(context).padding.bottom,
+                    ),
+                    child: const AlertMessage(
                       message: 'No recent searches',
                       vertical: true,
-                    );
-                  }
+                    ),
+                  );
+                }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                return Scrollbar(
+                  controller: widget.scrollController,
+                  child: ListView(
+                    controller: widget.scrollController,
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top +
+                          80, // Search bar height only
+                      bottom: kBottomNavigationBarHeight +
+                          MediaQuery.of(context).padding.bottom,
+                    ),
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 4),
+                        padding: EdgeInsets.only(
+                          left: 16 + MediaQuery.of(context).padding.left,
+                          right: 4 + MediaQuery.of(context).padding.right,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -101,57 +89,132 @@ class _SearchState extends State<Search> {
                           ],
                         ),
                       ),
-                      Expanded(
-                        child: ListView(
-                          controller: widget.scrollController,
-                          children: _searchStore.searchHistory
-                              .mapIndexed(
-                                (index, searchTerm) => ListTile(
-                                  leading: const Icon(Icons.history_rounded),
-                                  title: Text(searchTerm),
-                                  onTap: () {
-                                    _searchStore.textEditingController.text =
-                                        searchTerm;
-                                    _searchStore.handleQuery(searchTerm);
-                                    _searchStore.textEditingController
-                                        .selection = TextSelection.fromPosition(
-                                      TextPosition(
-                                        offset: _searchStore
-                                            .textEditingController.text.length,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              )
-                              .toList(),
+                      ..._searchStore.searchHistory.mapIndexed(
+                        (index, searchTerm) => ListTile(
+                          leading: const Icon(Icons.history_rounded),
+                          title: Text(searchTerm),
+                          onTap: () {
+                            _searchStore.textEditingController.text =
+                                searchTerm;
+                            _searchStore.handleQuery(searchTerm);
+                            _searchStore.textEditingController.selection =
+                                TextSelection.fromPosition(
+                              TextPosition(
+                                offset: _searchStore
+                                    .textEditingController.text.length,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
-                  );
-                }
-                return CustomScrollView(
-                  controller: widget.scrollController,
-                  slivers: [
-                    const SliverToBoxAdapter(
-                      child: SectionHeader(
+                  ),
+                );
+              }
+              return CustomScrollView(
+                controller: widget.scrollController,
+                slivers: [
+                  // Add padding for app bar and search bar
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).padding.top +
+                          80, // Search bar height only
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Builder(
+                      builder: (context) => SectionHeader(
                         'Channels',
                         isFirst: true,
-                        padding: EdgeInsets.fromLTRB(16, 12, 16, 8),
+                        padding: EdgeInsets.fromLTRB(
+                          16 + MediaQuery.of(context).padding.left,
+                          12,
+                          16 + MediaQuery.of(context).padding.right,
+                          8,
+                        ),
                       ),
                     ),
-                    SearchResultsChannels(
-                      searchStore: _searchStore,
-                      query: _searchStore.searchText,
-                    ),
-                    const SliverToBoxAdapter(
-                      child: SectionHeader(
+                  ),
+                  SearchResultsChannels(
+                    searchStore: _searchStore,
+                    query: _searchStore.searchText,
+                  ),
+                  SliverToBoxAdapter(
+                    child: Builder(
+                      builder: (context) => SectionHeader(
                         'Categories',
+                        padding: EdgeInsets.fromLTRB(
+                          16 + MediaQuery.of(context).padding.left,
+                          8,
+                          16 + MediaQuery.of(context).padding.right,
+                          8,
+                        ),
                       ),
                     ),
-                    SearchResultsCategories(searchStore: _searchStore),
-                  ],
-                );
-              },
+                  ),
+                  SearchResultsCategories(searchStore: _searchStore),
+                  // Add padding for bottom navigation bar
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).padding.bottom,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        // Blurred search bar on top
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: Container(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top,
+                  left: MediaQuery.of(context).padding.left,
+                  right: MediaQuery.of(context).padding.right,
+                ),
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
+                ),
+                child: Observer(
+                  builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: _searchStore.textEditingController,
+                        focusNode: _searchStore.textFieldFocusNode,
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          hintText: 'Find a channel or category',
+                          suffixIcon: _searchStore
+                                      .textFieldFocusNode.hasFocus ||
+                                  _searchStore.searchText.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.close_rounded),
+                                  tooltip: _searchStore.searchText.isEmpty
+                                      ? 'Cancel'
+                                      : 'Clear',
+                                  onPressed: () {
+                                    if (_searchStore.searchText.isEmpty) {
+                                      _searchStore.textFieldFocusNode.unfocus();
+                                    }
+                                    _searchStore.textEditingController.clear();
+                                  },
+                                )
+                              : null,
+                        ),
+                        onSubmitted: _searchStore.handleQuery,
+                      ),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ),

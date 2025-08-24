@@ -35,7 +35,12 @@ class CategoryCard extends StatelessWidget {
               )
           : null,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.only(
+          top: 8,
+          bottom: 8,
+          left: 16 + MediaQuery.of(context).padding.left,
+          right: 16 + MediaQuery.of(context).padding.right,
+        ),
         child: Row(
           children: [
             SizedBox(

@@ -6,7 +6,6 @@ import 'package:frosty/screens/home/top/categories/categories_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +52,10 @@ class _CategoriesState extends State<Categories>
 
     _categoriesStore.checkLastTimeRefreshedAndUpdate();
 
+    final topPadding = MediaQuery.of(context).padding.top + kToolbarHeight;
+
     return RefreshIndicator.adaptive(
+      edgeOffset: topPadding,
       onRefresh: () async {
         HapticFeedback.lightImpact();
         await _categoriesStore.refreshCategories();
@@ -85,21 +87,19 @@ class _CategoriesState extends State<Categories>
           if (_categoriesStore.categories.isEmpty) {
             if (_categoriesStore.isLoading && _categoriesStore.error == null) {
               // Show skeleton loaders while loading
-              return Column(
-                children: [
-                  AnimatedScrollBorder(
-                    scrollController: widget.scrollController,
+              return Scrollbar(
+                controller: widget.scrollController,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: widget.scrollController,
+                  padding: EdgeInsets.only(
+                    top: topPadding,
+                    bottom: MediaQuery.of(context).padding.bottom,
                   ),
-                  Expanded(
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: widget.scrollController,
-                      itemCount: 8,
-                      itemBuilder: (context, index) =>
-                          const CategorySkeletonLoader(),
-                    ),
-                  ),
-                ],
+                  itemCount: 10,
+                  itemBuilder: (context, index) =>
+                      const CategorySkeletonLoader(),
+                ),
               );
             } else {
               statusWidget = const AlertMessage(
@@ -121,32 +121,27 @@ class _CategoriesState extends State<Categories>
             );
           }
 
-          return Column(
-            children: [
-              AnimatedScrollBorder(
-                scrollController: widget.scrollController,
+          return Scrollbar(
+            controller: widget.scrollController,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              controller: widget.scrollController,
+              padding: EdgeInsets.only(
+                top: topPadding,
+                bottom: MediaQuery.of(context).padding.bottom,
               ),
-              Expanded(
-                child: Scrollbar(
-                  controller: widget.scrollController,
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    controller: widget.scrollController,
-                    itemCount: _categoriesStore.categories.length,
-                    itemBuilder: (context, index) {
-                      if (index > _categoriesStore.categories.length - 10 &&
-                          _categoriesStore.hasMore) {
-                        _categoriesStore.getCategories();
-                      }
-                      return CategoryCard(
-                        key: ValueKey(_categoriesStore.categories[index].id),
-                        category: _categoriesStore.categories[index],
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
+              itemCount: _categoriesStore.categories.length,
+              itemBuilder: (context, index) {
+                if (index > _categoriesStore.categories.length - 10 &&
+                    _categoriesStore.hasMore) {
+                  _categoriesStore.getCategories();
+                }
+                return CategoryCard(
+                  key: ValueKey(_categoriesStore.categories[index].id),
+                  category: _categoriesStore.categories[index],
+                );
+              },
+            ),
           );
         },
       ),

@@ -223,9 +223,11 @@ class StreamCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: showThumbnail ? 16 : 4,
+        padding: EdgeInsets.only(
+          top: 8,
+          bottom: 8,
+          left: showThumbnail ? 16 + MediaQuery.of(context).padding.left : 4 + MediaQuery.of(context).padding.left,
+          right: showThumbnail ? 16 + MediaQuery.of(context).padding.right : 4 + MediaQuery.of(context).padding.right,
         ),
         child: Row(
           children: [

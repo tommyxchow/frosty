@@ -27,7 +27,7 @@ class SearchResultsCategories extends StatelessWidget {
         switch (future.status) {
           case FutureStatus.pending:
             return SliverList.builder(
-              itemCount: 4,
+              itemCount: 8,
               itemBuilder: (context, index) => const CategorySkeletonLoader(),
             );
           case FutureStatus.rejected:
