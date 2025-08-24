@@ -90,10 +90,18 @@ abstract class VideoStoreBase with Store {
             _paused = false;
             if (Platform.isAndroid) pip.setIsPlaying(true);
             videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].muted = false;',
-            );
-            videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].volume = 1.0;',
+              '''
+              (function() {
+                const video = document.getElementsByTagName("video")[0];
+                if (video) {
+                  video.muted = false;
+                  video.volume = 1.0;
+                  if (video.textTracks && video.textTracks.length > 0) {
+                    video.textTracks[0].mode = "hidden";
+                  }
+                }
+              })();
+              ''',
             );
           },
         )
@@ -101,10 +109,14 @@ abstract class VideoStoreBase with Store {
           NavigationDelegate(
             onPageFinished: (url) async {
               if (url != videoUrl) return;
-              final injected =
-                  (await videoWebViewController.runJavaScriptReturningResult(
+              // Safe evaluation of JavaScript boolean result
+              final result =
+                  await videoWebViewController.runJavaScriptReturningResult(
                 'window._injected ? true : false',
-              )) as bool;
+              );
+              final injected = result is bool
+                  ? result
+                  : (result.toString().toLowerCase() == 'true');
               if (injected) return;
               await videoWebViewController
                   .runJavaScript('window._injected = true;');
@@ -367,15 +379,21 @@ abstract class VideoStoreBase with Store {
             const videoElement = await _asyncQuerySelector("video");
             videoElement.addEventListener("pause", () => {
               VideoPause.postMessage("video paused");
-              videoElement.textTracks[0].mode = "hidden";
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
             });
             videoElement.addEventListener("playing", () => {
               VideoPlaying.postMessage("video playing");
-              videoElement.textTracks[0].mode = "hidden";
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
             });
             if (!videoElement.paused) {
               VideoPlaying.postMessage("video playing");
-              videoElement.textTracks[0].mode = "hidden";
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
             }
           });
         ''');

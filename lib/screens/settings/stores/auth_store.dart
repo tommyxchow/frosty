@@ -92,34 +92,43 @@ abstract class AuthBase with Store {
         NavigationDelegate(
           onNavigationRequest: (request) =>
               handleNavigation(request: request, routeAfter: routeAfter),
-          onPageFinished: (_) => webViewController.runJavaScript(
-            '''
-            {
-              function modifyElement(element) {
-                element.style.maxHeight = '20vh';
-                element.style.overflow = 'auto';
-              }
-
-              const observer = new MutationObserver((mutations) => {
-                for (let mutation of mutations) {
-                  if (mutation.type === 'childList') {
-                    const element = document.querySelector('.fAVISI');
-                    if (element) {
-                      modifyElement(element);
-                      observer.disconnect();
-                      break;
-                    }
+          onWebResourceError: (error) {
+            debugPrint('Auth WebView error: ${error.description}');
+          },
+          onPageFinished: (_) async {
+            try {
+              await webViewController.runJavaScript(
+                '''
+                {
+                  function modifyElement(element) {
+                    element.style.maxHeight = '20vh';
+                    element.style.overflow = 'auto';
                   }
-                }
-              });
 
-              observer.observe(document.body, {
-                childList: true,
-                subtree: true
-              });
+                  const observer = new MutationObserver((mutations) => {
+                    for (let mutation of mutations) {
+                      if (mutation.type === 'childList') {
+                        const element = document.querySelector('.fAVISI');
+                        if (element) {
+                          modifyElement(element);
+                          observer.disconnect();
+                          break;
+                        }
+                      }
+                    }
+                  });
+
+                  observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                  });
+                }
+                ''',
+              );
+            } catch (e) {
+              debugPrint('Auth WebView JavaScript error: $e');
             }
-            ''',
-          ),
+          },
         ),
       )
       ..loadRequest(
