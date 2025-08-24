@@ -18,7 +18,13 @@ class SearchResultsCategories extends StatelessWidget {
       builder: (context) {
         final future = searchStore.categoryFuture;
 
-        switch (future!.status) {
+        if (future == null) {
+          return const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          );
+        }
+
+        switch (future.status) {
           case FutureStatus.pending:
             return const SliverToBoxAdapter(
               child: SizedBox(

@@ -74,7 +74,13 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
       builder: (context) {
         final future = widget.searchStore.channelFuture;
 
-        switch (future!.status) {
+        if (future == null) {
+          return const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          );
+        }
+
+        switch (future.status) {
           case FutureStatus.pending:
             return const SliverToBoxAdapter(
               child: LoadingIndicator(
