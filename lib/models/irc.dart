@@ -154,6 +154,7 @@ class IRCMessage {
     List<InlineSpan> span,
     double badgeSize,
     Map<String, UserTwitch>? channelIdToUserTwitch,
+    String? currentChannelId,
   ) {
     final isHistorical = tags['historical'] == '1';
     if (isHistorical) {
@@ -174,13 +175,17 @@ class IRCMessage {
     final sourceChannelId = tags['source-room-id'] ?? tags['room-id'];
     final sourceChannelUser = channelIdToUserTwitch?[sourceChannelId];
     if (sourceChannelUser != null) {
+      final isCurrentChannel = sourceChannelId == currentChannelId;
+
       span.add(
         WidgetSpan(
           alignment: PlaceholderAlignment.middle,
           child: Tooltip(
             triggerMode: TooltipTriggerMode.tap,
             preferBelow: false,
-            message: 'Sent from ${sourceChannelUser.displayName}',
+            message: isCurrentChannel
+                ? 'Sent from ${sourceChannelUser.displayName} (current channel)'
+                : 'Sent from ${sourceChannelUser.displayName}',
             child: CachedNetworkImage(
               cacheManager: CustomCacheManager.instance,
               imageUrl: sourceChannelUser.profileImageUrl,
@@ -191,6 +196,11 @@ class IRCMessage {
                   shape: BoxShape.circle,
                   image:
                       DecorationImage(image: imageProvider, fit: BoxFit.cover),
+                  border: isCurrentChannel
+                      ? Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
                 ),
               ),
               placeholder: (context, url) => Container(
@@ -199,6 +209,11 @@ class IRCMessage {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.grey,
+                  border: isCurrentChannel
+                      ? Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -621,6 +636,7 @@ class IRCMessage {
     bool useReadableColors = false,
     Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
+    String? currentChannelId,
   }) {
     final emoteToObject = assetsStore.emoteToObject;
     final badgeSize = defaultBadgeSize * badgeScale;
@@ -630,7 +646,12 @@ class IRCMessage {
     final span = <InlineSpan>[];
 
     _addTimestamp(span, style, timestamp);
-    _addHistoricalAndChannelBadges(span, badgeSize, channelIdToUserTwitch);
+    _addHistoricalAndChannelBadges(
+      span,
+      badgeSize,
+      channelIdToUserTwitch,
+      currentChannelId,
+    );
 
     final isHistorical = tags['historical'] == '1';
     _addUserBadges(

@@ -90,6 +90,7 @@ class ChatBottomBar extends StatelessWidget {
                         useReadableColors: chatStore.settings.useReadableColors,
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
+                        currentChannelId: chatStore.channelId,
                       ),
                     ),
                     maxLines: 3,

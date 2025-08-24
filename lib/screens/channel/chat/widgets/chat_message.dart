@@ -108,6 +108,7 @@ class ChatMessage extends StatelessWidget {
                   timestamp: chatStore.settings.timestampType,
                   channelIdToUserTwitch:
                       chatStore.assetsStore.channelIdToUserTwitch,
+                  currentChannelId: chatStore.channelId,
                 ),
                 style: defaultTextStyle,
               ),
@@ -187,6 +188,7 @@ class ChatMessage extends StatelessWidget {
                   timestamp: chatStore.settings.timestampType,
                   channelIdToUserTwitch:
                       chatStore.assetsStore.channelIdToUserTwitch,
+                  currentChannelId: chatStore.channelId,
                 ),
               ),
             );
@@ -320,6 +322,7 @@ class ChatMessage extends StatelessWidget {
                         timestamp: chatStore.settings.timestampType,
                         channelIdToUserTwitch:
                             chatStore.assetsStore.channelIdToUserTwitch,
+                        currentChannelId: chatStore.channelId,
                       ),
                     ),
                   ),
@@ -415,6 +418,7 @@ class ChatMessage extends StatelessWidget {
                           timestamp: chatStore.settings.timestampType,
                           channelIdToUserTwitch:
                               chatStore.assetsStore.channelIdToUserTwitch,
+                          currentChannelId: chatStore.channelId,
                         ),
                       ),
                     ),
