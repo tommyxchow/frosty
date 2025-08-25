@@ -7,24 +7,30 @@ class FrostyThemes {
 
   const FrostyThemes({required this.colorSchemeSeed});
 
+  ThemeData get light => createBaseTheme(
+        colorScheme: ColorScheme.fromSeed(seedColor: colorSchemeSeed),
+        backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
+      );
+
+  ThemeData get dark => createBaseTheme(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: colorSchemeSeed,
+          brightness: Brightness.dark,
+        ),
+        backgroundColor: Colors.black,
+      );
+
   ThemeData createBaseTheme({
-    required Brightness brightness,
-    required Color colorSchemeSeed,
+    required ColorScheme colorScheme,
     Color? backgroundColor,
   }) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: colorSchemeSeed,
-      brightness: brightness,
-    );
-
     final borderColor = colorScheme.outlineVariant;
 
     const borderWidth = 0.5;
 
     return ThemeData(
-      fontFamily: 'Inter',
-      brightness: brightness,
       colorScheme: colorScheme,
+      fontFamily: 'Inter',
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       scaffoldBackgroundColor: backgroundColor,
       bottomSheetTheme: BottomSheetThemeData(
@@ -68,6 +74,7 @@ class FrostyThemes {
         tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -129,25 +136,5 @@ class FrostyThemes {
         ),
       ),
     );
-  }
-
-  ThemeData get light {
-    final theme = createBaseTheme(
-      brightness: Brightness.light,
-      colorSchemeSeed: colorSchemeSeed,
-      backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
-    );
-
-    return theme;
-  }
-
-  ThemeData get dark {
-    final theme = createBaseTheme(
-      brightness: Brightness.dark,
-      colorSchemeSeed: colorSchemeSeed,
-      backgroundColor: Colors.black,
-    );
-
-    return theme;
   }
 }

@@ -261,7 +261,6 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
-          const SectionHeader('Sleep'),
           const SectionHeader('Muted keywords'),
           SettingsMutedWords(settingsStore: settingsStore),
           SettingsListSwitch(

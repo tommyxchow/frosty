@@ -82,7 +82,7 @@ class Settings extends StatelessWidget {
             ),
             children: [
               const SectionHeader(
-                'Profile',
+                'Account',
                 isFirst: true,
               ),
               ProfileCard(authStore: context.read<AuthStore>()),

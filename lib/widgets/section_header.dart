@@ -32,14 +32,18 @@ class SectionHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (!isFirst) ...[
-            const Divider(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 32),
           ],
           Text(
-            text,
+            text.toUpperCase(),
             style: TextStyle(
-              fontSize: fontSize ?? 16,
+              fontSize: fontSize ?? 14,
               fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.6),
             ),
           ),
         ],
