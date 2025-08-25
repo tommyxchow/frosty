@@ -8,6 +8,7 @@ import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
@@ -45,16 +46,29 @@ class _SearchState extends State<Search> {
             builder: (context) {
               if (_searchStore.textEditingController.text.isEmpty) {
                 if (_searchStore.searchHistory.isEmpty) {
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top +
-                          _kSearchBarHeight,
-                      bottom: MediaQuery.of(context).padding.bottom,
-                    ),
-                    child: const AlertMessage(
-                      message: 'No recent searches',
-                      vertical: true,
-                    ),
+                  // Keep controller attached so borders stay in sync
+                  return CustomScrollView(
+                    controller: widget.scrollController,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: SizedBox(
+                          height: MediaQuery.of(context).padding.top +
+                              _kSearchBarHeight,
+                        ),
+                      ),
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).padding.bottom,
+                          ),
+                          child: const AlertMessage(
+                            message: 'No recent searches',
+                            vertical: true,
+                          ),
+                        ),
+                      ),
+                    ],
                   );
                 }
 
@@ -167,33 +181,67 @@ class _SearchState extends State<Search> {
             ),
             child: Observer(
               builder: (context) {
-                return Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: TextField(
-                    controller: _searchStore.textEditingController,
-                    focusNode: _searchStore.textFieldFocusNode,
-                    autocorrect: false,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search_rounded),
-                      hintText: 'Find a channel or category',
-                      suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
-                              _searchStore.searchText.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.close_rounded),
-                              tooltip: _searchStore.searchText.isEmpty
-                                  ? 'Cancel'
-                                  : 'Clear',
-                              onPressed: () {
-                                if (_searchStore.searchText.isEmpty) {
-                                  _searchStore.textFieldFocusNode.unfocus();
-                                }
-                                _searchStore.textEditingController.clear();
-                              },
-                            )
-                          : null,
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: TextField(
+                        controller: _searchStore.textEditingController,
+                        focusNode: _searchStore.textFieldFocusNode,
+                        autocorrect: false,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          hintText: 'Find a channel or category',
+                          suffixIcon: _searchStore
+                                      .textFieldFocusNode.hasFocus ||
+                                  _searchStore.searchText.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.close_rounded),
+                                  tooltip: _searchStore.searchText.isEmpty
+                                      ? 'Cancel'
+                                      : 'Clear',
+                                  onPressed: () {
+                                    if (_searchStore.searchText.isEmpty) {
+                                      _searchStore.textFieldFocusNode.unfocus();
+                                    }
+                                    _searchStore.textEditingController.clear();
+                                    // Ensure borders reset: scroll back to top and trigger listeners
+                                    if (widget.scrollController.hasClients) {
+                                      widget.scrollController.animateTo(
+                                        0,
+                                        duration:
+                                            const Duration(milliseconds: 150),
+                                        curve: Curves.easeOut,
+                                      );
+                                    }
+                                    // After the frame (when content swaps), re-evaluate border state
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      if (widget.scrollController.hasClients) {
+                                        // Nudge listeners even if already at zero
+                                        final offset =
+                                            widget.scrollController.offset;
+                                        final target =
+                                            (offset == 0) ? 0.01 : 0.0;
+                                        widget.scrollController.jumpTo(
+                                          (offset == 0) ? target : 0.0,
+                                        );
+                                        if (target == 0.01) {
+                                          widget.scrollController.jumpTo(0.0);
+                                        }
+                                      }
+                                    });
+                                  },
+                                )
+                              : null,
+                        ),
+                        onSubmitted: _searchStore.handleQuery,
+                      ),
                     ),
-                    onSubmitted: _searchStore.handleQuery,
-                  ),
+                    AnimatedScrollBorder(
+                      scrollController: widget.scrollController,
+                    ),
+                  ],
                 );
               },
             ),

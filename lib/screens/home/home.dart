@@ -10,6 +10,7 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -88,8 +89,15 @@ class _HomeState extends State<Home> {
               // Only show flexible space when on Following tab
               if (!isOnFollowingTab) return const SizedBox.shrink();
 
-              return const BlurredContainer(
-                child: SizedBox.expand(),
+              return BlurredContainer(
+                child: Column(
+                  children: [
+                    const Expanded(child: SizedBox.expand()),
+                    AnimatedScrollBorder(
+                      scrollController: _homeStore.followedScrollController,
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -148,6 +156,27 @@ class _HomeState extends State<Home> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Observer(
+                builder: (_) {
+                  ScrollController scrollController;
+                  if (isLoggedIn && _homeStore.selectedIndex == 0) {
+                    // Following tab
+                    scrollController = _homeStore.followedScrollController;
+                  } else if (_homeStore.selectedIndex == (isLoggedIn ? 1 : 0)) {
+                    // Top tab
+                    scrollController = _homeStore.topSectionScrollControllers[
+                        _homeStore.topSectionCurrentIndex];
+                  } else {
+                    // Search tab
+                    scrollController = _homeStore.searchScrollController;
+                  }
+
+                  return AnimatedScrollBorder(
+                    scrollController: scrollController,
+                    position: ScrollBorderPosition.bottom,
+                  );
+                },
+              ),
               Observer(
                 builder: (_) => NavigationBar(
                   backgroundColor: Colors.transparent,

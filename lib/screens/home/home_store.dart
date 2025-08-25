@@ -25,6 +25,7 @@ abstract class HomeStoreBase with Store {
   final searchScrollController = ScrollController();
 
   /// The current index of the top section tab. Changes when switching between the streams and categories tabs.
+  @observable
   var topSectionCurrentIndex = 0;
 
   /// The current selected index/tab of the bottom navigation bar.

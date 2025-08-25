@@ -20,6 +20,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/app_bar.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/notification.dart';
 import 'package:provider/provider.dart';
@@ -217,8 +218,7 @@ class _VideoChatState extends State<VideoChat> {
                 duration: const Duration(milliseconds: 200),
                 child: IgnorePointer(
                   ignoring: !videoBarVisible,
-                  child: ColoredBox(
-                    color: Theme.of(context).scaffoldBackgroundColor,
+                  child: BlurredContainer(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
