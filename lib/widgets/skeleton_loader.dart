@@ -200,9 +200,15 @@ class StreamCardSkeletonLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: 8,
-        horizontal: showThumbnail ? 16 : 4,
+      padding: EdgeInsets.only(
+        top: 8,
+        bottom: 8,
+        left: showThumbnail
+            ? 16 + MediaQuery.of(context).padding.left
+            : 4 + MediaQuery.of(context).padding.left,
+        right: showThumbnail
+            ? 16 + MediaQuery.of(context).padding.right
+            : 4 + MediaQuery.of(context).padding.right,
       ),
       child: Row(
         children: [
@@ -243,7 +249,7 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   // Stream title skeleton with random width
                   SkeletonText(
                     height: 14,
@@ -251,7 +257,7 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                     maxWidth: 200,
                   ),
                   if (showCategory) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     // Category skeleton with random width
                     SkeletonText(
                       height: 14,
@@ -259,7 +265,7 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                       maxWidth: 120,
                     ),
                   ],
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   // Viewer count skeleton with random width
                   SkeletonText(
                     height: 14,
@@ -288,9 +294,11 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 12,
-        horizontal: 16,
+      padding: EdgeInsets.only(
+        top: 12,
+        bottom: 12,
+        left: 16 + MediaQuery.of(context).padding.left,
+        right: 16 + MediaQuery.of(context).padding.right,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +310,7 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // Streamer info row with profile picture and name
           Row(
             children: [
@@ -322,7 +330,7 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
                       minWidth: 80,
                       maxWidth: 150,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     // Stream title skeleton with random width
                     SkeletonText(
                       height: 14,
@@ -330,7 +338,7 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
                       maxWidth: 200,
                     ),
                     if (showCategory) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 8),
                       // Category skeleton with random width
                       SkeletonText(
                         height: 14,

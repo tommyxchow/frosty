@@ -131,13 +131,63 @@ class _StreamsListState extends State<StreamsList>
               // Show skeleton loaders while loading
               final settingsStore = context.watch<SettingsStore>();
               final isLargeCard = settingsStore.largeStreamCard;
+              final isFollowingTab = widget.listType == ListType.followed;
+              final pinnedChannelCount = settingsStore.pinnedChannelIds.length;
 
               return CustomScrollView(
                 slivers: [
                   // Add padding for app bar
                   SliverTopPadding(extraTopPadding: extraTopPadding),
+
+                  // Show pinned section if following tab and has pinned channels
+                  if (isFollowingTab && pinnedChannelCount > 0) ...[
+                    SliverToBoxAdapter(
+                      child: Builder(
+                        builder: (context) => SectionHeader(
+                          'Pinned',
+                          isFirst: true,
+                          padding: EdgeInsets.fromLTRB(
+                            16 + MediaQuery.of(context).padding.left,
+                            12,
+                            16 + MediaQuery.of(context).padding.right,
+                            8,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverList.builder(
+                      itemCount: pinnedChannelCount,
+                      itemBuilder: (context, index) {
+                        if (isLargeCard) {
+                          return LargeStreamCardSkeletonLoader(
+                            showCategory: widget.listType != ListType.category,
+                          );
+                        } else {
+                          return StreamCardSkeletonLoader(
+                            showThumbnail: settingsStore.showThumbnails,
+                            showCategory: widget.listType != ListType.category,
+                          );
+                        }
+                      },
+                    ),
+                    SliverToBoxAdapter(
+                      child: Builder(
+                        builder: (context) => SectionHeader(
+                          'All',
+                          isFirst: true,
+                          padding: EdgeInsets.fromLTRB(
+                            16 + MediaQuery.of(context).padding.left,
+                            8,
+                            16 + MediaQuery.of(context).padding.right,
+                            8,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+
                   SliverList.builder(
-                    itemCount: 8,
+                    itemCount: isFollowingTab && pinnedChannelCount > 0 ? 5 : 8,
                     itemBuilder: (context, index) {
                       if (isLargeCard) {
                         return LargeStreamCardSkeletonLoader(
