@@ -8,6 +8,7 @@ import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/photo_view.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -94,20 +95,24 @@ class StreamCard extends StatelessWidget {
             child: thumbnail,
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(0, 0, 0, 0.5),
-              borderRadius: BorderRadius.all(
-                Radius.circular(6),
-              ),
-            ),
             margin: const EdgeInsets.all(4),
-            child: Uptime(
-              startTime: streamInfo.startedAt,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: context.watch<FrostyThemes>().dark.colorScheme.onSurface,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: BlurredContainer(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              sigmaX: 8.0, // Less blur for subtlety
+              sigmaY: 8.0, // Less blur for subtlety
+              backgroundAlpha: 0.3, // More transparent to mix with background
+              child: Uptime(
+                startTime: streamInfo.startedAt,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color:
+                      context.watch<FrostyThemes>().dark.colorScheme.onSurface,
+                ),
               ),
             ),
           ),
