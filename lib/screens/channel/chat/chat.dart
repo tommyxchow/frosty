@@ -26,7 +26,7 @@ class Chat extends StatelessWidget {
                   if (chatStore.assetsStore.showEmoteMenu) {
                     chatStore.assetsStore.showEmoteMenu = false;
                   } else if (chatStore.textFieldFocusNode.hasFocus) {
-                    chatStore.textFieldFocusNode.unfocus();
+                    chatStore.unfocusInput();
                   }
                 },
                 child: Stack(

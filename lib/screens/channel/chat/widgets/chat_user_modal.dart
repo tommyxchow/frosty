@@ -64,7 +64,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       widget.chatStore.textController.text =
                           '@${widget.username} ';
                       Navigator.pop(context);
-                      widget.chatStore.textFieldFocusNode.requestFocus();
+                      widget.chatStore.safeRequestFocus();
                     },
                     icon: const Icon(Icons.reply_rounded),
                   ),

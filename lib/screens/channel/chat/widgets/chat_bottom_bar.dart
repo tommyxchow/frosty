@@ -35,7 +35,7 @@ class ChatBottomBar extends StatelessWidget {
                     : Icons.emoji_emotions_outlined,
               ),
               onPressed: () {
-                FocusScope.of(context).unfocus();
+                chatStore.unfocusInput();
                 chatStore.assetsStore.showEmoteMenu =
                     !chatStore.assetsStore.showEmoteMenu;
               },
@@ -74,7 +74,8 @@ class ChatBottomBar extends StatelessWidget {
           child: Column(
             children: [
               AnimatedScrollBorder(
-                  scrollController: chatStore.scrollController),
+                scrollController: chatStore.scrollController,
+              ),
               if (chatStore.replyingToMessage != null) ...[
                 const Divider(),
                 ListTile(
@@ -196,7 +197,7 @@ class ChatBottomBar extends StatelessWidget {
                         tooltip: 'Enter a message',
                         onPressed: () {
                           chatStore.expandChat = true;
-                          chatStore.textFieldFocusNode.requestFocus();
+                          chatStore.safeRequestFocus();
                         },
                         icon: const Icon(Icons.edit),
                       )

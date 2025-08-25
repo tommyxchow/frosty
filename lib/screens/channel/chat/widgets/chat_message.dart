@@ -126,7 +126,7 @@ class ChatMessage extends StatelessWidget {
               await copyMessage();
               // Paste the copied message into the text controller
               chatStore.textController.text = ircMessage.message ?? '';
-              chatStore.textFieldFocusNode.requestFocus();
+              chatStore.safeRequestFocus();
               if (context.mounted) {
                 Navigator.pop(context);
               }
@@ -137,7 +137,7 @@ class ChatMessage extends StatelessWidget {
           ListTile(
             onTap: () {
               chatStore.replyingToMessage = ircMessage;
-              chatStore.textFieldFocusNode.requestFocus();
+              chatStore.safeRequestFocus();
               Navigator.pop(context);
             },
             leading: const Icon(Icons.reply),

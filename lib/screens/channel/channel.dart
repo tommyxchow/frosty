@@ -149,7 +149,7 @@ class _VideoChatState extends State<VideoChat> {
           _chatStore.assetsStore.showEmoteMenu = false;
         } else {
           if (_chatStore.textFieldFocusNode.hasFocus) {
-            _chatStore.textFieldFocusNode.unfocus();
+            _chatStore.unfocusInput();
           } else {
             _videoStore.handleVideoTap();
           }

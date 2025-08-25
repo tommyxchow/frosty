@@ -229,6 +229,23 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$_hasIntentionallyUnfocusedAtom =
+      Atom(name: 'ChatStoreBase._hasIntentionallyUnfocused', context: context);
+
+  @override
+  bool get _hasIntentionallyUnfocused {
+    _$_hasIntentionallyUnfocusedAtom.reportRead();
+    return super._hasIntentionallyUnfocused;
+  }
+
+  @override
+  set _hasIntentionallyUnfocused(bool value) {
+    _$_hasIntentionallyUnfocusedAtom
+        .reportWrite(value, super._hasIntentionallyUnfocused, () {
+      super._hasIntentionallyUnfocused = value;
+    });
+  }
+
   late final _$getAssetsAsyncAction =
       AsyncAction('ChatStoreBase.getAssets', context: context);
 
@@ -366,6 +383,28 @@ mixin _$ChatStore on ChatStoreBase, Store {
         name: 'ChatStoreBase.cancelSleepTimer');
     try {
       return super.cancelSleepTimer();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void unfocusInput() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.unfocusInput');
+    try {
+      return super.unfocusInput();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void safeRequestFocus() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+        name: 'ChatStoreBase.safeRequestFocus');
+    try {
+      return super.safeRequestFocus();
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
