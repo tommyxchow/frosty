@@ -116,6 +116,9 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragStart(DragStartDetails details) {
+    // Disable drag gesture when already in PiP mode
+    if (_videoStore.isInPipMode) return;
+
     _animationController.stop(); // Stop any ongoing animation
     setState(() {
       _isPipDragging = true;
@@ -125,7 +128,7 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragUpdate(DragUpdateDetails details) {
-    if (!_isPipDragging) return;
+    if (!_isPipDragging || _videoStore.isInPipMode) return;
 
     setState(() {
       _pipDragDistance += details.delta.dy;
@@ -147,7 +150,7 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragEnd(DragEndDetails details) {
-    if (!_isPipDragging) return;
+    if (!_isPipDragging || _videoStore.isInPipMode) return;
 
     final velocity = details.velocity.pixelsPerSecond.dy;
     final shouldTriggerPip = _pipDragDistance >= _pipTriggerDistance ||

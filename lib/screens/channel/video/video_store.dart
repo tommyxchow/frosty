@@ -105,6 +105,18 @@ abstract class VideoStoreBase with Store {
             );
           },
         )
+        ..addJavaScriptChannel(
+          'PipEntered',
+          onMessageReceived: (message) {
+            _isInPipMode = true;
+          },
+        )
+        ..addJavaScriptChannel(
+          'PipExited',
+          onMessageReceived: (message) {
+            _isInPipMode = false;
+          },
+        )
         ..setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (url) async {
@@ -161,6 +173,11 @@ abstract class VideoStoreBase with Store {
 
   @readonly
   String? _latency;
+
+  /// Whether the app is currently in picture-in-picture mode (iOS only).
+  /// On Android, this state is not tracked since there's no programmatic exit.
+  @readonly
+  var _isInPipMode = false;
 
   /// The video URL to use for the webview.
   String get videoUrl =>
@@ -389,6 +406,15 @@ abstract class VideoStoreBase with Store {
                 videoElement.textTracks[0].mode = "hidden";
               }
             });
+            
+            // Add PiP event listeners for iOS
+            videoElement.addEventListener("enterpictureinpicture", () => {
+              PipEntered.postMessage("pip entered");
+            });
+            videoElement.addEventListener("leavepictureinpicture", () => {
+              PipExited.postMessage("pip exited");
+            });
+            
             if (!videoElement.paused) {
               VideoPlaying.postMessage("video playing");
               if (videoElement.textTracks && videoElement.textTracks.length > 0) {
@@ -500,6 +526,34 @@ abstract class VideoStoreBase with Store {
         videoWebViewController.runJavaScript(
           'document.getElementsByTagName("video")[0].requestPictureInPicture();',
         );
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Toggle picture-in-picture mode.
+  ///
+  /// If not in PiP mode, enters PiP mode.
+  /// If already in PiP mode on iOS, exits PiP mode.
+  /// On Android, always enters PiP mode (no programmatic exit or state tracking).
+  @action
+  void togglePictureInPicture() {
+    try {
+      if (Platform.isIOS && _isInPipMode) {
+        // Exit PiP mode on iOS
+        videoWebViewController.runJavaScript(
+          '''
+          (function() {
+            if (document.pictureInPictureElement) {
+              document.exitPictureInPicture();
+            }
+          })();
+          ''',
+        );
+      } else {
+        // Enter PiP mode (both iOS and Android)
+        requestPictureInPicture();
       }
     } catch (e) {
       debugPrint(e.toString());

@@ -353,16 +353,28 @@ class VideoOverlay extends StatelessWidget {
                     ),
                   ),
                   if (orientation == Orientation.landscape) latencyTooltip,
-                  Tooltip(
-                    message: 'Enter picture-in-picture',
-                    preferBelow: false,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.picture_in_picture_alt_rounded,
-                        color: surfaceColor,
-                      ),
-                      onPressed: videoStore.requestPictureInPicture,
-                    ),
+                  Observer(
+                    builder: (_) {
+                      // On iOS, show toggle behavior. On Android, always show enter PiP.
+                      final isIOS = Platform.isIOS;
+                      final showExitState = isIOS && videoStore.isInPipMode;
+
+                      return Tooltip(
+                        message: showExitState
+                            ? 'Exit picture-in-picture'
+                            : 'Enter picture-in-picture',
+                        preferBelow: false,
+                        child: IconButton(
+                          icon: Icon(
+                            showExitState
+                                ? Icons.picture_in_picture_alt_outlined
+                                : Icons.picture_in_picture_alt_rounded,
+                            color: surfaceColor,
+                          ),
+                          onPressed: videoStore.togglePictureInPicture,
+                        ),
+                      );
+                    },
                   ),
                   refreshButton,
                   // On iPad, hide the rotate button on the overlay

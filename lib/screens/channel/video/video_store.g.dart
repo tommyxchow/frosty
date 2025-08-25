@@ -118,6 +118,24 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$_isInPipModeAtom =
+      Atom(name: 'VideoStoreBase._isInPipMode', context: context);
+
+  bool get isInPipMode {
+    _$_isInPipModeAtom.reportRead();
+    return super._isInPipMode;
+  }
+
+  @override
+  bool get _isInPipMode => isInPipMode;
+
+  @override
+  set _isInPipMode(bool value) {
+    _$_isInPipModeAtom.reportWrite(value, super._isInPipMode, () {
+      super._isInPipMode = value;
+    });
+  }
+
   late final _$updateStreamQualitiesAsyncAction =
       AsyncAction('VideoStoreBase.updateStreamQualities', context: context);
 
@@ -192,6 +210,17 @@ mixin _$VideoStore on VideoStoreBase, Store {
         name: 'VideoStoreBase.handleRefresh');
     try {
       return super.handleRefresh();
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void togglePictureInPicture() {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+        name: 'VideoStoreBase.togglePictureInPicture');
+    try {
+      return super.togglePictureInPicture();
     } finally {
       _$VideoStoreBaseActionController.endAction(_$actionInfo);
     }
