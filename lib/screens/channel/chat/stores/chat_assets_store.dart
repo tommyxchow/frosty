@@ -143,12 +143,8 @@ abstract class ChatAssetsStoreBase with Store {
       Future.wait([
         Future.wait([
           if (showTwitchEmotes) ...[
-            twitchApi
-                .getEmotesGlobal()
-                .catchError(onEmoteError),
-            twitchApi
-                .getEmotesChannel(id: channelId)
-                .then((emotes) {
+            twitchApi.getEmotesGlobal().catchError(onEmoteError),
+            twitchApi.getEmotesChannel(id: channelId).then((emotes) {
               _userEmoteSectionToEmotes.update(
                 'Channel Emotes',
                 (existingEmoteSet) => [...existingEmoteSet, ...emotes],
@@ -194,9 +190,7 @@ abstract class ChatAssetsStoreBase with Store {
             if (sharedChatSession == null) return;
 
             for (final participant in sharedChatSession.participants) {
-              twitchApi
-                  .getUser(id: participant.broadcasterId)
-                  .then((user) {
+              twitchApi.getUser(id: participant.broadcasterId).then((user) {
                 channelIdToUserTwitch[participant.broadcasterId] = user;
               });
             }
@@ -234,9 +228,7 @@ abstract class ChatAssetsStoreBase with Store {
   }) async {
     final userEmotes = await Future.wait(
       emoteSets.map(
-        (setId) => twitchApi
-            .getEmotesSets(setId: setId)
-            .catchError(onError),
+        (setId) => twitchApi.getEmotesSets(setId: setId).catchError(onError),
       ),
     );
 

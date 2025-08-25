@@ -111,13 +111,15 @@ class UserActionsModal extends StatelessWidget {
                               ..setJavaScriptMode(JavaScriptMode.unrestricted)
                               ..loadRequest(
                                 Uri.parse(
-                                    'https://www.twitch.tv/$userLogin/report'),
+                                  'https://www.twitch.tv/$userLogin/report',
+                                ),
                               )
                               ..setNavigationDelegate(
                                 NavigationDelegate(
                                   onWebResourceError: (error) {
                                     debugPrint(
-                                        'WebView error: ${error.description}');
+                                      'WebView error: ${error.description}',
+                                    );
                                   },
                                 ),
                               ),

@@ -82,56 +82,56 @@ class LargeStreamCard extends StatelessWidget {
                 ),
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Tooltip(
-                  message: 'Stream uptime',
-                  preferBelow: false,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.circle,
-                        color: Colors.red,
-                        size: 10,
-                      ),
-                      const SizedBox(width: 4),
-                      Uptime(
-                        startTime: streamInfo.startedAt,
-                        style: TextStyle(
-                          color: surfaceColor,
-                          fontWeight: FontWeight.w500,
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  Tooltip(
+                    message: 'Stream uptime',
+                    preferBelow: false,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.circle,
+                          color: Colors.red,
+                          size: 10,
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Tooltip(
-                  message: 'Viewer count',
-                  preferBelow: false,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.visibility,
-                        size: 14,
-                        color: surfaceColor,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        NumberFormat().format(streamInfo.viewerCount),
-                        style: TextStyle(
-                          color: surfaceColor,
-                          fontWeight: FontWeight.w500,
+                        const SizedBox(width: 4),
+                        Uptime(
+                          startTime: streamInfo.startedAt,
+                          style: TextStyle(
+                            color: surfaceColor,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Tooltip(
+                    message: 'Viewer count',
+                    preferBelow: false,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.visibility,
+                          size: 14,
+                          color: surfaceColor,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          NumberFormat().format(streamInfo.viewerCount),
+                          style: TextStyle(
+                            color: surfaceColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           ],
         ),
       ),

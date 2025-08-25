@@ -68,7 +68,9 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
                 styleSheet: MarkdownStyleSheet(
                   h2: const TextStyle(fontSize: 20),
                   h3: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                   h3Padding: const EdgeInsets.only(top: 16),
                   h4: const TextStyle(fontSize: 14),
                   h4Padding: const EdgeInsets.only(top: 16),

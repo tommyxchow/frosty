@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/apis/twitch_api.dart';

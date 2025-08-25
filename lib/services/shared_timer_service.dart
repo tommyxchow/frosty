@@ -19,10 +19,11 @@ class SharedTimerService extends ChangeNotifier {
   DateTime get currentTime => _lastTick;
 
   /// Starts the shared timer when the first listener is added
+  @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
     _listenerCount++;
-    
+
     // Start the timer when we get the first listener
     if (_listenerCount == 1) {
       _startTimer();
@@ -34,7 +35,7 @@ class SharedTimerService extends ChangeNotifier {
   void removeListener(VoidCallback listener) {
     super.removeListener(listener);
     _listenerCount--;
-    
+
     // Stop the timer when we have no more listeners
     if (_listenerCount == 0) {
       _stopTimer();

@@ -16,16 +16,16 @@ class TwitchAuthInterceptor extends Interceptor {
       final twitchHeaders = _authStore.headersTwitch;
       options.headers.addAll(twitchHeaders);
     }
-    
+
     handler.next(options);
   }
 
   /// Determines if the request URL is for a Twitch API endpoint that requires authentication
   bool _shouldAddTwitchHeaders(Uri uri) {
     final url = uri.toString();
-    
+
     // Add headers for Twitch Helix API and OAuth endpoints
     return url.startsWith('https://api.twitch.tv/helix') ||
-           url.startsWith('https://id.twitch.tv/oauth2');
+        url.startsWith('https://id.twitch.tv/oauth2');
   }
 }

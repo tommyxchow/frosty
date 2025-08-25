@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/apis/twitch_api.dart';
-import 'package:frosty/models/user.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:provider/provider.dart';
 
@@ -30,22 +29,24 @@ class _ProfilePictureState extends State<ProfilePicture> {
 
   Future<String> _getProfileImageUrl() async {
     final userLogin = widget.userLogin;
-    
+
     // Return cached URL if available
     if (_urlCache.containsKey(userLogin)) {
       return _urlCache[userLogin]!;
     }
-    
+
     // Return existing pending request if one is already in progress
     if (_pendingRequests.containsKey(userLogin)) {
       return _pendingRequests[userLogin]!;
     }
-    
+
     // Make new request and cache it
-    final future = context.read<TwitchApi>().getUser(userLogin: userLogin)
+    final future = context
+        .read<TwitchApi>()
+        .getUser(userLogin: userLogin)
         .then((user) => user.profileImageUrl);
     _pendingRequests[userLogin] = future;
-    
+
     try {
       final url = await future;
       _urlCache[userLogin] = url;
@@ -82,12 +83,5 @@ class _ProfilePictureState extends State<ProfilePicture> {
         },
       ),
     );
-  }
-
-  // Clear cache when app needs fresh data (e.g., user logout/login)
-  // Can be called from anywhere: ProfilePicture.clearCache();
-  static void clearCache() {
-    _urlCache.clear();
-    _pendingRequests.clear();
   }
 }

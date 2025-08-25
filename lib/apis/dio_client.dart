@@ -35,11 +35,15 @@ class DioClient {
           onResponse: (response, handler) {
             final statusCode = response.statusCode ?? 0;
             final emoji = statusCode >= 200 && statusCode < 300 ? '✅' : '❌';
-            debugPrint('$emoji ${response.statusCode} ${response.requestOptions.method} ${response.requestOptions.uri}');
+            debugPrint(
+              '$emoji ${response.statusCode} ${response.requestOptions.method} ${response.requestOptions.uri}',
+            );
             handler.next(response);
           },
           onError: (error, handler) {
-            debugPrint('❌ ${error.type.name} ${error.requestOptions.method} ${error.requestOptions.uri}');
+            debugPrint(
+              '❌ ${error.type.name} ${error.requestOptions.method} ${error.requestOptions.uri}',
+            );
             if (error.response != null) {
               debugPrint('   Status: ${error.response!.statusCode}');
             }
