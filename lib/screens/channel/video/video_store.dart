@@ -494,6 +494,7 @@ abstract class VideoStoreBase with Store {
     HapticFeedback.lightImpact();
     _paused = true;
     _firstTimeSettingQuality = true;
+    _isInPipMode = false;
     videoWebViewController.reload();
     updateStreamInfo();
   }
