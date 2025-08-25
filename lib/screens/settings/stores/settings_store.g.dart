@@ -18,7 +18,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..showVideo = json['showVideo'] as bool? ?? true
       ..defaultToHighestQuality =
           json['defaultToHighestQuality'] as bool? ?? false
-      ..showLatency = json['showLatency'] as bool? ?? true
       ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? false
       ..showOverlay = json['showOverlay'] as bool? ?? true
       ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
@@ -28,7 +27,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
       ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 8.0
       ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
-      ..useReadableColors = json['useReadableColors'] as bool? ?? true
       ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
       ..showChatMessageDividers =
           json['showChatMessageDividers'] as bool? ?? false
@@ -54,7 +52,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.2
       ..fullScreenChatOverlayOpacity =
           (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
-      ..chatOnlyPreventSleep = json['chatOnlyPreventSleep'] as bool? ?? false
       ..autocomplete = json['autocomplete'] as bool? ?? true
       ..showTwitchEmotes = json['showTwitchEmotes'] as bool? ?? true
       ..showTwitchBadges = json['showTwitchBadges'] as bool? ?? true
@@ -87,7 +84,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'launchUrlExternal': instance.launchUrlExternal,
       'showVideo': instance.showVideo,
       'defaultToHighestQuality': instance.defaultToHighestQuality,
-      'showLatency': instance.showLatency,
       'useEnhancedRendering': instance.useEnhancedRendering,
       'showOverlay': instance.showOverlay,
       'toggleableOverlay': instance.toggleableOverlay,
@@ -97,7 +93,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'messageScale': instance.messageScale,
       'messageSpacing': instance.messageSpacing,
       'fontSize': instance.fontSize,
-      'useReadableColors': instance.useReadableColors,
       'showDeletedMessages': instance.showDeletedMessages,
       'showChatMessageDividers': instance.showChatMessageDividers,
       'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
@@ -114,7 +109,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
           _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
       'chatWidth': instance.chatWidth,
       'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
-      'chatOnlyPreventSleep': instance.chatOnlyPreventSleep,
       'autocomplete': instance.autocomplete,
       'showTwitchEmotes': instance.showTwitchEmotes,
       'showTwitchBadges': instance.showTwitchBadges,
@@ -271,22 +265,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showLatencyAtom =
-      Atom(name: '_SettingsStoreBase.showLatency', context: context);
-
-  @override
-  bool get showLatency {
-    _$showLatencyAtom.reportRead();
-    return super.showLatency;
-  }
-
-  @override
-  set showLatency(bool value) {
-    _$showLatencyAtom.reportWrite(value, super.showLatency, () {
-      super.showLatency = value;
-    });
-  }
-
   late final _$useEnhancedRenderingAtom =
       Atom(name: '_SettingsStoreBase.useEnhancedRendering', context: context);
 
@@ -429,22 +407,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set fontSize(double value) {
     _$fontSizeAtom.reportWrite(value, super.fontSize, () {
       super.fontSize = value;
-    });
-  }
-
-  late final _$useReadableColorsAtom =
-      Atom(name: '_SettingsStoreBase.useReadableColors', context: context);
-
-  @override
-  bool get useReadableColors {
-    _$useReadableColorsAtom.reportRead();
-    return super.useReadableColors;
-  }
-
-  @override
-  set useReadableColors(bool value) {
-    _$useReadableColorsAtom.reportWrite(value, super.useReadableColors, () {
-      super.useReadableColors = value;
     });
   }
 
@@ -693,23 +655,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$fullScreenChatOverlayOpacityAtom
         .reportWrite(value, super.fullScreenChatOverlayOpacity, () {
       super.fullScreenChatOverlayOpacity = value;
-    });
-  }
-
-  late final _$chatOnlyPreventSleepAtom =
-      Atom(name: '_SettingsStoreBase.chatOnlyPreventSleep', context: context);
-
-  @override
-  bool get chatOnlyPreventSleep {
-    _$chatOnlyPreventSleepAtom.reportRead();
-    return super.chatOnlyPreventSleep;
-  }
-
-  @override
-  set chatOnlyPreventSleep(bool value) {
-    _$chatOnlyPreventSleepAtom.reportWrite(value, super.chatOnlyPreventSleep,
-        () {
-      super.chatOnlyPreventSleep = value;
     });
   }
 
@@ -1034,7 +979,6 @@ largeStreamCard: ${largeStreamCard},
 launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
-showLatency: ${showLatency},
 useEnhancedRendering: ${useEnhancedRendering},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
@@ -1044,7 +988,6 @@ emoteScale: ${emoteScale},
 messageScale: ${messageScale},
 messageSpacing: ${messageSpacing},
 fontSize: ${fontSize},
-useReadableColors: ${useReadableColors},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
@@ -1060,7 +1003,6 @@ landscapeForceVerticalChat: ${landscapeForceVerticalChat},
 landscapeCutout: ${landscapeCutout},
 chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
-chatOnlyPreventSleep: ${chatOnlyPreventSleep},
 autocomplete: ${autocomplete},
 showTwitchEmotes: ${showTwitchEmotes},
 showTwitchBadges: ${showTwitchBadges},

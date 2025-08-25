@@ -67,6 +67,10 @@ class StreamCard extends StatelessWidget {
     final streamerName =
         getReadableName(streamInfo.userName, streamInfo.userLogin);
 
+    final streamTitle = streamInfo.title.trim();
+    final category =
+        streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category';
+
     const subFontSize = 14.0;
 
     final fontColor = DefaultTextStyle.of(context).style.color;
@@ -125,7 +129,7 @@ class StreamCard extends StatelessWidget {
               const SizedBox(width: 4),
               Flexible(
                 child: Tooltip(
-                  message: 'Streamer: $streamerName',
+                  message: streamerName,
                   preferBelow: false,
                   child: Text(
                     streamerName,
@@ -142,10 +146,10 @@ class StreamCard extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Tooltip(
-            message: 'Title: ${streamInfo.title.trim()}',
+            message: streamTitle,
             preferBelow: false,
             child: Text(
-              streamInfo.title.trim(),
+              streamTitle,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: subFontSize,
@@ -167,13 +171,10 @@ class StreamCard extends StatelessWidget {
                       )
                   : null,
               child: Tooltip(
-                message:
-                    'Category: ${streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'None'}',
+                message: category,
                 preferBelow: false,
                 child: Text(
-                  streamInfo.gameName.isNotEmpty
-                      ? streamInfo.gameName
-                      : 'No Category',
+                  category,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: subFontSize,
@@ -226,8 +227,12 @@ class StreamCard extends StatelessWidget {
         padding: EdgeInsets.only(
           top: 8,
           bottom: 8,
-          left: showThumbnail ? 16 + MediaQuery.of(context).padding.left : 4 + MediaQuery.of(context).padding.left,
-          right: showThumbnail ? 16 + MediaQuery.of(context).padding.right : 4 + MediaQuery.of(context).padding.right,
+          left: showThumbnail
+              ? 16 + MediaQuery.of(context).padding.left
+              : 4 + MediaQuery.of(context).padding.left,
+          right: showThumbnail
+              ? 16 + MediaQuery.of(context).padding.right
+              : 4 + MediaQuery.of(context).padding.right,
         ),
         child: Row(
           children: [

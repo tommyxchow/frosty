@@ -47,7 +47,8 @@ class _SearchState extends State<Search> {
                 if (_searchStore.searchHistory.isEmpty) {
                   return Padding(
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top + _kSearchBarHeight,
+                      top: MediaQuery.of(context).padding.top +
+                          _kSearchBarHeight,
                       bottom: MediaQuery.of(context).padding.bottom,
                     ),
                     child: const AlertMessage(
@@ -62,7 +63,8 @@ class _SearchState extends State<Search> {
                   child: ListView(
                     controller: widget.scrollController,
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top + _kSearchBarHeight,
+                      top: MediaQuery.of(context).padding.top +
+                          _kSearchBarHeight,
                       bottom: MediaQuery.of(context).padding.bottom,
                     ),
                     children: [
@@ -111,7 +113,7 @@ class _SearchState extends State<Search> {
               return CustomScrollView(
                 controller: widget.scrollController,
                 slivers: [
-                  // Add padding for app bar and search bar  
+                  // Add padding for app bar and search bar
                   _SearchTopPadding(),
                   SliverToBoxAdapter(
                     child: Builder(
@@ -174,8 +176,7 @@ class _SearchState extends State<Search> {
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search_rounded),
                       hintText: 'Find a channel or category',
-                      suffixIcon: _searchStore
-                                  .textFieldFocusNode.hasFocus ||
+                      suffixIcon: _searchStore.textFieldFocusNode.hasFocus ||
                               _searchStore.searchText.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.close_rounded),

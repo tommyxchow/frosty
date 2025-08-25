@@ -177,7 +177,7 @@ abstract class ChatStoreBase with Store {
     required this.displayName,
   }) {
     // Enable wakelock to prevent the chat from sleeping.
-    if (settings.chatOnlyPreventSleep) WakelockPlus.enable();
+    WakelockPlus.enable();
 
     // Create a reaction that will reconnect to chat when logging in or out.
     // Closing the channel will trigger a reconnect with the new credentials.

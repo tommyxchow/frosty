@@ -383,28 +383,25 @@ class IRCMessage {
   void _addUsername(
     List<InlineSpan> span,
     BuildContext context,
-    bool useReadableColors,
     void Function()? onTapName,
   ) {
     var color = Color(
       int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xFF')),
     );
 
-    if (useReadableColors) {
-      final isLightTheme = Theme.of(context).brightness == Brightness.light;
-      final hsl = HSLColor.fromColor(color);
-      if (isLightTheme == true) {
-        if (hsl.lightness >= 0.5) {
-          color = hsl
-              .withLightness(hsl.lightness + ((0 - hsl.lightness) * 0.5))
-              .toColor();
-        }
-      } else {
-        if (hsl.lightness <= 0.5) {
-          color = hsl
-              .withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5))
-              .toColor();
-        }
+    final isLightTheme = Theme.of(context).brightness == Brightness.light;
+    final hsl = HSLColor.fromColor(color);
+    if (isLightTheme == true) {
+      if (hsl.lightness >= 0.5) {
+        color = hsl
+            .withLightness(hsl.lightness + ((0 - hsl.lightness) * 0.5))
+            .toColor();
+      }
+    } else {
+      if (hsl.lightness <= 0.5) {
+        color = hsl
+            .withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5))
+            .toColor();
       }
     }
 
@@ -633,7 +630,6 @@ class IRCMessage {
     void Function()? onTapName,
     void Function(String)? onTapPingedUser,
     bool showMessage = true,
-    bool useReadableColors = false,
     Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
     String? currentChannelId,
@@ -663,7 +659,7 @@ class IRCMessage {
       isHistorical,
     );
 
-    _addUsername(span, context, useReadableColors, onTapName);
+    _addUsername(span, context, onTapName);
 
     // Italicize the text if it was called with an IRC Action (e.g., "/me").
     final textStyle =

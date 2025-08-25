@@ -103,7 +103,6 @@ class ChatMessage extends StatelessWidget {
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
-                  useReadableColors: chatStore.settings.useReadableColors,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                   channelIdToUserTwitch:
@@ -183,7 +182,6 @@ class ChatMessage extends StatelessWidget {
                   assetsStore: chatStore.assetsStore,
                   emoteScale: chatStore.settings.emoteScale,
                   badgeScale: chatStore.settings.badgeScale,
-                  useReadableColors: chatStore.settings.useReadableColors,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                   channelIdToUserTwitch:
@@ -317,7 +315,6 @@ class ChatMessage extends StatelessWidget {
                         emoteScale: chatStore.settings.emoteScale,
                         badgeScale: chatStore.settings.badgeScale,
                         showMessage: chatStore.settings.showDeletedMessages,
-                        useReadableColors: chatStore.settings.useReadableColors,
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
                         channelIdToUserTwitch:
@@ -412,8 +409,6 @@ class ChatMessage extends StatelessWidget {
                           assetsStore: chatStore.assetsStore,
                           emoteScale: chatStore.settings.emoteScale,
                           badgeScale: chatStore.settings.badgeScale,
-                          useReadableColors:
-                              chatStore.settings.useReadableColors,
                           launchExternal: chatStore.settings.launchUrlExternal,
                           timestamp: chatStore.settings.timestampType,
                           channelIdToUserTwitch:

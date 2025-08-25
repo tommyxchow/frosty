@@ -150,14 +150,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader('Message appearance'),
           SettingsListSwitch(
-            title: 'Use readable name colors',
-            subtitle: const Text(
-              'Adjusts the lightness value of overly bright and dark names.',
-            ),
-            value: settingsStore.useReadableColors,
-            onChanged: (newValue) => settingsStore.useReadableColors = newValue,
-          ),
-          SettingsListSwitch(
             title: 'Show deleted messages',
             subtitle: const Text(
               'Restores the original message of deleted messages.',
@@ -270,15 +262,6 @@ class _ChatSettingsState extends State<ChatSettings> {
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
           const SectionHeader('Sleep'),
-          SettingsListSwitch(
-            title: 'Prevent sleep in chat-only mode',
-            subtitle: const Text(
-              'Requires restarting the chat in order to take effect.',
-            ),
-            value: settingsStore.chatOnlyPreventSleep,
-            onChanged: (newValue) =>
-                settingsStore.chatOnlyPreventSleep = newValue,
-          ),
           const SectionHeader('Muted keywords'),
           SettingsMutedWords(settingsStore: settingsStore),
           SettingsListSwitch(

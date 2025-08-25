@@ -82,7 +82,8 @@ class _HomeState extends State<Home> {
           flexibleSpace: Observer(
             builder: (_) {
               // Only show flexible space on Following tab
-              final isOnFollowingTab = isLoggedIn && _homeStore.selectedIndex == 0;
+              final isOnFollowingTab =
+                  isLoggedIn && _homeStore.selectedIndex == 0;
 
               // Only show flexible space when on Following tab
               if (!isOnFollowingTab) return const SizedBox.shrink();
