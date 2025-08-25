@@ -44,15 +44,24 @@ class VideoChat extends StatefulWidget {
   State<VideoChat> createState() => _VideoChatState();
 }
 
-class _VideoChatState extends State<VideoChat> {
+class _VideoChatState extends State<VideoChat>
+    with SingleTickerProviderStateMixin {
   final _videoKey = GlobalKey();
   final _chatKey = GlobalKey();
 
-  // PiP drag state
+  // PiP drag state - essential only
   double _pipDragDistance = 0;
   bool _isPipDragging = false;
-  static const double _pipTriggerDistance = 100;
+  bool _isInPipTriggerZone =
+      false; // Track when in trigger zone for haptic feedback
+
+  // Essential constants for good UX balance
+  static const double _pipTriggerDistance = 80;
   static const double _pipMaxDragDistance = 150;
+
+  // Animation controller for smooth spring-back
+  late AnimationController _animationController;
+  late Animation<double> _springBackAnimation;
 
   late final ChatStore _chatStore = ChatStore(
     twitchApi: context.read<TwitchApi>(),
@@ -80,10 +89,38 @@ class _VideoChatState extends State<VideoChat> {
     settingsStore: context.read<SettingsStore>(),
   );
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize animation controller for smooth drag interactions
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    // Spring-back animation with smooth easing
+    _springBackAnimation = Tween<double>(
+      begin: 0,
+      end: 0,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
+    )..addListener(() {
+        setState(() {
+          _pipDragDistance = _springBackAnimation.value;
+        });
+      });
+  }
+
   void _handlePipDragStart(DragStartDetails details) {
+    _animationController.stop(); // Stop any ongoing animation
     setState(() {
       _isPipDragging = true;
       _pipDragDistance = 0;
+      _isInPipTriggerZone = false;
     });
   }
 
@@ -93,29 +130,67 @@ class _VideoChatState extends State<VideoChat> {
     setState(() {
       _pipDragDistance += details.delta.dy;
       _pipDragDistance = _pipDragDistance.clamp(0, _pipMaxDragDistance);
+
+      // Check if we've entered or exited the trigger zone for haptic feedback
+      final wasInTriggerZone = _isInPipTriggerZone;
+      _isInPipTriggerZone = _pipDragDistance >= _pipTriggerDistance;
+
+      // Provide haptic feedback when entering the trigger zone
+      if (!wasInTriggerZone && _isInPipTriggerZone) {
+        HapticFeedback.mediumImpact(); // Entering trigger zone
+      }
+      // Provide subtle haptic feedback when exiting the trigger zone
+      else if (wasInTriggerZone && !_isInPipTriggerZone) {
+        HapticFeedback.lightImpact(); // Exiting trigger zone
+      }
     });
   }
 
   void _handlePipDragEnd(DragEndDetails details) {
     if (!_isPipDragging) return;
 
-    final shouldTriggerPip = _pipDragDistance >= _pipTriggerDistance;
+    final velocity = details.velocity.pixelsPerSecond.dy;
+    final shouldTriggerPip = _pipDragDistance >= _pipTriggerDistance ||
+        velocity > 600; // Simple velocity threshold
 
     if (shouldTriggerPip) {
+      // Simple haptic feedback on success
+      HapticFeedback.mediumImpact();
       _videoStore.requestPictureInPicture();
+      _resetDragState();
+    } else {
+      // Animate back to original position
+      _animateSpringBack();
     }
-
-    // Reset drag state
-    setState(() {
-      _isPipDragging = false;
-      _pipDragDistance = 0;
-    });
   }
 
   void _handlePipDragCancel() {
+    if (!_isPipDragging) return;
+    _animateSpringBack();
+  }
+
+  void _resetDragState() {
     setState(() {
       _isPipDragging = false;
       _pipDragDistance = 0;
+      _isInPipTriggerZone = false;
+    });
+  }
+
+  void _animateSpringBack() {
+    _springBackAnimation = Tween<double>(
+      begin: _pipDragDistance,
+      end: 0,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.elasticOut,
+      ),
+    );
+
+    _animationController.reset();
+    _animationController.forward().then((_) {
+      _resetDragState();
     });
   }
 
@@ -417,18 +492,47 @@ class _VideoChatState extends State<VideoChat> {
                     top: 0,
                     left: 0,
                     right: 0,
-                    child: Transform.translate(
-                      offset: Offset(0, _pipDragDistance),
-                      child: GestureDetector(
-                        onPanStart: _handlePipDragStart,
-                        onPanUpdate: _handlePipDragUpdate,
-                        onPanEnd: _handlePipDragEnd,
-                        onPanCancel: _handlePipDragCancel,
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: video,
-                        ),
+                    child: AnimatedBuilder(
+                      animation: Listenable.merge(
+                        [_animationController, _springBackAnimation],
                       ),
+                      builder: (context, child) {
+                        // Calculate current drag distance from either manual drag or animation
+                        final currentDragDistance = _isPipDragging
+                            ? _pipDragDistance
+                            : (_springBackAnimation.value);
+
+                        // Simple scale effect for visual feedback
+                        final scaleFactor = 1.0 -
+                            (currentDragDistance / _pipMaxDragDistance * 0.1);
+
+                        // Only apply rounded corners when dragging or animating
+                        final shouldHaveRoundedCorners =
+                            _isPipDragging || currentDragDistance > 0;
+                        final borderRadius = shouldHaveRoundedCorners
+                            ? BorderRadius.circular(8)
+                            : BorderRadius.zero;
+
+                        return Transform.translate(
+                          offset: Offset(0, currentDragDistance),
+                          child: Transform.scale(
+                            scale: scaleFactor.clamp(0.9, 1.0),
+                            child: ClipRRect(
+                              borderRadius: borderRadius,
+                              child: GestureDetector(
+                                onPanStart: _handlePipDragStart,
+                                onPanUpdate: _handlePipDragUpdate,
+                                onPanEnd: _handlePipDragEnd,
+                                onPanCancel: _handlePipDragCancel,
+                                child: AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: video,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
               ],
