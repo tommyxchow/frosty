@@ -266,7 +266,8 @@ class _VideoChatState extends State<VideoChat>
                                     ),
                           ),
                           const SizedBox(
-                              width: 12), // Reduced gap between elements
+                            width: 12,
+                          ), // Reduced gap between elements
                           // Live indicator and uptime
                           Icon(
                             Icons.circle,
@@ -617,18 +618,47 @@ class _VideoChatState extends State<VideoChat>
                           offset: Offset(0, currentDragDistance),
                           child: Transform.scale(
                             scale: scaleFactor.clamp(0.9, 1.0),
-                            child: ClipRRect(
-                              borderRadius: borderRadius,
-                              child: GestureDetector(
-                                onPanStart: _handlePipDragStart,
-                                onPanUpdate: _handlePipDragUpdate,
-                                onPanEnd: _handlePipDragEnd,
-                                onPanCancel: _handlePipDragCancel,
-                                child: AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: video,
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: borderRadius,
+                                  child: GestureDetector(
+                                    onPanStart: _handlePipDragStart,
+                                    onPanUpdate: _handlePipDragUpdate,
+                                    onPanEnd: _handlePipDragEnd,
+                                    onPanCancel: _handlePipDragCancel,
+                                    child: AspectRatio(
+                                      aspectRatio: 16 / 9,
+                                      child: video,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                // Simple text overlay that follows the video
+                                if (_isPipDragging && !_videoStore.isInPipMode)
+                                  Positioned.fill(
+                                    child: Container(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.4),
+                                      child: Center(
+                                        child: AnimatedOpacity(
+                                          opacity:
+                                              _pipDragDistance > 20 ? 1.0 : 0.0,
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          child: const Text(
+                                            'Swipe down to enter picture-in-picture',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         );
