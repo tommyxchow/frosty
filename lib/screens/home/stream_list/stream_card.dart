@@ -85,10 +85,8 @@ class StreamCard extends StatelessWidget {
             onLongPress: () => showDialog(
               context: context,
               builder: (context) => FrostyPhotoViewDialog(
-                imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-                  '-{width}x{height}',
-                  '',
-                ),
+                imageUrl: streamInfo
+                    .thumbnailUrl, // Pass original URL with {width}x{height} placeholder
                 cacheKey: cacheKey,
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/theme.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 
@@ -19,40 +20,192 @@ class FrostyPhotoViewDialog extends StatefulWidget {
   State<FrostyPhotoViewDialog> createState() => _FrostyPhotoViewDialogState();
 }
 
-class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog> {
+class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
+    with TickerProviderStateMixin {
   PhotoViewScaleState photoViewScaleState = PhotoViewScaleState.initial;
+  bool _isFullResolution = false;
+  String? _currentCacheKey;
+
+  // Vertical drag offset in pixels. Positive = dragging down.
+  double _dragOffset = 0.0;
+  late final AnimationController _resetController;
+  late Animation<double> _resetAnimation;
+  // Exit animation (translate down + fade out) when dismissing
+  late final AnimationController _exitController;
+  late Animation<double> _exitTranslateAnimation;
+  late Animation<double> _exitOpacityAnimation;
+  double _imageOpacity = 1.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCacheKey = widget.cacheKey;
+    _resetController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _resetAnimation = Tween<double>(begin: 0, end: 0).animate(_resetController)
+      ..addListener(() => setState(() => _dragOffset = _resetAnimation.value));
+    _exitController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+    _exitTranslateAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _exitController, curve: Curves.easeOut),
+    )..addListener(
+        () => setState(() {}),
+      );
+    _exitOpacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _exitController, curve: Curves.easeOut),
+    )..addListener(
+        () => setState(() => _imageOpacity = _exitOpacityAnimation.value),
+      );
+  }
+
+  void _toggleResolution() {
+    setState(() {
+      if (_isFullResolution) {
+        // Switch back to the original thumbnail version
+        _isFullResolution = false;
+        _currentCacheKey = widget.cacheKey;
+      } else {
+        // Load full resolution and clear cache key to force fresh fetch
+        _isFullResolution = true;
+        _currentCacheKey = null;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Create full resolution URL (always 1920x1080)
+    final fullResUrl =
+        widget.imageUrl.replaceFirst('-{width}x{height}', '-1920x1080');
+
+    final screenHeight = MediaQuery.of(context).size.height;
+    final fadeDistance = screenHeight * 0.20; // 20% of screen height
+    final buttonsOpacity =
+        (1.0 - (_dragOffset.abs() / fadeDistance)).clamp(0.0, 1.0);
+
     return Stack(
       alignment: Alignment.topCenter,
       children: [
-        Dismissible(
-          key: const Key('photo_view_dismissible'),
-          direction: photoViewScaleState == PhotoViewScaleState.initial
-              ? DismissDirection.vertical
-              : DismissDirection.none,
-          onDismissed: Navigator.of(context).pop,
-          child: PhotoView(
-            imageProvider: CachedNetworkImageProvider(
-              widget.imageUrl,
-              cacheKey: widget.cacheKey,
-              cacheManager: CustomCacheManager.instance,
+        // Very weak blurred background behind the image (fills the screen)
+        BlurredContainer(
+          sigmaX: 4.0,
+          sigmaY: 4.0,
+          // Use a very low alpha so the blur is subtle
+          backgroundAlpha: 0,
+          child: const SizedBox.expand(),
+        ),
+        // Use a GestureDetector so we can track vertical drags and translate the
+        // PhotoView accordingly. When the photo is zoomed (not initial) we disable dragging.
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onVerticalDragStart: (_) {
+            if (_resetController.isAnimating) _resetController.stop();
+          },
+          onVerticalDragUpdate:
+              photoViewScaleState == PhotoViewScaleState.initial
+                  ? (details) => setState(() => _dragOffset += details.delta.dy)
+                  : null,
+          onVerticalDragEnd: photoViewScaleState == PhotoViewScaleState.initial
+              ? (details) {
+                  final velocity = details.velocity.pixelsPerSecond.dy;
+                  final shouldDismiss = (_dragOffset.abs() > fadeDistance) ||
+                      velocity.abs() > 700;
+                  if (shouldDismiss) {
+                    // run exit animation: translate down by 30% of screen and fade out
+                    _exitController
+                      ..value = 0.0
+                      ..forward()
+                          .whenComplete(() => Navigator.of(context).pop());
+                    return;
+                  }
+
+                  // animate back to zero
+                  _resetAnimation = Tween<double>(begin: _dragOffset, end: 0.0)
+                      .animate(_resetController);
+                  _resetController
+                    ..value = 0.0
+                    ..forward();
+                }
+              : null,
+          child: Transform.translate(
+            offset: Offset(
+              0,
+              _dragOffset +
+                  (_exitTranslateAnimation.value * screenHeight * 0.25),
             ),
-            scaleStateChangedCallback: (value) =>
-                setState(() => photoViewScaleState = value),
-            backgroundDecoration:
-                const BoxDecoration(color: Colors.transparent),
+            child: Opacity(
+              opacity: _imageOpacity,
+              child: PhotoView(
+                imageProvider: CachedNetworkImageProvider(
+                  _isFullResolution ? fullResUrl : widget.imageUrl,
+                  cacheKey: _currentCacheKey,
+                  cacheManager: CustomCacheManager.instance,
+                ),
+                scaleStateChangedCallback: (value) =>
+                    setState(() => photoViewScaleState = value),
+                backgroundDecoration:
+                    const BoxDecoration(color: Colors.transparent),
+              ),
+            ),
           ),
         ),
-        IconButton(
-          icon: Icon(
-            Icons.close,
-            color: context.watch<FrostyThemes>().dark.colorScheme.onSurface,
+        // Close button that fades with drag
+        AnimatedOpacity(
+          opacity: buttonsOpacity,
+          duration: const Duration(milliseconds: 100),
+          child: IconButton(
+            icon: Icon(
+              Icons.close,
+              color: context.watch<FrostyThemes>().dark.colorScheme.onSurface,
+            ),
+            onPressed: Navigator.of(context).pop,
           ),
-          onPressed: Navigator.of(context).pop,
+        ),
+
+        Positioned(
+          // Place the button roughly between the image area and the bottom of the screen.
+          // Assumption: the photo view occupies the top portion of the screen; using
+          // a fractional top offset (80%) places the button in the gap between image and bottom.
+          top: MediaQuery.of(context).size.height * 0.8,
+          left: 0,
+          right: 0,
+          child: SafeArea(
+            top: false,
+            child: Center(
+              child: AnimatedOpacity(
+                opacity: buttonsOpacity,
+                duration: const Duration(milliseconds: 100),
+                child: ElevatedButton(
+                  onPressed: _toggleResolution,
+                  child: Text(
+                    _isFullResolution
+                        ? 'View thumbnail'
+                        : 'View full resolution',
+                    style: TextStyle(
+                      color: context
+                          .watch<FrostyThemes>()
+                          .dark
+                          .colorScheme
+                          .onSurface,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _resetController.dispose();
+    _exitController.dispose();
+    super.dispose();
   }
 }
