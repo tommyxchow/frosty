@@ -194,13 +194,22 @@ class IRCMessage {
                 height: badgeSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  image:
-                      DecorationImage(image: imageProvider, fit: BoxFit.cover),
                   border: isCurrentChannel
                       ? Border.all(
                           color: Theme.of(context).colorScheme.primary,
+                          width: 1.5,
                         )
                       : null,
+                ),
+                child: Container(
+                  margin: isCurrentChannel ? const EdgeInsets.all(1.5) : null,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
               placeholder: (context, url) => Container(
@@ -208,10 +217,10 @@ class IRCMessage {
                 height: badgeSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey,
                   border: isCurrentChannel
                       ? Border.all(
                           color: Theme.of(context).colorScheme.primary,
+                          width: 1.5,
                         )
                       : null,
                 ),
