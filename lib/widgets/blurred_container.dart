@@ -6,7 +6,12 @@ import 'package:flutter/material.dart';
 class BlurConfig {
   static const double sigmaX = 16.0;
   static const double sigmaY = 16.0;
-  static const double backgroundAlpha = 0.6;
+
+  // Theme-specific adjustments
+  static const double lightModeAlpha =
+      0.6; // Slightly more opaque in light mode
+  static const double darkModeAlpha =
+      0.3; // More opaque in dark mode for better visibility
 }
 
 /// A reusable container with consistent blur effect and background
@@ -30,6 +35,12 @@ class BlurredContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Adaptive alpha based on theme for optimal visibility
+    final adaptiveAlpha = backgroundAlpha ??
+        (theme.brightness == Brightness.dark
+            ? BlurConfig.darkModeAlpha
+            : BlurConfig.lightModeAlpha);
+
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(
@@ -40,7 +51,7 @@ class BlurredContainer extends StatelessWidget {
           padding: padding,
           decoration: BoxDecoration(
             color: theme.scaffoldBackgroundColor.withValues(
-              alpha: backgroundAlpha ?? BlurConfig.backgroundAlpha,
+              alpha: adaptiveAlpha,
             ),
           ),
           child: child,
