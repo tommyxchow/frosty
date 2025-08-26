@@ -23,6 +23,9 @@ import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/notification.dart';
+import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/uptime.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
@@ -207,6 +210,100 @@ class _VideoChatState extends State<VideoChat>
       title: Text(
         getReadableName(_chatStore.displayName, _chatStore.channelName),
       ),
+    );
+
+    final chatOnlyAppBar = Observer(
+      builder: (context) {
+        final streamInfo = _videoStore.streamInfo;
+
+        // Custom app bar with profile pic and channel info
+        return AppBar(
+          titleSpacing: 8, // Reduce gap between back button and title
+          title: Row(
+            children: [
+              // Profile picture
+              ProfilePicture(
+                userLogin: widget.userLogin,
+                radius: 16,
+              ),
+              const SizedBox(width: 12),
+              // Channel name and stats
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Channel name
+                    Text(
+                      getReadableName(
+                        _chatStore.displayName,
+                        _chatStore.channelName,
+                      ),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2), // Reduced gap for subtitle
+                    // Stream status row
+                    if (streamInfo != null) ...[
+                      // Live stream: viewer count and uptime row
+                      Row(
+                        children: [
+                          // Viewer count
+                          Icon(
+                            Icons.visibility,
+                            size: 14,
+                            color: Theme.of(context).textTheme.bodySmall?.color,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            NumberFormat().format(streamInfo.viewerCount),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                          ),
+                          const SizedBox(
+                              width: 12), // Reduced gap between elements
+                          // Live indicator and uptime
+                          Icon(
+                            Icons.circle,
+                            color: Colors.red,
+                            size: 8,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Uptime(
+                              startTime: streamInfo.startedAt,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      // Offline status
+                      Text(
+                        'Offline',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.grey,
+                            ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
 
     final player = GestureDetector(
@@ -479,7 +576,7 @@ class _VideoChatState extends State<VideoChat>
                 Column(
                   children: [
                     if (!settingsStore.showVideo)
-                      appBar
+                      chatOnlyAppBar
                     else ...[
                       AspectRatio(
                         aspectRatio: 16 / 9,
