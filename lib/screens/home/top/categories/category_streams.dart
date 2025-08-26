@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
@@ -7,6 +5,7 @@ import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:provider/provider.dart';
@@ -57,99 +56,93 @@ class _CategoryStreamsState extends State<CategoryStreams> {
             top: 0,
             left: 0,
             right: 0,
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Container(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top,
-                    left: MediaQuery.of(context).padding.left,
-                    right: MediaQuery.of(context).padding.right,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.scaffoldBackgroundColor.withValues(alpha: 0.6),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: theme.colorScheme.outlineVariant
-                            .withValues(alpha: 0.3),
-                        width: 0.5,
-                      ),
+            child: BlurredContainer(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top,
+                left: MediaQuery.of(context).padding.left,
+                right: MediaQuery.of(context).padding.right,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: theme.colorScheme.outlineVariant
+                          .withValues(alpha: 0.3),
+                      width: 0.5,
                     ),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // App bar section
-                      SizedBox(
-                        height: kToolbarHeight,
-                        child: Row(
-                          children: [
-                            IconButton(
-                              tooltip: 'Back',
-                              icon: Icon(Icons.adaptive.arrow_back_rounded),
-                              onPressed: Navigator.of(context).pop,
-                            ),
-                          ],
-                        ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // App bar section
+                    SizedBox(
+                      height: kToolbarHeight,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            tooltip: 'Back',
+                            icon: Icon(Icons.adaptive.arrow_back_rounded),
+                            onPressed: Navigator.of(context).pop,
+                          ),
+                        ],
                       ),
-                      // Category card section
-                      Observer(
-                        builder: (_) {
-                          if (_listStore.categoryDetails != null) {
-                            return _TransparentCategoryCard(
-                              category: _listStore.categoryDetails!,
-                            );
-                          } else {
-                            // Skeleton loader for category card
-                            return Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: 16,
-                                left: 16,
-                                right: 16,
-                              ),
-                              child: Row(
-                                children: [
-                                  const SizedBox(
-                                    width: 80,
-                                    child: AspectRatio(
-                                      aspectRatio: 3 / 4,
-                                      child: SkeletonLoader(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(8),
-                                        ),
+                    ),
+                    // Category card section
+                    Observer(
+                      builder: (_) {
+                        if (_listStore.categoryDetails != null) {
+                          return _TransparentCategoryCard(
+                            category: _listStore.categoryDetails!,
+                          );
+                        } else {
+                          // Skeleton loader for category card
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: 16,
+                              left: 16,
+                              right: 16,
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(
+                                  width: 80,
+                                  child: AspectRatio(
+                                    aspectRatio: 3 / 4,
+                                    child: SkeletonLoader(
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(8),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SkeletonLoader(
-                                          height: 20,
-                                          width: double.infinity,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        SkeletonLoader(
-                                          height: 16,
-                                          width: 120,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                      ],
-                                    ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SkeletonLoader(
+                                        height: 20,
+                                        width: double.infinity,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SkeletonLoader(
+                                        height: 16,
+                                        width: 120,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
