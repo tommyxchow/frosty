@@ -21,6 +21,7 @@ abstract class _SettingsStoreBase with Store {
   // Stream card defaults
   static const defaultShowThumbnails = true;
   static const defaultLargeStreamCard = false;
+  static const defaultShowOfflinePinnedChannels = true;
 
   // Links defaults
   static const defaultLaunchUrlExternal = false;
@@ -43,6 +44,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var largeStreamCard = defaultLargeStreamCard;
 
+  @JsonKey(defaultValue: defaultShowOfflinePinnedChannels)
+  @observable
+  var showOfflinePinnedChannels = defaultShowOfflinePinnedChannels;
+
   // Links options
   @JsonKey(defaultValue: defaultLaunchUrlExternal)
   @observable
@@ -55,6 +60,7 @@ abstract class _SettingsStoreBase with Store {
 
     largeStreamCard = defaultLargeStreamCard;
     showThumbnails = defaultShowThumbnails;
+    showOfflinePinnedChannels = defaultShowOfflinePinnedChannels;
 
     launchUrlExternal = defaultLaunchUrlExternal;
   }

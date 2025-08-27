@@ -107,6 +107,13 @@ class _GeneralSettingsState extends State<GeneralSettings> {
                 onChanged: (newValue) =>
                     widget.settingsStore.showThumbnails = newValue,
               ),
+              SettingsListSwitch(
+                title: 'Show offline pinned channels',
+                subtitle: const Text('Display offline channels in the pinned section'),
+                value: widget.settingsStore.showOfflinePinnedChannels,
+                onChanged: (newValue) =>
+                    widget.settingsStore.showOfflinePinnedChannels = newValue,
+              ),
               const SectionHeader('Links'),
               SettingsListSwitch(
                 title: 'Open links in external browser',

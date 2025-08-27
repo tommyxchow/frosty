@@ -6,6 +6,7 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/emotes.dart';
+import 'package:frosty/models/followed_channel.dart';
 import 'package:frosty/models/shared_chat_session.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/user.dart';
@@ -189,6 +190,22 @@ class TwitchApi extends BaseApiClient {
     );
 
     return StreamsTwitch.fromJson(data);
+  }
+
+  /// Returns a [FollowedChannels] object containing all followed channels (including offline ones) for the given user ID.
+  Future<FollowedChannels> getFollowedChannels({
+    required String userId,
+    String? cursor,
+  }) async {
+    final queryParams = {'user_id': userId, 'first': '20'};
+    if (cursor != null) queryParams['after'] = cursor;
+
+    final data = await get<JsonMap>(
+      '/channels/followed',
+      queryParameters: queryParams,
+    );
+
+    return FollowedChannels.fromJson(data);
   }
 
   /// Returns a [StreamsTwitch] object that contains the list of streams under the given game/category ID.

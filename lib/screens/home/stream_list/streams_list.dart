@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/models/followed_channel.dart';
+import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/home/stream_list/large_stream_card.dart';
+import 'package:frosty/screens/home/stream_list/offline_channel_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_card.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/expandable_section_header.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
@@ -255,7 +259,7 @@ class _StreamsListState extends State<StreamsList>
                             extraTopPadding: extraTopPadding,
                           ),
                           if (isFollowingTab &&
-                              _listStore.pinnedStreams.isNotEmpty) ...[
+                              _listStore.allPinnedChannels.isNotEmpty) ...[
                             SliverToBoxAdapter(
                               child: Builder(
                                 builder: (context) => SectionHeader(
@@ -271,41 +275,46 @@ class _StreamsListState extends State<StreamsList>
                               ),
                             ),
                             SliverList.builder(
-                              itemCount: _listStore.pinnedStreams.length,
+                              itemCount: _listStore.allPinnedChannels.length,
                               itemBuilder: (context, index) {
+                                final item = _listStore.allPinnedChannels[index];
                                 return Observer(
                                   builder: (context) {
-                                    return settingsStore.largeStreamCard
-                                        ? LargeStreamCard(
-                                            key: ValueKey(
-                                              _listStore
-                                                  .pinnedStreams[index].userId,
-                                            ),
-                                            streamInfo:
-                                                _listStore.pinnedStreams[index],
-                                            showThumbnail: context
-                                                .read<SettingsStore>()
-                                                .showThumbnails,
-                                            showCategory:
-                                                widget.categoryId == null,
-                                            showPinOption: true,
-                                            isPinned: true,
-                                          )
-                                        : StreamCard(
-                                            key: ValueKey(
-                                              _listStore
-                                                  .pinnedStreams[index].userId,
-                                            ),
-                                            streamInfo:
-                                                _listStore.pinnedStreams[index],
-                                            showThumbnail: context
-                                                .read<SettingsStore>()
-                                                .showThumbnails,
-                                            showCategory:
-                                                widget.categoryId == null,
-                                            showPinOption: true,
-                                            isPinned: true,
-                                          );
+                                    // Check if it's a StreamTwitch (live) or FollowedChannel (offline)
+                                    if (item is StreamTwitch) {
+                                      // Live stream card
+                                      return settingsStore.largeStreamCard
+                                          ? LargeStreamCard(
+                                              key: ValueKey(item.userId),
+                                              streamInfo: item,
+                                              showThumbnail: context
+                                                  .read<SettingsStore>()
+                                                  .showThumbnails,
+                                              showCategory: widget.categoryId == null,
+                                              showPinOption: true,
+                                              isPinned: true,
+                                            )
+                                          : StreamCard(
+                                              key: ValueKey(item.userId),
+                                              streamInfo: item,
+                                              showThumbnail: context
+                                                  .read<SettingsStore>()
+                                                  .showThumbnails,
+                                              showCategory: widget.categoryId == null,
+                                              showPinOption: true,
+                                              isPinned: true,
+                                            );
+                                    } else {
+                                      // Offline channel card
+                                      final channel = item as FollowedChannel;
+                                      return OfflineChannelCard(
+                                        key: ValueKey(channel.broadcasterId),
+                                        channelInfo: channel,
+                                        showPinOption: true,
+                                        isPinned: true,
+                                        showOfflineStatus: true,
+                                      );
+                                    }
                                   },
                                 );
                               },
@@ -317,7 +326,7 @@ class _StreamsListState extends State<StreamsList>
                                   isFirst: true,
                                   padding: EdgeInsets.fromLTRB(
                                     16 + MediaQuery.of(context).padding.left,
-                                    8,
+                                    24,
                                     16 + MediaQuery.of(context).padding.right,
                                     8,
                                   ),
@@ -360,6 +369,48 @@ class _StreamsListState extends State<StreamsList>
                               );
                             },
                           ),
+                          // Add offline followed channels section for following tab
+                          if (isFollowingTab && _listStore.offlineChannels.isNotEmpty) ...[
+                            SliverToBoxAdapter(
+                              child: Observer(
+                                builder: (context) => ExpandableSectionHeader(
+                                  'Offline',
+                                  isFirst: true,
+                                  padding: EdgeInsets.fromLTRB(
+                                    16 + MediaQuery.of(context).padding.left,
+                                    32,
+                                    16 + MediaQuery.of(context).padding.right,
+                                    8,
+                                  ),
+                                  isExpanded: _listStore.isOfflineChannelsExpanded,
+                                  onToggle: () => _listStore.isOfflineChannelsExpanded = !_listStore.isOfflineChannelsExpanded,
+                                ),
+                              ),
+                            ),
+                            if (_listStore.isOfflineChannelsExpanded)
+                              SliverList.builder(
+                                itemCount: _listStore.offlineChannels.length,
+                                itemBuilder: (context, index) {
+                                  // Load more offline channels when nearing the end
+                                  if (index > _listStore.offlineChannels.length - 5 &&
+                                      _listStore.hasMoreOfflineChannels) {
+                                    _listStore.getOfflineChannels();
+                                  }
+                                  
+                                  return Observer(
+                                    builder: (context) => OfflineChannelCard(
+                                      key: ValueKey(
+                                        _listStore.offlineChannels[index].broadcasterId,
+                                      ),
+                                      channelInfo: _listStore.offlineChannels[index],
+                                      showPinOption: true,
+                                      isPinned: settingsStore.pinnedChannelIds
+                                          .contains(_listStore.offlineChannels[index].broadcasterId),
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
                           // Add padding for bottom navigation bar
                           const SliverBottomPadding(),
                         ],
