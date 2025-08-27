@@ -21,6 +21,7 @@ class BlurredContainer extends StatelessWidget {
   final double? sigmaX;
   final double? sigmaY;
   final double? backgroundAlpha;
+  final bool? forceDarkMode;
 
   const BlurredContainer({
     super.key,
@@ -29,17 +30,22 @@ class BlurredContainer extends StatelessWidget {
     this.sigmaX,
     this.sigmaY,
     this.backgroundAlpha,
+    this.forceDarkMode,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = forceDarkMode ?? (theme.brightness == Brightness.dark);
 
     // Adaptive alpha based on theme for optimal visibility
     final adaptiveAlpha = backgroundAlpha ??
-        (theme.brightness == Brightness.dark
-            ? BlurConfig.darkModeAlpha
-            : BlurConfig.lightModeAlpha);
+        (isDark ? BlurConfig.darkModeAlpha : BlurConfig.lightModeAlpha);
+
+    // Use dark background color if forced, otherwise use theme color
+    final backgroundColor = forceDarkMode == true 
+        ? Colors.black 
+        : theme.scaffoldBackgroundColor;
 
     return ClipRect(
       child: BackdropFilter(
@@ -50,7 +56,7 @@ class BlurredContainer extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: theme.scaffoldBackgroundColor.withValues(
+            color: backgroundColor.withValues(
               alpha: adaptiveAlpha,
             ),
           ),

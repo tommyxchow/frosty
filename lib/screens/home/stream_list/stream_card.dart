@@ -102,6 +102,7 @@ class StreamCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               sigmaX: 8.0, // Less blur for subtlety
               sigmaY: 8.0, // Less blur for subtlety
+              forceDarkMode: true,
               child: Uptime(
                 startTime: streamInfo.startedAt,
                 style: TextStyle(
