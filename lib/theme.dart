@@ -26,7 +26,7 @@ class FrostyThemes {
   }) {
     final borderColor = colorScheme.outlineVariant;
 
-    const borderWidth = 0.3;
+    const borderWidth = 0.25;
 
     return ThemeData(
       colorScheme: colorScheme,
