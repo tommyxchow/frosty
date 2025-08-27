@@ -66,7 +66,7 @@ abstract class ListStoreBase with Store {
   var _pinnedStreams = ObservableList<StreamTwitch>();
 
   @readonly
-  var _isPinnedStreamsLoading = false;
+  bool _isPinnedStreamsLoading = false;
 
   @readonly
   CategoryTwitch? _categoryDetails;
@@ -144,6 +144,7 @@ abstract class ListStoreBase with Store {
   String? _error;
 
   ReactionDisposer? _pinnedStreamsReactioniDisposer;
+  ReactionDisposer? _offlineChannelsExpansionDisposer;
 
   ListStoreBase({
     required this.authStore,
@@ -172,8 +173,22 @@ abstract class ListStoreBase with Store {
 
       getPinnedStreams();
 
-      // Always fetch offline channels for the bottom section
-      getOfflineChannels();
+      // Fetch offline channels only when expanded
+      _offlineChannelsExpansionDisposer = reaction(
+        (_) => isOfflineChannelsExpanded,
+        (expanded) {
+          if (expanded) {
+            // Fetch offline channels when expanded (only if not already loaded)
+            if (_allOfflineChannels.isEmpty) {
+              getOfflineChannels();
+            }
+          } else {
+            // Clear offline channels when collapsed to save memory
+            _allOfflineChannels.clear();
+            _offlineChannelsCursor = null;
+          }
+        },
+      );
     }
 
     if (listType == ListType.category) {
@@ -301,9 +316,11 @@ abstract class ListStoreBase with Store {
     if (listType == ListType.followed) {
       await getPinnedStreams();
 
-      // Always refresh offline channels for the bottom section
-      _offlineChannelsCursor = null;
-      await getOfflineChannels();
+      // Only refresh offline channels if they are currently expanded
+      if (isOfflineChannelsExpanded) {
+        _offlineChannelsCursor = null;
+        await getOfflineChannels();
+      }
     }
 
     _streamsCursor = null;
@@ -337,6 +354,7 @@ abstract class ListStoreBase with Store {
 
   void dispose() {
     _pinnedStreamsReactioniDisposer?.call();
+    _offlineChannelsExpansionDisposer?.call();
 
     scrollController?.dispose();
   }
