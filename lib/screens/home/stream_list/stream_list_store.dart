@@ -81,13 +81,9 @@ abstract class ListStoreBase with Store {
   @readonly
   bool _isOfflineChannelsLoading = false;
 
-  /// Specific pinned offline channels (fetched regardless of pagination).
-  @readonly
-  var _pinnedOfflineChannels = ObservableList<FollowedChannel>();
-
   /// Whether or not there are more offline channels for pagination.
   @computed
-  bool get hasMoreOfflineChannels => 
+  bool get hasMoreOfflineChannels =>
       _isOfflineChannelsLoading == false && _offlineChannelsCursor != null;
 
   /// Whether or not the scroll to top button is visible.
@@ -97,7 +93,6 @@ abstract class ListStoreBase with Store {
   /// Whether the offline channels section is expanded.
   @observable
   var isOfflineChannelsExpanded = false;
-
 
   /// The list of the fetched streams with blocked users filtered out.
   @computed
@@ -110,33 +105,20 @@ abstract class ListStoreBase with Store {
       .toList()
       .asObservable();
 
-  /// All pinned channels (both live streams and offline channels).
+  /// All pinned channels (only live streams).
   @computed
   List<dynamic> get allPinnedChannels {
     final blockedUserIds = authStore.user.blockedUsers
         .map((blockedUser) => blockedUser.userId)
         .toSet();
 
-    // Get live pinned streams
-    final livePinned = _pinnedStreams
+    // Get live pinned streams only
+    return _pinnedStreams
         .where((stream) => !blockedUserIds.contains(stream.userId))
         .toList();
-
-    // Get offline pinned channels (from dedicated list, not paginated list)
-    final offlinePinned = settingsStore.showOfflinePinnedChannels
-        ? _pinnedOfflineChannels
-            .where((channel) =>
-                settingsStore.pinnedChannelIds.contains(channel.broadcasterId) &&
-                !blockedUserIds.contains(channel.broadcasterId) &&
-                !_pinnedStreams.any((stream) => stream.userId == channel.broadcasterId),)
-            .toList()
-        : <FollowedChannel>[];
-
-    // Combine and return both types
-    return [...livePinned, ...offlinePinned];
   }
 
-  /// The list of offline followed channels with blocked users filtered out 
+  /// The list of offline followed channels with blocked users filtered out
   /// and excluding channels that are currently live or pinned.
   @computed
   ObservableList<FollowedChannel> get offlineChannels {
@@ -147,10 +129,12 @@ abstract class ListStoreBase with Store {
         .toSet();
 
     return _allOfflineChannels
-        .where((channel) =>
-            !liveChannelIds.contains(channel.broadcasterId) &&
-            !pinnedChannelIds.contains(channel.broadcasterId) &&
-            !blockedUserIds.contains(channel.broadcasterId),)
+        .where(
+          (channel) =>
+              !liveChannelIds.contains(channel.broadcasterId) &&
+              !pinnedChannelIds.contains(channel.broadcasterId) &&
+              !blockedUserIds.contains(channel.broadcasterId),
+        )
         .toList()
         .asObservable();
   }
@@ -187,6 +171,8 @@ abstract class ListStoreBase with Store {
       );
 
       getPinnedStreams();
+
+      // Always fetch offline channels for the bottom section
       getOfflineChannels();
     }
 
@@ -250,7 +236,6 @@ abstract class ListStoreBase with Store {
   Future<void> getPinnedStreams() async {
     if (settingsStore.pinnedChannelIds.isEmpty) {
       _pinnedStreams.clear();
-      _pinnedOfflineChannels.clear();
       return;
     }
 
@@ -262,9 +247,6 @@ abstract class ListStoreBase with Store {
       ))
           .data
           .asObservable();
-
-      // Fetch offline pinned channels for any pinned channels that aren't live
-      await _getPinnedOfflineChannels();
 
       _error = null;
     } on SocketException {
@@ -279,51 +261,6 @@ abstract class ListStoreBase with Store {
     }
 
     _isPinnedStreamsLoading = false;
-  }
-
-  @action
-  Future<void> _getPinnedOfflineChannels() async {
-    final liveChannelIds = _pinnedStreams.map((stream) => stream.userId).toSet();
-    final offlinePinnedIds = settingsStore.pinnedChannelIds
-        .where((id) => !liveChannelIds.contains(id))
-        .toSet();
-
-    if (offlinePinnedIds.isEmpty) {
-      _pinnedOfflineChannels.clear();
-      return;
-    }
-
-    // Fetch followed channels until we find all offline pinned channels
-    _pinnedOfflineChannels.clear();
-    String? cursor;
-    final foundChannels = <String>{};
-
-    while (foundChannels.length < offlinePinnedIds.length) {
-      try {
-        final followedChannels = await twitchApi.getFollowedChannels(
-          userId: authStore.user.details!.id,
-          cursor: cursor,
-        );
-
-        // Look for pinned channels in this batch
-        for (final channel in followedChannels.data) {
-          if (offlinePinnedIds.contains(channel.broadcasterId)) {
-            _pinnedOfflineChannels.add(channel);
-            foundChannels.add(channel.broadcasterId);
-          }
-        }
-
-        cursor = followedChannels.pagination['cursor'];
-        
-        // If no more pages or we found all channels, break
-        if (cursor == null || foundChannels.length >= offlinePinnedIds.length) {
-          break;
-        }
-      } catch (e) {
-        debugPrint('Error fetching pinned offline channels: $e');
-        break;
-      }
-    }
   }
 
   @action
@@ -363,7 +300,8 @@ abstract class ListStoreBase with Store {
   Future<void> refreshStreams() async {
     if (listType == ListType.followed) {
       await getPinnedStreams();
-      
+
+      // Always refresh offline channels for the bottom section
       _offlineChannelsCursor = null;
       await getOfflineChannels();
     }

@@ -200,26 +200,6 @@ mixin _$ListStore on ListStoreBase, Store {
     });
   }
 
-  late final _$_pinnedOfflineChannelsAtom =
-      Atom(name: 'ListStoreBase._pinnedOfflineChannels', context: context);
-
-  ObservableList<FollowedChannel> get pinnedOfflineChannels {
-    _$_pinnedOfflineChannelsAtom.reportRead();
-    return super._pinnedOfflineChannels;
-  }
-
-  @override
-  ObservableList<FollowedChannel> get _pinnedOfflineChannels =>
-      pinnedOfflineChannels;
-
-  @override
-  set _pinnedOfflineChannels(ObservableList<FollowedChannel> value) {
-    _$_pinnedOfflineChannelsAtom
-        .reportWrite(value, super._pinnedOfflineChannels, () {
-      super._pinnedOfflineChannels = value;
-    });
-  }
-
   late final _$showJumpButtonAtom =
       Atom(name: 'ListStoreBase.showJumpButton', context: context);
 
@@ -285,15 +265,6 @@ mixin _$ListStore on ListStoreBase, Store {
   @override
   Future<void> getPinnedStreams() {
     return _$getPinnedStreamsAsyncAction.run(() => super.getPinnedStreams());
-  }
-
-  late final _$_getPinnedOfflineChannelsAsyncAction =
-      AsyncAction('ListStoreBase._getPinnedOfflineChannels', context: context);
-
-  @override
-  Future<void> _getPinnedOfflineChannels() {
-    return _$_getPinnedOfflineChannelsAsyncAction
-        .run(() => super._getPinnedOfflineChannels());
   }
 
   late final _$getOfflineChannelsAsyncAction =

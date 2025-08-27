@@ -356,3 +356,50 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
     );
   }
 }
+
+/// A skeleton loader for offline channel cards
+class OfflineChannelCardSkeletonLoader extends StatelessWidget {
+  const OfflineChannelCardSkeletonLoader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 16 + MediaQuery.of(context).padding.left,
+        vertical: 8,
+      ),
+      child: Row(
+        children: [
+          // Profile picture skeleton (radius 24 = 48px diameter)
+          const SkeletonLoader(
+            width: 48,
+            height: 48,
+            borderRadius: BorderRadius.all(Radius.circular(24)),
+          ),
+          const SizedBox(width: 12),
+          // Channel info skeleton
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Channel name skeleton
+                SkeletonText(
+                  height: 16,
+                  minWidth: 80,
+                  maxWidth: 160,
+                ),
+                const SizedBox(height: 8),
+                // Following duration skeleton
+                SkeletonText(
+                  height: 14,
+                  minWidth: 100,
+                  maxWidth: 140,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

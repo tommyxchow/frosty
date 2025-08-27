@@ -14,8 +14,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..accentColor = (json['accentColor'] as num?)?.toInt() ?? 4287710975
       ..showThumbnails = json['showThumbnails'] as bool? ?? true
       ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
-      ..showOfflinePinnedChannels =
-          json['showOfflinePinnedChannels'] as bool? ?? true
       ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
       ..showVideo = json['showVideo'] as bool? ?? true
       ..defaultToHighestQuality =
@@ -83,7 +81,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'accentColor': instance.accentColor,
       'showThumbnails': instance.showThumbnails,
       'largeStreamCard': instance.largeStreamCard,
-      'showOfflinePinnedChannels': instance.showOfflinePinnedChannels,
       'launchUrlExternal': instance.launchUrlExternal,
       'showVideo': instance.showVideo,
       'defaultToHighestQuality': instance.defaultToHighestQuality,
@@ -216,23 +213,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set largeStreamCard(bool value) {
     _$largeStreamCardAtom.reportWrite(value, super.largeStreamCard, () {
       super.largeStreamCard = value;
-    });
-  }
-
-  late final _$showOfflinePinnedChannelsAtom = Atom(
-      name: '_SettingsStoreBase.showOfflinePinnedChannels', context: context);
-
-  @override
-  bool get showOfflinePinnedChannels {
-    _$showOfflinePinnedChannelsAtom.reportRead();
-    return super.showOfflinePinnedChannels;
-  }
-
-  @override
-  set showOfflinePinnedChannels(bool value) {
-    _$showOfflinePinnedChannelsAtom
-        .reportWrite(value, super.showOfflinePinnedChannels, () {
-      super.showOfflinePinnedChannels = value;
     });
   }
 
@@ -996,7 +976,6 @@ themeType: ${themeType},
 accentColor: ${accentColor},
 showThumbnails: ${showThumbnails},
 largeStreamCard: ${largeStreamCard},
-showOfflinePinnedChannels: ${showOfflinePinnedChannels},
 launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
