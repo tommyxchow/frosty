@@ -189,6 +189,10 @@ abstract class VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
+    // Reset chat delay to 0 if auto sync is already enabled to prevent starting with old values
+    if (settingsStore.autoSyncChatDelay) {
+      settingsStore.chatDelay = 0.0;
+    }
     // Initialize the video webview params for iOS to enable video autoplay.
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       _videoWebViewParams = WebKitWebViewControllerCreationParams(
