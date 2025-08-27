@@ -104,13 +104,12 @@ class OfflineChannelCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 2),
-
                   // Status and follow duration
                   Text(
                     showOfflineStatus ? 'Offline' : followedText,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
                       color: fontColor?.withValues(alpha: 0.6),
                     ),
                   ),
