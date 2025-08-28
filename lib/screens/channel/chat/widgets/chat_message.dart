@@ -14,6 +14,7 @@ class ChatMessage extends StatelessWidget {
   final ChatStore chatStore;
   final bool isModal;
   final bool showReplyHeader;
+  final bool isInReplyThread;
 
   const ChatMessage({
     super.key,
@@ -21,6 +22,7 @@ class ChatMessage extends StatelessWidget {
     required this.chatStore,
     this.isModal = false,
     this.showReplyHeader = true,
+    this.isInReplyThread = false,
   });
 
   void onTapName(BuildContext context) {
@@ -428,12 +430,37 @@ class ChatMessage extends StatelessWidget {
             renderMessage = const SizedBox();
         }
 
+        // Check if this is a reply message in reply thread context for indentation
+        final isReplyInThread = isInReplyThread &&
+            ircMessage.tags['reply-parent-display-name'] != null &&
+            ircMessage.tags['reply-parent-msg-body'] != null;
+
+        // Add reply icon for messages in reply thread
+        final messageWithIcon = isReplyInThread
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0, top: 2.0),
+                    child: Icon(
+                      Icons.subdirectory_arrow_right,
+                      size: 16,
+                      color: messageHeaderTextColor,
+                    ),
+                  ),
+                  Expanded(child: renderMessage),
+                ],
+              )
+            : renderMessage;
+
         final paddedMessage = Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: chatStore.settings.messageSpacing / 2,
-            horizontal: highlightColor == null ? 12 : 0,
+          padding: EdgeInsets.only(
+            top: chatStore.settings.messageSpacing / 2,
+            bottom: chatStore.settings.messageSpacing / 2,
+            left: isReplyInThread ? 16 : (highlightColor == null ? 12 : 0),
+            right: highlightColor == null ? 12 : 0,
           ),
-          child: renderMessage,
+          child: messageWithIcon,
         );
 
         // Add a divider above the message if dividers are enabled.

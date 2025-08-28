@@ -68,7 +68,6 @@ class ReplyThread extends StatelessWidget {
                         ),
                       ),
                     ),
-                  const Divider(),
                   Flexible(
                     child: ListView(
                       primary: false,
@@ -82,6 +81,7 @@ class ReplyThread extends StatelessWidget {
                             (message) => ChatMessage(
                               isModal: true,
                               showReplyHeader: false,
+                              isInReplyThread: true,
                               ircMessage: message,
                               chatStore: chatStore,
                             ),
