@@ -39,7 +39,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
       ..highlightFirstTimeChatter =
           json['highlightFirstTimeChatter'] as bool? ?? true
       ..showUserNotices = json['showUserNotices'] as bool? ?? true
-      ..showBottomBar = json['showBottomBar'] as bool? ?? true
       ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
       ..chatNotificationsOnBottom =
           json['chatNotificationsOnBottom'] as bool? ?? false
@@ -100,7 +99,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'chatDelay': instance.chatDelay,
       'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
       'showUserNotices': instance.showUserNotices,
-      'showBottomBar': instance.showBottomBar,
       'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
       'chatNotificationsOnBottom': instance.chatNotificationsOnBottom,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
@@ -521,22 +519,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showUserNotices(bool value) {
     _$showUserNoticesAtom.reportWrite(value, super.showUserNotices, () {
       super.showUserNotices = value;
-    });
-  }
-
-  late final _$showBottomBarAtom =
-      Atom(name: '_SettingsStoreBase.showBottomBar', context: context);
-
-  @override
-  bool get showBottomBar {
-    _$showBottomBarAtom.reportRead();
-    return super.showBottomBar;
-  }
-
-  @override
-  set showBottomBar(bool value) {
-    _$showBottomBarAtom.reportWrite(value, super.showBottomBar, () {
-      super.showBottomBar = value;
     });
   }
 
@@ -995,7 +977,6 @@ autoSyncChatDelay: ${autoSyncChatDelay},
 chatDelay: ${chatDelay},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
-showBottomBar: ${showBottomBar},
 emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
 chatNotificationsOnBottom: ${chatNotificationsOnBottom},
 landscapeChatLeftSide: ${landscapeChatLeftSide},

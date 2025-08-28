@@ -48,7 +48,9 @@ class Chat extends StatelessWidget {
                             builder: (context) {
                               return ListView.builder(
                                 reverse: true,
-                                padding: listPadding ?? EdgeInsets.zero,
+                                padding: (listPadding ?? EdgeInsets.zero).add(
+                                  const EdgeInsets.only(bottom: 64),
+                                ),
                                 addAutomaticKeepAlives: false,
                                 controller: chatStore.scrollController,
                                 itemCount: chatStore.renderMessages.length,
@@ -65,8 +67,19 @@ class Chat extends StatelessWidget {
                         ),
                       ),
                     ),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: ChatBottomBar(chatStore: chatStore),
+                    ),
                     Padding(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.only(
+                        left: 4,
+                        top: 4,
+                        right: 4,
+                        bottom: 68,
+                      ),
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
@@ -96,8 +109,6 @@ class Chat extends StatelessWidget {
                 ),
               ),
             ),
-            if (chatStore.settings.showBottomBar)
-              ChatBottomBar(chatStore: chatStore),
             PopScope(
               canPop: Platform.isIOS,
               onPopInvokedWithResult: (didPop, _) {
@@ -126,46 +137,49 @@ class Chat extends StatelessWidget {
                   switchInCurve: Curves.easeOut,
                   switchOutCurve: Curves.easeIn,
                   child: chatStore.assetsStore.showEmoteMenu
-                      ? Column(
-                          children: [
-                            const Divider(),
-                            Expanded(
-                              child: FrostyPageView(
-                                headers: [
-                                  'Recent',
-                                  if (chatStore.settings.showTwitchEmotes)
-                                    'Twitch',
-                                  if (chatStore.settings.show7TVEmotes) '7TV',
-                                  if (chatStore.settings.showBTTVEmotes) 'BTTV',
-                                  if (chatStore.settings.showFFZEmotes) 'FFZ',
-                                ],
-                                children: [
-                                  RecentEmotesPanel(
-                                    chatStore: chatStore,
-                                  ),
-                                  if (chatStore.settings.showTwitchEmotes)
-                                    EmoteMenuPanel(
-                                      chatStore: chatStore,
-                                      twitchEmotes: chatStore
-                                          .assetsStore.userEmoteSectionToEmotes,
-                                    ),
-                                  ...[
-                                    if (chatStore.settings.show7TVEmotes)
-                                      chatStore.assetsStore.sevenTVEmotes,
+                      ? ClipRect(
+                          child: Column(
+                            children: [
+                              const Divider(),
+                              Expanded(
+                                child: FrostyPageView(
+                                  headers: [
+                                    'Recent',
+                                    if (chatStore.settings.showTwitchEmotes)
+                                      'Twitch',
+                                    if (chatStore.settings.show7TVEmotes) '7TV',
                                     if (chatStore.settings.showBTTVEmotes)
-                                      chatStore.assetsStore.bttvEmotes,
-                                    if (chatStore.settings.showFFZEmotes)
-                                      chatStore.assetsStore.ffzEmotes,
-                                  ].map(
-                                    (emotes) => EmoteMenuPanel(
+                                      'BTTV',
+                                    if (chatStore.settings.showFFZEmotes) 'FFZ',
+                                  ],
+                                  children: [
+                                    RecentEmotesPanel(
                                       chatStore: chatStore,
-                                      emotes: emotes,
                                     ),
-                                  ),
-                                ],
+                                    if (chatStore.settings.showTwitchEmotes)
+                                      EmoteMenuPanel(
+                                        chatStore: chatStore,
+                                        twitchEmotes: chatStore.assetsStore
+                                            .userEmoteSectionToEmotes,
+                                      ),
+                                    ...[
+                                      if (chatStore.settings.show7TVEmotes)
+                                        chatStore.assetsStore.sevenTVEmotes,
+                                      if (chatStore.settings.showBTTVEmotes)
+                                        chatStore.assetsStore.bttvEmotes,
+                                      if (chatStore.settings.showFFZEmotes)
+                                        chatStore.assetsStore.ffzEmotes,
+                                    ].map(
+                                      (emotes) => EmoteMenuPanel(
+                                        chatStore: chatStore,
+                                        emotes: emotes,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         )
                       : null,
                 ),

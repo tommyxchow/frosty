@@ -223,11 +223,6 @@ class _ChatSettingsState extends State<ChatSettings> {
               ),
               const SectionHeader('Layout'),
               SettingsListSwitch(
-                title: 'Show bottom bar',
-                value: settingsStore.showBottomBar,
-                onChanged: (newValue) => settingsStore.showBottomBar = newValue,
-              ),
-              SettingsListSwitch(
                 title: 'Move emote menu button left',
                 subtitle: const Text(
                   'Places the emote menu button on the left side to avoid accidental presses.',

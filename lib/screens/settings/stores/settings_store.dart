@@ -129,7 +129,6 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowUserNotices = true;
 
   // Layout defaults
-  static const defaultShowBottomBar = true;
   static const defaultEmoteMenuButtonOnLeft = false;
   static const defaultChatNotificationsOnBottom = false;
 
@@ -215,10 +214,6 @@ abstract class _SettingsStoreBase with Store {
   var showUserNotices = defaultHighlightFirstTimeChatter;
 
   // Layout options
-  @JsonKey(defaultValue: defaultShowBottomBar)
-  @observable
-  var showBottomBar = defaultShowBottomBar;
-
   @JsonKey(defaultValue: defaultEmoteMenuButtonOnLeft)
   @observable
   var emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
@@ -313,7 +308,6 @@ abstract class _SettingsStoreBase with Store {
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
     showUserNotices = defaultShowUserNotices;
 
-    showBottomBar = defaultShowBottomBar;
     emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
     chatNotificationsOnBottom = defaultChatNotificationsOnBottom;
 
