@@ -366,8 +366,7 @@ class _StreamsListState extends State<StreamsList>
                             },
                           ),
                           // Add offline followed channels section for following tab
-                          if (isFollowingTab &&
-                              _listStore.offlineChannels.isNotEmpty) ...[
+                          if (isFollowingTab) ...[
                             SliverToBoxAdapter(
                               child: Observer(
                                 builder: (context) => ExpandableSectionHeader(
