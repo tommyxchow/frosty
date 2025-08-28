@@ -78,9 +78,11 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
 
   @override
   Widget build(BuildContext context) {
-    // Create full resolution URL (always 1920x1080)
-    final fullResUrl =
-        widget.imageUrl.replaceFirst('-{width}x{height}', '-1920x1080');
+    // Create full resolution URL
+    final fullResUrl = widget.imageUrl.replaceFirst('-{width}x{height}', '');
+    // Only stream card thumbnails include the placeholder; emotes do not.
+    // If replacement yields the same URL, there is no full-res variant.
+    final supportsFullRes = fullResUrl != widget.imageUrl;
 
     final screenHeight = MediaQuery.of(context).size.height;
     final fadeDistance = screenHeight * 0.20; // 20% of screen height
@@ -166,38 +168,39 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
           ),
         ),
 
-        Positioned(
-          // Place the button roughly between the image area and the bottom of the screen.
-          // Assumption: the photo view occupies the top portion of the screen; using
-          // a fractional top offset (80%) places the button in the gap between image and bottom.
-          top: MediaQuery.of(context).size.height * 0.8,
-          left: 0,
-          right: 0,
-          child: SafeArea(
-            top: false,
-            child: Center(
-              child: AnimatedOpacity(
-                opacity: buttonsOpacity,
-                duration: const Duration(milliseconds: 100),
-                child: ElevatedButton(
-                  onPressed: _toggleResolution,
-                  child: Text(
-                    _isFullResolution
-                        ? 'View thumbnail'
-                        : 'View full resolution',
-                    style: TextStyle(
-                      color: context
-                          .watch<FrostyThemes>()
-                          .dark
-                          .colorScheme
-                          .onSurface,
+        if (supportsFullRes)
+          Positioned(
+            // Place the button roughly between the image area and the bottom of the screen.
+            // Assumption: the photo view occupies the top portion of the screen; using
+            // a fractional top offset (80%) places the button in the gap between image and bottom.
+            top: MediaQuery.of(context).size.height * 0.8,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+              top: false,
+              child: Center(
+                child: AnimatedOpacity(
+                  opacity: buttonsOpacity,
+                  duration: const Duration(milliseconds: 100),
+                  child: ElevatedButton(
+                    onPressed: _toggleResolution,
+                    child: Text(
+                      _isFullResolution
+                          ? 'View thumbnail'
+                          : 'View original',
+                      style: TextStyle(
+                        color: context
+                            .watch<FrostyThemes>()
+                            .dark
+                            .colorScheme
+                            .onSurface,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
