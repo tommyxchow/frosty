@@ -501,97 +501,80 @@ class _VideoChatState extends State<VideoChat>
                   color: settingsStore.showVideo
                       ? Colors.black
                       : Theme.of(context).scaffoldBackgroundColor,
-                  child: SafeArea(
-                    top: settingsStore.showVideo,
-                    bottom: false,
-                    left: (settingsStore.landscapeCutout ==
-                                LandscapeCutoutType.both ||
-                            settingsStore.landscapeCutout ==
-                                LandscapeCutoutType.left)
-                        ? false
-                        : true,
-                    right: (settingsStore.landscapeCutout ==
-                                LandscapeCutoutType.both ||
-                            settingsStore.landscapeCutout ==
-                                LandscapeCutoutType.right)
-                        ? false
-                        : true,
-                    child: settingsStore.showVideo
-                        ? settingsStore.fullScreen
-                            ? Stack(
-                                children: [
-                                  player,
-                                  if (settingsStore.showOverlay)
-                                    Row(
-                                      children:
-                                          settingsStore.landscapeChatLeftSide
-                                              ? [
-                                                  overlayChat,
-                                                  Expanded(child: overlay),
-                                                ]
-                                              : [
-                                                  Expanded(child: overlay),
-                                                  overlayChat,
-                                                ],
-                                    ),
-                                ],
-                              )
-                            : LayoutBuilder(
-                                builder: (context, constraints) {
-                                  final totalWidth = constraints.maxWidth;
-                                  final chatWidth = _chatStore.expandChat
-                                      ? 0.5
-                                      : _chatStore.settings.chatWidth;
-
-                                  // Create the landscape chat container with proper styling
-                                  final chatContainer = AnimatedContainer(
-                                    curve: Curves.ease,
-                                    duration: const Duration(milliseconds: 200),
-                                    width: totalWidth * chatWidth,
-                                    color: _chatStore.settings.fullScreen
-                                        ? Colors.black.withValues(
-                                            alpha: _chatStore.settings
-                                                .fullScreenChatOverlayOpacity,
-                                          )
-                                        : Theme.of(context)
-                                            .scaffoldBackgroundColor,
-                                    child: chat,
-                                  );
-
-                                  final draggableDivider = Observer(
-                                    builder: (_) => DraggableDivider(
-                                      currentWidth: chatWidth,
-                                      maxWidth: 0.6,
-                                      isResizableOnLeft:
-                                          settingsStore.landscapeChatLeftSide,
-                                      showHandle: _videoStore.overlayVisible,
-                                      onDrag: (newWidth) {
-                                        if (!_chatStore.expandChat) {
-                                          _chatStore.settings.chatWidth =
-                                              newWidth;
-                                        }
-                                      },
-                                    ),
-                                  );
-
-                                  return Row(
+                  child: settingsStore.showVideo
+                      ? settingsStore.fullScreen
+                          ? Stack(
+                              children: [
+                                player,
+                                if (settingsStore.showOverlay)
+                                  Row(
                                     children:
                                         settingsStore.landscapeChatLeftSide
                                             ? [
-                                                chatContainer,
-                                                draggableDivider,
-                                                Expanded(child: video),
+                                                overlayChat,
+                                                Expanded(child: overlay),
                                               ]
                                             : [
-                                                Expanded(child: video),
-                                                draggableDivider,
-                                                chatContainer,
+                                                Expanded(child: overlay),
+                                                overlayChat,
                                               ],
-                                  );
-                                },
-                              )
-                        : chat,
-                  ),
+                                  ),
+                              ],
+                            )
+                          : LayoutBuilder(
+                              builder: (context, constraints) {
+                                final totalWidth = constraints.maxWidth;
+                                final chatWidth = _chatStore.expandChat
+                                    ? 0.5
+                                    : _chatStore.settings.chatWidth;
+
+                                // Create the landscape chat container with proper styling
+                                final chatContainer = AnimatedContainer(
+                                  curve: Curves.ease,
+                                  duration: const Duration(milliseconds: 200),
+                                  width: totalWidth * chatWidth,
+                                  color: _chatStore.settings.fullScreen
+                                      ? Colors.black.withValues(
+                                          alpha: _chatStore.settings
+                                              .fullScreenChatOverlayOpacity,
+                                        )
+                                      : Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                  child: chat,
+                                );
+
+                                final draggableDivider = Observer(
+                                  builder: (_) => DraggableDivider(
+                                    currentWidth: chatWidth,
+                                    maxWidth: 0.6,
+                                    isResizableOnLeft:
+                                        settingsStore.landscapeChatLeftSide,
+                                    showHandle: _videoStore.overlayVisible,
+                                    onDrag: (newWidth) {
+                                      if (!_chatStore.expandChat) {
+                                        _chatStore.settings.chatWidth =
+                                            newWidth;
+                                      }
+                                    },
+                                  ),
+                                );
+
+                                return Row(
+                                  children: settingsStore.landscapeChatLeftSide
+                                      ? [
+                                          chatContainer,
+                                          draggableDivider,
+                                          Expanded(child: video),
+                                        ]
+                                      : [
+                                          Expanded(child: video),
+                                          draggableDivider,
+                                          chatContainer,
+                                        ],
+                                );
+                              },
+                            )
+                      : chat,
                 );
               }
 
