@@ -11,8 +11,9 @@ import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
+  final EdgeInsetsGeometry? listPadding;
 
-  const Chat({super.key, required this.chatStore});
+  const Chat({super.key, required this.chatStore, this.listPadding});
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class Chat extends StatelessWidget {
                             builder: (context) {
                               return ListView.builder(
                                 reverse: true,
-                                padding: EdgeInsets.zero,
+                                padding: listPadding ?? EdgeInsets.zero,
                                 addAutomaticKeepAlives: false,
                                 controller: chatStore.scrollController,
                                 itemCount: chatStore.renderMessages.length,

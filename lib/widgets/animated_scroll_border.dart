@@ -5,11 +5,13 @@ enum ScrollBorderPosition { top, bottom }
 class AnimatedScrollBorder extends StatefulWidget {
   final ScrollController scrollController;
   final ScrollBorderPosition position;
+  final bool isReversed; // For lists with reverse: true
 
   const AnimatedScrollBorder({
     super.key,
     required this.scrollController,
     this.position = ScrollBorderPosition.top,
+    this.isReversed = false,
   });
 
   @override
@@ -56,11 +58,21 @@ class _AnimatedScrollBorderState extends State<AnimatedScrollBorder> {
     bool shouldShow = false;
 
     if (widget.position == ScrollBorderPosition.top) {
-      // Show border when scrolled away from top
-      if (widget.scrollController.hasClients) {
+      // Show border when scrolled away from top.
+      if (!widget.scrollController.hasClients) {
+        shouldShow = false;
+      } else if (!widget.isReversed) {
         shouldShow = widget.scrollController.position.pixels > 0;
       } else {
-        shouldShow = false;
+        // For reversed lists, the visual "top" corresponds to maxScrollExtent.
+        final pos = widget.scrollController.position;
+        final bool noScrollExtent = pos.maxScrollExtent <= 0.5;
+        if (noScrollExtent) {
+          shouldShow = false;
+        } else {
+          final bool reachedTop = pos.pixels >= (pos.maxScrollExtent - 1.0);
+          shouldShow = !reachedTop;
+        }
       }
     } else {
       // Bottom border: default visible, hide only when we've reached the end

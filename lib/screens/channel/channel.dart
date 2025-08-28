@@ -19,7 +19,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
-import 'package:frosty/widgets/app_bar.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/notification.dart';
@@ -206,107 +206,6 @@ class _VideoChatState extends State<VideoChat>
 
     final settingsStore = _chatStore.settings;
 
-    final appBar = FrostyAppBar(
-      title: Text(
-        getReadableName(_chatStore.displayName, _chatStore.channelName),
-      ),
-    );
-
-    final chatOnlyAppBar = Observer(
-      builder: (context) {
-        final streamInfo = _videoStore.streamInfo;
-
-        // Custom app bar with profile pic and channel info
-        return AppBar(
-          titleSpacing: 8, // Reduce gap between back button and title
-          title: Row(
-            children: [
-              // Profile picture
-              ProfilePicture(
-                userLogin: widget.userLogin,
-                radius: 16,
-              ),
-              const SizedBox(width: 12),
-              // Channel name and stats
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Channel name
-                    Text(
-                      getReadableName(
-                        _chatStore.displayName,
-                        _chatStore.channelName,
-                      ),
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2), // Reduced gap for subtitle
-                    // Stream status row
-                    if (streamInfo != null) ...[
-                      // Live stream: viewer count and uptime row
-                      Row(
-                        children: [
-                          // Viewer count
-                          Icon(
-                            Icons.visibility,
-                            size: 14,
-                            color: Theme.of(context).textTheme.bodySmall?.color,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            NumberFormat().format(streamInfo.viewerCount),
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                          ),
-                          const SizedBox(
-                            width: 12,
-                          ), // Reduced gap between elements
-                          // Live indicator and uptime
-                          Icon(
-                            Icons.circle,
-                            color: Colors.red,
-                            size: 8,
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Uptime(
-                              startTime: streamInfo.startedAt,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ] else ...[
-                      // Offline status
-                      Text(
-                        'Offline',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey,
-                            ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-
     final player = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
       child: Video(
@@ -381,11 +280,18 @@ class _VideoChatState extends State<VideoChat>
             _chatStore.settings.showVideo &&
             (_videoStore.paused || _videoStore.overlayVisible);
 
+        final bool chatOnly = !_chatStore.settings.showVideo;
+
         return Stack(
           children: [
             Chat(
               key: _chatKey,
               chatStore: _chatStore,
+              listPadding: chatOnly
+                  ? EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top,
+                    )
+                  : null,
             ),
             if (orientation == Orientation.portrait)
               AnimatedOpacity(
@@ -430,246 +336,376 @@ class _VideoChatState extends State<VideoChat>
       },
     );
 
-    final videoChat = Scaffold(
-      body: Observer(
-        builder: (context) {
-          if (orientation == Orientation.landscape &&
-              !settingsStore.landscapeForceVerticalChat) {
-            SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    final videoChat = Observer(
+      builder: (context) {
+        final theme = Theme.of(context);
 
-            final landscapeChat = AnimatedContainer(
-              curve: Curves.ease,
-              duration: const Duration(milliseconds: 200),
-              width: _chatStore.expandChat
-                  ? MediaQuery.of(context).size.width / 2
-                  : MediaQuery.of(context).size.width *
-                      _chatStore.settings.chatWidth,
-              color: _chatStore.settings.fullScreen
-                  ? Colors.black.withValues(
-                      alpha: _chatStore.settings.fullScreenChatOverlayOpacity,
-                    )
-                  : Theme.of(context).scaffoldBackgroundColor,
-              child: chat,
-            );
+        // Build a blurred AppBar when in chat-only mode (no video)
+        PreferredSizeWidget? chatOnlyBlurredAppBar;
+        if (!settingsStore.showVideo) {
+          final streamInfo = _videoStore.streamInfo;
 
-            final overlayChat = Visibility(
-              visible: settingsStore.fullScreenChatOverlay,
-              maintainState: true,
-              child: Theme(
-                data: FrostyThemes(
-                  colorSchemeSeed: Color(settingsStore.accentColor),
-                ).dark,
-                child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context).style.copyWith(
-                        color: context
-                            .watch<FrostyThemes>()
-                            .dark
-                            .colorScheme
-                            .onSurface,
-                      ),
-                  child: landscapeChat,
-                ),
-              ),
-            );
-
-            return ColoredBox(
-              color: settingsStore.showVideo
-                  ? Colors.black
-                  : Theme.of(context).scaffoldBackgroundColor,
-              child: SafeArea(
-                bottom: false,
-                left: (settingsStore.landscapeCutout ==
-                            LandscapeCutoutType.both ||
-                        settingsStore.landscapeCutout ==
-                            LandscapeCutoutType.left)
-                    ? false
-                    : true,
-                right: (settingsStore.landscapeCutout ==
-                            LandscapeCutoutType.both ||
-                        settingsStore.landscapeCutout ==
-                            LandscapeCutoutType.right)
-                    ? false
-                    : true,
-                child: settingsStore.showVideo
-                    ? settingsStore.fullScreen
-                        ? Stack(
-                            children: [
-                              player,
-                              if (settingsStore.showOverlay)
-                                Row(
-                                  children: settingsStore.landscapeChatLeftSide
-                                      ? [
-                                          overlayChat,
-                                          Expanded(child: overlay),
-                                        ]
-                                      : [
-                                          Expanded(child: overlay),
-                                          overlayChat,
-                                        ],
-                                ),
-                            ],
-                          )
-                        : LayoutBuilder(
-                            builder: (context, constraints) {
-                              final totalWidth = constraints.maxWidth;
-                              final chatWidth = _chatStore.expandChat
-                                  ? 0.5
-                                  : _chatStore.settings.chatWidth;
-
-                              // Create the landscape chat container with proper styling
-                              final chatContainer = AnimatedContainer(
-                                curve: Curves.ease,
-                                duration: const Duration(milliseconds: 200),
-                                width: totalWidth * chatWidth,
-                                color: _chatStore.settings.fullScreen
-                                    ? Colors.black.withValues(
-                                        alpha: _chatStore.settings
-                                            .fullScreenChatOverlayOpacity,
-                                      )
-                                    : Theme.of(context).scaffoldBackgroundColor,
-                                child: chat,
-                              );
-
-                              final draggableDivider = Observer(
-                                builder: (_) => DraggableDivider(
-                                  currentWidth: chatWidth,
-                                  maxWidth: 0.6,
-                                  isResizableOnLeft:
-                                      settingsStore.landscapeChatLeftSide,
-                                  showHandle: _videoStore.overlayVisible,
-                                  onDrag: (newWidth) {
-                                    if (!_chatStore.expandChat) {
-                                      _chatStore.settings.chatWidth = newWidth;
-                                    }
-                                  },
-                                ),
-                              );
-
-                              return Row(
-                                children: settingsStore.landscapeChatLeftSide
-                                    ? [
-                                        chatContainer,
-                                        draggableDivider,
-                                        Expanded(child: video),
-                                      ]
-                                    : [
-                                        Expanded(child: video),
-                                        draggableDivider,
-                                        chatContainer,
-                                      ],
-                              );
-                            },
-                          )
-                    : Column(
-                        children: [appBar, Expanded(child: chat)],
-                      ),
-              ),
-            );
-          }
-
-          SystemChrome.setEnabledSystemUIMode(
-            SystemUiMode.manual,
-            overlays: SystemUiOverlay.values,
-          );
-          return SafeArea(
-            child: Stack(
+          chatOnlyBlurredAppBar = AppBar(
+            centerTitle: false,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: theme.brightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+            ),
+            titleSpacing: 8,
+            title: Row(
               children: [
-                Column(
-                  children: [
-                    if (!settingsStore.showVideo)
-                      chatOnlyAppBar
-                    else ...[
-                      AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: Container(), // Placeholder for video space
-                      ),
-                      const Divider(),
-                    ],
-                    Expanded(child: chat),
-                  ],
+                ProfilePicture(
+                  userLogin: widget.userLogin,
+                  radius: 16,
                 ),
-                if (settingsStore.showVideo)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    child: AnimatedBuilder(
-                      animation: Listenable.merge(
-                        [_animationController, _springBackAnimation],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        getReadableName(
+                          _chatStore.displayName,
+                          _chatStore.channelName,
+                        ),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      builder: (context, child) {
-                        // Calculate current drag distance from either manual drag or animation
-                        final currentDragDistance = _isPipDragging
-                            ? _pipDragDistance
-                            : (_springBackAnimation.value);
-
-                        // Simple scale effect for visual feedback
-                        final scaleFactor = 1.0 -
-                            (currentDragDistance / _pipMaxDragDistance * 0.1);
-
-                        // Only apply rounded corners when dragging or animating
-                        final shouldHaveRoundedCorners =
-                            _isPipDragging || currentDragDistance > 0;
-                        final borderRadius = shouldHaveRoundedCorners
-                            ? BorderRadius.circular(8)
-                            : BorderRadius.zero;
-
-                        return Transform.translate(
-                          offset: Offset(0, currentDragDistance),
-                          child: Transform.scale(
-                            scale: scaleFactor.clamp(0.9, 1.0),
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: borderRadius,
-                                  child: GestureDetector(
-                                    onPanStart: _handlePipDragStart,
-                                    onPanUpdate: _handlePipDragUpdate,
-                                    onPanEnd: _handlePipDragEnd,
-                                    onPanCancel: _handlePipDragCancel,
-                                    child: AspectRatio(
-                                      aspectRatio: 16 / 9,
-                                      child: video,
-                                    ),
+                      const SizedBox(height: 2),
+                      if (streamInfo != null) ...[
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.visibility,
+                              size: 14,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              NumberFormat().format(streamInfo.viewerCount),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                ),
-                                // Simple text overlay that follows the video
-                                if (_isPipDragging && !_videoStore.isInPipMode)
-                                  Positioned.fill(
-                                    child: Container(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.4),
-                                      child: Center(
-                                        child: AnimatedOpacity(
-                                          opacity:
-                                              _pipDragDistance > 20 ? 1.0 : 0.0,
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          child: const Text(
-                                            'Swipe down to enter picture-in-picture',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
+                            ),
+                            const SizedBox(width: 12),
+                            Icon(
+                              Icons.circle,
+                              color: Colors.red,
+                              size: 8,
+                            ),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Uptime(
+                                startTime: streamInfo.startedAt,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ] else ...[
+                        Text(
+                          'Offline',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            flexibleSpace: BlurredContainer(
+              child: Column(
+                children: [
+                  const Expanded(child: SizedBox.expand()),
+                  AnimatedScrollBorder(
+                    scrollController: _chatStore.scrollController,
+                    isReversed: true,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return Scaffold(
+          extendBody: true,
+          extendBodyBehindAppBar: true,
+          appBar: chatOnlyBlurredAppBar,
+          body: Observer(
+            builder: (context) {
+              if (orientation == Orientation.landscape &&
+                  !settingsStore.landscapeForceVerticalChat) {
+                SystemChrome.setEnabledSystemUIMode(
+                  SystemUiMode.immersiveSticky,
+                );
+
+                final landscapeChat = AnimatedContainer(
+                  curve: Curves.ease,
+                  duration: const Duration(milliseconds: 200),
+                  width: _chatStore.expandChat
+                      ? MediaQuery.of(context).size.width / 2
+                      : MediaQuery.of(context).size.width *
+                          _chatStore.settings.chatWidth,
+                  color: _chatStore.settings.fullScreen
+                      ? Colors.black.withValues(
+                          alpha:
+                              _chatStore.settings.fullScreenChatOverlayOpacity,
+                        )
+                      : Theme.of(context).scaffoldBackgroundColor,
+                  child: chat,
+                );
+
+                final overlayChat = Visibility(
+                  visible: settingsStore.fullScreenChatOverlay,
+                  maintainState: true,
+                  child: Theme(
+                    data: FrostyThemes(
+                      colorSchemeSeed: Color(settingsStore.accentColor),
+                    ).dark,
+                    child: DefaultTextStyle(
+                      style: DefaultTextStyle.of(context).style.copyWith(
+                            color: context
+                                .watch<FrostyThemes>()
+                                .dark
+                                .colorScheme
+                                .onSurface,
+                          ),
+                      child: landscapeChat,
+                    ),
+                  ),
+                );
+
+                return ColoredBox(
+                  color: settingsStore.showVideo
+                      ? Colors.black
+                      : Theme.of(context).scaffoldBackgroundColor,
+                  child: SafeArea(
+                    top: settingsStore.showVideo,
+                    bottom: false,
+                    left: (settingsStore.landscapeCutout ==
+                                LandscapeCutoutType.both ||
+                            settingsStore.landscapeCutout ==
+                                LandscapeCutoutType.left)
+                        ? false
+                        : true,
+                    right: (settingsStore.landscapeCutout ==
+                                LandscapeCutoutType.both ||
+                            settingsStore.landscapeCutout ==
+                                LandscapeCutoutType.right)
+                        ? false
+                        : true,
+                    child: settingsStore.showVideo
+                        ? settingsStore.fullScreen
+                            ? Stack(
+                                children: [
+                                  player,
+                                  if (settingsStore.showOverlay)
+                                    Row(
+                                      children:
+                                          settingsStore.landscapeChatLeftSide
+                                              ? [
+                                                  overlayChat,
+                                                  Expanded(child: overlay),
+                                                ]
+                                              : [
+                                                  Expanded(child: overlay),
+                                                  overlayChat,
+                                                ],
+                                    ),
+                                ],
+                              )
+                            : LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final totalWidth = constraints.maxWidth;
+                                  final chatWidth = _chatStore.expandChat
+                                      ? 0.5
+                                      : _chatStore.settings.chatWidth;
+
+                                  // Create the landscape chat container with proper styling
+                                  final chatContainer = AnimatedContainer(
+                                    curve: Curves.ease,
+                                    duration: const Duration(milliseconds: 200),
+                                    width: totalWidth * chatWidth,
+                                    color: _chatStore.settings.fullScreen
+                                        ? Colors.black.withValues(
+                                            alpha: _chatStore.settings
+                                                .fullScreenChatOverlayOpacity,
+                                          )
+                                        : Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                    child: chat,
+                                  );
+
+                                  final draggableDivider = Observer(
+                                    builder: (_) => DraggableDivider(
+                                      currentWidth: chatWidth,
+                                      maxWidth: 0.6,
+                                      isResizableOnLeft:
+                                          settingsStore.landscapeChatLeftSide,
+                                      showHandle: _videoStore.overlayVisible,
+                                      onDrag: (newWidth) {
+                                        if (!_chatStore.expandChat) {
+                                          _chatStore.settings.chatWidth =
+                                              newWidth;
+                                        }
+                                      },
+                                    ),
+                                  );
+
+                                  return Row(
+                                    children:
+                                        settingsStore.landscapeChatLeftSide
+                                            ? [
+                                                chatContainer,
+                                                draggableDivider,
+                                                Expanded(child: video),
+                                              ]
+                                            : [
+                                                Expanded(child: video),
+                                                draggableDivider,
+                                                chatContainer,
+                                              ],
+                                  );
+                                },
+                              )
+                        : chat,
+                  ),
+                );
+              }
+
+              SystemChrome.setEnabledSystemUIMode(
+                SystemUiMode.manual,
+                overlays: SystemUiOverlay.values,
+              );
+              return SafeArea(
+                // Keep chat-only scrolling under the blurred app bar, but
+                // ensure video does not bleed into the system status bar.
+                top: settingsStore.showVideo,
+                child: Stack(
+                  children: [
+                    Column(
+                      children: [
+                        if (settingsStore.showVideo) ...[
+                          AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: Container(), // Placeholder for video space
+                          ),
+                          const Divider(),
+                        ],
+                        Expanded(child: chat),
+                      ],
+                    ),
+                    if (settingsStore.showVideo)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: AnimatedBuilder(
+                          animation: Listenable.merge(
+                            [_animationController, _springBackAnimation],
+                          ),
+                          builder: (context, child) {
+                            // Calculate current drag distance from either manual drag or animation
+                            final currentDragDistance = _isPipDragging
+                                ? _pipDragDistance
+                                : (_springBackAnimation.value);
+
+                            // Simple scale effect for visual feedback
+                            final scaleFactor = 1.0 -
+                                (currentDragDistance /
+                                    _pipMaxDragDistance *
+                                    0.1);
+
+                            // Only apply rounded corners when dragging or animating
+                            final shouldHaveRoundedCorners =
+                                _isPipDragging || currentDragDistance > 0;
+                            final borderRadius = shouldHaveRoundedCorners
+                                ? BorderRadius.circular(8)
+                                : BorderRadius.zero;
+
+                            return Transform.translate(
+                              offset: Offset(0, currentDragDistance),
+                              child: Transform.scale(
+                                scale: scaleFactor.clamp(0.9, 1.0),
+                                child: Stack(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: borderRadius,
+                                      child: GestureDetector(
+                                        onPanStart: _handlePipDragStart,
+                                        onPanUpdate: _handlePipDragUpdate,
+                                        onPanEnd: _handlePipDragEnd,
+                                        onPanCancel: _handlePipDragCancel,
+                                        child: AspectRatio(
+                                          aspectRatio: 16 / 9,
+                                          child: video,
+                                        ),
+                                      ),
+                                    ),
+                                    // Simple text overlay that follows the video
+                                    if (_isPipDragging &&
+                                        !_videoStore.isInPipMode)
+                                      Positioned.fill(
+                                        child: Container(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.4),
+                                          child: Center(
+                                            child: AnimatedOpacity(
+                                              opacity: _pipDragDistance > 20
+                                                  ? 1.0
+                                                  : 0.0,
+                                              duration: const Duration(
+                                                milliseconds: 200,
+                                              ),
+                                              child: const Text(
+                                                'Swipe down to enter picture-in-picture',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
 
     // If on Android, use PiPSwitcher to enable PiP functionality.
