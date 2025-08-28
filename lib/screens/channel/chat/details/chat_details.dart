@@ -6,6 +6,7 @@ import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
@@ -71,7 +72,7 @@ class _ChatDetailsState extends State<ChatDetails> {
       Duration(hours: 12),
     ];
 
-    return showModalBottomSheet(
+    return showModalBottomSheetWithProperFocus(
       context: context,
       builder: (context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,7 +171,7 @@ class _ChatDetailsState extends State<ChatDetails> {
       ListTile(
         leading: const Icon(Icons.people_outline),
         title: const Text('Chatters'),
-        onTap: () => showModalBottomSheet(
+        onTap: () => showModalBottomSheetWithProperFocus(
           isScrollControlled: true,
           context: context,
           builder: (context) => GestureDetector(

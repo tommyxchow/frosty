@@ -7,6 +7,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 class ChatMessage extends StatelessWidget {
@@ -35,7 +36,7 @@ class ChatMessage extends StatelessWidget {
       return;
     }
 
-    showModalBottomSheet(
+    showModalBottomSheetWithProperFocus(
       isScrollControlled: true,
       context: context,
       builder: (context) => ChatUserModal(
@@ -61,7 +62,7 @@ class ChatMessage extends StatelessWidget {
     )
         .then((user) {
       if (context.mounted) {
-        showModalBottomSheet(
+        showModalBottomSheetWithProperFocus(
           isScrollControlled: true,
           context: context,
           builder: (context) => ChatUserModal(
@@ -90,7 +91,7 @@ class ChatMessage extends StatelessWidget {
       return;
     }
 
-    showModalBottomSheet(
+    showModalBottomSheetWithProperFocus(
       context: context,
       isScrollControlled: true,
       builder: (context) => ListView(
@@ -208,7 +209,7 @@ class ChatMessage extends StatelessWidget {
               messageHeader = GestureDetector(
                 onTap: isModal
                     ? null
-                    : () => showModalBottomSheet(
+                    : () => showModalBottomSheetWithProperFocus(
                           context: context,
                           builder: (context) {
                             return ReplyThread(

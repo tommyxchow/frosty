@@ -12,6 +12,7 @@ import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/photo_view.dart';
 import 'package:intl/intl.dart';
@@ -871,7 +872,7 @@ class IRCMessage {
     required bool launchExternal,
     bool showCopyName = true,
   }) {
-    showModalBottomSheet(
+    showModalBottomSheetWithProperFocus(
       context: context,
       builder: (context) => ListView(
         shrinkWrap: true,

@@ -4,6 +4,7 @@ import 'package:frosty/models/followed_channel.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
 import 'package:provider/provider.dart';
@@ -66,7 +67,7 @@ class OfflineChannelCard extends StatelessWidget {
       onLongPress: () {
         HapticFeedback.mediumImpact();
 
-        showModalBottomSheet(
+        showModalBottomSheetWithProperFocus(
           context: context,
           builder: (context) => UserActionsModal(
             authStore: context.read<AuthStore>(),

@@ -229,23 +229,6 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$_hasIntentionallyUnfocusedAtom =
-      Atom(name: 'ChatStoreBase._hasIntentionallyUnfocused', context: context);
-
-  @override
-  bool get _hasIntentionallyUnfocused {
-    _$_hasIntentionallyUnfocusedAtom.reportRead();
-    return super._hasIntentionallyUnfocused;
-  }
-
-  @override
-  set _hasIntentionallyUnfocused(bool value) {
-    _$_hasIntentionallyUnfocusedAtom
-        .reportWrite(value, super._hasIntentionallyUnfocused, () {
-      super._hasIntentionallyUnfocused = value;
-    });
-  }
-
   late final _$getAssetsAsyncAction =
       AsyncAction('ChatStoreBase.getAssets', context: context);
 

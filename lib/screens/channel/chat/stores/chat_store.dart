@@ -163,10 +163,6 @@ abstract class ChatStoreBase with Store {
   @observable
   IRCMessage? replyingToMessage;
 
-  /// Tracks whether the user has intentionally unfocused the input field.
-  /// When true, prevents automatic refocusing until the user manually focuses again.
-  @observable
-  var _hasIntentionallyUnfocused = false;
 
   /// Public getter for whether a message is currently being sent.
   bool get isSendingMessage => _isSendingMessage;
@@ -277,8 +273,6 @@ abstract class ChatStoreBase with Store {
 
     textFieldFocusNode.addListener(() {
       if (textFieldFocusNode.hasFocus) {
-        // Reset the intentional unfocus flag when user manually focuses
-        _hasIntentionallyUnfocused = false;
         // Hide the emote menu if it is currently shown.
         if (assetsStore.showEmoteMenu) assetsStore.showEmoteMenu = false;
       }
@@ -853,20 +847,15 @@ abstract class ChatStoreBase with Store {
     WakelockPlus.disable();
   }
 
-  /// Unfocuses the text field and marks it as intentionally unfocused.
-  /// This prevents automatic refocusing until the user manually focuses again.
+  /// Unfocuses the text field.
   @action
   void unfocusInput() {
-    _hasIntentionallyUnfocused = true;
     textFieldFocusNode.unfocus();
   }
 
-  /// Requests focus for the text field only if it hasn't been intentionally unfocused.
-  /// Use this instead of direct requestFocus() calls to respect user's unfocus intent.
+  /// Requests focus for the text field.
   @action
   void safeRequestFocus() {
-    if (!_hasIntentionallyUnfocused) {
-      textFieldFocusNode.requestFocus();
-    }
+    textFieldFocusNode.requestFocus();
   }
 }

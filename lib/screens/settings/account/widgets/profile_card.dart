@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/account/account_options.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -13,7 +14,7 @@ class ProfileCard extends StatelessWidget {
   const ProfileCard({super.key, required this.authStore});
 
   Future<void> _showAccountOptionsModalBottomSheet(BuildContext context) {
-    return showModalBottomSheet(
+    return showModalBottomSheetWithProperFocus(
       context: context,
       builder: (context) {
         return AccountOptions(authStore: authStore);

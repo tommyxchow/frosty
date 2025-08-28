@@ -8,6 +8,7 @@ import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/uptime.dart';
@@ -154,7 +155,7 @@ class LargeStreamCard extends StatelessWidget {
       onLongPress: () {
         HapticFeedback.mediumImpact();
 
-        showModalBottomSheet(
+        showModalBottomSheetWithProperFocus(
           context: context,
           builder: (context) => UserActionsModal(
             authStore: context.read<AuthStore>(),

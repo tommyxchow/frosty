@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
 
 class SettingsMutedWords extends StatefulWidget {
@@ -43,7 +44,7 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
     return ListTile(
       trailing: const Icon(Icons.edit),
       title: const Text('Muted keywords'),
-      onTap: () => showModalBottomSheet(
+      onTap: () => showModalBottomSheetWithProperFocus(
         isScrollControlled: true,
         context: context,
         builder: (context) => SizedBox(

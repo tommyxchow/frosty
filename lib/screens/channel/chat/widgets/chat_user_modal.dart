@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
@@ -70,7 +71,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                   ),
                 IconButton(
                   tooltip: 'More',
-                  onPressed: () => showModalBottomSheet(
+                  onPressed: () => showModalBottomSheetWithProperFocus(
                     context: context,
                     builder: (context) => UserActionsModal(
                       authStore: widget.chatStore.auth,

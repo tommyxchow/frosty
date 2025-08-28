@@ -10,6 +10,7 @@ import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -64,7 +65,7 @@ class VideoOverlay extends StatelessWidget {
       color: surfaceColor,
       onPressed: () {
         videoStore.updateStreamQualities();
-        showModalBottomSheet(
+        showModalBottomSheetWithProperFocus(
           context: context,
           builder: (context) => Column(
             mainAxisSize: MainAxisSize.min,
@@ -311,7 +312,7 @@ class VideoOverlay extends StatelessWidget {
                             message: 'Viewer count',
                             preferBelow: false,
                             child: GestureDetector(
-                              onTap: () => showModalBottomSheet(
+                              onTap: () => showModalBottomSheetWithProperFocus(
                                 isScrollControlled: true,
                                 context: context,
                                 builder: (context) => GestureDetector(

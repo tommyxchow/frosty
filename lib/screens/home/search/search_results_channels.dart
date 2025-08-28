@@ -6,6 +6,7 @@ import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
@@ -127,7 +128,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                       onLongPress: () {
                         HapticFeedback.lightImpact();
 
-                        showModalBottomSheet(
+                        showModalBottomSheetWithProperFocus(
                           context: context,
                           builder: (context) => UserActionsModal(
                             authStore: widget.searchStore.authStore,
