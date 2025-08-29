@@ -301,6 +301,7 @@ class _VideoChatState extends State<VideoChat>
                 child: IgnorePointer(
                   ignoring: !videoBarVisible,
                   child: BlurredContainer(
+                    gradientDirection: GradientDirection.up,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
