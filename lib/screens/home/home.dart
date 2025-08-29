@@ -180,39 +180,62 @@ class _HomeState extends State<Home> {
                 },
               ),
               Observer(
-                builder: (_) => NavigationBar(
-                  backgroundColor: Colors.transparent,
-                  surfaceTintColor: Colors.transparent,
-                  elevation: 0,
-                  destinations: [
+                builder: (_) => Theme(
+                  data: Theme.of(context).copyWith(
+                    splashFactory: NoSplash.splashFactory,
+                  ),
+                  child: NavigationBar(
+                    backgroundColor: Colors.transparent,
+                    surfaceTintColor: Colors.transparent,
+                    elevation: 0,
+                    destinations: [
                     if (_authStore.isLoggedIn)
-                      const NavigationDestination(
+                      NavigationDestination(
                         icon: Icon(
                           Icons.favorite_border_rounded,
+                          color: _homeStore.selectedIndex == 0
+                              ? theme.colorScheme.onSurface
+                              : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                         ),
-                        selectedIcon: Icon(Icons.favorite_rounded),
+                        selectedIcon: Icon(
+                          Icons.favorite_rounded,
+                          color: theme.colorScheme.onSurface,
+                        ),
                         label: 'Following',
                         tooltip: 'Following',
                       ),
-                    const NavigationDestination(
+                    NavigationDestination(
                       icon: Icon(
                         Icons.arrow_upward_rounded,
+                        color: _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
+                            ? theme.colorScheme.onSurface
+                            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                       ),
-                      selectedIcon: Icon(Icons.arrow_upward_rounded),
+                      selectedIcon: Icon(
+                        Icons.arrow_upward_rounded,
+                        color: theme.colorScheme.onSurface,
+                      ),
                       label: 'Top',
                       tooltip: 'Top',
                     ),
-                    const NavigationDestination(
+                    NavigationDestination(
                       icon: Icon(
                         Icons.search_rounded,
+                        color: _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
+                            ? theme.colorScheme.onSurface
+                            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                       ),
-                      selectedIcon: Icon(Icons.search_rounded),
+                      selectedIcon: Icon(
+                        Icons.search_rounded,
+                        color: theme.colorScheme.onSurface,
+                      ),
                       label: 'Search',
                       tooltip: 'Search',
                     ),
-                  ],
-                  selectedIndex: _homeStore.selectedIndex,
-                  onDestinationSelected: _homeStore.handleTap,
+                    ],
+                    selectedIndex: _homeStore.selectedIndex,
+                    onDestinationSelected: _homeStore.handleTap,
+                  ),
                 ),
               ),
             ],

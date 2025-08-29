@@ -68,6 +68,9 @@ class FrostyThemes {
         backgroundColor: backgroundColor,
         height: 64,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        indicatorColor: Colors.transparent,
+        indicatorShape: const CircleBorder(),
+        overlayColor: const WidgetStatePropertyAll(Colors.transparent),
       ),
       tabBarTheme: const TabBarThemeData(
         dividerColor: Colors.transparent,
