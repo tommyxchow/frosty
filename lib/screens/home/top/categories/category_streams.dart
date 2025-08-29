@@ -57,6 +57,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
             left: 0,
             right: 0,
             child: BlurredContainer(
+              gradientDirection: GradientDirection.up,
               padding: EdgeInsets.only(
                 top: MediaQuery.of(context).padding.top,
                 left: MediaQuery.of(context).padding.left,

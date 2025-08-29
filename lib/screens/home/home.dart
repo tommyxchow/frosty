@@ -90,6 +90,7 @@ class _HomeState extends State<Home> {
               if (!isOnFollowingTab) return const SizedBox.shrink();
 
               return BlurredContainer(
+                gradientDirection: GradientDirection.up,
                 child: Column(
                   children: [
                     const Expanded(child: SizedBox.expand()),
@@ -153,6 +154,7 @@ class _HomeState extends State<Home> {
           ),
         ),
         bottomNavigationBar: BlurredContainer(
+          gradientDirection: GradientDirection.down,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

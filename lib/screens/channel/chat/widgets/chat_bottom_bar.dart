@@ -72,6 +72,7 @@ class ChatBottomBar extends StatelessWidget {
             .toList();
 
         return BlurredContainer(
+          gradientDirection: GradientDirection.down,
           child: Column(
             children: [
               AnimatedScrollBorder(

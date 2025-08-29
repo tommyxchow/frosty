@@ -436,6 +436,7 @@ class _VideoChatState extends State<VideoChat>
               ],
             ),
             flexibleSpace: BlurredContainer(
+              gradientDirection: GradientDirection.up,
               child: Column(
                 children: [
                   const Expanded(child: SizedBox.expand()),
