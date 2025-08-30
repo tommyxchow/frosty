@@ -353,7 +353,6 @@ class _VideoChatState extends State<VideoChat>
                       ? Brightness.light
                       : Brightness.dark,
             ),
-            titleSpacing: 8,
             title: Row(
               children: [
                 ProfilePicture(

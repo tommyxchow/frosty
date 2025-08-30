@@ -46,6 +46,7 @@ class FrostyThemes {
         elevation: 0,
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
+        titleSpacing: 0,
       ),
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),

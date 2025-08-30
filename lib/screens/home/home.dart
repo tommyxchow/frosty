@@ -74,6 +74,7 @@ class _HomeState extends State<Home> {
           elevation: 0,
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
+          titleSpacing: 16,
           systemOverlayStyle: SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
             statusBarIconBrightness: theme.brightness == Brightness.dark
@@ -189,49 +190,54 @@ class _HomeState extends State<Home> {
                     surfaceTintColor: Colors.transparent,
                     elevation: 0,
                     destinations: [
-                    if (_authStore.isLoggedIn)
+                      if (_authStore.isLoggedIn)
+                        NavigationDestination(
+                          icon: Icon(
+                            Icons.favorite_border_rounded,
+                            color: _homeStore.selectedIndex == 0
+                                ? theme.colorScheme.onSurface
+                                : theme.colorScheme.onSurfaceVariant
+                                    .withValues(alpha: 0.6),
+                          ),
+                          selectedIcon: Icon(
+                            Icons.favorite_rounded,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                          label: 'Following',
+                          tooltip: 'Following',
+                        ),
                       NavigationDestination(
                         icon: Icon(
-                          Icons.favorite_border_rounded,
-                          color: _homeStore.selectedIndex == 0
-                              ? theme.colorScheme.onSurface
-                              : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                          Icons.arrow_upward_rounded,
+                          color:
+                              _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
+                                  ? theme.colorScheme.onSurface
+                                  : theme.colorScheme.onSurfaceVariant
+                                      .withValues(alpha: 0.6),
                         ),
                         selectedIcon: Icon(
-                          Icons.favorite_rounded,
+                          Icons.arrow_upward_rounded,
                           color: theme.colorScheme.onSurface,
                         ),
-                        label: 'Following',
-                        tooltip: 'Following',
+                        label: 'Top',
+                        tooltip: 'Top',
                       ),
-                    NavigationDestination(
-                      icon: Icon(
-                        Icons.arrow_upward_rounded,
-                        color: _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
-                            ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                      NavigationDestination(
+                        icon: Icon(
+                          Icons.search_rounded,
+                          color:
+                              _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
+                                  ? theme.colorScheme.onSurface
+                                  : theme.colorScheme.onSurfaceVariant
+                                      .withValues(alpha: 0.6),
+                        ),
+                        selectedIcon: Icon(
+                          Icons.search_rounded,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        label: 'Search',
+                        tooltip: 'Search',
                       ),
-                      selectedIcon: Icon(
-                        Icons.arrow_upward_rounded,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      label: 'Top',
-                      tooltip: 'Top',
-                    ),
-                    NavigationDestination(
-                      icon: Icon(
-                        Icons.search_rounded,
-                        color: _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
-                            ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                      ),
-                      selectedIcon: Icon(
-                        Icons.search_rounded,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      label: 'Search',
-                      tooltip: 'Search',
-                    ),
                     ],
                     selectedIndex: _homeStore.selectedIndex,
                     onDestinationSelected: _homeStore.handleTap,
