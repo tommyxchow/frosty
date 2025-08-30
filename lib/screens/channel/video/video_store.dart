@@ -243,6 +243,14 @@ abstract class VideoStoreBase with Store {
       },
     );
 
+    // Check initial state and start timer if already in chat-only mode
+    if (!settingsStore.showVideo) {
+      _startStreamInfoTimer();
+      _overlayTimer.cancel();
+      _overlayTimer =
+          Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+    }
+
     // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
     if (Platform.isAndroid) {
       _disposeAndroidAutoPipReaction = autorun(
@@ -482,8 +490,8 @@ abstract class VideoStoreBase with Store {
 
   /// Starts the periodic stream info timer for chat-only mode.
   void _startStreamInfoTimer() {
-    // Only start if not already active and we're in chat-only mode
-    if (_streamInfoTimer?.isActive != true && !settingsStore.showVideo) {
+    // Only start if not already active
+    if (_streamInfoTimer?.isActive != true) {
       _streamInfoTimer = Timer.periodic(
         const Duration(seconds: 60),
         (_) => updateStreamInfo(),
