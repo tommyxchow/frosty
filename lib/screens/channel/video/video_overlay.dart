@@ -10,8 +10,8 @@ import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
-import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -33,8 +33,6 @@ class VideoOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orientation = OrientationUtils.getCurrentOrientation(context);
-
     final surfaceColor =
         context.watch<FrostyThemes>().dark.colorScheme.onSurface;
 

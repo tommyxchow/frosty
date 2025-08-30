@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/utils/orientation_utils.dart';
+import 'package:frosty/utils/context_extensions.dart';
 
 class SectionHeader extends StatelessWidget {
   final String text;
@@ -40,10 +40,7 @@ class SectionHeader extends StatelessWidget {
               fontSize: fontSize ?? 13,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.6),
+              color: context.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
         ],

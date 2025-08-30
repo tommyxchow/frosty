@@ -5,8 +5,8 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
-import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -101,8 +101,7 @@ class ChatBottomBar extends StatelessWidget {
                       ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: DefaultTextStyle.of(context)
-                          .style
+                      style: context.defaultTextStyle
                           .copyWith(fontSize: chatStore.settings.fontSize),
                     ),
                   ),

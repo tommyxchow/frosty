@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/utils/orientation_utils.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 
 /// A reusable layout for settings pages that handles common functionality:
@@ -41,9 +41,7 @@ class _SettingsPageLayoutState extends State<SettingsPageLayout> {
     // Responsive values based on orientation
     final listPadding = EdgeInsets.only(
       top: isPortrait ? 116 : 92,
-      bottom: widget.hasBottomPadding
-          ? MediaQuery.of(context).padding.bottom + 8
-          : 0,
+      bottom: widget.hasBottomPadding ? context.safePaddingBottom + 8 : 0,
     );
 
     final borderTop = isPortrait ? 108 : 84;

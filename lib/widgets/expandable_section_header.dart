@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/utils/orientation_utils.dart';
+import 'package:frosty/utils/context_extensions.dart';
 
 class ExpandableSectionHeader extends StatelessWidget {
   final String text;
@@ -49,10 +49,8 @@ class ExpandableSectionHeader extends StatelessWidget {
                       fontSize: fontSize ?? 13,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.6),
+                      color:
+                          context.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ),
@@ -61,10 +59,7 @@ class ExpandableSectionHeader extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     Icons.keyboard_arrow_down,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.6),
+                    color: context.colorScheme.onSurface.withValues(alpha: 0.6),
                     size: 20,
                   ),
                 ),

@@ -4,10 +4,8 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/utils/orientation_utils.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/cached_image.dart';
-import 'package:provider/provider.dart';
 
 class EmoteMenuSection extends StatefulWidget {
   final ChatStore chatStore;
@@ -35,7 +33,7 @@ class _EmoteMenuSectionState extends State<EmoteMenuSection>
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: context.isPortrait
             ? 8
-            : context.read<SettingsStore>().showVideo
+            : context.settingsStore.showVideo
                 ? 6
                 : 16,
       ),

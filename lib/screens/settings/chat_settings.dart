@@ -9,6 +9,7 @@ import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/screens/settings/widgets/settings_muted_words.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/settings_page_layout.dart';
@@ -82,20 +83,17 @@ class _ChatSettingsState extends State<ChatSettings> {
                             ),
                           ],
                         ),
-                        textScaler:
-                            TextScaler.linear(settingsStore.messageScale),
+                        textScaler: settingsStore.messageScale.textScaler,
                       ),
                       SizedBox(height: settingsStore.messageSpacing),
                       Text(
                         'Hello! Here\'s a text preview.',
-                        textScaler:
-                            TextScaler.linear(settingsStore.messageScale),
+                        textScaler: settingsStore.messageScale.textScaler,
                       ),
                       SizedBox(height: settingsStore.messageSpacing),
                       Text(
                         'And another for spacing without an emote!',
-                        textScaler:
-                            TextScaler.linear(settingsStore.messageScale),
+                        textScaler: settingsStore.messageScale.textScaler,
                       ),
                     ],
                   ),

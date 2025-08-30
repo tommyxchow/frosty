@@ -3,10 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/apis/bttv_api.dart';
-import 'package:frosty/apis/ffz_api.dart';
-import 'package:frosty/apis/seventv_api.dart';
-import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
@@ -15,11 +11,9 @@ import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
-import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
-import 'package:frosty/utils/orientation_utils.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
@@ -68,29 +62,29 @@ class _VideoChatState extends State<VideoChat>
   late Animation<double> _springBackAnimation;
 
   late final ChatStore _chatStore = ChatStore(
-    twitchApi: context.read<TwitchApi>(),
+    twitchApi: context.twitchApi,
     channelName: widget.userLogin,
     channelId: widget.userId,
     displayName: widget.userName,
-    auth: context.read<AuthStore>(),
-    settings: context.read<SettingsStore>(),
+    auth: context.authStore,
+    settings: context.settingsStore,
     chatDetailsStore: ChatDetailsStore(
-      twitchApi: context.read<TwitchApi>(),
+      twitchApi: context.twitchApi,
       channelName: widget.userLogin,
     ),
     assetsStore: ChatAssetsStore(
-      twitchApi: context.read<TwitchApi>(),
-      ffzApi: context.read<FFZApi>(),
-      bttvApi: context.read<BTTVApi>(),
-      sevenTVApi: context.read<SevenTVApi>(),
+      twitchApi: context.twitchApi,
+      ffzApi: context.ffzApi,
+      bttvApi: context.bttvApi,
+      sevenTVApi: context.sevenTVApi,
     ),
   );
 
   late final VideoStore _videoStore = VideoStore(
     userLogin: widget.userLogin,
-    twitchApi: context.read<TwitchApi>(),
-    authStore: context.read<AuthStore>(),
-    settingsStore: context.read<SettingsStore>(),
+    twitchApi: context.twitchApi,
+    authStore: context.authStore,
+    settingsStore: context.settingsStore,
   );
 
   @override
@@ -207,8 +201,6 @@ class _VideoChatState extends State<VideoChat>
 
   @override
   Widget build(BuildContext context) {
-    final orientation = OrientationUtils.getCurrentOrientation(context);
-
     final settingsStore = _chatStore.settings;
 
     final player = GestureDetector(
@@ -294,7 +286,7 @@ class _VideoChatState extends State<VideoChat>
               chatStore: _chatStore,
               listPadding: chatOnly
                   ? EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top,
+                      top: context.safePaddingTop,
                     )
                   : null,
             ),
@@ -344,8 +336,6 @@ class _VideoChatState extends State<VideoChat>
 
     final videoChat = Observer(
       builder: (context) {
-        final theme = Theme.of(context);
-
         // Build a blurred AppBar when in chat-only mode (no video)
         PreferredSizeWidget? chatOnlyBlurredAppBar;
         if (!settingsStore.showVideo) {
@@ -358,9 +348,10 @@ class _VideoChatState extends State<VideoChat>
             surfaceTintColor: Colors.transparent,
             systemOverlayStyle: SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,
-              statusBarIconBrightness: theme.brightness == Brightness.dark
-                  ? Brightness.light
-                  : Brightness.dark,
+              statusBarIconBrightness:
+                  context.theme.brightness == Brightness.dark
+                      ? Brightness.light
+                      : Brightness.dark,
             ),
             titleSpacing: 8,
             title: Row(
@@ -393,18 +384,14 @@ class _VideoChatState extends State<VideoChat>
                             Icon(
                               Icons.visibility,
                               size: 14,
-                              color:
-                                  Theme.of(context).textTheme.bodySmall?.color,
+                              color: context.bodySmallColor,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               NumberFormat().format(streamInfo.viewerCount),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                              style: context.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Icon(
@@ -416,12 +403,9 @@ class _VideoChatState extends State<VideoChat>
                             Flexible(
                               child: Uptime(
                                 startTime: streamInfo.startedAt,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                style: context.textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
@@ -429,11 +413,10 @@ class _VideoChatState extends State<VideoChat>
                       ] else ...[
                         Text(
                           'Offline',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey,
-                                  ),
+                          style: context.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ],
@@ -472,15 +455,14 @@ class _VideoChatState extends State<VideoChat>
                   curve: Curves.ease,
                   duration: const Duration(milliseconds: 200),
                   width: _chatStore.expandChat
-                      ? MediaQuery.of(context).size.width / 2
-                      : MediaQuery.of(context).size.width *
-                          _chatStore.settings.chatWidth,
+                      ? context.screenWidth / 2
+                      : context.screenWidth * _chatStore.settings.chatWidth,
                   color: _chatStore.settings.fullScreen
                       ? Colors.black.withValues(
                           alpha:
                               _chatStore.settings.fullScreenChatOverlayOpacity,
                         )
-                      : Theme.of(context).scaffoldBackgroundColor,
+                      : context.scaffoldColor,
                   child: chat,
                 );
 
@@ -492,13 +474,13 @@ class _VideoChatState extends State<VideoChat>
                       colorSchemeSeed: Color(settingsStore.accentColor),
                     ).dark,
                     child: DefaultTextStyle(
-                      style: DefaultTextStyle.of(context).style.copyWith(
-                            color: context
-                                .watch<FrostyThemes>()
-                                .dark
-                                .colorScheme
-                                .onSurface,
-                          ),
+                      style: context.defaultTextStyle.copyWith(
+                        color: context
+                            .watch<FrostyThemes>()
+                            .dark
+                            .colorScheme
+                            .onSurface,
+                      ),
                       child: landscapeChat,
                     ),
                   ),
@@ -507,7 +489,7 @@ class _VideoChatState extends State<VideoChat>
                 return ColoredBox(
                   color: settingsStore.showVideo
                       ? Colors.black
-                      : Theme.of(context).scaffoldBackgroundColor,
+                      : context.scaffoldColor,
                   child: settingsStore.showVideo
                       ? settingsStore.fullScreen
                           ? Stack(
@@ -545,8 +527,7 @@ class _VideoChatState extends State<VideoChat>
                                           alpha: _chatStore.settings
                                               .fullScreenChatOverlayOpacity,
                                         )
-                                      : Theme.of(context)
-                                          .scaffoldBackgroundColor,
+                                      : context.scaffoldColor,
                                   child: chat,
                                 );
 
