@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 
 class SectionHeader extends StatelessWidget {
   final String text;
@@ -16,8 +17,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape = context.isLandscape;
 
     return Padding(
       padding: padding ??

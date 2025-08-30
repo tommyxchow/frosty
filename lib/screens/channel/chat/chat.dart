@@ -7,6 +7,7 @@ import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart'
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
@@ -127,10 +128,7 @@ class Chat extends StatelessWidget {
                 duration: const Duration(milliseconds: 200),
                 height: chatStore.assetsStore.showEmoteMenu
                     ? MediaQuery.of(context).size.height /
-                        (MediaQuery.of(context).orientation ==
-                                Orientation.portrait
-                            ? 3
-                            : 2)
+                        (context.isPortrait ? 3 : 2)
                     : 0,
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 100),

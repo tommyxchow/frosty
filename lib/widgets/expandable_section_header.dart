@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 
 class ExpandableSectionHeader extends StatelessWidget {
   final String text;
@@ -20,8 +21,7 @@ class ExpandableSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape = context.isLandscape;
 
     return InkWell(
       onTap: onToggle,

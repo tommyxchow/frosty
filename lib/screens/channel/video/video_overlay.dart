@@ -11,6 +11,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +33,7 @@ class VideoOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
+    final orientation = OrientationUtils.getCurrentOrientation(context);
 
     final surfaceColor =
         context.watch<FrostyThemes>().dark.colorScheme.onSurface;
@@ -169,9 +170,8 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final rotateButton = Tooltip(
-      message: orientation == Orientation.portrait
-          ? 'Enter landscape mode'
-          : 'Exit landscape mode',
+      message:
+          context.isPortrait ? 'Enter landscape mode' : 'Exit landscape mode',
       preferBelow: false,
       child: IconButton(
         icon: Icon(
@@ -179,7 +179,7 @@ class VideoOverlay extends StatelessWidget {
           color: surfaceColor,
         ),
         onPressed: () {
-          if (orientation == Orientation.portrait) {
+          if (context.isPortrait) {
             SystemChrome.setPreferredOrientations([
               DeviceOrientation.landscapeLeft,
               DeviceOrientation.landscapeRight,
@@ -206,7 +206,7 @@ class VideoOverlay extends StatelessWidget {
                   backButton,
                   const Spacer(),
                   if (videoStore.settingsStore.fullScreen &&
-                      orientation == Orientation.landscape)
+                      context.isLandscape)
                     chatOverlayButton,
                 ],
               ),
@@ -219,7 +219,7 @@ class VideoOverlay extends StatelessWidget {
                     // On iPad, hide the rotate button on the overlay
                     // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
                     if (!isIPad()) rotateButton,
-                    if (orientation == Orientation.landscape) fullScreenButton,
+                    if (context.isLandscape) fullScreenButton,
                   ],
                 ),
               ),
@@ -234,7 +234,7 @@ class VideoOverlay extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 backButton,
-                if (orientation == Orientation.landscape)
+                if (context.isLandscape)
                   Expanded(
                     child: VideoBar(
                       streamInfo: streamInfo,
@@ -243,8 +243,7 @@ class VideoOverlay extends StatelessWidget {
                       subtitleTextWeight: FontWeight.w500,
                     ),
                   ),
-                if (videoStore.settingsStore.fullScreen &&
-                    orientation == Orientation.landscape)
+                if (videoStore.settingsStore.fullScreen && context.isLandscape)
                   chatOverlayButton,
                 if (!Platform.isIOS || isIPad())
                   Row(
@@ -353,7 +352,7 @@ class VideoOverlay extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (orientation == Orientation.landscape) latencyTooltip,
+                  if (context.isLandscape) latencyTooltip,
                   Observer(
                     builder: (_) {
                       // On iOS, show toggle behavior. On Android, always show enter PiP.
@@ -381,7 +380,7 @@ class VideoOverlay extends StatelessWidget {
                   // On iPad, hide the rotate button on the overlay
                   // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
                   if (!isIPad()) rotateButton,
-                  if (orientation == Orientation.landscape) fullScreenButton,
+                  if (context.isLandscape) fullScreenButton,
                 ],
               ),
             ),

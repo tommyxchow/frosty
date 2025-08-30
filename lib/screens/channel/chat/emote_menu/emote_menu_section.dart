@@ -5,6 +5,7 @@ import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:provider/provider.dart';
 
@@ -32,12 +33,11 @@ class _EmoteMenuSectionState extends State<EmoteMenuSection>
 
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount:
-            MediaQuery.of(context).orientation == Orientation.portrait
-                ? 8
-                : context.read<SettingsStore>().showVideo
-                    ? 6
-                    : 16,
+        crossAxisCount: context.isPortrait
+            ? 8
+            : context.read<SettingsStore>().showVideo
+                ? 6
+                : 16,
       ),
       itemBuilder: (context, index) => InkWell(
         onTap: widget.disabled

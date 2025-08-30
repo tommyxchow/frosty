@@ -19,6 +19,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
@@ -206,7 +207,7 @@ class _VideoChatState extends State<VideoChat>
 
   @override
   Widget build(BuildContext context) {
-    final orientation = MediaQuery.of(context).orientation;
+    final orientation = OrientationUtils.getCurrentOrientation(context);
 
     final settingsStore = _chatStore.settings;
 
@@ -220,7 +221,7 @@ class _VideoChatState extends State<VideoChat>
 
     final overlay = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
-      onDoubleTap: orientation == Orientation.landscape
+      onDoubleTap: context.isLandscape
           ? () => settingsStore.fullScreen = !settingsStore.fullScreen
           : null,
       onTap: () {
@@ -297,7 +298,7 @@ class _VideoChatState extends State<VideoChat>
                     )
                   : null,
             ),
-            if (orientation == Orientation.portrait)
+            if (context.isPortrait)
               AnimatedOpacity(
                 opacity: videoBarVisible ? 1 : 0,
                 curve: Curves.ease,
@@ -461,7 +462,7 @@ class _VideoChatState extends State<VideoChat>
           appBar: chatOnlyBlurredAppBar,
           body: Observer(
             builder: (context) {
-              if (orientation == Orientation.landscape &&
+              if (context.isLandscape &&
                   !settingsStore.landscapeForceVerticalChat) {
                 SystemChrome.setEnabledSystemUIMode(
                   SystemUiMode.immersiveSticky,

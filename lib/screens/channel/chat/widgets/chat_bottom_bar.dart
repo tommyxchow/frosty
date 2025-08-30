@@ -6,6 +6,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/cached_image.dart';
@@ -193,8 +194,7 @@ class ChatBottomBar extends StatelessWidget {
                     if (!chatStore.expandChat &&
                         chatStore.settings.chatWidth < 0.3 &&
                         chatStore.settings.showVideo &&
-                        MediaQuery.of(context).orientation ==
-                            Orientation.landscape)
+                        context.isLandscape)
                       IconButton(
                         tooltip: 'Enter a message',
                         onPressed: () {
@@ -240,8 +240,7 @@ class ChatBottomBar extends StatelessWidget {
                     if (chatStore.showSendButton &&
                         (chatStore.settings.chatWidth >= 0.3 ||
                             chatStore.expandChat ||
-                            MediaQuery.of(context).orientation ==
-                                Orientation.portrait))
+                            context.isPortrait))
                       Observer(
                         builder: (context) {
                           return IconButton(

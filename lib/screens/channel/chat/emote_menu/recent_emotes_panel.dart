@@ -5,6 +5,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/utils/orientation_utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:provider/provider.dart';
@@ -31,12 +32,11 @@ class RecentEmotesPanel extends StatelessWidget {
             else
               SliverGrid.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      MediaQuery.of(context).orientation == Orientation.portrait
-                          ? 8
-                          : context.read<SettingsStore>().showVideo
-                              ? 6
-                              : 16,
+                  crossAxisCount: context.isPortrait
+                      ? 8
+                      : context.read<SettingsStore>().showVideo
+                          ? 6
+                          : 16,
                 ),
                 itemBuilder: (context, index) {
                   final emote = chatStore.assetsStore.recentEmotes[index];
