@@ -119,8 +119,8 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragStart(DragStartDetails details) {
-    // Disable drag gesture when already in PiP mode
-    if (_videoStore.isInPipMode) return;
+    // Disable drag gesture when already in PiP mode or video is not playing
+    if (_videoStore.isInPipMode || _videoStore.paused) return;
 
     _animationController.stop(); // Stop any ongoing animation
     setState(() {
@@ -131,7 +131,9 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragUpdate(DragUpdateDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode) return;
+    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+      return;
+    }
 
     setState(() {
       _pipDragDistance += details.delta.dy;
@@ -153,7 +155,9 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragEnd(DragEndDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode) return;
+    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+      return;
+    }
 
     final velocity = details.velocity.pixelsPerSecond.dy;
     final shouldTriggerPip = _pipDragDistance >= _pipTriggerDistance ||
@@ -561,18 +565,21 @@ class _VideoChatState extends State<VideoChat>
                                   ),
                                 );
 
-                                return Row(
-                                  children: settingsStore.landscapeChatLeftSide
-                                      ? [
-                                          chatContainer,
-                                          draggableDivider,
-                                          Expanded(child: video),
-                                        ]
-                                      : [
-                                          Expanded(child: video),
-                                          draggableDivider,
-                                          chatContainer,
-                                        ],
+                                return SafeArea(
+                                  child: Row(
+                                    children:
+                                        settingsStore.landscapeChatLeftSide
+                                            ? [
+                                                chatContainer,
+                                                draggableDivider,
+                                                Expanded(child: video),
+                                              ]
+                                            : [
+                                                Expanded(child: video),
+                                                draggableDivider,
+                                                chatContainer,
+                                              ],
+                                  ),
                                 );
                               },
                             )
