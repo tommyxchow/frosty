@@ -51,17 +51,34 @@ class FrostyThemes {
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         filled: true,
-        fillColor: colorScheme.surfaceContainer,
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(100)),
+        fillColor: colorScheme.surfaceContainer.withValues(alpha: 0.6),
+        border: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
         ),
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.all(Radius.circular(100)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.3),
+            width: 1.5,
+          ),
         ),
-        disabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.all(Radius.circular(100)),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.2),
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(100)),
+          borderSide: BorderSide(
+            color: colorScheme.primary.withValues(alpha: 0.8),
+            width: 1.5,
+          ),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
