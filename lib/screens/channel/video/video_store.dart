@@ -142,7 +142,7 @@ abstract class VideoStoreBase with Store {
   late Timer _overlayTimer;
 
   /// The timer that handles periodic stream info updates
-  late Timer _streamInfoTimer;
+  Timer? _streamInfoTimer;
 
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
@@ -235,6 +235,10 @@ abstract class VideoStoreBase with Store {
         } else {
           // In chat-only mode, start the timer for automatic updates
           _startStreamInfoTimer();
+          // Ensure overlay timer is active for clean UI
+          _overlayTimer.cancel();
+          _overlayTimer =
+              Timer(const Duration(seconds: 5), () => _overlayVisible = false);
         }
       },
     );
@@ -479,7 +483,7 @@ abstract class VideoStoreBase with Store {
   /// Starts the periodic stream info timer for chat-only mode.
   void _startStreamInfoTimer() {
     // Only start if not already active and we're in chat-only mode
-    if (!_streamInfoTimer.isActive && !settingsStore.showVideo) {
+    if (_streamInfoTimer?.isActive != true && !settingsStore.showVideo) {
       _streamInfoTimer = Timer.periodic(
         const Duration(seconds: 60),
         (_) => updateStreamInfo(),
@@ -489,8 +493,8 @@ abstract class VideoStoreBase with Store {
 
   /// Stops the periodic stream info timer.
   void _stopStreamInfoTimer() {
-    if (_streamInfoTimer.isActive) {
-      _streamInfoTimer.cancel();
+    if (_streamInfoTimer?.isActive == true) {
+      _streamInfoTimer?.cancel();
     }
   }
 
@@ -509,6 +513,12 @@ abstract class VideoStoreBase with Store {
       _overlayTimer.cancel();
       _streamInfo = null;
       _paused = true;
+
+      // Restart overlay timer in chat-only mode even on error
+      if (!settingsStore.showVideo) {
+        _overlayTimer =
+            Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+      }
     }
   }
 
@@ -617,7 +627,7 @@ abstract class VideoStoreBase with Store {
     }
 
     _overlayTimer.cancel();
-    _streamInfoTimer.cancel();
+    _streamInfoTimer?.cancel();
 
     _disposeOverlayReaction();
     _disposeVideoModeReaction();
