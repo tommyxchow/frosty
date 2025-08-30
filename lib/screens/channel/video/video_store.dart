@@ -141,8 +141,14 @@ abstract class VideoStoreBase with Store {
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
 
+  /// The timer that handles periodic stream info updates
+  late Timer _streamInfoTimer;
+
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
+
+  /// Disposes the video mode reaction for timer management.
+  late final ReactionDisposer _disposeVideoModeReaction;
 
   ReactionDisposer? _disposeAndroidAutoPipReaction;
 
@@ -219,6 +225,20 @@ abstract class VideoStoreBase with Store {
       (_) => videoWebViewController.loadRequest(Uri.parse(videoUrl)),
     );
 
+    // Initialize a reaction to manage stream info timer based on video mode
+    _disposeVideoModeReaction = reaction(
+      (_) => settingsStore.showVideo,
+      (showVideo) {
+        if (showVideo) {
+          // In video mode, stop the timer since overlay taps handle refreshing
+          _stopStreamInfoTimer();
+        } else {
+          // In chat-only mode, start the timer for automatic updates
+          _startStreamInfoTimer();
+        }
+      },
+    );
+
     // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
     if (Platform.isAndroid) {
       _disposeAndroidAutoPipReaction = autorun(
@@ -233,6 +253,8 @@ abstract class VideoStoreBase with Store {
     }
 
     updateStreamInfo();
+
+    // Stream info timer will be started when entering chat-only mode
   }
 
   @action
@@ -454,6 +476,24 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  /// Starts the periodic stream info timer for chat-only mode.
+  void _startStreamInfoTimer() {
+    // Only start if not already active and we're in chat-only mode
+    if (!_streamInfoTimer.isActive && !settingsStore.showVideo) {
+      _streamInfoTimer = Timer.periodic(
+        const Duration(seconds: 60),
+        (_) => updateStreamInfo(),
+      );
+    }
+  }
+
+  /// Stops the periodic stream info timer.
+  void _stopStreamInfoTimer() {
+    if (_streamInfoTimer.isActive) {
+      _streamInfoTimer.cancel();
+    }
+  }
+
   /// Updates the stream info from the Twitch API.
   ///
   /// If the stream is offline, disables the overlay.
@@ -490,6 +530,8 @@ abstract class VideoStoreBase with Store {
             Timer(const Duration(seconds: 3), () => _overlayVisible = false);
       }
     }
+
+    // Stream info timer is managed automatically by the video mode reaction
   }
 
   /// Refreshes the stream webview and updates the stream info.
@@ -575,8 +617,10 @@ abstract class VideoStoreBase with Store {
     }
 
     _overlayTimer.cancel();
+    _streamInfoTimer.cancel();
 
     _disposeOverlayReaction();
+    _disposeVideoModeReaction();
     _disposeAndroidAutoPipReaction?.call();
   }
 }

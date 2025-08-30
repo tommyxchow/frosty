@@ -366,34 +366,60 @@ class _VideoChatState extends State<VideoChat>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        getReadableName(
-                          _chatStore.displayName,
-                          _chatStore.channelName,
-                        ),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            getReadableName(
+                              _chatStore.displayName,
+                              _chatStore.channelName,
+                            ),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          if (streamInfo != null &&
+                              streamInfo.title.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Builder(
+                                builder: (context) {
+                                  final tooltipKey = GlobalKey<TooltipState>();
+                                  return Tooltip(
+                                    key: tooltipKey,
+                                    message: streamInfo.title,
+                                    triggerMode: TooltipTriggerMode.manual,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        tooltipKey.currentState
+                                            ?.ensureTooltipVisible();
+                                      },
+                                      child: Text(
+                                        streamInfo.title,
+                                        style: context.textTheme.bodyMedium
+                                            ?.copyWith(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          color: context.bodySmallColor
+                                              ?.withValues(alpha: 0.6),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       const SizedBox(height: 2),
                       if (streamInfo != null) ...[
                         Row(
                           children: [
-                            Icon(
-                              Icons.visibility,
-                              size: 14,
-                              color: context.bodySmallColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              NumberFormat().format(streamInfo.viewerCount),
-                              style: context.textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
                             Icon(
                               Icons.circle,
                               color: Colors.red,
@@ -408,6 +434,55 @@ class _VideoChatState extends State<VideoChat>
                                 ),
                               ),
                             ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              Icons.visibility,
+                              size: 14,
+                              color: context.bodySmallColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              NumberFormat().format(streamInfo.viewerCount),
+                              style: context.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            if (streamInfo.gameName.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              Icon(
+                                Icons.gamepad,
+                                size: 14,
+                                color: context.bodySmallColor,
+                              ),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Builder(
+                                  builder: (context) {
+                                    final tooltipKey =
+                                        GlobalKey<TooltipState>();
+                                    return Tooltip(
+                                      key: tooltipKey,
+                                      message: streamInfo.gameName,
+                                      triggerMode: TooltipTriggerMode.manual,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          tooltipKey.currentState
+                                              ?.ensureTooltipVisible();
+                                        },
+                                        child: Text(
+                                          streamInfo.gameName,
+                                          style: context.textTheme.bodySmall
+                                              ?.copyWith(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ] else ...[
