@@ -340,7 +340,8 @@ abstract class VideoStoreBase with Store {
             const topBar = document.querySelector(".top-bar");
             const playerControls = document.querySelector(".player-controls");
             const channelDisclosures = document.querySelector("#channel-player-disclosures");
-            hideElements(topBar, playerControls, channelDisclosures);
+            const videoPreviewOverlay = document.querySelector('[data-a-target="player-overlay-preview-background"]');
+            hideElements(topBar, playerControls, channelDisclosures, videoPreviewOverlay);
           }
           const observer = new MutationObserver(() => {
             const videoOverlay = document.querySelector('.video-player__overlay');
