@@ -651,6 +651,7 @@ class _VideoChatState extends State<VideoChat>
                 // Keep chat-only scrolling under the blurred app bar, but
                 // ensure video does not bleed into the system status bar.
                 top: settingsStore.showVideo,
+                bottom: false,
                 child: Stack(
                   children: [
                     Column(
