@@ -49,7 +49,7 @@ class FrostyThemes {
         titleSpacing: 0,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         filled: true,
         fillColor: colorScheme.surfaceContainer.withValues(alpha: 0.6),
         border: OutlineInputBorder(
