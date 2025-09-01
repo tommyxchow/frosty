@@ -48,7 +48,10 @@ class Chat extends StatelessWidget {
                               return ListView.builder(
                                 reverse: true,
                                 padding: (listPadding ?? EdgeInsets.zero).add(
-                                  const EdgeInsets.only(bottom: 64),
+                                  EdgeInsets.only(
+                                    bottom: 68 +
+                                        MediaQuery.of(context).padding.bottom,
+                                  ),
                                 ),
                                 addAutomaticKeepAlives: false,
                                 controller: chatStore.scrollController,
@@ -73,11 +76,11 @@ class Chat extends StatelessWidget {
                       child: ChatBottomBar(chatStore: chatStore),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
+                      padding: EdgeInsets.only(
                         left: 4,
                         top: 4,
                         right: 4,
-                        bottom: 68,
+                        bottom: 68 + MediaQuery.of(context).padding.bottom,
                       ),
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
