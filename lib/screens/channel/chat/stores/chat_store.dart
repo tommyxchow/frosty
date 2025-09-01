@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
@@ -162,7 +163,6 @@ abstract class ChatStoreBase with Store {
 
   @observable
   IRCMessage? replyingToMessage;
-
 
   /// Public getter for whether a message is currently being sent.
   bool get isSendingMessage => _isSendingMessage;
@@ -648,14 +648,6 @@ abstract class ChatStoreBase with Store {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) return;
 
-    // Prevent sending messages when message delay is enabled
-    if (settings.showVideo && settings.chatDelay > 0) {
-      updateNotification(
-        'Cannot send message while message delay is enabled (${settings.chatDelay.toInt()}s delay)',
-      );
-      return;
-    }
-
     // Prevent sending multiple messages simultaneously
     if (_isSendingMessage) {
       updateNotification('Please wait, sending previous message...');
@@ -755,10 +747,13 @@ abstract class ChatStoreBase with Store {
     // when copying messages repeatedly.
     _notificationTimer?.cancel();
 
+    // Provide subtle haptic feedback when notification is triggered
+    HapticFeedback.lightImpact();
+
     // Set the new notification message and create a new timer that will dismiss it after 3 seconds.
     _notification = notificationMessage;
     _notificationTimer =
-        Timer(const Duration(seconds: 3), () => _notification = null);
+        Timer(const Duration(seconds: 5), () => _notification = null);
   }
 
   /// Clears the current notification immediately.

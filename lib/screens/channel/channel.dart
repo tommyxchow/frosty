@@ -290,6 +290,43 @@ class _VideoChatState extends State<VideoChat>
                     )
                   : null,
             ),
+            Observer(
+              builder: (_) => AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                child: _chatStore.notification != null
+                    ? AnimatedContainer(
+                        key: const ValueKey('notification'),
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                        margin: EdgeInsets.only(
+                          top: _chatStore.settings.chatNotificationsOnBottom
+                              ? 0
+                              : (MediaQuery.of(context).orientation ==
+                                          Orientation.portrait &&
+                                      videoBarVisible
+                                  ? 90 // Position under video bar
+                                  : 0), // Default top margin
+                          bottom: _chatStore.settings.chatNotificationsOnBottom
+                              ? 16
+                              : 0,
+                        ),
+                        child: Align(
+                          alignment:
+                              _chatStore.settings.chatNotificationsOnBottom
+                                  ? Alignment.bottomCenter
+                                  : Alignment.topCenter,
+                          child: FrostyNotification(
+                            message: _chatStore.notification!,
+                            onDismissed: () => _chatStore.clearNotification(),
+                            showGradient: !videoBarVisible,
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ),
             if (context.isPortrait)
               AnimatedOpacity(
                 opacity: videoBarVisible ? 1 : 0,
@@ -313,22 +350,6 @@ class _VideoChatState extends State<VideoChat>
                   ),
                 ),
               ),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              switchInCurve: Curves.easeOut,
-              switchOutCurve: Curves.easeIn,
-              child: _chatStore.notification != null
-                  ? Align(
-                      alignment: _chatStore.settings.chatNotificationsOnBottom
-                          ? Alignment.bottomCenter
-                          : Alignment.topCenter,
-                      child: FrostyNotification(
-                        message: _chatStore.notification!,
-                        onDismissed: () => _chatStore.clearNotification(),
-                      ),
-                    )
-                  : null,
-            ),
           ],
         );
       },

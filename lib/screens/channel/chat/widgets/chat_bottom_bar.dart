@@ -211,58 +211,79 @@ class ChatBottomBar extends StatelessWidget {
                       Expanded(
                         child: Observer(
                           builder: (context) {
-                            return TextField(
-                              textInputAction: TextInputAction.send,
-                              focusNode: chatStore.textFieldFocusNode,
-                              minLines: 1,
-                              maxLines: 3,
-                              // Disable text field when sending message or when not logged in
-                              enabled: chatStore.auth.isLoggedIn &&
-                                  !chatStore.isSendingMessage,
-                              decoration: InputDecoration(
-                                prefixIcon:
-                                    chatStore.settings.emoteMenuButtonOnLeft
-                                        ? emoteMenuButton
-                                        : null,
-                                suffixIcon: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    if (chatStore.settings.chatDelay > 0 &&
-                                        chatStore.settings.showVideo)
-                                      Tooltip(
-                                        message:
-                                            'Message delay: ${chatStore.settings.chatDelay.toInt()} seconds${chatStore.settings.autoSyncChatDelay ? ' (auto-synced)' : ''}',
-                                        preferBelow: false,
-                                        triggerMode: TooltipTriggerMode.tap,
-                                        child: Text(
-                                          '${chatStore.settings.chatDelay.toInt()}s',
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                      ),
-                                    if (!chatStore
-                                            .settings.emoteMenuButtonOnLeft &&
-                                        emoteMenuButton != null)
-                                      emoteMenuButton,
-                                  ],
+                            final isDisabledDueToDelay =
+                                chatStore.settings.showVideo &&
+                                    chatStore.settings.chatDelay > 0;
+                            final isDisabled = !chatStore.auth.isLoggedIn ||
+                                chatStore.isSendingMessage ||
+                                isDisabledDueToDelay;
+
+                            return GestureDetector(
+                              onTap: () {
+                                // Show notification when trying to tap disabled input due to chat delay
+                                if (isDisabledDueToDelay) {
+                                  chatStore.updateNotification(
+                                    'Chatting is disabled due to message delay',
+                                  );
+                                }
+                              },
+                              child: TextField(
+                                textInputAction: TextInputAction.send,
+                                focusNode: chatStore.textFieldFocusNode,
+                                minLines: 1,
+                                maxLines: 3,
+                                // Disable text field when sending message, when not logged in, or when chat delay is active
+                                enabled: !isDisabled,
+                                decoration: InputDecoration(
+                                  prefixIcon:
+                                      chatStore.settings.emoteMenuButtonOnLeft
+                                          ? emoteMenuButton
+                                          : null,
+                                  suffixIcon: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (!chatStore
+                                              .settings.emoteMenuButtonOnLeft &&
+                                          emoteMenuButton != null)
+                                        emoteMenuButton,
+                                    ],
+                                  ),
+                                  hintMaxLines: 1,
+                                  hintText: chatStore.auth.isLoggedIn
+                                      ? chatStore.isSendingMessage
+                                          ? 'Sending...'
+                                          : chatStore.replyingToMessage != null
+                                              ? 'Reply'
+                                              : 'Chat'
+                                      : 'Log in',
                                 ),
-                                hintMaxLines: 1,
-                                hintText: chatStore.auth.isLoggedIn
-                                    ? chatStore.isSendingMessage
-                                        ? 'Sending...'
-                                        : chatStore.replyingToMessage != null
-                                            ? 'Reply'
-                                            : 'Chat'
-                                    : 'Log in',
+                                controller: chatStore.textController,
+                                onSubmitted: chatStore.sendMessage,
                               ),
-                              controller: chatStore.textController,
-                              onSubmitted: chatStore.sendMessage,
                             );
                           },
+                        ),
+                      ),
+                    if (chatStore.settings.showVideo &&
+                        chatStore.settings.chatDelay > 0)
+                      Tooltip(
+                        message:
+                            'Message delay: ${chatStore.settings.chatDelay.toInt()} seconds${chatStore.settings.autoSyncChatDelay ? ' (auto-synced)' : ''}',
+                        preferBelow: false,
+                        triggerMode: TooltipTriggerMode.tap,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Text(
+                            '${chatStore.settings.chatDelay.toInt()}s',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'monospace',
+                              fontFeatures: [
+                                const FontFeature.tabularFigures(),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     if (chatStore.showSendButton &&
@@ -285,7 +306,9 @@ class ChatBottomBar extends StatelessWidget {
                                   )
                                 : const Icon(Icons.send_rounded),
                             onPressed: chatStore.auth.isLoggedIn &&
-                                    !chatStore.isSendingMessage
+                                    !chatStore.isSendingMessage &&
+                                    !(chatStore.settings.showVideo &&
+                                        chatStore.settings.chatDelay > 0)
                                 ? () => chatStore
                                     .sendMessage(chatStore.textController.text)
                                 : null,

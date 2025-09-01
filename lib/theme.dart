@@ -62,10 +62,7 @@ class FrostyThemes {
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.2),
-            width: 1.5,
-          ),
+          borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
