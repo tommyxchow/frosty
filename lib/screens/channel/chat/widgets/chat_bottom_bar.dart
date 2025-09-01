@@ -253,9 +253,11 @@ class ChatBottomBar extends StatelessWidget {
                                 hintMaxLines: 1,
                                 hintText: chatStore.auth.isLoggedIn
                                     ? chatStore.isSendingMessage
-                                        ? 'Sending message...'
-                                        : 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'}'
-                                    : 'Log in to chat',
+                                        ? 'Sending...'
+                                        : chatStore.replyingToMessage != null
+                                            ? 'Reply'
+                                            : 'Chat'
+                                    : 'Log in',
                               ),
                               controller: chatStore.textController,
                               onSubmitted: chatStore.sendMessage,
@@ -271,7 +273,7 @@ class ChatBottomBar extends StatelessWidget {
                         builder: (context) {
                           return IconButton(
                             tooltip: chatStore.isSendingMessage
-                                ? 'Sending message...'
+                                ? 'Sending...'
                                 : 'Send',
                             icon: chatStore.isSendingMessage
                                 ? const SizedBox(

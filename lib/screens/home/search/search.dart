@@ -192,7 +192,7 @@ class _SearchState extends State<Search> {
                         autocorrect: false,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.search_rounded),
-                          hintText: 'Find a channel or category',
+                          hintText: 'Search channels or categories',
                           suffixIcon: _searchStore
                                       .textFieldFocusNode.hasFocus ||
                                   _searchStore.searchText.isNotEmpty
