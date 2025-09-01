@@ -89,7 +89,6 @@ class OfflineChannelCard extends StatelessWidget {
             // Profile picture
             ProfilePicture(
               userLogin: channelInfo.broadcasterLogin,
-              radius: 24,
             ),
             const SizedBox(width: 12),
 
