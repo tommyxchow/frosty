@@ -54,17 +54,11 @@ class FrostyThemes {
         fillColor: colorScheme.surfaceContainer.withValues(alpha: 0.6),
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
-          borderSide: BorderSide(
-            color: colorScheme.outline.withValues(alpha: 0.3),
-            width: 1.5,
-          ),
+          borderSide: BorderSide.none,
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
@@ -119,42 +113,51 @@ class FrostyThemes {
         space: borderWidth,
         color: borderColor,
       ),
-      textTheme: const TextTheme(
-        // Used in alert dialog title.
+      textTheme: TextTheme(
+        // Alert dialog title
         headlineSmall: TextStyle(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0,
         ),
-        // Used in app bar title.
+
+        // App bar title
         titleLarge: TextStyle(
           fontSize: 24,
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0,
         ),
-        titleMedium: TextStyle(letterSpacing: 0),
-        // Used in tab bar title.
+
+        // Section titles
+        titleMedium: TextStyle(
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0,
+        ),
+
+        // Tab bar title
         titleSmall: TextStyle(
           fontSize: 16,
-          letterSpacing: 0,
           fontWeight: FontWeight.w600,
+          letterSpacing: 0,
         ),
+
+        // Labels
         labelLarge: TextStyle(
+          fontWeight: FontWeight.w500,
           letterSpacing: 0,
         ),
         labelMedium: TextStyle(
+          fontWeight: FontWeight.w500,
           letterSpacing: 0,
         ),
         labelSmall: TextStyle(
+          fontWeight: FontWeight.w500,
           letterSpacing: 0,
         ),
-        // Used in list tile title.
-        bodyLarge: TextStyle(
-          letterSpacing: 0,
-        ),
-        bodyMedium: TextStyle(
-          letterSpacing: 0,
-        ),
-        bodySmall: TextStyle(
-          letterSpacing: 0,
-        ),
+
+        // Body text
+        bodyLarge: TextStyle(letterSpacing: 0),
+        bodyMedium: TextStyle(letterSpacing: 0),
+        bodySmall: TextStyle(letterSpacing: 0),
       ),
     );
   }

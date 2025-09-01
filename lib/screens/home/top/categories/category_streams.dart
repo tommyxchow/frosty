@@ -211,9 +211,7 @@ class _TransparentCategoryCard extends StatelessWidget {
               children: [
                 Text(
                   category.name,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                  style: Theme.of(context).textTheme.titleMedium,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
