@@ -117,33 +117,33 @@ class FrostyThemes {
         // Alert dialog title
         headlineSmall: TextStyle(
           fontWeight: FontWeight.w700,
-          letterSpacing: 0,
+          letterSpacing: -0.019,
         ),
 
         // App bar title
         titleLarge: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0,
+          letterSpacing: -0.019,
         ),
 
         // Section titles
         titleMedium: TextStyle(
           fontWeight: FontWeight.w600,
-          letterSpacing: 0,
+          letterSpacing: -0.011,
         ),
 
         // Tab bar title
         titleSmall: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          letterSpacing: 0,
+          letterSpacing: -0.011,
         ),
 
         // Labels
         labelLarge: TextStyle(
           fontWeight: FontWeight.w500,
-          letterSpacing: 0,
+          letterSpacing: -0.006,
         ),
         labelMedium: TextStyle(
           fontWeight: FontWeight.w500,
@@ -151,13 +151,19 @@ class FrostyThemes {
         ),
         labelSmall: TextStyle(
           fontWeight: FontWeight.w500,
-          letterSpacing: 0,
+          letterSpacing: 0.005,
         ),
 
         // Body text
-        bodyLarge: TextStyle(letterSpacing: 0),
-        bodyMedium: TextStyle(letterSpacing: 0),
-        bodySmall: TextStyle(letterSpacing: 0),
+        bodyLarge: TextStyle(
+          letterSpacing: -0.011,
+        ),
+        bodyMedium: TextStyle(
+          letterSpacing: -0.006,
+        ),
+        bodySmall: TextStyle(
+          letterSpacing: 0,
+        ),
       ),
     );
   }

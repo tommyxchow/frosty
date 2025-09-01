@@ -74,8 +74,11 @@ class ChatBottomBar extends StatelessWidget {
 
         return BlurredContainer(
           gradientDirection: GradientDirection.down,
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+          padding: EdgeInsets.only(
+            bottom: chatStore.assetsStore.showEmoteMenu
+                ? 0
+                : MediaQuery.of(context).padding.bottom,
+          ),
           child: Column(
             children: [
               AnimatedScrollBorder(

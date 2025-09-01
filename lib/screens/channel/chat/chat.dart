@@ -50,7 +50,11 @@ class Chat extends StatelessWidget {
                                 padding: (listPadding ?? EdgeInsets.zero).add(
                                   EdgeInsets.only(
                                     bottom: 68 +
-                                        MediaQuery.of(context).padding.bottom,
+                                        (chatStore.assetsStore.showEmoteMenu
+                                            ? 0
+                                            : MediaQuery.of(context)
+                                                .padding
+                                                .bottom),
                                   ),
                                 ),
                                 addAutomaticKeepAlives: false,
@@ -80,7 +84,10 @@ class Chat extends StatelessWidget {
                         left: 4,
                         top: 4,
                         right: 4,
-                        bottom: 68 + MediaQuery.of(context).padding.bottom,
+                        bottom: 68 +
+                            (chatStore.assetsStore.showEmoteMenu
+                                ? 0
+                                : MediaQuery.of(context).padding.bottom),
                       ),
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
