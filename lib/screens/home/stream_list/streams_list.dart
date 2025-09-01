@@ -151,7 +151,7 @@ class _StreamsListState extends State<StreamsList>
                           isFirst: true,
                           padding: EdgeInsets.fromLTRB(
                             16 + MediaQuery.of(context).padding.left,
-                            12,
+                            8,
                             16 + MediaQuery.of(context).padding.right,
                             8,
                           ),
@@ -266,7 +266,7 @@ class _StreamsListState extends State<StreamsList>
                                   isFirst: true,
                                   padding: EdgeInsets.fromLTRB(
                                     16 + MediaQuery.of(context).padding.left,
-                                    12,
+                                    8,
                                     16 + MediaQuery.of(context).padding.right,
                                     8,
                                   ),
@@ -322,7 +322,7 @@ class _StreamsListState extends State<StreamsList>
                                   isFirst: true,
                                   padding: EdgeInsets.fromLTRB(
                                     16 + MediaQuery.of(context).padding.left,
-                                    24,
+                                    8,
                                     16 + MediaQuery.of(context).padding.right,
                                     8,
                                   ),
@@ -374,7 +374,7 @@ class _StreamsListState extends State<StreamsList>
                                   isFirst: true,
                                   padding: EdgeInsets.fromLTRB(
                                     16 + MediaQuery.of(context).padding.left,
-                                    32,
+                                    16,
                                     16 + MediaQuery.of(context).padding.right,
                                     8,
                                   ),
