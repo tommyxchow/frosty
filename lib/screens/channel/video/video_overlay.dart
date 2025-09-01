@@ -12,6 +12,7 @@ import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
+import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
@@ -115,7 +116,7 @@ class VideoOverlay extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
-          spacing: 8,
+          spacing: 6,
           children: [
             Observer(
               builder: (context) => Text(
@@ -286,13 +287,9 @@ class VideoOverlay extends StatelessWidget {
                             message: 'Stream uptime',
                             preferBelow: false,
                             child: Row(
-                              spacing: 4,
+                              spacing: 6,
                               children: [
-                                const Icon(
-                                  Icons.circle,
-                                  color: Colors.red,
-                                  size: 10,
-                                ),
+                                const LiveIndicator(),
                                 Uptime(
                                   startTime: streamInfo.startedAt,
                                   style: TextStyle(

@@ -17,6 +17,7 @@ import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
+import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/notification.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/uptime.dart';
@@ -390,7 +391,7 @@ class _VideoChatState extends State<VideoChat>
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
-                        spacing: 8,
+                        spacing: 6,
                         children: [
                           Text(
                             getReadableName(
@@ -439,13 +440,9 @@ class _VideoChatState extends State<VideoChat>
                       ),
                       if (streamInfo != null) ...[
                         Row(
-                          spacing: 4,
                           children: [
-                            Icon(
-                              Icons.circle,
-                              color: Colors.red,
-                              size: 8,
-                            ),
+                            const LiveIndicator(),
+                            const SizedBox(width: 6),
                             Flexible(
                               child: Uptime(
                                 startTime: streamInfo.startedAt,

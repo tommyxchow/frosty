@@ -10,6 +10,7 @@ import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
@@ -92,13 +93,9 @@ class LargeStreamCard extends StatelessWidget {
                     message: 'Stream uptime',
                     preferBelow: false,
                     child: Row(
-                      spacing: 4,
+                      spacing: 6,
                       children: [
-                        const Icon(
-                          Icons.circle,
-                          color: Colors.red,
-                          size: 10,
-                        ),
+                        const LiveIndicator(),
                         Uptime(
                           startTime: streamInfo.startedAt,
                           style: TextStyle(

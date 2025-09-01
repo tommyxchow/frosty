@@ -8,6 +8,7 @@ import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/uptime.dart';
@@ -146,13 +147,9 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                         ),
                         subtitle: channel.isLive
                             ? Row(
-                                spacing: 4,
+                                spacing: 6,
                                 children: [
-                                  const Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
-                                    size: 10,
-                                  ),
+                                  const LiveIndicator(),
                                   Uptime(startTime: channel.startedAt),
                                 ],
                               )
