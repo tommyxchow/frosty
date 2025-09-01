@@ -28,12 +28,12 @@ class AlertMessage extends StatelessWidget {
       widget = Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
+        spacing: 8,
         children: [
           Icon(
             Icons.info_outline_rounded,
             color: color ?? defaultColor,
           ),
-          const SizedBox(height: 8),
           Text(
             message,
             textAlign: centered ? TextAlign.center : TextAlign.start,
@@ -47,12 +47,12 @@ class AlertMessage extends StatelessWidget {
       widget = Row(
         mainAxisAlignment:
             centered ? MainAxisAlignment.center : MainAxisAlignment.start,
+        spacing: 8,
         children: [
           Icon(
             Icons.info_outline_rounded,
             color: color ?? defaultColor,
           ),
-          const SizedBox(width: 8),
           Flexible(
             child: Text(
               message,

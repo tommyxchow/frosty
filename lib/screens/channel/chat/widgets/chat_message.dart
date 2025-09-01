@@ -258,12 +258,13 @@ class ChatMessage extends StatelessWidget {
             if (messageHeader != null) {
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 4,
                 children: [
                   if (messageHeaderIcon != null)
                     Row(
+                      spacing: 4,
                       children: [
                         messageHeaderIcon,
-                        const SizedBox(width: 4),
                         Flexible(
                           child: messageHeader,
                         ),
@@ -271,7 +272,6 @@ class ChatMessage extends StatelessWidget {
                     )
                   else
                     messageHeader,
-                  const SizedBox(height: 4),
                   messageSpan,
                 ],
               );
@@ -289,6 +289,7 @@ class ChatMessage extends StatelessWidget {
               opacity: 0.5,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 4,
                 children: [
                   if (banDuration == null)
                     if (ircMessage.command == Command.clearMessage)
@@ -307,7 +308,6 @@ class ChatMessage extends StatelessWidget {
                       style:
                           const TextStyle(fontWeight: messageHeaderFontWeight),
                     ),
-                  const SizedBox(height: 4),
                   Text.rich(
                     TextSpan(
                       children: ircMessage.generateSpan(
@@ -387,14 +387,15 @@ class ChatMessage extends StatelessWidget {
 
               renderMessage = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 4,
                 children: [
                   if (messageHeader != null)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4,
                       children: [
                         if (messageHeaderIcon != null) ...[
                           messageHeaderIcon,
-                          const SizedBox(width: 4),
                         ],
                         Expanded(
                           child: messageHeader,
@@ -402,7 +403,6 @@ class ChatMessage extends StatelessWidget {
                       ],
                     ),
                   if (ircMessage.message != null) ...[
-                    const SizedBox(height: 4),
                     Text.rich(
                       TextSpan(
                         children: ircMessage.generateSpan(

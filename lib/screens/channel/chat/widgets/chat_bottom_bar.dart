@@ -241,6 +241,7 @@ class ChatBottomBar extends StatelessWidget {
                                           : null,
                                   suffixIcon: Row(
                                     mainAxisSize: MainAxisSize.min,
+                                    spacing: 8,
                                     children: [
                                       if (!chatStore
                                               .settings.emoteMenuButtonOnLeft &&

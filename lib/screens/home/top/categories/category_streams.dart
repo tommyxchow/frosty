@@ -105,6 +105,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                               right: 16,
                             ),
                             child: Row(
+                              spacing: 12,
                               children: [
                                 const SizedBox(
                                   width: 80,
@@ -117,18 +118,17 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
+                                    spacing: 8,
                                     children: [
                                       SkeletonLoader(
                                         height: 20,
                                         width: double.infinity,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      const SizedBox(height: 8),
                                       SkeletonLoader(
                                         height: 16,
                                         width: 120,
@@ -183,6 +183,7 @@ class _TransparentCategoryCard extends StatelessWidget {
         right: 16,
       ),
       child: Row(
+        spacing: 12,
         children: [
           SizedBox(
             width: 80,
@@ -204,7 +205,6 @@ class _TransparentCategoryCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

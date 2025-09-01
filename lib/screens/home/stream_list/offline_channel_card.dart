@@ -85,13 +85,12 @@ class OfflineChannelCard extends StatelessWidget {
           vertical: 8,
         ),
         child: Row(
+          spacing: 12,
           children: [
             // Profile picture
             ProfilePicture(
               userLogin: channelInfo.broadcasterLogin,
             ),
-            const SizedBox(width: 12),
-
             // Channel info
             Expanded(
               child: Column(

@@ -23,12 +23,12 @@ class FrostyNotification extends StatelessWidget {
         children: [
           Expanded(
             child: Row(
+              spacing: 8,
               children: [
                 Icon(
                   Icons.info_outline_rounded,
                   size: 20,
                 ),
-                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     message,

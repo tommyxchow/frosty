@@ -123,14 +123,15 @@ class StreamCard extends StatelessWidget {
       padding: const EdgeInsets.only(left: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 2,
         children: [
           Row(
+            spacing: 4,
             children: [
               ProfilePicture(
                 userLogin: streamInfo.userLogin,
                 radius: 10,
               ),
-              const SizedBox(width: 4),
               Flexible(
                 child: Tooltip(
                   message: streamerName,
@@ -148,7 +149,6 @@ class StreamCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 2),
           Tooltip(
             message: streamTitle,
             preferBelow: false,
@@ -161,7 +161,6 @@ class StreamCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 2),
           if (showCategory) ...[
             InkWell(
               onTap: streamInfo.gameName.isNotEmpty
@@ -187,7 +186,6 @@ class StreamCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 2),
           ],
           Text(
             '${NumberFormat().format(streamInfo.viewerCount)} viewers',

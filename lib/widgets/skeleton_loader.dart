@@ -160,6 +160,7 @@ class CategorySkeletonLoader extends StatelessWidget {
         right: 16 + MediaQuery.of(context).padding.right,
       ),
       child: Row(
+        spacing: 16,
         children: [
           // Category box art skeleton (3:4 aspect ratio, 80px wide)
           SizedBox(
@@ -171,7 +172,6 @@ class CategorySkeletonLoader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 16),
           // Category name skeleton with random width (matches bodyLarge text)
           Flexible(
             child: SkeletonText(
@@ -230,16 +230,17 @@ class StreamCardSkeletonLoader extends StatelessWidget {
               padding: const EdgeInsets.only(left: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
                 children: [
                   // Streamer name row
                   Row(
+                    spacing: 4,
                     children: [
                       const SkeletonLoader(
                         width: 20,
                         height: 20,
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                       ),
-                      const SizedBox(width: 4),
                       Expanded(
                         child: SkeletonText(
                           height: 16,
@@ -249,7 +250,6 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
                   // Stream title skeleton with random width
                   SkeletonText(
                     height: 14,
@@ -257,7 +257,6 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                     maxWidth: 200,
                   ),
                   if (showCategory) ...[
-                    const SizedBox(height: 8),
                     // Category skeleton with random width
                     SkeletonText(
                       height: 14,
@@ -265,7 +264,6 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                       maxWidth: 120,
                     ),
                   ],
-                  const SizedBox(height: 8),
                   // Viewer count skeleton with random width
                   SkeletonText(
                     height: 14,
@@ -302,6 +300,7 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 12,
         children: [
           // Thumbnail skeleton (16:9 aspect ratio)
           AspectRatio(
@@ -310,19 +309,19 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
           ),
-          const SizedBox(height: 12),
           // Streamer info row with profile picture and name
           Row(
+            spacing: 12,
             children: [
               const SkeletonLoader(
                 width: 56, // ProfilePicture radius 28 * 2
                 height: 56,
                 borderRadius: BorderRadius.all(Radius.circular(28)),
               ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 8,
                   children: [
                     // Streamer name skeleton with random width
                     SkeletonText(
@@ -330,7 +329,6 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
                       minWidth: 80,
                       maxWidth: 150,
                     ),
-                    const SizedBox(height: 8),
                     // Stream title skeleton with random width
                     SkeletonText(
                       height: 14,
@@ -338,7 +336,6 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
                       maxWidth: 200,
                     ),
                     if (showCategory) ...[
-                      const SizedBox(height: 8),
                       // Category skeleton with random width
                       SkeletonText(
                         height: 14,
@@ -369,6 +366,7 @@ class OfflineChannelCardSkeletonLoader extends StatelessWidget {
         vertical: 8,
       ),
       child: Row(
+        spacing: 12,
         children: [
           // Profile picture skeleton (radius 24 = 48px diameter)
           const SkeletonLoader(
@@ -376,11 +374,11 @@ class OfflineChannelCardSkeletonLoader extends StatelessWidget {
             height: 48,
             borderRadius: BorderRadius.all(Radius.circular(24)),
           ),
-          const SizedBox(width: 12),
           // Channel info skeleton
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 8,
               children: [
                 // Channel name skeleton
                 SkeletonText(
@@ -388,7 +386,6 @@ class OfflineChannelCardSkeletonLoader extends StatelessWidget {
                   minWidth: 80,
                   maxWidth: 160,
                 ),
-                const SizedBox(height: 8),
                 // Following duration skeleton
                 SkeletonText(
                   height: 14,

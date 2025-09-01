@@ -375,20 +375,22 @@ class _VideoChatState extends State<VideoChat>
                       : Brightness.dark,
             ),
             title: Row(
+              spacing: 12,
               children: [
                 ProfilePicture(
                   userLogin: widget.userLogin,
                   radius: 16,
                 ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
+                    spacing: 2,
                     children: [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
+                        spacing: 8,
                         children: [
                           Text(
                             getReadableName(
@@ -402,7 +404,6 @@ class _VideoChatState extends State<VideoChat>
                           ),
                           if (streamInfo != null &&
                               streamInfo.title.isNotEmpty) ...[
-                            const SizedBox(width: 8),
                             Flexible(
                               child: Builder(
                                 builder: (context) {
@@ -436,16 +437,15 @@ class _VideoChatState extends State<VideoChat>
                           ],
                         ],
                       ),
-                      const SizedBox(height: 2),
                       if (streamInfo != null) ...[
                         Row(
+                          spacing: 4,
                           children: [
                             Icon(
                               Icons.circle,
                               color: Colors.red,
                               size: 8,
                             ),
-                            const SizedBox(width: 4),
                             Flexible(
                               child: Uptime(
                                 startTime: streamInfo.startedAt,

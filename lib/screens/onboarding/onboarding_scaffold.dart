@@ -53,16 +53,17 @@ class OnboardingScaffold extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
                 child: Column(
+                  spacing: 24,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 12,
                       children: [
                         if (showLogo) ...[
                           SvgPicture.asset(
                             'assets/icons/logo.svg',
                             height: 80,
                           ),
-                          const SizedBox(width: 12),
                         ],
                         Text(
                           header,
@@ -74,7 +75,6 @@ class OnboardingScaffold extends StatelessWidget {
                       ],
                     ),
                     if (subtitle != null) ...[
-                      const SizedBox(height: 24),
                       Opacity(
                         opacity: 0.8,
                         child: Text(

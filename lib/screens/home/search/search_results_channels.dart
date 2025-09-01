@@ -146,13 +146,13 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
                         ),
                         subtitle: channel.isLive
                             ? Row(
+                                spacing: 4,
                                 children: [
                                   const Icon(
                                     Icons.circle,
                                     color: Colors.red,
                                     size: 10,
                                   ),
-                                  const SizedBox(width: 5),
                                   Uptime(startTime: channel.startedAt),
                                 ],
                               )

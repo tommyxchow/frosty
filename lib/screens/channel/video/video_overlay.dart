@@ -115,6 +115,7 @@ class VideoOverlay extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
+          spacing: 8,
           children: [
             Observer(
               builder: (context) => Text(
@@ -125,9 +126,6 @@ class VideoOverlay extends StatelessWidget {
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
               ),
-            ),
-            const SizedBox(
-              width: 8,
             ),
             Icon(
               Icons.speed_rounded,
@@ -282,18 +280,19 @@ class VideoOverlay extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Row(
+                        spacing: 12,
                         children: [
                           Tooltip(
                             message: 'Stream uptime',
                             preferBelow: false,
                             child: Row(
+                              spacing: 4,
                               children: [
                                 const Icon(
                                   Icons.circle,
                                   color: Colors.red,
                                   size: 10,
                                 ),
-                                const SizedBox(width: 4),
                                 Uptime(
                                   startTime: streamInfo.startedAt,
                                   style: TextStyle(
@@ -304,7 +303,6 @@ class VideoOverlay extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 12),
                           Tooltip(
                             message: 'Viewer count',
                             preferBelow: false,
@@ -323,13 +321,13 @@ class VideoOverlay extends StatelessWidget {
                                 ),
                               ),
                               child: Row(
+                                spacing: 4,
                                 children: [
                                   Icon(
                                     Icons.visibility,
                                     size: 14,
                                     color: surfaceColor,
                                   ),
-                                  const SizedBox(width: 4),
                                   Text(
                                     NumberFormat().format(
                                       videoStore.streamInfo?.viewerCount,

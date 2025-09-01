@@ -42,6 +42,7 @@ class CategoryCard extends StatelessWidget {
           right: 16 + MediaQuery.of(context).padding.right,
         ),
         child: Row(
+          spacing: 16,
           children: [
             SizedBox(
               width: 80,
@@ -62,7 +63,6 @@ class CategoryCard extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
             Flexible(
               child: Text(
                 category.name,

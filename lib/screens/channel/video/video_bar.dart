@@ -36,16 +36,17 @@ class VideoBar extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Row(
+        spacing: 12,
         children: [
           ProfilePicture(
             userLogin: streamInfo.userLogin,
             radius: 28,
           ),
-          const SizedBox(width: 12),
           Flexible(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 2,
               children: [
                 Tooltip(
                   message: streamerName,
@@ -60,7 +61,6 @@ class VideoBar extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 2),
                 Tooltip(
                   message: streamTitle,
                   showDuration: const Duration(seconds: 5),
@@ -78,7 +78,6 @@ class VideoBar extends StatelessWidget {
                   ),
                 ),
                 if (showCategory) ...[
-                  const SizedBox(height: 2),
                   InkWell(
                     onTap: tappableCategory && streamInfo.gameName.isNotEmpty
                         ? () => Navigator.push(
