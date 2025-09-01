@@ -224,15 +224,37 @@ class ChatBottomBar extends StatelessWidget {
                                     chatStore.settings.emoteMenuButtonOnLeft
                                         ? emoteMenuButton
                                         : null,
-                                suffixIcon:
-                                    chatStore.settings.emoteMenuButtonOnLeft
-                                        ? null
-                                        : emoteMenuButton,
+                                suffixIcon: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (chatStore.settings.chatDelay > 0 &&
+                                        chatStore.settings.showVideo)
+                                      Tooltip(
+                                        message:
+                                            'Message delay: ${chatStore.settings.chatDelay.toInt()} seconds${chatStore.settings.autoSyncChatDelay ? ' (auto-synced)' : ''}',
+                                        preferBelow: false,
+                                        triggerMode: TooltipTriggerMode.tap,
+                                        child: Text(
+                                          '${chatStore.settings.chatDelay.toInt()}s',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    if (!chatStore
+                                            .settings.emoteMenuButtonOnLeft &&
+                                        emoteMenuButton != null)
+                                      emoteMenuButton,
+                                  ],
+                                ),
                                 hintMaxLines: 1,
                                 hintText: chatStore.auth.isLoggedIn
                                     ? chatStore.isSendingMessage
                                         ? 'Sending message...'
-                                        : 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'} ${chatStore.settings.chatDelay == 0 || !chatStore.settings.showVideo ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
+                                        : 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'}'
                                     : 'Log in to chat',
                               ),
                               controller: chatStore.textController,
