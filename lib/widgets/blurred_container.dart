@@ -111,7 +111,8 @@ class BlurredContainer extends StatelessWidget {
           sigmaX: sigmaX ?? BlurConfig.sigmaX,
           sigmaY: sigmaY ?? BlurConfig.sigmaY,
         ),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: padding,
           decoration: decoration,
           child: child,

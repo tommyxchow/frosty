@@ -79,7 +79,8 @@ class Chat extends StatelessWidget {
                       bottom: 0,
                       child: ChatBottomBar(chatStore: chatStore),
                     ),
-                    Padding(
+                    AnimatedPadding(
+                      duration: const Duration(milliseconds: 200),
                       padding: EdgeInsets.only(
                         left: 4,
                         top: 4,
