@@ -272,14 +272,16 @@ class ChatBottomBar extends StatelessWidget {
                             'Message delay: ${chatStore.settings.chatDelay.toInt()} seconds${chatStore.settings.autoSyncChatDelay ? ' (auto-synced)' : ''}',
                         preferBelow: false,
                         triggerMode: TooltipTriggerMode.tap,
-                        child: Padding(
+                        child: Container(
                           padding: const EdgeInsets.only(left: 12),
+                          width: 38,
                           child: Text(
                             '${chatStore.settings.chatDelay.toInt()}s',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.secondary,
                               fontWeight: FontWeight.w500,
-                              fontFamily: 'monospace',
+                              overflow: TextOverflow.ellipsis,
                               fontFeatures: [
                                 const FontFeature.tabularFigures(),
                               ],
