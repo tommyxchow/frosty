@@ -108,6 +108,7 @@ class LargeStreamCard extends StatelessWidget {
               streamInfo: streamInfo,
               showCategory: showCategory,
               padding: const EdgeInsets.symmetric(vertical: 12),
+              tooltipTriggerMode: TooltipTriggerMode.longPress,
             ),
           ],
         ),

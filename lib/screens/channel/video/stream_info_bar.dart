@@ -15,6 +15,7 @@ class StreamInfoBar extends StatelessWidget {
   final bool showUptime;
   final bool showViewerCount;
   final EdgeInsets padding;
+  final TooltipTriggerMode tooltipTriggerMode;
 
   const StreamInfoBar({
     super.key,
@@ -24,6 +25,7 @@ class StreamInfoBar extends StatelessWidget {
     this.showUptime = true,
     this.showViewerCount = true,
     this.padding = EdgeInsets.zero,
+    this.tooltipTriggerMode = TooltipTriggerMode.tap,
   });
 
   @override
@@ -55,7 +57,8 @@ class StreamInfoBar extends StatelessWidget {
                   children: [
                     Text(
                       streamerName,
-                      style: TextStyle(
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -63,26 +66,19 @@ class StreamInfoBar extends StatelessWidget {
                       Flexible(
                         child: Builder(
                           builder: (context) {
-                            final tooltipKey = GlobalKey<TooltipState>();
                             return Tooltip(
-                              key: tooltipKey,
                               message: streamTitle,
-                              triggerMode: TooltipTriggerMode.manual,
-                              child: GestureDetector(
-                                onTap: () {
-                                  tooltipKey.currentState
-                                      ?.ensureTooltipVisible();
-                                },
-                                child: Text(
-                                  streamTitle,
-                                  style: context.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w500,
-                                    color: context.bodySmallColor
-                                        ?.withValues(alpha: 0.7),
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                              triggerMode: tooltipTriggerMode,
+                              child: Text(
+                                streamTitle,
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: context.bodySmallColor
+                                      ?.withValues(alpha: 0.7),
                                 ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
                             );
                           },
@@ -102,12 +98,11 @@ class StreamInfoBar extends StatelessWidget {
                         const SizedBox(width: 6),
                       ],
                       if (showUptime) ...[
-                        Flexible(
-                          child: Uptime(
-                            startTime: streamInfo.startedAt,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                            ),
+                        Uptime(
+                          startTime: streamInfo.startedAt,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                         if (showViewerCount) const SizedBox(width: 8),
@@ -121,7 +116,8 @@ class StreamInfoBar extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           NumberFormat().format(streamInfo.viewerCount),
-                          style: TextStyle(
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -139,51 +135,38 @@ class StreamInfoBar extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         Flexible(
-                          child: Builder(
-                            builder: (context) {
-                              final tooltipKey = GlobalKey<TooltipState>();
-                              return Tooltip(
-                                key: tooltipKey,
-                                message: streamInfo.gameName,
-                                triggerMode: TooltipTriggerMode.manual,
-                                child: tappableCategory
-                                    ? GestureDetector(
-                                        onTap: () {
-                                          tooltipKey.currentState
-                                              ?.ensureTooltipVisible();
-                                        },
-                                        onDoubleTap: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                CategoryStreams(
-                                              categoryId: streamInfo.gameId,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          streamInfo.gameName,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      )
-                                    : GestureDetector(
-                                        onTap: () {
-                                          tooltipKey.currentState
-                                              ?.ensureTooltipVisible();
-                                        },
-                                        child: Text(
-                                          streamInfo.gameName,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
+                          child: Tooltip(
+                            message: streamInfo.gameName,
+                            triggerMode: tooltipTriggerMode,
+                            child: tappableCategory
+                                ? GestureDetector(
+                                    onDoubleTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CategoryStreams(
+                                          categoryId: streamInfo.gameId,
                                         ),
                                       ),
-                              );
-                            },
+                                    ),
+                                    child: Text(
+                                      streamInfo.gameName,
+                                      style: context.textTheme.bodyMedium
+                                          ?.copyWith(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  )
+                                : Text(
+                                    streamInfo.gameName,
+                                    style:
+                                        context.textTheme.bodyMedium?.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                           ),
                         ),
                       ],

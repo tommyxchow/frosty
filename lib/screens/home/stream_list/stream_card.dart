@@ -73,6 +73,8 @@ class StreamCard extends StatelessWidget {
     final category =
         streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category';
 
+    const subFontSize = 14.0;
+
     final fontColor = DefaultTextStyle.of(context).style.color;
 
     final imageSection = ClipRRect(
@@ -154,6 +156,7 @@ class StreamCard extends StatelessWidget {
               streamTitle,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
+                fontSize: subFontSize,
                 color: fontColor?.withValues(alpha: 0.8),
               ),
             ),
@@ -177,6 +180,7 @@ class StreamCard extends StatelessWidget {
                   category,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
+                    fontSize: subFontSize,
                     color: fontColor?.withValues(alpha: 0.8),
                   ),
                 ),
@@ -186,6 +190,7 @@ class StreamCard extends StatelessWidget {
           Text(
             '${NumberFormat().format(streamInfo.viewerCount)} viewers',
             style: TextStyle(
+              fontSize: subFontSize,
               color: fontColor?.withValues(alpha: 0.8),
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
