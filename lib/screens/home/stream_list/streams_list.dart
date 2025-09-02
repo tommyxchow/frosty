@@ -163,6 +163,7 @@ class _StreamsListState extends State<StreamsList>
                       itemBuilder: (context, index) {
                         if (isLargeCard) {
                           return LargeStreamCardSkeletonLoader(
+                            showThumbnail: settingsStore.showThumbnails,
                             showCategory: widget.listType != ListType.category,
                           );
                         } else {
@@ -194,6 +195,7 @@ class _StreamsListState extends State<StreamsList>
                     itemBuilder: (context, index) {
                       if (isLargeCard) {
                         return LargeStreamCardSkeletonLoader(
+                          showThumbnail: settingsStore.showThumbnails,
                           showCategory: widget.listType != ListType.category,
                         );
                       } else {
