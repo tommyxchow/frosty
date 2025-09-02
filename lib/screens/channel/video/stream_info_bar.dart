@@ -28,6 +28,22 @@ class StreamInfoBar extends StatelessWidget {
     this.tooltipTriggerMode = TooltipTriggerMode.tap,
   });
 
+  static const _iconShadow = [
+    Shadow(
+      offset: Offset(0, 1),
+      blurRadius: 4,
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+    ),
+  ];
+
+  static const _textShadow = [
+    Shadow(
+      offset: Offset(0, 1),
+      blurRadius: 4,
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final streamTitle = streamInfo.title.trim();
@@ -47,7 +63,6 @@ class StreamInfoBar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              spacing: 2,
               children: [
                 // Top row: Streamer name + stream title
                 Row(
@@ -60,6 +75,7 @@ class StreamInfoBar extends StatelessWidget {
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
+                        shadows: _textShadow,
                       ),
                     ),
                     if (streamTitle.isNotEmpty) ...[
@@ -76,6 +92,7 @@ class StreamInfoBar extends StatelessWidget {
                                   fontWeight: FontWeight.w500,
                                   color: context.bodySmallColor
                                       ?.withValues(alpha: 0.7),
+                                  shadows: _textShadow,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
@@ -103,6 +120,7 @@ class StreamInfoBar extends StatelessWidget {
                           style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
+                            shadows: _textShadow,
                           ),
                         ),
                         if (showViewerCount) const SizedBox(width: 8),
@@ -112,6 +130,7 @@ class StreamInfoBar extends StatelessWidget {
                           Icons.visibility,
                           size: 14,
                           color: context.bodySmallColor,
+                          shadows: _iconShadow,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -119,6 +138,7 @@ class StreamInfoBar extends StatelessWidget {
                           style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
+                            shadows: _textShadow,
                           ),
                         ),
                       ],
@@ -132,6 +152,7 @@ class StreamInfoBar extends StatelessWidget {
                           Icons.gamepad,
                           size: 14,
                           color: context.bodySmallColor,
+                          shadows: _iconShadow,
                         ),
                         const SizedBox(width: 4),
                         Flexible(
@@ -154,6 +175,7 @@ class StreamInfoBar extends StatelessWidget {
                                           ?.copyWith(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
+                                        shadows: _textShadow,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -164,6 +186,7 @@ class StreamInfoBar extends StatelessWidget {
                                         context.textTheme.bodyMedium?.copyWith(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
+                                      shadows: _textShadow,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),

@@ -32,6 +32,22 @@ class VideoOverlay extends StatelessWidget {
     required this.settingsStore,
   });
 
+  static const _iconShadow = [
+    Shadow(
+      offset: Offset(0, 1),
+      blurRadius: 4,
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+    ),
+  ];
+
+  static const _textShadow = [
+    Shadow(
+      offset: Offset(0, 1),
+      blurRadius: 4,
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     final surfaceColor =
@@ -42,6 +58,7 @@ class VideoOverlay extends StatelessWidget {
       icon: Icon(
         Icons.adaptive.arrow_back_rounded,
         color: surfaceColor,
+        shadows: _iconShadow,
       ),
       onPressed: Navigator.of(context).pop,
     );
@@ -54,14 +71,17 @@ class VideoOverlay extends StatelessWidget {
         onPressed: () => videoStore.settingsStore.fullScreenChatOverlay =
             !videoStore.settingsStore.fullScreenChatOverlay,
         icon: videoStore.settingsStore.fullScreenChatOverlay
-            ? const Icon(Icons.chat_rounded)
-            : const Icon(Icons.chat_outlined),
+            ? Icon(Icons.chat_rounded, shadows: _iconShadow)
+            : Icon(Icons.chat_outlined, shadows: _iconShadow),
         color: surfaceColor,
       ),
     );
 
     final videoSettingsButton = IconButton(
-      icon: const Icon(Icons.settings),
+      icon: Icon(
+        Icons.settings,
+        shadows: _iconShadow,
+      ),
       color: surfaceColor,
       onPressed: () {
         videoStore.updateStreamQualities();
@@ -131,6 +151,7 @@ class VideoOverlay extends StatelessWidget {
             Icon(
               Icons.speed_rounded,
               color: surfaceColor,
+              shadows: _iconShadow,
             ),
           ],
         ),
@@ -144,6 +165,7 @@ class VideoOverlay extends StatelessWidget {
         icon: Icon(
           Icons.refresh_rounded,
           color: surfaceColor,
+          shadows: _iconShadow,
         ),
         onPressed: videoStore.handleRefresh,
       ),
@@ -160,6 +182,7 @@ class VideoOverlay extends StatelessWidget {
               ? Icons.fullscreen_exit_rounded
               : Icons.fullscreen_rounded,
           color: surfaceColor,
+          shadows: _iconShadow,
         ),
         onPressed: () => videoStore.settingsStore.fullScreen =
             !videoStore.settingsStore.fullScreen,
@@ -174,6 +197,7 @@ class VideoOverlay extends StatelessWidget {
         icon: Icon(
           Icons.screen_rotation_rounded,
           color: surfaceColor,
+          shadows: _iconShadow,
         ),
         onPressed: () {
           if (context.isPortrait) {
@@ -201,16 +225,16 @@ class VideoOverlay extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black,
-                  Colors.black.withValues(alpha: 0.8),
+                  Colors.black.withValues(alpha: 0.6),
                   Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.1),
                   Colors.transparent,
                   Colors.transparent,
-                  Colors.black.withValues(alpha: 0.4),
-                  Colors.black.withValues(alpha: 0.8),
-                  Colors.black,
+                  Colors.black.withValues(alpha: 0.2),
+                  Colors.black.withValues(alpha: 0.5),
+                  Colors.black.withValues(alpha: 0.7),
                 ],
-                stops: const [0.0, 0.05, 0.15, 0.25, 0.75, 0.85, 0.95, 1.0],
+                stops: const [0.0, 0.12, 0.25, 0.35, 0.75, 0.85, 0.95, 1.0],
               ),
             ),
             child: Stack(
@@ -258,7 +282,7 @@ class VideoOverlay extends StatelessWidget {
                 Colors.black.withValues(alpha: 0.8),
                 Colors.black,
               ],
-              stops: const [0.0, 0.1, 0.25, 0.35, 0.65, 0.75, 0.9, 1.0],
+              stops: const [0.0, 0.15, 0.3, 0.4, 0.7, 0.8, 0.9, 1.0],
             ),
           ),
           child: Stack(
@@ -299,6 +323,13 @@ class VideoOverlay extends StatelessWidget {
                           ? Icons.play_arrow_rounded
                           : Icons.pause_rounded,
                       color: surfaceColor,
+                      shadows: [
+                        Shadow(
+                          offset: const Offset(0, 3),
+                          blurRadius: 8,
+                          color: Colors.black.withValues(alpha: 0.6),
+                        ),
+                      ],
                     ),
                     onPressed: videoStore.handlePausePlay,
                   ),
@@ -326,6 +357,7 @@ class VideoOverlay extends StatelessWidget {
                                     style: TextStyle(
                                       color: surfaceColor,
                                       fontWeight: FontWeight.w500,
+                                      shadows: _textShadow,
                                     ),
                                   ),
                                 ],
@@ -355,6 +387,7 @@ class VideoOverlay extends StatelessWidget {
                                     Icon(
                                       Icons.visibility,
                                       size: 14,
+                                      shadows: _iconShadow,
                                       color: surfaceColor,
                                     ),
                                     Text(
@@ -367,6 +400,7 @@ class VideoOverlay extends StatelessWidget {
                                         fontFeatures: const [
                                           FontFeature.tabularFigures(),
                                         ],
+                                        shadows: _textShadow,
                                       ),
                                     ),
                                   ],
@@ -395,6 +429,7 @@ class VideoOverlay extends StatelessWidget {
                                   ? Icons.picture_in_picture_alt_outlined
                                   : Icons.picture_in_picture_alt_rounded,
                               color: surfaceColor,
+                              shadows: _iconShadow,
                             ),
                             onPressed: videoStore.togglePictureInPicture,
                           ),
