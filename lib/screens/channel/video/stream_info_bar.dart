@@ -56,7 +56,6 @@ class StreamInfoBar extends StatelessWidget {
                     Text(
                       streamerName,
                       style: TextStyle(
-                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -77,7 +76,6 @@ class StreamInfoBar extends StatelessWidget {
                                 child: Text(
                                   streamTitle,
                                   style: context.textTheme.bodyMedium?.copyWith(
-                                    fontSize: 13,
                                     fontWeight: FontWeight.w500,
                                     color: context.bodySmallColor
                                         ?.withValues(alpha: 0.7),
@@ -107,8 +105,7 @@ class StreamInfoBar extends StatelessWidget {
                         Flexible(
                           child: Uptime(
                             startTime: streamInfo.startedAt,
-                            style: context.textTheme.bodySmall?.copyWith(
-                              fontSize: 13,
+                            style: TextStyle(
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -118,14 +115,13 @@ class StreamInfoBar extends StatelessWidget {
                       if (showViewerCount) ...[
                         Icon(
                           Icons.visibility,
-                          size: 13,
+                          size: 14,
                           color: context.bodySmallColor,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           NumberFormat().format(streamInfo.viewerCount),
-                          style: context.textTheme.bodySmall?.copyWith(
-                            fontSize: 13,
+                          style: TextStyle(
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -138,7 +134,7 @@ class StreamInfoBar extends StatelessWidget {
                       if (showCategory && streamInfo.gameName.isNotEmpty) ...[
                         Icon(
                           Icons.gamepad,
-                          size: 13,
+                          size: 14,
                           color: context.bodySmallColor,
                         ),
                         const SizedBox(width: 4),
@@ -167,9 +163,7 @@ class StreamInfoBar extends StatelessWidget {
                                         ),
                                         child: Text(
                                           streamInfo.gameName,
-                                          style: context.textTheme.bodySmall
-                                              ?.copyWith(
-                                            fontSize: 13,
+                                          style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                           ),
                                           overflow: TextOverflow.ellipsis,
@@ -182,9 +176,7 @@ class StreamInfoBar extends StatelessWidget {
                                         },
                                         child: Text(
                                           streamInfo.gameName,
-                                          style: context.textTheme.bodySmall
-                                              ?.copyWith(
-                                            fontSize: 13,
+                                          style: TextStyle(
                                             fontWeight: FontWeight.w500,
                                           ),
                                           overflow: TextOverflow.ellipsis,
