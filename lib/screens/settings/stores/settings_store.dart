@@ -68,7 +68,7 @@ abstract class _SettingsStoreBase with Store {
   // Overlay defaults
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
-  static const defaultOverlayOpacity = 0.5;
+  static const defaultOverlayOpacity = 0.0;
 
   // Player options
   @JsonKey(defaultValue: defaultShowVideo)
