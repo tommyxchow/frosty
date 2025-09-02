@@ -62,7 +62,7 @@ class FrostyNotification extends StatelessWidget {
       return Dismissible(
         key: ValueKey(message),
         onDismissed: (_) => onDismissed!(),
-        direction: DismissDirection.vertical,
+        direction: DismissDirection.up,
         child: notificationContent,
       );
     }

@@ -299,7 +299,7 @@ class _VideoChatState extends State<VideoChat>
                 child: _chatStore.notification != null
                     ? AnimatedContainer(
                         key: const ValueKey('notification'),
-                        duration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 100),
                         curve: Curves.easeOut,
                         margin: EdgeInsets.only(
                           top: _chatStore.settings.chatNotificationsOnBottom
