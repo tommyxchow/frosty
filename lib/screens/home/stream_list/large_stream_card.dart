@@ -4,17 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
-import 'package:frosty/screens/channel/video/video_bar.dart';
+import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/cached_image.dart';
-import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
-import 'package:frosty/widgets/uptime.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class LargeStreamCard extends StatelessWidget {
@@ -47,90 +43,24 @@ class LargeStreamCard extends StatelessWidget {
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
     final thumbnailWidth = min((size.width * pixelRatio) ~/ 1, 1920);
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
-    final surfaceColor =
-        context.watch<FrostyThemes>().dark.colorScheme.onSurface;
 
     final thumbnail = SizedBox(
       width: double.infinity,
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(8)),
-        child: Stack(
-          alignment: Alignment.bottomLeft,
-          children: [
-            Container(
-              foregroundDecoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.8, 1.0],
-                  colors: [
-                    Colors.transparent,
-                    Colors.black,
-                  ],
-                ),
-              ),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: FrostyCachedNetworkImage(
-                  imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-                    '-{width}x{height}',
-                    '-${thumbnailWidth}x$thumbnailHeight',
-                  ),
-                  cacheKey: cacheKey,
-                  placeholder: (context, url) => const SkeletonLoader(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                  useOldImageOnUrlChange: true,
-                ),
-              ),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: FrostyCachedNetworkImage(
+            imageUrl: streamInfo.thumbnailUrl.replaceFirst(
+              '-{width}x{height}',
+              '-${thumbnailWidth}x$thumbnailHeight',
             ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                spacing: 12,
-                children: [
-                  Tooltip(
-                    message: 'Stream uptime',
-                    preferBelow: false,
-                    child: Row(
-                      spacing: 6,
-                      children: [
-                        const LiveIndicator(),
-                        Uptime(
-                          startTime: streamInfo.startedAt,
-                          style: TextStyle(
-                            color: surfaceColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Tooltip(
-                    message: 'Viewer count',
-                    preferBelow: false,
-                    child: Row(
-                      spacing: 4,
-                      children: [
-                        Icon(
-                          Icons.visibility,
-                          size: 14,
-                          color: surfaceColor,
-                        ),
-                        Text(
-                          NumberFormat().format(streamInfo.viewerCount),
-                          style: TextStyle(
-                            color: surfaceColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            cacheKey: cacheKey,
+            placeholder: (context, url) => const SkeletonLoader(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
-          ],
+            useOldImageOnUrlChange: true,
+          ),
         ),
       ),
     );
@@ -174,10 +104,10 @@ class LargeStreamCard extends StatelessWidget {
         child: Column(
           children: [
             if (showThumbnail) thumbnail,
-            VideoBar(
+            StreamInfoBar(
               streamInfo: streamInfo,
               showCategory: showCategory,
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 12),
             ),
           ],
         ),

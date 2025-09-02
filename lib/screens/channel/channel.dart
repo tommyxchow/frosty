@@ -7,8 +7,8 @@ import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
-import 'package:frosty/screens/channel/video/video_bar.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/theme.dart';
@@ -17,11 +17,8 @@ import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
-import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/notification.dart';
 import 'package:frosty/widgets/profile_picture.dart';
-import 'package:frosty/widgets/uptime.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
@@ -274,10 +271,6 @@ class _VideoChatState extends State<VideoChat>
 
     final chat = Observer(
       builder: (context) {
-        final videoBarVisible = _videoStore.streamInfo != null &&
-            _chatStore.settings.showVideo &&
-            (_videoStore.paused || _videoStore.overlayVisible);
-
         final bool chatOnly = !_chatStore.settings.showVideo;
 
         return Stack(
@@ -297,60 +290,18 @@ class _VideoChatState extends State<VideoChat>
                 switchInCurve: Curves.easeOut,
                 switchOutCurve: Curves.easeIn,
                 child: _chatStore.notification != null
-                    ? AnimatedContainer(
-                        key: const ValueKey('notification'),
-                        duration: const Duration(milliseconds: 100),
-                        curve: Curves.easeOut,
-                        margin: EdgeInsets.only(
-                          top: _chatStore.settings.chatNotificationsOnBottom
-                              ? 0
-                              : (MediaQuery.of(context).orientation ==
-                                          Orientation.portrait &&
-                                      videoBarVisible
-                                  ? 90 // Position under video bar
-                                  : 0), // Default top margin
-                          bottom: _chatStore.settings.chatNotificationsOnBottom
-                              ? 16
-                              : 0,
-                        ),
-                        child: Align(
-                          alignment:
-                              _chatStore.settings.chatNotificationsOnBottom
-                                  ? Alignment.bottomCenter
-                                  : Alignment.topCenter,
-                          child: FrostyNotification(
-                            message: _chatStore.notification!,
-                            onDismissed: () => _chatStore.clearNotification(),
-                            showGradient: !videoBarVisible,
-                          ),
+                    ? Align(
+                        alignment: _chatStore.settings.chatNotificationsOnBottom
+                            ? Alignment.bottomCenter
+                            : Alignment.topCenter,
+                        child: FrostyNotification(
+                          message: _chatStore.notification!,
+                          onDismissed: _chatStore.clearNotification,
                         ),
                       )
-                    : const SizedBox.shrink(),
+                    : null,
               ),
             ),
-            if (context.isPortrait)
-              AnimatedOpacity(
-                opacity: videoBarVisible ? 1 : 0,
-                curve: Curves.ease,
-                duration: const Duration(milliseconds: 200),
-                child: IgnorePointer(
-                  ignoring: !videoBarVisible,
-                  child: BlurredContainer(
-                    gradientDirection: GradientDirection.up,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_videoStore.streamInfo != null)
-                          VideoBar(
-                            streamInfo: _videoStore.streamInfo!,
-                            tappableCategory: false,
-                          ),
-                        const Divider(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
           ],
         );
       },
@@ -375,147 +326,36 @@ class _VideoChatState extends State<VideoChat>
                       ? Brightness.light
                       : Brightness.dark,
             ),
-            title: Row(
-              spacing: 12,
-              children: [
-                ProfilePicture(
-                  userLogin: widget.userLogin,
-                  radius: 16,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    spacing: 2,
+            title: streamInfo != null
+                ? StreamInfoBar(
+                    streamInfo: streamInfo,
+                  )
+                : Row(
+                    spacing: 12,
                     children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        spacing: 6,
-                        children: [
-                          Text(
-                            getReadableName(
-                              _chatStore.displayName,
-                              _chatStore.channelName,
-                            ),
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          if (streamInfo != null &&
-                              streamInfo.title.isNotEmpty) ...[
-                            Flexible(
-                              child: Builder(
-                                builder: (context) {
-                                  final tooltipKey = GlobalKey<TooltipState>();
-                                  return Tooltip(
-                                    key: tooltipKey,
-                                    message: streamInfo.title,
-                                    triggerMode: TooltipTriggerMode.manual,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        tooltipKey.currentState
-                                            ?.ensureTooltipVisible();
-                                      },
-                                      child: Text(
-                                        streamInfo.title,
-                                        style: context.textTheme.bodyMedium
-                                            ?.copyWith(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: context.bodySmallColor
-                                              ?.withValues(alpha: 0.6),
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ],
+                      ProfilePicture(
+                        userLogin: widget.userLogin,
+                        radius: 16,
                       ),
-                      if (streamInfo != null) ...[
-                        Row(
-                          children: [
-                            const LiveIndicator(),
-                            const SizedBox(width: 6),
-                            Flexible(
-                              child: Uptime(
-                                startTime: streamInfo.startedAt,
-                                style: context.textTheme.bodySmall?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Icon(
-                              Icons.visibility,
-                              size: 14,
-                              color: context.bodySmallColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              NumberFormat().format(streamInfo.viewerCount),
-                              style: context.textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            if (streamInfo.gameName.isNotEmpty) ...[
-                              const SizedBox(width: 8),
-                              Icon(
-                                Icons.gamepad,
-                                size: 14,
-                                color: context.bodySmallColor,
-                              ),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Builder(
-                                  builder: (context) {
-                                    final tooltipKey =
-                                        GlobalKey<TooltipState>();
-                                    return Tooltip(
-                                      key: tooltipKey,
-                                      message: streamInfo.gameName,
-                                      triggerMode: TooltipTriggerMode.manual,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          tooltipKey.currentState
-                                              ?.ensureTooltipVisible();
-                                        },
-                                        child: Text(
-                                          streamInfo.gameName,
-                                          style: context.textTheme.bodySmall
-                                              ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ],
-                          ],
+                      Text(
+                        getReadableName(
+                          _chatStore.displayName,
+                          _chatStore.channelName,
                         ),
-                      ] else ...[
-                        Text(
-                          'Offline',
-                          style: context.textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey,
-                          ),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
+                      ),
+                      Text(
+                        'Offline',
+                        style: context.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
-            ),
             flexibleSpace: BlurredContainer(
               gradientDirection: GradientDirection.up,
               child: Column(

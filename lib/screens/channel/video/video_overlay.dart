@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
-import 'package:frosty/screens/channel/video/video_bar.dart';
+import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
@@ -195,23 +195,212 @@ class VideoOverlay extends StatelessWidget {
       builder: (context) {
         final streamInfo = videoStore.streamInfo;
         if (streamInfo == null) {
-          return Stack(
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black,
+                  Colors.black.withValues(alpha: 0.8),
+                  Colors.black.withValues(alpha: 0.4),
+                  Colors.transparent,
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.4),
+                  Colors.black.withValues(alpha: 0.8),
+                  Colors.black,
+                ],
+                stops: const [0.0, 0.05, 0.15, 0.25, 0.75, 0.85, 0.95, 1.0],
+              ),
+            ),
+            child: Stack(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    backButton,
+                    const Spacer(),
+                    if (videoStore.settingsStore.fullScreen &&
+                        context.isLandscape)
+                      chatOverlayButton,
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      refreshButton,
+                      // On iPad, hide the rotate button on the overlay
+                      // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
+                      if (!isIPad()) rotateButton,
+                      if (context.isLandscape) fullScreenButton,
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black,
+                Colors.black.withValues(alpha: 0.8),
+                Colors.black.withValues(alpha: 0.4),
+                Colors.transparent,
+                Colors.transparent,
+                Colors.black.withValues(alpha: 0.4),
+                Colors.black.withValues(alpha: 0.8),
+                Colors.black,
+              ],
+              stops: const [0.0, 0.05, 0.15, 0.25, 0.75, 0.85, 0.95, 1.0],
+            ),
+          ),
+          child: Stack(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  backButton,
-                  const Spacer(),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        backButton,
+                        Flexible(
+                          child: StreamInfoBar(
+                            streamInfo: streamInfo,
+                            showUptime: false,
+                            showViewerCount: false,
+                            padding: const EdgeInsets.only(top: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   if (videoStore.settingsStore.fullScreen &&
                       context.isLandscape)
                     chatOverlayButton,
+                  if (!Platform.isIOS || isIPad()) videoSettingsButton,
                 ],
               ),
+              Center(
+                child: Tooltip(
+                  message: videoStore.paused ? 'Play' : 'Pause',
+                  preferBelow: false,
+                  child: IconButton(
+                    iconSize: 56,
+                    icon: Icon(
+                      videoStore.paused
+                          ? Icons.play_arrow_rounded
+                          : Icons.pause_rounded,
+                      color: surfaceColor,
+                    ),
+                    onPressed: videoStore.handlePausePlay,
+                  ),
+                ),
+              ),
               Align(
-                alignment: Alignment.bottomRight,
+                alignment: Alignment.bottomLeft,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Row(
+                          spacing: 12,
+                          children: [
+                            Tooltip(
+                              message: 'Stream uptime',
+                              preferBelow: false,
+                              child: Row(
+                                spacing: 6,
+                                children: [
+                                  const LiveIndicator(),
+                                  Uptime(
+                                    startTime: streamInfo.startedAt,
+                                    style: TextStyle(
+                                      color: surfaceColor,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Tooltip(
+                              message: 'Viewer count',
+                              preferBelow: false,
+                              child: GestureDetector(
+                                onTap: () =>
+                                    showModalBottomSheetWithProperFocus(
+                                  isScrollControlled: true,
+                                  context: context,
+                                  builder: (context) => GestureDetector(
+                                    onTap: FocusScope.of(context).unfocus,
+                                    child: ChattersList(
+                                      chatDetailsStore:
+                                          chatStore.chatDetailsStore,
+                                      chatStore: chatStore,
+                                      userLogin: streamInfo.userLogin,
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  spacing: 4,
+                                  children: [
+                                    Icon(
+                                      Icons.visibility,
+                                      size: 14,
+                                      color: surfaceColor,
+                                    ),
+                                    Text(
+                                      NumberFormat().format(
+                                        videoStore.streamInfo?.viewerCount,
+                                      ),
+                                      style: TextStyle(
+                                        color: surfaceColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontFeatures: const [
+                                          FontFeature.tabularFigures(),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (context.isLandscape) latencyTooltip,
+                    Observer(
+                      builder: (_) {
+                        // On iOS, show toggle behavior. On Android, always show enter PiP.
+                        final isIOS = Platform.isIOS;
+                        final showExitState = isIOS && videoStore.isInPipMode;
+
+                        return Tooltip(
+                          message: showExitState
+                              ? 'Exit picture-in-picture'
+                              : 'Enter picture-in-picture',
+                          preferBelow: false,
+                          child: IconButton(
+                            icon: Icon(
+                              showExitState
+                                  ? Icons.picture_in_picture_alt_outlined
+                                  : Icons.picture_in_picture_alt_rounded,
+                              color: surfaceColor,
+                            ),
+                            onPressed: videoStore.togglePictureInPicture,
+                          ),
+                        );
+                      },
+                    ),
                     refreshButton,
                     // On iPad, hide the rotate button on the overlay
                     // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
@@ -221,163 +410,7 @@ class VideoOverlay extends StatelessWidget {
                 ),
               ),
             ],
-          );
-        }
-
-        return Stack(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                backButton,
-                if (context.isLandscape)
-                  Expanded(
-                    child: VideoBar(
-                      streamInfo: streamInfo,
-                      titleTextColor: surfaceColor,
-                      subtitleTextColor: surfaceColor,
-                      subtitleTextWeight: FontWeight.w500,
-                    ),
-                  ),
-                if (videoStore.settingsStore.fullScreen && context.isLandscape)
-                  chatOverlayButton,
-                if (!Platform.isIOS || isIPad())
-                  Row(
-                    children: [
-                      Text(
-                        videoStore.streamQuality,
-                        style: TextStyle(
-                          color: surfaceColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      videoSettingsButton,
-                    ],
-                  ),
-              ],
-            ),
-            Center(
-              child: Tooltip(
-                message: videoStore.paused ? 'Play' : 'Pause',
-                preferBelow: false,
-                child: IconButton(
-                  iconSize: 56,
-                  icon: Icon(
-                    videoStore.paused
-                        ? Icons.play_arrow_rounded
-                        : Icons.pause_rounded,
-                    color: surfaceColor,
-                  ),
-                  onPressed: videoStore.handlePausePlay,
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        spacing: 12,
-                        children: [
-                          Tooltip(
-                            message: 'Stream uptime',
-                            preferBelow: false,
-                            child: Row(
-                              spacing: 6,
-                              children: [
-                                const LiveIndicator(),
-                                Uptime(
-                                  startTime: streamInfo.startedAt,
-                                  style: TextStyle(
-                                    color: surfaceColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Tooltip(
-                            message: 'Viewer count',
-                            preferBelow: false,
-                            child: GestureDetector(
-                              onTap: () => showModalBottomSheetWithProperFocus(
-                                isScrollControlled: true,
-                                context: context,
-                                builder: (context) => GestureDetector(
-                                  onTap: FocusScope.of(context).unfocus,
-                                  child: ChattersList(
-                                    chatDetailsStore:
-                                        chatStore.chatDetailsStore,
-                                    chatStore: chatStore,
-                                    userLogin: streamInfo.userLogin,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                spacing: 4,
-                                children: [
-                                  Icon(
-                                    Icons.visibility,
-                                    size: 14,
-                                    color: surfaceColor,
-                                  ),
-                                  Text(
-                                    NumberFormat().format(
-                                      videoStore.streamInfo?.viewerCount,
-                                    ),
-                                    style: TextStyle(
-                                      color: surfaceColor,
-                                      fontWeight: FontWeight.w500,
-                                      fontFeatures: const [
-                                        FontFeature.tabularFigures(),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (context.isLandscape) latencyTooltip,
-                  Observer(
-                    builder: (_) {
-                      // On iOS, show toggle behavior. On Android, always show enter PiP.
-                      final isIOS = Platform.isIOS;
-                      final showExitState = isIOS && videoStore.isInPipMode;
-
-                      return Tooltip(
-                        message: showExitState
-                            ? 'Exit picture-in-picture'
-                            : 'Enter picture-in-picture',
-                        preferBelow: false,
-                        child: IconButton(
-                          icon: Icon(
-                            showExitState
-                                ? Icons.picture_in_picture_alt_outlined
-                                : Icons.picture_in_picture_alt_rounded,
-                            color: surfaceColor,
-                          ),
-                          onPressed: videoStore.togglePictureInPicture,
-                        ),
-                      );
-                    },
-                  ),
-                  refreshButton,
-                  // On iPad, hide the rotate button on the overlay
-                  // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
-                  if (!isIPad()) rotateButton,
-                  if (context.isLandscape) fullScreenButton,
-                ],
-              ),
-            ),
-          ],
+          ),
         );
       },
     );
