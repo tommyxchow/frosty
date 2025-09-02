@@ -86,9 +86,9 @@ class FrostyThemes {
         tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: colorScheme.surfaceContainer,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           border: Border.all(color: borderColor, width: borderWidth),
         ),
