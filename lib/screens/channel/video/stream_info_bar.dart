@@ -17,6 +17,7 @@ class StreamInfoBar extends StatelessWidget {
   final EdgeInsets padding;
   final TooltipTriggerMode tooltipTriggerMode;
   final Color? textColor;
+  final bool isCompact;
 
   const StreamInfoBar({
     super.key,
@@ -28,6 +29,7 @@ class StreamInfoBar extends StatelessWidget {
     this.padding = EdgeInsets.zero,
     this.tooltipTriggerMode = TooltipTriggerMode.tap,
     this.textColor,
+    this.isCompact = false,
   });
 
   static const _iconShadow = [
@@ -51,6 +53,7 @@ class StreamInfoBar extends StatelessWidget {
     final streamTitle = streamInfo.title.trim();
     final streamerName =
         getReadableName(streamInfo.userName, streamInfo.userLogin);
+    final secondLineSize = isCompact ? 13.0 : 14.0;
 
     return Padding(
       padding: padding,
@@ -122,7 +125,7 @@ class StreamInfoBar extends StatelessWidget {
                         Uptime(
                           startTime: streamInfo.startedAt,
                           style: context.textTheme.bodyMedium?.copyWith(
-                            fontSize: 14,
+                            fontSize: secondLineSize,
                             fontWeight: FontWeight.w500,
                             color: textColor,
                             shadows: _textShadow,
@@ -133,7 +136,7 @@ class StreamInfoBar extends StatelessWidget {
                       if (showViewerCount) ...[
                         Icon(
                           Icons.visibility,
-                          size: 14,
+                          size: secondLineSize,
                           color: textColor ?? context.bodySmallColor,
                           shadows: _iconShadow,
                         ),
@@ -141,7 +144,7 @@ class StreamInfoBar extends StatelessWidget {
                         Text(
                           NumberFormat().format(streamInfo.viewerCount),
                           style: context.textTheme.bodyMedium?.copyWith(
-                            fontSize: 14,
+                            fontSize: secondLineSize,
                             fontWeight: FontWeight.w500,
                             color: textColor,
                             shadows: _textShadow,
@@ -156,7 +159,7 @@ class StreamInfoBar extends StatelessWidget {
                       if (showCategory && streamInfo.gameName.isNotEmpty) ...[
                         Icon(
                           Icons.gamepad,
-                          size: 14,
+                          size: secondLineSize,
                           color: textColor ?? context.bodySmallColor,
                           shadows: _iconShadow,
                         ),
@@ -179,7 +182,7 @@ class StreamInfoBar extends StatelessWidget {
                                       streamInfo.gameName,
                                       style: context.textTheme.bodyMedium
                                           ?.copyWith(
-                                        fontSize: 14,
+                                        fontSize: secondLineSize,
                                         fontWeight: FontWeight.w500,
                                         color: textColor,
                                         shadows: _textShadow,
@@ -191,7 +194,7 @@ class StreamInfoBar extends StatelessWidget {
                                     streamInfo.gameName,
                                     style:
                                         context.textTheme.bodyMedium?.copyWith(
-                                      fontSize: 14,
+                                      fontSize: secondLineSize,
                                       fontWeight: FontWeight.w500,
                                       color: textColor,
                                       shadows: _textShadow,

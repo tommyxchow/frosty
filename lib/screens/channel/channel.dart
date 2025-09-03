@@ -329,6 +329,7 @@ class _VideoChatState extends State<VideoChat>
             title: streamInfo != null
                 ? StreamInfoBar(
                     streamInfo: streamInfo,
+                    isCompact: true,
                   )
                 : Row(
                     spacing: 12,
