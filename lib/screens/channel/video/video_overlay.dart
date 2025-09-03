@@ -225,16 +225,37 @@ class VideoOverlay extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Colors.black.withValues(alpha: 0.6),
-                  Colors.black.withValues(alpha: 0.3),
-                  Colors.black.withValues(alpha: 0.1),
+                  Colors.black.withValues(alpha: 0.5),
+                  Colors.black.withValues(alpha: 0.35),
+                  Colors.black.withValues(alpha: 0.20),
+                  Colors.black.withValues(alpha: 0.10),
+                  Colors.black.withValues(alpha: 0.04),
+                  Colors.black.withValues(alpha: 0.01),
                   Colors.transparent,
                   Colors.transparent,
-                  Colors.black.withValues(alpha: 0.1),
-                  Colors.black.withValues(alpha: 0.3),
-                  Colors.black.withValues(alpha: 0.6),
+                  Colors.black.withValues(alpha: 0.01),
+                  Colors.black.withValues(alpha: 0.04),
+                  Colors.black.withValues(alpha: 0.10),
+                  Colors.black.withValues(alpha: 0.20),
+                  Colors.black.withValues(alpha: 0.35),
+                  Colors.black.withValues(alpha: 0.5),
                 ],
-                stops: const [0.0, 0.15, 0.30, 0.40, 0.60, 0.70, 0.85, 1.0],
+                stops: const [
+                  0.0, // Top edge
+                  0.10, // Quick fade
+                  0.18, // Gentle fade
+                  0.25, // Light fade
+                  0.32, // Very light
+                  0.38, // Nearly clear
+                  0.42, // Transparent start
+                  0.58, // Transparent end
+                  0.62, // Nearly clear
+                  0.68, // Very light
+                  0.75, // Light fade
+                  0.82, // Gentle fade
+                  0.90, // Quick fade
+                  1.0, // Bottom edge
+                ],
               ),
             ),
             child: Stack(
@@ -274,27 +295,43 @@ class VideoOverlay extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [
                 Colors.black,
-                Colors.black.withValues(alpha: 0.7),
-                Colors.black.withValues(alpha: 0.3),
-                Colors.black.withValues(alpha: 0.1),
+                Colors.black.withValues(alpha: 0.85),
+                Colors.black.withValues(alpha: 0.65),
+                Colors.black.withValues(alpha: 0.45),
+                Colors.black.withValues(alpha: 0.28),
+                Colors.black.withValues(alpha: 0.15),
+                Colors.black.withValues(alpha: 0.06),
+                Colors.black.withValues(alpha: 0.02),
                 Colors.transparent,
                 Colors.transparent,
-                Colors.black.withValues(alpha: 0.1),
-                Colors.black.withValues(alpha: 0.3),
-                Colors.black.withValues(alpha: 0.7),
+                Colors.black.withValues(alpha: 0.02),
+                Colors.black.withValues(alpha: 0.06),
+                Colors.black.withValues(alpha: 0.15),
+                Colors.black.withValues(alpha: 0.28),
+                Colors.black.withValues(alpha: 0.45),
+                Colors.black.withValues(alpha: 0.65),
+                Colors.black.withValues(alpha: 0.85),
                 Colors.black,
               ],
               stops: const [
-                0.0,
-                0.17,
-                0.30,
-                0.37,
-                0.43,
-                0.57,
-                0.63,
-                0.70,
-                0.83,
-                1.0,
+                0.0, // Top: Full black
+                0.08, // Solid black area (reduced)
+                0.16, // Strong fade
+                0.22, // Medium-strong
+                0.28, // Medium fade
+                0.32, // Light fade
+                0.36, // Very light
+                0.38, // Nearly clear
+                0.40, // Transparent start
+                0.60, // Transparent end
+                0.62, // Nearly clear
+                0.64, // Very light
+                0.68, // Light fade
+                0.72, // Medium fade
+                0.78, // Medium-strong
+                0.84, // Strong fade
+                0.92, // Solid black area (reduced)
+                1.0, // Bottom: Full black
               ],
             ),
           ),
