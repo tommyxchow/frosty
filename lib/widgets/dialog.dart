@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/widgets/section_header.dart';
 
 /// A custom dialog that makes the title bold, puts the actions in a column, and adds a subtle border.
 class FrostyDialog extends StatelessWidget {
@@ -18,14 +19,16 @@ class FrostyDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-        title,
-        // style: const TextStyle(fontWeight: FontWeight.bold),
-        // textAlign: TextAlign.center,
-      ),
       content: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SectionHeader(
+              title,
+              isFirst: true,
+              padding: EdgeInsets.zero,
+            ),
+            const SizedBox(height: 16),
             content ?? Text(message!, textAlign: TextAlign.center),
             if (actions != null) ...[
               const SizedBox(height: 16),

@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -48,25 +51,10 @@ class GeneralSettings extends StatelessWidget {
               onPressed: () {
                 showDialog(
                   context: context,
-                  builder: (context) => FrostyDialog(
-                    title: 'Accent color',
-                    content: SingleChildScrollView(
-                      child: ColorPicker(
-                        pickerColor: Color(settingsStore.accentColor),
-                        onColorChanged: (newColor) =>
-                            settingsStore.accentColor = newColor.toARGB32(),
-                        enableAlpha: false,
-                        pickerAreaBorderRadius:
-                            const BorderRadius.all(Radius.circular(8)),
-                        labelTypes: const [],
-                      ),
-                    ),
-                    actions: [
-                      FilledButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Done'),
-                      ),
-                    ],
+                  builder: (context) => _ColorPickerDialog(
+                    initialColor: Color(settingsStore.accentColor),
+                    onColorChanged: (newColor) =>
+                        settingsStore.accentColor = newColor.toARGB32(),
                   ),
                 );
               },
@@ -91,6 +79,75 @@ class GeneralSettings extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ColorPickerDialog extends StatefulWidget {
+  final Color initialColor;
+  final ValueChanged<Color> onColorChanged;
+
+  const _ColorPickerDialog({
+    required this.initialColor,
+    required this.onColorChanged,
+  });
+
+  @override
+  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<_ColorPickerDialog> {
+  late Color currentColor;
+
+  @override
+  void initState() {
+    super.initState();
+    currentColor = widget.initialColor;
+  }
+
+  void _generateRandomColor() {
+    HapticFeedback.mediumImpact();
+    final random = Random();
+    final newColor = Color.fromARGB(
+      255, // Always full opacity
+      random.nextInt(256), // Red
+      random.nextInt(256), // Green
+      random.nextInt(256), // Blue
+    );
+    setState(() {
+      currentColor = newColor;
+    });
+    widget.onColorChanged(newColor);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FrostyDialog(
+      title: 'Accent color',
+      content: SingleChildScrollView(
+        child: ColorPicker(
+          pickerColor: currentColor,
+          onColorChanged: (newColor) {
+            setState(() {
+              currentColor = newColor;
+            });
+            widget.onColorChanged(newColor);
+          },
+          enableAlpha: false,
+          pickerAreaBorderRadius: const BorderRadius.all(Radius.circular(8)),
+          labelTypes: const [],
+        ),
+      ),
+      actions: [
+        FilledButton.tonal(
+          onPressed: _generateRandomColor,
+          child: const Text('Random'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Done'),
+        ),
+      ],
     );
   }
 }
