@@ -301,6 +301,7 @@ class VideoOverlay extends StatelessWidget {
                             showUptime: false,
                             showViewerCount: false,
                             padding: const EdgeInsets.only(top: 12),
+                            textColor: surfaceColor,
                           ),
                         ),
                       ],

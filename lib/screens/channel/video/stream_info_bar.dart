@@ -16,6 +16,7 @@ class StreamInfoBar extends StatelessWidget {
   final bool showViewerCount;
   final EdgeInsets padding;
   final TooltipTriggerMode tooltipTriggerMode;
+  final Color? textColor;
 
   const StreamInfoBar({
     super.key,
@@ -26,6 +27,7 @@ class StreamInfoBar extends StatelessWidget {
     this.showViewerCount = true,
     this.padding = EdgeInsets.zero,
     this.tooltipTriggerMode = TooltipTriggerMode.tap,
+    this.textColor,
   });
 
   static const _iconShadow = [
@@ -75,6 +77,7 @@ class StreamInfoBar extends StatelessWidget {
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
+                        color: textColor,
                         shadows: _textShadow,
                       ),
                     ),
@@ -90,8 +93,9 @@ class StreamInfoBar extends StatelessWidget {
                                 style: context.textTheme.bodyMedium?.copyWith(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
-                                  color: context.bodySmallColor
-                                      ?.withValues(alpha: 0.7),
+                                  color: textColor?.withValues(alpha: 0.7) ??
+                                      context.bodySmallColor
+                                          ?.withValues(alpha: 0.7),
                                   shadows: _textShadow,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -120,6 +124,7 @@ class StreamInfoBar extends StatelessWidget {
                           style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
+                            color: textColor,
                             shadows: _textShadow,
                           ),
                         ),
@@ -129,7 +134,7 @@ class StreamInfoBar extends StatelessWidget {
                         Icon(
                           Icons.visibility,
                           size: 14,
-                          color: context.bodySmallColor,
+                          color: textColor ?? context.bodySmallColor,
                           shadows: _iconShadow,
                         ),
                         const SizedBox(width: 4),
@@ -138,6 +143,7 @@ class StreamInfoBar extends StatelessWidget {
                           style: context.textTheme.bodyMedium?.copyWith(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
+                            color: textColor,
                             shadows: _textShadow,
                           ),
                         ),
@@ -151,7 +157,7 @@ class StreamInfoBar extends StatelessWidget {
                         Icon(
                           Icons.gamepad,
                           size: 14,
-                          color: context.bodySmallColor,
+                          color: textColor ?? context.bodySmallColor,
                           shadows: _iconShadow,
                         ),
                         const SizedBox(width: 4),
@@ -175,6 +181,7 @@ class StreamInfoBar extends StatelessWidget {
                                           ?.copyWith(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
+                                        color: textColor,
                                         shadows: _textShadow,
                                       ),
                                       overflow: TextOverflow.ellipsis,
@@ -186,6 +193,7 @@ class StreamInfoBar extends StatelessWidget {
                                         context.textTheme.bodyMedium?.copyWith(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
+                                      color: textColor,
                                       shadows: _textShadow,
                                     ),
                                     overflow: TextOverflow.ellipsis,
