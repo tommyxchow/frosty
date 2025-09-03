@@ -88,7 +88,7 @@ class FrostyThemes {
       tooltipTheme: TooltipThemeData(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainer,
+          color: colorScheme.surface,
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           border: Border.all(color: borderColor, width: borderWidth),
         ),
