@@ -18,6 +18,7 @@ class StreamInfoBar extends StatelessWidget {
   final TooltipTriggerMode tooltipTriggerMode;
   final Color? textColor;
   final bool isCompact;
+  final bool isInSharedChatMode;
 
   const StreamInfoBar({
     super.key,
@@ -30,6 +31,7 @@ class StreamInfoBar extends StatelessWidget {
     this.tooltipTriggerMode = TooltipTriggerMode.tap,
     this.textColor,
     this.isCompact = false,
+    this.isInSharedChatMode = false,
   });
 
   static const _iconShadow = [
@@ -60,9 +62,23 @@ class StreamInfoBar extends StatelessWidget {
       child: Row(
         spacing: 12,
         children: [
-          ProfilePicture(
-            userLogin: streamInfo.userLogin,
-            radius: 16,
+          Container(
+            decoration: isInSharedChatMode
+                ? BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: textColor ?? Theme.of(context).colorScheme.primary,
+                      width: 2.0,
+                    ),
+                  )
+                : null,
+            child: Container(
+              margin: isInSharedChatMode ? const EdgeInsets.all(2.0) : null,
+              child: ProfilePicture(
+                userLogin: streamInfo.userLogin,
+                radius: 16,
+              ),
+            ),
           ),
           Expanded(
             child: Column(

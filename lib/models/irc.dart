@@ -152,6 +152,7 @@ class IRCMessage {
 
   /// Adds historical and channel source badges to the span
   void _addHistoricalAndChannelBadges(
+    BuildContext context,
     List<InlineSpan> span,
     double badgeSize,
     Map<String, UserTwitch>? channelIdToUserTwitch,
@@ -166,7 +167,13 @@ class IRCMessage {
             message: 'Historical message',
             preferBelow: false,
             triggerMode: TooltipTriggerMode.tap,
-            child: Icon(Icons.history_rounded, size: badgeSize),
+            child: Icon(
+              Icons.history_rounded,
+              size: badgeSize,
+              color:
+                  Theme.of(context).iconTheme.color?.withValues(alpha: 0.5) ??
+                      Colors.grey.withValues(alpha: 0.5),
+            ),
           ),
         ),
       );
@@ -653,6 +660,7 @@ class IRCMessage {
 
     _addTimestamp(span, style, timestamp);
     _addHistoricalAndChannelBadges(
+      context,
       span,
       badgeSize,
       channelIdToUserTwitch,

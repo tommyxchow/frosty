@@ -154,6 +154,10 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _isSendingMessage = false;
 
+  /// Whether the chat is currently in shared chat mode (based on source-room-id tag presence).
+  @readonly
+  var _isInSharedChatMode = false;
+
   /// The logged-in user's appearance in chat.
   @readonly
   var _userState = const USERSTATE();
@@ -166,6 +170,9 @@ abstract class ChatStoreBase with Store {
 
   /// Public getter for whether a message is currently being sent.
   bool get isSendingMessage => _isSendingMessage;
+
+  /// Public getter for whether the chat is in shared chat mode.
+  bool get isInSharedChatMode => _isInSharedChatMode;
 
   ChatStoreBase({
     required this.twitchApi,
@@ -305,7 +312,7 @@ abstract class ChatStoreBase with Store {
     // The IRC data can contain more than one message separated by CRLF.
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
-      // debugPrint('$message\n');
+      debugPrint('$message\n');
       if (message.startsWith('@')) {
         final parsedIRCMessage =
             IRCMessage.fromString(message, userLogin: auth.user.details?.login);
@@ -345,6 +352,9 @@ abstract class ChatStoreBase with Store {
           case Command.privateMessage:
           case Command.notice:
           case Command.userNotice:
+            // Update shared chat mode based on source-room-id tag presence
+            _isInSharedChatMode =
+                parsedIRCMessage.tags.containsKey('source-room-id');
             messageBuffer.add(parsedIRCMessage);
             break;
           case Command.clearChat:

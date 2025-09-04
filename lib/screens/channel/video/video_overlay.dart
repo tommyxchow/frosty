@@ -346,12 +346,15 @@ class VideoOverlay extends StatelessWidget {
                       children: [
                         backButton,
                         Flexible(
-                          child: StreamInfoBar(
-                            streamInfo: streamInfo,
-                            showUptime: false,
-                            showViewerCount: false,
-                            padding: const EdgeInsets.only(top: 12),
-                            textColor: surfaceColor,
+                          child: Observer(
+                            builder: (context) => StreamInfoBar(
+                              streamInfo: streamInfo,
+                              showUptime: false,
+                              showViewerCount: false,
+                              padding: const EdgeInsets.only(top: 12),
+                              textColor: surfaceColor,
+                              isInSharedChatMode: chatStore.isInSharedChatMode,
+                            ),
                           ),
                         ),
                       ],
