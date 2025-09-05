@@ -47,11 +47,11 @@ class _ChatDetailsState extends State<ChatDetails> {
     final seconds = duration.inSeconds.remainder(60);
 
     if (hours > 0) {
-      return '${hours}h ${minutes}m left';
+      return '${hours}h ${minutes}m';
     } else if (minutes > 0) {
-      return '${minutes}m ${seconds}s left';
+      return '${minutes}m ${seconds}s';
     } else {
-      return '${seconds}s left';
+      return '${seconds}s';
     }
   }
 
@@ -95,10 +95,24 @@ class _ChatDetailsState extends State<ChatDetails> {
                     builder: (context) {
                       return ListTile(
                         leading: const Icon(Icons.close_rounded),
-                        title: Text(
-                          'Turn off (${formatTimeLeft(widget.chatStore.timeRemaining)})',
-                          style: const TextStyle(
-                            fontFeatures: [FontFeature.tabularFigures()],
+                        title: Text.rich(
+                          TextSpan(
+                            text: 'Cancel   ',
+                            children: [
+                              TextSpan(
+                                text: formatTimeLeft(
+                                  widget.chatStore.timeRemaining,
+                                ),
+                                style: TextStyle(
+                                  color: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.color
+                                      ?.withValues(alpha: 0.6),
+                                  fontFeatures: [FontFeature.tabularFigures()],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         onTap: () {
@@ -257,12 +271,16 @@ class _ChatDetailsState extends State<ChatDetails> {
               builder: (context) {
                 final hasTimer = widget.chatStore.timeRemaining.inSeconds > 0;
                 final label = hasTimer
-                    ? 'Sleep timer on ('
-                        '${formatTimeLeft(widget.chatStore.timeRemaining)})'
+                    ? formatTimeLeft(widget.chatStore.timeRemaining)
                     : 'Sleep timer';
                 return _buildActionCard(
                   icon: Icons.timer_outlined,
                   label: label,
+                  labelStyle: hasTimer
+                      ? const TextStyle(
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        )
+                      : null,
                   onTap: () => _showSleepTimer(context),
                 );
               },
@@ -339,6 +357,7 @@ extension on _ChatDetailsState {
     required IconData icon,
     required String label,
     required VoidCallback? onTap,
+    TextStyle? labelStyle,
   }) {
     return Card(
       margin: EdgeInsets.zero,
@@ -348,7 +367,7 @@ extension on _ChatDetailsState {
         child: const AspectRatio(
           aspectRatio: 16 / 9,
           child: _CardContents(),
-        )._withIconAndLabel(icon, label),
+        )._withIconAndLabel(icon, label, labelStyle: labelStyle),
       ),
     );
   }
@@ -358,10 +377,12 @@ class _CardContents extends StatelessWidget {
   const _CardContents({
     this.icon,
     this.label,
+    this.labelStyle,
   });
 
   final IconData? icon;
   final String? label;
+  final TextStyle? labelStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -376,6 +397,7 @@ class _CardContents extends StatelessWidget {
             Text(
               label!,
               textAlign: TextAlign.center,
+              style: labelStyle,
             ),
           ],
         ],
@@ -385,8 +407,12 @@ class _CardContents extends StatelessWidget {
 }
 
 extension on Widget {
-  Widget _withIconAndLabel(IconData icon, String label) {
-    return _CardContents(icon: icon, label: label);
+  Widget _withIconAndLabel(
+    IconData icon,
+    String label, {
+    TextStyle? labelStyle,
+  }) {
+    return _CardContents(icon: icon, label: label, labelStyle: labelStyle);
   }
 }
 
