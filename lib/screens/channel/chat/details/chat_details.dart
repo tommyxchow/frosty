@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
+import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/details/chat_modes.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/settings.dart';
+import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/section_header.dart';
@@ -154,6 +157,85 @@ class _ChatDetailsState extends State<ChatDetails> {
     );
   }
 
+  /// Converts a hex color string to a color name if it matches one of our predefined chat colors.
+  /// Returns null if no match is found.
+  String? _hexToColorName(String hexColor) {
+    // Remove # if present
+    final cleanHex =
+        hexColor.startsWith('#') ? hexColor.substring(1) : hexColor;
+
+    // Convert to uppercase for comparison
+    final upperHex = cleanHex.toUpperCase();
+
+    // Find matching color name
+    for (final entry in chatColorValues.entries) {
+      final colorValue = entry.value.toARGB32().toRadixString(16).toUpperCase();
+      // Remove alpha channel (first 2 characters) for comparison
+      if (colorValue.length >= 6) {
+        final colorHex = colorValue.substring(2);
+        if (colorHex == upperHex) {
+          return entry.key;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> _showChatColorPicker(BuildContext context) async {
+    final selectedColor = await _getCurrentUserColor();
+    if (!context.mounted) return;
+
+    showModalBottomSheetWithProperFocus(
+      context: context,
+      builder: (context) => SizedBox(
+        height: MediaQuery.of(context).size.height * 0.5,
+        child: _ChatColorPickerModal(
+          initialColor: selectedColor,
+          scrollController: _scrollController,
+          onColorSelected: _handleColorUpdate,
+          chatStore: widget.chatStore,
+        ),
+      ),
+    );
+  }
+
+  Future<String?> _getCurrentUserColor() async {
+    try {
+      final currentColorHex = await widget.chatStore.twitchApi.getUserChatColor(
+        userId: widget.chatStore.auth.user.details!.id,
+      );
+
+      if (currentColorHex.isNotEmpty) {
+        return _hexToColorName(currentColorHex);
+      }
+    } catch (e) {
+      // Ignore errors when fetching current color
+    }
+    return null;
+  }
+
+  Future<void> _handleColorUpdate(BuildContext context, String color) async {
+    final success = await widget.chatStore.twitchApi.updateUserChatColor(
+      userId: widget.chatStore.auth.user.details!.id,
+      color: color,
+    );
+
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
+
+    final message = success
+        ? 'Chat color updated successfully!'
+        : 'Failed to update chat color. Please try again.';
+    _showMessage(context, message);
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final children = [
@@ -203,6 +285,12 @@ class _ChatDetailsState extends State<ChatDetails> {
         title: const Text('Clear recent emotes'),
         onTap: () => _showClearDialog(context),
       ),
+      if (widget.chatStore.auth.isLoggedIn)
+        ListTile(
+          leading: const Icon(Icons.palette_outlined),
+          title: const Text('Select chat color'),
+          onTap: () => _showChatColorPicker(context),
+        ),
       ListTile(
         leading: const Icon(Icons.refresh_rounded),
         title: const Text('Reconnect to chat'),
@@ -257,5 +345,206 @@ class _ChatDetailsState extends State<ChatDetails> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+}
+
+class _ChatColorPickerModal extends StatefulWidget {
+  const _ChatColorPickerModal({
+    required this.initialColor,
+    required this.scrollController,
+    required this.onColorSelected,
+    required this.chatStore,
+  });
+
+  final String? initialColor;
+  final ScrollController scrollController;
+  final Future<void> Function(BuildContext context, String color)
+      onColorSelected;
+  final ChatStore chatStore;
+
+  @override
+  State<_ChatColorPickerModal> createState() => _ChatColorPickerModalState();
+}
+
+class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
+  String? selectedColor;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedColor = widget.initialColor;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildHeader(),
+        _buildPreview(),
+        AnimatedScrollBorder(scrollController: widget.scrollController),
+        _buildColorList(),
+        _buildBottomBar(),
+      ],
+    );
+  }
+
+  Widget _buildHeader() {
+    return const SectionHeader(
+      'Select chat color',
+      isFirst: true,
+    );
+  }
+
+  Widget _buildPreview() {
+    if (selectedColor == null) return const SizedBox.shrink();
+
+    // Create a realistic preview using the current user's chat state and badges
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: _buildRealisticChatPreview(),
+    );
+  }
+
+  Widget _buildRealisticChatPreview() {
+    final userDetails = widget.chatStore.auth.user.details!;
+    final userState = widget.chatStore.userState;
+
+    // Create a mock IRC message with the user's current state
+    final mockTags = <String, String>{
+      'display-name': userDetails.displayName,
+      'color':
+          '#${chatColorValues[selectedColor!]!.toARGB32().toRadixString(16).substring(2)}',
+      'user-id': userDetails.id,
+      'mod': userState.mod ? '1' : '0',
+      'subscriber': userState.subscriber ? '1' : '0',
+      'id': 'preview-message',
+      'tmi-sent-ts': DateTime.now().millisecondsSinceEpoch.toString(),
+    };
+
+    // Copy any badges from the current user state
+    if (userState.raw != null) {
+      final userStateMessage = IRCMessage.fromString(userState.raw!);
+      if (userStateMessage.tags['badges'] != null) {
+        mockTags['badges'] = userStateMessage.tags['badges']!;
+      }
+      if (userStateMessage.tags['badge-info'] != null) {
+        mockTags['badge-info'] = userStateMessage.tags['badge-info']!;
+      }
+    }
+
+    final mockMessage = IRCMessage(
+      raw: '',
+      command: Command.privateMessage,
+      tags: mockTags,
+      user: userDetails.login,
+      message: 'How it will look in chat',
+      split: [
+        'How',
+        'it',
+        'will',
+        'look',
+        'in',
+        'chat',
+      ],
+      action: false,
+      mention: false,
+    );
+
+    return Text.rich(
+      TextSpan(
+        children: mockMessage.generateSpan(
+          context,
+          assetsStore: widget.chatStore.assetsStore,
+          emoteScale: widget.chatStore.settings.emoteScale,
+          badgeScale: widget.chatStore.settings.badgeScale,
+          launchExternal: false, // Disable launching for preview
+          style: DefaultTextStyle.of(context).style,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorList() {
+    return Expanded(
+      child: Scrollbar(
+        controller: widget.scrollController,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          controller: widget.scrollController,
+          children: chatColorNames
+              .map((colorName) => _buildColorTile(colorName))
+              .toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorTile(String colorName) {
+    final isSelected = selectedColor == colorName;
+    final displayName = colorName
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((word) => word[0].toUpperCase() + word.substring(1))
+        .join(' ');
+
+    // Apply the same color adjustment for consistent preview
+    final rawColor = chatColorValues[colorName]!;
+    final adjustedColor =
+        adjustColorForTheme(rawColor, Theme.of(context).brightness);
+
+    return ListTile(
+      leading: Container(
+        width: 24,
+        height: 24,
+        decoration: BoxDecoration(
+          color: adjustedColor,
+          shape: BoxShape.circle,
+        ),
+      ),
+      title: Text(displayName),
+      trailing: isSelected
+          ? Icon(
+              Icons.check,
+              color: Theme.of(context).colorScheme.primary,
+            )
+          : null,
+      onTap: () => setState(() => selectedColor = colorName),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return Column(
+      children: [
+        AnimatedScrollBorder(
+          scrollController: widget.scrollController,
+          position: ScrollBorderPosition.bottom,
+        ),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: selectedColor == null
+                        ? null
+                        : () => widget.onColorSelected(context, selectedColor!),
+                    child: const Text('Save'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

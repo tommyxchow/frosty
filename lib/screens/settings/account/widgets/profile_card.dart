@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/screens/onboarding/login_webview.dart';
 import 'package:frosty/screens/settings/account/account_options.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
-import 'package:frosty/widgets/app_bar.dart';
 import 'package:frosty/widgets/profile_picture.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class ProfileCard extends StatelessWidget {
   final AuthStore authStore;
@@ -63,40 +62,7 @@ class ProfileCard extends StatelessWidget {
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) {
-                return Scaffold(
-                  appBar: FrostyAppBar(
-                    title: const Text('Connect with Twitch'),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.help_rounded),
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text(
-                                'Workaround for the Twitch cookie banner',
-                              ),
-                              content: const Text(
-                                'If the Twitch cookie banner is still blocking the login, try clicking one of the links in the cookie policy description and navigating until you reach the Twitch home page. From there, you can try logging in on the top right profile icon. Once logged in, exit this page and then try again.',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: Navigator.of(context).pop,
-                                  child: const Text('Close'),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  body: WebViewWidget(
-                    controller: authStore.createAuthWebViewController(),
-                  ),
-                );
-              },
+              builder: (context) => LoginWebView(),
             ),
           ),
           onLongPress: () async {

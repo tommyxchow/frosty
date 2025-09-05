@@ -448,6 +448,56 @@ class TwitchApi extends BaseApiClient {
     return SharedChatSession.fromJson(sessionData.first);
   }
 
+  /// Gets the color used for the user's name in chat.
+  /// [userId] - The ID of the user whose chat color to get
+  /// Returns the color as a hex string or empty string if no color is set.
+  Future<String> getUserChatColor({
+    required String userId,
+  }) async {
+    try {
+      final data = await get<JsonMap>(
+        '/chat/color',
+        queryParameters: {
+          'user_id': userId,
+        },
+      );
+
+      final users = data['data'] as JsonList;
+      if (users.isNotEmpty) {
+        final user = users.first as JsonMap;
+        return user['color'] as String? ?? '';
+      }
+
+      return '';
+    } on ApiException {
+      return '';
+    }
+  }
+
+  /// Updates the color used for the user's name in chat.
+  /// [userId] - The ID of the user whose chat color to update
+  /// [color] - The color to use. Can be a named color (blue, blue_violet, etc.) or hex code for Turbo/Prime users
+  /// Returns true on success or false on failure.
+  Future<bool> updateUserChatColor({
+    required String userId,
+    required String color,
+  }) async {
+    try {
+      await put<dynamic>(
+        '/chat/color',
+        queryParameters: {
+          'user_id': userId,
+          'color': color,
+        },
+      );
+      return true; // If no exception, operation succeeded
+    } on ApiException catch (e) {
+      // Log the specific error for debugging
+      debugPrint('Failed to update chat color: $e');
+      return false;
+    }
+  }
+
   // Gets recent messages from a third-party service.
   Future<JsonList> getRecentMessages({
     required String userLogin,

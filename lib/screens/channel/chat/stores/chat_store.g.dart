@@ -179,6 +179,24 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$_isInSharedChatModeAtom =
+      Atom(name: 'ChatStoreBase._isInSharedChatMode', context: context);
+
+  bool get isInSharedChatMode {
+    _$_isInSharedChatModeAtom.reportRead();
+    return super._isInSharedChatMode;
+  }
+
+  @override
+  bool get _isInSharedChatMode => isInSharedChatMode;
+
+  @override
+  set _isInSharedChatMode(bool value) {
+    _$_isInSharedChatModeAtom.reportWrite(value, super._isInSharedChatMode, () {
+      super._isInSharedChatMode = value;
+    });
+  }
+
   late final _$_userStateAtom =
       Atom(name: 'ChatStoreBase._userState', context: context);
 

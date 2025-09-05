@@ -11,7 +11,7 @@ import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/utils.dart';
+import 'package:frosty/utils.dart' as utils;
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/cached_image.dart';
 import 'package:frosty/widgets/photo_view.dart';
@@ -406,26 +406,15 @@ class IRCMessage {
       int.parse((tags['color'] ?? '#868686').replaceFirst('#', '0xFF')),
     );
 
-    final isLightTheme = Theme.of(context).brightness == Brightness.light;
-    final hsl = HSLColor.fromColor(color);
-    if (isLightTheme == true) {
-      if (hsl.lightness >= 0.5) {
-        color = hsl
-            .withLightness(hsl.lightness + ((0 - hsl.lightness) * 0.5))
-            .toColor();
-      }
-    } else {
-      if (hsl.lightness <= 0.5) {
-        color = hsl
-            .withLightness(hsl.lightness + ((1 - hsl.lightness) * 0.5))
-            .toColor();
-      }
-    }
+    // Adjust color for theme contrast using the common utility
+    color = utils.adjustColorForTheme(color, Theme.of(context).brightness);
 
     final displayName = tags['display-name']!;
     span.add(
       TextSpan(
-        text: user != null ? getReadableName(displayName, user!) : displayName,
+        text: user != null
+            ? utils.getReadableName(displayName, user!)
+            : displayName,
         style: TextStyle(
           color: color,
           fontWeight: FontWeight.bold,
@@ -863,7 +852,7 @@ class IRCMessage {
           Text(emote.type.toString()),
           if (emote.ownerDisplayName != null && emote.ownerUsername != null)
             Text(
-              'by ${getReadableName(emote.ownerDisplayName!, emote.ownerUsername!)}',
+              'by ${utils.getReadableName(emote.ownerDisplayName!, emote.ownerUsername!)}',
             ),
         ],
       ),

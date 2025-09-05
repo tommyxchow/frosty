@@ -61,17 +61,22 @@ class _AnimatedScrollBorderState extends State<AnimatedScrollBorder> {
       // Show border when scrolled away from top.
       if (!widget.scrollController.hasClients) {
         shouldShow = false;
-      } else if (!widget.isReversed) {
-        shouldShow = widget.scrollController.position.pixels > 0;
       } else {
-        // For reversed lists, the visual "top" corresponds to maxScrollExtent.
         final pos = widget.scrollController.position;
-        final bool noScrollExtent = pos.maxScrollExtent <= 0.5;
-        if (noScrollExtent) {
+        final bool hasDims = pos.hasPixels && pos.haveDimensions;
+        if (!hasDims) {
           shouldShow = false;
+        } else if (!widget.isReversed) {
+          shouldShow = pos.pixels > 0;
         } else {
-          final bool reachedTop = pos.pixels >= (pos.maxScrollExtent - 1.0);
-          shouldShow = !reachedTop;
+          // For reversed lists, the visual "top" corresponds to maxScrollExtent.
+          final bool noScrollExtent = pos.maxScrollExtent <= 0.5;
+          if (noScrollExtent) {
+            shouldShow = false;
+          } else {
+            final bool reachedTop = pos.pixels >= (pos.maxScrollExtent - 1.0);
+            shouldShow = !reachedTop;
+          }
         }
       }
     } else {
@@ -80,14 +85,19 @@ class _AnimatedScrollBorderState extends State<AnimatedScrollBorder> {
         shouldShow = true; // default visible before attachment/first layout
       } else {
         final pos = widget.scrollController.position;
-        // If there is no scrollable extent, keep it visible (default)
-        final bool noScrollExtent = pos.maxScrollExtent <= 0.5;
-        if (noScrollExtent) {
-          shouldShow = true;
+        final bool hasDims = pos.hasPixels && pos.haveDimensions;
+        if (!hasDims) {
+          shouldShow = true; // keep visible until dimensions are known
         } else {
-          // Hide only when we're essentially at the end
-          final bool reachedEnd = pos.pixels >= (pos.maxScrollExtent - 1.0);
-          shouldShow = !reachedEnd;
+          // If there is no scrollable extent, keep it visible (default)
+          final bool noScrollExtent = pos.maxScrollExtent <= 0.5;
+          if (noScrollExtent) {
+            shouldShow = true;
+          } else {
+            // Hide only when we're essentially at the end
+            final bool reachedEnd = pos.pixels >= (pos.maxScrollExtent - 1.0);
+            shouldShow = !reachedEnd;
+          }
         }
       }
     }

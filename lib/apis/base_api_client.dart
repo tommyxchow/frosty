@@ -118,10 +118,7 @@ abstract class BaseApiClient {
         url,
         data: data,
         queryParameters: queryParameters,
-        options: Options(
-          headers: headers,
-          validateStatus: (status) => status != null && status < 500,
-        ),
+        options: Options(headers: headers),
         cancelToken: cancelToken,
       );
       return response.data as T;
@@ -142,10 +139,7 @@ abstract class BaseApiClient {
       final response = await _dio.delete(
         url,
         queryParameters: queryParameters,
-        options: Options(
-          headers: headers,
-          validateStatus: (status) => status != null && status < 500,
-        ),
+        options: Options(headers: headers),
         cancelToken: cancelToken,
       );
       return response.data as T;

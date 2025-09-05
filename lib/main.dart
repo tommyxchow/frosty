@@ -13,6 +13,7 @@ import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/apis/twitch_auth_interceptor.dart';
+import 'package:frosty/apis/unauthorized_interceptor.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/firebase_options.dart';
 import 'package:frosty/screens/home/home.dart';
@@ -83,6 +84,9 @@ void main() async {
 
   // Add the auth interceptor to the Dio client after AuthStore creation
   dioClient.interceptors.add(TwitchAuthInterceptor(authStore));
+
+  // Add the unauthorized interceptor to catch 401 errors
+  dioClient.interceptors.add(UnauthorizedInterceptor(authStore));
 
   await authStore.init();
 
