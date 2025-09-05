@@ -407,7 +407,7 @@ class IRCMessage {
     );
 
     // Adjust color for theme contrast using the common utility
-    color = utils.adjustColorForTheme(color, Theme.of(context).brightness);
+    color = utils.adjustChatNameColor(context, color);
 
     final displayName = tags['display-name']!;
     span.add(

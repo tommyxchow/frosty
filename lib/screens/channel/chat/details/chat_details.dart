@@ -490,8 +490,7 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
 
     // Apply the same color adjustment for consistent preview
     final rawColor = chatColorValues[colorName]!;
-    final adjustedColor =
-        adjustColorForTheme(rawColor, Theme.of(context).brightness);
+    final adjustedColor = adjustChatNameColor(context, rawColor);
 
     return ListTile(
       leading: Container(
