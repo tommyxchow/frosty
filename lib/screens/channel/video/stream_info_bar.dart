@@ -113,8 +113,8 @@ class StreamInfoBar extends StatelessWidget {
                 ? BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: textColor ?? Theme.of(context).colorScheme.primary,
-                      width: 1.5,
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
                     ),
                   )
                 : null,

@@ -345,21 +345,25 @@ class VideoOverlay extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Row(
-                      children: [
-                        backButton,
-                        Flexible(
-                          child: Observer(
-                            builder: (context) => StreamInfoBar(
-                              streamInfo: streamInfo,
-                              showUptime: false,
-                              showViewerCount: false,
-                              textColor: surfaceColor,
-                              isInSharedChatMode: chatStore.isInSharedChatMode,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                        children: [
+                          backButton,
+                          Flexible(
+                            child: Observer(
+                              builder: (context) => StreamInfoBar(
+                                streamInfo: streamInfo,
+                                showUptime: false,
+                                showViewerCount: false,
+                                textColor: surfaceColor,
+                                isInSharedChatMode:
+                                    chatStore.isInSharedChatMode,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   if (videoStore.settingsStore.fullScreen &&
