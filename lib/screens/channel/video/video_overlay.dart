@@ -276,24 +276,27 @@ class VideoOverlay extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: Row(
-                        children: [
-                          backButton,
-                          if (offlineChannelInfo != null)
-                            Flexible(
-                              child: StreamInfoBar(
-                                offlineChannelInfo: offlineChannelInfo,
-                                displayName: chatStore.displayName,
-                                showUptime: false,
-                                showViewerCount: false,
-                                showOfflineIndicator: false,
-                                textColor: surfaceColor,
-                                isOffline: true,
-                                isInSharedChatMode:
-                                    chatStore.isInSharedChatMode,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: [
+                            backButton,
+                            if (offlineChannelInfo != null)
+                              Flexible(
+                                child: StreamInfoBar(
+                                  offlineChannelInfo: offlineChannelInfo,
+                                  displayName: chatStore.displayName,
+                                  showUptime: false,
+                                  showViewerCount: false,
+                                  showOfflineIndicator: false,
+                                  textColor: surfaceColor,
+                                  isOffline: true,
+                                  isInSharedChatMode:
+                                      chatStore.isInSharedChatMode,
+                                ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     if (videoStore.settingsStore.fullScreen &&
