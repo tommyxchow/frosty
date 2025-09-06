@@ -225,123 +225,145 @@ class _ChatDetailsState extends State<ChatDetails> {
     );
   }
 
+  bool _hasActiveModes() {
+    final roomState = widget.chatDetailsStore.roomState;
+    return roomState.subMode != '0' ||
+        roomState.followersOnly != '-1' ||
+        roomState.emoteOnly != '0' ||
+        roomState.slowMode != '0' ||
+        roomState.r9k != '0';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final children = [
-      const SectionHeader(
-        'Chat modes',
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-        isFirst: true,
-      ),
-      ListTile(
-        title: ChatModes(roomState: widget.chatDetailsStore.roomState),
-      ),
-      const SectionHeader(
-        'More',
-      ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: GridView(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 16 / 9,
-          ),
-          children: [
-            _buildActionCard(
-              icon: Icons.people_outline,
-              label: 'Chatters',
-              onTap: () => showModalBottomSheetWithProperFocus(
-                isScrollControlled: true,
-                context: context,
-                builder: (context) => GestureDetector(
-                  onTap: FocusScope.of(context).unfocus,
-                  child: ChattersList(
-                    chatDetailsStore: widget.chatDetailsStore,
-                    chatStore: widget.chatStore,
-                    userLogin: widget.userLogin,
-                  ),
-                ),
-              ),
+    return Observer(
+      builder: (context) {
+        final hasActiveModes = _hasActiveModes();
+
+        final children = [
+          if (hasActiveModes) ...[
+            const SectionHeader(
+              'Active chat modes',
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              isFirst: true,
             ),
-            Observer(
-              builder: (context) {
-                final hasTimer = widget.chatStore.timeRemaining.inSeconds > 0;
-                final label = hasTimer
-                    ? formatTimeLeft(widget.chatStore.timeRemaining)
-                    : 'Sleep timer';
-                return _buildActionCard(
-                  icon: Icons.timer_outlined,
-                  label: label,
-                  labelStyle: hasTimer
-                      ? const TextStyle(
-                          fontFeatures: [FontFeature.tabularFigures()],
-                        )
-                      : null,
-                  onTap: () => _showSleepTimer(context),
-                );
-              },
-            ),
-            if (widget.chatStore.auth.isLoggedIn)
-              _buildActionCard(
-                icon: Icons.palette_outlined,
-                label: 'Username color',
-                onTap: () => _showChatColorPicker(context),
-              ),
-            _buildActionCard(
-              icon: Icons.refresh_rounded,
-              label: 'Reconnect to chat',
-              onTap: () {
-                widget.chatStore.updateNotification('Reconnecting to chat...');
-                widget.chatStore.connectToChat();
-              },
-            ),
-            _buildActionCard(
-              icon: Icons.refresh_rounded,
-              label: 'Refresh badges and emotes',
-              onTap: () async {
-                await widget.chatStore.getAssets();
-                widget.chatStore.updateNotification(
-                  'Badges and emotes refreshed',
-                );
-              },
-            ),
-            Observer(
-              builder: (context) {
-                final showVideo = widget.chatStore.settings.showVideo;
-                final label = '${showVideo ? 'Enter' : 'Exit'} chat-only mode';
-                return _buildActionCard(
-                  icon: Icons.chat_outlined,
-                  label: label,
-                  onTap: () => widget.chatStore.settings.showVideo =
-                      !widget.chatStore.settings.showVideo,
-                );
-              },
-            ),
-            _buildActionCard(
-              icon: Icons.settings_outlined,
-              label: 'Settings',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Settings(
-                    settingsStore: widget.chatStore.settings,
-                  ),
-                ),
-              ),
+            ListTile(
+              title: ChatModes(roomState: widget.chatDetailsStore.roomState),
             ),
           ],
-        ),
-      ),
-    ];
+          SectionHeader(
+            'More',
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            topPadding: hasActiveModes ? 16 : null,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: GridView(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 16 / 9,
+              ),
+              children: [
+                _buildActionCard(
+                  icon: Icons.people_outline,
+                  label: 'Chatters',
+                  onTap: () => showModalBottomSheetWithProperFocus(
+                    isScrollControlled: true,
+                    context: context,
+                    builder: (context) => GestureDetector(
+                      onTap: FocusScope.of(context).unfocus,
+                      child: ChattersList(
+                        chatDetailsStore: widget.chatDetailsStore,
+                        chatStore: widget.chatStore,
+                        userLogin: widget.userLogin,
+                      ),
+                    ),
+                  ),
+                ),
+                Observer(
+                  builder: (context) {
+                    final hasTimer =
+                        widget.chatStore.timeRemaining.inSeconds > 0;
+                    final label = hasTimer
+                        ? formatTimeLeft(widget.chatStore.timeRemaining)
+                        : 'Sleep timer';
+                    return _buildActionCard(
+                      icon: Icons.timer_outlined,
+                      label: label,
+                      labelStyle: hasTimer
+                          ? const TextStyle(
+                              fontFeatures: [FontFeature.tabularFigures()],
+                            )
+                          : null,
+                      onTap: () => _showSleepTimer(context),
+                    );
+                  },
+                ),
+                if (widget.chatStore.auth.isLoggedIn)
+                  _buildActionCard(
+                    icon: Icons.palette_outlined,
+                    label: 'Username color',
+                    onTap: () => _showChatColorPicker(context),
+                  ),
+                _buildActionCard(
+                  icon: Icons.refresh_rounded,
+                  label: 'Reconnect to chat',
+                  onTap: () {
+                    widget.chatStore
+                        .updateNotification('Reconnecting to chat...');
+                    widget.chatStore.connectToChat();
+                  },
+                ),
+                _buildActionCard(
+                  icon: Icons.refresh_rounded,
+                  label: 'Refresh badges and emotes',
+                  onTap: () async {
+                    await widget.chatStore.getAssets();
+                    widget.chatStore.updateNotification(
+                      'Badges and emotes refreshed',
+                    );
+                  },
+                ),
+                Observer(
+                  builder: (context) {
+                    final showVideo = widget.chatStore.settings.showVideo;
+                    final label =
+                        '${showVideo ? 'Enter' : 'Exit'} chat-only mode';
+                    return _buildActionCard(
+                      icon: Icons.chat_outlined,
+                      label: label,
+                      onTap: () => widget.chatStore.settings.showVideo =
+                          !widget.chatStore.settings.showVideo,
+                    );
+                  },
+                ),
+                _buildActionCard(
+                  icon: Icons.settings_outlined,
+                  label: 'Settings',
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Settings(
+                        settingsStore: widget.chatStore.settings,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ];
 
-    return ListView(
-      shrinkWrap: true,
-      primary: false,
-      children: children,
+        return ListView(
+          shrinkWrap: true,
+          primary: false,
+          children: children,
+        );
+      },
     );
   }
 

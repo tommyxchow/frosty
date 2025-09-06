@@ -6,6 +6,7 @@ class SectionHeader extends StatelessWidget {
   final EdgeInsets? padding;
   final double? fontSize;
   final bool isFirst;
+  final double? topPadding;
 
   const SectionHeader(
     this.text, {
@@ -13,6 +14,7 @@ class SectionHeader extends StatelessWidget {
     this.padding,
     this.fontSize,
     this.isFirst = false,
+    this.topPadding,
   });
 
   @override
@@ -32,7 +34,7 @@ class SectionHeader extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (!isFirst) ...[
-            const SizedBox(height: 32),
+            SizedBox(height: topPadding ?? 32),
           ],
           Text(
             text.toUpperCase(),

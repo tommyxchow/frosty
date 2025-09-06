@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/irc.dart';
 
 class ChatModes extends StatelessWidget {
@@ -10,81 +11,177 @@ class ChatModes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final disabledColor =
-        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+    return Observer(
+      builder: (context) {
+        final activeModes = <MapEntry<String, Widget>>[];
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Tooltip(
-          preferBelow: false,
-          triggerMode: TooltipTriggerMode.tap,
-          showDuration: const Duration(seconds: 3),
-          message:
-              'Emote-only mode ${roomState.emoteOnly != '0' ? 'on' : 'off'}',
-          child: Icon(
-            roomState.emoteOnly != '0'
-                ? Icons.emoji_emotions_rounded
-                : Icons.emoji_emotions_outlined,
-            color: roomState.emoteOnly != '0' ? Colors.yellow : disabledColor,
-          ),
-        ),
-        Tooltip(
-          preferBelow: false,
-          triggerMode: TooltipTriggerMode.tap,
-          showDuration: const Duration(seconds: 3),
-          message: roomState.followersOnly == '-1'
-              ? 'Followers-only mode off'
-              : roomState.followersOnly == '0'
-                  ? 'Followers-only mode on'
-                  : 'Followers-only mode on (${roomState.followersOnly} ${pluralize('minute', roomState.followersOnly)})',
-          child: Icon(
-            roomState.followersOnly != '-1'
-                ? Icons.favorite_rounded
-                : Icons.favorite_outline_rounded,
-            color: roomState.followersOnly != '-1' ? Colors.red : disabledColor,
-          ),
-        ),
-        Tooltip(
-          preferBelow: false,
-          triggerMode: TooltipTriggerMode.tap,
-          showDuration: const Duration(seconds: 3),
-          message:
-              'R9K (unique-chat) mode ${roomState.r9k != '0' ? 'on' : 'off'}',
-          child: Text(
-            'R9K',
-            style: TextStyle(
-              color: roomState.r9k != '0' ? Colors.purple : disabledColor,
-              fontWeight: FontWeight.w500,
+        // Collect active modes with their labels for sorting
+        if (roomState.emoteOnly != '0') {
+          activeModes.add(
+            MapEntry(
+              'Emote only',
+              _buildModeChip(
+                context: context,
+                icon: Icons.emoji_emotions_outlined,
+                activeIcon: Icons.emoji_emotions_rounded,
+                label: 'Emote only',
+                activeLabel: 'Emote only',
+                isActive: true,
+                activeColor: const Color(0xFFFFB74D), // Slightly lighter orange
+              ),
             ),
-          ),
-        ),
-        Tooltip(
-          preferBelow: false,
-          triggerMode: TooltipTriggerMode.tap,
-          showDuration: const Duration(seconds: 3),
-          message:
-              'Slow mode ${roomState.slowMode != '0' ? 'on (${roomState.slowMode} ${pluralize('second', roomState.slowMode)})' : 'off'}',
-          child: Icon(
-            roomState.slowMode != '0'
-                ? Icons.hourglass_top_rounded
-                : Icons.hourglass_empty_rounded,
-            color: roomState.slowMode != '0' ? Colors.blue : disabledColor,
-          ),
-        ),
-        Tooltip(
-          preferBelow: false,
-          triggerMode: TooltipTriggerMode.tap,
-          showDuration: const Duration(seconds: 3),
-          message: 'Subs-only mode ${roomState.subMode != '0' ? 'on' : 'off'}',
-          child: Icon(
-            roomState.subMode != '0'
-                ? Icons.monetization_on_rounded
-                : Icons.monetization_on_outlined,
-            color: roomState.subMode != '0' ? Colors.green : disabledColor,
-          ),
-        ),
-      ],
+          );
+        }
+
+        if (roomState.followersOnly != '-1') {
+          activeModes.add(
+            MapEntry(
+              'Follower only',
+              _buildModeChip(
+                context: context,
+                icon: Icons.favorite_outline_rounded,
+                activeIcon: Icons.favorite_rounded,
+                label: 'Follower only',
+                activeLabel: 'Follower only',
+                isActive: true,
+                activeColor: const Color(0xFFF44336), // Bright red
+                duration: _getFollowersDuration(),
+              ),
+            ),
+          );
+        }
+
+        if (roomState.slowMode != '0') {
+          activeModes.add(
+            MapEntry(
+              'Slow mode',
+              _buildModeChip(
+                context: context,
+                icon: Icons.hourglass_empty_rounded,
+                activeIcon: Icons.hourglass_top_rounded,
+                label: 'Slow mode',
+                activeLabel: 'Slow mode',
+                isActive: true,
+                activeColor: const Color(0xFF2196F3), // Bright blue
+                duration: _getSlowModeDuration(),
+              ),
+            ),
+          );
+        }
+
+        if (roomState.subMode != '0') {
+          activeModes.add(
+            MapEntry(
+              'Sub only',
+              _buildModeChip(
+                context: context,
+                icon: Icons.monetization_on_outlined,
+                activeIcon: Icons.monetization_on_rounded,
+                label: 'Sub only',
+                activeLabel: 'Sub only',
+                isActive: true,
+                activeColor: const Color(0xFF4CAF50), // Bright green
+              ),
+            ),
+          );
+        }
+
+        if (roomState.r9k != '0') {
+          activeModes.add(
+            MapEntry(
+              'Unique mode',
+              _buildModeChip(
+                context: context,
+                icon: Icons.quiz_outlined,
+                activeIcon: Icons.quiz_rounded,
+                label: 'Unique mode',
+                activeLabel: 'Unique mode',
+                isActive: true,
+                activeColor: const Color(0xFFAB47BC), // Slightly lighter purple
+              ),
+            ),
+          );
+        }
+
+        // Sort alphabetically by label
+        activeModes.sort((a, b) => a.key.compareTo(b.key));
+        final activeChips = activeModes.map((entry) => entry.value).toList();
+
+        return Wrap(
+          spacing: 8,
+          runSpacing: -4,
+          children: activeChips,
+        );
+      },
+    );
+  }
+
+  String? _getFollowersDuration() {
+    if (roomState.followersOnly == '0') {
+      return null; // No duration for immediate followers
+    }
+    final minutes = int.parse(roomState.followersOnly);
+    if (minutes >= 60) {
+      final hours = minutes ~/ 60;
+      final remainingMinutes = minutes % 60;
+      if (remainingMinutes == 0) {
+        return '${hours}h';
+      } else {
+        return '${hours}h ${remainingMinutes}m';
+      }
+    }
+    return '${minutes}m';
+  }
+
+  String _getSlowModeDuration() {
+    final seconds = int.parse(roomState.slowMode);
+    if (seconds >= 60) {
+      final minutes = seconds ~/ 60;
+      final remainingSeconds = seconds % 60;
+      if (remainingSeconds == 0) {
+        return '${minutes}m';
+      } else {
+        return '${minutes}m ${remainingSeconds}s';
+      }
+    }
+    return '${seconds}s';
+  }
+
+  Widget _buildModeChip({
+    required BuildContext context,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required String activeLabel,
+    required bool isActive,
+    required Color activeColor,
+    String? duration,
+  }) {
+    return Chip(
+      avatar: Icon(
+        isActive ? activeIcon : icon,
+        size: 16,
+        color: isActive ? activeColor : null,
+      ),
+      label: duration != null
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(isActive ? activeLabel : label),
+                const SizedBox(width: 4),
+                Text(
+                  duration,
+                  style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
+            )
+          : Text(isActive ? activeLabel : label),
+      side: BorderSide.none,
     );
   }
 }
