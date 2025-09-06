@@ -23,6 +23,7 @@ class StreamInfoBar extends StatelessWidget {
   final bool isCompact;
   final bool isInSharedChatMode;
   final bool isOffline;
+  final bool showTextShadows;
   final String? displayName;
 
   const StreamInfoBar({
@@ -40,6 +41,7 @@ class StreamInfoBar extends StatelessWidget {
     this.isCompact = false,
     this.isInSharedChatMode = false,
     this.isOffline = false,
+    this.showTextShadows = true,
     this.displayName,
   });
 
@@ -68,7 +70,7 @@ class StreamInfoBar extends StatelessWidget {
           fontSize: fontSize,
           fontWeight: fontWeight,
           color: textColor,
-          shadows: _textShadow,
+          shadows: showTextShadows ? _textShadow : null,
         ) ??
         const TextStyle();
   }
@@ -80,7 +82,7 @@ class StreamInfoBar extends StatelessWidget {
           color:
               textColor?.withValues(alpha: 0.7) ??
               context.bodySmallColor?.withValues(alpha: 0.7),
-          shadows: _textShadow,
+          shadows: showTextShadows ? _textShadow : null,
         ) ??
         const TextStyle();
   }

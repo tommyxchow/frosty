@@ -323,6 +323,7 @@ class _VideoChatState extends State<VideoChat>
               isCompact: true,
               isOffline: streamInfo == null,
               isInSharedChatMode: _chatStore.isInSharedChatMode,
+              showTextShadows: false,
             ),
             flexibleSpace: BlurredContainer(
               gradientDirection: GradientDirection.up,
