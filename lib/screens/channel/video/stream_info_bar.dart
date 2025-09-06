@@ -16,6 +16,7 @@ class StreamInfoBar extends StatelessWidget {
   final bool tappableCategory;
   final bool showUptime;
   final bool showViewerCount;
+  final bool showOfflineIndicator;
   final EdgeInsets padding;
   final TooltipTriggerMode tooltipTriggerMode;
   final Color? textColor;
@@ -32,6 +33,7 @@ class StreamInfoBar extends StatelessWidget {
     this.tappableCategory = true,
     this.showUptime = true,
     this.showViewerCount = true,
+    this.showOfflineIndicator = true,
     this.padding = EdgeInsets.zero,
     this.tooltipTriggerMode = TooltipTriggerMode.tap,
     this.textColor,
@@ -91,7 +93,7 @@ class StreamInfoBar extends StatelessWidget {
     final streamerName = isOffline
         ? getReadableName(
             offlineChannelInfo?.broadcasterName.isNotEmpty == true
-                ? offlineChannelInfo!.broadcasterName
+                ? offlineChannelInfo?.broadcasterName ?? ''
                 : displayName ?? '',
             offlineChannelInfo?.broadcasterLogin ?? '',
           )
@@ -123,7 +125,7 @@ class StreamInfoBar extends StatelessWidget {
               child: ProfilePicture(
                 userLogin: isOffline
                     ? (offlineChannelInfo?.broadcasterLogin.isNotEmpty == true
-                          ? offlineChannelInfo!.broadcasterLogin
+                          ? offlineChannelInfo?.broadcasterLogin ?? ''
                           : displayName ?? '')
                     : (streamInfo?.userLogin ?? ''),
                 radius: 16,
@@ -174,72 +176,71 @@ class StreamInfoBar extends StatelessWidget {
                         (streamInfo?.gameName.isNotEmpty ?? false))) ...[
                   Row(
                     children: [
-                      if (isOffline) ...[
+                      if (isOffline && showOfflineIndicator) ...[
                         Text(
                           'Offline',
-                          style: _getBaseTextStyle(
+                          style: _getSecondaryTextStyle(
                             context,
                             secondLineSize,
-                            FontWeight.w500,
-                          ).copyWith(color: textColor ?? Colors.grey),
-                        ),
-                        if (showCategory &&
-                            (offlineChannelInfo?.gameName.isNotEmpty ??
-                                false)) ...[
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.gamepad,
-                            size: secondLineSize,
-                            color: textColor ?? context.bodySmallColor,
-                            shadows: _iconShadow,
                           ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Tooltip(
-                              message: offlineChannelInfo!.gameName,
-                              triggerMode: tooltipTriggerMode,
-                              child: tappableCategory
-                                  ? GestureDetector(
-                                      onDoubleTap: () {
-                                        if (offlineChannelInfo
-                                                ?.gameId
-                                                .isNotEmpty ??
-                                            false) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CategoryStreams(
-                                                    categoryId:
-                                                        offlineChannelInfo!
-                                                            .gameId,
-                                                  ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      child: Text(
-                                        offlineChannelInfo!.gameName,
-                                        style: _getBaseTextStyle(
+                        ),
+                      ],
+                      if (isOffline &&
+                          showCategory &&
+                          (offlineChannelInfo?.gameName.isNotEmpty ??
+                              false)) ...[
+                        if (showOfflineIndicator) const SizedBox(width: 8),
+                        Icon(
+                          Icons.gamepad,
+                          size: secondLineSize,
+                          color: textColor ?? context.bodySmallColor,
+                          shadows: _iconShadow,
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Tooltip(
+                            message: offlineChannelInfo?.gameName ?? '',
+                            triggerMode: tooltipTriggerMode,
+                            child: tappableCategory
+                                ? GestureDetector(
+                                    onDoubleTap: () {
+                                      if (offlineChannelInfo
+                                              ?.gameId
+                                              .isNotEmpty ??
+                                          false) {
+                                        Navigator.push(
                                           context,
-                                          secondLineSize,
-                                          FontWeight.w500,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    )
-                                  : Text(
-                                      offlineChannelInfo!.gameName,
-                                      style: _getBaseTextStyle(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CategoryStreams(
+                                                  categoryId:
+                                                      offlineChannelInfo
+                                                          ?.gameId ??
+                                                      '',
+                                                ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Text(
+                                      offlineChannelInfo?.gameName ?? '',
+                                      style: _getSecondaryTextStyle(
                                         context,
                                         secondLineSize,
-                                        FontWeight.w500,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                            ),
+                                  )
+                                : Text(
+                                    offlineChannelInfo?.gameName ?? '',
+                                    style: _getSecondaryTextStyle(
+                                      context,
+                                      secondLineSize,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                           ),
-                        ],
+                        ),
                       ] else ...[
                         if (showUptime || showViewerCount) ...[
                           const LiveIndicator(),
@@ -247,7 +248,9 @@ class StreamInfoBar extends StatelessWidget {
                         ],
                         if (showUptime) ...[
                           Uptime(
-                            startTime: streamInfo!.startedAt,
+                            startTime:
+                                streamInfo?.startedAt ??
+                                DateTime.now().toIso8601String(),
                             style: _getBaseTextStyle(
                               context,
                               secondLineSize,
@@ -265,7 +268,7 @@ class StreamInfoBar extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            NumberFormat().format(streamInfo!.viewerCount),
+                            NumberFormat().format(streamInfo?.viewerCount ?? 0),
                             style: _getBaseTextStyle(
                               context,
                               secondLineSize,
@@ -274,12 +277,12 @@ class StreamInfoBar extends StatelessWidget {
                           ),
                         ],
                         if (showCategory &&
-                            streamInfo!.gameName.isNotEmpty &&
+                            (streamInfo?.gameName.isNotEmpty ?? false) &&
                             (showUptime || showViewerCount)) ...[
                           const SizedBox(width: 8),
                         ],
                         if (showCategory &&
-                            streamInfo!.gameName.isNotEmpty) ...[
+                            (streamInfo?.gameName.isNotEmpty ?? false)) ...[
                           Icon(
                             Icons.gamepad,
                             size: secondLineSize,
@@ -289,7 +292,7 @@ class StreamInfoBar extends StatelessWidget {
                           const SizedBox(width: 4),
                           Flexible(
                             child: Tooltip(
-                              message: streamInfo!.gameName,
+                              message: streamInfo?.gameName ?? '',
                               triggerMode: tooltipTriggerMode,
                               child: tappableCategory
                                   ? GestureDetector(
@@ -297,12 +300,13 @@ class StreamInfoBar extends StatelessWidget {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => CategoryStreams(
-                                            categoryId: streamInfo!.gameId,
+                                            categoryId:
+                                                streamInfo?.gameId ?? '',
                                           ),
                                         ),
                                       ),
                                       child: Text(
-                                        streamInfo!.gameName,
+                                        streamInfo?.gameName ?? '',
                                         style: _getBaseTextStyle(
                                           context,
                                           secondLineSize,
@@ -312,7 +316,7 @@ class StreamInfoBar extends StatelessWidget {
                                       ),
                                     )
                                   : Text(
-                                      streamInfo!.gameName,
+                                      streamInfo?.gameName ?? '',
                                       style: _getBaseTextStyle(
                                         context,
                                         secondLineSize,
