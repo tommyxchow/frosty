@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -24,6 +25,9 @@ abstract class VideoStoreBase with Store {
 
   /// The userlogin of the current channel.
   final String userLogin;
+
+  /// The user ID of the current channel.
+  final String userId;
 
   final AuthStore authStore;
 
@@ -166,6 +170,10 @@ abstract class VideoStoreBase with Store {
   @readonly
   StreamTwitch? _streamInfo;
 
+  /// The offline channel info, used for displaying channel details when offline.
+  @readonly
+  Channel? _offlineChannelInfo;
+
   @readonly
   List<String> _availableStreamQualities = [];
 
@@ -191,6 +199,7 @@ abstract class VideoStoreBase with Store {
 
   VideoStoreBase({
     required this.userLogin,
+    required this.userId,
     required this.twitchApi,
     required this.authStore,
     required this.settingsStore,
@@ -515,17 +524,24 @@ abstract class VideoStoreBase with Store {
 
   /// Updates the stream info from the Twitch API.
   ///
-  /// If the stream is offline, disables the overlay.
+  /// If the stream is offline, fetches channel information to show offline details.
   @action
   Future<void> updateStreamInfo() async {
     try {
       _streamInfo = await twitchApi.getStream(userLogin: userLogin);
+      // Clear offline info when stream is live
+      _offlineChannelInfo = null;
     } catch (e) {
-      debugPrint(e.toString());
-
       _overlayTimer.cancel();
       _streamInfo = null;
       _paused = true;
+
+      // Try to fetch offline channel information
+      try {
+        _offlineChannelInfo = await twitchApi.getChannel(userId: userId);
+      } catch (channelError) {
+        _offlineChannelInfo = null;
+      }
 
       // Restart overlay timer in chat-only mode even on error
       if (!settingsStore.showVideo) {

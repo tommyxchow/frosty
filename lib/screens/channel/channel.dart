@@ -78,6 +78,7 @@ class _VideoChatState extends State<VideoChat>
 
   late final VideoStore _videoStore = VideoStore(
     userLogin: widget.userLogin,
+    userId: widget.userId,
     twitchApi: context.twitchApi,
     authStore: context.authStore,
     settingsStore: context.settingsStore,
@@ -317,6 +318,7 @@ class _VideoChatState extends State<VideoChat>
             ),
             title: StreamInfoBar(
               streamInfo: streamInfo,
+              offlineChannelInfo: _videoStore.offlineChannelInfo,
               displayName: _chatStore.displayName,
               isCompact: true,
               isOffline: streamInfo == null,

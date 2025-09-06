@@ -69,6 +69,26 @@ mixin _$VideoStore on VideoStoreBase, Store {
     });
   }
 
+  late final _$_offlineChannelInfoAtom = Atom(
+    name: 'VideoStoreBase._offlineChannelInfo',
+    context: context,
+  );
+
+  Channel? get offlineChannelInfo {
+    _$_offlineChannelInfoAtom.reportRead();
+    return super._offlineChannelInfo;
+  }
+
+  @override
+  Channel? get _offlineChannelInfo => offlineChannelInfo;
+
+  @override
+  set _offlineChannelInfo(Channel? value) {
+    _$_offlineChannelInfoAtom.reportWrite(value, super._offlineChannelInfo, () {
+      super._offlineChannelInfo = value;
+    });
+  }
+
   late final _$_availableStreamQualitiesAtom = Atom(
     name: 'VideoStoreBase._availableStreamQualities',
     context: context,
