@@ -133,7 +133,6 @@ class StreamInfoBar extends StatelessWidget {
                       child: Tooltip(
                         message: streamerName,
                         triggerMode: tooltipTriggerMode,
-                        showDuration: const Duration(seconds: 3),
                         child: Text(
                           streamerName,
                           style:
@@ -147,7 +146,6 @@ class StreamInfoBar extends StatelessWidget {
                         child: Tooltip(
                           message: streamTitle,
                           triggerMode: tooltipTriggerMode,
-                          showDuration: const Duration(seconds: 3),
                           child: Text(
                             streamTitle,
                             style: _getSecondaryTextStyle(context, 14),
@@ -229,7 +227,6 @@ class StreamInfoBar extends StatelessWidget {
                             child: Tooltip(
                               message: streamInfo!.gameName,
                               triggerMode: tooltipTriggerMode,
-                              showDuration: const Duration(seconds: 3),
                               child: tappableCategory
                                   ? GestureDetector(
                                       onDoubleTap: () => Navigator.push(
