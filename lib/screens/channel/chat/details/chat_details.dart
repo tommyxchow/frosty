@@ -288,7 +288,7 @@ class _ChatDetailsState extends State<ChatDetails> {
             if (widget.chatStore.auth.isLoggedIn)
               _buildActionCard(
                 icon: Icons.palette_outlined,
-                label: 'Select chat color',
+                label: 'Username color',
                 onTap: () => _showChatColorPicker(context),
               ),
             _buildActionCard(
@@ -459,7 +459,7 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
 
   Widget _buildHeader() {
     return const SectionHeader(
-      'Select chat color',
+      'Username color',
       isFirst: true,
     );
   }
