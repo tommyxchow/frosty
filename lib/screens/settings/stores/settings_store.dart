@@ -130,7 +130,6 @@ abstract class _SettingsStoreBase with Store {
 
   // Layout defaults
   static const defaultEmoteMenuButtonOnLeft = false;
-  static const defaultChatNotificationsOnBottom = false;
 
   // Landscape mode defaults
   static const defaultLandscapeChatLeftSide = false;
@@ -218,9 +217,6 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
 
-  @JsonKey(defaultValue: defaultChatNotificationsOnBottom)
-  @observable
-  var chatNotificationsOnBottom = defaultChatNotificationsOnBottom;
 
   // Landscape mode options
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
@@ -309,7 +305,6 @@ abstract class _SettingsStoreBase with Store {
     showUserNotices = defaultShowUserNotices;
 
     emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
-    chatNotificationsOnBottom = defaultChatNotificationsOnBottom;
 
     landscapeChatLeftSide = defaultLandscapeChatLeftSide;
     landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;

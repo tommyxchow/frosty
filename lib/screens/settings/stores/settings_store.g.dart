@@ -40,8 +40,6 @@ SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
           json['highlightFirstTimeChatter'] as bool? ?? true
       ..showUserNotices = json['showUserNotices'] as bool? ?? true
       ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
-      ..chatNotificationsOnBottom =
-          json['chatNotificationsOnBottom'] as bool? ?? false
       ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
       ..landscapeForceVerticalChat =
           json['landscapeForceVerticalChat'] as bool? ?? false
@@ -100,7 +98,6 @@ Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
       'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
       'showUserNotices': instance.showUserNotices,
       'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
-      'chatNotificationsOnBottom': instance.chatNotificationsOnBottom,
       'landscapeChatLeftSide': instance.landscapeChatLeftSide,
       'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
       'landscapeCutout':
@@ -539,23 +536,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$chatNotificationsOnBottomAtom = Atom(
-      name: '_SettingsStoreBase.chatNotificationsOnBottom', context: context);
-
-  @override
-  bool get chatNotificationsOnBottom {
-    _$chatNotificationsOnBottomAtom.reportRead();
-    return super.chatNotificationsOnBottom;
-  }
-
-  @override
-  set chatNotificationsOnBottom(bool value) {
-    _$chatNotificationsOnBottomAtom
-        .reportWrite(value, super.chatNotificationsOnBottom, () {
-      super.chatNotificationsOnBottom = value;
-    });
-  }
-
   late final _$landscapeChatLeftSideAtom =
       Atom(name: '_SettingsStoreBase.landscapeChatLeftSide', context: context);
 
@@ -978,7 +958,6 @@ chatDelay: ${chatDelay},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
 emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
-chatNotificationsOnBottom: ${chatNotificationsOnBottom},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
 landscapeForceVerticalChat: ${landscapeForceVerticalChat},
 landscapeCutout: ${landscapeCutout},

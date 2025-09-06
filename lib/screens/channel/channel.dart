@@ -291,12 +291,15 @@ class _VideoChatState extends State<VideoChat>
                 switchOutCurve: Curves.easeIn,
                 child: _chatStore.notification != null
                     ? Align(
-                        alignment: _chatStore.settings.chatNotificationsOnBottom
-                            ? Alignment.bottomCenter
-                            : Alignment.topCenter,
-                        child: FrostyNotification(
-                          message: _chatStore.notification!,
-                          onDismissed: _chatStore.clearNotification,
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: chatOnly ? context.safePaddingTop : 0,
+                          ),
+                          child: FrostyNotification(
+                            message: _chatStore.notification!,
+                            onDismissed: _chatStore.clearNotification,
+                          ),
                         ),
                       )
                     : null,
