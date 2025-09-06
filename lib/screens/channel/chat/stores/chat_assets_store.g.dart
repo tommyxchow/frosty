@@ -205,6 +205,60 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
     return _$initAsyncAction.run(() => super.init());
   }
 
+  late final _$fetchSharedChatAssetsAsyncAction = AsyncAction(
+    'ChatAssetsStoreBase.fetchSharedChatAssets',
+    context: context,
+  );
+
+  @override
+  Future<void> fetchSharedChatAssets({
+    required String channelId,
+    required Map<String, String> headers,
+    required Function onEmoteError,
+    required Function onBadgeError,
+    bool showTwitchEmotes = true,
+    bool showTwitchBadges = true,
+    bool show7TVEmotes = true,
+    bool showBTTVEmotes = true,
+    bool showFFZEmotes = true,
+    bool showFFZBadges = true,
+    bool force = false,
+  }) {
+    return _$fetchSharedChatAssetsAsyncAction.run(
+      () => super.fetchSharedChatAssets(
+        channelId: channelId,
+        headers: headers,
+        onEmoteError: onEmoteError,
+        onBadgeError: onBadgeError,
+        showTwitchEmotes: showTwitchEmotes,
+        showTwitchBadges: showTwitchBadges,
+        show7TVEmotes: show7TVEmotes,
+        showBTTVEmotes: showBTTVEmotes,
+        showFFZEmotes: showFFZEmotes,
+        showFFZBadges: showFFZBadges,
+        force: force,
+      ),
+    );
+  }
+
+  late final _$populateSharedChatParticipantsAsyncAction = AsyncAction(
+    'ChatAssetsStoreBase.populateSharedChatParticipants',
+    context: context,
+  );
+
+  @override
+  Future<List<String>> populateSharedChatParticipants({
+    required String channelId,
+    required Function onBadgeError,
+  }) {
+    return _$populateSharedChatParticipantsAsyncAction.run(
+      () => super.populateSharedChatParticipants(
+        channelId: channelId,
+        onBadgeError: onBadgeError,
+      ),
+    );
+  }
+
   late final _$userEmotesFutureAsyncAction = AsyncAction(
     'ChatAssetsStoreBase.userEmotesFuture',
     context: context,

@@ -349,9 +349,31 @@ abstract class ChatStoreBase with Store {
           case Command.notice:
           case Command.userNotice:
             // Update shared chat mode based on source-room-id tag presence
+            final wasShared = _isInSharedChatMode;
             _isInSharedChatMode = parsedIRCMessage.tags.containsKey(
               'source-room-id',
             );
+            // On transition into shared chat mode, fetch assets for participants.
+            if (!wasShared && _isInSharedChatMode) {
+              assetsStore.fetchSharedChatAssets(
+                channelId: channelId,
+                headers: auth.headersTwitch,
+                onEmoteError: (error) {
+                  debugPrint(error.toString());
+                  return <Emote>[];
+                },
+                onBadgeError: (error) {
+                  debugPrint(error.toString());
+                  return <ChatBadge>[];
+                },
+                showTwitchEmotes: settings.showTwitchEmotes,
+                showTwitchBadges: settings.showTwitchBadges,
+                show7TVEmotes: settings.show7TVEmotes,
+                showBTTVEmotes: settings.showBTTVEmotes,
+                showFFZEmotes: settings.showFFZEmotes,
+                showFFZBadges: settings.showFFZBadges,
+              );
+            }
             messageBuffer.add(parsedIRCMessage);
             break;
           case Command.clearChat:
@@ -451,25 +473,52 @@ abstract class ChatStoreBase with Store {
 
   // Fetch the assets used in chat including badges and emotes.
   @action
-  Future<void> getAssets() async => assetsStore.assetsFuture(
-    channelId: channelId,
-    headers: auth.headersTwitch,
-    onEmoteError: (error) {
+  Future<void> getAssets() async {
+    // Prepare common error handlers to avoid repetition.
+    List<Emote> onEmoteError(dynamic error) {
       debugPrint(error.toString());
       return <Emote>[];
-    },
-    onBadgeError: (error) {
+    }
+
+    List<ChatBadge> onBadgeError(dynamic error) {
       debugPrint(error.toString());
       return <ChatBadge>[];
-    },
-    showTwitchEmotes: settings.showTwitchEmotes,
-    showTwitchBadges: settings.showTwitchBadges,
-    show7TVEmotes: settings.show7TVEmotes,
-    showBTTVEmotes: settings.showBTTVEmotes,
-    showBTTVBadges: settings.showBTTVBadges,
-    showFFZEmotes: settings.showFFZEmotes,
-    showFFZBadges: settings.showFFZBadges,
-  );
+    }
+
+    final baseAssets = assetsStore.assetsFuture(
+      channelId: channelId,
+      headers: auth.headersTwitch,
+      onEmoteError: onEmoteError,
+      onBadgeError: onBadgeError,
+      showTwitchEmotes: settings.showTwitchEmotes,
+      showTwitchBadges: settings.showTwitchBadges,
+      show7TVEmotes: settings.show7TVEmotes,
+      showBTTVEmotes: settings.showBTTVEmotes,
+      showBTTVBadges: settings.showBTTVBadges,
+      showFFZEmotes: settings.showFFZEmotes,
+      showFFZBadges: settings.showFFZBadges,
+    );
+
+    // If shared chat mode is active, also refresh participant assets in parallel.
+    if (_isInSharedChatMode) {
+      final sharedAssets = assetsStore.fetchSharedChatAssets(
+        channelId: channelId,
+        headers: auth.headersTwitch,
+        onEmoteError: onEmoteError,
+        onBadgeError: onBadgeError,
+        showTwitchEmotes: settings.showTwitchEmotes,
+        showTwitchBadges: settings.showTwitchBadges,
+        show7TVEmotes: settings.show7TVEmotes,
+        showBTTVEmotes: settings.showBTTVEmotes,
+        showFFZEmotes: settings.showFFZEmotes,
+        showFFZBadges: settings.showFFZBadges,
+        force: true,
+      );
+      await Future.wait([baseAssets, sharedAssets]);
+    } else {
+      await baseAssets;
+    }
+  }
 
   /// Re-enables [_autoScroll] and jumps to the latest message.
   @action
