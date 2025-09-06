@@ -94,13 +94,13 @@ class StreamCard extends StatelessWidget {
             child: thumbnail,
           ),
           Container(
-            margin: const EdgeInsets.all(4),
+            margin: const EdgeInsets.all(3),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
             ),
             clipBehavior: Clip.antiAlias,
             child: BlurredContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               sigmaX: 8.0, // Less blur for subtlety
               sigmaY: 8.0, // Less blur for subtlety
               forceDarkMode: true,
