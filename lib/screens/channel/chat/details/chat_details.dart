@@ -247,15 +247,16 @@ class _ChatDetailsState extends State<ChatDetails> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               isFirst: true,
             ),
-            ListTile(
-              title: ChatModes(roomState: widget.chatDetailsStore.roomState),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ChatModes(roomState: widget.chatDetailsStore.roomState),
+            ),
+            const Divider(
+              height: 16,
+              indent: 16,
+              endIndent: 16,
             ),
           ],
-          SectionHeader(
-            'More',
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            topPadding: hasActiveModes ? 16 : null,
-          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: GridView(
