@@ -42,8 +42,10 @@ abstract class AuthBase with Store {
 
   /// Authentication headers for Twitch API requests.
   @computed
-  Map<String, String> get headersTwitch =>
-      {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
+  Map<String, String> get headersTwitch => {
+    'Authorization': 'Bearer $_token',
+    'Client-Id': clientId,
+  };
 
   /// Error flag that will be non-null and contain an error message if login failed.
   @readonly
@@ -70,8 +72,9 @@ abstract class AuthBase with Store {
     if (request.url == 'https://www.twitch.tv/?no-reload=true') {
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
-        navigatorKey.currentState
-            ?.push(MaterialPageRoute(builder: (context) => routeAfter));
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(builder: (context) => routeAfter),
+        );
       } else {
         // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
         navigatorKey.currentState?.pop();
@@ -97,8 +100,7 @@ abstract class AuthBase with Store {
           },
           onPageFinished: (_) async {
             try {
-              await webViewController.runJavaScript(
-                '''
+              await webViewController.runJavaScript('''
                 {
                   function modifyElement(element) {
                     element.style.maxHeight = '20vh';
@@ -123,8 +125,7 @@ abstract class AuthBase with Store {
                     subtree: true
                   });
                 }
-                ''',
-              );
+                ''');
             } catch (e) {
               debugPrint('Auth WebView JavaScript error: $e');
             }
@@ -167,10 +168,7 @@ abstract class AuthBase with Store {
       if (isBlocked) {
         user.unblock(targetId: targetUserId);
       } else {
-        user.block(
-          targetId: targetUserId,
-          displayName: targetUser,
-        );
+        user.block(targetId: targetUserId, displayName: targetUser);
       }
       Navigator.pop(context);
     }
@@ -185,10 +183,7 @@ abstract class AuthBase with Store {
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: onPressed,
-            child: const Text('Yes'),
-          ),
+          TextButton(onPressed: onPressed, child: const Text('Yes')),
         ],
       ),
     );

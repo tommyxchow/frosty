@@ -7,11 +7,7 @@ class Uptime extends StatefulWidget {
   final String startTime;
   final TextStyle? style;
 
-  const Uptime({
-    super.key,
-    required this.startTime,
-    this.style,
-  });
+  const Uptime({super.key, required this.startTime, this.style});
 
   @override
   State<Uptime> createState() => _UptimeState();
@@ -40,8 +36,9 @@ class _UptimeState extends State<Uptime> {
           .difference(DateTime.parse(widget.startTime))
           .toString()
           .split('.')[0],
-      style: widget.style
-          ?.copyWith(fontFeatures: [const FontFeature.tabularFigures()]),
+      style: widget.style?.copyWith(
+        fontFeatures: [const FontFeature.tabularFigures()],
+      ),
     );
   }
 

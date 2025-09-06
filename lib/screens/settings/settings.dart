@@ -81,10 +81,7 @@ class Settings extends StatelessWidget {
               top: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
             ),
             children: [
-              const SectionHeader(
-                'Account',
-                isFirst: true,
-              ),
+              const SectionHeader('Account', isFirst: true),
               ProfileCard(authStore: context.read<AuthStore>()),
               const SectionHeader('Customize'),
               SettingsTileRoute(

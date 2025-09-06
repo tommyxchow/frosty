@@ -9,8 +9,10 @@ part of 'home_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$HomeStore on HomeStoreBase, Store {
-  late final _$topSectionCurrentIndexAtom =
-      Atom(name: 'HomeStoreBase.topSectionCurrentIndex', context: context);
+  late final _$topSectionCurrentIndexAtom = Atom(
+    name: 'HomeStoreBase.topSectionCurrentIndex',
+    context: context,
+  );
 
   @override
   int get topSectionCurrentIndex {
@@ -20,14 +22,19 @@ mixin _$HomeStore on HomeStoreBase, Store {
 
   @override
   set topSectionCurrentIndex(int value) {
-    _$topSectionCurrentIndexAtom
-        .reportWrite(value, super.topSectionCurrentIndex, () {
-      super.topSectionCurrentIndex = value;
-    });
+    _$topSectionCurrentIndexAtom.reportWrite(
+      value,
+      super.topSectionCurrentIndex,
+      () {
+        super.topSectionCurrentIndex = value;
+      },
+    );
   }
 
-  late final _$_selectedIndexAtom =
-      Atom(name: 'HomeStoreBase._selectedIndex', context: context);
+  late final _$_selectedIndexAtom = Atom(
+    name: 'HomeStoreBase._selectedIndex',
+    context: context,
+  );
 
   int get selectedIndex {
     _$_selectedIndexAtom.reportRead();
@@ -44,13 +51,16 @@ mixin _$HomeStore on HomeStoreBase, Store {
     });
   }
 
-  late final _$HomeStoreBaseActionController =
-      ActionController(name: 'HomeStoreBase', context: context);
+  late final _$HomeStoreBaseActionController = ActionController(
+    name: 'HomeStoreBase',
+    context: context,
+  );
 
   @override
   void handleTap(int index) {
     final _$actionInfo = _$HomeStoreBaseActionController.startAction(
-        name: 'HomeStoreBase.handleTap');
+      name: 'HomeStoreBase.handleTap',
+    );
     try {
       return super.handleTap(index);
     } finally {

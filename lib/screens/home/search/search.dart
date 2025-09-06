@@ -18,10 +18,7 @@ class Search extends StatefulWidget {
   // The scroll controller for handling scroll to top functionality.
   final ScrollController scrollController;
 
-  const Search({
-    super.key,
-    required this.scrollController,
-  });
+  const Search({super.key, required this.scrollController});
 
   @override
   State<Search> createState() => _SearchState();
@@ -52,7 +49,8 @@ class _SearchState extends State<Search> {
                     slivers: [
                       SliverToBoxAdapter(
                         child: SizedBox(
-                          height: MediaQuery.of(context).padding.top +
+                          height:
+                              MediaQuery.of(context).padding.top +
                               _kSearchBarHeight,
                         ),
                       ),
@@ -77,7 +75,8 @@ class _SearchState extends State<Search> {
                   child: ListView(
                     controller: widget.scrollController,
                     padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).padding.top +
+                      top:
+                          MediaQuery.of(context).padding.top +
                           _kSearchBarHeight,
                       bottom: MediaQuery.of(context).padding.bottom,
                     ),
@@ -112,11 +111,13 @@ class _SearchState extends State<Search> {
                             _searchStore.handleQuery(searchTerm);
                             _searchStore.textEditingController.selection =
                                 TextSelection.fromPosition(
-                              TextPosition(
-                                offset: _searchStore
-                                    .textEditingController.text.length,
-                              ),
-                            );
+                                  TextPosition(
+                                    offset: _searchStore
+                                        .textEditingController
+                                        .text
+                                        .length,
+                                  ),
+                                );
                           },
                         ),
                       ),
@@ -193,8 +194,8 @@ class _SearchState extends State<Search> {
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.search_rounded),
                           hintText: 'Search channels or categories',
-                          suffixIcon: _searchStore
-                                      .textFieldFocusNode.hasFocus ||
+                          suffixIcon:
+                              _searchStore.textFieldFocusNode.hasFocus ||
                                   _searchStore.searchText.isNotEmpty
                               ? IconButton(
                                   icon: const Icon(Icons.close_rounded),
@@ -210,20 +211,23 @@ class _SearchState extends State<Search> {
                                     if (widget.scrollController.hasClients) {
                                       widget.scrollController.animateTo(
                                         0,
-                                        duration:
-                                            const Duration(milliseconds: 150),
+                                        duration: const Duration(
+                                          milliseconds: 150,
+                                        ),
                                         curve: Curves.easeOut,
                                       );
                                     }
                                     // After the frame (when content swaps), re-evaluate border state
-                                    WidgetsBinding.instance
-                                        .addPostFrameCallback((_) {
+                                    WidgetsBinding.instance.addPostFrameCallback((
+                                      _,
+                                    ) {
                                       if (widget.scrollController.hasClients) {
                                         // Nudge listeners even if already at zero
                                         final offset =
                                             widget.scrollController.offset;
-                                        final target =
-                                            (offset == 0) ? 0.01 : 0.0;
+                                        final target = (offset == 0)
+                                            ? 0.01
+                                            : 0.0;
                                         widget.scrollController.jumpTo(
                                           (offset == 0) ? target : 0.0,
                                         );

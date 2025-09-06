@@ -10,10 +10,7 @@ import 'package:frosty/widgets/blurred_container.dart';
 class TopSection extends StatefulWidget {
   final HomeStore homeStore;
 
-  const TopSection({
-    super.key,
-    required this.homeStore,
-  });
+  const TopSection({super.key, required this.homeStore});
 
   @override
   State<TopSection> createState() => _TopSectionState();
@@ -68,17 +65,16 @@ class _TopSectionState extends State<TopSection>
                   isScrollable: true,
                   controller: _tabBarController,
                   tabs: const [
-                    Tab(
-                      child: Text('Streams'),
-                    ),
+                    Tab(child: Text('Streams')),
                     Tab(child: Text('Categories')),
                   ],
                 ),
                 Observer(
                   builder: (_) => AnimatedScrollBorder(
                     scrollController:
-                        widget.homeStore.topSectionScrollControllers[
-                            widget.homeStore.topSectionCurrentIndex],
+                        widget.homeStore.topSectionScrollControllers[widget
+                            .homeStore
+                            .topSectionCurrentIndex],
                   ),
                 ),
               ],

@@ -50,8 +50,11 @@ class VideoOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surfaceColor =
-        context.watch<FrostyThemes>().dark.colorScheme.onSurface;
+    final surfaceColor = context
+        .watch<FrostyThemes>()
+        .dark
+        .colorScheme
+        .onSurface;
 
     final backButton = IconButton(
       tooltip: 'Back',
@@ -78,10 +81,7 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final videoSettingsButton = IconButton(
-      icon: Icon(
-        Icons.settings,
-        shadows: _iconShadow,
-      ),
+      icon: Icon(Icons.settings, shadows: _iconShadow),
       color: surfaceColor,
       onPressed: () {
         videoStore.updateStreamQualities();
@@ -190,8 +190,9 @@ class VideoOverlay extends StatelessWidget {
     );
 
     final rotateButton = Tooltip(
-      message:
-          context.isPortrait ? 'Enter landscape mode' : 'Exit landscape mode',
+      message: context.isPortrait
+          ? 'Enter landscape mode'
+          : 'Exit landscape mode',
       preferBelow: false,
       child: IconButton(
         icon: Icon(
@@ -206,9 +207,9 @@ class VideoOverlay extends StatelessWidget {
               DeviceOrientation.landscapeRight,
             ]);
           } else {
-            SystemChrome.setPreferredOrientations(
-              [DeviceOrientation.portraitUp],
-            );
+            SystemChrome.setPreferredOrientations([
+              DeviceOrientation.portraitUp,
+            ]);
             SystemChrome.setPreferredOrientations([]);
           }
         },
@@ -423,18 +424,18 @@ class VideoOverlay extends StatelessWidget {
                               child: GestureDetector(
                                 onTap: () =>
                                     showModalBottomSheetWithProperFocus(
-                                  isScrollControlled: true,
-                                  context: context,
-                                  builder: (context) => GestureDetector(
-                                    onTap: FocusScope.of(context).unfocus,
-                                    child: ChattersList(
-                                      chatDetailsStore:
-                                          chatStore.chatDetailsStore,
-                                      chatStore: chatStore,
-                                      userLogin: streamInfo.userLogin,
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder: (context) => GestureDetector(
+                                        onTap: FocusScope.of(context).unfocus,
+                                        child: ChattersList(
+                                          chatDetailsStore:
+                                              chatStore.chatDetailsStore,
+                                          chatStore: chatStore,
+                                          userLogin: streamInfo.userLogin,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
                                 child: Row(
                                   spacing: 4,
                                   children: [

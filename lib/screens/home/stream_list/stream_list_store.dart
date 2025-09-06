@@ -213,9 +213,7 @@ abstract class ListStoreBase with Store {
           );
           break;
         case ListType.top:
-          newStreams = await twitchApi.getTopStreams(
-            cursor: _streamsCursor,
-          );
+          newStreams = await twitchApi.getTopStreams(cursor: _streamsCursor);
           break;
         case ListType.category:
           newStreams = await twitchApi.getStreamsUnderCategory(
@@ -259,9 +257,7 @@ abstract class ListStoreBase with Store {
     try {
       _pinnedStreams = (await twitchApi.getStreamsByIds(
         userIds: settingsStore.pinnedChannelIds,
-      ))
-          .data
-          .asObservable();
+      )).data.asObservable();
 
       _error = null;
     } on SocketException {
@@ -333,9 +329,7 @@ abstract class ListStoreBase with Store {
 
     _isCategoryDetailsLoading = true;
 
-    final categoryDetails = await twitchApi.getCategory(
-      gameId: categoryId!,
-    );
+    final categoryDetails = await twitchApi.getCategory(gameId: categoryId!);
 
     _categoryDetails = categoryDetails.data.first;
 
@@ -365,8 +359,4 @@ abstract class ListStoreBase with Store {
 /// [ListType.followed] is the list of streams that the user is following.
 /// [ListType.top] is the list of top streams.
 /// [ListType.category] is the list of streams under a category.
-enum ListType {
-  followed,
-  top,
-  category,
-}
+enum ListType { followed, top, category }

@@ -66,12 +66,15 @@ class StreamCard extends StatelessWidget {
       ),
     );
 
-    final streamerName =
-        getReadableName(streamInfo.userName, streamInfo.userLogin);
+    final streamerName = getReadableName(
+      streamInfo.userName,
+      streamInfo.userLogin,
+    );
 
     final streamTitle = streamInfo.title.trim();
-    final category =
-        streamInfo.gameName.isNotEmpty ? streamInfo.gameName : 'No Category';
+    final category = streamInfo.gameName.isNotEmpty
+        ? streamInfo.gameName
+        : 'No Category';
 
     const subFontSize = 14.0;
 
@@ -95,9 +98,7 @@ class StreamCard extends StatelessWidget {
           ),
           Container(
             margin: const EdgeInsets.all(3),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
             clipBehavior: Clip.antiAlias,
             child: BlurredContainer(
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -109,8 +110,11 @@ class StreamCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color:
-                      context.watch<FrostyThemes>().dark.colorScheme.onSurface,
+                  color: context
+                      .watch<FrostyThemes>()
+                      .dark
+                      .colorScheme
+                      .onSurface,
                 ),
               ),
             ),
@@ -128,10 +132,7 @@ class StreamCard extends StatelessWidget {
           Row(
             spacing: 4,
             children: [
-              ProfilePicture(
-                userLogin: streamInfo.userLogin,
-                radius: 10,
-              ),
+              ProfilePicture(userLogin: streamInfo.userLogin, radius: 10),
               Flexible(
                 child: Tooltip(
                   message: streamerName,
@@ -165,13 +166,12 @@ class StreamCard extends StatelessWidget {
             InkWell(
               onTap: streamInfo.gameName.isNotEmpty
                   ? () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CategoryStreams(
-                            categoryId: streamInfo.gameId,
-                          ),
-                        ),
-                      )
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            CategoryStreams(categoryId: streamInfo.gameId),
+                      ),
+                    )
                   : null,
               child: Tooltip(
                 message: category,
@@ -238,14 +238,8 @@ class StreamCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            if (showThumbnail)
-              Flexible(
-                child: imageSection,
-              ),
-            Flexible(
-              flex: 2,
-              child: streamInfoSection,
-            ),
+            if (showThumbnail) Flexible(child: imageSection),
+            Flexible(flex: 2, child: streamInfoSection),
           ],
         ),
       ),

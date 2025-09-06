@@ -39,8 +39,9 @@ class Chat extends StatelessWidget {
                         textScaler: chatStore.settings.messageScale.textScaler,
                       ),
                       child: DefaultTextStyle(
-                        style: context.defaultTextStyle
-                            .copyWith(fontSize: chatStore.settings.fontSize),
+                        style: context.defaultTextStyle.copyWith(
+                          fontSize: chatStore.settings.fontSize,
+                        ),
                         child: Scrollbar(
                           controller: chatStore.scrollController,
                           child: Observer(
@@ -49,20 +50,23 @@ class Chat extends StatelessWidget {
                                 reverse: true,
                                 padding: (listPadding ?? EdgeInsets.zero).add(
                                   EdgeInsets.only(
-                                    bottom: 68 +
+                                    bottom:
+                                        68 +
                                         (chatStore.assetsStore.showEmoteMenu
                                             ? 0
-                                            : MediaQuery.of(context)
-                                                .padding
-                                                .bottom),
+                                            : MediaQuery.of(
+                                                context,
+                                              ).padding.bottom),
                                   ),
                                 ),
                                 addAutomaticKeepAlives: false,
                                 controller: chatStore.scrollController,
                                 itemCount: chatStore.renderMessages.length,
                                 itemBuilder: (context, index) => ChatMessage(
-                                  ircMessage: chatStore.renderMessages[
-                                      chatStore.renderMessages.length -
+                                  ircMessage:
+                                      chatStore.renderMessages[chatStore
+                                              .renderMessages
+                                              .length -
                                           1 -
                                           index],
                                   chatStore: chatStore,
@@ -85,7 +89,8 @@ class Chat extends StatelessWidget {
                         left: 4,
                         top: 4,
                         right: 4,
-                        bottom: 68 +
+                        bottom:
+                            68 +
                             (chatStore.assetsStore.showEmoteMenu
                                 ? 0
                                 : MediaQuery.of(context).padding.bottom),
@@ -99,8 +104,9 @@ class Chat extends StatelessWidget {
                               ? null
                               : ElevatedButton.icon(
                                   onPressed: chatStore.resumeScroll,
-                                  icon:
-                                      const Icon(Icons.arrow_downward_rounded),
+                                  icon: const Icon(
+                                    Icons.arrow_downward_rounded,
+                                  ),
                                   label: Text(
                                     chatStore.messageBuffer.isNotEmpty
                                         ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
@@ -159,13 +165,12 @@ class Chat extends StatelessWidget {
                                     if (chatStore.settings.showFFZEmotes) 'FFZ',
                                   ],
                                   children: [
-                                    RecentEmotesPanel(
-                                      chatStore: chatStore,
-                                    ),
+                                    RecentEmotesPanel(chatStore: chatStore),
                                     if (chatStore.settings.showTwitchEmotes)
                                       EmoteMenuPanel(
                                         chatStore: chatStore,
-                                        twitchEmotes: chatStore.assetsStore
+                                        twitchEmotes: chatStore
+                                            .assetsStore
                                             .userEmoteSectionToEmotes,
                                       ),
                                     ...[

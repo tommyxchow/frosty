@@ -217,7 +217,6 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
 
-
   // Landscape mode options
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
   @observable
@@ -376,25 +375,12 @@ abstract class _SettingsStoreBase with Store {
 
 const themeNames = ['System', 'Light', 'Dark'];
 
-enum ThemeType {
-  system,
-  light,
-  dark,
-}
+enum ThemeType { system, light, dark }
 
 const timestampNames = ['Disabled', '12-hour', '24-hour'];
 
-enum TimestampType {
-  disabled,
-  twelve,
-  twentyFour,
-}
+enum TimestampType { disabled, twelve, twentyFour }
 
 const landscapeCutoutNames = ['None', 'Left', 'Right', 'Both'];
 
-enum LandscapeCutoutType {
-  none,
-  left,
-  right,
-  both,
-}
+enum LandscapeCutoutType { none, left, right, both }

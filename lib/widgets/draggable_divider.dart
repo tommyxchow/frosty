@@ -146,8 +146,8 @@ class _DraggableDividerState extends State<DraggableDivider> {
                     color: _isDragging
                         ? colorScheme.primary
                         : (_isHovered
-                            ? colorScheme.onSurface.withValues(alpha: 0.3)
-                            : colorScheme.onSurface.withValues(alpha: 0.1)),
+                              ? colorScheme.onSurface.withValues(alpha: 0.3)
+                              : colorScheme.onSurface.withValues(alpha: 0.1)),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),

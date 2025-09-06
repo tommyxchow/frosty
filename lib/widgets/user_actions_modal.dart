@@ -55,15 +55,15 @@ class UserActionsModal extends StatelessWidget {
             leading: const Icon(Icons.block_rounded),
             onTap: () => authStore
                 .showBlockDialog(
-              context,
-              targetUser: name,
-              targetUserId: userId,
-            )
+                  context,
+                  targetUser: name,
+                  targetUserId: userId,
+                )
                 .then((_) {
-              if (context.mounted) {
-                Navigator.pop(context);
-              }
-            }),
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                }),
             title: Text('Block $name'),
           ),
         ListTile(
@@ -87,8 +87,8 @@ class UserActionsModal extends StatelessWidget {
                       statusBarColor: Colors.transparent,
                       statusBarIconBrightness:
                           theme.brightness == Brightness.dark
-                              ? Brightness.light
-                              : Brightness.dark,
+                          ? Brightness.light
+                          : Brightness.dark,
                     ),
                     leading: IconButton(
                       tooltip: 'Back',
@@ -103,7 +103,8 @@ class UserActionsModal extends StatelessWidget {
                       Positioned.fill(
                         child: Padding(
                           padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top +
+                            top:
+                                MediaQuery.of(context).padding.top +
                                 kToolbarHeight,
                           ),
                           child: WebViewWidget(

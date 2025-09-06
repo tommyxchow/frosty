@@ -48,21 +48,21 @@ class BlurredContainer extends StatelessWidget {
     final isDark = forceDarkMode ?? (theme.brightness == Brightness.dark);
 
     // Adaptive alpha based on theme for optimal visibility
-    final adaptiveAlpha = backgroundAlpha ??
+    final adaptiveAlpha =
+        backgroundAlpha ??
         (isDark ? BlurConfig.darkModeAlpha : BlurConfig.lightModeAlpha);
 
     // Use dark background color if forced, otherwise use theme color
-    final backgroundColor =
-        forceDarkMode == true ? Colors.black : theme.scaffoldBackgroundColor;
+    final backgroundColor = forceDarkMode == true
+        ? Colors.black
+        : theme.scaffoldBackgroundColor;
 
     // Create decoration based on gradient direction
     Decoration decoration;
     if (gradientDirection == GradientDirection.none) {
       // Solid color (original behavior)
       decoration = BoxDecoration(
-        color: backgroundColor.withValues(
-          alpha: adaptiveAlpha,
-        ),
+        color: backgroundColor.withValues(alpha: adaptiveAlpha),
       );
     } else {
       List<Color> colors;

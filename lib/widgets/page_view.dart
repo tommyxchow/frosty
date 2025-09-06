@@ -28,16 +28,8 @@ class _FrostyPageViewState extends State<FrostyPageView> {
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
-            labelPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-            ),
-            tabs: widget.headers
-                .map(
-                  (header) => Tab(
-                    text: header,
-                  ),
-                )
-                .toList(),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+            tabs: widget.headers.map((header) => Tab(text: header)).toList(),
           ),
           const Divider(),
           Expanded(child: TabBarView(children: widget.children)),

@@ -61,13 +61,12 @@ class ProfileCard extends StatelessWidget {
           ),
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => LoginWebView(),
-            ),
+            MaterialPageRoute(builder: (context) => LoginWebView()),
           ),
           onLongPress: () async {
-            final clipboardText =
-                (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+            final clipboardText = (await Clipboard.getData(
+              Clipboard.kTextPlain,
+            ))?.text;
 
             if (clipboardText == null) return;
 

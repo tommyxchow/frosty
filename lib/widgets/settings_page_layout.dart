@@ -59,9 +59,7 @@ class _SettingsPageLayoutState extends State<SettingsPageLayout> {
           top: borderTop.toDouble(),
           left: 0,
           right: 0,
-          child: AnimatedScrollBorder(
-            scrollController: _scrollController,
-          ),
+          child: AnimatedScrollBorder(scrollController: _scrollController),
         ),
       ],
     );

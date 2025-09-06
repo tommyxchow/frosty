@@ -52,19 +52,14 @@ abstract class UserStoreBase with Store {
   }
 
   @action
-  Future<void> unblock({
-    required String targetId,
-  }) async {
+  Future<void> unblock({required String targetId}) async {
     final success = await twitchApi.unblockUser(userId: targetId);
     if (success) await refreshBlockedUsers();
   }
 
   @action
-  Future<void> refreshBlockedUsers() async =>
-      _blockedUsers = (await twitchApi.getUserBlockedList(
-        id: _details!.id,
-      ))
-          .asObservable();
+  Future<void> refreshBlockedUsers() async => _blockedUsers =
+      (await twitchApi.getUserBlockedList(id: _details!.id)).asObservable();
 
   @action
   void dispose() {

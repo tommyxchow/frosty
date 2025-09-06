@@ -21,10 +21,7 @@ class GeneralSettings extends StatelessWidget {
     return Observer(
       builder: (context) => SettingsPageLayout(
         children: [
-          const SectionHeader(
-            'Theme',
-            isFirst: true,
-          ),
+          const SectionHeader('Theme', isFirst: true),
           SettingsListSelect(
             selectedOption: themeNames[settingsStore.themeType.index],
             options: themeNames,

@@ -75,22 +75,12 @@ class _LiveIndicatorState extends State<LiveIndicator>
     _pingScale = Tween<double>(
       begin: _pingScaleStart,
       end: _pingScaleEnd,
-    ).animate(
-      CurvedAnimation(
-        parent: _pingController!,
-        curve: Curves.easeOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _pingController!, curve: Curves.easeOut));
 
     _pingOpacity = Tween<double>(
       begin: _pingOpacityStart,
       end: _pingOpacityEnd,
-    ).animate(
-      CurvedAnimation(
-        parent: _pingController!,
-        curve: Curves.easeOut,
-      ),
-    );
+    ).animate(CurvedAnimation(parent: _pingController!, curve: Curves.easeOut));
   }
 
   void _disposeAnimations() {
@@ -144,10 +134,7 @@ class _LiveIndicatorState extends State<LiveIndicator>
       return Container(
         width: widget.size,
         height: widget.size,
-        decoration: BoxDecoration(
-          color: widget.color,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: widget.color, shape: BoxShape.circle),
       );
     }
 
@@ -177,8 +164,9 @@ class _LiveIndicatorState extends State<LiveIndicator>
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: widget.color
-                                  .withValues(alpha: _borderOpacity),
+                              color: widget.color.withValues(
+                                alpha: _borderOpacity,
+                              ),
                               width: _borderWidth,
                             ),
                           ),

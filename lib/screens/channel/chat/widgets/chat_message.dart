@@ -48,19 +48,12 @@ class ChatMessage extends StatelessWidget {
     );
   }
 
-  void onTapPingedUser(
-    BuildContext context, {
-    required String nickname,
-  }) {
+  void onTapPingedUser(BuildContext context, {required String nickname}) {
     // Ignore if the message is a recent message in the modal bottom sheet.
     if (isModal) return;
 
     final twitchApi = context.read<TwitchApi>();
-    twitchApi
-        .getUser(
-      userLogin: nickname,
-    )
-        .then((user) {
+    twitchApi.getUser(userLogin: nickname).then((user) {
       if (context.mounted) {
         showModalBottomSheetWithProperFocus(
           isScrollControlled: true,
@@ -156,8 +149,9 @@ class ChatMessage extends StatelessWidget {
     final defaultTextStyle = DefaultTextStyle.of(context).style;
     final messageHeaderIconSize =
         defaultBadgeSize * chatStore.settings.badgeScale;
-    final messageHeaderTextColor =
-        defaultTextStyle.color?.withValues(alpha: 0.5);
+    final messageHeaderTextColor = defaultTextStyle.color?.withValues(
+      alpha: 0.5,
+    );
     const messageHeaderFontWeight = FontWeight.w600;
 
     return Observer(
@@ -170,8 +164,9 @@ class ChatMessage extends StatelessWidget {
           case Command.userState:
             final shouldHighlightFirstMessage =
                 chatStore.settings.highlightFirstTimeChatter &&
-                    ircMessage.tags['first-msg'] == '1';
-            final shouldHighlightMessage = chatStore.settings.showUserNotices &&
+                ircMessage.tags['first-msg'] == '1';
+            final shouldHighlightMessage =
+                chatStore.settings.showUserNotices &&
                 ircMessage.tags['msg-id'] == 'highlighted-message';
 
             final messageSpan = Text.rich(
@@ -210,14 +205,14 @@ class ChatMessage extends StatelessWidget {
                 onTap: isModal
                     ? null
                     : () => showModalBottomSheetWithProperFocus(
-                          context: context,
-                          builder: (context) {
-                            return ReplyThread(
-                              selectedMessage: ircMessage,
-                              chatStore: chatStore,
-                            );
-                          },
-                        ),
+                        context: context,
+                        builder: (context) {
+                          return ReplyThread(
+                            selectedMessage: ircMessage,
+                            chatStore: chatStore,
+                          );
+                        },
+                      ),
                 child: Text(
                   'Replying to @$replyUser: $replyBody',
                   maxLines: 1,
@@ -265,9 +260,7 @@ class ChatMessage extends StatelessWidget {
                       spacing: 4,
                       children: [
                         messageHeaderIcon,
-                        Flexible(
-                          child: messageHeader,
-                        ),
+                        Flexible(child: messageHeader),
                       ],
                     )
                   else
@@ -305,8 +298,9 @@ class ChatMessage extends StatelessWidget {
                   else
                     Text(
                       'Timed out for $banDuration ${int.parse(banDuration) > 1 ? 'seconds' : 'second'}',
-                      style:
-                          const TextStyle(fontWeight: messageHeaderFontWeight),
+                      style: const TextStyle(
+                        fontWeight: messageHeaderFontWeight,
+                      ),
                     ),
                   Text.rich(
                     TextSpan(
@@ -394,12 +388,8 @@ class ChatMessage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       spacing: 4,
                       children: [
-                        if (messageHeaderIcon != null) ...[
-                          messageHeaderIcon,
-                        ],
-                        Expanded(
-                          child: messageHeader,
-                        ),
+                        if (messageHeaderIcon != null) ...[messageHeaderIcon],
+                        Expanded(child: messageHeader),
                       ],
                     ),
                   if (ircMessage.message != null) ...[
@@ -432,7 +422,8 @@ class ChatMessage extends StatelessWidget {
         }
 
         // Check if this is a reply message in reply thread context for indentation
-        final isReplyInThread = isInReplyThread &&
+        final isReplyInThread =
+            isInReplyThread &&
             ircMessage.tags['reply-parent-display-name'] != null &&
             ircMessage.tags['reply-parent-msg-body'] != null;
 
@@ -468,10 +459,7 @@ class ChatMessage extends StatelessWidget {
         final dividedMessage = chatStore.settings.showChatMessageDividers
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  paddedMessage,
-                  const Divider(),
-                ],
+                children: [paddedMessage, const Divider()],
               )
             : paddedMessage;
 

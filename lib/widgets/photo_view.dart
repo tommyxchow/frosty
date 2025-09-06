@@ -52,14 +52,13 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
     );
     _exitTranslateAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _exitController, curve: Curves.easeOut),
-    )..addListener(
-        () => setState(() {}),
-      );
-    _exitOpacityAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _exitController, curve: Curves.easeOut),
-    )..addListener(
-        () => setState(() => _imageOpacity = _exitOpacityAnimation.value),
-      );
+    )..addListener(() => setState(() {}));
+    _exitOpacityAnimation =
+        Tween<double>(begin: 1.0, end: 0.0).animate(
+          CurvedAnimation(parent: _exitController, curve: Curves.easeOut),
+        )..addListener(
+          () => setState(() => _imageOpacity = _exitOpacityAnimation.value),
+        );
   }
 
   void _toggleResolution() {
@@ -86,8 +85,10 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
 
     final screenHeight = MediaQuery.of(context).size.height;
     final fadeDistance = screenHeight * 0.20; // 20% of screen height
-    final buttonsOpacity =
-        (1.0 - (_dragOffset.abs() / fadeDistance)).clamp(0.0, 1.0);
+    final buttonsOpacity = (1.0 - (_dragOffset.abs() / fadeDistance)).clamp(
+      0.0,
+      1.0,
+    );
 
     return Stack(
       alignment: Alignment.topCenter,
@@ -109,25 +110,29 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
           },
           onVerticalDragUpdate:
               photoViewScaleState == PhotoViewScaleState.initial
-                  ? (details) => setState(() => _dragOffset += details.delta.dy)
-                  : null,
+              ? (details) => setState(() => _dragOffset += details.delta.dy)
+              : null,
           onVerticalDragEnd: photoViewScaleState == PhotoViewScaleState.initial
               ? (details) {
                   final velocity = details.velocity.pixelsPerSecond.dy;
-                  final shouldDismiss = (_dragOffset.abs() > fadeDistance) ||
+                  final shouldDismiss =
+                      (_dragOffset.abs() > fadeDistance) ||
                       velocity.abs() > 700;
                   if (shouldDismiss) {
                     // run exit animation: translate down by 30% of screen and fade out
                     _exitController
                       ..value = 0.0
-                      ..forward()
-                          .whenComplete(() => Navigator.of(context).pop());
+                      ..forward().whenComplete(
+                        () => Navigator.of(context).pop(),
+                      );
                     return;
                   }
 
                   // animate back to zero
-                  _resetAnimation = Tween<double>(begin: _dragOffset, end: 0.0)
-                      .animate(_resetController);
+                  _resetAnimation = Tween<double>(
+                    begin: _dragOffset,
+                    end: 0.0,
+                  ).animate(_resetController);
                   _resetController
                     ..value = 0.0
                     ..forward();
@@ -149,8 +154,9 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
                 ),
                 scaleStateChangedCallback: (value) =>
                     setState(() => photoViewScaleState = value),
-                backgroundDecoration:
-                    const BoxDecoration(color: Colors.transparent),
+                backgroundDecoration: const BoxDecoration(
+                  color: Colors.transparent,
+                ),
               ),
             ),
           ),
@@ -185,9 +191,7 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
                   child: ElevatedButton(
                     onPressed: _toggleResolution,
                     child: Text(
-                      _isFullResolution
-                          ? 'View thumbnail'
-                          : 'View original',
+                      _isFullResolution ? 'View thumbnail' : 'View original',
                       style: TextStyle(
                         color: context
                             .watch<FrostyThemes>()

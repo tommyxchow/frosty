@@ -37,10 +37,7 @@ class _BlurredSettingsPage extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const _BlurredSettingsPage({
-    required this.title,
-    required this.child,
-  });
+  const _BlurredSettingsPage({required this.title, required this.child});
 
   @override
   Widget build(BuildContext context) {

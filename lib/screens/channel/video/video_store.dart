@@ -62,8 +62,9 @@ abstract class VideoStoreBase with Store {
           'StreamQualities',
           onMessageReceived: (message) async {
             final data = jsonDecode(message.message) as List;
-            _availableStreamQualities =
-                data.map((item) => item as String).toList();
+            _availableStreamQualities = data
+                .map((item) => item as String)
+                .toList();
             if (_firstTimeSettingQuality) {
               _firstTimeSettingQuality = false;
               if (settingsStore.defaultToHighestQuality) {
@@ -89,8 +90,7 @@ abstract class VideoStoreBase with Store {
           onMessageReceived: (message) {
             _paused = false;
             if (Platform.isAndroid) pip.setIsPlaying(true);
-            videoWebViewController.runJavaScript(
-              '''
+            videoWebViewController.runJavaScript('''
               (function() {
                 const video = document.getElementsByTagName("video")[0];
                 if (video) {
@@ -101,8 +101,7 @@ abstract class VideoStoreBase with Store {
                   }
                 }
               })();
-              ''',
-            );
+              ''');
           },
         )
         ..addJavaScriptChannel(
@@ -122,16 +121,17 @@ abstract class VideoStoreBase with Store {
             onPageFinished: (url) async {
               if (url != videoUrl) return;
               // Safe evaluation of JavaScript boolean result
-              final result =
-                  await videoWebViewController.runJavaScriptReturningResult(
-                'window._injected ? true : false',
-              );
+              final result = await videoWebViewController
+                  .runJavaScriptReturningResult(
+                    'window._injected ? true : false',
+                  );
               final injected = result is bool
                   ? result
                   : (result.toString().toLowerCase() == 'true');
               if (injected) return;
-              await videoWebViewController
-                  .runJavaScript('window._injected = true;');
+              await videoWebViewController.runJavaScript(
+                'window._injected = true;',
+              );
               await initVideo();
               _acceptContentWarning();
             },
@@ -216,8 +216,10 @@ abstract class VideoStoreBase with Store {
     }
 
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
-    _overlayTimer =
-        Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+    _overlayTimer = Timer(
+      const Duration(seconds: 5),
+      () => _overlayVisible = false,
+    );
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
@@ -226,42 +228,43 @@ abstract class VideoStoreBase with Store {
     );
 
     // Initialize a reaction to manage stream info timer based on video mode
-    _disposeVideoModeReaction = reaction(
-      (_) => settingsStore.showVideo,
-      (showVideo) {
-        if (showVideo) {
-          // In video mode, stop the timer since overlay taps handle refreshing
-          _stopStreamInfoTimer();
-        } else {
-          // In chat-only mode, start the timer for automatic updates
-          _startStreamInfoTimer();
-          // Ensure overlay timer is active for clean UI
-          _overlayTimer.cancel();
-          _overlayTimer =
-              Timer(const Duration(seconds: 5), () => _overlayVisible = false);
-        }
-      },
-    );
+    _disposeVideoModeReaction = reaction((_) => settingsStore.showVideo, (
+      showVideo,
+    ) {
+      if (showVideo) {
+        // In video mode, stop the timer since overlay taps handle refreshing
+        _stopStreamInfoTimer();
+      } else {
+        // In chat-only mode, start the timer for automatic updates
+        _startStreamInfoTimer();
+        // Ensure overlay timer is active for clean UI
+        _overlayTimer.cancel();
+        _overlayTimer = Timer(
+          const Duration(seconds: 5),
+          () => _overlayVisible = false,
+        );
+      }
+    });
 
     // Check initial state and start timer if already in chat-only mode
     if (!settingsStore.showVideo) {
       _startStreamInfoTimer();
       _overlayTimer.cancel();
-      _overlayTimer =
-          Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+      _overlayTimer = Timer(
+        const Duration(seconds: 5),
+        () => _overlayVisible = false,
+      );
     }
 
     // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
     if (Platform.isAndroid) {
-      _disposeAndroidAutoPipReaction = autorun(
-        (_) async {
-          if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
-            pip.setAutoPipMode();
-          } else {
-            pip.setAutoPipMode(autoEnter: false);
-          }
-        },
-      );
+      _disposeAndroidAutoPipReaction = autorun((_) async {
+        if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
+          pip.setAutoPipMode();
+        } else {
+          pip.setAutoPipMode(autoEnter: false);
+        }
+      });
     }
 
     updateStreamInfo();
@@ -303,8 +306,9 @@ abstract class VideoStoreBase with Store {
 
   @action
   Future<void> setStreamQuality(String newStreamQuality) async {
-    final indexOfStreamQuality =
-        _availableStreamQualities.indexOf(newStreamQuality);
+    final indexOfStreamQuality = _availableStreamQualities.indexOf(
+      newStreamQuality,
+    );
     if (indexOfStreamQuality == -1) return;
     await _setStreamQualityIndex(indexOfStreamQuality);
   }
@@ -484,8 +488,10 @@ abstract class VideoStoreBase with Store {
       updateStreamInfo();
 
       _overlayVisible = true;
-      _overlayTimer =
-          Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+      _overlayTimer = Timer(
+        const Duration(seconds: 5),
+        () => _overlayVisible = false,
+      );
     }
   }
 
@@ -513,9 +519,7 @@ abstract class VideoStoreBase with Store {
   @action
   Future<void> updateStreamInfo() async {
     try {
-      _streamInfo = await twitchApi.getStream(
-        userLogin: userLogin,
-      );
+      _streamInfo = await twitchApi.getStream(userLogin: userLogin);
     } catch (e) {
       debugPrint(e.toString());
 
@@ -525,8 +529,10 @@ abstract class VideoStoreBase with Store {
 
       // Restart overlay timer in chat-only mode even on error
       if (!settingsStore.showVideo) {
-        _overlayTimer =
-            Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+        _overlayTimer = Timer(
+          const Duration(seconds: 5),
+          () => _overlayVisible = false,
+        );
       }
     }
   }
@@ -545,8 +551,10 @@ abstract class VideoStoreBase with Store {
         _overlayVisible = true;
 
         _overlayTimer.cancel();
-        _overlayTimer =
-            Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+        _overlayTimer = Timer(
+          const Duration(seconds: 3),
+          () => _overlayVisible = false,
+        );
       }
     }
 
@@ -568,8 +576,9 @@ abstract class VideoStoreBase with Store {
   void handlePausePlay() {
     try {
       if (_paused) {
-        videoWebViewController
-            .runJavaScript('document.getElementsByTagName("video")[0].play();');
+        videoWebViewController.runJavaScript(
+          'document.getElementsByTagName("video")[0].play();',
+        );
       } else {
         videoWebViewController.runJavaScript(
           'document.getElementsByTagName("video")[0].pause();',
@@ -608,15 +617,13 @@ abstract class VideoStoreBase with Store {
     try {
       if (Platform.isIOS && _isInPipMode) {
         // Exit PiP mode on iOS
-        videoWebViewController.runJavaScript(
-          '''
+        videoWebViewController.runJavaScript('''
           (function() {
             if (document.pictureInPictureElement) {
               document.exitPictureInPicture();
             }
           })();
-          ''',
-        );
+          ''');
       } else {
         // Enter PiP mode (both iOS and Android)
         requestPictureInPicture();

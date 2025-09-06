@@ -19,8 +19,9 @@ class AlertMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor =
-        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+    final defaultColor = Theme.of(
+      context,
+    ).colorScheme.onSurface.withValues(alpha: 0.5);
 
     final Widget widget;
 
@@ -30,49 +31,38 @@ class AlertMessage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: 8,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: color ?? defaultColor,
-          ),
+          Icon(Icons.info_outline_rounded, color: color ?? defaultColor),
           Text(
             message,
             textAlign: centered ? TextAlign.center : TextAlign.start,
-            style: TextStyle(
-              color: color ?? defaultColor,
-            ),
+            style: TextStyle(color: color ?? defaultColor),
           ),
         ],
       );
     } else {
       widget = Row(
-        mainAxisAlignment:
-            centered ? MainAxisAlignment.center : MainAxisAlignment.start,
+        mainAxisAlignment: centered
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
         spacing: 8,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: color ?? defaultColor,
-          ),
+          Icon(Icons.info_outline_rounded, color: color ?? defaultColor),
           Flexible(
             child: Text(
               message,
-              style: TextStyle(
-                color: color ?? defaultColor,
-              ),
+              style: TextStyle(color: color ?? defaultColor),
             ),
           ),
         ],
       );
     }
 
-    final effectivePadding = padding ??
+    final effectivePadding =
+        padding ??
         (vertical ? const EdgeInsets.symmetric(horizontal: 24) : null);
 
     return effectivePadding != null
-        ? Padding(
-            padding: effectivePadding,
-            child: widget,
-          )
+        ? Padding(padding: effectivePadding, child: widget)
         : widget;
   }
 }

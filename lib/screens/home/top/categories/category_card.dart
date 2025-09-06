@@ -26,13 +26,11 @@ class CategoryCard extends StatelessWidget {
     return InkWell(
       onTap: isTappable
           ? () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CategoryStreams(
-                    categoryId: category.id,
-                  ),
-                ),
-              )
+              context,
+              MaterialPageRoute(
+                builder: (context) => CategoryStreams(categoryId: category.id),
+              ),
+            )
           : null,
       child: Padding(
         padding: EdgeInsets.only(
@@ -66,10 +64,9 @@ class CategoryCard extends StatelessWidget {
             Flexible(
               child: Text(
                 category.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
           ],

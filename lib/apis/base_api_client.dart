@@ -20,27 +20,27 @@ class ApiException implements Exception {
 
 class NetworkException extends ApiException {
   const NetworkException(String message)
-      : super(message, null, DioExceptionType.connectionError);
+    : super(message, null, DioExceptionType.connectionError);
 }
 
 class TimeoutException extends ApiException {
   const TimeoutException(String message)
-      : super(message, null, DioExceptionType.connectionTimeout);
+    : super(message, null, DioExceptionType.connectionTimeout);
 }
 
 class ServerException extends ApiException {
   const ServerException(String message, int statusCode)
-      : super(message, statusCode, DioExceptionType.badResponse);
+    : super(message, statusCode, DioExceptionType.badResponse);
 }
 
 class NotFoundException extends ApiException {
   const NotFoundException(String message)
-      : super(message, 404, DioExceptionType.badResponse);
+    : super(message, 404, DioExceptionType.badResponse);
 }
 
 class UnauthorizedException extends ApiException {
   const UnauthorizedException(String message)
-      : super(message, 401, DioExceptionType.badResponse);
+    : super(message, 401, DioExceptionType.badResponse);
 }
 
 /// Base API client to eliminate code duplication across API services
@@ -204,7 +204,8 @@ abstract class BaseApiClient {
     // Extract error message from server response
     String? serverMessage;
     if (responseData is JsonMap) {
-      serverMessage = responseData['message'] as String? ??
+      serverMessage =
+          responseData['message'] as String? ??
           responseData['error'] as String? ??
           responseData['error_description'] as String?;
     }

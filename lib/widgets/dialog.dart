@@ -23,11 +23,7 @@ class FrostyDialog extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SectionHeader(
-              title,
-              isFirst: true,
-              padding: EdgeInsets.zero,
-            ),
+            SectionHeader(title, isFirst: true, padding: EdgeInsets.zero),
             const SizedBox(height: 16),
             content ?? Text(message!, textAlign: TextAlign.center),
             if (actions != null) ...[

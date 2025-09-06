@@ -58,8 +58,10 @@ Color adjustChatNameColor(
     final mid = (lo + hi) / 2.0;
     final t = (mid - 0.5).abs() * 2; // 0..1 near ends
     final easedSat = (hsl0.saturation * (1 - 0.25 * t * t)).clamp(0.0, 1.0);
-    final candidate =
-        hsl0.withLightness(mid).withSaturation(easedSat).toColor();
+    final candidate = hsl0
+        .withLightness(mid)
+        .withSaturation(easedSat)
+        .toColor();
 
     if (_contrastRatio(candidate, bg) >= targetContrast) {
       bestL = mid;

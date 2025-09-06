@@ -24,15 +24,16 @@ class SevenTVApi extends BaseApiClient {
     final data = await get<JsonMap>('/users/twitch/$id');
 
     final emoteSetId = data['emote_set']['id'] as String;
-    final emotes = (data['emote_set']['emotes'] as JsonList)
-        .map((emote) => Emote7TV.fromJson(emote));
+    final emotes = (data['emote_set']['emotes'] as JsonList).map(
+      (emote) => Emote7TV.fromJson(emote),
+    );
 
     return (
       emoteSetId,
       emotes
           .map((emote) => Emote.from7TV(emote, EmoteType.sevenTVChannel))
           .where((emote) => emote.url.isNotEmpty)
-          .toList()
+          .toList(),
     );
   }
 }

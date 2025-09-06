@@ -65,8 +65,10 @@ class LargeStreamCard extends StatelessWidget {
       ),
     );
 
-    final streamerName =
-        getReadableName(streamInfo.userName, streamInfo.userLogin);
+    final streamerName = getReadableName(
+      streamInfo.userName,
+      streamInfo.userLogin,
+    );
 
     return InkWell(
       onTap: () => Navigator.push(

@@ -8,17 +8,17 @@ class FrostyThemes {
   const FrostyThemes({required this.colorSchemeSeed});
 
   ThemeData get light => createBaseTheme(
-        colorScheme: ColorScheme.fromSeed(seedColor: colorSchemeSeed),
-        backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
-      );
+    colorScheme: ColorScheme.fromSeed(seedColor: colorSchemeSeed),
+    backgroundColor: const Color.fromRGBO(248, 248, 248, 1),
+  );
 
   ThemeData get dark => createBaseTheme(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: colorSchemeSeed,
-          brightness: Brightness.dark,
-        ),
-        backgroundColor: Colors.black,
-      );
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: colorSchemeSeed,
+      brightness: Brightness.dark,
+    ),
+    backgroundColor: Colors.black,
+  );
 
   ThemeData createBaseTheme({
     required ColorScheme colorScheme,
@@ -93,9 +93,7 @@ class FrostyThemes {
           borderRadius: const BorderRadius.all(Radius.circular(8)),
           border: Border.all(color: borderColor, width: borderWidth),
         ),
-        textStyle: TextStyle(
-          color: colorScheme.onSurface,
-        ),
+        textStyle: TextStyle(color: colorScheme.onSurface),
       ),
       snackBarTheme: SnackBarThemeData(
         showCloseIcon: true,
@@ -143,25 +141,16 @@ class FrostyThemes {
           fontWeight: FontWeight.w500,
           letterSpacing: -0.006,
         ),
-        labelMedium: TextStyle(
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0,
-        ),
+        labelMedium: TextStyle(fontWeight: FontWeight.w500, letterSpacing: 0),
         labelSmall: TextStyle(
           fontWeight: FontWeight.w500,
           letterSpacing: 0.005,
         ),
 
         // Body text
-        bodyLarge: TextStyle(
-          letterSpacing: -0.011,
-        ),
-        bodyMedium: TextStyle(
-          letterSpacing: -0.006,
-        ),
-        bodySmall: TextStyle(
-          letterSpacing: 0,
-        ),
+        bodyLarge: TextStyle(letterSpacing: -0.011),
+        bodyMedium: TextStyle(letterSpacing: -0.006),
+        bodySmall: TextStyle(letterSpacing: 0),
       ),
     );
   }

@@ -172,7 +172,7 @@ class IRCMessage {
               size: badgeSize,
               color:
                   Theme.of(context).iconTheme.color?.withValues(alpha: 0.5) ??
-                      Colors.grey.withValues(alpha: 0.5),
+                  Colors.grey.withValues(alpha: 0.5),
             ),
           ),
         ),
@@ -270,14 +270,16 @@ class IRCMessage {
           // Handle custom FFZ mod badge
           if (badgeInfo.name == 'Moderator' &&
               (ffzUserBadges != null || ffzRoomInfo?.modUrls != null)) {
-            final botBadge = ffzUserBadges
-                ?.firstWhereOrNull((element) => element.name == 'Bot');
+            final botBadge = ffzUserBadges?.firstWhereOrNull(
+              (element) => element.name == 'Bot',
+            );
 
             if (botBadge != null) {
               badgeUrl = botBadge.url;
               skipBot = true;
             } else if (ffzRoomInfo?.modUrls != null) {
-              badgeUrl = ffzRoomInfo!.modUrls?.url4x ??
+              badgeUrl =
+                  ffzRoomInfo!.modUrls?.url4x ??
                   ffzRoomInfo.modUrls?.url2x ??
                   ffzRoomInfo.modUrls!.url1x;
             }
@@ -303,7 +305,8 @@ class IRCMessage {
 
           // Handle custom FFZ VIP badge
           if (badgeInfo.name == 'VIP' && ffzRoomInfo?.vipBadge != null) {
-            badgeUrl = ffzRoomInfo!.vipBadge?.url4x ??
+            badgeUrl =
+                ffzRoomInfo!.vipBadge?.url4x ??
                 ffzRoomInfo.vipBadge?.url2x ??
                 ffzRoomInfo.vipBadge!.url1x;
           }
@@ -415,10 +418,7 @@ class IRCMessage {
         text: user != null
             ? utils.getReadableName(displayName, user!)
             : displayName,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(color: color, fontWeight: FontWeight.bold),
         recognizer: TapGestureRecognizer()..onTap = onTapName,
       ),
     );
@@ -496,8 +496,9 @@ class IRCMessage {
             localSpan.add(
               _createEmojiSpan(
                 emoji: word,
-                style:
-                    textStyle?.copyWith(fontSize: emoteSize - _emojiSizeOffset),
+                style: textStyle?.copyWith(
+                  fontSize: emoteSize - _emojiSizeOffset,
+                ),
               ),
             );
           } else {
@@ -583,10 +584,8 @@ class IRCMessage {
                 if (nextWordIsEmoji)
                   Text(emoji, style: textStyle?.copyWith(fontSize: 40)),
                 ...emoteStack.reversed.map(
-                  (emote) => FrostyCachedNetworkImage(
-                    imageUrl: emote.url,
-                    width: 56,
-                  ),
+                  (emote) =>
+                      FrostyCachedNetworkImage(imageUrl: emote.url, width: 56),
                 ),
               ],
             ),
@@ -669,8 +668,9 @@ class IRCMessage {
     _addUsername(span, context, onTapName);
 
     // Italicize the text if it was called with an IRC Action (e.g., "/me").
-    final textStyle =
-        action == true ? const TextStyle(fontStyle: FontStyle.italic) : style;
+    final textStyle = action == true
+        ? const TextStyle(fontStyle: FontStyle.italic)
+        : style;
 
     _addMessageContent(
       context,
@@ -693,10 +693,7 @@ class IRCMessage {
   }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
-      child: Text(
-        emoji,
-        style: style,
-      ),
+      child: Text(emoji, style: style),
     );
   }
 
@@ -717,11 +714,7 @@ class IRCMessage {
         ),
       );
     } else if (isSvg == true) {
-      return SvgPicture.network(
-        badge.url,
-        height: size,
-        width: size,
-      );
+      return SvgPicture.network(badge.url, height: size, width: size);
     } else {
       return FrostyCachedNetworkImage(
         imageUrl: badge.url,
@@ -820,11 +813,11 @@ class IRCMessage {
         ),
         recognizer: TapGestureRecognizer()
           ..onTap = () => launchUrl(
-                Uri.parse(text),
-                mode: launchExternal
-                    ? LaunchMode.externalApplication
-                    : LaunchMode.inAppBrowserView,
-              ),
+            Uri.parse(text),
+            mode: launchExternal
+                ? LaunchMode.externalApplication
+                : LaunchMode.inAppBrowserView,
+          ),
       );
     } else {
       return TextSpan(text: text, style: style);
@@ -838,10 +831,7 @@ class IRCMessage {
   }) {
     _showAssetDetailsBottomSheet(
       context,
-      leading: FrostyCachedNetworkImage(
-        imageUrl: emote.url,
-        width: 56,
-      ),
+      leading: FrostyCachedNetworkImage(imageUrl: emote.url, width: 56),
       url: emote.url,
       title: emote.realName != null
           ? '${emote.name} (${emote.realName})'
@@ -885,9 +875,7 @@ class IRCMessage {
             ),
             title: Text(
               title,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             subtitle: subtitle,
           ),
@@ -944,8 +932,9 @@ class IRCMessage {
 
     // Get the tags substring and escape characters.
     // IRC messages escape spaces with \s.
-    final tags =
-        whole.substring(1, tagAndIrcMessageDivider).replaceAll('\\s', ' ');
+    final tags = whole
+        .substring(1, tagAndIrcMessageDivider)
+        .replaceAll('\\s', ' ');
 
     // Next, parse and map the tags.
     final mappedTags = <String, String>{};
@@ -1000,8 +989,10 @@ class IRCMessage {
 
       for (final emoteIdAndPosition in emotes) {
         final indexBetweenIdAndPositions = emoteIdAndPosition.indexOf(':');
-        final emoteId =
-            emoteIdAndPosition.substring(0, indexBetweenIdAndPositions);
+        final emoteId = emoteIdAndPosition.substring(
+          0,
+          indexBetweenIdAndPositions,
+        );
 
         // Parse the range in order to extract the associated word.
         // If there are more than one indices, use the first one.
@@ -1133,12 +1124,8 @@ class IRCMessage {
     );
   }
 
-  factory IRCMessage.createNotice({required String message}) => IRCMessage(
-        raw: '',
-        tags: {},
-        command: Command.notice,
-        message: message,
-      );
+  factory IRCMessage.createNotice({required String message}) =>
+      IRCMessage(raw: '', tags: {}, command: Command.notice, message: message);
 }
 
 /// The object representation of the IRC ROOMSTATE message.
@@ -1159,12 +1146,12 @@ class ROOMSTATE {
 
   /// Create a new copy with the parameters from the provided [IRCMessage]
   ROOMSTATE fromIRCMessage(IRCMessage ircMessage) => ROOMSTATE(
-        emoteOnly: ircMessage.tags['emote-only'] ?? emoteOnly,
-        followersOnly: ircMessage.tags['followers-only'] ?? followersOnly,
-        r9k: ircMessage.tags['r9k'] ?? r9k,
-        slowMode: ircMessage.tags['slow'] ?? slowMode,
-        subMode: ircMessage.tags['subs-only'] ?? subMode,
-      );
+    emoteOnly: ircMessage.tags['emote-only'] ?? emoteOnly,
+    followersOnly: ircMessage.tags['followers-only'] ?? followersOnly,
+    r9k: ircMessage.tags['r9k'] ?? r9k,
+    slowMode: ircMessage.tags['slow'] ?? slowMode,
+    subMode: ircMessage.tags['subs-only'] ?? subMode,
+  );
 }
 
 class USERSTATE {
@@ -1183,12 +1170,12 @@ class USERSTATE {
   });
 
   USERSTATE fromIRCMessage(IRCMessage ircMessage) => USERSTATE(
-        raw: ircMessage.raw,
-        color: ircMessage.tags['color'] ?? color,
-        displayName: ircMessage.tags['display-name'] ?? displayName,
-        mod: ircMessage.tags['mod'] == '0' ? false : true,
-        subscriber: ircMessage.tags['subscriber'] == '0' ? false : true,
-      );
+    raw: ircMessage.raw,
+    color: ircMessage.tags['color'] ?? color,
+    displayName: ircMessage.tags['display-name'] ?? displayName,
+    mod: ircMessage.tags['mod'] == '0' ? false : true,
+    subscriber: ircMessage.tags['subscriber'] == '0' ? false : true,
+  );
 }
 
 /// The possible types of Twitch IRC commands.

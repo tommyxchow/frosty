@@ -28,13 +28,11 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
   void initState() {
     super.initState();
 
-    rootBundle.loadString('assets/release-notes.md').then(
-      (changelog) {
-        setState(() {
-          releaseNotes = changelog;
-        });
-      },
-    );
+    rootBundle.loadString('assets/release-notes.md').then((changelog) {
+      setState(() {
+        releaseNotes = changelog;
+      });
+    });
   }
 
   @override
@@ -78,20 +76,14 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
               data: releaseNotes,
               styleSheet: MarkdownStyleSheet(
                 h2: const TextStyle(fontSize: 20),
-                h3: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+                h3: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 h3Padding: const EdgeInsets.only(top: 16),
                 h4: const TextStyle(fontSize: 14),
                 h4Padding: const EdgeInsets.only(top: 16),
                 p: const TextStyle(fontSize: 14),
                 horizontalRuleDecoration: const BoxDecoration(
                   border: Border(
-                    top: BorderSide(
-                      color: Colors.transparent,
-                      width: 32,
-                    ),
+                    top: BorderSide(color: Colors.transparent, width: 32),
                   ),
                 ),
               ),
@@ -127,9 +119,7 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
             top: MediaQuery.of(context).padding.top + kToolbarHeight,
             left: 0,
             right: 0,
-            child: AnimatedScrollBorder(
-              scrollController: _scrollController,
-            ),
+            child: AnimatedScrollBorder(scrollController: _scrollController),
           ),
         ],
       ),

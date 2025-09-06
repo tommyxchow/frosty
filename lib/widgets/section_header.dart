@@ -22,7 +22,8 @@ class SectionHeader extends StatelessWidget {
     final isLandscape = context.isLandscape;
 
     return Padding(
-      padding: padding ??
+      padding:
+          padding ??
           EdgeInsets.fromLTRB(
             isLandscape ? MediaQuery.of(context).padding.left : 16,
             0,
@@ -33,9 +34,7 @@ class SectionHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (!isFirst) ...[
-            SizedBox(height: topPadding ?? 32),
-          ],
+          if (!isFirst) ...[SizedBox(height: topPadding ?? 32)],
           Text(
             text.toUpperCase(),
             style: TextStyle(

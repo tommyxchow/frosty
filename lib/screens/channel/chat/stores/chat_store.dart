@@ -190,10 +190,7 @@ abstract class ChatStoreBase with Store {
     // Create a reaction that will reconnect to chat when logging in or out.
     // Closing the channel will trigger a reconnect with the new credentials.
     reactions.add(
-      reaction(
-        (_) => auth.isLoggedIn,
-        (_) => _channel?.sink.close(1000),
-      ),
+      reaction((_) => auth.isLoggedIn, (_) => _channel?.sink.close(1000)),
     );
 
     reactions.add(
@@ -238,27 +235,22 @@ abstract class ChatStoreBase with Store {
     }
 
     reactions.add(
-      reaction(
-        (_) => settings.showVideo,
-        (showVideo) {
-          if (settings.chatDelay > 0) {
-            if (showVideo) {
-              _messages.add(
-                IRCMessage.createNotice(
-                  message:
-                      'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
-                ),
-              );
-            } else {
-              _messages.add(
-                IRCMessage.createNotice(
-                  message: 'Removing message delay...',
-                ),
-              );
-            }
+      reaction((_) => settings.showVideo, (showVideo) {
+        if (settings.chatDelay > 0) {
+          if (showVideo) {
+            _messages.add(
+              IRCMessage.createNotice(
+                message:
+                    'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
+              ),
+            );
+          } else {
+            _messages.add(
+              IRCMessage.createNotice(message: 'Removing message delay...'),
+            );
           }
-        },
-      ),
+        }
+      }),
     );
 
     if (settings.showRecentMessages) {
@@ -293,12 +285,14 @@ abstract class ChatStoreBase with Store {
     textController.addListener(() {
       _inputText = textController.text;
 
-      _showEmoteAutocomplete = !_showMentionAutocomplete &&
+      _showEmoteAutocomplete =
+          !_showMentionAutocomplete &&
           textFieldFocusNode.hasFocus &&
           textController.text.split(' ').last.isNotEmpty;
 
       _showSendButton = textController.text.isNotEmpty;
-      _showMentionAutocomplete = textFieldFocusNode.hasFocus &&
+      _showMentionAutocomplete =
+          textFieldFocusNode.hasFocus &&
           textController.text.split(' ').last.startsWith('@');
     });
   }
@@ -314,8 +308,10 @@ abstract class ChatStoreBase with Store {
     for (final message in data.trimRight().split('\r\n')) {
       // debugPrint('$message\n');
       if (message.startsWith('@')) {
-        final parsedIRCMessage =
-            IRCMessage.fromString(message, userLogin: auth.user.details?.login);
+        final parsedIRCMessage = IRCMessage.fromString(
+          message,
+          userLogin: auth.user.details?.login,
+        );
 
         if (parsedIRCMessage.user != null) {
           chatDetailsStore.chatUsers.add(parsedIRCMessage.user!);
@@ -353,8 +349,9 @@ abstract class ChatStoreBase with Store {
           case Command.notice:
           case Command.userNotice:
             // Update shared chat mode based on source-room-id tag presence
-            _isInSharedChatMode =
-                parsedIRCMessage.tags.containsKey('source-room-id');
+            _isInSharedChatMode = parsedIRCMessage.tags.containsKey(
+              'source-room-id',
+            );
             messageBuffer.add(parsedIRCMessage);
             break;
           case Command.clearChat:
@@ -372,8 +369,8 @@ abstract class ChatStoreBase with Store {
             );
             break;
           case Command.roomState:
-            chatDetailsStore.roomState =
-                chatDetailsStore.roomState.fromIRCMessage(parsedIRCMessage);
+            chatDetailsStore.roomState = chatDetailsStore.roomState
+                .fromIRCMessage(parsedIRCMessage);
             continue;
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
@@ -455,24 +452,24 @@ abstract class ChatStoreBase with Store {
   // Fetch the assets used in chat including badges and emotes.
   @action
   Future<void> getAssets() async => assetsStore.assetsFuture(
-        channelId: channelId,
-        headers: auth.headersTwitch,
-        onEmoteError: (error) {
-          debugPrint(error.toString());
-          return <Emote>[];
-        },
-        onBadgeError: (error) {
-          debugPrint(error.toString());
-          return <ChatBadge>[];
-        },
-        showTwitchEmotes: settings.showTwitchEmotes,
-        showTwitchBadges: settings.showTwitchBadges,
-        show7TVEmotes: settings.show7TVEmotes,
-        showBTTVEmotes: settings.showBTTVEmotes,
-        showBTTVBadges: settings.showBTTVBadges,
-        showFFZEmotes: settings.showFFZEmotes,
-        showFFZBadges: settings.showFFZBadges,
-      );
+    channelId: channelId,
+    headers: auth.headersTwitch,
+    onEmoteError: (error) {
+      debugPrint(error.toString());
+      return <Emote>[];
+    },
+    onBadgeError: (error) {
+      debugPrint(error.toString());
+      return <ChatBadge>[];
+    },
+    showTwitchEmotes: settings.showTwitchEmotes,
+    showTwitchBadges: settings.showTwitchBadges,
+    show7TVEmotes: settings.show7TVEmotes,
+    showBTTVEmotes: settings.showBTTVEmotes,
+    showBTTVBadges: settings.showBTTVBadges,
+    showFFZEmotes: settings.showFFZEmotes,
+    showFFZBadges: settings.showFFZBadges,
+  );
 
   /// Re-enables [_autoScroll] and jumps to the latest message.
   @action
@@ -499,8 +496,9 @@ abstract class ChatStoreBase with Store {
     );
 
     _sevenTVChannel?.sink.close(1000);
-    _sevenTVChannel =
-        WebSocketChannel.connect(Uri.parse('wss://events.7tv.io/v3'));
+    _sevenTVChannel = WebSocketChannel.connect(
+      Uri.parse('wss://events.7tv.io/v3'),
+    );
 
     void listener(dynamic data) {
       // debugPrint(data);
@@ -567,8 +565,9 @@ abstract class ChatStoreBase with Store {
   @action
   void connectToChat() {
     _channel?.sink.close(1000);
-    _channel =
-        WebSocketChannel.connect(Uri.parse('wss://irc-ws.chat.twitch.tv:443'));
+    _channel = WebSocketChannel.connect(
+      Uri.parse('wss://irc-ws.chat.twitch.tv:443'),
+    );
 
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
@@ -591,9 +590,7 @@ abstract class ChatStoreBase with Store {
 
         if (_retries >= _maxRetries) {
           messageBuffer.add(
-            IRCMessage.createNotice(
-              message: 'Disconnected from chat',
-            ),
+            IRCMessage.createNotice(message: 'Disconnected from chat'),
           );
           return;
         }
@@ -762,8 +759,10 @@ abstract class ChatStoreBase with Store {
 
     // Set the new notification message and create a new timer that will dismiss it after 3 seconds.
     _notification = notificationMessage;
-    _notificationTimer =
-        Timer(const Duration(seconds: 5), () => _notification = null);
+    _notificationTimer = Timer(
+      const Duration(seconds: 5),
+      () => _notification = null,
+    );
   }
 
   /// Clears the current notification immediately.
@@ -787,20 +786,17 @@ abstract class ChatStoreBase with Store {
     timeRemaining = duration;
 
     // Set a periodic timer that will update the time remaining every second.
-    sleepTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        // If the timer is up, cancel the timer and exit the app.
-        if (timeRemaining.inSeconds == 0) {
-          timer.cancel();
-          onTimerFinished();
-          return;
-        }
+    sleepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      // If the timer is up, cancel the timer and exit the app.
+      if (timeRemaining.inSeconds == 0) {
+        timer.cancel();
+        onTimerFinished();
+        return;
+      }
 
-        // Decrement the time remaining.
-        timeRemaining = Duration(seconds: timeRemaining.inSeconds - 1);
-      },
-    );
+      // Decrement the time remaining.
+      timeRemaining = Duration(seconds: timeRemaining.inSeconds - 1);
+    });
   }
 
   /// Cancels the sleep timer and resets the time remaining.
@@ -812,8 +808,9 @@ abstract class ChatStoreBase with Store {
 
   @action
   Future<void> getRecentMessage() async {
-    final recentMessages =
-        await twitchApi.getRecentMessages(userLogin: channelName);
+    final recentMessages = await twitchApi.getRecentMessages(
+      userLogin: channelName,
+    );
 
     for (final message in recentMessages) {
       _handleIRCData(message);

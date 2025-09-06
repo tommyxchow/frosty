@@ -19,10 +19,7 @@ class VideoSettings extends StatelessWidget {
     return Observer(
       builder: (context) => SettingsPageLayout(
         children: [
-          const SectionHeader(
-            'Player',
-            isFirst: true,
-          ),
+          const SectionHeader('Player', isFirst: true),
           SettingsListSwitch(
             title: 'Enable video',
             value: settingsStore.showVideo,

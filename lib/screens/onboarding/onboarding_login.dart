@@ -18,9 +18,7 @@ class OnboardingLogin extends StatelessWidget {
       buttonText: 'Connect with Twitch',
       buttonIcon: const Icon(SimpleIcons.twitch),
       skipRoute: const OnboardingSetup(),
-      route: LoginWebView(
-        routeAfter: const OnboardingSetup(),
-      ),
+      route: LoginWebView(routeAfter: const OnboardingSetup()),
     );
   }
 }

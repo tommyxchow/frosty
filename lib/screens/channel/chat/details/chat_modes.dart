@@ -107,11 +107,7 @@ class ChatModes extends StatelessWidget {
         activeModes.sort((a, b) => a.key.compareTo(b.key));
         final activeChips = activeModes.map((entry) => entry.value).toList();
 
-        return Wrap(
-          spacing: 8,
-          runSpacing: -4,
-          children: activeChips,
-        );
+        return Wrap(spacing: 8, runSpacing: -4, children: activeChips);
       },
     );
   }
@@ -172,10 +168,9 @@ class ChatModes extends StatelessWidget {
                 Text(
                   duration,
                   style: TextStyle(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.6),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],

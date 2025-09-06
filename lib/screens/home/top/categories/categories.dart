@@ -13,10 +13,7 @@ import 'package:provider/provider.dart';
 class Categories extends StatefulWidget {
   final ScrollController scrollController;
 
-  const Categories({
-    super.key,
-    required this.scrollController,
-  });
+  const Categories({super.key, required this.scrollController});
 
   @override
   State<Categories> createState() => _CategoriesState();
@@ -111,11 +108,7 @@ class _CategoriesState extends State<Categories>
           if (statusWidget != null) {
             return CustomScrollView(
               slivers: [
-                SliverFillRemaining(
-                  child: Center(
-                    child: statusWidget,
-                  ),
-                ),
+                SliverFillRemaining(child: Center(child: statusWidget)),
               ],
             );
           }

@@ -18,7 +18,8 @@ class ChatBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEmotesEnabled = chatStore.settings.showTwitchEmotes ||
+    final isEmotesEnabled =
+        chatStore.settings.showTwitchEmotes ||
         chatStore.settings.show7TVEmotes ||
         chatStore.settings.showBTTVEmotes ||
         chatStore.settings.showFFZEmotes;
@@ -47,18 +48,19 @@ class ChatBottomBar extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final matchingEmotes = [
-          ...chatStore.assetsStore.userEmoteToObject.values,
-          ...chatStore.assetsStore.bttvEmotes,
-          ...chatStore.assetsStore.ffzEmotes,
-          ...chatStore.assetsStore.sevenTVEmotes,
-        ]
-            .where(
-              (emote) => emote.name.toLowerCase().contains(
+        final matchingEmotes =
+            [
+                  ...chatStore.assetsStore.userEmoteToObject.values,
+                  ...chatStore.assetsStore.bttvEmotes,
+                  ...chatStore.assetsStore.ffzEmotes,
+                  ...chatStore.assetsStore.sevenTVEmotes,
+                ]
+                .where(
+                  (emote) => emote.name.toLowerCase().contains(
                     chatStore.inputText.split(' ').last.toLowerCase(),
                   ),
-            )
-            .toList();
+                )
+                .toList();
 
         final matchingChatters = chatStore.chatDetailsStore.chatUsers
             .where(
@@ -106,8 +108,9 @@ class ChatBottomBar extends StatelessWidget {
                       ),
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
-                      style: context.defaultTextStyle
-                          .copyWith(fontSize: chatStore.settings.fontSize),
+                      style: context.defaultTextStyle.copyWith(
+                        fontSize: chatStore.settings.fontSize,
+                      ),
                     ),
                   ),
                   trailing: IconButton(
@@ -149,7 +152,8 @@ class ChatBottomBar extends StatelessWidget {
                           child: FrostyCachedNetworkImage(
                             imageUrl: matchingEmotes[index].url,
                             useFade: false,
-                            height: matchingEmotes[index].height?.toDouble() ??
+                            height:
+                                matchingEmotes[index].height?.toDouble() ??
                                 defaultEmoteSize,
                             width: matchingEmotes[index].width?.toDouble(),
                           ),
@@ -181,10 +185,10 @@ class ChatBottomBar extends StatelessWidget {
                         chatStore.textController.text = split.join(' ');
                         chatStore.textController.selection =
                             TextSelection.fromPosition(
-                          TextPosition(
-                            offset: chatStore.textController.text.length,
-                          ),
-                        );
+                              TextPosition(
+                                offset: chatStore.textController.text.length,
+                              ),
+                            );
                       },
                       child: Text(matchingChatters[index]),
                     ),
@@ -213,8 +217,9 @@ class ChatBottomBar extends StatelessWidget {
                           builder: (context) {
                             final isDisabledDueToDelay =
                                 chatStore.settings.showVideo &&
-                                    chatStore.settings.chatDelay > 0;
-                            final isDisabled = !chatStore.auth.isLoggedIn ||
+                                chatStore.settings.chatDelay > 0;
+                            final isDisabled =
+                                !chatStore.auth.isLoggedIn ||
                                 chatStore.isSendingMessage ||
                                 isDisabledDueToDelay;
 
@@ -237,14 +242,15 @@ class ChatBottomBar extends StatelessWidget {
                                 decoration: InputDecoration(
                                   prefixIcon:
                                       chatStore.settings.emoteMenuButtonOnLeft
-                                          ? emoteMenuButton
-                                          : null,
+                                      ? emoteMenuButton
+                                      : null,
                                   suffixIcon: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     spacing: 8,
                                     children: [
                                       if (!chatStore
-                                              .settings.emoteMenuButtonOnLeft &&
+                                              .settings
+                                              .emoteMenuButtonOnLeft &&
                                           emoteMenuButton != null)
                                         emoteMenuButton,
                                     ],
@@ -252,10 +258,11 @@ class ChatBottomBar extends StatelessWidget {
                                   hintMaxLines: 1,
                                   hintText: chatStore.auth.isLoggedIn
                                       ? chatStore.isSendingMessage
-                                          ? 'Sending...'
-                                          : chatStore.replyingToMessage != null
-                                              ? 'Reply'
-                                              : 'Chat'
+                                            ? 'Sending...'
+                                            : chatStore.replyingToMessage !=
+                                                  null
+                                            ? 'Reply'
+                                            : 'Chat'
                                       : 'Log in',
                                 ),
                                 controller: chatStore.textController,
@@ -308,12 +315,14 @@ class ChatBottomBar extends StatelessWidget {
                                     ),
                                   )
                                 : const Icon(Icons.send_rounded),
-                            onPressed: chatStore.auth.isLoggedIn &&
+                            onPressed:
+                                chatStore.auth.isLoggedIn &&
                                     !chatStore.isSendingMessage &&
                                     !(chatStore.settings.showVideo &&
                                         chatStore.settings.chatDelay > 0)
-                                ? () => chatStore
-                                    .sendMessage(chatStore.textController.text)
+                                ? () => chatStore.sendMessage(
+                                    chatStore.textController.text,
+                                  )
                                 : null,
                           );
                         },

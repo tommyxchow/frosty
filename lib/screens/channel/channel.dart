@@ -94,19 +94,17 @@ class _VideoChatState extends State<VideoChat>
     );
 
     // Spring-back animation with smooth easing
-    _springBackAnimation = Tween<double>(
-      begin: 0,
-      end: 0,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.elasticOut,
-      ),
-    )..addListener(() {
-        setState(() {
-          _pipDragDistance = _springBackAnimation.value;
+    _springBackAnimation =
+        Tween<double>(begin: 0, end: 0).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.elasticOut,
+          ),
+        )..addListener(() {
+          setState(() {
+            _pipDragDistance = _springBackAnimation.value;
+          });
         });
-      });
   }
 
   void _handlePipDragStart(DragStartDetails details) {
@@ -151,7 +149,8 @@ class _VideoChatState extends State<VideoChat>
     }
 
     final velocity = details.velocity.pixelsPerSecond.dy;
-    final shouldTriggerPip = _pipDragDistance >= _pipTriggerDistance ||
+    final shouldTriggerPip =
+        _pipDragDistance >= _pipTriggerDistance ||
         velocity > 600; // Simple velocity threshold
 
     if (shouldTriggerPip) {
@@ -179,15 +178,13 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _animateSpringBack() {
-    _springBackAnimation = Tween<double>(
-      begin: _pipDragDistance,
-      end: 0,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.elasticOut,
-      ),
-    );
+    _springBackAnimation = Tween<double>(begin: _pipDragDistance, end: 0)
+        .animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.elasticOut,
+          ),
+        );
 
     _animationController.reset();
     _animationController.forward().then((_) {
@@ -201,10 +198,7 @@ class _VideoChatState extends State<VideoChat>
 
     final player = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
-      child: Video(
-        key: _videoKey,
-        videoStore: _videoStore,
-      ),
+      child: Video(key: _videoKey, videoStore: _videoStore),
     );
 
     final overlay = GestureDetector(
@@ -241,8 +235,9 @@ class _VideoChatState extends State<VideoChat>
             duration: const Duration(milliseconds: 200),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.black
-                    .withValues(alpha: settingsStore.overlayOpacity),
+                color: Colors.black.withValues(
+                  alpha: settingsStore.overlayOpacity,
+                ),
               ),
               child: IgnorePointer(
                 ignoring: !_videoStore.overlayVisible,
@@ -258,12 +253,7 @@ class _VideoChatState extends State<VideoChat>
       builder: (context) {
         if (!_videoStore.settingsStore.showOverlay) return player;
 
-        return Stack(
-          children: [
-            player,
-            overlay,
-          ],
-        );
+        return Stack(children: [player, overlay]);
       },
     );
 
@@ -277,9 +267,7 @@ class _VideoChatState extends State<VideoChat>
               key: _chatKey,
               chatStore: _chatStore,
               listPadding: chatOnly
-                  ? EdgeInsets.only(
-                      top: context.safePaddingTop,
-                    )
+                  ? EdgeInsets.only(top: context.safePaddingTop)
                   : null,
             ),
             Observer(
@@ -324,8 +312,8 @@ class _VideoChatState extends State<VideoChat>
               statusBarColor: Colors.transparent,
               statusBarIconBrightness:
                   context.theme.brightness == Brightness.dark
-                      ? Brightness.light
-                      : Brightness.dark,
+                  ? Brightness.light
+                  : Brightness.dark,
             ),
             title: StreamInfoBar(
               streamInfo: streamInfo,
@@ -402,79 +390,80 @@ class _VideoChatState extends State<VideoChat>
                       : context.scaffoldColor,
                   child: settingsStore.showVideo
                       ? settingsStore.fullScreen
-                          ? Stack(
-                              children: [
-                                player,
-                                if (settingsStore.showOverlay)
-                                  Row(
-                                    children:
-                                        settingsStore.landscapeChatLeftSide
-                                            ? [
-                                                overlayChat,
-                                                Expanded(child: overlay),
-                                              ]
-                                            : [
-                                                Expanded(child: overlay),
-                                                overlayChat,
-                                              ],
-                                  ),
-                              ],
-                            )
-                          : LayoutBuilder(
-                              builder: (context, constraints) {
-                                final totalWidth = constraints.maxWidth;
-                                final chatWidth = _chatStore.expandChat
-                                    ? 0.5
-                                    : _chatStore.settings.chatWidth;
+                            ? Stack(
+                                children: [
+                                  player,
+                                  if (settingsStore.showOverlay)
+                                    Row(
+                                      children:
+                                          settingsStore.landscapeChatLeftSide
+                                          ? [
+                                              overlayChat,
+                                              Expanded(child: overlay),
+                                            ]
+                                          : [
+                                              Expanded(child: overlay),
+                                              overlayChat,
+                                            ],
+                                    ),
+                                ],
+                              )
+                            : LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final totalWidth = constraints.maxWidth;
+                                  final chatWidth = _chatStore.expandChat
+                                      ? 0.5
+                                      : _chatStore.settings.chatWidth;
 
-                                // Create the landscape chat container with proper styling
-                                final chatContainer = AnimatedContainer(
-                                  curve: Curves.ease,
-                                  duration: const Duration(milliseconds: 200),
-                                  width: totalWidth * chatWidth,
-                                  color: _chatStore.settings.fullScreen
-                                      ? Colors.black.withValues(
-                                          alpha: _chatStore.settings
-                                              .fullScreenChatOverlayOpacity,
-                                        )
-                                      : context.scaffoldColor,
-                                  child: chat,
-                                );
+                                  // Create the landscape chat container with proper styling
+                                  final chatContainer = AnimatedContainer(
+                                    curve: Curves.ease,
+                                    duration: const Duration(milliseconds: 200),
+                                    width: totalWidth * chatWidth,
+                                    color: _chatStore.settings.fullScreen
+                                        ? Colors.black.withValues(
+                                            alpha: _chatStore
+                                                .settings
+                                                .fullScreenChatOverlayOpacity,
+                                          )
+                                        : context.scaffoldColor,
+                                    child: chat,
+                                  );
 
-                                final draggableDivider = Observer(
-                                  builder: (_) => DraggableDivider(
-                                    currentWidth: chatWidth,
-                                    maxWidth: 0.6,
-                                    isResizableOnLeft:
-                                        settingsStore.landscapeChatLeftSide,
-                                    showHandle: _videoStore.overlayVisible,
-                                    onDrag: (newWidth) {
-                                      if (!_chatStore.expandChat) {
-                                        _chatStore.settings.chatWidth =
-                                            newWidth;
-                                      }
-                                    },
-                                  ),
-                                );
+                                  final draggableDivider = Observer(
+                                    builder: (_) => DraggableDivider(
+                                      currentWidth: chatWidth,
+                                      maxWidth: 0.6,
+                                      isResizableOnLeft:
+                                          settingsStore.landscapeChatLeftSide,
+                                      showHandle: _videoStore.overlayVisible,
+                                      onDrag: (newWidth) {
+                                        if (!_chatStore.expandChat) {
+                                          _chatStore.settings.chatWidth =
+                                              newWidth;
+                                        }
+                                      },
+                                    ),
+                                  );
 
-                                return SafeArea(
-                                  child: Row(
-                                    children:
-                                        settingsStore.landscapeChatLeftSide
-                                            ? [
-                                                chatContainer,
-                                                draggableDivider,
-                                                Expanded(child: video),
-                                              ]
-                                            : [
-                                                Expanded(child: video),
-                                                draggableDivider,
-                                                chatContainer,
-                                              ],
-                                  ),
-                                );
-                              },
-                            )
+                                  return SafeArea(
+                                    child: Row(
+                                      children:
+                                          settingsStore.landscapeChatLeftSide
+                                          ? [
+                                              chatContainer,
+                                              draggableDivider,
+                                              Expanded(child: video),
+                                            ]
+                                          : [
+                                              Expanded(child: video),
+                                              draggableDivider,
+                                              chatContainer,
+                                            ],
+                                    ),
+                                  );
+                                },
+                              )
                       : chat,
                 );
               }
@@ -508,9 +497,10 @@ class _VideoChatState extends State<VideoChat>
                         left: 0,
                         right: 0,
                         child: AnimatedBuilder(
-                          animation: Listenable.merge(
-                            [_animationController, _springBackAnimation],
-                          ),
+                          animation: Listenable.merge([
+                            _animationController,
+                            _springBackAnimation,
+                          ]),
                           builder: (context, child) {
                             // Calculate current drag distance from either manual drag or animation
                             final currentDragDistance = _isPipDragging
@@ -518,7 +508,8 @@ class _VideoChatState extends State<VideoChat>
                                 : (_springBackAnimation.value);
 
                             // Simple scale effect for visual feedback
-                            final scaleFactor = 1.0 -
+                            final scaleFactor =
+                                1.0 -
                                 (currentDragDistance /
                                     _pipMaxDragDistance *
                                     0.1);
@@ -554,8 +545,9 @@ class _VideoChatState extends State<VideoChat>
                                         !_videoStore.isInPipMode)
                                       Positioned.fill(
                                         child: Container(
-                                          color: Colors.black
-                                              .withValues(alpha: 0.4),
+                                          color: Colors.black.withValues(
+                                            alpha: 0.4,
+                                          ),
                                           child: Center(
                                             child: AnimatedOpacity(
                                               opacity: _pipDragDistance > 20

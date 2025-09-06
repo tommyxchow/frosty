@@ -36,7 +36,9 @@ class FFZApi extends BaseApiClient {
 
     return (
       roomInfo,
-      emotes.map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel)).toList()
+      emotes
+          .map((emote) => Emote.fromFFZ(emote, EmoteType.ffzChannel))
+          .toList(),
     );
   }
 
@@ -45,8 +47,9 @@ class FFZApi extends BaseApiClient {
     final data = await get<JsonMap>('/badges/ids');
 
     final badges = data['badges'] as JsonList;
-    final badgeObjects =
-        badges.map((badge) => BadgeInfoFFZ.fromJson(badge)).toList();
+    final badgeObjects = badges
+        .map((badge) => BadgeInfoFFZ.fromJson(badge))
+        .toList();
 
     final result = <String, List<ChatBadge>>{};
     for (final badge in badgeObjects.reversed) {

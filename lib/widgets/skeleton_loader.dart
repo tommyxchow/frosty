@@ -8,12 +8,7 @@ class SkeletonLoader extends StatefulWidget {
   final double? height;
   final BorderRadius? borderRadius;
 
-  const SkeletonLoader({
-    super.key,
-    this.width,
-    this.height,
-    this.borderRadius,
-  });
+  const SkeletonLoader({super.key, this.width, this.height, this.borderRadius});
 
   @override
   State<SkeletonLoader> createState() => _SkeletonLoaderState();
@@ -32,10 +27,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
       vsync: this,
     );
     _animation = Tween<double>(begin: 0.3, end: 0.9).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.repeat(reverse: true);
   }
@@ -130,17 +122,9 @@ class ChannelSkeletonLoader extends StatelessWidget {
         height: 32,
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
-      title: SkeletonText(
-        height: 16,
-        minWidth: 60,
-        maxWidth: 140,
-      ),
+      title: SkeletonText(height: 16, minWidth: 60, maxWidth: 140),
       subtitle: shouldShowSubtitle
-          ? SkeletonText(
-              height: 14,
-              minWidth: 30,
-              maxWidth: 80,
-            )
+          ? SkeletonText(height: 14, minWidth: 30, maxWidth: 80)
           : null,
     );
   }
@@ -174,11 +158,7 @@ class CategorySkeletonLoader extends StatelessWidget {
           ),
           // Category name skeleton with random width (matches bodyLarge text)
           Flexible(
-            child: SkeletonText(
-              height: 18,
-              minWidth: 80,
-              maxWidth: 180,
-            ),
+            child: SkeletonText(height: 18, minWidth: 80, maxWidth: 180),
           ),
         ],
       ),
@@ -251,25 +231,13 @@ class StreamCardSkeletonLoader extends StatelessWidget {
                     ],
                   ),
                   // Stream title skeleton with random width
-                  SkeletonText(
-                    height: 14,
-                    minWidth: 100,
-                    maxWidth: 200,
-                  ),
+                  SkeletonText(height: 14, minWidth: 100, maxWidth: 200),
                   if (showCategory) ...[
                     // Category skeleton with random width
-                    SkeletonText(
-                      height: 14,
-                      minWidth: 60,
-                      maxWidth: 120,
-                    ),
+                    SkeletonText(height: 14, minWidth: 60, maxWidth: 120),
                   ],
                   // Viewer count skeleton with random width
-                  SkeletonText(
-                    height: 14,
-                    minWidth: 50,
-                    maxWidth: 90,
-                  ),
+                  SkeletonText(height: 14, minWidth: 50, maxWidth: 90),
                 ],
               ),
             ),
@@ -324,11 +292,7 @@ class StreamInfoBarSkeletonLoader extends StatelessWidget {
                   spacing: 8,
                   children: [
                     // Streamer name skeleton
-                    SkeletonText(
-                      height: 14,
-                      minWidth: 60,
-                      maxWidth: 120,
-                    ),
+                    SkeletonText(height: 14, minWidth: 60, maxWidth: 120),
                     // Stream title skeleton (flexible)
                     Flexible(
                       child: SkeletonText(
@@ -354,11 +318,7 @@ class StreamInfoBarSkeletonLoader extends StatelessWidget {
                       ],
                       if (showUptime) ...[
                         // Uptime skeleton
-                        SkeletonText(
-                          height: 14,
-                          minWidth: 40,
-                          maxWidth: 70,
-                        ),
+                        SkeletonText(height: 14, minWidth: 40, maxWidth: 70),
                         if (showViewerCount) const SizedBox(width: 8),
                       ],
                       if (showViewerCount) ...[
@@ -370,11 +330,7 @@ class StreamInfoBarSkeletonLoader extends StatelessWidget {
                         ),
                         const SizedBox(width: 4),
                         // Viewer count text skeleton
-                        SkeletonText(
-                          height: 14,
-                          minWidth: 30,
-                          maxWidth: 80,
-                        ),
+                        SkeletonText(height: 14, minWidth: 30, maxWidth: 80),
                       ],
                       if (showCategory && (showUptime || showViewerCount)) ...[
                         const SizedBox(width: 8),
@@ -483,17 +439,9 @@ class OfflineChannelCardSkeletonLoader extends StatelessWidget {
               spacing: 8,
               children: [
                 // Channel name skeleton
-                SkeletonText(
-                  height: 16,
-                  minWidth: 80,
-                  maxWidth: 160,
-                ),
+                SkeletonText(height: 16, minWidth: 80, maxWidth: 160),
                 // Following duration skeleton
-                SkeletonText(
-                  height: 14,
-                  minWidth: 100,
-                  maxWidth: 140,
-                ),
+                SkeletonText(height: 14, minWidth: 100, maxWidth: 140),
               ],
             ),
           ),

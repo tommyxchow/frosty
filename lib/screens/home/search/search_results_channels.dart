@@ -49,10 +49,7 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
     } on ApiException catch (e) {
       debugPrint('Search channels ApiException: $e');
       final snackBar = SnackBar(
-        content: AlertMessage(
-          message: e.message,
-          centered: false,
-        ),
+        content: AlertMessage(message: e.message, centered: false),
       );
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -76,18 +73,15 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
         final future = widget.searchStore.channelFuture;
 
         if (future == null) {
-          return const SliverToBoxAdapter(
-            child: SizedBox.shrink(),
-          );
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
         switch (future.status) {
           case FutureStatus.pending:
             return SliverList.builder(
               itemCount: 8,
-              itemBuilder: (context, index) => ChannelSkeletonLoader(
-                index: index,
-              ),
+              itemBuilder: (context, index) =>
+                  ChannelSkeletonLoader(index: index),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
@@ -108,56 +102,54 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
 
             return SliverList.list(
               children: [
-                ...results.map(
-                  (channel) {
-                    final displayName = getReadableName(
-                      channel.displayName,
-                      channel.broadcasterLogin,
-                    );
+                ...results.map((channel) {
+                  final displayName = getReadableName(
+                    channel.displayName,
+                    channel.broadcasterLogin,
+                  );
 
-                    return InkWell(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoChat(
-                            userId: channel.id,
-                            userName: channel.displayName,
-                            userLogin: channel.broadcasterLogin,
-                          ),
-                        ),
-                      ),
-                      onLongPress: () {
-                        HapticFeedback.lightImpact();
-
-                        showModalBottomSheetWithProperFocus(
-                          context: context,
-                          builder: (context) => UserActionsModal(
-                            authStore: widget.searchStore.authStore,
-                            name: displayName,
-                            userLogin: channel.broadcasterLogin,
-                            userId: channel.id,
-                          ),
-                        );
-                      },
-                      child: ListTile(
-                        title: Text(displayName),
-                        leading: ProfilePicture(
+                  return InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VideoChat(
+                          userId: channel.id,
+                          userName: channel.displayName,
                           userLogin: channel.broadcasterLogin,
-                          radius: 16,
                         ),
-                        subtitle: channel.isLive
-                            ? Row(
-                                spacing: 6,
-                                children: [
-                                  const LiveIndicator(),
-                                  Uptime(startTime: channel.startedAt),
-                                ],
-                              )
-                            : null,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                    onLongPress: () {
+                      HapticFeedback.lightImpact();
+
+                      showModalBottomSheetWithProperFocus(
+                        context: context,
+                        builder: (context) => UserActionsModal(
+                          authStore: widget.searchStore.authStore,
+                          name: displayName,
+                          userLogin: channel.broadcasterLogin,
+                          userId: channel.id,
+                        ),
+                      );
+                    },
+                    child: ListTile(
+                      title: Text(displayName),
+                      leading: ProfilePicture(
+                        userLogin: channel.broadcasterLogin,
+                        radius: 16,
+                      ),
+                      subtitle: channel.isLive
+                          ? Row(
+                              spacing: 6,
+                              children: [
+                                const LiveIndicator(),
+                                Uptime(startTime: channel.startedAt),
+                              ],
+                            )
+                          : null,
+                    ),
+                  );
+                }),
                 ListTile(
                   title: Text('Go to channel "${widget.query}"'),
                   onTap: () => _handleSearch(context, widget.query),

@@ -19,9 +19,7 @@ class SearchResultsCategories extends StatelessWidget {
         final future = searchStore.categoryFuture;
 
         if (future == null) {
-          return const SliverToBoxAdapter(
-            child: SizedBox.shrink(),
-          );
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 
         switch (future.status) {
@@ -69,9 +67,8 @@ class SearchResultsCategories extends StatelessWidget {
 
             return SliverList.builder(
               itemCount: categories.data.length,
-              itemBuilder: (context, index) => CategoryCard(
-                category: categories.data[index],
-              ),
+              itemBuilder: (context, index) =>
+                  CategoryCard(category: categories.data[index]),
             );
         }
       },

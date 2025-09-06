@@ -15,10 +15,7 @@ class CategoryStreams extends StatefulWidget {
   /// The category id, used for fetching the relevant streams in the [ListStore].
   final String categoryId;
 
-  const CategoryStreams({
-    super.key,
-    required this.categoryId,
-  });
+  const CategoryStreams({super.key, required this.categoryId});
 
   @override
   State<CategoryStreams> createState() => _CategoryStreamsState();
@@ -67,8 +64,9 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: theme.colorScheme.outlineVariant
-                          .withValues(alpha: 0.3),
+                      color: theme.colorScheme.outlineVariant.withValues(
+                        alpha: 0.3,
+                      ),
                       width: 0.5,
                     ),
                   ),
@@ -164,9 +162,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
 class _TransparentCategoryCard extends StatelessWidget {
   final dynamic category;
 
-  const _TransparentCategoryCard({
-    required this.category,
-  });
+  const _TransparentCategoryCard({required this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -177,11 +173,7 @@ class _TransparentCategoryCard extends StatelessWidget {
     final artHeight = (artWidth * (4 / 3)).toInt();
 
     return Padding(
-      padding: const EdgeInsets.only(
-        bottom: 16,
-        left: 16,
-        right: 16,
-      ),
+      padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
       child: Row(
         spacing: 12,
         children: [

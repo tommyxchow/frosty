@@ -26,7 +26,8 @@ class ExpandableSectionHeader extends StatelessWidget {
     return InkWell(
       onTap: onToggle,
       child: Padding(
-        padding: padding ??
+        padding:
+            padding ??
             EdgeInsets.fromLTRB(
               isLandscape ? MediaQuery.of(context).padding.left : 16,
               0,
@@ -37,9 +38,7 @@ class ExpandableSectionHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!isFirst) ...[
-              const SizedBox(height: 32),
-            ],
+            if (!isFirst) ...[const SizedBox(height: 32)],
             Row(
               children: [
                 Expanded(
@@ -49,8 +48,9 @@ class ExpandableSectionHeader extends StatelessWidget {
                       fontSize: fontSize ?? 13,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
-                      color:
-                          context.colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: context.colorScheme.onSurface.withValues(
+                        alpha: 0.6,
+                      ),
                     ),
                   ),
                 ),

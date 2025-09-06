@@ -93,8 +93,8 @@ class _StreamsListState extends State<StreamsList>
     final extraTopPadding = widget.listType == ListType.top
         ? kToolbarHeight
         : widget.listType == ListType.category
-            ? kToolbarHeight + 122
-            : 0.0;
+        ? kToolbarHeight + 122
+        : 0.0;
 
     final topPadding = MediaQuery.of(context).padding.top + extraTopPadding;
 
@@ -107,10 +107,7 @@ class _StreamsListState extends State<StreamsList>
 
         if (_listStore.error != null) {
           final snackBar = SnackBar(
-            content: AlertMessage(
-              message: _listStore.error!,
-              centered: false,
-            ),
+            content: AlertMessage(message: _listStore.error!, centered: false),
           );
 
           if (!context.mounted) return;
@@ -222,11 +219,7 @@ class _StreamsListState extends State<StreamsList>
           if (statusWidget != null) {
             return CustomScrollView(
               slivers: [
-                SliverFillRemaining(
-                  child: Center(
-                    child: statusWidget,
-                  ),
-                ),
+                SliverFillRemaining(child: Center(child: statusWidget)),
               ],
             );
           }
@@ -235,11 +228,12 @@ class _StreamsListState extends State<StreamsList>
 
           final unpinnedStreams = widget.listType == ListType.followed
               ? _listStore.streams
-                  .where(
-                    (stream) =>
-                        !settingsStore.pinnedChannelIds.contains(stream.userId),
-                  )
-                  .toList()
+                    .where(
+                      (stream) => !settingsStore.pinnedChannelIds.contains(
+                        stream.userId,
+                      ),
+                    )
+                    .toList()
               : _listStore.streams;
 
           final isFollowingTab = widget.listType == ListType.followed;
@@ -256,9 +250,7 @@ class _StreamsListState extends State<StreamsList>
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: _listStore.scrollController,
                         slivers: [
-                          SliverTopPadding(
-                            extraTopPadding: extraTopPadding,
-                          ),
+                          SliverTopPadding(extraTopPadding: extraTopPadding),
                           if (isFollowingTab &&
                               _listStore.allPinnedChannels.isNotEmpty) ...[
                             SliverToBoxAdapter(
@@ -340,8 +332,8 @@ class _StreamsListState extends State<StreamsList>
                                 _listStore.getStreams();
                               }
                               return Observer(
-                                builder: (context) => settingsStore
-                                        .largeStreamCard
+                                builder: (context) =>
+                                    settingsStore.largeStreamCard
                                     ? LargeStreamCard(
                                         key: ValueKey(
                                           unpinnedStreams[index].userId,
@@ -403,7 +395,8 @@ class _StreamsListState extends State<StreamsList>
                                   return Observer(
                                     builder: (context) => OfflineChannelCard(
                                       key: ValueKey(
-                                        _listStore.offlineChannels[index]
+                                        _listStore
+                                            .offlineChannels[index]
                                             .broadcasterId,
                                       ),
                                       channelInfo:
@@ -448,10 +441,7 @@ class _StreamsListState extends State<StreamsList>
 class SliverTopPadding extends StatelessWidget {
   final double extraTopPadding;
 
-  const SliverTopPadding({
-    super.key,
-    this.extraTopPadding = 0.0,
-  });
+  const SliverTopPadding({super.key, this.extraTopPadding = 0.0});
 
   @override
   Widget build(BuildContext context) {
@@ -465,16 +455,12 @@ class SliverTopPadding extends StatelessWidget {
 
 /// Helper widget for consistent bottom padding in sliver lists
 class SliverBottomPadding extends StatelessWidget {
-  const SliverBottomPadding({
-    super.key,
-  });
+  const SliverBottomPadding({super.key});
 
   @override
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
-      child: SizedBox(
-        height: MediaQuery.of(context).padding.bottom,
-      ),
+      child: SizedBox(height: MediaQuery.of(context).padding.bottom),
     );
   }
 }

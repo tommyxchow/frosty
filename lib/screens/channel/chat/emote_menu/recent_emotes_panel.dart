@@ -13,18 +13,16 @@ import 'package:provider/provider.dart';
 class RecentEmotesPanel extends StatelessWidget {
   final ChatStore chatStore;
 
-  const RecentEmotesPanel({
-    super.key,
-    required this.chatStore,
-  });
+  const RecentEmotesPanel({super.key, required this.chatStore});
 
   Future<void> _showClearDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog.adaptive(
         title: const Text('Clear recent emotes'),
-        content:
-            const Text('Are you sure you want to clear your recent emotes?'),
+        content: const Text(
+          'Are you sure you want to clear your recent emotes?',
+        ),
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
@@ -64,8 +62,8 @@ class RecentEmotesPanel extends StatelessWidget {
                     crossAxisCount: context.isPortrait
                         ? 8
                         : context.read<SettingsStore>().showVideo
-                            ? 6
-                            : 16,
+                        ? 6
+                        : 16,
                   ),
                   itemBuilder: (context, index) {
                     final emote = chatStore.assetsStore.recentEmotes[index];

@@ -34,22 +34,17 @@ class _ChatSettingsState extends State<ChatSettings> {
     return Observer(
       builder: (context) => SettingsPageLayout(
         children: [
-          const SectionHeader(
-            'Message sizing',
-            isFirst: true,
-          ),
+          const SectionHeader('Message sizing', isFirst: true),
           ExpansionTile(
-            title: const Text(
-              'Preview',
-            ),
+            title: const Text('Preview'),
             children: [
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(fontSize: settingsStore.fontSize),
+                  style: DefaultTextStyle.of(
+                    context,
+                  ).style.copyWith(fontSize: settingsStore.fontSize),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -67,9 +62,7 @@ class _ChatSettingsState extends State<ChatSettings> {
                                     defaultBadgeSize * settingsStore.badgeScale,
                               ),
                             ),
-                            const TextSpan(
-                              text: ' Badge and emote preview. ',
-                            ),
+                            const TextSpan(text: ' Badge and emote preview. '),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.middle,
                               child: FrostyCachedNetworkImage(
@@ -234,8 +227,9 @@ class _ChatSettingsState extends State<ChatSettings> {
                 landscapeCutoutNames[settingsStore.landscapeCutout.index],
             options: landscapeCutoutNames,
             onChanged: (newValue) => settingsStore.landscapeCutout =
-                LandscapeCutoutType
-                    .values[landscapeCutoutNames.indexOf(newValue)],
+                LandscapeCutoutType.values[landscapeCutoutNames.indexOf(
+                  newValue,
+                )],
           ),
           SettingsListSlider(
             title: 'Chat overlay opacity',
@@ -320,13 +314,11 @@ class _ChatSettingsState extends State<ChatSettings> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => launchUrl(
-                            Uri.parse(
-                              'https://recent-messages.robotty.de/',
-                            ),
-                            mode: settingsStore.launchUrlExternal
-                                ? LaunchMode.externalApplication
-                                : LaunchMode.inAppBrowserView,
-                          ),
+                        Uri.parse('https://recent-messages.robotty.de/'),
+                        mode: settingsStore.launchUrlExternal
+                            ? LaunchMode.externalApplication
+                            : LaunchMode.inAppBrowserView,
+                      ),
                   ),
                 ],
               ),

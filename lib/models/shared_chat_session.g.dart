@@ -17,6 +17,5 @@ SharedChatSession _$SharedChatSessionFromJson(Map<String, dynamic> json) =>
       updatedAt: json['updated_at'] as String,
     );
 
-Participant _$ParticipantFromJson(Map<String, dynamic> json) => Participant(
-      broadcasterId: json['broadcaster_id'] as String,
-    );
+Participant _$ParticipantFromJson(Map<String, dynamic> json) =>
+    Participant(broadcasterId: json['broadcaster_id'] as String);

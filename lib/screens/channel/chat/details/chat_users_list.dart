@@ -46,8 +46,8 @@ class _ChattersListState extends State<ChattersList> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.filter_list_rounded),
                     hintText: 'Filter chatters',
-                    suffixIcon: widget
-                                .chatDetailsStore.textFieldFocusNode.hasFocus ||
+                    suffixIcon:
+                        widget.chatDetailsStore.textFieldFocusNode.hasFocus ||
                             widget.chatDetailsStore.filterText.isNotEmpty
                         ? IconButton(
                             tooltip: widget.chatDetailsStore.filterText.isEmpty
@@ -108,11 +108,14 @@ class _ChattersListState extends State<ChattersList> {
                             if (widget.chatDetailsStore.chatUsers.isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
-                                child:
-                                    AlertMessage(message: 'No chatters found'),
+                                child: AlertMessage(
+                                  message: 'No chatters found',
+                                ),
                               )
                             else if (widget
-                                .chatDetailsStore.filteredUsers.isEmpty)
+                                .chatDetailsStore
+                                .filteredUsers
+                                .isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: AlertMessage(
@@ -133,12 +136,14 @@ class _ChattersListState extends State<ChattersList> {
                                     ),
                                   ),
                                   onTap: () async {
-                                    final userInfo =
-                                        await context.read<TwitchApi>().getUser(
-                                              userLogin: widget.chatDetailsStore
-                                                  .filteredUsers
-                                                  .elementAt(index),
-                                            );
+                                    final userInfo = await context
+                                        .read<TwitchApi>()
+                                        .getUser(
+                                          userLogin: widget
+                                              .chatDetailsStore
+                                              .filteredUsers
+                                              .elementAt(index),
+                                        );
 
                                     if (!context.mounted) return;
 
@@ -155,7 +160,9 @@ class _ChattersListState extends State<ChattersList> {
                                   },
                                 ),
                                 itemCount: widget
-                                    .chatDetailsStore.filteredUsers.length,
+                                    .chatDetailsStore
+                                    .filteredUsers
+                                    .length,
                               ),
                           ],
                         );

@@ -7,10 +7,7 @@ class ChatUsers {
   final int chatterCount;
   final Chatters chatters;
 
-  ChatUsers(
-    this.chatterCount,
-    this.chatters,
-  );
+  ChatUsers(this.chatterCount, this.chatters);
 
   factory ChatUsers.fromJson(Map<String, dynamic> json) =>
       _$ChatUsersFromJson(json);

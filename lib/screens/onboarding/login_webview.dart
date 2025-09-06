@@ -9,10 +9,7 @@ class LoginWebView extends StatelessWidget {
   /// Optional widget to navigate to after successful login
   final Widget? routeAfter;
 
-  const LoginWebView({
-    super.key,
-    this.routeAfter,
-  });
+  const LoginWebView({super.key, this.routeAfter});
 
   @override
   Widget build(BuildContext context) {

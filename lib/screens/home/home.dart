@@ -145,12 +145,8 @@ class _HomeState extends State<Home> {
                   listType: ListType.followed,
                   scrollController: _homeStore.followedScrollController,
                 ),
-              TopSection(
-                homeStore: _homeStore,
-              ),
-              Search(
-                scrollController: _homeStore.searchScrollController,
-              ),
+              TopSection(homeStore: _homeStore),
+              Search(scrollController: _homeStore.searchScrollController),
             ],
           ),
         ),
@@ -167,8 +163,9 @@ class _HomeState extends State<Home> {
                     scrollController = _homeStore.followedScrollController;
                   } else if (_homeStore.selectedIndex == (isLoggedIn ? 1 : 0)) {
                     // Top tab
-                    scrollController = _homeStore.topSectionScrollControllers[
-                        _homeStore.topSectionCurrentIndex];
+                    scrollController =
+                        _homeStore.topSectionScrollControllers[_homeStore
+                            .topSectionCurrentIndex];
                   } else {
                     // Search tab
                     scrollController = _homeStore.searchScrollController;
@@ -182,9 +179,9 @@ class _HomeState extends State<Home> {
               ),
               Observer(
                 builder: (_) => Theme(
-                  data: Theme.of(context).copyWith(
-                    splashFactory: NoSplash.splashFactory,
-                  ),
+                  data: Theme.of(
+                    context,
+                  ).copyWith(splashFactory: NoSplash.splashFactory),
                   child: NavigationBar(
                     backgroundColor: Colors.transparent,
                     surfaceTintColor: Colors.transparent,
@@ -196,8 +193,9 @@ class _HomeState extends State<Home> {
                             Icons.favorite_border_rounded,
                             color: _homeStore.selectedIndex == 0
                                 ? theme.colorScheme.onSurface
-                                : theme.colorScheme.onSurfaceVariant
-                                    .withValues(alpha: 0.6),
+                                : theme.colorScheme.onSurfaceVariant.withValues(
+                                    alpha: 0.6,
+                                  ),
                           ),
                           selectedIcon: Icon(
                             Icons.favorite_rounded,
@@ -211,9 +209,10 @@ class _HomeState extends State<Home> {
                           Icons.arrow_upward_rounded,
                           color:
                               _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
-                                  ? theme.colorScheme.onSurface
-                                  : theme.colorScheme.onSurfaceVariant
-                                      .withValues(alpha: 0.6),
+                              ? theme.colorScheme.onSurface
+                              : theme.colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.6,
+                                ),
                         ),
                         selectedIcon: Icon(
                           Icons.arrow_upward_rounded,
@@ -227,9 +226,10 @@ class _HomeState extends State<Home> {
                           Icons.search_rounded,
                           color:
                               _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
-                                  ? theme.colorScheme.onSurface
-                                  : theme.colorScheme.onSurfaceVariant
-                                      .withValues(alpha: 0.6),
+                              ? theme.colorScheme.onSurface
+                              : theme.colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.6,
+                                ),
                         ),
                         selectedIcon: Icon(
                           Icons.search_rounded,

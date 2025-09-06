@@ -6,120 +6,131 @@ part of 'settings_store.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SettingsStore _$SettingsStoreFromJson(Map<String, dynamic> json) =>
-    SettingsStore()
-      ..themeType = $enumDecodeNullable(_$ThemeTypeEnumMap, json['themeType'],
-              unknownValue: ThemeType.system) ??
-          ThemeType.system
-      ..accentColor = (json['accentColor'] as num?)?.toInt() ?? 4287710975
-      ..showThumbnails = json['showThumbnails'] as bool? ?? true
-      ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
-      ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
-      ..showVideo = json['showVideo'] as bool? ?? true
-      ..defaultToHighestQuality =
-          json['defaultToHighestQuality'] as bool? ?? false
-      ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? false
-      ..showOverlay = json['showOverlay'] as bool? ?? true
-      ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
-      ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.0
-      ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
-      ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
-      ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
-      ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 8.0
-      ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
-      ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
-      ..showChatMessageDividers =
-          json['showChatMessageDividers'] as bool? ?? false
-      ..timestampType = $enumDecodeNullable(
-              _$TimestampTypeEnumMap, json['timestampType'],
-              unknownValue: TimestampType.disabled) ??
-          TimestampType.disabled
-      ..autoSyncChatDelay = json['autoSyncChatDelay'] as bool? ?? false
-      ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
-      ..highlightFirstTimeChatter =
-          json['highlightFirstTimeChatter'] as bool? ?? true
-      ..showUserNotices = json['showUserNotices'] as bool? ?? true
-      ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
-      ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
-      ..landscapeForceVerticalChat =
-          json['landscapeForceVerticalChat'] as bool? ?? false
-      ..landscapeCutout = $enumDecodeNullable(
-              _$LandscapeCutoutTypeEnumMap, json['landscapeCutout']) ??
-          LandscapeCutoutType.none
-      ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.2
-      ..fullScreenChatOverlayOpacity =
-          (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
-      ..autocomplete = json['autocomplete'] as bool? ?? true
-      ..showTwitchEmotes = json['showTwitchEmotes'] as bool? ?? true
-      ..showTwitchBadges = json['showTwitchBadges'] as bool? ?? true
-      ..show7TVEmotes = json['show7TVEmotes'] as bool? ?? true
-      ..showBTTVEmotes = json['showBTTVEmotes'] as bool? ?? true
-      ..showBTTVBadges = json['showBTTVBadges'] as bool? ?? true
-      ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
-      ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
-      ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
-      ..mutedWords = (json['mutedWords'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          []
-      ..matchWholeWord = json['matchWholeWord'] as bool? ?? true
-      ..shareCrashLogsAndAnalytics =
-          json['shareCrashLogsAndAnalytics'] as bool? ?? true
-      ..fullScreen = json['fullScreen'] as bool? ?? false
-      ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false
-      ..pinnedChannelIds = (json['pinnedChannelIds'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          [];
+SettingsStore _$SettingsStoreFromJson(
+  Map<String, dynamic> json,
+) => SettingsStore()
+  ..themeType =
+      $enumDecodeNullable(
+        _$ThemeTypeEnumMap,
+        json['themeType'],
+        unknownValue: ThemeType.system,
+      ) ??
+      ThemeType.system
+  ..accentColor = (json['accentColor'] as num?)?.toInt() ?? 4287710975
+  ..showThumbnails = json['showThumbnails'] as bool? ?? true
+  ..largeStreamCard = json['largeStreamCard'] as bool? ?? false
+  ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
+  ..showVideo = json['showVideo'] as bool? ?? true
+  ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
+  ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? false
+  ..showOverlay = json['showOverlay'] as bool? ?? true
+  ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
+  ..overlayOpacity = (json['overlayOpacity'] as num?)?.toDouble() ?? 0.0
+  ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
+  ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
+  ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
+  ..messageSpacing = (json['messageSpacing'] as num?)?.toDouble() ?? 8.0
+  ..fontSize = (json['fontSize'] as num?)?.toDouble() ?? 12.0
+  ..showDeletedMessages = json['showDeletedMessages'] as bool? ?? false
+  ..showChatMessageDividers = json['showChatMessageDividers'] as bool? ?? false
+  ..timestampType =
+      $enumDecodeNullable(
+        _$TimestampTypeEnumMap,
+        json['timestampType'],
+        unknownValue: TimestampType.disabled,
+      ) ??
+      TimestampType.disabled
+  ..autoSyncChatDelay = json['autoSyncChatDelay'] as bool? ?? false
+  ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
+  ..highlightFirstTimeChatter =
+      json['highlightFirstTimeChatter'] as bool? ?? true
+  ..showUserNotices = json['showUserNotices'] as bool? ?? true
+  ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
+  ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
+  ..landscapeForceVerticalChat =
+      json['landscapeForceVerticalChat'] as bool? ?? false
+  ..landscapeCutout =
+      $enumDecodeNullable(
+        _$LandscapeCutoutTypeEnumMap,
+        json['landscapeCutout'],
+      ) ??
+      LandscapeCutoutType.none
+  ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.2
+  ..fullScreenChatOverlayOpacity =
+      (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
+  ..autocomplete = json['autocomplete'] as bool? ?? true
+  ..showTwitchEmotes = json['showTwitchEmotes'] as bool? ?? true
+  ..showTwitchBadges = json['showTwitchBadges'] as bool? ?? true
+  ..show7TVEmotes = json['show7TVEmotes'] as bool? ?? true
+  ..showBTTVEmotes = json['showBTTVEmotes'] as bool? ?? true
+  ..showBTTVBadges = json['showBTTVBadges'] as bool? ?? true
+  ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
+  ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
+  ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
+  ..mutedWords =
+      (json['mutedWords'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      []
+  ..matchWholeWord = json['matchWholeWord'] as bool? ?? true
+  ..shareCrashLogsAndAnalytics =
+      json['shareCrashLogsAndAnalytics'] as bool? ?? true
+  ..fullScreen = json['fullScreen'] as bool? ?? false
+  ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false
+  ..pinnedChannelIds =
+      (json['pinnedChannelIds'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      [];
 
-Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
-    <String, dynamic>{
-      'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
-      'accentColor': instance.accentColor,
-      'showThumbnails': instance.showThumbnails,
-      'largeStreamCard': instance.largeStreamCard,
-      'launchUrlExternal': instance.launchUrlExternal,
-      'showVideo': instance.showVideo,
-      'defaultToHighestQuality': instance.defaultToHighestQuality,
-      'useEnhancedRendering': instance.useEnhancedRendering,
-      'showOverlay': instance.showOverlay,
-      'toggleableOverlay': instance.toggleableOverlay,
-      'overlayOpacity': instance.overlayOpacity,
-      'badgeScale': instance.badgeScale,
-      'emoteScale': instance.emoteScale,
-      'messageScale': instance.messageScale,
-      'messageSpacing': instance.messageSpacing,
-      'fontSize': instance.fontSize,
-      'showDeletedMessages': instance.showDeletedMessages,
-      'showChatMessageDividers': instance.showChatMessageDividers,
-      'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
-      'autoSyncChatDelay': instance.autoSyncChatDelay,
-      'chatDelay': instance.chatDelay,
-      'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
-      'showUserNotices': instance.showUserNotices,
-      'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
-      'landscapeChatLeftSide': instance.landscapeChatLeftSide,
-      'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
-      'landscapeCutout':
-          _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
-      'chatWidth': instance.chatWidth,
-      'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
-      'autocomplete': instance.autocomplete,
-      'showTwitchEmotes': instance.showTwitchEmotes,
-      'showTwitchBadges': instance.showTwitchBadges,
-      'show7TVEmotes': instance.show7TVEmotes,
-      'showBTTVEmotes': instance.showBTTVEmotes,
-      'showBTTVBadges': instance.showBTTVBadges,
-      'showFFZEmotes': instance.showFFZEmotes,
-      'showFFZBadges': instance.showFFZBadges,
-      'showRecentMessages': instance.showRecentMessages,
-      'mutedWords': instance.mutedWords,
-      'matchWholeWord': instance.matchWholeWord,
-      'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
-      'fullScreen': instance.fullScreen,
-      'fullScreenChatOverlay': instance.fullScreenChatOverlay,
-      'pinnedChannelIds': instance.pinnedChannelIds,
-    };
+Map<String, dynamic> _$SettingsStoreToJson(
+  SettingsStore instance,
+) => <String, dynamic>{
+  'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
+  'accentColor': instance.accentColor,
+  'showThumbnails': instance.showThumbnails,
+  'largeStreamCard': instance.largeStreamCard,
+  'launchUrlExternal': instance.launchUrlExternal,
+  'showVideo': instance.showVideo,
+  'defaultToHighestQuality': instance.defaultToHighestQuality,
+  'useEnhancedRendering': instance.useEnhancedRendering,
+  'showOverlay': instance.showOverlay,
+  'toggleableOverlay': instance.toggleableOverlay,
+  'overlayOpacity': instance.overlayOpacity,
+  'badgeScale': instance.badgeScale,
+  'emoteScale': instance.emoteScale,
+  'messageScale': instance.messageScale,
+  'messageSpacing': instance.messageSpacing,
+  'fontSize': instance.fontSize,
+  'showDeletedMessages': instance.showDeletedMessages,
+  'showChatMessageDividers': instance.showChatMessageDividers,
+  'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
+  'autoSyncChatDelay': instance.autoSyncChatDelay,
+  'chatDelay': instance.chatDelay,
+  'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
+  'showUserNotices': instance.showUserNotices,
+  'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
+  'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+  'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
+  'landscapeCutout': _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
+  'chatWidth': instance.chatWidth,
+  'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
+  'autocomplete': instance.autocomplete,
+  'showTwitchEmotes': instance.showTwitchEmotes,
+  'showTwitchBadges': instance.showTwitchBadges,
+  'show7TVEmotes': instance.show7TVEmotes,
+  'showBTTVEmotes': instance.showBTTVEmotes,
+  'showBTTVBadges': instance.showBTTVBadges,
+  'showFFZEmotes': instance.showFFZEmotes,
+  'showFFZBadges': instance.showFFZBadges,
+  'showRecentMessages': instance.showRecentMessages,
+  'mutedWords': instance.mutedWords,
+  'matchWholeWord': instance.matchWholeWord,
+  'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
+  'fullScreen': instance.fullScreen,
+  'fullScreenChatOverlay': instance.fullScreenChatOverlay,
+  'pinnedChannelIds': instance.pinnedChannelIds,
+};
 
 const _$ThemeTypeEnumMap = {
   ThemeType.system: 'system',
@@ -147,8 +158,10 @@ const _$LandscapeCutoutTypeEnumMap = {
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SettingsStore on _SettingsStoreBase, Store {
-  late final _$themeTypeAtom =
-      Atom(name: '_SettingsStoreBase.themeType', context: context);
+  late final _$themeTypeAtom = Atom(
+    name: '_SettingsStoreBase.themeType',
+    context: context,
+  );
 
   @override
   ThemeType get themeType {
@@ -163,8 +176,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$accentColorAtom =
-      Atom(name: '_SettingsStoreBase.accentColor', context: context);
+  late final _$accentColorAtom = Atom(
+    name: '_SettingsStoreBase.accentColor',
+    context: context,
+  );
 
   @override
   int get accentColor {
@@ -179,8 +194,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showThumbnailsAtom =
-      Atom(name: '_SettingsStoreBase.showThumbnails', context: context);
+  late final _$showThumbnailsAtom = Atom(
+    name: '_SettingsStoreBase.showThumbnails',
+    context: context,
+  );
 
   @override
   bool get showThumbnails {
@@ -195,8 +212,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$largeStreamCardAtom =
-      Atom(name: '_SettingsStoreBase.largeStreamCard', context: context);
+  late final _$largeStreamCardAtom = Atom(
+    name: '_SettingsStoreBase.largeStreamCard',
+    context: context,
+  );
 
   @override
   bool get largeStreamCard {
@@ -211,8 +230,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$launchUrlExternalAtom =
-      Atom(name: '_SettingsStoreBase.launchUrlExternal', context: context);
+  late final _$launchUrlExternalAtom = Atom(
+    name: '_SettingsStoreBase.launchUrlExternal',
+    context: context,
+  );
 
   @override
   bool get launchUrlExternal {
@@ -227,8 +248,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showVideoAtom =
-      Atom(name: '_SettingsStoreBase.showVideo', context: context);
+  late final _$showVideoAtom = Atom(
+    name: '_SettingsStoreBase.showVideo',
+    context: context,
+  );
 
   @override
   bool get showVideo {
@@ -244,7 +267,9 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   }
 
   late final _$defaultToHighestQualityAtom = Atom(
-      name: '_SettingsStoreBase.defaultToHighestQuality', context: context);
+    name: '_SettingsStoreBase.defaultToHighestQuality',
+    context: context,
+  );
 
   @override
   bool get defaultToHighestQuality {
@@ -254,14 +279,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set defaultToHighestQuality(bool value) {
-    _$defaultToHighestQualityAtom
-        .reportWrite(value, super.defaultToHighestQuality, () {
-      super.defaultToHighestQuality = value;
-    });
+    _$defaultToHighestQualityAtom.reportWrite(
+      value,
+      super.defaultToHighestQuality,
+      () {
+        super.defaultToHighestQuality = value;
+      },
+    );
   }
 
-  late final _$useEnhancedRenderingAtom =
-      Atom(name: '_SettingsStoreBase.useEnhancedRendering', context: context);
+  late final _$useEnhancedRenderingAtom = Atom(
+    name: '_SettingsStoreBase.useEnhancedRendering',
+    context: context,
+  );
 
   @override
   bool get useEnhancedRendering {
@@ -271,14 +301,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set useEnhancedRendering(bool value) {
-    _$useEnhancedRenderingAtom.reportWrite(value, super.useEnhancedRendering,
-        () {
-      super.useEnhancedRendering = value;
-    });
+    _$useEnhancedRenderingAtom.reportWrite(
+      value,
+      super.useEnhancedRendering,
+      () {
+        super.useEnhancedRendering = value;
+      },
+    );
   }
 
-  late final _$showOverlayAtom =
-      Atom(name: '_SettingsStoreBase.showOverlay', context: context);
+  late final _$showOverlayAtom = Atom(
+    name: '_SettingsStoreBase.showOverlay',
+    context: context,
+  );
 
   @override
   bool get showOverlay {
@@ -293,8 +328,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$toggleableOverlayAtom =
-      Atom(name: '_SettingsStoreBase.toggleableOverlay', context: context);
+  late final _$toggleableOverlayAtom = Atom(
+    name: '_SettingsStoreBase.toggleableOverlay',
+    context: context,
+  );
 
   @override
   bool get toggleableOverlay {
@@ -309,8 +346,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$overlayOpacityAtom =
-      Atom(name: '_SettingsStoreBase.overlayOpacity', context: context);
+  late final _$overlayOpacityAtom = Atom(
+    name: '_SettingsStoreBase.overlayOpacity',
+    context: context,
+  );
 
   @override
   double get overlayOpacity {
@@ -325,8 +364,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$badgeScaleAtom =
-      Atom(name: '_SettingsStoreBase.badgeScale', context: context);
+  late final _$badgeScaleAtom = Atom(
+    name: '_SettingsStoreBase.badgeScale',
+    context: context,
+  );
 
   @override
   double get badgeScale {
@@ -341,8 +382,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$emoteScaleAtom =
-      Atom(name: '_SettingsStoreBase.emoteScale', context: context);
+  late final _$emoteScaleAtom = Atom(
+    name: '_SettingsStoreBase.emoteScale',
+    context: context,
+  );
 
   @override
   double get emoteScale {
@@ -357,8 +400,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$messageScaleAtom =
-      Atom(name: '_SettingsStoreBase.messageScale', context: context);
+  late final _$messageScaleAtom = Atom(
+    name: '_SettingsStoreBase.messageScale',
+    context: context,
+  );
 
   @override
   double get messageScale {
@@ -373,8 +418,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$messageSpacingAtom =
-      Atom(name: '_SettingsStoreBase.messageSpacing', context: context);
+  late final _$messageSpacingAtom = Atom(
+    name: '_SettingsStoreBase.messageSpacing',
+    context: context,
+  );
 
   @override
   double get messageSpacing {
@@ -389,8 +436,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$fontSizeAtom =
-      Atom(name: '_SettingsStoreBase.fontSize', context: context);
+  late final _$fontSizeAtom = Atom(
+    name: '_SettingsStoreBase.fontSize',
+    context: context,
+  );
 
   @override
   double get fontSize {
@@ -405,8 +454,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showDeletedMessagesAtom =
-      Atom(name: '_SettingsStoreBase.showDeletedMessages', context: context);
+  late final _$showDeletedMessagesAtom = Atom(
+    name: '_SettingsStoreBase.showDeletedMessages',
+    context: context,
+  );
 
   @override
   bool get showDeletedMessages {
@@ -422,7 +473,9 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   }
 
   late final _$showChatMessageDividersAtom = Atom(
-      name: '_SettingsStoreBase.showChatMessageDividers', context: context);
+    name: '_SettingsStoreBase.showChatMessageDividers',
+    context: context,
+  );
 
   @override
   bool get showChatMessageDividers {
@@ -432,14 +485,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set showChatMessageDividers(bool value) {
-    _$showChatMessageDividersAtom
-        .reportWrite(value, super.showChatMessageDividers, () {
-      super.showChatMessageDividers = value;
-    });
+    _$showChatMessageDividersAtom.reportWrite(
+      value,
+      super.showChatMessageDividers,
+      () {
+        super.showChatMessageDividers = value;
+      },
+    );
   }
 
-  late final _$timestampTypeAtom =
-      Atom(name: '_SettingsStoreBase.timestampType', context: context);
+  late final _$timestampTypeAtom = Atom(
+    name: '_SettingsStoreBase.timestampType',
+    context: context,
+  );
 
   @override
   TimestampType get timestampType {
@@ -454,8 +512,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$autoSyncChatDelayAtom =
-      Atom(name: '_SettingsStoreBase.autoSyncChatDelay', context: context);
+  late final _$autoSyncChatDelayAtom = Atom(
+    name: '_SettingsStoreBase.autoSyncChatDelay',
+    context: context,
+  );
 
   @override
   bool get autoSyncChatDelay {
@@ -470,8 +530,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$chatDelayAtom =
-      Atom(name: '_SettingsStoreBase.chatDelay', context: context);
+  late final _$chatDelayAtom = Atom(
+    name: '_SettingsStoreBase.chatDelay',
+    context: context,
+  );
 
   @override
   double get chatDelay {
@@ -487,7 +549,9 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   }
 
   late final _$highlightFirstTimeChatterAtom = Atom(
-      name: '_SettingsStoreBase.highlightFirstTimeChatter', context: context);
+    name: '_SettingsStoreBase.highlightFirstTimeChatter',
+    context: context,
+  );
 
   @override
   bool get highlightFirstTimeChatter {
@@ -497,14 +561,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set highlightFirstTimeChatter(bool value) {
-    _$highlightFirstTimeChatterAtom
-        .reportWrite(value, super.highlightFirstTimeChatter, () {
-      super.highlightFirstTimeChatter = value;
-    });
+    _$highlightFirstTimeChatterAtom.reportWrite(
+      value,
+      super.highlightFirstTimeChatter,
+      () {
+        super.highlightFirstTimeChatter = value;
+      },
+    );
   }
 
-  late final _$showUserNoticesAtom =
-      Atom(name: '_SettingsStoreBase.showUserNotices', context: context);
+  late final _$showUserNoticesAtom = Atom(
+    name: '_SettingsStoreBase.showUserNotices',
+    context: context,
+  );
 
   @override
   bool get showUserNotices {
@@ -519,8 +588,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$emoteMenuButtonOnLeftAtom =
-      Atom(name: '_SettingsStoreBase.emoteMenuButtonOnLeft', context: context);
+  late final _$emoteMenuButtonOnLeftAtom = Atom(
+    name: '_SettingsStoreBase.emoteMenuButtonOnLeft',
+    context: context,
+  );
 
   @override
   bool get emoteMenuButtonOnLeft {
@@ -530,14 +601,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set emoteMenuButtonOnLeft(bool value) {
-    _$emoteMenuButtonOnLeftAtom.reportWrite(value, super.emoteMenuButtonOnLeft,
-        () {
-      super.emoteMenuButtonOnLeft = value;
-    });
+    _$emoteMenuButtonOnLeftAtom.reportWrite(
+      value,
+      super.emoteMenuButtonOnLeft,
+      () {
+        super.emoteMenuButtonOnLeft = value;
+      },
+    );
   }
 
-  late final _$landscapeChatLeftSideAtom =
-      Atom(name: '_SettingsStoreBase.landscapeChatLeftSide', context: context);
+  late final _$landscapeChatLeftSideAtom = Atom(
+    name: '_SettingsStoreBase.landscapeChatLeftSide',
+    context: context,
+  );
 
   @override
   bool get landscapeChatLeftSide {
@@ -547,14 +623,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set landscapeChatLeftSide(bool value) {
-    _$landscapeChatLeftSideAtom.reportWrite(value, super.landscapeChatLeftSide,
-        () {
-      super.landscapeChatLeftSide = value;
-    });
+    _$landscapeChatLeftSideAtom.reportWrite(
+      value,
+      super.landscapeChatLeftSide,
+      () {
+        super.landscapeChatLeftSide = value;
+      },
+    );
   }
 
   late final _$landscapeForceVerticalChatAtom = Atom(
-      name: '_SettingsStoreBase.landscapeForceVerticalChat', context: context);
+    name: '_SettingsStoreBase.landscapeForceVerticalChat',
+    context: context,
+  );
 
   @override
   bool get landscapeForceVerticalChat {
@@ -564,14 +645,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set landscapeForceVerticalChat(bool value) {
-    _$landscapeForceVerticalChatAtom
-        .reportWrite(value, super.landscapeForceVerticalChat, () {
-      super.landscapeForceVerticalChat = value;
-    });
+    _$landscapeForceVerticalChatAtom.reportWrite(
+      value,
+      super.landscapeForceVerticalChat,
+      () {
+        super.landscapeForceVerticalChat = value;
+      },
+    );
   }
 
-  late final _$landscapeCutoutAtom =
-      Atom(name: '_SettingsStoreBase.landscapeCutout', context: context);
+  late final _$landscapeCutoutAtom = Atom(
+    name: '_SettingsStoreBase.landscapeCutout',
+    context: context,
+  );
 
   @override
   LandscapeCutoutType get landscapeCutout {
@@ -586,8 +672,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$chatWidthAtom =
-      Atom(name: '_SettingsStoreBase.chatWidth', context: context);
+  late final _$chatWidthAtom = Atom(
+    name: '_SettingsStoreBase.chatWidth',
+    context: context,
+  );
 
   @override
   double get chatWidth {
@@ -603,8 +691,9 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   }
 
   late final _$fullScreenChatOverlayOpacityAtom = Atom(
-      name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
-      context: context);
+    name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
+    context: context,
+  );
 
   @override
   double get fullScreenChatOverlayOpacity {
@@ -614,14 +703,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set fullScreenChatOverlayOpacity(double value) {
-    _$fullScreenChatOverlayOpacityAtom
-        .reportWrite(value, super.fullScreenChatOverlayOpacity, () {
-      super.fullScreenChatOverlayOpacity = value;
-    });
+    _$fullScreenChatOverlayOpacityAtom.reportWrite(
+      value,
+      super.fullScreenChatOverlayOpacity,
+      () {
+        super.fullScreenChatOverlayOpacity = value;
+      },
+    );
   }
 
-  late final _$autocompleteAtom =
-      Atom(name: '_SettingsStoreBase.autocomplete', context: context);
+  late final _$autocompleteAtom = Atom(
+    name: '_SettingsStoreBase.autocomplete',
+    context: context,
+  );
 
   @override
   bool get autocomplete {
@@ -636,8 +730,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showTwitchEmotesAtom =
-      Atom(name: '_SettingsStoreBase.showTwitchEmotes', context: context);
+  late final _$showTwitchEmotesAtom = Atom(
+    name: '_SettingsStoreBase.showTwitchEmotes',
+    context: context,
+  );
 
   @override
   bool get showTwitchEmotes {
@@ -652,8 +748,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showTwitchBadgesAtom =
-      Atom(name: '_SettingsStoreBase.showTwitchBadges', context: context);
+  late final _$showTwitchBadgesAtom = Atom(
+    name: '_SettingsStoreBase.showTwitchBadges',
+    context: context,
+  );
 
   @override
   bool get showTwitchBadges {
@@ -668,8 +766,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$show7TVEmotesAtom =
-      Atom(name: '_SettingsStoreBase.show7TVEmotes', context: context);
+  late final _$show7TVEmotesAtom = Atom(
+    name: '_SettingsStoreBase.show7TVEmotes',
+    context: context,
+  );
 
   @override
   bool get show7TVEmotes {
@@ -684,8 +784,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showBTTVEmotesAtom =
-      Atom(name: '_SettingsStoreBase.showBTTVEmotes', context: context);
+  late final _$showBTTVEmotesAtom = Atom(
+    name: '_SettingsStoreBase.showBTTVEmotes',
+    context: context,
+  );
 
   @override
   bool get showBTTVEmotes {
@@ -700,8 +802,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showBTTVBadgesAtom =
-      Atom(name: '_SettingsStoreBase.showBTTVBadges', context: context);
+  late final _$showBTTVBadgesAtom = Atom(
+    name: '_SettingsStoreBase.showBTTVBadges',
+    context: context,
+  );
 
   @override
   bool get showBTTVBadges {
@@ -716,8 +820,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showFFZEmotesAtom =
-      Atom(name: '_SettingsStoreBase.showFFZEmotes', context: context);
+  late final _$showFFZEmotesAtom = Atom(
+    name: '_SettingsStoreBase.showFFZEmotes',
+    context: context,
+  );
 
   @override
   bool get showFFZEmotes {
@@ -732,8 +838,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showFFZBadgesAtom =
-      Atom(name: '_SettingsStoreBase.showFFZBadges', context: context);
+  late final _$showFFZBadgesAtom = Atom(
+    name: '_SettingsStoreBase.showFFZBadges',
+    context: context,
+  );
 
   @override
   bool get showFFZBadges {
@@ -748,8 +856,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showRecentMessagesAtom =
-      Atom(name: '_SettingsStoreBase.showRecentMessages', context: context);
+  late final _$showRecentMessagesAtom = Atom(
+    name: '_SettingsStoreBase.showRecentMessages',
+    context: context,
+  );
 
   @override
   bool get showRecentMessages {
@@ -764,8 +874,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$mutedWordsAtom =
-      Atom(name: '_SettingsStoreBase.mutedWords', context: context);
+  late final _$mutedWordsAtom = Atom(
+    name: '_SettingsStoreBase.mutedWords',
+    context: context,
+  );
 
   @override
   List<String> get mutedWords {
@@ -780,8 +892,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$matchWholeWordAtom =
-      Atom(name: '_SettingsStoreBase.matchWholeWord', context: context);
+  late final _$matchWholeWordAtom = Atom(
+    name: '_SettingsStoreBase.matchWholeWord',
+    context: context,
+  );
 
   @override
   bool get matchWholeWord {
@@ -797,7 +911,9 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   }
 
   late final _$shareCrashLogsAndAnalyticsAtom = Atom(
-      name: '_SettingsStoreBase.shareCrashLogsAndAnalytics', context: context);
+    name: '_SettingsStoreBase.shareCrashLogsAndAnalytics',
+    context: context,
+  );
 
   @override
   bool get shareCrashLogsAndAnalytics {
@@ -807,14 +923,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set shareCrashLogsAndAnalytics(bool value) {
-    _$shareCrashLogsAndAnalyticsAtom
-        .reportWrite(value, super.shareCrashLogsAndAnalytics, () {
-      super.shareCrashLogsAndAnalytics = value;
-    });
+    _$shareCrashLogsAndAnalyticsAtom.reportWrite(
+      value,
+      super.shareCrashLogsAndAnalytics,
+      () {
+        super.shareCrashLogsAndAnalytics = value;
+      },
+    );
   }
 
-  late final _$fullScreenAtom =
-      Atom(name: '_SettingsStoreBase.fullScreen', context: context);
+  late final _$fullScreenAtom = Atom(
+    name: '_SettingsStoreBase.fullScreen',
+    context: context,
+  );
 
   @override
   bool get fullScreen {
@@ -829,8 +950,10 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$fullScreenChatOverlayAtom =
-      Atom(name: '_SettingsStoreBase.fullScreenChatOverlay', context: context);
+  late final _$fullScreenChatOverlayAtom = Atom(
+    name: '_SettingsStoreBase.fullScreenChatOverlay',
+    context: context,
+  );
 
   @override
   bool get fullScreenChatOverlay {
@@ -840,14 +963,19 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
 
   @override
   set fullScreenChatOverlay(bool value) {
-    _$fullScreenChatOverlayAtom.reportWrite(value, super.fullScreenChatOverlay,
-        () {
-      super.fullScreenChatOverlay = value;
-    });
+    _$fullScreenChatOverlayAtom.reportWrite(
+      value,
+      super.fullScreenChatOverlay,
+      () {
+        super.fullScreenChatOverlay = value;
+      },
+    );
   }
 
-  late final _$pinnedChannelIdsAtom =
-      Atom(name: '_SettingsStoreBase.pinnedChannelIds', context: context);
+  late final _$pinnedChannelIdsAtom = Atom(
+    name: '_SettingsStoreBase.pinnedChannelIds',
+    context: context,
+  );
 
   @override
   List<String> get pinnedChannelIds {
@@ -862,13 +990,16 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$_SettingsStoreBaseActionController =
-      ActionController(name: '_SettingsStoreBase', context: context);
+  late final _$_SettingsStoreBaseActionController = ActionController(
+    name: '_SettingsStoreBase',
+    context: context,
+  );
 
   @override
   void resetGeneralSettings() {
     final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
-        name: '_SettingsStoreBase.resetGeneralSettings');
+      name: '_SettingsStoreBase.resetGeneralSettings',
+    );
     try {
       return super.resetGeneralSettings();
     } finally {
@@ -879,7 +1010,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   @override
   void resetVideoSettings() {
     final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
-        name: '_SettingsStoreBase.resetVideoSettings');
+      name: '_SettingsStoreBase.resetVideoSettings',
+    );
     try {
       return super.resetVideoSettings();
     } finally {
@@ -890,7 +1022,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   @override
   void resetChatSettings() {
     final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
-        name: '_SettingsStoreBase.resetChatSettings');
+      name: '_SettingsStoreBase.resetChatSettings',
+    );
     try {
       return super.resetChatSettings();
     } finally {
@@ -901,7 +1034,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   @override
   void resetOtherSettings() {
     final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
-        name: '_SettingsStoreBase.resetOtherSettings');
+      name: '_SettingsStoreBase.resetOtherSettings',
+    );
     try {
       return super.resetOtherSettings();
     } finally {
@@ -912,7 +1046,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   @override
   void resetGlobalConfigs() {
     final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
-        name: '_SettingsStoreBase.resetGlobalConfigs');
+      name: '_SettingsStoreBase.resetGlobalConfigs',
+    );
     try {
       return super.resetGlobalConfigs();
     } finally {
@@ -923,7 +1058,8 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   @override
   void resetAllSettings() {
     final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
-        name: '_SettingsStoreBase.resetAllSettings');
+      name: '_SettingsStoreBase.resetAllSettings',
+    );
     try {
       return super.resetAllSettings();
     } finally {

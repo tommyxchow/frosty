@@ -26,12 +26,14 @@ class BTTVApi extends BaseApiClient {
 
     final emoteToUrl = <Emote>[];
     emoteToUrl.addAll(
-      result.channelEmotes
-          .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvChannel)),
+      result.channelEmotes.map(
+        (emote) => Emote.fromBTTV(emote, EmoteType.bttvChannel),
+      ),
     );
     emoteToUrl.addAll(
-      result.sharedEmotes
-          .map((emote) => Emote.fromBTTV(emote, EmoteType.bttvShared)),
+      result.sharedEmotes.map(
+        (emote) => Emote.fromBTTV(emote, EmoteType.bttvShared),
+      ),
     );
 
     return emoteToUrl;
@@ -41,8 +43,9 @@ class BTTVApi extends BaseApiClient {
   Future<Map<String, ChatBadge>> getBadges() async {
     final data = await get<JsonList>('/badges');
 
-    final badgeObjects =
-        data.map((badge) => BadgeInfoBTTV.fromJson(badge)).toList();
+    final badgeObjects = data
+        .map((badge) => BadgeInfoBTTV.fromJson(badge))
+        .toList();
 
     return {
       for (final badge in badgeObjects)

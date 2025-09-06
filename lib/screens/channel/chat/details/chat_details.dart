@@ -150,8 +150,9 @@ class _ChatDetailsState extends State<ChatDetails> {
   /// Returns null if no match is found.
   String? _hexToColorName(String hexColor) {
     // Remove # if present
-    final cleanHex =
-        hexColor.startsWith('#') ? hexColor.substring(1) : hexColor;
+    final cleanHex = hexColor.startsWith('#')
+        ? hexColor.substring(1)
+        : hexColor;
 
     // Convert to uppercase for comparison
     final upperHex = cleanHex.toUpperCase();
@@ -220,9 +221,9 @@ class _ChatDetailsState extends State<ChatDetails> {
   }
 
   void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   bool _hasActiveModes() {
@@ -251,11 +252,7 @@ class _ChatDetailsState extends State<ChatDetails> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: ChatModes(roomState: widget.chatDetailsStore.roomState),
             ),
-            const Divider(
-              height: 16,
-              indent: 16,
-              endIndent: 16,
-            ),
+            const Divider(height: 16, indent: 16, endIndent: 16),
           ],
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -314,8 +311,9 @@ class _ChatDetailsState extends State<ChatDetails> {
                   icon: Icons.refresh_rounded,
                   label: 'Reconnect to chat',
                   onTap: () {
-                    widget.chatStore
-                        .updateNotification('Reconnecting to chat...');
+                    widget.chatStore.updateNotification(
+                      'Reconnecting to chat...',
+                    );
                     widget.chatStore.connectToChat();
                   },
                 ),
@@ -348,9 +346,8 @@ class _ChatDetailsState extends State<ChatDetails> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => Settings(
-                        settingsStore: widget.chatStore.settings,
-                      ),
+                      builder: (context) =>
+                          Settings(settingsStore: widget.chatStore.settings),
                     ),
                   ),
                 ),
@@ -359,11 +356,7 @@ class _ChatDetailsState extends State<ChatDetails> {
           ),
         ];
 
-        return ListView(
-          shrinkWrap: true,
-          primary: false,
-          children: children,
-        );
+        return ListView(shrinkWrap: true, primary: false, children: children);
       },
     );
   }
@@ -397,11 +390,7 @@ extension on _ChatDetailsState {
 }
 
 class _CardContents extends StatelessWidget {
-  const _CardContents({
-    this.icon,
-    this.label,
-    this.labelStyle,
-  });
+  const _CardContents({this.icon, this.label, this.labelStyle});
 
   final IconData? icon;
   final String? label;
@@ -417,11 +406,7 @@ class _CardContents extends StatelessWidget {
           if (icon != null) Icon(icon),
           if (label != null) ...[
             const SizedBox(height: 8),
-            Text(
-              label!,
-              textAlign: TextAlign.center,
-              style: labelStyle,
-            ),
+            Text(label!, textAlign: TextAlign.center, style: labelStyle),
           ],
         ],
       ),
@@ -450,7 +435,7 @@ class _ChatColorPickerModal extends StatefulWidget {
   final String? initialColor;
   final ScrollController scrollController;
   final Future<void> Function(BuildContext context, String color)
-      onColorSelected;
+  onColorSelected;
   final ChatStore chatStore;
 
   @override
@@ -481,10 +466,7 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
   }
 
   Widget _buildHeader() {
-    return const SectionHeader(
-      'Username color',
-      isFirst: true,
-    );
+    return const SectionHeader('Username color', isFirst: true);
   }
 
   Widget _buildPreview() {
@@ -530,14 +512,7 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
       tags: mockTags,
       user: userDetails.login,
       message: 'How it will look in chat',
-      split: [
-        'How',
-        'it',
-        'will',
-        'look',
-        'in',
-        'chat',
-      ],
+      split: ['How', 'it', 'will', 'look', 'in', 'chat'],
       action: false,
       mention: false,
     );
@@ -587,17 +562,11 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
       leading: Container(
         width: 24,
         height: 24,
-        decoration: BoxDecoration(
-          color: adjustedColor,
-          shape: BoxShape.circle,
-        ),
+        decoration: BoxDecoration(color: adjustedColor, shape: BoxShape.circle),
       ),
       title: Text(displayName),
       trailing: isSelected
-          ? Icon(
-              Icons.check,
-              color: Theme.of(context).colorScheme.primary,
-            )
+          ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
           : null,
       onTap: () => setState(() => selectedColor = colorName),
     );

@@ -9,10 +9,7 @@ import 'package:frosty/widgets/settings_page_layout.dart';
 class BlockedUsers extends StatelessWidget {
   final AuthStore authStore;
 
-  const BlockedUsers({
-    super.key,
-    required this.authStore,
-  });
+  const BlockedUsers({super.key, required this.authStore});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +22,7 @@ class BlockedUsers extends StatelessWidget {
               await authStore.user.refreshBlockedUsers();
             },
             child: const Center(
-              child: AlertMessage(
-                message: 'No blocked users',
-                vertical: true,
-              ),
+              child: AlertMessage(message: 'No blocked users', vertical: true),
             ),
           );
         }
@@ -39,29 +33,25 @@ class BlockedUsers extends StatelessWidget {
             HapticFeedback.lightImpact();
             await authStore.user.refreshBlockedUsers();
           },
-          children: authStore.user.blockedUsers.map(
-            (blockedUser) {
-              final displayName = getReadableName(
-                blockedUser.displayName,
-                blockedUser.userLogin,
-              );
+          children: authStore.user.blockedUsers.map((blockedUser) {
+            final displayName = getReadableName(
+              blockedUser.displayName,
+              blockedUser.userLogin,
+            );
 
-              return ListTile(
-                title: Text(displayName),
-                trailing: TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
-                  onPressed: () => authStore.showBlockDialog(
-                    context,
-                    targetUser: displayName,
-                    targetUserId: blockedUser.userId,
-                  ),
-                  child: const Text('Unblock'),
+            return ListTile(
+              title: Text(displayName),
+              trailing: TextButton(
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                onPressed: () => authStore.showBlockDialog(
+                  context,
+                  targetUser: displayName,
+                  targetUserId: blockedUser.userId,
                 ),
-              );
-            },
-          ).toList(),
+                child: const Text('Unblock'),
+              ),
+            );
+          }).toList(),
         );
       },
     );

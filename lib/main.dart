@@ -31,9 +31,7 @@ void main() async {
 
   CustomCacheManager.removeOrphanedCacheFiles();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -111,10 +109,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 class MyApp extends StatefulWidget {
   final bool firstRun;
 
-  const MyApp({
-    super.key,
-    this.firstRun = false,
-  });
+  const MyApp({super.key, this.firstRun = false});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -138,8 +133,9 @@ class _MyAppState extends State<MyApp> {
     return Observer(
       builder: (context) {
         final settingsStore = context.read<SettingsStore>();
-        final themes =
-            FrostyThemes(colorSchemeSeed: Color(settingsStore.accentColor));
+        final themes = FrostyThemes(
+          colorSchemeSeed: Color(settingsStore.accentColor),
+        );
 
         return Provider<FrostyThemes>(
           create: (_) => themes,
@@ -150,8 +146,8 @@ class _MyAppState extends State<MyApp> {
             themeMode: settingsStore.themeType == ThemeType.system
                 ? ThemeMode.system
                 : settingsStore.themeType == ThemeType.light
-                    ? ThemeMode.light
-                    : ThemeMode.dark,
+                ? ThemeMode.light
+                : ThemeMode.dark,
             home: widget.firstRun ? const OnboardingIntro() : const Home(),
             navigatorKey: navigatorKey,
           ),

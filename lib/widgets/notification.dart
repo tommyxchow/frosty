@@ -16,8 +16,9 @@ class FrostyNotification extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget notificationContent = BlurredContainer(
-      gradientDirection:
-          showGradient ? GradientDirection.up : GradientDirection.none,
+      gradientDirection: showGradient
+          ? GradientDirection.up
+          : GradientDirection.none,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
@@ -25,18 +26,13 @@ class FrostyNotification extends StatelessWidget {
             child: Row(
               spacing: 8,
               children: [
-                Icon(
-                  Icons.info_outline_rounded,
-                  size: 20,
-                ),
+                Icon(Icons.info_outline_rounded, size: 20),
                 Expanded(
                   child: Text(
                     message,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -48,10 +44,9 @@ class FrostyNotification extends StatelessWidget {
               icon: const Icon(Icons.close_rounded, size: 20),
               visualDensity: VisualDensity.compact,
               tooltip: 'Dismiss',
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurfaceVariant
-                  .withValues(alpha: 0.6),
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
         ],
       ),

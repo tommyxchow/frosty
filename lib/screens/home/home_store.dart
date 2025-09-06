@@ -16,10 +16,7 @@ abstract class HomeStoreBase with Store {
 
   /// The scroll controllers for controlling the scroll to top on the top section.
   /// One controller is for the top streams tab and the other is for the top categories tab.
-  final topSectionScrollControllers = [
-    ScrollController(),
-    ScrollController(),
-  ];
+  final topSectionScrollControllers = [ScrollController(), ScrollController()];
 
   /// The scroll controller for controlling the scroll to top on the search section.
   final searchScrollController = ScrollController();

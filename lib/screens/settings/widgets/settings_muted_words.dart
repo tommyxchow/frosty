@@ -24,19 +24,14 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
   }
 
   void addMutedWord(String text) {
-    settingsStore.mutedWords = [
-      ...settingsStore.mutedWords,
-      text,
-    ];
+    settingsStore.mutedWords = [...settingsStore.mutedWords, text];
 
     textController.clear();
     textFieldFocusNode.unfocus();
   }
 
   void removeMutedWord(int index) {
-    settingsStore.mutedWords = [
-      ...settingsStore.mutedWords..removeAt(index),
-    ];
+    settingsStore.mutedWords = [...settingsStore.mutedWords..removeAt(index)];
   }
 
   @override
@@ -75,9 +70,7 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                             if (textController.text.isEmpty) {
                               textFieldFocusNode.unfocus();
                             } else {
-                              addMutedWord(
-                                textController.text,
-                              );
+                              addMutedWord(textController.text);
                             }
                           },
                           icon: const Icon(Icons.check),
@@ -97,8 +90,9 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                       itemCount: settingsStore.mutedWords.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title:
-                              Text(settingsStore.mutedWords.elementAt(index)),
+                          title: Text(
+                            settingsStore.mutedWords.elementAt(index),
+                          ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {

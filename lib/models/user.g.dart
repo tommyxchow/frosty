@@ -7,11 +7,11 @@ part of 'user.dart';
 // **************************************************************************
 
 UserTwitch _$UserTwitchFromJson(Map<String, dynamic> json) => UserTwitch(
-      json['id'] as String,
-      json['login'] as String,
-      json['display_name'] as String,
-      json['profile_image_url'] as String,
-    );
+  json['id'] as String,
+  json['login'] as String,
+  json['display_name'] as String,
+  json['profile_image_url'] as String,
+);
 
 UserBlockedTwitch _$UserBlockedTwitchFromJson(Map<String, dynamic> json) =>
     UserBlockedTwitch(

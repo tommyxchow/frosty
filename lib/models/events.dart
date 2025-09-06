@@ -10,11 +10,7 @@ class SevenTVEvent {
   final int? t;
   final SevenTVEventData d;
 
-  const SevenTVEvent({
-    required this.op,
-    this.t,
-    required this.d,
-  });
+  const SevenTVEvent({required this.op, this.t, required this.d});
 
   factory SevenTVEvent.fromJson(Map<String, dynamic> json) =>
       _$SevenTVEventFromJson(json);
@@ -29,11 +25,7 @@ class SevenTVEventData {
   @JsonKey(includeToJson: false)
   final SevenTVEventEmoteSetBody? body;
 
-  const SevenTVEventData({
-    required this.type,
-    this.condition,
-    this.body,
-  });
+  const SevenTVEventData({required this.type, this.condition, this.body});
 
   factory SevenTVEventData.fromJson(Map<String, dynamic> json) =>
       _$SevenTVEventDataFromJson(json);
@@ -46,10 +38,7 @@ class SevenTVEventUpdatedEmote {
   final Emote7TV? value;
   final Emote7TV? oldValue;
 
-  const SevenTVEventUpdatedEmote({
-    this.value,
-    this.oldValue,
-  });
+  const SevenTVEventUpdatedEmote({this.value, this.oldValue});
 
   factory SevenTVEventUpdatedEmote.fromJson(Map<String, dynamic> json) =>
       _$SevenTVEventUpdatedEmoteFromJson(json);

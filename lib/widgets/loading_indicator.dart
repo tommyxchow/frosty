@@ -19,8 +19,9 @@ class LoadingIndicator extends StatelessWidget {
         Text(
           subtitle!,
           style: TextStyle(
-            color:
-                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.5),
           ),
         ),
       ],

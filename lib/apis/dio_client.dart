@@ -8,10 +8,12 @@ class DioClient {
 
     // Optimized configuration based on 2024-2025 best practices
     dio.options = BaseOptions(
-      connectTimeout:
-          const Duration(seconds: 8), // Balanced for various networks
-      receiveTimeout:
-          const Duration(seconds: 15), // Allow for larger API responses
+      connectTimeout: const Duration(
+        seconds: 8,
+      ), // Balanced for various networks
+      receiveTimeout: const Duration(
+        seconds: 15,
+      ), // Allow for larger API responses
       sendTimeout: const Duration(seconds: 10), // Reasonable for uploads
       headers: {
         'User-Agent': 'Frosty (Flutter Twitch Client)',

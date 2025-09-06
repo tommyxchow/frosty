@@ -38,9 +38,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
         children: [
           ListTile(
             contentPadding: const EdgeInsets.all(12),
-            leading: ProfilePicture(
-              userLogin: widget.username,
-            ),
+            leading: ProfilePicture(userLogin: widget.username),
             title: Row(
               children: [
                 Flexible(
@@ -104,9 +102,9 @@ class _ChatUserModalState extends State<ChatUserModal> {
                     ),
                   ),
                   child: DefaultTextStyle(
-                    style: DefaultTextStyle.of(context)
-                        .style
-                        .copyWith(fontSize: widget.chatStore.settings.fontSize),
+                    style: DefaultTextStyle.of(context).style.copyWith(
+                      fontSize: widget.chatStore.settings.fontSize,
+                    ),
                     child: ListView.builder(
                       reverse: true,
                       primary: false,

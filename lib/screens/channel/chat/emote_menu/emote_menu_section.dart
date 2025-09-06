@@ -37,8 +37,8 @@ class _EmoteMenuSectionState extends State<EmoteMenuSection>
           crossAxisCount: context.isPortrait
               ? 8
               : context.settingsStore.showVideo
-                  ? 6
-                  : 16,
+              ? 6
+              : 16,
         ),
         padding: EdgeInsets.zero,
         itemBuilder: (context, index) => InkWell(
