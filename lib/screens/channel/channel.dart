@@ -12,13 +12,11 @@ import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/theme.dart';
-import 'package:frosty/utils.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/notification.dart';
-import 'package:frosty/widgets/profile_picture.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
@@ -329,37 +327,13 @@ class _VideoChatState extends State<VideoChat>
                       ? Brightness.light
                       : Brightness.dark,
             ),
-            title: streamInfo != null
-                ? StreamInfoBar(
-                    streamInfo: streamInfo,
-                    isCompact: true,
-                  )
-                : Row(
-                    spacing: 12,
-                    children: [
-                      ProfilePicture(
-                        userLogin: widget.userLogin,
-                        radius: 16,
-                      ),
-                      Text(
-                        getReadableName(
-                          _chatStore.displayName,
-                          _chatStore.channelName,
-                        ),
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        'Offline',
-                        style: context.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
+            title: StreamInfoBar(
+              streamInfo: streamInfo,
+              displayName: _chatStore.displayName,
+              isCompact: true,
+              isOffline: streamInfo == null,
+              isInSharedChatMode: _chatStore.isInSharedChatMode,
+            ),
             flexibleSpace: BlurredContainer(
               gradientDirection: GradientDirection.up,
               child: Column(

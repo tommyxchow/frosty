@@ -9,7 +9,7 @@ import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 
 class StreamInfoBar extends StatelessWidget {
-  final StreamTwitch streamInfo;
+  final StreamTwitch? streamInfo;
   final bool showCategory;
   final bool tappableCategory;
   final bool showUptime;
@@ -19,10 +19,12 @@ class StreamInfoBar extends StatelessWidget {
   final Color? textColor;
   final bool isCompact;
   final bool isInSharedChatMode;
+  final bool isOffline;
+  final String? displayName;
 
   const StreamInfoBar({
     super.key,
-    required this.streamInfo,
+    this.streamInfo,
     this.showCategory = true,
     this.tappableCategory = true,
     this.showUptime = true,
@@ -32,6 +34,8 @@ class StreamInfoBar extends StatelessWidget {
     this.textColor,
     this.isCompact = false,
     this.isInSharedChatMode = false,
+    this.isOffline = false,
+    this.displayName,
   });
 
   static const _iconShadow = [
@@ -50,11 +54,40 @@ class StreamInfoBar extends StatelessWidget {
     ),
   ];
 
+  TextStyle _getBaseTextStyle(
+    BuildContext context,
+    double fontSize,
+    FontWeight fontWeight,
+  ) {
+    return context.textTheme.bodyMedium?.copyWith(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: textColor,
+          shadows: _textShadow,
+        ) ??
+        const TextStyle();
+  }
+
+  TextStyle _getSecondaryTextStyle(BuildContext context, double fontSize) {
+    return context.textTheme.bodyMedium?.copyWith(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w500,
+          color: textColor?.withValues(alpha: 0.7) ??
+              context.bodySmallColor?.withValues(alpha: 0.7),
+          shadows: _textShadow,
+        ) ??
+        const TextStyle();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final streamTitle = streamInfo.title.trim();
-    final streamerName =
-        getReadableName(streamInfo.userName, streamInfo.userLogin);
+    final streamTitle = isOffline ? '' : (streamInfo?.title.trim() ?? '');
+    final streamerName = isOffline
+        ? getReadableName(displayName ?? '', '')
+        : getReadableName(
+            streamInfo?.userName ?? '',
+            streamInfo?.userLogin ?? '',
+          );
     final secondLineSize = isCompact ? 13.0 : 14.0;
 
     return Padding(
@@ -72,10 +105,14 @@ class StreamInfoBar extends StatelessWidget {
                     ),
                   )
                 : null,
-            child: Container(
-              margin: isInSharedChatMode ? const EdgeInsets.all(2.0) : null,
+            child: Padding(
+              padding: isInSharedChatMode
+                  ? const EdgeInsets.all(2.0)
+                  : EdgeInsets.zero,
               child: ProfilePicture(
-                userLogin: streamInfo.userLogin,
+                userLogin: isOffline
+                    ? (displayName ?? '')
+                    : (streamInfo?.userLogin ?? ''),
                 radius: 16,
               ),
             ),
@@ -93,132 +130,126 @@ class StreamInfoBar extends StatelessWidget {
                   children: [
                     Text(
                       streamerName,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                        shadows: _textShadow,
-                      ),
+                      style: _getBaseTextStyle(context, 14, FontWeight.w600),
                     ),
                     if (streamTitle.isNotEmpty) ...[
                       Flexible(
-                        child: Builder(
-                          builder: (context) {
-                            return Tooltip(
-                              message: streamTitle,
-                              triggerMode: tooltipTriggerMode,
-                              child: Text(
-                                streamTitle,
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: textColor?.withValues(alpha: 0.7) ??
-                                      context.bodySmallColor
-                                          ?.withValues(alpha: 0.7),
-                                  shadows: _textShadow,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            );
-                          },
+                        child: Tooltip(
+                          message: streamTitle,
+                          triggerMode: tooltipTriggerMode,
+                          child: Text(
+                            streamTitle,
+                            style: _getSecondaryTextStyle(context, 14),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
                       ),
                     ],
                   ],
                 ),
-                // Bottom row: Live indicator, uptime, viewer count, game name
-                if (showUptime ||
+                // Bottom row: Live indicator, uptime, viewer count, game name or Offline text
+                if (isOffline ||
+                    showUptime ||
                     showViewerCount ||
-                    (showCategory && streamInfo.gameName.isNotEmpty)) ...[
+                    (showCategory &&
+                        (streamInfo?.gameName.isNotEmpty ?? false))) ...[
                   Row(
                     children: [
-                      if (showUptime || showViewerCount) ...[
-                        const LiveIndicator(),
-                        const SizedBox(width: 6),
-                      ],
-                      if (showUptime) ...[
-                        Uptime(
-                          startTime: streamInfo.startedAt,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            fontSize: secondLineSize,
-                            fontWeight: FontWeight.w500,
-                            color: textColor,
-                            shadows: _textShadow,
-                          ),
-                        ),
-                        if (showViewerCount) const SizedBox(width: 8),
-                      ],
-                      if (showViewerCount) ...[
-                        Icon(
-                          Icons.visibility,
-                          size: secondLineSize,
-                          color: textColor ?? context.bodySmallColor,
-                          shadows: _iconShadow,
-                        ),
-                        const SizedBox(width: 4),
+                      if (isOffline) ...[
                         Text(
-                          NumberFormat().format(streamInfo.viewerCount),
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            fontSize: secondLineSize,
-                            fontWeight: FontWeight.w500,
-                            color: textColor,
-                            shadows: _textShadow,
+                          'Offline',
+                          style: _getBaseTextStyle(
+                            context,
+                            secondLineSize,
+                            FontWeight.w500,
+                          ).copyWith(
+                            color: textColor ?? Colors.grey,
                           ),
                         ),
-                      ],
-                      if (showCategory &&
-                          streamInfo.gameName.isNotEmpty &&
-                          (showUptime || showViewerCount)) ...[
-                        const SizedBox(width: 8),
-                      ],
-                      if (showCategory && streamInfo.gameName.isNotEmpty) ...[
-                        Icon(
-                          Icons.gamepad,
-                          size: secondLineSize,
-                          color: textColor ?? context.bodySmallColor,
-                          shadows: _iconShadow,
-                        ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Tooltip(
-                            message: streamInfo.gameName,
-                            triggerMode: tooltipTriggerMode,
-                            child: tappableCategory
-                                ? GestureDetector(
-                                    onDoubleTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => CategoryStreams(
-                                          categoryId: streamInfo.gameId,
+                      ] else ...[
+                        if (showUptime || showViewerCount) ...[
+                          const LiveIndicator(),
+                          const SizedBox(width: 6),
+                        ],
+                        if (showUptime) ...[
+                          Uptime(
+                            startTime: streamInfo!.startedAt,
+                            style: _getBaseTextStyle(
+                              context,
+                              secondLineSize,
+                              FontWeight.w500,
+                            ),
+                          ),
+                          if (showViewerCount) const SizedBox(width: 8),
+                        ],
+                        if (showViewerCount) ...[
+                          Icon(
+                            Icons.visibility,
+                            size: secondLineSize,
+                            color: textColor ?? context.bodySmallColor,
+                            shadows: _iconShadow,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            NumberFormat().format(streamInfo!.viewerCount),
+                            style: _getBaseTextStyle(
+                              context,
+                              secondLineSize,
+                              FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                        if (showCategory &&
+                            streamInfo!.gameName.isNotEmpty &&
+                            (showUptime || showViewerCount)) ...[
+                          const SizedBox(width: 8),
+                        ],
+                        if (showCategory &&
+                            streamInfo!.gameName.isNotEmpty) ...[
+                          Icon(
+                            Icons.gamepad,
+                            size: secondLineSize,
+                            color: textColor ?? context.bodySmallColor,
+                            shadows: _iconShadow,
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Tooltip(
+                              message: streamInfo!.gameName,
+                              triggerMode: tooltipTriggerMode,
+                              child: tappableCategory
+                                  ? GestureDetector(
+                                      onDoubleTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CategoryStreams(
+                                            categoryId: streamInfo!.gameId,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    child: Text(
-                                      streamInfo.gameName,
-                                      style: context.textTheme.bodyMedium
-                                          ?.copyWith(
-                                        fontSize: secondLineSize,
-                                        fontWeight: FontWeight.w500,
-                                        color: textColor,
-                                        shadows: _textShadow,
+                                      child: Text(
+                                        streamInfo!.gameName,
+                                        style: _getBaseTextStyle(
+                                          context,
+                                          secondLineSize,
+                                          FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    )
+                                  : Text(
+                                      streamInfo!.gameName,
+                                      style: _getBaseTextStyle(
+                                        context,
+                                        secondLineSize,
+                                        FontWeight.w500,
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                  )
-                                : Text(
-                                    streamInfo.gameName,
-                                    style:
-                                        context.textTheme.bodyMedium?.copyWith(
-                                      fontSize: secondLineSize,
-                                      fontWeight: FontWeight.w500,
-                                      color: textColor,
-                                      shadows: _textShadow,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                            ),
                           ),
-                        ),
+                        ],
                       ],
                     ],
                   ),
