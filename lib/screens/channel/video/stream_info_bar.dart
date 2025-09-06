@@ -106,7 +106,7 @@ class StreamInfoBar extends StatelessWidget {
     return Padding(
       padding: padding,
       child: Row(
-        spacing: 12,
+        spacing: 8,
         children: [
           Container(
             decoration: isInSharedChatMode
@@ -141,7 +141,7 @@ class StreamInfoBar extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
-                  spacing: 8,
+                  spacing: 4,
                   children: [
                     Tooltip(
                       message: streamerName,

@@ -133,28 +133,27 @@ class VideoOverlay extends StatelessWidget {
     final latencyTooltip = Tooltip(
       message: 'Latency to broadcaster',
       preferBelow: false,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
-          spacing: 6,
-          children: [
-            Observer(
-              builder: (context) => Text(
-                videoStore.latency ?? 'N/A',
-                style: TextStyle(
-                  color: surfaceColor,
-                  fontWeight: FontWeight.w500,
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
+      child: Row(
+        spacing: 4,
+        children: [
+          Icon(
+            Icons.speed_rounded,
+            size: 14,
+            color: surfaceColor,
+            shadows: _iconShadow,
+          ),
+          Observer(
+            builder: (context) => Text(
+              videoStore.latency ?? 'N/A',
+              style: TextStyle(
+                color: surfaceColor,
+                fontWeight: FontWeight.w500,
+                fontFeatures: const [FontFeature.tabularFigures()],
+                shadows: _textShadow,
               ),
             ),
-            Icon(
-              Icons.speed_rounded,
-              color: surfaceColor,
-              shadows: _iconShadow,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
 
@@ -288,7 +287,6 @@ class VideoOverlay extends StatelessWidget {
                                 showUptime: false,
                                 showViewerCount: false,
                                 showOfflineIndicator: false,
-                                padding: const EdgeInsets.only(top: 12),
                                 textColor: surfaceColor,
                                 isOffline: true,
                                 isInSharedChatMode:
@@ -305,22 +303,19 @@ class VideoOverlay extends StatelessWidget {
                 ),
                 Align(
                   alignment: Alignment.bottomLeft,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Text(
-                            'Offline',
-                            style: TextStyle(
-                              color: surfaceColor.withValues(alpha: 0.7),
-                              fontWeight: FontWeight.w500,
-                              shadows: _textShadow,
-                            ),
-                          ),
-                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    child: Text(
+                      'Offline',
+                      style: TextStyle(
+                        color: surfaceColor.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w500,
+                        shadows: _textShadow,
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 Align(
@@ -359,7 +354,6 @@ class VideoOverlay extends StatelessWidget {
                               streamInfo: streamInfo,
                               showUptime: false,
                               showViewerCount: false,
-                              padding: const EdgeInsets.only(top: 12),
                               textColor: surfaceColor,
                               isInSharedChatMode: chatStore.isInSharedChatMode,
                             ),
@@ -400,12 +394,16 @@ class VideoOverlay extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomLeft,
                 child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                         child: Row(
-                          spacing: 12,
+                          spacing: 8,
                           children: [
                             Tooltip(
                               message: 'Stream uptime',
@@ -469,11 +467,11 @@ class VideoOverlay extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            if (context.isLandscape) latencyTooltip,
                           ],
                         ),
                       ),
                     ),
-                    if (context.isLandscape) latencyTooltip,
                     Observer(
                       builder: (_) {
                         // On iOS, show toggle behavior. On Android, always show enter PiP.
