@@ -193,7 +193,8 @@ class StreamInfoBar extends StatelessWidget {
                         Icon(
                           Icons.gamepad,
                           size: secondLineSize,
-                          color: textColor ?? context.bodySmallColor,
+                          color: (textColor ?? context.bodySmallColor)
+                              ?.withValues(alpha: 0.7),
                           shadows: _iconShadow,
                         ),
                         const SizedBox(width: 4),
