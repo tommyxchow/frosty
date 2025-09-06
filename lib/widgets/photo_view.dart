@@ -30,11 +30,13 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
   double _dragOffset = 0.0;
   late final AnimationController _resetController;
   late Animation<double> _resetAnimation;
-  // Exit animation (translate down + fade out) when dismissing
+  // Exit animation (translate in swipe direction + fade out) when dismissing
   late final AnimationController _exitController;
   late Animation<double> _exitTranslateAnimation;
   late Animation<double> _exitOpacityAnimation;
   double _imageOpacity = 1.0;
+  // Track swipe direction for dismissal animation
+  double _swipeDirection = 1.0; // 1.0 for down, -1.0 for up
 
   @override
   void initState() {
@@ -107,6 +109,8 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
           behavior: HitTestBehavior.opaque,
           onVerticalDragStart: (_) {
             if (_resetController.isAnimating) _resetController.stop();
+            // Reset swipe direction for new drag
+            _swipeDirection = 1.0;
           },
           onVerticalDragUpdate:
               photoViewScaleState == PhotoViewScaleState.initial
@@ -119,7 +123,12 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
                       (_dragOffset.abs() > fadeDistance) ||
                       velocity.abs() > 700;
                   if (shouldDismiss) {
-                    // run exit animation: translate down by 30% of screen and fade out
+                    // Determine swipe direction based on drag offset and velocity
+                    _swipeDirection = _dragOffset > 0 ? 1.0 : -1.0;
+                    if (_dragOffset.abs() < 10 && velocity != 0) {
+                      _swipeDirection = velocity > 0 ? 1.0 : -1.0;
+                    }
+                    // run exit animation: translate in swipe direction by 30% of screen and fade out
                     _exitController
                       ..value = 0.0
                       ..forward().whenComplete(
@@ -142,7 +151,10 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
             offset: Offset(
               0,
               _dragOffset +
-                  (_exitTranslateAnimation.value * screenHeight * 0.25),
+                  (_exitTranslateAnimation.value *
+                      screenHeight *
+                      0.25 *
+                      _swipeDirection),
             ),
             child: Opacity(
               opacity: _imageOpacity,
