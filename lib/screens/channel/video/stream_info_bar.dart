@@ -128,15 +128,26 @@ class StreamInfoBar extends StatelessWidget {
                   textBaseline: TextBaseline.alphabetic,
                   spacing: 8,
                   children: [
-                    Text(
-                      streamerName,
-                      style: _getBaseTextStyle(context, 14, FontWeight.w600),
+                    Expanded(
+                      flex: 4,
+                      child: Tooltip(
+                        message: streamerName,
+                        triggerMode: tooltipTriggerMode,
+                        showDuration: const Duration(seconds: 3),
+                        child: Text(
+                          streamerName,
+                          style:
+                              _getBaseTextStyle(context, 14, FontWeight.w600),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ),
                     if (streamTitle.isNotEmpty) ...[
                       Flexible(
                         child: Tooltip(
                           message: streamTitle,
                           triggerMode: tooltipTriggerMode,
+                          showDuration: const Duration(seconds: 3),
                           child: Text(
                             streamTitle,
                             style: _getSecondaryTextStyle(context, 14),
@@ -218,6 +229,7 @@ class StreamInfoBar extends StatelessWidget {
                             child: Tooltip(
                               message: streamInfo!.gameName,
                               triggerMode: tooltipTriggerMode,
+                              showDuration: const Duration(seconds: 3),
                               child: tappableCategory
                                   ? GestureDetector(
                                       onDoubleTap: () => Navigator.push(
