@@ -472,7 +472,7 @@ class VideoOverlay extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Observer(
+                    Builder(
                       builder: (_) {
                         // On iOS, show toggle behavior. On Android, always show enter PiP.
                         final isIOS = Platform.isIOS;
