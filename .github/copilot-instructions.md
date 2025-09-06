@@ -29,7 +29,7 @@ flutter packages pub run build_runner build --delete-conflicting-outputs
 - `flutter packages pub run build_runner build` - Generate code once
 - `flutter packages pub run build_runner watch` - Watch and regenerate code on changes
 
-Generated `.g.dart` files are excluded from linting but must be committed.
+Generated `.g.dart` files are excluded from linting but must be committed to source control.
 
 ### Environment Setup
 
@@ -60,6 +60,7 @@ flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YO
   - Detects Twitch API URLs and adds Authorization + Client-Id headers
   - Updates automatically when user authentication changes
   - Eliminates manual header passing throughout the codebase
+- **Error Handling**: `UnauthorizedInterceptor` catches 401 errors for token refresh
 - **Service Pattern**: All API services extend `BaseApiClient` for consistent error handling
 
 ### Project Structure
@@ -73,6 +74,7 @@ flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YO
 - `lib/widgets/` - Reusable UI components
 - `lib/cache_manager.dart` - Custom cache management for images/media
 - `lib/utils.dart` - Utility functions and helpers
+- `lib/utils/` - Additional utility modules including context extensions
 
 ### Screen Organization
 
@@ -138,6 +140,9 @@ Analysis rules in `analysis_options.yaml`:
 - Package imports: `always_use_package_imports`
 - Trailing commas: `require_trailing_commas`
 - Final locals: `prefer_final_locals`
+- Additional rules: `directives_ordering`, `avoid_void_async`, `always_declare_return_types`
+
+**Important**: `.g.dart` files are excluded from analysis but must be committed to source control.
 
 ## Common Patterns
 
