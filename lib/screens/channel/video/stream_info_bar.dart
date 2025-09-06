@@ -72,7 +72,8 @@ class StreamInfoBar extends StatelessWidget {
     return context.textTheme.bodyMedium?.copyWith(
           fontSize: fontSize,
           fontWeight: FontWeight.w500,
-          color: textColor?.withValues(alpha: 0.7) ??
+          color:
+              textColor?.withValues(alpha: 0.7) ??
               context.bodySmallColor?.withValues(alpha: 0.7),
           shadows: _textShadow,
         ) ??
@@ -128,17 +129,13 @@ class StreamInfoBar extends StatelessWidget {
                   textBaseline: TextBaseline.alphabetic,
                   spacing: 8,
                   children: [
-                    Expanded(
-                      flex: 4,
-                      child: Tooltip(
-                        message: streamerName,
-                        triggerMode: tooltipTriggerMode,
-                        child: Text(
-                          streamerName,
-                          style:
-                              _getBaseTextStyle(context, 14, FontWeight.w600),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                    Tooltip(
+                      message: streamerName,
+                      triggerMode: tooltipTriggerMode,
+                      child: Text(
+                        streamerName,
+                        style: _getBaseTextStyle(context, 14, FontWeight.w600),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (streamTitle.isNotEmpty) ...[
@@ -172,9 +169,7 @@ class StreamInfoBar extends StatelessWidget {
                             context,
                             secondLineSize,
                             FontWeight.w500,
-                          ).copyWith(
-                            color: textColor ?? Colors.grey,
-                          ),
+                          ).copyWith(color: textColor ?? Colors.grey),
                         ),
                       ] else ...[
                         if (showUptime || showViewerCount) ...[
