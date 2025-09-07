@@ -31,7 +31,7 @@ class _OtherSettingsState extends State<OtherSettings> {
         title: 'Reset all settings',
         message: 'Are you sure you want to reset all settings?',
         actions: [
-          ElevatedButton(
+          TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
@@ -52,7 +52,7 @@ class _OtherSettingsState extends State<OtherSettings> {
                 ),
               );
             },
-            child: const Text('Yes'),
+            child: const Text('Reset'),
           ),
         ],
       ),

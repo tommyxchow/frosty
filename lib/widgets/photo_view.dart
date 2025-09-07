@@ -200,7 +200,7 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
                 child: AnimatedOpacity(
                   opacity: buttonsOpacity,
                   duration: const Duration(milliseconds: 100),
-                  child: ElevatedButton(
+                  child: FilledButton.tonal(
                     onPressed: _toggleResolution,
                     child: Text(
                       _isFullResolution ? 'View thumbnail' : 'View original',

@@ -74,7 +74,7 @@ class _AccentColorPickerDialogState extends State<AccentColorPickerDialog> {
         ),
       ),
       actions: [
-        ElevatedButton(
+        TextButton(
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),

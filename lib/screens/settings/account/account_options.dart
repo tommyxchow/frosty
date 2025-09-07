@@ -17,7 +17,7 @@ class AccountOptions extends StatelessWidget {
         title: 'Log out',
         message: 'Are you sure you want to log out?',
         actions: [
-          ElevatedButton(
+          TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
@@ -27,7 +27,7 @@ class AccountOptions extends StatelessWidget {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: const Text('Yes'),
+            child: const Text('Log out'),
           ),
         ],
       ),

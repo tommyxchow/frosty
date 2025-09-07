@@ -51,7 +51,7 @@ class UnauthorizedInterceptor extends Interceptor {
           title: title,
           message: message,
           actions: [
-            ElevatedButton(
+            TextButton(
               onPressed: () {
                 _isDialogShowing = false;
                 Navigator.of(dialogContext).pop(); // Close dialog

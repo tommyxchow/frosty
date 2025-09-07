@@ -13,13 +13,13 @@ class ScrollToTopButton extends StatelessWidget {
         child: Tooltip(
           message: 'Scroll to top',
           preferBelow: false,
-          child: ElevatedButton(
+          child: FilledButton(
             onPressed: () => scrollController.animateTo(
               0.0,
               curve: Curves.easeOut,
               duration: const Duration(milliseconds: 500),
             ),
-            style: ElevatedButton.styleFrom(
+            style: FilledButton.styleFrom(
               shape: const CircleBorder(),
               padding: const EdgeInsets.all(12),
             ),

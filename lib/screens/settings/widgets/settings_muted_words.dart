@@ -105,7 +105,7 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                                   message:
                                       'Are you sure you want to delete this keyword?',
                                   actions: [
-                                    ElevatedButton(
+                                    TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },

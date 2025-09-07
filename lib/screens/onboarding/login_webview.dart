@@ -30,7 +30,7 @@ class LoginWebView extends StatelessWidget {
                   message:
                       'If the Twitch cookie banner is still blocking the login, try clicking one of the links in the cookie policy description and navigating until you reach the Twitch home page. From there, you can try logging in on the top right profile icon. Once logged in, go back to the first step of the onboarding and then try again.',
                   actions: [
-                    ElevatedButton(
+                    TextButton(
                       onPressed: Navigator.of(context).pop,
                       child: const Text('Close'),
                     ),

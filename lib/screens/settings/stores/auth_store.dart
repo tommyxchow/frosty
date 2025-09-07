@@ -180,7 +180,7 @@ abstract class AuthBase with Store {
         title: title,
         message: message,
         actions: [
-          ElevatedButton(
+          TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),

@@ -571,7 +571,7 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
             child: Row(
               children: [
                 Expanded(
-                  child: ElevatedButton(
+                  child: TextButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),

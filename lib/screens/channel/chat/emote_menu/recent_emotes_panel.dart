@@ -23,7 +23,7 @@ class RecentEmotesPanel extends StatelessWidget {
         title: 'Clear recent emotes',
         message: 'Are you sure you want to clear your recent emotes?',
         actions: [
-          ElevatedButton(
+          TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
@@ -34,7 +34,7 @@ class RecentEmotesPanel extends StatelessWidget {
 
               Navigator.pop(context);
             },
-            child: const Text('Yes'),
+            child: const Text('Clear'),
           ),
         ],
       ),
