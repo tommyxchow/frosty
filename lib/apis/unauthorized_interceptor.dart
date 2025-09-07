@@ -38,7 +38,7 @@ class UnauthorizedInterceptor extends Interceptor {
     // Determine if user is logged in but missing scopes vs completely logged out
     final isLoggedIn = _authStore.isLoggedIn;
     final title = isLoggedIn ? 'Missing Permissions' : 'Session Expired';
-    final content = isLoggedIn
+    final message = isLoggedIn
         ? 'Your account is missing required permissions. Please re-authorize to continue.'
         : 'Your login session has expired. Please log in again to continue.';
     final buttonText = isLoggedIn ? 'Re-authorize' : 'Log In';
@@ -49,9 +49,16 @@ class UnauthorizedInterceptor extends Interceptor {
       builder: (BuildContext dialogContext) {
         return FrostyDialog(
           title: title,
-          message: content,
+          message: message,
           actions: [
             ElevatedButton(
+              onPressed: () {
+                _isDialogShowing = false;
+                Navigator.of(dialogContext).pop(); // Close dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
               onPressed: () {
                 _isDialogShowing = false;
                 Navigator.of(dialogContext).pop(); // Close dialog
@@ -66,13 +73,6 @@ class UnauthorizedInterceptor extends Interceptor {
                 );
               },
               child: Text(buttonText),
-            ),
-            TextButton(
-              onPressed: () {
-                _isDialogShowing = false;
-                Navigator.of(dialogContext).pop(); // Close dialog
-              },
-              child: const Text('Cancel'),
             ),
           ],
         );

@@ -8,6 +8,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/dialog.dart';
 import 'package:provider/provider.dart';
 
 class RecentEmotesPanel extends StatelessWidget {
@@ -18,17 +19,15 @@ class RecentEmotesPanel extends StatelessWidget {
   Future<void> _showClearDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog.adaptive(
-        title: const Text('Clear recent emotes'),
-        content: const Text(
-          'Are you sure you want to clear your recent emotes?',
-        ),
+      builder: (context) => FrostyDialog(
+        title: 'Clear recent emotes',
+        message: 'Are you sure you want to clear your recent emotes?',
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () {
               chatStore.assetsStore.recentEmotes.clear();
               chatStore.updateNotification('Recent emotes cleared');

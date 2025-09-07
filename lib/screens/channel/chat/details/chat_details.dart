@@ -571,14 +571,14 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextButton(
+                  child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     child: const Text('Cancel'),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
+                  child: FilledButton(
                     onPressed: selectedColor == null
                         ? null
                         : () => widget.onColorSelected(context, selectedColor!),

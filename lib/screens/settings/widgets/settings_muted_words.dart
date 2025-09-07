@@ -3,6 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/dialog.dart';
 
 class SettingsMutedWords extends StatefulWidget {
   final SettingsStore settingsStore;
@@ -99,19 +100,18 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                               // show confirmation dialog before deleting a keyword
                               showDialog(
                                 context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Delete keyword'),
-                                  content: const Text(
-                                    'Are you sure you want to delete this keyword?',
-                                  ),
+                                builder: (context) => FrostyDialog(
+                                  title: 'Delete keyword',
+                                  message:
+                                      'Are you sure you want to delete this keyword?',
                                   actions: [
-                                    TextButton(
+                                    ElevatedButton(
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
                                       child: const Text('Cancel'),
                                     ),
-                                    TextButton(
+                                    FilledButton(
                                       onPressed: () {
                                         removeMutedWord(index);
                                         Navigator.of(context).pop();

@@ -3,6 +3,7 @@ import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/settings/account/blocked_users.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
+import 'package:frosty/widgets/dialog.dart';
 
 class AccountOptions extends StatelessWidget {
   final AuthStore authStore;
@@ -12,15 +13,15 @@ class AccountOptions extends StatelessWidget {
   Future<void> _showLogoutDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog.adaptive(
-        title: const Text('Log out'),
-        content: const Text('Are you sure you want to log out?'),
+      builder: (context) => FrostyDialog(
+        title: 'Log out',
+        message: 'Are you sure you want to log out?',
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () {
               authStore.logout();
               Navigator.pop(context);
