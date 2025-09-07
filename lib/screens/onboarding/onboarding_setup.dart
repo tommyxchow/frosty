@@ -3,14 +3,15 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+// import removed: flutter_colorpicker
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/onboarding/onboarding_scaffold.dart';
 import 'package:frosty/screens/onboarding/onboarding_welcome.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
-import 'package:frosty/widgets/dialog.dart';
+// import removed: frosty/widgets/dialog.dart
+import 'package:frosty/widgets/accent_color_picker_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -56,29 +57,10 @@ class OnboardingSetup extends StatelessWidget {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => FrostyDialog(
-                        title: 'Accent color',
-                        content: SingleChildScrollView(
-                          child: ColorPicker(
-                            pickerColor: Color(settingsStore.accentColor),
-                            onColorChanged: (newColor) =>
-                                // TODO: Update when new method arrives in stable:
-                                // https://github.com/flutter/flutter/issues/160184#issuecomment-2560184639
-                                // ignore: deprecated_member_use
-                                settingsStore.accentColor = newColor.value,
-                            enableAlpha: false,
-                            pickerAreaBorderRadius: const BorderRadius.all(
-                              Radius.circular(8),
-                            ),
-                            labelTypes: const [],
-                          ),
-                        ),
-                        actions: [
-                          FilledButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Done'),
-                          ),
-                        ],
+                      builder: (context) => AccentColorPickerDialog(
+                        initialColor: Color(settingsStore.accentColor),
+                        onColorChanged: (newColor) =>
+                            settingsStore.accentColor = newColor.toARGB32(),
                       ),
                     );
                   },
