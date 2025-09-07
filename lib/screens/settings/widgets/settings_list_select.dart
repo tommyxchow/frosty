@@ -31,10 +31,7 @@ class SettingsListSelect extends StatelessWidget {
               .map(
                 (option) => ButtonSegment(
                   value: option,
-                  label: Text(
-                    option,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  label: Text(option, overflow: TextOverflow.ellipsis),
                 ),
               )
               .toList(),

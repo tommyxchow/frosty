@@ -12,10 +12,11 @@ mixin _$AuthStore on AuthBase, Store {
   Computed<Map<String, String>>? _$headersTwitchComputed;
 
   @override
-  Map<String, String> get headersTwitch => (_$headersTwitchComputed ??=
-          Computed<Map<String, String>>(() => super.headersTwitch,
-              name: 'AuthBase.headersTwitch'))
-      .value;
+  Map<String, String> get headersTwitch =>
+      (_$headersTwitchComputed ??= Computed<Map<String, String>>(
+        () => super.headersTwitch,
+        name: 'AuthBase.headersTwitch',
+      )).value;
 
   late final _$_tokenAtom = Atom(name: 'AuthBase._token', context: context);
 
@@ -34,8 +35,10 @@ mixin _$AuthStore on AuthBase, Store {
     });
   }
 
-  late final _$_isLoggedInAtom =
-      Atom(name: 'AuthBase._isLoggedIn', context: context);
+  late final _$_isLoggedInAtom = Atom(
+    name: 'AuthBase._isLoggedIn',
+    context: context,
+  );
 
   bool get isLoggedIn {
     _$_isLoggedInAtom.reportRead();
@@ -76,16 +79,20 @@ mixin _$AuthStore on AuthBase, Store {
     return _$initAsyncAction.run(() => super.init());
   }
 
-  late final _$loginAsyncAction =
-      AsyncAction('AuthBase.login', context: context);
+  late final _$loginAsyncAction = AsyncAction(
+    'AuthBase.login',
+    context: context,
+  );
 
   @override
   Future<void> login({required String token}) {
     return _$loginAsyncAction.run(() => super.login(token: token));
   }
 
-  late final _$logoutAsyncAction =
-      AsyncAction('AuthBase.logout', context: context);
+  late final _$logoutAsyncAction = AsyncAction(
+    'AuthBase.logout',
+    context: context,
+  );
 
   @override
   Future<void> logout() {

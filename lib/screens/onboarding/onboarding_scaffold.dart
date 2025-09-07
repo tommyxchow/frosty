@@ -37,14 +37,13 @@ class OnboardingScaffold extends StatelessWidget {
     ]);
 
     if (isLast) {
-      SharedPreferences.getInstance()
-          .then((prefs) => prefs.setBool('first_run', false));
+      SharedPreferences.getInstance().then(
+        (prefs) => prefs.setBool('first_run', false),
+      );
     }
 
     return Scaffold(
-      appBar: AppBar(
-        shape: const Border(),
-      ),
+      appBar: AppBar(shape: const Border()),
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
@@ -53,16 +52,14 @@ class OnboardingScaffold extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
                 child: Column(
+                  spacing: 24,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      spacing: 12,
                       children: [
                         if (showLogo) ...[
-                          SvgPicture.asset(
-                            'assets/icons/logo.svg',
-                            height: 80,
-                          ),
-                          const SizedBox(width: 12),
+                          SvgPicture.asset('assets/icons/logo.svg', height: 80),
                         ],
                         Text(
                           header,
@@ -74,7 +71,6 @@ class OnboardingScaffold extends StatelessWidget {
                       ],
                     ),
                     if (subtitle != null) ...[
-                      const SizedBox(height: 24),
                       Opacity(
                         opacity: 0.8,
                         child: Text(
@@ -97,8 +93,10 @@ class OnboardingScaffold extends StatelessWidget {
               ),
               if (disclaimer != null)
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
                   child: Opacity(
                     opacity: 0.5,
                     child: Text(
@@ -120,9 +118,7 @@ class OnboardingScaffold extends StatelessWidget {
                         )
                       : Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => route,
-                          ),
+                          MaterialPageRoute(builder: (context) => route),
                         ),
                   icon: buttonIcon ?? const SizedBox(),
                   label: Text(buttonText ?? 'Next'),
@@ -135,9 +131,7 @@ class OnboardingScaffold extends StatelessWidget {
                   child: TextButton(
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => skipRoute!,
-                      ),
+                      MaterialPageRoute(builder: (context) => skipRoute!),
                     ),
                     child: const Text('Skip'),
                   ),

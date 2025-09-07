@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
+import 'package:frosty/models/followed_channel.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -34,6 +36,9 @@ abstract class ListStoreBase with Store {
   /// The pagination cursor for the streams.
   String? _streamsCursor;
 
+  /// The pagination cursor for the offline followed channels.
+  String? _offlineChannelsCursor;
+
   /// The last time the streams were refreshed/updated.
   var lastTimeRefreshed = DateTime.now();
 
@@ -45,7 +50,8 @@ abstract class ListStoreBase with Store {
   bool get isLoading =>
       _isAllStreamsLoading ||
       _isPinnedStreamsLoading ||
-      _isCategoryDetailsLoading;
+      _isCategoryDetailsLoading ||
+      _isOfflineChannelsLoading;
 
   /// The loading status for pagination.
 
@@ -60,7 +66,7 @@ abstract class ListStoreBase with Store {
   var _pinnedStreams = ObservableList<StreamTwitch>();
 
   @readonly
-  var _isPinnedStreamsLoading = false;
+  bool _isPinnedStreamsLoading = false;
 
   @readonly
   CategoryTwitch? _categoryDetails;
@@ -68,9 +74,25 @@ abstract class ListStoreBase with Store {
   @readonly
   var _isCategoryDetailsLoading = false;
 
+  /// The list of offline followed channels.
+  @readonly
+  var _allOfflineChannels = ObservableList<FollowedChannel>();
+
+  @readonly
+  bool _isOfflineChannelsLoading = false;
+
+  /// Whether or not there are more offline channels for pagination.
+  @computed
+  bool get hasMoreOfflineChannels =>
+      _isOfflineChannelsLoading == false && _offlineChannelsCursor != null;
+
   /// Whether or not the scroll to top button is visible.
   @observable
   var showJumpButton = false;
+
+  /// Whether the offline channels section is expanded.
+  @observable
+  var isOfflineChannelsExpanded = false;
 
   /// The list of the fetched streams with blocked users filtered out.
   @computed
@@ -83,11 +105,46 @@ abstract class ListStoreBase with Store {
       .toList()
       .asObservable();
 
+  /// All pinned channels (only live streams).
+  @computed
+  List<dynamic> get allPinnedChannels {
+    final blockedUserIds = authStore.user.blockedUsers
+        .map((blockedUser) => blockedUser.userId)
+        .toSet();
+
+    // Get live pinned streams only
+    return _pinnedStreams
+        .where((stream) => !blockedUserIds.contains(stream.userId))
+        .toList();
+  }
+
+  /// The list of offline followed channels with blocked users filtered out
+  /// and excluding channels that are currently live or pinned.
+  @computed
+  ObservableList<FollowedChannel> get offlineChannels {
+    final liveChannelIds = streams.map((stream) => stream.userId).toSet();
+    final pinnedChannelIds = settingsStore.pinnedChannelIds.toSet();
+    final blockedUserIds = authStore.user.blockedUsers
+        .map((blockedUser) => blockedUser.userId)
+        .toSet();
+
+    return _allOfflineChannels
+        .where(
+          (channel) =>
+              !liveChannelIds.contains(channel.broadcasterId) &&
+              !pinnedChannelIds.contains(channel.broadcasterId) &&
+              !blockedUserIds.contains(channel.broadcasterId),
+        )
+        .toList()
+        .asObservable();
+  }
+
   /// The error message to show if any. Will be non-null if there is an error.
   @readonly
   String? _error;
 
   ReactionDisposer? _pinnedStreamsReactioniDisposer;
+  ReactionDisposer? _offlineChannelsExpansionDisposer;
 
   ListStoreBase({
     required this.authStore,
@@ -115,6 +172,23 @@ abstract class ListStoreBase with Store {
       );
 
       getPinnedStreams();
+
+      // Fetch offline channels only when expanded
+      _offlineChannelsExpansionDisposer = reaction(
+        (_) => isOfflineChannelsExpanded,
+        (expanded) {
+          if (expanded) {
+            // Fetch offline channels when expanded (only if not already loaded)
+            if (_allOfflineChannels.isEmpty) {
+              getOfflineChannels();
+            }
+          } else {
+            // Clear offline channels when collapsed to save memory
+            _allOfflineChannels.clear();
+            _offlineChannelsCursor = null;
+          }
+        },
+      );
     }
 
     if (listType == ListType.category) {
@@ -135,20 +209,15 @@ abstract class ListStoreBase with Store {
         case ListType.followed:
           newStreams = await twitchApi.getFollowedStreams(
             id: authStore.user.details!.id,
-            headers: authStore.headersTwitch,
             cursor: _streamsCursor,
           );
           break;
         case ListType.top:
-          newStreams = await twitchApi.getTopStreams(
-            headers: authStore.headersTwitch,
-            cursor: _streamsCursor,
-          );
+          newStreams = await twitchApi.getTopStreams(cursor: _streamsCursor);
           break;
         case ListType.category:
           newStreams = await twitchApi.getStreamsUnderCategory(
             gameId: categoryId!,
-            headers: authStore.headersTwitch,
             cursor: _streamsCursor,
           );
           break;
@@ -163,9 +232,14 @@ abstract class ListStoreBase with Store {
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect';
+      _error = 'Unable to connect to Twitch';
+      debugPrint('Streams SocketException: No internet connection');
+    } on ApiException catch (e) {
+      _error = e.message;
+      debugPrint('Streams ApiException: $e');
     } catch (e) {
-      _error = e.toString();
+      _error = 'Something went wrong loading streams';
+      debugPrint('Streams error: $e');
     }
 
     _isAllStreamsLoading = false;
@@ -183,25 +257,67 @@ abstract class ListStoreBase with Store {
     try {
       _pinnedStreams = (await twitchApi.getStreamsByIds(
         userIds: settingsStore.pinnedChannelIds,
-        headers: authStore.headersTwitch,
-      ))
-          .data
-          .asObservable();
+      )).data.asObservable();
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect';
+      _error = 'Unable to connect to Twitch';
+      debugPrint('Pinned streams SocketException: No internet connection');
+    } on ApiException catch (e) {
+      _error = e.message;
+      debugPrint('Pinned streams ApiException: $e');
     } catch (e) {
-      _error = e.toString();
+      _error = 'Something went wrong loading pinned streams';
+      debugPrint('Pinned streams error: $e');
     }
 
     _isPinnedStreamsLoading = false;
   }
 
+  @action
+  Future<void> getOfflineChannels() async {
+    _isOfflineChannelsLoading = true;
+
+    try {
+      final followedChannels = await twitchApi.getFollowedChannels(
+        userId: authStore.user.details!.id,
+        cursor: _offlineChannelsCursor,
+      );
+
+      if (_offlineChannelsCursor == null) {
+        _allOfflineChannels = followedChannels.data.asObservable();
+      } else {
+        _allOfflineChannels.addAll(followedChannels.data);
+      }
+      _offlineChannelsCursor = followedChannels.pagination['cursor'];
+
+      _error = null;
+    } on SocketException {
+      _error = 'Unable to connect to Twitch';
+      debugPrint('Offline channels SocketException: No internet connection');
+    } on ApiException catch (e) {
+      _error = e.message;
+      debugPrint('Offline channels ApiException: $e');
+    } catch (e) {
+      _error = 'Something went wrong loading offline channels';
+      debugPrint('Offline channels error: $e');
+    }
+
+    _isOfflineChannelsLoading = false;
+  }
+
   /// Resets the cursor and then fetches the streams.
   @action
   Future<void> refreshStreams() async {
-    if (listType == ListType.followed) await getPinnedStreams();
+    if (listType == ListType.followed) {
+      await getPinnedStreams();
+
+      // Only refresh offline channels if they are currently expanded
+      if (isOfflineChannelsExpanded) {
+        _offlineChannelsCursor = null;
+        await getOfflineChannels();
+      }
+    }
 
     _streamsCursor = null;
     await getStreams();
@@ -213,10 +329,7 @@ abstract class ListStoreBase with Store {
 
     _isCategoryDetailsLoading = true;
 
-    final categoryDetails = await twitchApi.getCategory(
-      headers: authStore.headersTwitch,
-      gameId: categoryId!,
-    );
+    final categoryDetails = await twitchApi.getCategory(gameId: categoryId!);
 
     _categoryDetails = categoryDetails.data.first;
 
@@ -235,6 +348,7 @@ abstract class ListStoreBase with Store {
 
   void dispose() {
     _pinnedStreamsReactioniDisposer?.call();
+    _offlineChannelsExpansionDisposer?.call();
 
     scrollController?.dispose();
   }
@@ -245,8 +359,4 @@ abstract class ListStoreBase with Store {
 /// [ListType.followed] is the list of streams that the user is following.
 /// [ListType.top] is the list of top streams.
 /// [ListType.category] is the list of streams under a category.
-enum ListType {
-  followed,
-  top,
-  category,
-}
+enum ListType { followed, top, category }

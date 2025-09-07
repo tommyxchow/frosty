@@ -7,12 +7,14 @@ import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart'
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
+  final EdgeInsetsGeometry? listPadding;
 
-  const Chat({super.key, required this.chatStore});
+  const Chat({super.key, required this.chatStore, this.listPadding});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class Chat extends StatelessWidget {
                   if (chatStore.assetsStore.showEmoteMenu) {
                     chatStore.assetsStore.showEmoteMenu = false;
                   } else if (chatStore.textFieldFocusNode.hasFocus) {
-                    chatStore.textFieldFocusNode.unfocus();
+                    chatStore.unfocusInput();
                   }
                 },
                 child: Stack(
@@ -34,26 +36,37 @@ class Chat extends StatelessWidget {
                   children: [
                     MediaQuery(
                       data: MediaQuery.of(context).copyWith(
-                        textScaler:
-                            TextScaler.linear(chatStore.settings.messageScale),
+                        textScaler: chatStore.settings.messageScale.textScaler,
                       ),
                       child: DefaultTextStyle(
-                        style: DefaultTextStyle.of(context)
-                            .style
-                            .copyWith(fontSize: chatStore.settings.fontSize),
+                        style: context.defaultTextStyle.copyWith(
+                          fontSize: chatStore.settings.fontSize,
+                        ),
                         child: Scrollbar(
                           controller: chatStore.scrollController,
                           child: Observer(
                             builder: (context) {
                               return ListView.builder(
                                 reverse: true,
-                                padding: EdgeInsets.zero,
+                                padding: (listPadding ?? EdgeInsets.zero).add(
+                                  EdgeInsets.only(
+                                    bottom:
+                                        68 +
+                                        (chatStore.assetsStore.showEmoteMenu
+                                            ? 0
+                                            : MediaQuery.of(
+                                                context,
+                                              ).padding.bottom),
+                                  ),
+                                ),
                                 addAutomaticKeepAlives: false,
                                 controller: chatStore.scrollController,
                                 itemCount: chatStore.renderMessages.length,
                                 itemBuilder: (context, index) => ChatMessage(
-                                  ircMessage: chatStore.renderMessages[
-                                      chatStore.renderMessages.length -
+                                  ircMessage:
+                                      chatStore.renderMessages[chatStore
+                                              .renderMessages
+                                              .length -
                                           1 -
                                           index],
                                   chatStore: chatStore,
@@ -64,8 +77,24 @@ class Chat extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(4),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: ChatBottomBar(chatStore: chatStore),
+                    ),
+                    AnimatedPadding(
+                      duration: const Duration(milliseconds: 200),
+                      padding: EdgeInsets.only(
+                        left: 4,
+                        top: 4,
+                        right: 4,
+                        bottom:
+                            68 +
+                            (chatStore.assetsStore.showEmoteMenu
+                                ? 0
+                                : MediaQuery.of(context).padding.bottom),
+                      ),
                       child: Observer(
                         builder: (_) => AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
@@ -75,8 +104,9 @@ class Chat extends StatelessWidget {
                               ? null
                               : ElevatedButton.icon(
                                   onPressed: chatStore.resumeScroll,
-                                  icon:
-                                      const Icon(Icons.arrow_downward_rounded),
+                                  icon: const Icon(
+                                    Icons.arrow_downward_rounded,
+                                  ),
                                   label: Text(
                                     chatStore.messageBuffer.isNotEmpty
                                         ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
@@ -95,8 +125,6 @@ class Chat extends StatelessWidget {
                 ),
               ),
             ),
-            if (chatStore.settings.showBottomBar)
-              ChatBottomBar(chatStore: chatStore),
             PopScope(
               canPop: Platform.isIOS,
               onPopInvokedWithResult: (didPop, _) {
@@ -114,57 +142,55 @@ class Chat extends StatelessWidget {
                 curve: Curves.ease,
                 duration: const Duration(milliseconds: 200),
                 height: chatStore.assetsStore.showEmoteMenu
-                    ? MediaQuery.of(context).size.height /
-                        (MediaQuery.of(context).orientation ==
-                                Orientation.portrait
-                            ? 3
-                            : 2)
+                    ? context.screenHeight / (context.isPortrait ? 3 : 2)
                     : 0,
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 100),
                   switchInCurve: Curves.easeOut,
                   switchOutCurve: Curves.easeIn,
                   child: chatStore.assetsStore.showEmoteMenu
-                      ? Column(
-                          children: [
-                            const Divider(),
-                            Expanded(
-                              child: FrostyPageView(
-                                headers: [
-                                  'Recent',
-                                  if (chatStore.settings.showTwitchEmotes)
-                                    'Twitch',
-                                  if (chatStore.settings.show7TVEmotes) '7TV',
-                                  if (chatStore.settings.showBTTVEmotes) 'BTTV',
-                                  if (chatStore.settings.showFFZEmotes) 'FFZ',
-                                ],
-                                children: [
-                                  RecentEmotesPanel(
-                                    chatStore: chatStore,
-                                  ),
-                                  if (chatStore.settings.showTwitchEmotes)
-                                    EmoteMenuPanel(
-                                      chatStore: chatStore,
-                                      twitchEmotes: chatStore
-                                          .assetsStore.userEmoteSectionToEmotes,
-                                    ),
-                                  ...[
-                                    if (chatStore.settings.show7TVEmotes)
-                                      chatStore.assetsStore.sevenTVEmotes,
+                      ? ClipRect(
+                          child: Column(
+                            children: [
+                              const Divider(),
+                              Expanded(
+                                child: FrostyPageView(
+                                  headers: [
+                                    'Recent',
+                                    if (chatStore.settings.showTwitchEmotes)
+                                      'Twitch',
+                                    if (chatStore.settings.show7TVEmotes) '7TV',
                                     if (chatStore.settings.showBTTVEmotes)
-                                      chatStore.assetsStore.bttvEmotes,
-                                    if (chatStore.settings.showFFZEmotes)
-                                      chatStore.assetsStore.ffzEmotes,
-                                  ].map(
-                                    (emotes) => EmoteMenuPanel(
-                                      chatStore: chatStore,
-                                      emotes: emotes,
+                                      'BTTV',
+                                    if (chatStore.settings.showFFZEmotes) 'FFZ',
+                                  ],
+                                  children: [
+                                    RecentEmotesPanel(chatStore: chatStore),
+                                    if (chatStore.settings.showTwitchEmotes)
+                                      EmoteMenuPanel(
+                                        chatStore: chatStore,
+                                        twitchEmotes: chatStore
+                                            .assetsStore
+                                            .userEmoteSectionToEmotes,
+                                      ),
+                                    ...[
+                                      if (chatStore.settings.show7TVEmotes)
+                                        chatStore.assetsStore.sevenTVEmotes,
+                                      if (chatStore.settings.showBTTVEmotes)
+                                        chatStore.assetsStore.bttvEmotes,
+                                      if (chatStore.settings.showFFZEmotes)
+                                        chatStore.assetsStore.ffzEmotes,
+                                    ].map(
+                                      (emotes) => EmoteMenuPanel(
+                                        chatStore: chatStore,
+                                        emotes: emotes,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         )
                       : null,
                 ),

@@ -63,13 +63,11 @@ abstract class _SettingsStoreBase with Store {
   // Player defaults
   static const defaultShowVideo = true;
   static const defaultDefaultToHighestQuality = false;
-  static const defaultShowLatency = true;
   static const defaultUseEnhancedRendering = false;
 
   // Overlay defaults
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
-  static const defaultOverlayOpacity = 0.5;
 
   // Player options
   @JsonKey(defaultValue: defaultShowVideo)
@@ -79,10 +77,6 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultDefaultToHighestQuality)
   @observable
   var defaultToHighestQuality = defaultDefaultToHighestQuality;
-
-  @JsonKey(defaultValue: defaultShowLatency)
-  @observable
-  var showLatency = defaultShowLatency;
 
   @JsonKey(defaultValue: defaultUseEnhancedRendering)
   @observable
@@ -97,20 +91,14 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var toggleableOverlay = defaultToggleableOverlay;
 
-  @JsonKey(defaultValue: defaultOverlayOpacity)
-  @observable
-  var overlayOpacity = defaultOverlayOpacity;
-
   @action
   void resetVideoSettings() {
     showVideo = defaultShowVideo;
     defaultToHighestQuality = defaultDefaultToHighestQuality;
-    showLatency = defaultShowLatency;
     useEnhancedRendering = defaultUseEnhancedRendering;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
-    overlayOpacity = defaultOverlayOpacity;
   }
 
   // * Chat Settings
@@ -122,7 +110,6 @@ abstract class _SettingsStoreBase with Store {
   static const defaultFontSize = 12.0;
 
   // Message appearance defaults
-  static const defaultUseReadableColors = true;
   static const defaultShowDeletedMessages = false;
   static const defaultShowChatMessageDividers = false;
   static const defaultTimestampType = TimestampType.disabled;
@@ -136,19 +123,14 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowUserNotices = true;
 
   // Layout defaults
-  static const defaultShowBottomBar = true;
   static const defaultEmoteMenuButtonOnLeft = false;
-  static const defaultChatNotificationsOnBottom = false;
 
   // Landscape mode defaults
   static const defaultLandscapeChatLeftSide = false;
   static const defaultLandscapeForceVerticalChat = false;
   static const defaultLandscapeCutout = LandscapeCutoutType.none;
-  static const defaultChatWidth = 0.25;
+  static const defaultChatWidth = 0.2;
   static const defaultFullScreenChatOverlayOpacity = 0.5;
-
-  // Sleep defaults
-  static const defaultChatOnlyPreventSleep = false;
 
   // mute words defaults
   static const defaultMutedWords = <String>[];
@@ -191,10 +173,6 @@ abstract class _SettingsStoreBase with Store {
   var fontSize = defaultFontSize;
 
   // Message appearance options
-  @JsonKey(defaultValue: defaultUseReadableColors)
-  @observable
-  var useReadableColors = defaultUseReadableColors;
-
   @JsonKey(defaultValue: defaultShowDeletedMessages)
   @observable
   var showDeletedMessages = defaultShowDeletedMessages;
@@ -229,17 +207,9 @@ abstract class _SettingsStoreBase with Store {
   var showUserNotices = defaultHighlightFirstTimeChatter;
 
   // Layout options
-  @JsonKey(defaultValue: defaultShowBottomBar)
-  @observable
-  var showBottomBar = defaultShowBottomBar;
-
   @JsonKey(defaultValue: defaultEmoteMenuButtonOnLeft)
   @observable
   var emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
-
-  @JsonKey(defaultValue: defaultChatNotificationsOnBottom)
-  @observable
-  var chatNotificationsOnBottom = defaultChatNotificationsOnBottom;
 
   // Landscape mode options
   @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
@@ -261,11 +231,6 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultFullScreenChatOverlayOpacity)
   @observable
   var fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
-
-  // Sleep options
-  @JsonKey(defaultValue: defaultChatOnlyPreventSleep)
-  @observable
-  var chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
 
   // Autocomplete options
   @JsonKey(defaultValue: defaultAutocomplete)
@@ -322,7 +287,6 @@ abstract class _SettingsStoreBase with Store {
     messageSpacing = defaultMessageSpacing;
     fontSize = defaultFontSize;
 
-    useReadableColors = defaultUseReadableColors;
     showDeletedMessages = defaultShowDeletedMessages;
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
@@ -333,17 +297,13 @@ abstract class _SettingsStoreBase with Store {
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
     showUserNotices = defaultShowUserNotices;
 
-    showBottomBar = defaultShowBottomBar;
     emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
-    chatNotificationsOnBottom = defaultChatNotificationsOnBottom;
 
     landscapeChatLeftSide = defaultLandscapeChatLeftSide;
     landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;
     landscapeCutout = defaultLandscapeCutout;
     chatWidth = defaultChatWidth;
     fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
-
-    chatOnlyPreventSleep = defaultChatOnlyPreventSleep;
 
     mutedWords = defaultMutedWords;
     matchWholeWord = defaultMatchWholeWord;
@@ -409,25 +369,12 @@ abstract class _SettingsStoreBase with Store {
 
 const themeNames = ['System', 'Light', 'Dark'];
 
-enum ThemeType {
-  system,
-  light,
-  dark,
-}
+enum ThemeType { system, light, dark }
 
 const timestampNames = ['Disabled', '12-hour', '24-hour'];
 
-enum TimestampType {
-  disabled,
-  twelve,
-  twentyFour,
-}
+enum TimestampType { disabled, twelve, twentyFour }
 
 const landscapeCutoutNames = ['None', 'Left', 'Right', 'Both'];
 
-enum LandscapeCutoutType {
-  none,
-  left,
-  right,
-  both,
-}
+enum LandscapeCutoutType { none, left, right, both }

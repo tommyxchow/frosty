@@ -12,12 +12,15 @@ mixin _$CategoriesStore on CategoriesStoreBase, Store {
   Computed<bool>? _$hasMoreComputed;
 
   @override
-  bool get hasMore => (_$hasMoreComputed ??= Computed<bool>(() => super.hasMore,
-          name: 'CategoriesStoreBase.hasMore'))
-      .value;
+  bool get hasMore => (_$hasMoreComputed ??= Computed<bool>(
+    () => super.hasMore,
+    name: 'CategoriesStoreBase.hasMore',
+  )).value;
 
-  late final _$_isLoadingAtom =
-      Atom(name: 'CategoriesStoreBase._isLoading', context: context);
+  late final _$_isLoadingAtom = Atom(
+    name: 'CategoriesStoreBase._isLoading',
+    context: context,
+  );
 
   bool get isLoading {
     _$_isLoadingAtom.reportRead();
@@ -34,8 +37,10 @@ mixin _$CategoriesStore on CategoriesStoreBase, Store {
     });
   }
 
-  late final _$_categoriesAtom =
-      Atom(name: 'CategoriesStoreBase._categories', context: context);
+  late final _$_categoriesAtom = Atom(
+    name: 'CategoriesStoreBase._categories',
+    context: context,
+  );
 
   ObservableList<CategoryTwitch> get categories {
     _$_categoriesAtom.reportRead();
@@ -52,8 +57,10 @@ mixin _$CategoriesStore on CategoriesStoreBase, Store {
     });
   }
 
-  late final _$_errorAtom =
-      Atom(name: 'CategoriesStoreBase._error', context: context);
+  late final _$_errorAtom = Atom(
+    name: 'CategoriesStoreBase._error',
+    context: context,
+  );
 
   String? get error {
     _$_errorAtom.reportRead();
@@ -70,21 +77,26 @@ mixin _$CategoriesStore on CategoriesStoreBase, Store {
     });
   }
 
-  late final _$getCategoriesAsyncAction =
-      AsyncAction('CategoriesStoreBase.getCategories', context: context);
+  late final _$getCategoriesAsyncAction = AsyncAction(
+    'CategoriesStoreBase.getCategories',
+    context: context,
+  );
 
   @override
   Future<void> getCategories() {
     return _$getCategoriesAsyncAction.run(() => super.getCategories());
   }
 
-  late final _$CategoriesStoreBaseActionController =
-      ActionController(name: 'CategoriesStoreBase', context: context);
+  late final _$CategoriesStoreBaseActionController = ActionController(
+    name: 'CategoriesStoreBase',
+    context: context,
+  );
 
   @override
   Future<void> refreshCategories() {
     final _$actionInfo = _$CategoriesStoreBaseActionController.startAction(
-        name: 'CategoriesStoreBase.refreshCategories');
+      name: 'CategoriesStoreBase.refreshCategories',
+    );
     try {
       return super.refreshCategories();
     } finally {

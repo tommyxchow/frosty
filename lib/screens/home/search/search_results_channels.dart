@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
 import 'package:mobx/mobx.dart';
@@ -43,10 +46,18 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
           ),
         ),
       );
+    } on ApiException catch (e) {
+      debugPrint('Search channels ApiException: $e');
+      final snackBar = SnackBar(
+        content: AlertMessage(message: e.message, centered: false),
+      );
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     } catch (error) {
+      debugPrint('Search channels error: $error');
       final snackBar = SnackBar(
         content: AlertMessage(
-          message: error.toString(),
+          message: 'Unable to follow channel',
           centered: false,
         ),
       );
@@ -61,18 +72,25 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
       builder: (context) {
         final future = widget.searchStore.channelFuture;
 
-        switch (future!.status) {
+        if (future == null) {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
+
+        switch (future.status) {
           case FutureStatus.pending:
-            return const SliverToBoxAdapter(
-              child: LoadingIndicator(
-                subtitle: 'Loading channels...',
-              ),
+            return SliverList.builder(
+              itemCount: 8,
+              itemBuilder: (context, index) =>
+                  ChannelSkeletonLoader(index: index),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
               child: SizedBox(
                 height: 100.0,
-                child: AlertMessage(message: 'Failed to get channels'),
+                child: AlertMessage(
+                  message: 'Unable to load channels',
+                  vertical: true,
+                ),
               ),
             );
           case FutureStatus.fulfilled:
@@ -84,60 +102,54 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
 
             return SliverList.list(
               children: [
-                ...results.map(
-                  (channel) {
-                    final displayName = getReadableName(
-                      channel.displayName,
-                      channel.broadcasterLogin,
-                    );
+                ...results.map((channel) {
+                  final displayName = getReadableName(
+                    channel.displayName,
+                    channel.broadcasterLogin,
+                  );
 
-                    return InkWell(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VideoChat(
-                            userId: channel.id,
-                            userName: channel.displayName,
-                            userLogin: channel.broadcasterLogin,
-                          ),
-                        ),
-                      ),
-                      onLongPress: () {
-                        HapticFeedback.lightImpact();
-
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) => UserActionsModal(
-                            authStore: widget.searchStore.authStore,
-                            name: displayName,
-                            userLogin: channel.broadcasterLogin,
-                            userId: channel.id,
-                          ),
-                        );
-                      },
-                      child: ListTile(
-                        title: Text(displayName),
-                        leading: ProfilePicture(
+                  return InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VideoChat(
+                          userId: channel.id,
+                          userName: channel.displayName,
                           userLogin: channel.broadcasterLogin,
-                          radius: 16,
                         ),
-                        subtitle: channel.isLive
-                            ? Row(
-                                children: [
-                                  const Icon(
-                                    Icons.circle,
-                                    color: Colors.red,
-                                    size: 10,
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Uptime(startTime: channel.startedAt),
-                                ],
-                              )
-                            : null,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                    onLongPress: () {
+                      HapticFeedback.lightImpact();
+
+                      showModalBottomSheetWithProperFocus(
+                        context: context,
+                        builder: (context) => UserActionsModal(
+                          authStore: widget.searchStore.authStore,
+                          name: displayName,
+                          userLogin: channel.broadcasterLogin,
+                          userId: channel.id,
+                        ),
+                      );
+                    },
+                    child: ListTile(
+                      title: Text(displayName),
+                      leading: ProfilePicture(
+                        userLogin: channel.broadcasterLogin,
+                        radius: 16,
+                      ),
+                      subtitle: channel.isLive
+                          ? Row(
+                              spacing: 6,
+                              children: [
+                                const LiveIndicator(),
+                                Uptime(startTime: channel.startedAt),
+                              ],
+                            )
+                          : null,
+                    ),
+                  );
+                }),
                 ListTile(
                   title: Text('Go to channel "${widget.query}"'),
                   onTap: () => _handleSearch(context, widget.query),

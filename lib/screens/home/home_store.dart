@@ -16,15 +16,13 @@ abstract class HomeStoreBase with Store {
 
   /// The scroll controllers for controlling the scroll to top on the top section.
   /// One controller is for the top streams tab and the other is for the top categories tab.
-  final topSectionScrollControllers = [
-    ScrollController(),
-    ScrollController(),
-  ];
+  final topSectionScrollControllers = [ScrollController(), ScrollController()];
 
   /// The scroll controller for controlling the scroll to top on the search section.
   final searchScrollController = ScrollController();
 
   /// The current index of the top section tab. Changes when switching between the streams and categories tabs.
+  @observable
   var topSectionCurrentIndex = 0;
 
   /// The current selected index/tab of the bottom navigation bar.
@@ -99,6 +97,7 @@ abstract class HomeStoreBase with Store {
     _disposeReaction();
 
     followedScrollController.dispose();
+    searchScrollController.dispose();
 
     for (final controller in topSectionScrollControllers) {
       controller.dispose();

@@ -68,3 +68,64 @@ Use `--dart-define` to set environment variables:
 **Dependency Injection**: Uses Provider for dependency injection, with all major services (API clients, stores) provided at the app root in `main.dart` with a shared HTTP client for efficiency.
 
 **Platform Support**: iOS and Android with platform-specific configurations. Uses Firebase for crashlytics, performance monitoring, and analytics.
+
+## HTTP Client Architecture
+
+**Centralized Dio Setup**: All API services share a single Dio instance configured in `DioClient.createClient()` with:
+- Connection pooling and keep-alive headers for efficiency
+- Optimized timeouts: 8s connect, 15s receive, 10s send
+- Global Twitch User-Agent header
+- Simple logging in debug mode (not verbose to avoid log spam)
+
+**Authentication Interceptor**: `TwitchAuthInterceptor` automatically injects auth headers:
+- Detects Twitch API URLs and adds Authorization + Client-Id headers
+- Updates automatically when user authentication changes
+- Eliminates manual header passing throughout the codebase
+
+**API Service Pattern**: All API services extend `BaseApiClient` for consistent error handling and HTTP operations. Services include `TwitchApi`, `BTTVApi`, `FFZApi`, and `SevenTVApi`.
+
+## Authentication & Token Management
+
+**Two-tier Token System**:
+- Default app token for unauthenticated requests
+- Optional user token stored in Flutter Secure Storage
+- Automatic token validation on startup with fallback
+
+**WebView OAuth Flow**: Custom JavaScript injection in WebView for seamless Twitch login experience without opening external browsers.
+
+**Secure Storage Cleanup**: First-run detection clears secure storage to handle Android/iOS uninstall scenarios where secure storage persists.
+
+## MobX Store Implementation
+
+**Store Pattern**: All stores follow `StoreBase with _$StoreName` pattern:
+- Generate `.g.dart` files with `flutter packages pub run build_runner build`
+- Use `@observable`, `@action`, and `@computed` annotations
+- Settings store uses `@JsonSerializable()` with automatic persistence via `autorun()`
+
+**Authentication Headers**: Generated as `@computed` properties that automatically update when tokens change.
+
+**State Persistence**: Settings automatically saved to SharedPreferences via MobX `autorun()` reaction.
+
+## Custom Cache Management
+
+**Orphaned File Cleanup**: `CustomCacheManager.removeOrphanedCacheFiles()` runs on startup to remove files not in database.
+
+**Optimized Settings**: 30-day stale period, 10,000 max objects for efficient image caching across the app.
+
+## Chat System Architecture
+
+**Real-time IRC**: WebSocket connection to Twitch IRC with custom `IRCMessage` parsing.
+
+**Third-party Emotes**: Asynchronous loading of BTTV, FFZ, and 7TV assets via dedicated APIs.
+
+**Message Management**: 5000 message limit with 20% batch removal optimization for performance.
+
+**Assets Store**: Separate `ChatAssetsStore` manages emotes, badges, and chat-related data.
+
+## Code Style Guidelines
+
+- **Prefer modern Flutter/Dart features and type-safety**
+- **Use consistent naming, comments, and styles matching the existing codebase**
+- **Single quotes, trailing commas, and final locals per lint rules**
+- **Package imports over relative imports**
+- **Observer widgets only wrap necessary UI components for MobX optimization**

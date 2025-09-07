@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -24,6 +25,9 @@ abstract class VideoStoreBase with Store {
 
   /// The userlogin of the current channel.
   final String userLogin;
+
+  /// The user ID of the current channel.
+  final String userId;
 
   final AuthStore authStore;
 
@@ -62,8 +66,9 @@ abstract class VideoStoreBase with Store {
           'StreamQualities',
           onMessageReceived: (message) async {
             final data = jsonDecode(message.message) as List;
-            _availableStreamQualities =
-                data.map((item) => item as String).toList();
+            _availableStreamQualities = data
+                .map((item) => item as String)
+                .toList();
             if (_firstTimeSettingQuality) {
               _firstTimeSettingQuality = false;
               if (settingsStore.defaultToHighestQuality) {
@@ -89,25 +94,48 @@ abstract class VideoStoreBase with Store {
           onMessageReceived: (message) {
             _paused = false;
             if (Platform.isAndroid) pip.setIsPlaying(true);
-            videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].muted = false;',
-            );
-            videoWebViewController.runJavaScript(
-              'document.getElementsByTagName("video")[0].volume = 1.0;',
-            );
+            videoWebViewController.runJavaScript('''
+              (function() {
+                const video = document.getElementsByTagName("video")[0];
+                if (video) {
+                  video.muted = false;
+                  video.volume = 1.0;
+                  if (video.textTracks && video.textTracks.length > 0) {
+                    video.textTracks[0].mode = "hidden";
+                  }
+                }
+              })();
+              ''');
+          },
+        )
+        ..addJavaScriptChannel(
+          'PipEntered',
+          onMessageReceived: (message) {
+            _isInPipMode = true;
+          },
+        )
+        ..addJavaScriptChannel(
+          'PipExited',
+          onMessageReceived: (message) {
+            _isInPipMode = false;
           },
         )
         ..setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (url) async {
               if (url != videoUrl) return;
-              final injected =
-                  (await videoWebViewController.runJavaScriptReturningResult(
-                'window._injected ? true : false',
-              )) as bool;
+              // Safe evaluation of JavaScript boolean result
+              final result = await videoWebViewController
+                  .runJavaScriptReturningResult(
+                    'window._injected ? true : false',
+                  );
+              final injected = result is bool
+                  ? result
+                  : (result.toString().toLowerCase() == 'true');
               if (injected) return;
-              await videoWebViewController
-                  .runJavaScript('window._injected = true;');
+              await videoWebViewController.runJavaScript(
+                'window._injected = true;',
+              );
               await initVideo();
               _acceptContentWarning();
             },
@@ -117,8 +145,14 @@ abstract class VideoStoreBase with Store {
   /// The timer that handles hiding the overlay automatically
   late Timer _overlayTimer;
 
+  /// The timer that handles periodic stream info updates
+  Timer? _streamInfoTimer;
+
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
+
+  /// Disposes the video mode reaction for timer management.
+  late final ReactionDisposer _disposeVideoModeReaction;
 
   ReactionDisposer? _disposeAndroidAutoPipReaction;
 
@@ -136,6 +170,10 @@ abstract class VideoStoreBase with Store {
   @readonly
   StreamTwitch? _streamInfo;
 
+  /// The offline channel info, used for displaying channel details when offline.
+  @readonly
+  Channel? _offlineChannelInfo;
+
   @readonly
   List<String> _availableStreamQualities = [];
 
@@ -150,16 +188,26 @@ abstract class VideoStoreBase with Store {
   @readonly
   String? _latency;
 
+  /// Whether the app is currently in picture-in-picture mode (iOS only).
+  /// On Android, this state is not tracked since there's no programmatic exit.
+  @readonly
+  var _isInPipMode = false;
+
   /// The video URL to use for the webview.
   String get videoUrl =>
       'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';
 
   VideoStoreBase({
     required this.userLogin,
+    required this.userId,
     required this.twitchApi,
     required this.authStore,
     required this.settingsStore,
   }) {
+    // Reset chat delay to 0 if auto sync is already enabled to prevent starting with old values
+    if (settingsStore.autoSyncChatDelay) {
+      settingsStore.chatDelay = 0.0;
+    }
     // Initialize the video webview params for iOS to enable video autoplay.
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       _videoWebViewParams = WebKitWebViewControllerCreationParams(
@@ -177,8 +225,10 @@ abstract class VideoStoreBase with Store {
     }
 
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
-    _overlayTimer =
-        Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+    _overlayTimer = Timer(
+      const Duration(seconds: 5),
+      () => _overlayVisible = false,
+    );
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
@@ -186,20 +236,49 @@ abstract class VideoStoreBase with Store {
       (_) => videoWebViewController.loadRequest(Uri.parse(videoUrl)),
     );
 
-    // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
-    if (Platform.isAndroid) {
-      _disposeAndroidAutoPipReaction = autorun(
-        (_) async {
-          if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
-            pip.setAutoPipMode();
-          } else {
-            pip.setAutoPipMode(autoEnter: false);
-          }
-        },
+    // Initialize a reaction to manage stream info timer based on video mode
+    _disposeVideoModeReaction = reaction((_) => settingsStore.showVideo, (
+      showVideo,
+    ) {
+      if (showVideo) {
+        // In video mode, stop the timer since overlay taps handle refreshing
+        _stopStreamInfoTimer();
+      } else {
+        // In chat-only mode, start the timer for automatic updates
+        _startStreamInfoTimer();
+        // Ensure overlay timer is active for clean UI
+        _overlayTimer.cancel();
+        _overlayTimer = Timer(
+          const Duration(seconds: 5),
+          () => _overlayVisible = false,
+        );
+      }
+    });
+
+    // Check initial state and start timer if already in chat-only mode
+    if (!settingsStore.showVideo) {
+      _startStreamInfoTimer();
+      _overlayTimer.cancel();
+      _overlayTimer = Timer(
+        const Duration(seconds: 5),
+        () => _overlayVisible = false,
       );
     }
 
+    // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
+    if (Platform.isAndroid) {
+      _disposeAndroidAutoPipReaction = autorun((_) async {
+        if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
+          pip.setAutoPipMode();
+        } else {
+          pip.setAutoPipMode(autoEnter: false);
+        }
+      });
+    }
+
     updateStreamInfo();
+
+    // Stream info timer will be started when entering chat-only mode
   }
 
   @action
@@ -236,8 +315,9 @@ abstract class VideoStoreBase with Store {
 
   @action
   Future<void> setStreamQuality(String newStreamQuality) async {
-    final indexOfStreamQuality =
-        _availableStreamQualities.indexOf(newStreamQuality);
+    final indexOfStreamQuality = _availableStreamQualities.indexOf(
+      newStreamQuality,
+    );
     if (indexOfStreamQuality == -1) return;
     await _setStreamQualityIndex(indexOfStreamQuality);
   }
@@ -273,7 +353,8 @@ abstract class VideoStoreBase with Store {
             const topBar = document.querySelector(".top-bar");
             const playerControls = document.querySelector(".player-controls");
             const channelDisclosures = document.querySelector("#channel-player-disclosures");
-            hideElements(topBar, playerControls, channelDisclosures);
+            const videoPreviewOverlay = document.querySelector('[data-a-target="player-overlay-preview-background"]');
+            hideElements(topBar, playerControls, channelDisclosures, videoPreviewOverlay);
           }
           const observer = new MutationObserver(() => {
             const videoOverlay = document.querySelector('.video-player__overlay');
@@ -367,15 +448,30 @@ abstract class VideoStoreBase with Store {
             const videoElement = await _asyncQuerySelector("video");
             videoElement.addEventListener("pause", () => {
               VideoPause.postMessage("video paused");
-              videoElement.textTracks[0].mode = "hidden";
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
             });
             videoElement.addEventListener("playing", () => {
               VideoPlaying.postMessage("video playing");
-              videoElement.textTracks[0].mode = "hidden";
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
             });
+            
+            // Add PiP event listeners for iOS
+            videoElement.addEventListener("enterpictureinpicture", () => {
+              PipEntered.postMessage("pip entered");
+            });
+            videoElement.addEventListener("leavepictureinpicture", () => {
+              PipExited.postMessage("pip exited");
+            });
+            
             if (!videoElement.paused) {
               VideoPlaying.postMessage("video playing");
-              videoElement.textTracks[0].mode = "hidden";
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
             }
           });
         ''');
@@ -401,27 +497,59 @@ abstract class VideoStoreBase with Store {
       updateStreamInfo();
 
       _overlayVisible = true;
-      _overlayTimer =
-          Timer(const Duration(seconds: 5), () => _overlayVisible = false);
+      _overlayTimer = Timer(
+        const Duration(seconds: 5),
+        () => _overlayVisible = false,
+      );
+    }
+  }
+
+  /// Starts the periodic stream info timer for chat-only mode.
+  void _startStreamInfoTimer() {
+    // Only start if not already active
+    if (_streamInfoTimer?.isActive != true) {
+      _streamInfoTimer = Timer.periodic(
+        const Duration(seconds: 60),
+        (_) => updateStreamInfo(),
+      );
+    }
+  }
+
+  /// Stops the periodic stream info timer.
+  void _stopStreamInfoTimer() {
+    if (_streamInfoTimer?.isActive == true) {
+      _streamInfoTimer?.cancel();
     }
   }
 
   /// Updates the stream info from the Twitch API.
   ///
-  /// If the stream is offline, disables the overlay.
+  /// If the stream is offline, fetches channel information to show offline details.
   @action
   Future<void> updateStreamInfo() async {
     try {
-      _streamInfo = await twitchApi.getStream(
-        userLogin: userLogin,
-        headers: authStore.headersTwitch,
-      );
+      _streamInfo = await twitchApi.getStream(userLogin: userLogin);
+      // Clear offline info when stream is live
+      _offlineChannelInfo = null;
     } catch (e) {
-      debugPrint(e.toString());
-
       _overlayTimer.cancel();
       _streamInfo = null;
       _paused = true;
+
+      // Try to fetch offline channel information
+      try {
+        _offlineChannelInfo = await twitchApi.getChannel(userId: userId);
+      } catch (channelError) {
+        _offlineChannelInfo = null;
+      }
+
+      // Restart overlay timer in chat-only mode even on error
+      if (!settingsStore.showVideo) {
+        _overlayTimer = Timer(
+          const Duration(seconds: 5),
+          () => _overlayVisible = false,
+        );
+      }
     }
   }
 
@@ -439,10 +567,14 @@ abstract class VideoStoreBase with Store {
         _overlayVisible = true;
 
         _overlayTimer.cancel();
-        _overlayTimer =
-            Timer(const Duration(seconds: 3), () => _overlayVisible = false);
+        _overlayTimer = Timer(
+          const Duration(seconds: 3),
+          () => _overlayVisible = false,
+        );
       }
     }
+
+    // Stream info timer is managed automatically by the video mode reaction
   }
 
   /// Refreshes the stream webview and updates the stream info.
@@ -451,6 +583,7 @@ abstract class VideoStoreBase with Store {
     HapticFeedback.lightImpact();
     _paused = true;
     _firstTimeSettingQuality = true;
+    _isInPipMode = false;
     videoWebViewController.reload();
     updateStreamInfo();
   }
@@ -459,8 +592,9 @@ abstract class VideoStoreBase with Store {
   void handlePausePlay() {
     try {
       if (_paused) {
-        videoWebViewController
-            .runJavaScript('document.getElementsByTagName("video")[0].play();');
+        videoWebViewController.runJavaScript(
+          'document.getElementsByTagName("video")[0].play();',
+        );
       } else {
         videoWebViewController.runJavaScript(
           'document.getElementsByTagName("video")[0].pause();',
@@ -489,6 +623,32 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  /// Toggle picture-in-picture mode.
+  ///
+  /// If not in PiP mode, enters PiP mode.
+  /// If already in PiP mode on iOS, exits PiP mode.
+  /// On Android, always enters PiP mode (no programmatic exit or state tracking).
+  @action
+  void togglePictureInPicture() {
+    try {
+      if (Platform.isIOS && _isInPipMode) {
+        // Exit PiP mode on iOS
+        videoWebViewController.runJavaScript('''
+          (function() {
+            if (document.pictureInPictureElement) {
+              document.exitPictureInPicture();
+            }
+          })();
+          ''');
+      } else {
+        // Enter PiP mode (both iOS and Android)
+        requestPictureInPicture();
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
   @action
   void dispose() {
     // Disable auto PiP when leaving so that we don't enter PiP on other screens.
@@ -499,8 +659,10 @@ abstract class VideoStoreBase with Store {
     }
 
     _overlayTimer.cancel();
+    _streamInfoTimer?.cancel();
 
     _disposeOverlayReaction();
+    _disposeVideoModeReaction();
     _disposeAndroidAutoPipReaction?.call();
   }
 }

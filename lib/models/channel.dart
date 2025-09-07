@@ -8,11 +8,19 @@ class Channel {
   final String broadcasterId;
   final String broadcasterLogin;
   final String broadcasterName;
+  final String broadcasterLanguage;
+  final String title;
+  final String gameId;
+  final String gameName;
 
   const Channel({
     required this.broadcasterId,
     required this.broadcasterLogin,
     required this.broadcasterName,
+    required this.broadcasterLanguage,
+    required this.title,
+    required this.gameId,
+    required this.gameName,
   });
 
   factory Channel.fromJson(Map<String, dynamic> json) =>

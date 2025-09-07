@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
 
 class SettingsMutedWords extends StatefulWidget {
@@ -23,19 +24,14 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
   }
 
   void addMutedWord(String text) {
-    settingsStore.mutedWords = [
-      ...settingsStore.mutedWords,
-      text,
-    ];
+    settingsStore.mutedWords = [...settingsStore.mutedWords, text];
 
     textController.clear();
     textFieldFocusNode.unfocus();
   }
 
   void removeMutedWord(int index) {
-    settingsStore.mutedWords = [
-      ...settingsStore.mutedWords..removeAt(index),
-    ];
+    settingsStore.mutedWords = [...settingsStore.mutedWords..removeAt(index)];
   }
 
   @override
@@ -43,7 +39,7 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
     return ListTile(
       trailing: const Icon(Icons.edit),
       title: const Text('Muted keywords'),
-      onTap: () => showModalBottomSheet(
+      onTap: () => showModalBottomSheetWithProperFocus(
         isScrollControlled: true,
         context: context,
         builder: (context) => SizedBox(
@@ -74,9 +70,7 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                             if (textController.text.isEmpty) {
                               textFieldFocusNode.unfocus();
                             } else {
-                              addMutedWord(
-                                textController.text,
-                              );
+                              addMutedWord(textController.text);
                             }
                           },
                           icon: const Icon(Icons.check),
@@ -88,6 +82,7 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                     const Expanded(
                       child: AlertMessage(
                         message: 'No muted keywords',
+                        vertical: true,
                       ),
                     ),
                   Expanded(
@@ -95,8 +90,9 @@ class _SettingsMutedWordsState extends State<SettingsMutedWords> {
                       itemCount: settingsStore.mutedWords.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title:
-                              Text(settingsStore.mutedWords.elementAt(index)),
+                          title: Text(
+                            settingsStore.mutedWords.elementAt(index),
+                          ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {

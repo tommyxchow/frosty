@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:frosty/widgets/settings_page_layout.dart';
 
 class VideoSettings extends StatelessWidget {
   final SettingsStore settingsStore;
@@ -16,13 +16,9 @@ class VideoSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder: (context) => ListView(
-        padding: const EdgeInsets.only(top: 16),
+      builder: (context) => SettingsPageLayout(
         children: [
-          const SectionHeader(
-            'Player',
-            isFirst: true,
-          ),
+          const SectionHeader('Player', isFirst: true),
           SettingsListSwitch(
             title: 'Enable video',
             value: settingsStore.showVideo,
@@ -35,11 +31,6 @@ class VideoSettings extends StatelessWidget {
               onChanged: (newValue) =>
                   settingsStore.defaultToHighestQuality = newValue,
             ),
-          SettingsListSwitch(
-            title: 'Show latency',
-            value: settingsStore.showLatency,
-            onChanged: (newValue) => settingsStore.showLatency = newValue,
-          ),
           if (Platform.isAndroid)
             SettingsListSwitch(
               title: 'Use enhanced rendering',
@@ -66,16 +57,6 @@ class VideoSettings extends StatelessWidget {
             ),
             value: settingsStore.toggleableOverlay,
             onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
-          ),
-          SettingsListSlider(
-            title: 'Custom overlay opacity',
-            trailing:
-                '${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%',
-            subtitle:
-                'Adjusts the opacity (transparency) of the custom video overlay when active.',
-            value: settingsStore.overlayOpacity,
-            divisions: 10,
-            onChanged: (newValue) => settingsStore.overlayOpacity = newValue,
           ),
         ],
       ),

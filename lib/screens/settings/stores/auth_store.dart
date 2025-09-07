@@ -42,8 +42,10 @@ abstract class AuthBase with Store {
 
   /// Authentication headers for Twitch API requests.
   @computed
-  Map<String, String> get headersTwitch =>
-      {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
+  Map<String, String> get headersTwitch => {
+    'Authorization': 'Bearer $_token',
+    'Client-Id': clientId,
+  };
 
   /// Error flag that will be non-null and contain an error message if login failed.
   @readonly
@@ -70,8 +72,9 @@ abstract class AuthBase with Store {
     if (request.url == 'https://www.twitch.tv/?no-reload=true') {
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
-        navigatorKey.currentState
-            ?.push(MaterialPageRoute(builder: (context) => routeAfter));
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(builder: (context) => routeAfter),
+        );
       } else {
         // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
         navigatorKey.currentState?.pop();
@@ -92,34 +95,41 @@ abstract class AuthBase with Store {
         NavigationDelegate(
           onNavigationRequest: (request) =>
               handleNavigation(request: request, routeAfter: routeAfter),
-          onPageFinished: (_) => webViewController.runJavaScript(
-            '''
-            {
-              function modifyElement(element) {
-                element.style.maxHeight = '20vh';
-                element.style.overflow = 'auto';
-              }
-
-              const observer = new MutationObserver((mutations) => {
-                for (let mutation of mutations) {
-                  if (mutation.type === 'childList') {
-                    const element = document.querySelector('.fAVISI');
-                    if (element) {
-                      modifyElement(element);
-                      observer.disconnect();
-                      break;
-                    }
+          onWebResourceError: (error) {
+            debugPrint('Auth WebView error: ${error.description}');
+          },
+          onPageFinished: (_) async {
+            try {
+              await webViewController.runJavaScript('''
+                {
+                  function modifyElement(element) {
+                    element.style.maxHeight = '20vh';
+                    element.style.overflow = 'auto';
                   }
-                }
-              });
 
-              observer.observe(document.body, {
-                childList: true,
-                subtree: true
-              });
+                  const observer = new MutationObserver((mutations) => {
+                    for (let mutation of mutations) {
+                      if (mutation.type === 'childList') {
+                        const element = document.querySelector('.fAVISI');
+                        if (element) {
+                          modifyElement(element);
+                          observer.disconnect();
+                          break;
+                        }
+                      }
+                    }
+                  });
+
+                  observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                  });
+                }
+                ''');
+            } catch (e) {
+              debugPrint('Auth WebView JavaScript error: $e');
             }
-            ''',
-          ),
+          },
         ),
       )
       ..loadRequest(
@@ -132,7 +142,7 @@ abstract class AuthBase with Store {
             'redirect_uri': 'https://twitch.tv/login',
             'response_type': 'token',
             'scope':
-                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
+                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users user:manage:chat_color',
             'force_verify': 'true',
           },
         ),
@@ -156,13 +166,9 @@ abstract class AuthBase with Store {
 
     void onPressed() {
       if (isBlocked) {
-        user.unblock(targetId: targetUserId, headers: headersTwitch);
+        user.unblock(targetId: targetUserId);
       } else {
-        user.block(
-          targetId: targetUserId,
-          displayName: targetUser,
-          headers: headersTwitch,
-        );
+        user.block(targetId: targetUserId, displayName: targetUser);
       }
       Navigator.pop(context);
     }
@@ -177,10 +183,7 @@ abstract class AuthBase with Store {
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: onPressed,
-            child: const Text('Yes'),
-          ),
+          TextButton(onPressed: onPressed, child: const Text('Yes')),
         ],
       ),
     );
@@ -213,7 +216,7 @@ abstract class AuthBase with Store {
         if (!_tokenIsValid) return await logout();
 
         // Initialize the user store.
-        await user.init(headers: headersTwitch);
+        await user.init();
 
         if (user.details != null) _isLoggedIn = true;
       }
@@ -240,7 +243,7 @@ abstract class AuthBase with Store {
       await _storage.write(key: _userTokenKey, value: token);
 
       // Initialize the user with the new token.
-      await user.init(headers: headersTwitch);
+      await user.init();
 
       // Set the login status to logged in.
       if (user.details != null) _isLoggedIn = true;

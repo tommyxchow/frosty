@@ -16,10 +16,7 @@ import 'package:url_launcher/url_launcher.dart';
 class OtherSettings extends StatefulWidget {
   final SettingsStore settingsStore;
 
-  const OtherSettings({
-    super.key,
-    required this.settingsStore,
-  });
+  const OtherSettings({super.key, required this.settingsStore});
 
   @override
   State<OtherSettings> createState() => _OtherSettingsState();
@@ -89,11 +86,9 @@ class _OtherSettingsState extends State<OtherSettings> {
         ListTile(
           leading: const Icon(Icons.notes_rounded),
           title: const Text('Release notes'),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const ReleaseNotes(),
-            ),
-          ),
+          onTap: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => const ReleaseNotes())),
         ),
         ListTile(
           leading: const Icon(Icons.launch_rounded),
@@ -141,12 +136,15 @@ class _OtherSettingsState extends State<OtherSettings> {
             onChanged: (newValue) {
               widget.settingsStore.shareCrashLogsAndAnalytics = newValue;
 
-              FirebaseCrashlytics.instance
-                  .setCrashlyticsCollectionEnabled(newValue);
-              FirebaseAnalytics.instance
-                  .setAnalyticsCollectionEnabled(newValue);
-              FirebasePerformance.instance
-                  .setPerformanceCollectionEnabled(newValue);
+              FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+                newValue,
+              );
+              FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(
+                newValue,
+              );
+              FirebasePerformance.instance.setPerformanceCollectionEnabled(
+                newValue,
+              );
             },
           ),
         ),

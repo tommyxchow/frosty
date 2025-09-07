@@ -41,9 +41,9 @@ class ReplyThread extends StatelessWidget {
               textScaler: TextScaler.linear(chatStore.settings.messageScale),
             ),
             child: DefaultTextStyle(
-              style: DefaultTextStyle.of(context)
-                  .style
-                  .copyWith(fontSize: chatStore.settings.fontSize),
+              style: DefaultTextStyle.of(
+                context,
+              ).style.copyWith(fontSize: chatStore.settings.fontSize),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -54,21 +54,15 @@ class ReplyThread extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(12, 0, 12, 8),
                   ),
                   if (replyParent != null)
-                    ChatMessage(
-                      ircMessage: replyParent,
-                      chatStore: chatStore,
-                    )
+                    ChatMessage(ircMessage: replyParent, chatStore: chatStore)
                   else
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                       child: Text(
                         '$replyName: $replyBody',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
-                  const Divider(),
                   Flexible(
                     child: ListView(
                       primary: false,
@@ -82,6 +76,7 @@ class ReplyThread extends StatelessWidget {
                             (message) => ChatMessage(
                               isModal: true,
                               showReplyHeader: false,
+                              isInReplyThread: true,
                               ircMessage: message,
                               chatStore: chatStore,
                             ),

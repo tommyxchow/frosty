@@ -4,7 +4,7 @@ import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/search/search_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:mobx/mobx.dart';
 
 class SearchResultsCategories extends StatelessWidget {
@@ -18,21 +18,24 @@ class SearchResultsCategories extends StatelessWidget {
       builder: (context) {
         final future = searchStore.categoryFuture;
 
-        switch (future!.status) {
+        if (future == null) {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
+
+        switch (future.status) {
           case FutureStatus.pending:
-            return const SliverToBoxAdapter(
-              child: SizedBox(
-                height: 100.0,
-                child: LoadingIndicator(
-                  subtitle: 'Loading categories...',
-                ),
-              ),
+            return SliverList.builder(
+              itemCount: 8,
+              itemBuilder: (context, index) => const CategorySkeletonLoader(),
             );
           case FutureStatus.rejected:
             return const SliverToBoxAdapter(
               child: SizedBox(
                 height: 100.0,
-                child: AlertMessage(message: 'Failed to get categories'),
+                child: AlertMessage(
+                  message: 'Unable to load categories',
+                  vertical: true,
+                ),
               ),
             );
           case FutureStatus.fulfilled:
@@ -42,7 +45,10 @@ class SearchResultsCategories extends StatelessWidget {
               return const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 100.0,
-                  child: AlertMessage(message: 'Failed to get categories'),
+                  child: AlertMessage(
+                    message: 'Failed to get categories',
+                    vertical: true,
+                  ),
                 ),
               );
             }
@@ -51,16 +57,18 @@ class SearchResultsCategories extends StatelessWidget {
               return const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 100.0,
-                  child: AlertMessage(message: 'No matching categories'),
+                  child: AlertMessage(
+                    message: 'No matching categories',
+                    vertical: true,
+                  ),
                 ),
               );
             }
 
             return SliverList.builder(
               itemCount: categories.data.length,
-              itemBuilder: (context, index) => CategoryCard(
-                category: categories.data[index],
-              ),
+              itemBuilder: (context, index) =>
+                  CategoryCard(category: categories.data[index]),
             );
         }
       },

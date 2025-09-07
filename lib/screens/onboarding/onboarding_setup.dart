@@ -67,8 +67,9 @@ class OnboardingSetup extends StatelessWidget {
                                 // ignore: deprecated_member_use
                                 settingsStore.accentColor = newColor.value,
                             enableAlpha: false,
-                            pickerAreaBorderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
+                            pickerAreaBorderRadius: const BorderRadius.all(
+                              Radius.circular(8),
+                            ),
                             labelTypes: const [],
                           ),
                         ),
@@ -99,13 +100,11 @@ class OnboardingSetup extends StatelessWidget {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () => launchUrl(
-                                Uri.parse(
-                                  'https://recent-messages.robotty.de/',
-                                ),
-                                mode: settingsStore.launchUrlExternal
-                                    ? LaunchMode.externalApplication
-                                    : LaunchMode.inAppBrowserView,
-                              ),
+                            Uri.parse('https://recent-messages.robotty.de/'),
+                            mode: settingsStore.launchUrlExternal
+                                ? LaunchMode.externalApplication
+                                : LaunchMode.inAppBrowserView,
+                          ),
                       ),
                     ],
                   ),
@@ -123,12 +122,15 @@ class OnboardingSetup extends StatelessWidget {
                 onChanged: (newValue) {
                   settingsStore.shareCrashLogsAndAnalytics = newValue;
 
-                  FirebaseCrashlytics.instance
-                      .setCrashlyticsCollectionEnabled(newValue);
-                  FirebaseAnalytics.instance
-                      .setAnalyticsCollectionEnabled(newValue);
-                  FirebasePerformance.instance
-                      .setPerformanceCollectionEnabled(newValue);
+                  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+                    newValue,
+                  );
+                  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(
+                    newValue,
+                  );
+                  FirebasePerformance.instance.setPerformanceCollectionEnabled(
+                    newValue,
+                  );
                 },
               ),
             ],

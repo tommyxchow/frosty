@@ -52,9 +52,7 @@ class AccountOptions extends StatelessWidget {
         SettingsTileRoute(
           leading: const Icon(Icons.block_rounded),
           title: 'Blocked users',
-          child: BlockedUsers(
-            authStore: authStore,
-          ),
+          child: BlockedUsers(authStore: authStore),
         ),
         ListTile(
           leading: const Icon(Icons.logout_rounded),
