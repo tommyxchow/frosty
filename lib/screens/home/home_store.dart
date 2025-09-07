@@ -97,6 +97,7 @@ abstract class HomeStoreBase with Store {
     _disposeReaction();
 
     followedScrollController.dispose();
+    searchScrollController.dispose();
 
     for (final controller in topSectionScrollControllers) {
       controller.dispose();
