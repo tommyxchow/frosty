@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
@@ -58,16 +57,6 @@ class VideoSettings extends StatelessWidget {
             ),
             value: settingsStore.toggleableOverlay,
             onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
-          ),
-          SettingsListSlider(
-            title: 'Custom overlay opacity',
-            trailing:
-                '${(settingsStore.overlayOpacity * 100).toStringAsFixed(0)}%',
-            subtitle:
-                'Adjusts the opacity (transparency) of the custom video overlay when active.',
-            value: settingsStore.overlayOpacity,
-            divisions: 10,
-            onChanged: (newValue) => settingsStore.overlayOpacity = newValue,
           ),
         ],
       ),

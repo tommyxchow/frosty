@@ -234,16 +234,9 @@ class _VideoChatState extends State<VideoChat>
             opacity: _videoStore.overlayVisible ? 1.0 : 0.0,
             curve: Curves.ease,
             duration: const Duration(milliseconds: 200),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(
-                  alpha: settingsStore.overlayOpacity,
-                ),
-              ),
-              child: IgnorePointer(
-                ignoring: !_videoStore.overlayVisible,
-                child: videoOverlay,
-              ),
+            child: IgnorePointer(
+              ignoring: !_videoStore.overlayVisible,
+              child: videoOverlay,
             ),
           );
         },
