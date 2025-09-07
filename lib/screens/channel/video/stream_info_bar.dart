@@ -172,10 +172,10 @@ class StreamInfoBar extends StatelessWidget {
                 ),
                 // Bottom row: Live indicator, uptime, viewer count, game name or Offline text
                 if (isOffline ||
-                    showUptime ||
-                    showViewerCount ||
+                    (!isOffline && showUptime) ||
+                    (!isOffline && showViewerCount) ||
                     (showCategory &&
-                        (streamInfo?.gameName.isNotEmpty ?? false))) ...[
+                        (isOffline ? (offlineChannelInfo?.gameName.isNotEmpty ?? false) : (streamInfo?.gameName.isNotEmpty ?? false)))) ...[
                   Row(
                     children: [
                       if (isOffline && showOfflineIndicator) ...[
@@ -245,11 +245,11 @@ class StreamInfoBar extends StatelessWidget {
                           ),
                         ),
                       ] else ...[
-                        if (showUptime || showViewerCount) ...[
+                        if (!isOffline && (showUptime || showViewerCount)) ...[
                           const LiveIndicator(),
                           const SizedBox(width: 6),
                         ],
-                        if (showUptime) ...[
+                        if (!isOffline && showUptime) ...[
                           Uptime(
                             startTime:
                                 streamInfo?.startedAt ??
@@ -260,9 +260,9 @@ class StreamInfoBar extends StatelessWidget {
                               FontWeight.w500,
                             ),
                           ),
-                          if (showViewerCount) const SizedBox(width: 8),
+                          if (!isOffline && showViewerCount) const SizedBox(width: 8),
                         ],
-                        if (showViewerCount) ...[
+                        if (!isOffline && showViewerCount) ...[
                           Icon(
                             Icons.visibility,
                             size: secondLineSize,
@@ -279,12 +279,12 @@ class StreamInfoBar extends StatelessWidget {
                             ),
                           ),
                         ],
-                        if (showCategory &&
+                        if (!isOffline && showCategory &&
                             (streamInfo?.gameName.isNotEmpty ?? false) &&
                             (showUptime || showViewerCount)) ...[
                           const SizedBox(width: 8),
                         ],
-                        if (showCategory &&
+                        if (!isOffline && showCategory &&
                             (streamInfo?.gameName.isNotEmpty ?? false)) ...[
                           Icon(
                             Icons.gamepad,
