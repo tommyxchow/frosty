@@ -226,42 +226,30 @@ class VideoOverlay extends StatelessWidget {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Colors.black,
-              Colors.black.withValues(alpha: 0.99),
-              Colors.black.withValues(alpha: 0.98),
-              Colors.black.withValues(alpha: 0.97),
-              Colors.black.withValues(alpha: 0.96),
-              Colors.black.withValues(alpha: 0.95),
-              Colors.black.withValues(alpha: 0.93),
-              Colors.black.withValues(alpha: 0.9),
-              Colors.black.withValues(alpha: 0.87),
-              Colors.black.withValues(alpha: 0.83),
-              Colors.black.withValues(alpha: 0.75),
-              Colors.black.withValues(alpha: 0.6),
-              Colors.black.withValues(alpha: 0.4),
-              Colors.black.withValues(alpha: 0.2),
-              Colors.black.withValues(alpha: 0.08),
-              Colors.black.withValues(alpha: 0.02),
-              Colors.transparent,
+              Colors.black, // Solid black for controls
+              Colors.black.withValues(alpha: 0.95), // Strong coverage
+              Colors.black.withValues(alpha: 0.88), // Still very strong
+              Colors.black.withValues(alpha: 0.78), // Strong transition
+              Colors.black.withValues(alpha: 0.65), // Begin smooth fade
+              Colors.black.withValues(alpha: 0.48), // Faster fade
+              Colors.black.withValues(alpha: 0.32), // Quick transition
+              Colors.black.withValues(alpha: 0.18), // Rapid fade
+              Colors.black.withValues(alpha: 0.08), // Very light
+              Colors.black.withValues(alpha: 0.02), // Nearly gone
+              Colors.transparent, // Transparent end
             ],
             stops: [
               0.0, // Top: Full black - solid area for controls
-              0.02, // Very slight fade start
-              0.04, // Still very strong black
-              0.06, // Strong black maintained
-              0.08, // Still solid black
-              0.12, // Very strong black - extended
-              0.16, // Strong black - solid area
-              0.22, // Still strong black
-              0.28, // Solid black maintained
-              0.35, // Strong black - almost halfway
-              0.42, // Still very solid black
-              0.5, // Halfway point - start smooth fade
-              0.58, // Begin gradual fade
-              0.67, // Smooth fade transition
-              0.76, // Light fade
-              0.85, // Very light
-              1.0, // Bottom: Transparent - smooth fade out
+              0.1, // Maintain strong coverage for readability
+              0.2, // Still strong black
+              0.3, // Begin gradual fade
+              0.42, // Smooth transition
+              0.52, // Faster fade point
+              0.62, // Quick transition
+              0.7, // Rapid fade
+              0.8, // Very light
+              0.9, // Nearly gone
+              1.0, // Bottom: Fully transparent
             ],
           ),
         );
@@ -272,42 +260,30 @@ class VideoOverlay extends StatelessWidget {
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
             colors: [
-              Colors.black,
-              Colors.black.withValues(alpha: 0.99),
-              Colors.black.withValues(alpha: 0.98),
-              Colors.black.withValues(alpha: 0.97),
-              Colors.black.withValues(alpha: 0.96),
-              Colors.black.withValues(alpha: 0.95),
-              Colors.black.withValues(alpha: 0.93),
-              Colors.black.withValues(alpha: 0.9),
-              Colors.black.withValues(alpha: 0.87),
-              Colors.black.withValues(alpha: 0.83),
-              Colors.black.withValues(alpha: 0.75),
-              Colors.black.withValues(alpha: 0.6),
-              Colors.black.withValues(alpha: 0.4),
-              Colors.black.withValues(alpha: 0.2),
-              Colors.black.withValues(alpha: 0.08),
-              Colors.black.withValues(alpha: 0.02),
-              Colors.transparent,
+              Colors.black, // Solid black for controls
+              Colors.black.withValues(alpha: 0.95), // Strong coverage
+              Colors.black.withValues(alpha: 0.88), // Still very strong
+              Colors.black.withValues(alpha: 0.78), // Strong transition
+              Colors.black.withValues(alpha: 0.65), // Begin smooth fade
+              Colors.black.withValues(alpha: 0.48), // Faster fade
+              Colors.black.withValues(alpha: 0.32), // Quick transition
+              Colors.black.withValues(alpha: 0.18), // Rapid fade
+              Colors.black.withValues(alpha: 0.08), // Very light
+              Colors.black.withValues(alpha: 0.02), // Nearly gone
+              Colors.transparent, // Transparent end
             ],
             stops: [
               0.0, // Bottom: Full black - solid area for controls
-              0.02, // Very slight fade start
-              0.04, // Still very strong black
-              0.06, // Strong black maintained
-              0.08, // Still solid black
-              0.12, // Very strong black - extended
-              0.16, // Strong black - solid area
-              0.22, // Still strong black
-              0.28, // Solid black maintained
-              0.35, // Strong black - almost halfway
-              0.42, // Still very solid black
-              0.5, // Halfway point - start smooth fade
-              0.58, // Begin gradual fade
-              0.67, // Smooth fade transition
-              0.76, // Light fade
-              0.85, // Very light
-              1.0, // Top: Transparent - smooth fade out
+              0.1, // Maintain strong coverage for readability
+              0.2, // Still strong black
+              0.3, // Begin gradual fade
+              0.42, // Smooth transition
+              0.52, // Faster fade point
+              0.62, // Quick transition
+              0.7, // Rapid fade
+              0.8, // Very light
+              0.9, // Nearly gone
+              1.0, // Top: Fully transparent
             ],
           ),
         );
