@@ -90,7 +90,7 @@ class _VideoChatState extends State<VideoChat>
 
     // Initialize animation controller for smooth drag interactions
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
 
@@ -99,7 +99,7 @@ class _VideoChatState extends State<VideoChat>
         Tween<double>(begin: 0, end: 0).animate(
           CurvedAnimation(
             parent: _animationController,
-            curve: Curves.elasticOut,
+            curve: Curves.easeOut,
           ),
         )..addListener(() {
           setState(() {
@@ -183,7 +183,7 @@ class _VideoChatState extends State<VideoChat>
         .animate(
           CurvedAnimation(
             parent: _animationController,
-            curve: Curves.elasticOut,
+            curve: Curves.easeOut,
           ),
         );
 
@@ -513,55 +513,52 @@ class _VideoChatState extends State<VideoChat>
                                     _pipMaxDragDistance *
                                     0.1);
 
-                            // Only apply rounded corners when dragging or animating
-                            final shouldHaveRoundedCorners =
-                                _isPipDragging || currentDragDistance > 0;
-                            final borderRadius = shouldHaveRoundedCorners
-                                ? BorderRadius.circular(8)
-                                : BorderRadius.zero;
-
                             return Transform.translate(
                               offset: Offset(0, currentDragDistance),
                               child: Transform.scale(
                                 scale: scaleFactor.clamp(0.9, 1.0),
                                 child: Stack(
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: borderRadius,
-                                      child: GestureDetector(
-                                        onPanStart: _handlePipDragStart,
-                                        onPanUpdate: _handlePipDragUpdate,
-                                        onPanEnd: _handlePipDragEnd,
-                                        onPanCancel: _handlePipDragCancel,
-                                        child: AspectRatio(
-                                          aspectRatio: 16 / 9,
-                                          child: video,
-                                        ),
+                                    GestureDetector(
+                                      onPanStart: _handlePipDragStart,
+                                      onPanUpdate: _handlePipDragUpdate,
+                                      onPanEnd: _handlePipDragEnd,
+                                      onPanCancel: _handlePipDragCancel,
+                                      child: AspectRatio(
+                                        aspectRatio: 16 / 9,
+                                        child: video,
                                       ),
                                     ),
-                                    // Simple text overlay that follows the video
-                                    if (_isPipDragging &&
-                                        !_videoStore.isInPipMode)
+                                    // Simple text overlay that follows the video with smooth opacity animation
+                                    if (!_videoStore.isInPipMode)
                                       Positioned.fill(
-                                        child: Container(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.4,
-                                          ),
-                                          child: Center(
-                                            child: AnimatedOpacity(
-                                              opacity: _pipDragDistance > 20
-                                                  ? 1.0
-                                                  : 0.0,
-                                              duration: const Duration(
-                                                milliseconds: 200,
+                                        child: IgnorePointer(
+                                          ignoring:
+                                              !(_isPipDragging &&
+                                                  _pipDragDistance > 0),
+                                          child: AnimatedOpacity(
+                                            opacity:
+                                                (_isPipDragging &&
+                                                    _pipDragDistance > 0)
+                                                ? 1.0
+                                                : 0.0,
+                                            duration: const Duration(
+                                              milliseconds: 150,
+                                            ),
+                                            curve: Curves.easeOut,
+                                            child: Container(
+                                              color: Colors.black.withValues(
+                                                alpha: 0.4,
                                               ),
-                                              child: const Text(
-                                                'Swipe down to enter picture-in-picture',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
+                                              child: const Center(
+                                                child: Text(
+                                                  'Swipe down to enter picture-in-picture',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -602,6 +599,8 @@ class _VideoChatState extends State<VideoChat>
     _chatStore.dispose();
 
     _videoStore.dispose();
+
+    _animationController.dispose();
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
