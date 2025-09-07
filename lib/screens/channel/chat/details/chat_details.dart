@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
@@ -32,6 +35,9 @@ class ChatDetails extends StatefulWidget {
 
 class _ChatDetailsState extends State<ChatDetails> {
   late final _scrollController = ScrollController();
+
+  bool _isRefreshingAssets = false;
+  bool _showRefreshSuccess = false;
 
   String formatDuration(Duration duration) {
     if (duration.inMinutes < 60) {
@@ -235,6 +241,51 @@ class _ChatDetailsState extends State<ChatDetails> {
         roomState.r9k != '0';
   }
 
+  Widget _buildRefreshTrailingWidget() {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 200),
+      child: _isRefreshingAssets
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+            )
+          : _showRefreshSuccess
+          ? Icon(
+              Icons.check_rounded,
+              color: Theme.of(context).colorScheme.primary,
+              key: const ValueKey('success'),
+            )
+          : const SizedBox.shrink(),
+    );
+  }
+
+  Future<void> _handleRefreshAssets() async {
+    setState(() => _isRefreshingAssets = true);
+
+    try {
+      await widget.chatStore.getAssets();
+      if (mounted) {
+        HapticFeedback.lightImpact();
+        setState(() {
+          _isRefreshingAssets = false;
+          _showRefreshSuccess = true;
+        });
+
+        // Hide success after 2 seconds
+        Timer(const Duration(seconds: 2), () {
+          if (mounted) {
+            setState(() => _showRefreshSuccess = false);
+          }
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isRefreshingAssets = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Observer(
@@ -243,115 +294,106 @@ class _ChatDetailsState extends State<ChatDetails> {
 
         final children = [
           if (hasActiveModes) ...[
-            const SectionHeader(
-              'Active chat modes',
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              isFirst: true,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ChatModes(roomState: widget.chatDetailsStore.roomState),
-            ),
-            const Divider(height: 16, indent: 16, endIndent: 16),
-          ],
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: GridView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                childAspectRatio: 16 / 9,
+            const SectionHeader('Active chat modes', isFirst: true),
+            SizedBox(
+              height: 48,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                children: [
+                  Observer(
+                    builder: (context) =>
+                        ChatModes(roomState: widget.chatDetailsStore.roomState),
+                  ),
+                ],
               ),
-              children: [
-                _buildActionCard(
-                  icon: Icons.people_outline,
-                  label: 'Chatters',
-                  onTap: () => showModalBottomSheetWithProperFocus(
-                    isScrollControlled: true,
-                    context: context,
-                    builder: (context) => GestureDetector(
-                      onTap: FocusScope.of(context).unfocus,
-                      child: ChattersList(
-                        chatDetailsStore: widget.chatDetailsStore,
-                        chatStore: widget.chatStore,
-                        userLogin: widget.userLogin,
-                      ),
-                    ),
-                  ),
+            ),
+          ],
+          const SizedBox(height: 12),
+          Divider(indent: 16, endIndent: 16),
+          Observer(
+            builder: (context) {
+              final showVideo = widget.chatStore.settings.showVideo;
+              final label = showVideo ? 'Chat only' : 'Show video';
+              return ListTile(
+                leading: Icon(
+                  showVideo ? Icons.chat_outlined : Icons.tv_outlined,
                 ),
-                Observer(
-                  builder: (context) {
-                    final hasTimer =
-                        widget.chatStore.timeRemaining.inSeconds > 0;
-                    final label = hasTimer
-                        ? formatTimeLeft(widget.chatStore.timeRemaining)
-                        : 'Sleep timer';
-                    return _buildActionCard(
-                      icon: Icons.timer_outlined,
-                      label: label,
-                      labelStyle: hasTimer
-                          ? const TextStyle(
-                              fontFeatures: [FontFeature.tabularFigures()],
-                            )
-                          : null,
-                      onTap: () => _showSleepTimer(context),
-                    );
-                  },
+                title: Text(label),
+                onTap: () {
+                  widget.chatStore.settings.showVideo = !showVideo;
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+          ),
+          if (widget.chatStore.auth.isLoggedIn)
+            ListTile(
+              leading: const Icon(Icons.palette_outlined),
+              title: const Text('Username color'),
+              onTap: () => _showChatColorPicker(context),
+            ),
+          ListTile(
+            leading: const Icon(Icons.people_outline),
+            title: const Text('Chatters'),
+            onTap: () => showModalBottomSheetWithProperFocus(
+              isScrollControlled: true,
+              context: context,
+              builder: (context) => GestureDetector(
+                onTap: FocusScope.of(context).unfocus,
+                child: ChattersList(
+                  chatDetailsStore: widget.chatDetailsStore,
+                  chatStore: widget.chatStore,
+                  userLogin: widget.userLogin,
                 ),
-                if (widget.chatStore.auth.isLoggedIn)
-                  _buildActionCard(
-                    icon: Icons.palette_outlined,
-                    label: 'Username color',
-                    onTap: () => _showChatColorPicker(context),
-                  ),
-                _buildActionCard(
-                  icon: Icons.refresh_rounded,
-                  label: 'Reconnect to chat',
-                  onTap: () {
-                    widget.chatStore.updateNotification(
-                      'Reconnecting to chat...',
-                    );
-                    widget.chatStore.connectToChat();
-                  },
+              ),
+            ),
+          ),
+          Observer(
+            builder: (context) {
+              final hasTimer = widget.chatStore.timeRemaining.inSeconds > 0;
+              final label = hasTimer
+                  ? formatTimeLeft(widget.chatStore.timeRemaining)
+                  : 'Sleep timer';
+              return ListTile(
+                leading: Icon(hasTimer ? Icons.timer : Icons.timer_outlined),
+                title: Text(
+                  label,
+                  style: hasTimer
+                      ? const TextStyle(
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        )
+                      : null,
                 ),
-                _buildActionCard(
-                  icon: Icons.refresh_rounded,
-                  label: 'Refresh badges and emotes',
-                  onTap: () async {
-                    await widget.chatStore.getAssets();
-                    widget.chatStore.updateNotification(
-                      'Badges and emotes refreshed',
-                    );
-                  },
-                ),
-                Observer(
-                  builder: (context) {
-                    final showVideo = widget.chatStore.settings.showVideo;
-                    final label =
-                        '${showVideo ? 'Enter' : 'Exit'} chat-only mode';
-                    return _buildActionCard(
-                      icon: Icons.chat_outlined,
-                      label: label,
-                      onTap: () => widget.chatStore.settings.showVideo =
-                          !widget.chatStore.settings.showVideo,
-                    );
-                  },
-                ),
-                _buildActionCard(
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          Settings(settingsStore: widget.chatStore.settings),
-                    ),
-                  ),
-                ),
-              ],
+                onTap: () => _showSleepTimer(context),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.refresh_rounded),
+            title: const Text('Refresh emotes and badges'),
+            trailing: _buildRefreshTrailingWidget(),
+            enabled: !_isRefreshingAssets,
+            onTap: _isRefreshingAssets ? null : _handleRefreshAssets,
+          ),
+          ListTile(
+            leading: const Icon(Icons.refresh_rounded),
+            title: const Text('Reconnect'),
+            onTap: () {
+              Navigator.of(context).pop();
+              widget.chatStore.updateNotification('Reconnecting to chat...');
+              widget.chatStore.connectToChat();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined),
+            title: const Text('Settings'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    Settings(settingsStore: widget.chatStore.settings),
+              ),
             ),
           ),
         ];
@@ -365,62 +407,6 @@ class _ChatDetailsState extends State<ChatDetails> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-}
-
-extension on _ChatDetailsState {
-  Widget _buildActionCard({
-    required IconData icon,
-    required String label,
-    required VoidCallback? onTap,
-    TextStyle? labelStyle,
-  }) {
-    return Card(
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: const AspectRatio(
-          aspectRatio: 16 / 9,
-          child: _CardContents(),
-        )._withIconAndLabel(icon, label, labelStyle: labelStyle),
-      ),
-    );
-  }
-}
-
-class _CardContents extends StatelessWidget {
-  const _CardContents({this.icon, this.label, this.labelStyle});
-
-  final IconData? icon;
-  final String? label;
-  final TextStyle? labelStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) Icon(icon),
-          if (label != null) ...[
-            const SizedBox(height: 8),
-            Text(label!, textAlign: TextAlign.center, style: labelStyle),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-extension on Widget {
-  Widget _withIconAndLabel(
-    IconData icon,
-    String label, {
-    TextStyle? labelStyle,
-  }) {
-    return _CardContents(icon: icon, label: label, labelStyle: labelStyle);
   }
 }
 
