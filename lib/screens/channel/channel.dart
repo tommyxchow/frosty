@@ -536,34 +536,29 @@ class _VideoChatState extends State<VideoChat>
                                         ),
                                       ),
                                     ),
-                                    // Simple text overlay that follows the video with smooth transition
-                                    if (!_videoStore.isInPipMode)
+                                    // Simple text overlay that follows the video
+                                    if (_isPipDragging &&
+                                        !_videoStore.isInPipMode)
                                       Positioned.fill(
-                                        child: AnimatedOpacity(
-                                          opacity: _isPipDragging ? 1.0 : 0.0,
-                                          duration: const Duration(
-                                            milliseconds: 150,
+                                        child: Container(
+                                          color: Colors.black.withValues(
+                                            alpha: 0.4,
                                           ),
-                                          child: Container(
-                                            color: Colors.black.withValues(
-                                              alpha: 0.4,
-                                            ),
-                                            child: Center(
-                                              child: AnimatedOpacity(
-                                                opacity: _pipDragDistance > 20
-                                                    ? 1.0
-                                                    : 0.0,
-                                                duration: const Duration(
-                                                  milliseconds: 200,
-                                                ),
-                                                child: const Text(
-                                                  'Swipe down to enter picture-in-picture',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
+                                          child: Center(
+                                            child: AnimatedOpacity(
+                                              opacity: _pipDragDistance > 20
+                                                  ? 1.0
+                                                  : 0.0,
+                                              duration: const Duration(
+                                                milliseconds: 200,
+                                              ),
+                                              child: const Text(
+                                                'Swipe down to enter picture-in-picture',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                             ),
