@@ -343,23 +343,6 @@ class VideoOverlay extends StatelessWidget {
                     ],
                   ),
                   Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 10,
-                      ),
-                      child: Text(
-                        'Offline',
-                        style: TextStyle(
-                          color: surfaceColor.withValues(alpha: 0.7),
-                          fontWeight: FontWeight.w500,
-                          shadows: _textShadow,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Align(
                     alignment: Alignment.bottomRight,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
