@@ -8,10 +8,9 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/onboarding/onboarding_scaffold.dart';
 import 'package:frosty/screens/onboarding/onboarding_welcome.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
-// import removed: frosty/widgets/dialog.dart
-import 'package:frosty/widgets/accent_color_picker_dialog.dart';
+import 'package:frosty/widgets/accent_color_setting.dart';
+import 'package:frosty/widgets/theme_selection_setting.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,42 +29,8 @@ class OnboardingSetup extends StatelessWidget {
         builder: (context) {
           return ListView(
             children: [
-              SettingsListSelect(
-                title: 'Theme',
-                selectedOption: themeNames[settingsStore.themeType.index],
-                options: themeNames,
-                onChanged: (newTheme) => settingsStore.themeType =
-                    ThemeType.values[themeNames.indexOf(newTheme)],
-              ),
-              ListTile(
-                title: const Text('Accent color'),
-                trailing: IconButton(
-                  icon: DecoratedBox(
-                    position: DecorationPosition.foreground,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        width: 2,
-                      ),
-                    ),
-                    child: CircleAvatar(
-                      backgroundColor: Color(settingsStore.accentColor),
-                      radius: 16,
-                    ),
-                  ),
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AccentColorPickerDialog(
-                        initialColor: Color(settingsStore.accentColor),
-                        onColorChanged: (newColor) =>
-                            settingsStore.accentColor = newColor.toARGB32(),
-                      ),
-                    );
-                  },
-                ),
-              ),
+              ThemeSelectionSetting(settingsStore: settingsStore),
+              AccentColorSetting(settingsStore: settingsStore),
               SettingsListSwitch(
                 title: 'Show historical recent messages',
                 subtitle: Text.rich(
