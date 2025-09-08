@@ -879,7 +879,7 @@ class IRCMessage {
             ),
             subtitle: subtitle,
           ),
-          const Divider(),
+          const Divider(indent: 16, endIndent: 16),
           if (showCopyName)
             ListTile(
               leading: const Icon(Icons.copy_rounded),

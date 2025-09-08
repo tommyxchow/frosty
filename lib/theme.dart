@@ -26,6 +26,8 @@ class FrostyThemes {
   }) {
     final borderColor = colorScheme.outlineVariant.withValues(alpha: 0.5);
 
+    const borderWidth = 0.5;
+
     return ThemeData(
       colorScheme: colorScheme,
       fontFamily: 'Inter',
@@ -35,10 +37,6 @@ class FrostyThemes {
         showDragHandle: true,
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-          side: BorderSide(color: borderColor),
-        ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: backgroundColor,
@@ -115,8 +113,8 @@ class FrostyThemes {
         behavior: SnackBarBehavior.floating,
       ),
       dividerTheme: DividerThemeData(
-        thickness: 1,
-        space: 1,
+        thickness: borderWidth,
+        space: borderWidth,
         color: borderColor,
       ),
       textTheme: TextTheme(

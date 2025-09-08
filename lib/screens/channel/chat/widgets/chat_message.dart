@@ -110,7 +110,7 @@ class ChatMessage extends StatelessWidget {
               ),
             ),
           ),
-          const Divider(),
+          const Divider(indent: 12, endIndent: 12),
           ListTile(
             onTap: () {
               copyMessage();
