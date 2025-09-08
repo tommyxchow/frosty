@@ -37,7 +37,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.all(12),
+            contentPadding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
             leading: ProfilePicture(userLogin: widget.username),
             title: Row(
               children: [

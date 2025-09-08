@@ -26,8 +26,6 @@ class FrostyThemes {
   }) {
     final borderColor = colorScheme.outlineVariant.withValues(alpha: 0.5);
 
-    const borderWidth = 0.5;
-
     return ThemeData(
       colorScheme: colorScheme,
       fontFamily: 'Inter',
@@ -59,7 +57,11 @@ class FrostyThemes {
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         filled: true,
-        fillColor: colorScheme.surfaceContainer.withValues(alpha: 0.6),
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+        hintStyle: TextStyle(
+          color: colorScheme.onSurface.withValues(alpha: 0.6),
+          fontWeight: FontWeight.normal,
+        ),
         border: OutlineInputBorder(
           borderRadius: const BorderRadius.all(Radius.circular(100)),
           borderSide: BorderSide.none,
@@ -113,8 +115,8 @@ class FrostyThemes {
         behavior: SnackBarBehavior.floating,
       ),
       dividerTheme: DividerThemeData(
-        thickness: borderWidth,
-        space: borderWidth,
+        thickness: 1,
+        space: 1,
         color: borderColor,
       ),
       textTheme: TextTheme(

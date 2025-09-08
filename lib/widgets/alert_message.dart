@@ -19,7 +19,9 @@ class AlertMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor = Theme.of(context).colorScheme.onSurface;
+    final defaultColor = Theme.of(
+      context,
+    ).colorScheme.onSurface.withValues(alpha: vertical ? 0.6 : 1);
 
     final Widget widget;
 

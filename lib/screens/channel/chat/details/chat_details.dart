@@ -310,7 +310,7 @@ class _ChatDetailsState extends State<ChatDetails> {
             ),
           ],
           const SizedBox(height: 12),
-          Divider(indent: 16, endIndent: 16),
+          const Divider(),
           Observer(
             builder: (context) {
               final showVideo = widget.chatStore.settings.showVideo;

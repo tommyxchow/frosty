@@ -91,8 +91,9 @@ class ChatMessage extends StatelessWidget {
         shrinkWrap: true,
         primary: false,
         children: [
-          ListTile(
-            title: Text.rich(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text.rich(
               TextSpan(
                 children: ircMessage.generateSpan(
                   context,
@@ -109,6 +110,7 @@ class ChatMessage extends StatelessWidget {
               ),
             ),
           ),
+          const Divider(),
           ListTile(
             onTap: () {
               copyMessage();
