@@ -37,6 +37,10 @@ class FrostyThemes {
         showDragHandle: true,
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          side: BorderSide(color: borderColor),
+        ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: backgroundColor,
