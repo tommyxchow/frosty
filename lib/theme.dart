@@ -24,9 +24,9 @@ class FrostyThemes {
     required ColorScheme colorScheme,
     Color? backgroundColor,
   }) {
-    final borderColor = colorScheme.outlineVariant;
+    final borderColor = colorScheme.outlineVariant.withValues(alpha: 0.5);
 
-    const borderWidth = 0.25;
+    const borderWidth = 0.5;
 
     return ThemeData(
       colorScheme: colorScheme,
@@ -41,6 +41,10 @@ class FrostyThemes {
       dialogTheme: DialogThemeData(
         backgroundColor: backgroundColor,
         surfaceTintColor: backgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(color: borderColor),
+        ),
       ),
       appBarTheme: AppBarTheme(
         elevation: 0,
@@ -86,12 +90,12 @@ class FrostyThemes {
         tabAlignment: TabAlignment.start,
       ),
       tooltipTheme: TooltipThemeData(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         showDuration: const Duration(seconds: 2),
         decoration: BoxDecoration(
           color: colorScheme.surface,
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
-          border: Border.all(color: borderColor, width: borderWidth),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          border: Border.all(color: borderColor),
         ),
         textStyle: TextStyle(color: colorScheme.onSurface),
       ),
@@ -100,7 +104,7 @@ class FrostyThemes {
         backgroundColor: backgroundColor,
         shape: RoundedRectangleBorder(
           side: BorderSide(color: borderColor),
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
         ),
         behavior: SnackBarBehavior.floating,
       ),
@@ -112,7 +116,8 @@ class FrostyThemes {
       textTheme: TextTheme(
         // Alert dialog title
         headlineSmall: TextStyle(
-          fontWeight: FontWeight.w700,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
           letterSpacing: -0.019,
         ),
 

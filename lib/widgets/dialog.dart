@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:frosty/widgets/section_header.dart';
 
 /// A custom dialog that makes the title bold, displays actions in a full-width row layout with 50/50 split for 2 buttons, and adds a subtle border.
 class FrostyDialog extends StatelessWidget {
@@ -19,12 +18,11 @@ class FrostyDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      title: Text(title),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SectionHeader(title, isFirst: true, padding: EdgeInsets.zero),
-            const SizedBox(height: 16),
             if (message != null) Text(message!),
             if (content != null) content!,
             if (actions != null) ...[
