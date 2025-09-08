@@ -37,11 +37,10 @@ class UnauthorizedInterceptor extends Interceptor {
 
     // Determine if user is logged in but missing scopes vs completely logged out
     final isLoggedIn = _authStore.isLoggedIn;
-    final title = isLoggedIn ? 'Missing Permissions' : 'Session Expired';
+    final title = isLoggedIn ? 'Missing permissions' : 'Session expired';
     final message = isLoggedIn
-        ? 'Your account is missing required permissions. Please re-authorize to continue.'
-        : 'Your login session has expired. Please log in again to continue.';
-    final buttonText = isLoggedIn ? 'Re-authorize' : 'Log In';
+        ? 'Your session is missing permissions. Please log in again to continue.'
+        : 'Your session has expired. Please log in again to continue.';
 
     showDialog(
       context: context,
@@ -72,7 +71,7 @@ class UnauthorizedInterceptor extends Interceptor {
                   ),
                 );
               },
-              child: Text(buttonText),
+              child: Text('Log in'),
             ),
           ],
         );
