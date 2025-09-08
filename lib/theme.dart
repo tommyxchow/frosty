@@ -157,7 +157,10 @@ class FrostyThemes {
         ),
 
         // Body text
-        bodyLarge: TextStyle(letterSpacing: -0.011),
+        bodyLarge: TextStyle(
+          fontWeight: FontWeight.w500,
+          letterSpacing: -0.011,
+        ),
         bodyMedium: TextStyle(letterSpacing: -0.006),
         bodySmall: TextStyle(letterSpacing: 0),
       ),
