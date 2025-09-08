@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/accent_color_picker_dialog.dart';
 
@@ -9,33 +10,35 @@ class AccentColorSetting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: const Text('Accent color'),
-      trailing: IconButton(
-        icon: DecoratedBox(
-          position: DecorationPosition.foreground,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Theme.of(context).colorScheme.onSurface,
-              width: 2,
+    return Observer(
+      builder: (context) => ListTile(
+        title: const Text('Accent color'),
+        trailing: IconButton(
+          icon: DecoratedBox(
+            position: DecorationPosition.foreground,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface,
+                width: 2,
+              ),
+            ),
+            child: CircleAvatar(
+              backgroundColor: Color(settingsStore.accentColor),
+              radius: 16,
             ),
           ),
-          child: CircleAvatar(
-            backgroundColor: Color(settingsStore.accentColor),
-            radius: 16,
-          ),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AccentColorPickerDialog(
+                initialColor: Color(settingsStore.accentColor),
+                onColorChanged: (newColor) =>
+                    settingsStore.accentColor = newColor.toARGB32(),
+              ),
+            );
+          },
         ),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) => AccentColorPickerDialog(
-              initialColor: Color(settingsStore.accentColor),
-              onColorChanged: (newColor) =>
-                  settingsStore.accentColor = newColor.toARGB32(),
-            ),
-          );
-        },
       ),
     );
   }

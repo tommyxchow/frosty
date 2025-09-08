@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 
@@ -9,11 +10,13 @@ class ThemeSelectionSetting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsListSelect(
-      selectedOption: themeNames[settingsStore.themeType.index],
-      options: themeNames,
-      onChanged: (newTheme) => settingsStore.themeType =
-          ThemeType.values[themeNames.indexOf(newTheme)],
+    return Observer(
+      builder: (context) => SettingsListSelect(
+        selectedOption: themeNames[settingsStore.themeType.index],
+        options: themeNames,
+        onChanged: (newTheme) => settingsStore.themeType =
+            ThemeType.values[themeNames.indexOf(newTheme)],
+      ),
     );
   }
 }
