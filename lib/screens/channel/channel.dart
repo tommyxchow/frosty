@@ -11,6 +11,7 @@ import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
@@ -440,6 +441,16 @@ class _VideoChatState extends State<VideoChat>
                                   );
 
                                   return SafeArea(
+                                    left:
+                                        settingsStore.landscapeCutout ==
+                                            LandscapeCutoutType.left ||
+                                        settingsStore.landscapeCutout ==
+                                            LandscapeCutoutType.both,
+                                    right:
+                                        settingsStore.landscapeCutout ==
+                                            LandscapeCutoutType.right ||
+                                        settingsStore.landscapeCutout ==
+                                            LandscapeCutoutType.both,
                                     child: Row(
                                       children:
                                           settingsStore.landscapeChatLeftSide
