@@ -175,7 +175,9 @@ class StreamInfoBar extends StatelessWidget {
                     (!isOffline && showUptime) ||
                     (!isOffline && showViewerCount) ||
                     (showCategory &&
-                        (isOffline ? (offlineChannelInfo?.gameName.isNotEmpty ?? false) : (streamInfo?.gameName.isNotEmpty ?? false)))) ...[
+                        (isOffline
+                            ? (offlineChannelInfo?.gameName.isNotEmpty ?? false)
+                            : (streamInfo?.gameName.isNotEmpty ?? false)))) ...[
                   Row(
                     children: [
                       if (isOffline && showOfflineIndicator) ...[
@@ -260,7 +262,8 @@ class StreamInfoBar extends StatelessWidget {
                               FontWeight.w500,
                             ),
                           ),
-                          if (!isOffline && showViewerCount) const SizedBox(width: 8),
+                          if (!isOffline && showViewerCount)
+                            const SizedBox(width: 8),
                         ],
                         if (!isOffline && showViewerCount) ...[
                           Icon(
@@ -279,12 +282,14 @@ class StreamInfoBar extends StatelessWidget {
                             ),
                           ),
                         ],
-                        if (!isOffline && showCategory &&
+                        if (!isOffline &&
+                            showCategory &&
                             (streamInfo?.gameName.isNotEmpty ?? false) &&
                             (showUptime || showViewerCount)) ...[
                           const SizedBox(width: 8),
                         ],
-                        if (!isOffline && showCategory &&
+                        if (!isOffline &&
+                            showCategory &&
                             (streamInfo?.gameName.isNotEmpty ?? false)) ...[
                           Icon(
                             Icons.gamepad,

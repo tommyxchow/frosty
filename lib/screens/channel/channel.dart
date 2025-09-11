@@ -97,10 +97,7 @@ class _VideoChatState extends State<VideoChat>
     // Spring-back animation with smooth easing
     _springBackAnimation =
         Tween<double>(begin: 0, end: 0).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOut,
-          ),
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
         )..addListener(() {
           setState(() {
             _pipDragDistance = _springBackAnimation.value;
@@ -181,10 +178,7 @@ class _VideoChatState extends State<VideoChat>
   void _animateSpringBack() {
     _springBackAnimation = Tween<double>(begin: _pipDragDistance, end: 0)
         .animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOut,
-          ),
+          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
         );
 
     _animationController.reset();

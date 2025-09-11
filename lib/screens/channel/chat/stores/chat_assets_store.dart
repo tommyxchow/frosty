@@ -262,18 +262,19 @@ abstract class ChatAssetsStoreBase with Store {
     // Add emote futures for each participant.
     futures.addAll(
       newParticipantIds.map(
-        (id) => _fetchEmotesForChannel(
-          id,
-          onEmoteError: onEmoteError,
-          showTwitchEmotes: showTwitchEmotes,
-          show7TVEmotes: show7TVEmotes,
-          showBTTVEmotes: showBTTVEmotes,
-          showFFZEmotes: showFFZEmotes,
-        ).then((emotes) {
-          for (final emote in emotes) {
-            _emoteToObject[emote.name] = emote;
-          }
-        }),
+        (id) =>
+            _fetchEmotesForChannel(
+              id,
+              onEmoteError: onEmoteError,
+              showTwitchEmotes: showTwitchEmotes,
+              show7TVEmotes: show7TVEmotes,
+              showBTTVEmotes: showBTTVEmotes,
+              showFFZEmotes: showFFZEmotes,
+            ).then((emotes) {
+              for (final emote in emotes) {
+                _emoteToObject[emote.name] = emote;
+              }
+            }),
       ),
     );
 
