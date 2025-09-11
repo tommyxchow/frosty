@@ -153,8 +153,13 @@ class TwitchApi extends BaseApiClient {
         headers: {'Authorization': 'Bearer $token'},
       );
       return true;
-    } on ApiException {
+    } on UnauthorizedException {
+      // 401 -> token is invalid/expired (propagated from interceptor for validate requests)
       return false;
+    } on ApiException catch (e) {
+      // Network/timeout/server errors -> treat as indeterminate, not invalid
+      debugPrint('Token validation indeterminate: $e');
+      rethrow;
     }
   }
 

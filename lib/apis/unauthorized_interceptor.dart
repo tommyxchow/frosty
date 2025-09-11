@@ -16,9 +16,14 @@ class UnauthorizedInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) {
     // Check if this is a 401 Unauthorized error
     if (err.response?.statusCode == 401) {
-      // Show login dialog
+      // For token validation requests, let the error propagate so validateToken can handle it
+      if (err.requestOptions.uri.path.endsWith('/validate')) {
+        handler.next(err);
+        return;
+      }
+
+      // For other requests, show login dialog and don't propagate
       _showLoginDialog();
-      // Don't call handler.next() to prevent the error from propagating further
       return;
     }
 

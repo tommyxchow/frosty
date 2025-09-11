@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
@@ -29,6 +30,9 @@ abstract class AuthBase with Store {
 
   /// Whether the token is valid or not.
   var _tokenIsValid = false;
+
+  /// Timer used to retry authentication when offline or on transient failures.
+  Timer? _reconnectTimer;
 
   /// The MobX store containing information relevant to the current user.
   final UserStore user;
@@ -210,8 +214,16 @@ abstract class AuthBase with Store {
           await _storage.write(key: _defaultTokenKey, value: _token);
         }
       } else {
-        // Validate the existing token.
-        _tokenIsValid = await twitchApi.validateToken(token: _token!);
+        // Validate the existing token. If network/server error occurs,
+        // don't log out — start a reconnect loop instead.
+        try {
+          _tokenIsValid = await twitchApi.validateToken(token: _token!);
+        } on ApiException catch (e) {
+          debugPrint('Token validation failed (transient): $e');
+          _isLoggedIn = false;
+          _startReconnectLoop();
+          return;
+        }
 
         // If the token is invalid, logout.
         if (!_tokenIsValid) return await logout();
@@ -219,7 +231,10 @@ abstract class AuthBase with Store {
         // Initialize the user store.
         await user.init();
 
-        if (user.details != null) _isLoggedIn = true;
+        if (user.details != null) {
+          _isLoggedIn = true;
+          _stopReconnectLoop();
+        }
       }
 
       _error = null;
@@ -247,7 +262,10 @@ abstract class AuthBase with Store {
       await user.init();
 
       // Set the login status to logged in.
-      if (user.details != null) _isLoggedIn = true;
+      if (user.details != null) {
+        _isLoggedIn = true;
+        _stopReconnectLoop();
+      }
     } catch (e) {
       debugPrint('Login failed due to $e');
     }
@@ -257,6 +275,7 @@ abstract class AuthBase with Store {
   @action
   Future<void> logout() async {
     try {
+      _stopReconnectLoop();
       // Delete the existing user token.
       await _storage.delete(key: _userTokenKey);
       _token = null;
@@ -280,5 +299,43 @@ abstract class AuthBase with Store {
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  void _startReconnectLoop() {
+    if (_reconnectTimer != null) return;
+    _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (_) async {
+      try {
+        final stored = await _storage.read(key: _userTokenKey);
+        if (stored == null) {
+          _stopReconnectLoop();
+          return;
+        }
+
+        final isValid = await twitchApi.validateToken(token: stored);
+        if (!isValid) {
+          // Token truly invalid; stop retrying and proceed to logout.
+          await logout();
+          return;
+        }
+
+        // Token valid again — restore session.
+        _token = stored;
+        await user.init();
+        if (user.details != null) {
+          _isLoggedIn = true;
+          _error = null;
+          _stopReconnectLoop();
+        }
+      } on ApiException catch (_) {
+        // Still offline or transient issue; keep retrying.
+      } catch (e) {
+        debugPrint('Reconnect loop error: $e');
+      }
+    });
+  }
+
+  void _stopReconnectLoop() {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
   }
 }
