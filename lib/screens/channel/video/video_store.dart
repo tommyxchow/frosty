@@ -148,6 +148,9 @@ abstract class VideoStoreBase with Store {
   /// The timer that handles periodic stream info updates
   Timer? _streamInfoTimer;
 
+  /// Tracks the last time stream info was updated to prevent double refresh
+  DateTime? _lastStreamInfoUpdate;
+
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
 
@@ -494,7 +497,7 @@ abstract class VideoStoreBase with Store {
     if (_overlayVisible) {
       _overlayVisible = false;
     } else {
-      updateStreamInfo();
+      updateStreamInfo(forceUpdate: true);
 
       _overlayVisible = true;
       _overlayTimer = Timer(
@@ -522,11 +525,32 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  /// Handles app resume event for immediate stream info refresh in chat-only mode.
+  @action
+  void handleAppResume() {
+    // Only refresh immediately in chat-only mode
+    if (!settingsStore.showVideo) {
+      updateStreamInfo(forceUpdate: true);
+    }
+  }
+
   /// Updates the stream info from the Twitch API.
   ///
   /// If the stream is offline, fetches channel information to show offline details.
+  /// Set [forceUpdate] to true to bypass the rate limiting check.
   @action
-  Future<void> updateStreamInfo() async {
+  Future<void> updateStreamInfo({bool forceUpdate = false}) async {
+    // Rate limiting: prevent too frequent updates unless forced
+    final now = DateTime.now();
+    if (!forceUpdate && _lastStreamInfoUpdate != null) {
+      final timeSinceLastUpdate = now.difference(_lastStreamInfoUpdate!);
+      if (timeSinceLastUpdate.inSeconds < 5) {
+        return; // Skip update if less than 5 seconds since last update
+      }
+    }
+
+    _lastStreamInfoUpdate = now;
+
     try {
       _streamInfo = await twitchApi.getStream(userLogin: userLogin);
       // Clear offline info when stream is live

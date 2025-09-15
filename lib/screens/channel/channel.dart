@@ -40,7 +40,7 @@ class VideoChat extends StatefulWidget {
 }
 
 class _VideoChatState extends State<VideoChat>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final _videoKey = GlobalKey();
   final _chatKey = GlobalKey();
 
@@ -104,6 +104,18 @@ class _VideoChatState extends State<VideoChat>
             _pipDragDistance = _springBackAnimation.value;
           });
         });
+
+    // Register as observer for app lifecycle events
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      _videoStore.handleAppResume();
+    }
   }
 
   void _handlePipDragStart(DragStartDetails details) {
@@ -601,6 +613,9 @@ class _VideoChatState extends State<VideoChat>
 
   @override
   void dispose() {
+    // Remove observer for app lifecycle events
+    WidgetsBinding.instance.removeObserver(this);
+
     _chatStore.dispose();
 
     _videoStore.dispose();

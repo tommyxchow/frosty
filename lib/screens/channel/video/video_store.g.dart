@@ -225,8 +225,10 @@ mixin _$VideoStore on VideoStoreBase, Store {
   );
 
   @override
-  Future<void> updateStreamInfo() {
-    return _$updateStreamInfoAsyncAction.run(() => super.updateStreamInfo());
+  Future<void> updateStreamInfo({bool forceUpdate = false}) {
+    return _$updateStreamInfoAsyncAction.run(
+      () => super.updateStreamInfo(forceUpdate: forceUpdate),
+    );
   }
 
   late final _$VideoStoreBaseActionController = ActionController(
@@ -241,6 +243,18 @@ mixin _$VideoStore on VideoStoreBase, Store {
     );
     try {
       return super.handleVideoTap();
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void handleAppResume() {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+      name: 'VideoStoreBase.handleAppResume',
+    );
+    try {
+      return super.handleAppResume();
     } finally {
       _$VideoStoreBaseActionController.endAction(_$actionInfo);
     }
