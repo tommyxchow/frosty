@@ -454,14 +454,14 @@ class _VideoChatState extends State<VideoChat>
 
                                   return SafeArea(
                                     left:
-                                        settingsStore.landscapeCutout ==
-                                            LandscapeCutoutType.left ||
-                                        settingsStore.landscapeCutout ==
+                                        settingsStore.landscapeCutout !=
+                                            LandscapeCutoutType.left &&
+                                        settingsStore.landscapeCutout !=
                                             LandscapeCutoutType.both,
                                     right:
-                                        settingsStore.landscapeCutout ==
-                                            LandscapeCutoutType.right ||
-                                        settingsStore.landscapeCutout ==
+                                        settingsStore.landscapeCutout !=
+                                            LandscapeCutoutType.right &&
+                                        settingsStore.landscapeCutout !=
                                             LandscapeCutoutType.both,
                                     child: Row(
                                       children:
