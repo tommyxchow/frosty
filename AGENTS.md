@@ -1,34 +1,24 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- Source lives in `src/` with feature‑oriented folders (e.g., `src/auth/`, `src/api/`).
-- Tests live in `tests/` or next to code as `__tests__/` or `*.test.*`.
-- Tooling and scripts reside in `scripts/`; static assets in `assets/`.
-- Keep modules small and cohesive; colocate fixtures/mocks with their tests.
+Frosty is a Flutter client with a standalone marketing site. App code sits in `lib/`, split into `apis/`, `services/`, `models/`, `screens/`, `widgets/`, plus shared helpers in `utils/`, `constants.dart`, `theme.dart`, and the `main.dart` entrypoint. Platform shells live in `android/` and `ios/`; touch them only for native integrations. Assets, fonts, and splash art are checked into `assets/` and declared in `pubspec.yaml`. The Next.js site under `web/` keeps its own `src/` and `public/` structure.
 
 ## Build, Test, and Development Commands
-- Node: `npm i` (install), `npm run dev` (local dev), `npm test` (unit tests), `npm run build` (production build).
-- Python: `python -m venv .venv && . .venv/bin/activate`, `pip install -r requirements.txt`, `pytest -q` (tests), `ruff check .` (lint), `black .` (format).
-- Rust: `cargo build`, `cargo test`, `cargo fmt`, `cargo clippy`.
-- Docker (optional): `docker compose up --build` to run the stack locally.
+- `flutter pub get` syncs dependencies whenever `pubspec.yaml` changes.
+- `dart run build_runner watch --delete-conflicting-outputs` keeps MobX `*.g.dart` files in sync while editing stores.
+- `flutter run --dart-define=clientId=... --dart-define=secret=...` launches the app with Twitch credentials.
+- `flutter analyze` enforces the lint rules used by CI.
+- `flutter test` runs unit and widget suites; add `--coverage` when refreshing reports.
+- Inside `web/`, run `pnpm install`, `pnpm dev`, and `pnpm lint` for the marketing site.
 
 ## Coding Style & Naming Conventions
-- Indentation: 2 spaces (JS/TS), 4 spaces (Python); rustfmt defaults (Rust).
-- Names: camelCase for variables/functions; PascalCase for classes/types; snake_case for Python files; kebab-case for CLI scripts.
-- Formatting/Linting: Prettier + ESLint (JS/TS), Black + Ruff (Python), `cargo fmt` + Clippy (Rust). Run linters before pushing.
+Use the Flutter formatter (2-space indent) and respect `analysis_options.yaml` rules such as `prefer_single_quotes`, `require_trailing_commas`, and `always_use_package_imports`. Name Dart files with `snake_case`, classes with `PascalCase`, and MobX stores as `SomethingStore`. Keep styling centralised in `theme.dart` and avoid importing relative siblings across packages. In `web/`, rely on Prettier, TypeScript components in `PascalCase`, and hooks/helpers in `camelCase`.
 
 ## Testing Guidelines
-- Frameworks: Jest/Vitest (JS/TS), Pytest (Python), Cargo test (Rust).
-- Naming: `*.test.ts` or `*.spec.ts`; `test_*.py`; `*_test.rs`.
-- Coverage: target ≥80% for changed code. Add tests for new behavior and fixed bugs.
-- Prefer fast unit tests; keep integration tests deterministic. Use fixtures/test doubles to isolate units.
+Create Dart tests under `test/`, mirroring `lib/` paths (e.g., `lib/services/chat_service.dart` -> `test/services/chat_service_test.dart`). Prefer widget tests for UI states and mock network calls so suites stay deterministic. Run `flutter test` locally before pushing. For the web project, linting is the current gate; add component or e2e tests when introducing interactive behaviour.
 
 ## Commit & Pull Request Guidelines
-- Commits: follow Conventional Commits (e.g., `feat:`, `fix:`, `docs:`, `chore:`). Keep them small, focused, and imperative; include rationale when non‑obvious.
-- Pull Requests: include a clear description, link issues (e.g., `Closes #123`), add screenshots for UI changes, list steps to validate, and note breaking changes/migrations.
+Commits follow the existing conventional format (`refactor:`, `feat:`, `fix:`, `format`, etc.) and should stay tightly scoped. Include generated outputs (MobX `.g.dart`, assets) in the same commit as their source. Pull requests need a clear summary of user impact, manual test notes, and linked issues. Attach screenshots or recordings for UI changes and confirm `flutter analyze`, `flutter test`, and `pnpm lint` before requesting review.
 
 ## Security & Configuration Tips
-- Never commit secrets. Use environment files like `.env.local`; provide `.env.example` with safe defaults.
-- Validate inputs at boundaries; log minimally; prefer least‑privilege tokens/keys.
-- Document required env vars in README or `.env.example` with brief descriptions.
-
+Pass Twitch secrets through `--dart-define` or untracked `.env` files; never commit credentials. `lib/firebase_options.dart` is generated via `flutterfire configure`; regenerate rather than editing by hand. When adjusting native builds, prefer local Gradle/Xcode properties instead of checked-in configuration.
