@@ -10,16 +10,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `flutter build apk` - Build Android APK
 - `flutter build ios` - Build iOS app
 - `flutter analyze` - Run static analysis and lint checks
+- `flutter test` - Run tests (note: no test suite currently exists)
 
 **Code Generation (Required for MobX stores and JSON serialization)**
 - `flutter packages pub run build_runner build` - Generate code once
 - `flutter packages pub run build_runner watch` - Watch and regenerate code on changes
 - `flutter packages pub run build_runner build --delete-conflicting-outputs` - Force rebuild all generated files
 
+**Asset Generation**
+- `flutter pub run flutter_native_splash:create` - Generate native splash screens
+- `flutter pub run flutter_launcher_icons:main` - Generate app launcher icons
+
 **Environment Variables**
-Use `--dart-define` to set environment variables:
+Use `--dart-define` to set environment variables (required for Twitch API access):
 - `--dart-define=clientId=YOUR_TWITCH_CLIENT_ID`
 - `--dart-define=secret=YOUR_TWITCH_CLIENT_SECRET`
+
+Example: `flutter run --dart-define=clientId=abc123 --dart-define=secret=def456`
 
 ## Architecture Overview
 
@@ -63,7 +70,7 @@ Use `--dart-define` to set environment variables:
 
 **API Configuration**: Requires Twitch Client ID and Client Secret from dev.twitch.tv console for API access. Use `--dart-define` flags when running the app.
 
-**Code Style**: The project enforces specific lint rules including single quotes, trailing commas, final locals, and package imports. Run `flutter analyze` to check for violations.
+**Code Style**: The project enforces specific lint rules via `analysis_options.yaml` including single quotes, trailing commas, final locals, and package imports. Custom rules include `directives_ordering`, `always_use_package_imports`, `prefer_final_locals`, and `require_trailing_commas`. Run `flutter analyze` to check for violations.
 
 **Dependency Injection**: Uses Provider for dependency injection, with all major services (API clients, stores) provided at the app root in `main.dart` with a shared HTTP client for efficiency.
 
