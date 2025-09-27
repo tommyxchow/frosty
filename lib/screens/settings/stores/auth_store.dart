@@ -34,6 +34,12 @@ abstract class AuthBase with Store {
   /// Timer used to retry authentication when offline or on transient failures.
   Timer? _reconnectTimer;
 
+  /// Retry count for reconnection attempts.
+  var _reconnectAttempts = 0;
+
+  /// Maximum number of reconnection attempts before giving up.
+  static const _maxReconnectAttempts = 5;
+
   /// The MobX store containing information relevant to the current user.
   final UserStore user;
 
@@ -214,12 +220,11 @@ abstract class AuthBase with Store {
           await _storage.write(key: _defaultTokenKey, value: _token);
         }
       } else {
-        // Validate the existing token. If network/server error occurs,
-        // don't log out — start a reconnect loop instead.
+        // Validate the existing token. If it fails, start reconnect loop.
         try {
           _tokenIsValid = await twitchApi.validateToken(token: _token!);
         } on ApiException catch (e) {
-          debugPrint('Token validation failed (transient): $e');
+          debugPrint('Token validation failed: $e');
           _isLoggedIn = false;
           _startReconnectLoop();
           return;
@@ -303,8 +308,15 @@ abstract class AuthBase with Store {
 
   void _startReconnectLoop() {
     if (_reconnectTimer != null) return;
+    _reconnectAttempts = 0;
     _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (_) async {
       try {
+        _reconnectAttempts++;
+        if (_reconnectAttempts > _maxReconnectAttempts) {
+          await logout();
+          return;
+        }
+
         final stored = await _storage.read(key: _userTokenKey);
         if (stored == null) {
           _stopReconnectLoop();
@@ -313,7 +325,6 @@ abstract class AuthBase with Store {
 
         final isValid = await twitchApi.validateToken(token: stored);
         if (!isValid) {
-          // Token truly invalid; stop retrying and proceed to logout.
           await logout();
           return;
         }
@@ -327,7 +338,7 @@ abstract class AuthBase with Store {
           _stopReconnectLoop();
         }
       } on ApiException catch (_) {
-        // Still offline or transient issue; keep retrying.
+        // Continue trying
       } catch (e) {
         debugPrint('Reconnect loop error: $e');
       }
@@ -337,5 +348,6 @@ abstract class AuthBase with Store {
   void _stopReconnectLoop() {
     _reconnectTimer?.cancel();
     _reconnectTimer = null;
+    _reconnectAttempts = 0;
   }
 }
