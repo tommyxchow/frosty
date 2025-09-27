@@ -62,7 +62,20 @@ class _AnimatedScrollBorderState extends State<AnimatedScrollBorder> {
       if (!widget.scrollController.hasClients) {
         shouldShow = false;
       } else {
-        final pos = widget.scrollController.position;
+        // Safely access position to handle ScrollController state transitions
+        final ScrollPosition? pos;
+        try {
+          pos = widget.scrollController.position;
+        } catch (e) {
+          // ScrollController might be attached to multiple scroll views during rebuilds
+          shouldShow = false;
+          if (shouldShow != _shouldShowBorder) {
+            setState(() {
+              _shouldShowBorder = shouldShow;
+            });
+          }
+          return;
+        }
         final bool hasDims = pos.hasPixels && pos.haveDimensions;
         if (!hasDims) {
           shouldShow = false;
@@ -84,7 +97,20 @@ class _AnimatedScrollBorderState extends State<AnimatedScrollBorder> {
       if (!widget.scrollController.hasClients) {
         shouldShow = true; // default visible before attachment/first layout
       } else {
-        final pos = widget.scrollController.position;
+        // Safely access position to handle ScrollController state transitions
+        final ScrollPosition? pos;
+        try {
+          pos = widget.scrollController.position;
+        } catch (e) {
+          // ScrollController might be attached to multiple scroll views during rebuilds
+          shouldShow = true; // default to visible for bottom border
+          if (shouldShow != _shouldShowBorder) {
+            setState(() {
+              _shouldShowBorder = shouldShow;
+            });
+          }
+          return;
+        }
         final bool hasDims = pos.hasPixels && pos.haveDimensions;
         if (!hasDims) {
           shouldShow = true; // keep visible until dimensions are known
