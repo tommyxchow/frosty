@@ -125,9 +125,11 @@ class _SearchState extends State<Search> {
                   ),
                 );
               }
-              return CustomScrollView(
+              return Scrollbar(
                 controller: widget.scrollController,
-                slivers: [
+                child: CustomScrollView(
+                  controller: widget.scrollController,
+                  slivers: [
                   // Add padding for app bar and search bar
                   _SearchTopPadding(),
                   SliverToBoxAdapter(
@@ -162,9 +164,10 @@ class _SearchState extends State<Search> {
                     ),
                   ),
                   SearchResultsCategories(searchStore: _searchStore),
-                  // Add padding for bottom navigation bar
-                  const SliverBottomPadding(),
-                ],
+                    // Add padding for bottom navigation bar
+                    const SliverBottomPadding(),
+                  ],
+                ),
               );
             },
           ),
