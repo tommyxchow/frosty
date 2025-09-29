@@ -217,7 +217,7 @@ class ChatMessage extends StatelessWidget {
                       ),
                 child: Text(
                   'Replying to @$replyUser: $replyBody',
-                  maxLines: 1,
+                  maxLines: 2,
                   style: TextStyle(
                     overflow: TextOverflow.ellipsis,
                     color: messageHeaderTextColor,
