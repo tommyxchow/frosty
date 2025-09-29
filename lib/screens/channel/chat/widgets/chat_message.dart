@@ -215,12 +215,23 @@ class ChatMessage extends StatelessWidget {
                           );
                         },
                       ),
-                child: Text(
-                  'Replying to @$replyUser: $replyBody',
-                  maxLines: 2,
-                  style: TextStyle(
-                    overflow: TextOverflow.ellipsis,
-                    color: messageHeaderTextColor,
+                child: Text.rich(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: replyUser,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: messageHeaderTextColor,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ': $replyBody',
+                        style: TextStyle(color: messageHeaderTextColor),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -437,7 +448,7 @@ class ChatMessage extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(right: 8.0, top: 2.0),
                     child: Icon(
-                      Icons.subdirectory_arrow_right,
+                      Icons.subdirectory_arrow_right_rounded,
                       size: 16,
                       color: messageHeaderTextColor,
                     ),
