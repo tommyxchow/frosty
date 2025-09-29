@@ -354,8 +354,8 @@ class ChatMessage extends StatelessWidget {
                 final isGift = messageId?.contains('gift') == true;
                 final isSub = messageId?.contains('sub') == true;
                 final isRaid = messageId?.contains('raid') == true;
-                // TODO: Implement Prime sub icons when a crown icon is added.
-                // final isPrime = ircMessage.tags['msg-param-sub-plan'] == 'Prime';
+                final isPrime =
+                    ircMessage.tags['msg-param-sub-plan'] == 'Prime';
 
                 IconData? icon;
                 if (isGift) {
@@ -364,6 +364,8 @@ class ChatMessage extends StatelessWidget {
                   icon = Icons.star_rounded;
                 } else if (isRaid) {
                   icon = Icons.people_rounded;
+                } else if (isPrime) {
+                  icon = Icons.workspace_premium_rounded;
                 }
 
                 if (icon != null) {
