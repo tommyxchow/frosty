@@ -74,7 +74,8 @@ class ChatBottomBar extends StatelessWidget {
             )
             .toList();
 
-        final isFullscreenOverlay = chatStore.settings.fullScreen;
+        final isFullscreenOverlay =
+            chatStore.settings.fullScreen && context.isLandscape;
 
         final bottomBarContent = Column(
           children: [
