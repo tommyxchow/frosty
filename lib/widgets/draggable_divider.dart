@@ -154,38 +154,29 @@ class _DraggableDividerState extends State<DraggableDivider> {
               ),
               // Modern drag handle
               if (widget.showHandle)
-                AnimatedOpacity(
-                  opacity: _isDragging || _isHovered ? 1.0 : 0.8,
+                AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   curve: Curves.easeOut,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeOut,
-                    width: _isDragging ? 12.0 : 10.0,
-                    height: _isDragging ? 52.0 : 48.0,
-                    decoration: BoxDecoration(
-                      color: _isDragging
-                          ? colorScheme.primary.withValues(alpha: 0.9)
-                          : colorScheme.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colorScheme.shadow.withValues(alpha: 0.08),
-                          blurRadius: 4,
-                          offset: const Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 2,
-                        height: _isDragging ? 20.0 : 16.0,
-                        decoration: BoxDecoration(
-                          color: _isDragging
-                              ? colorScheme.onPrimary
-                              : colorScheme.onSurfaceVariant,
-                          borderRadius: BorderRadius.circular(1),
-                        ),
+                  width: _isDragging ? 12.0 : 10.0,
+                  height: _isDragging ? 52.0 : 48.0,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.shadow.withValues(alpha: 0.08),
+                        blurRadius: 4,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: 2,
+                      height: _isDragging ? 20.0 : 16.0,
+                      decoration: BoxDecoration(
+                        color: colorScheme.onPrimary,
+                        borderRadius: BorderRadius.circular(1),
                       ),
                     ),
                   ),
