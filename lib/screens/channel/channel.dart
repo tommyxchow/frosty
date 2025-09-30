@@ -360,7 +360,9 @@ class _VideoChatState extends State<VideoChat>
 
                 final landscapeChat = AnimatedContainer(
                   curve: Curves.ease,
-                  duration: const Duration(milliseconds: 200),
+                  duration: _isDividerDragging
+                      ? Duration.zero
+                      : const Duration(milliseconds: 200),
                   width: _chatStore.expandChat
                       ? context.screenWidth / 2
                       : context.screenWidth * _chatStore.settings.chatWidth,
@@ -403,17 +405,68 @@ class _VideoChatState extends State<VideoChat>
                                 children: [
                                   player,
                                   if (settingsStore.showOverlay)
-                                    Row(
-                                      children:
-                                          settingsStore.landscapeChatLeftSide
-                                          ? [
-                                              overlayChat,
-                                              Expanded(child: overlay),
-                                            ]
-                                          : [
-                                              Expanded(child: overlay),
-                                              overlayChat,
-                                            ],
+                                    LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        final totalWidth = constraints.maxWidth;
+                                        final chatWidth = _chatStore.expandChat
+                                            ? 0.5
+                                            : _chatStore.settings.chatWidth;
+
+                                        final draggableDivider = Observer(
+                                          builder: (_) => DraggableDivider(
+                                            currentWidth: chatWidth,
+                                            maxWidth: 0.6,
+                                            isResizableOnLeft:
+                                                settingsStore.landscapeChatLeftSide,
+                                            showHandle: _videoStore.overlayVisible,
+                                            showDividerLine: false,
+                                            onDragStart: () {
+                                              setState(() {
+                                                _isDividerDragging = true;
+                                              });
+                                            },
+                                            onDrag: (newWidth) {
+                                              if (!_chatStore.expandChat) {
+                                                _chatStore.settings.chatWidth =
+                                                    newWidth;
+                                              }
+                                            },
+                                            onDragEnd: () {
+                                              setState(() {
+                                                _isDividerDragging = false;
+                                              });
+                                            },
+                                          ),
+                                        );
+
+                                        return Stack(
+                                          children: [
+                                            Row(
+                                              children:
+                                                  settingsStore.landscapeChatLeftSide
+                                                  ? [
+                                                      overlayChat,
+                                                      Expanded(child: overlay),
+                                                    ]
+                                                  : [
+                                                      Expanded(child: overlay),
+                                                      overlayChat,
+                                                    ],
+                                            ),
+                                            Positioned(
+                                              top: 0,
+                                              bottom: 0,
+                                              left: settingsStore.landscapeChatLeftSide
+                                                  ? (totalWidth * chatWidth) - 12
+                                                  : null,
+                                              right: !settingsStore.landscapeChatLeftSide
+                                                  ? (totalWidth * chatWidth) - 12
+                                                  : null,
+                                              child: draggableDivider,
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     ),
                                 ],
                               )

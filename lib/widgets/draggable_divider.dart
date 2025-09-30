@@ -30,6 +30,9 @@ class DraggableDivider extends StatefulWidget {
   /// Whether to show the pill-shaped drag handle
   final bool showHandle;
 
+  /// Whether to show the background divider line
+  final bool showDividerLine;
+
   const DraggableDivider({
     super.key,
     required this.onDrag,
@@ -41,6 +44,7 @@ class DraggableDivider extends StatefulWidget {
     this.dragAreaWidth = 24.0,
     this.isResizableOnLeft = true,
     this.showHandle = true,
+    this.showDividerLine = true,
   });
 
   @override
@@ -137,21 +141,22 @@ class _DraggableDividerState extends State<DraggableDivider> {
             alignment: Alignment.center,
             children: [
               // Background divider line
-              Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  curve: Curves.easeOut,
-                  width: _isDragging ? 4.0 : (_isHovered ? 3.0 : 1.0),
-                  decoration: BoxDecoration(
-                    color: _isDragging
-                        ? colorScheme.primary
-                        : (_isHovered
-                              ? colorScheme.onSurface.withValues(alpha: 0.3)
-                              : colorScheme.onSurface.withValues(alpha: 0.1)),
-                    borderRadius: BorderRadius.circular(2),
+              if (widget.showDividerLine)
+                Center(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    curve: Curves.easeOut,
+                    width: _isDragging ? 4.0 : (_isHovered ? 3.0 : 1.0),
+                    decoration: BoxDecoration(
+                      color: _isDragging
+                          ? colorScheme.primary
+                          : (_isHovered
+                                ? colorScheme.onSurface.withValues(alpha: 0.3)
+                                : colorScheme.onSurface.withValues(alpha: 0.1)),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
                 ),
-              ),
               // Modern drag handle
               if (widget.showHandle)
                 AnimatedContainer(

@@ -74,14 +74,9 @@ class ChatBottomBar extends StatelessWidget {
             )
             .toList();
 
-        return BlurredContainer(
-          gradientDirection: GradientDirection.down,
-          padding: EdgeInsets.only(
-            bottom: chatStore.assetsStore.showEmoteMenu
-                ? 0
-                : MediaQuery.of(context).padding.bottom,
-          ),
-          child: Column(
+        final isFullscreenOverlay = chatStore.settings.fullScreen;
+
+        final bottomBarContent = Column(
             children: [
               AnimatedScrollBorder(
                 scrollController: chatStore.scrollController,
@@ -345,8 +340,26 @@ class ChatBottomBar extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        );
+          );
+
+        return isFullscreenOverlay
+            ? Padding(
+                padding: EdgeInsets.only(
+                  bottom: chatStore.assetsStore.showEmoteMenu
+                      ? 0
+                      : MediaQuery.of(context).padding.bottom,
+                ),
+                child: bottomBarContent,
+              )
+            : BlurredContainer(
+                gradientDirection: GradientDirection.down,
+                padding: EdgeInsets.only(
+                  bottom: chatStore.assetsStore.showEmoteMenu
+                      ? 0
+                      : MediaQuery.of(context).padding.bottom,
+                ),
+                child: bottomBarContent,
+              );
       },
     );
   }
