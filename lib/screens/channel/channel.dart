@@ -389,6 +389,12 @@ class _VideoChatState extends State<VideoChat>
                             .dark
                             .colorScheme
                             .onSurface,
+                        shadows: settingsStore.fullScreen
+                            ? const [
+                                Shadow(blurRadius: 8),
+                                Shadow(blurRadius: 4, offset: Offset(1, 1)),
+                              ]
+                            : null,
                       ),
                       child: landscapeChat,
                     ),
@@ -416,9 +422,10 @@ class _VideoChatState extends State<VideoChat>
                                           builder: (_) => DraggableDivider(
                                             currentWidth: chatWidth,
                                             maxWidth: 0.6,
-                                            isResizableOnLeft:
-                                                settingsStore.landscapeChatLeftSide,
-                                            showHandle: _videoStore.overlayVisible,
+                                            isResizableOnLeft: settingsStore
+                                                .landscapeChatLeftSide,
+                                            showHandle:
+                                                _videoStore.overlayVisible,
                                             showDividerLine: false,
                                             onDragStart: () {
                                               setState(() {
@@ -443,7 +450,8 @@ class _VideoChatState extends State<VideoChat>
                                           children: [
                                             Row(
                                               children:
-                                                  settingsStore.landscapeChatLeftSide
+                                                  settingsStore
+                                                      .landscapeChatLeftSide
                                                   ? [
                                                       overlayChat,
                                                       Expanded(child: overlay),
@@ -456,11 +464,17 @@ class _VideoChatState extends State<VideoChat>
                                             Positioned(
                                               top: 0,
                                               bottom: 0,
-                                              left: settingsStore.landscapeChatLeftSide
-                                                  ? (totalWidth * chatWidth) - 12
+                                              left:
+                                                  settingsStore
+                                                      .landscapeChatLeftSide
+                                                  ? (totalWidth * chatWidth) -
+                                                        12
                                                   : null,
-                                              right: !settingsStore.landscapeChatLeftSide
-                                                  ? (totalWidth * chatWidth) - 12
+                                              right:
+                                                  !settingsStore
+                                                      .landscapeChatLeftSide
+                                                  ? (totalWidth * chatWidth) -
+                                                        12
                                                   : null,
                                               child: draggableDivider,
                                             ),
@@ -535,7 +549,8 @@ class _VideoChatState extends State<VideoChat>
                                       children: [
                                         Row(
                                           children:
-                                              settingsStore.landscapeChatLeftSide
+                                              settingsStore
+                                                  .landscapeChatLeftSide
                                               ? [
                                                   chatContainer,
                                                   Expanded(child: video),
@@ -548,11 +563,17 @@ class _VideoChatState extends State<VideoChat>
                                         Positioned(
                                           top: 0,
                                           bottom: 0,
-                                          left: settingsStore.landscapeChatLeftSide
-                                              ? (availableWidth * chatWidth) - 12
+                                          left:
+                                              settingsStore
+                                                  .landscapeChatLeftSide
+                                              ? (availableWidth * chatWidth) -
+                                                    12
                                               : null,
-                                          right: !settingsStore.landscapeChatLeftSide
-                                              ? (availableWidth * chatWidth) - 12
+                                          right:
+                                              !settingsStore
+                                                  .landscapeChatLeftSide
+                                              ? (availableWidth * chatWidth) -
+                                                    12
                                               : null,
                                           child: draggableDivider,
                                         ),
