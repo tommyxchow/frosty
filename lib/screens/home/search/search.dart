@@ -130,40 +130,40 @@ class _SearchState extends State<Search> {
                 child: CustomScrollView(
                   controller: widget.scrollController,
                   slivers: [
-                  // Add padding for app bar and search bar
-                  _SearchTopPadding(),
-                  SliverToBoxAdapter(
-                    child: Builder(
-                      builder: (context) => SectionHeader(
-                        'Channels',
-                        isFirst: true,
-                        padding: EdgeInsets.fromLTRB(
-                          16 + MediaQuery.of(context).padding.left,
-                          12,
-                          16 + MediaQuery.of(context).padding.right,
-                          8,
+                    // Add padding for app bar and search bar
+                    _SearchTopPadding(),
+                    SliverToBoxAdapter(
+                      child: Builder(
+                        builder: (context) => SectionHeader(
+                          'Channels',
+                          isFirst: true,
+                          padding: EdgeInsets.fromLTRB(
+                            16 + MediaQuery.of(context).padding.left,
+                            12,
+                            16 + MediaQuery.of(context).padding.right,
+                            8,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SearchResultsChannels(
-                    searchStore: _searchStore,
-                    query: _searchStore.searchText,
-                  ),
-                  SliverToBoxAdapter(
-                    child: Builder(
-                      builder: (context) => SectionHeader(
-                        'Categories',
-                        padding: EdgeInsets.fromLTRB(
-                          16 + MediaQuery.of(context).padding.left,
-                          8,
-                          16 + MediaQuery.of(context).padding.right,
-                          8,
+                    SearchResultsChannels(
+                      searchStore: _searchStore,
+                      query: _searchStore.searchText,
+                    ),
+                    SliverToBoxAdapter(
+                      child: Builder(
+                        builder: (context) => SectionHeader(
+                          'Categories',
+                          padding: EdgeInsets.fromLTRB(
+                            16 + MediaQuery.of(context).padding.left,
+                            8,
+                            16 + MediaQuery.of(context).padding.right,
+                            8,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  SearchResultsCategories(searchStore: _searchStore),
+                    SearchResultsCategories(searchStore: _searchStore),
                     // Add padding for bottom navigation bar
                     const SliverBottomPadding(),
                   ],
