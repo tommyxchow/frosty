@@ -231,6 +231,16 @@ mixin _$VideoStore on VideoStoreBase, Store {
     );
   }
 
+  late final _$disposeAsyncAction = AsyncAction(
+    'VideoStoreBase.dispose',
+    context: context,
+  );
+
+  @override
+  Future<void> dispose() {
+    return _$disposeAsyncAction.run(() => super.dispose());
+  }
+
   late final _$VideoStoreBaseActionController = ActionController(
     name: 'VideoStoreBase',
     context: context,
@@ -291,18 +301,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
     );
     try {
       return super.togglePictureInPicture();
-    } finally {
-      _$VideoStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void dispose() {
-    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
-      name: 'VideoStoreBase.dispose',
-    );
-    try {
-      return super.dispose();
     } finally {
       _$VideoStoreBaseActionController.endAction(_$actionInfo);
     }
