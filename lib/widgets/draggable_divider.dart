@@ -12,6 +12,9 @@ class DraggableDivider extends StatefulWidget {
   /// Called when dragging ends
   final VoidCallback? onDragEnd;
 
+  /// Called when the divider is double-tapped to reset to default
+  final VoidCallback? onDoubleTap;
+
   /// The minimum width percentage (0.0 to 1.0)
   final double minWidth;
 
@@ -38,6 +41,7 @@ class DraggableDivider extends StatefulWidget {
     required this.onDrag,
     this.onDragStart,
     this.onDragEnd,
+    this.onDoubleTap,
     this.minWidth = 0.2,
     this.maxWidth = 0.8,
     required this.currentWidth,
@@ -121,6 +125,11 @@ class _DraggableDividerState extends State<DraggableDivider> {
     });
   }
 
+  void _handleDoubleTap() {
+    HapticFeedback.mediumImpact();
+    widget.onDoubleTap?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -134,6 +143,7 @@ class _DraggableDividerState extends State<DraggableDivider> {
         onPanStart: _handlePanStart,
         onPanUpdate: _handlePanUpdate,
         onPanEnd: _handlePanEnd,
+        onDoubleTap: _handleDoubleTap,
         child: Container(
           width: widget.dragAreaWidth,
           color: Colors.transparent,

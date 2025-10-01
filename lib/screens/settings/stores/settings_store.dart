@@ -10,6 +10,9 @@ class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
   factory SettingsStore.fromJson(Map<String, dynamic> json) =>
       _$SettingsStoreFromJson(json);
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
+
+  // Expose default constants publicly
+  static const double kDefaultChatWidth = _SettingsStoreBase.defaultChatWidth;
 }
 
 abstract class _SettingsStoreBase with Store {
