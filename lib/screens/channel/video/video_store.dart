@@ -402,10 +402,22 @@ abstract class VideoStoreBase with Store {
           (await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
           (await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]')).style.display = "none";
           (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
-          const observer = new MutationObserver((changes) => {
-            Latency.postMessage(changes[0].target.textContent);
-          })
-          observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
+
+          // Wait for and verify latency element exists
+          const latencyElement = await _asyncQuerySelector('[aria-label="Latency To Broadcaster"]');
+          if (!latencyElement) {
+            console.warn("Latency element not found");
+            return;
+          }
+
+          // Poll latency every 5 seconds instead of observing every change
+          // This is much more efficient than MutationObserver for frequently-updating content
+          setInterval(() => {
+            const latencyText = latencyElement.textContent;
+            if (latencyText) {
+              Latency.postMessage(latencyText);
+            }
+          }, 5000);
         });
       ''');
     } catch (e) {
@@ -426,50 +438,65 @@ abstract class VideoStoreBase with Store {
             window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(method, method);
             return window._PROMISE_QUEUE;
           };
-          window._asyncQuerySelector = (selector, timeout = undefined) => new Promise((resolve) => {
+          window._asyncQuerySelector = (selector, timeout = 30000) => new Promise((resolve) => {
             let element = document.querySelector(selector);
             if (element) {
               return resolve(element);
             }
+
+            let timeoutId;
             const observer = new MutationObserver(() => {
               element = document.querySelector(selector);
               if (element) {
                 observer.disconnect();
+                clearTimeout(timeoutId);
                 resolve(element);
               }
             });
             observer.observe(document.body, { childList: true, subtree: true });
-            if (timeout) {
-              setTimeout(() => {
-                observer.disconnect();
-                resolve(undefined);
-              }, timeout);
-            }
+
+            // Always set timeout with default of 30 seconds
+            timeoutId = setTimeout(() => {
+              observer.disconnect();
+              resolve(undefined);
+            }, timeout);
           });
 
           _queuePromise(async () => {
             const videoElement = await _asyncQuerySelector("video");
-            videoElement.addEventListener("pause", () => {
-              VideoPause.postMessage("video paused");
-              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
-                videoElement.textTracks[0].mode = "hidden";
-              }
-            });
-            videoElement.addEventListener("playing", () => {
-              VideoPlaying.postMessage("video playing");
-              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
-                videoElement.textTracks[0].mode = "hidden";
-              }
-            });
-            
-            // Add PiP event listeners for iOS
-            videoElement.addEventListener("enterpictureinpicture", () => {
-              PipEntered.postMessage("pip entered");
-            });
-            videoElement.addEventListener("leavepictureinpicture", () => {
-              PipExited.postMessage("pip exited");
-            });
-            
+
+            // Null check in case element was not found within timeout
+            if (!videoElement) {
+              console.warn("Video element not found within timeout");
+              return;
+            }
+
+            // Prevent duplicate event listener registration
+            if (!videoElement._listenersAdded) {
+              videoElement._listenersAdded = true;
+
+              videoElement.addEventListener("pause", () => {
+                VideoPause.postMessage("video paused");
+                if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                  videoElement.textTracks[0].mode = "hidden";
+                }
+              });
+              videoElement.addEventListener("playing", () => {
+                VideoPlaying.postMessage("video playing");
+                if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                  videoElement.textTracks[0].mode = "hidden";
+                }
+              });
+
+              // Add PiP event listeners for iOS
+              videoElement.addEventListener("enterpictureinpicture", () => {
+                PipEntered.postMessage("pip entered");
+              });
+              videoElement.addEventListener("leavepictureinpicture", () => {
+                PipExited.postMessage("pip exited");
+              });
+            }
+
             if (!videoElement.paused) {
               VideoPlaying.postMessage("video playing");
               if (videoElement.textTracks && videoElement.textTracks.length > 0) {
@@ -688,5 +715,10 @@ abstract class VideoStoreBase with Store {
     _disposeOverlayReaction();
     _disposeVideoModeReaction();
     _disposeAndroidAutoPipReaction?.call();
+
+    // Note: JavaScript cleanup and channel removal are unnecessary here.
+    // The Video widget loads about:blank during disposal (video.dart:63-65),
+    // which automatically clears all JavaScript state, observers, listeners,
+    // and channels. Attempting cleanup here causes a race condition crash.
   }
 }
