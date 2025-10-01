@@ -347,11 +347,6 @@ abstract class VideoStoreBase with Store {
     try {
       await videoWebViewController.runJavaScript('''
         {
-          // Initialize observer tracking array if it doesn't exist
-          if (!window._observers) {
-            window._observers = [];
-          }
-
           const hideElements = (...el) => {
             el.forEach((el) => {
               el?.style.setProperty("display", "none", "important");
@@ -370,13 +365,9 @@ abstract class VideoStoreBase with Store {
             hide();
             const videoOverlayObserver = new MutationObserver(hide);
             videoOverlayObserver.observe(videoOverlay, { childList: true, subtree: true });
-            // Track the overlay observer for cleanup
-            window._observers.push(videoOverlayObserver);
             observer.disconnect();
           });
           observer.observe(document.body, { childList: true, subtree: true });
-          // Track the main observer for cleanup
-          window._observers.push(observer);
         }
       ''');
     } catch (e) {
@@ -411,31 +402,10 @@ abstract class VideoStoreBase with Store {
           (await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
           (await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]')).style.display = "none";
           (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
-
-          // Wait for and verify latency element exists
-          const latencyElement = await _asyncQuerySelector('[aria-label="Latency To Broadcaster"]');
-          if (!latencyElement) {
-            console.warn("Latency element not found");
-            return;
-          }
-
-          // Throttle latency updates to once every 5 seconds minimum
-          let lastLatencyUpdate = 0;
-          const LATENCY_UPDATE_INTERVAL = 5000; // 5 seconds in milliseconds
-
           const observer = new MutationObserver((changes) => {
-            const now = Date.now();
-            if (now - lastLatencyUpdate >= LATENCY_UPDATE_INTERVAL) {
-              lastLatencyUpdate = now;
-              Latency.postMessage(changes[0].target.textContent);
-            }
+            Latency.postMessage(changes[0].target.textContent);
           })
-          observer.observe(latencyElement, { characterData: true, attributes: false, childList: false, subtree: true });
-          // Track the latency observer for cleanup
-          if (!window._observers) {
-            window._observers = [];
-          }
-          window._observers.push(observer);
+          observer.observe(document.querySelector('[aria-label="Latency To Broadcaster"]'), { characterData: true, attributes: false, childList: false, subtree: true });
         });
       ''');
     } catch (e) {
@@ -456,82 +426,50 @@ abstract class VideoStoreBase with Store {
             window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(method, method);
             return window._PROMISE_QUEUE;
           };
-          window._asyncQuerySelector = (selector, timeout = 30000) => new Promise((resolve) => {
+          window._asyncQuerySelector = (selector, timeout = undefined) => new Promise((resolve) => {
             let element = document.querySelector(selector);
             if (element) {
               return resolve(element);
             }
-
-            let timeoutId;
-            const cleanup = () => {
-              observer.disconnect();
-              if (timeoutId) clearTimeout(timeoutId);
-              // Remove from tracking array with null safety
-              if (window._observers) {
-                const index = window._observers.indexOf(observer);
-                if (index > -1) {
-                  window._observers.splice(index, 1);
-                }
-              }
-            };
-
             const observer = new MutationObserver(() => {
               element = document.querySelector(selector);
               if (element) {
-                cleanup();
+                observer.disconnect();
                 resolve(element);
               }
             });
             observer.observe(document.body, { childList: true, subtree: true });
-
-            // Track observer for cleanup
-            if (!window._observers) {
-              window._observers = [];
+            if (timeout) {
+              setTimeout(() => {
+                observer.disconnect();
+                resolve(undefined);
+              }, timeout);
             }
-            window._observers.push(observer);
-
-            // Always set timeout with default of 30 seconds
-            timeoutId = setTimeout(() => {
-              cleanup();
-              resolve(undefined);
-            }, timeout);
           });
 
           _queuePromise(async () => {
             const videoElement = await _asyncQuerySelector("video");
-
-            // Null check in case element was not found within timeout
-            if (!videoElement) {
-              console.warn("Video element not found within timeout");
-              return;
-            }
-
-            // Prevent duplicate event listener registration
-            if (!videoElement._listenersAdded) {
-              videoElement._listenersAdded = true;
-
-              videoElement.addEventListener("pause", () => {
-                VideoPause.postMessage("video paused");
-                if (videoElement.textTracks && videoElement.textTracks.length > 0) {
-                  videoElement.textTracks[0].mode = "hidden";
-                }
-              });
-              videoElement.addEventListener("playing", () => {
-                VideoPlaying.postMessage("video playing");
-                if (videoElement.textTracks && videoElement.textTracks.length > 0) {
-                  videoElement.textTracks[0].mode = "hidden";
-                }
-              });
-
-              // Add PiP event listeners for iOS
-              videoElement.addEventListener("enterpictureinpicture", () => {
-                PipEntered.postMessage("pip entered");
-              });
-              videoElement.addEventListener("leavepictureinpicture", () => {
-                PipExited.postMessage("pip exited");
-              });
-            }
-
+            videoElement.addEventListener("pause", () => {
+              VideoPause.postMessage("video paused");
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
+            });
+            videoElement.addEventListener("playing", () => {
+              VideoPlaying.postMessage("video playing");
+              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+                videoElement.textTracks[0].mode = "hidden";
+              }
+            });
+            
+            // Add PiP event listeners for iOS
+            videoElement.addEventListener("enterpictureinpicture", () => {
+              PipEntered.postMessage("pip entered");
+            });
+            videoElement.addEventListener("leavepictureinpicture", () => {
+              PipExited.postMessage("pip exited");
+            });
+            
             if (!videoElement.paused) {
               VideoPlaying.postMessage("video playing");
               if (videoElement.textTracks && videoElement.textTracks.length > 0) {
@@ -735,35 +673,8 @@ abstract class VideoStoreBase with Store {
     }
   }
 
-  /// Cleans up JavaScript state and observers to prevent memory leaks.
-  Future<void> _cleanupJavaScript() async {
-    try {
-      await videoWebViewController.runJavaScript('''
-        (function() {
-          // Disconnect all MutationObservers created by our app
-          if (window._observers) {
-            window._observers.forEach(observer => observer.disconnect());
-            delete window._observers;
-          }
-
-          // Clear window-level state
-          delete window._PROMISE_QUEUE;
-          delete window._queuePromise;
-          delete window._asyncQuerySelector;
-          delete window._injected;
-
-          // Note: Video element listener cleanup is unnecessary since
-          // about:blank will be loaded immediately after this (see video.dart:63-65)
-        })();
-      ''');
-    } catch (e) {
-      // Ignore errors during cleanup as the WebView may already be disposed
-      debugPrint('Error during JavaScript cleanup: ${e.toString()}');
-    }
-  }
-
   @action
-  Future<void> dispose() async {
+  void dispose() {
     // Disable auto PiP when leaving so that we don't enter PiP on other screens.
     if (Platform.isAndroid) {
       SimplePip.isAutoPipAvailable.then((isAutoPipAvailable) {
@@ -777,21 +688,5 @@ abstract class VideoStoreBase with Store {
     _disposeOverlayReaction();
     _disposeVideoModeReaction();
     _disposeAndroidAutoPipReaction?.call();
-
-    // Clean up JavaScript state and observers
-    await _cleanupJavaScript();
-
-    // Remove all JavaScript channels to prevent memory leaks
-    try {
-      videoWebViewController.removeJavaScriptChannel('Latency');
-      videoWebViewController.removeJavaScriptChannel('StreamQualities');
-      videoWebViewController.removeJavaScriptChannel('VideoPause');
-      videoWebViewController.removeJavaScriptChannel('VideoPlaying');
-      videoWebViewController.removeJavaScriptChannel('PipEntered');
-      videoWebViewController.removeJavaScriptChannel('PipExited');
-    } catch (e) {
-      // Ignore errors if channels were already removed
-      debugPrint('Error removing JavaScript channels: ${e.toString()}');
-    }
   }
 }
