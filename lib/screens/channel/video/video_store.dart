@@ -393,32 +393,122 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  /// Sets up intermittent stats panel latency tracking.
+  ///
+  /// Toggles the stats panel on/off cyclically to minimize CPU overhead.
+  /// The panel is only active ~10% of the time (2s on, 18s off, every 20s).
   Future<void> _listenOnLatencyChanges() async {
     try {
-      await videoWebViewController.runJavaScript('''
-        _queuePromise(async () => {
-          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
-          (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]')).click();
-          (await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input')).click();
-          (await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]')).style.display = "none";
-          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+      await videoWebViewController.runJavaScript(r'''
+        window._latencyTracker = {
+          CYCLE_INTERVAL: 20000,
+          STATS_ACTIVE_TIME: 2000,
+          cycleCount: 0,
 
-          // Wait for and verify latency element exists
-          const latencyElement = await _asyncQuerySelector('[aria-label="Latency To Broadcaster"]');
-          if (!latencyElement) {
-            console.warn("Latency element not found");
-            return;
-          }
+          async init() {
+            await this._cycleStatsPanel();
+          },
 
-          // Poll latency every 5 seconds instead of observing every change
-          // This is much more efficient than MutationObserver for frequently-updating content
-          setInterval(() => {
-            const latencyText = latencyElement.textContent;
-            if (latencyText) {
-              Latency.postMessage(latencyText);
+          async _cycleStatsPanel() {
+            this.cycleCount++;
+            const cycleStart = Date.now();
+
+            await this._enableStats();
+
+            // Wait longer on first cycle for stats to populate
+            const waitTime = this.cycleCount === 1 ? 3000 : this.STATS_ACTIVE_TIME;
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+
+            this._readLatency();
+            await this._disableStats();
+
+            const totalActiveTime = Date.now() - cycleStart;
+            const idleTime = this.CYCLE_INTERVAL - totalActiveTime;
+
+            setTimeout(() => this._cycleStatsPanel(), idleTime);
+          },
+
+          async _enableStats() {
+            try {
+              await _queuePromise(async () => {
+                const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
+                if (!settingsBtn) return;
+                settingsBtn.click();
+
+                const advancedItem = await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]');
+                if (!advancedItem) {
+                  settingsBtn.click();
+                  return;
+                }
+                advancedItem.click();
+
+                const statsCheckbox = await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input');
+                if (statsCheckbox && !statsCheckbox.checked) {
+                  statsCheckbox.click();
+                }
+
+                const statsOverlay = await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]');
+                if (statsOverlay) {
+                  statsOverlay.style.display = 'none';
+                }
+
+                settingsBtn.click();
+              });
+            } catch (error) {
+              // Silently fail - stats panel may not be available
             }
-          }, 5000);
-        });
+          },
+
+          async _disableStats() {
+            try {
+              await _queuePromise(async () => {
+                const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
+                if (!settingsBtn) return;
+                settingsBtn.click();
+
+                const advancedItem = await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]');
+                if (!advancedItem) {
+                  settingsBtn.click();
+                  return;
+                }
+                advancedItem.click();
+
+                const statsCheckbox = await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input');
+                if (statsCheckbox && statsCheckbox.checked) {
+                  statsCheckbox.click();
+                }
+
+                settingsBtn.click();
+              });
+            } catch (error) {
+              // Silently fail
+            }
+          },
+
+          _readLatency() {
+            try {
+              const latencyElement = document.querySelector('[aria-label="Latency To Broadcaster"]');
+              if (latencyElement && latencyElement.textContent) {
+                let latencyText = latencyElement.textContent.trim();
+
+                // Convert to whole number: "4.69 sec." -> "5 seconds"
+                const match = latencyText.match(/([0-9.]+)\s*sec/i);
+                if (match) {
+                  const rounded = Math.round(parseFloat(match[1]));
+                  latencyText = rounded + ' seconds';
+                }
+
+                if (window.Latency) {
+                  Latency.postMessage(latencyText);
+                }
+              }
+            } catch (error) {
+              // Silently fail
+            }
+          }
+        };
+
+        window._latencyTracker.init();
       ''');
     } catch (e) {
       debugPrint(e.toString());
@@ -718,7 +808,10 @@ abstract class VideoStoreBase with Store {
 
     // Note: JavaScript cleanup and channel removal are unnecessary here.
     // The Video widget loads about:blank during disposal (video.dart:63-65),
-    // which automatically clears all JavaScript state, observers, listeners,
-    // and channels. Attempting cleanup here causes a race condition crash.
+    // which automatically clears all JavaScript state, including:
+    //   - Event listeners (play/pause/pip)
+    //   - Latency tracker (HLS manifest polling + fetch interception)
+    //   - JavaScript channels
+    // Attempting cleanup here causes a race condition crash.
   }
 }
