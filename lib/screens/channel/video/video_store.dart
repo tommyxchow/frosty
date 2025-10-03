@@ -54,8 +54,9 @@ abstract class VideoStoreBase with Store {
 
             if (!settingsStore.autoSyncChatDelay) return;
 
-            final trimmedLatency = receivedLatency.split(' ')[0];
-            final latencyAsDouble = double.tryParse(trimmedLatency);
+            // Parse latency from abbreviated format: "5s" -> 5.0
+            final numericPart = receivedLatency.replaceAll(RegExp(r'[^0-9.]'), '');
+            final latencyAsDouble = double.tryParse(numericPart);
 
             if (latencyAsDouble != null) {
               settingsStore.chatDelay = latencyAsDouble;
@@ -499,11 +500,11 @@ abstract class VideoStoreBase with Store {
               if (latencyElement && latencyElement.textContent) {
                 let latencyText = latencyElement.textContent.trim();
 
-                // Convert to whole number: "4.69 sec." -> "5 seconds"
+                // Convert to whole number with abbreviated unit: "4.69 sec." -> "5s"
                 const match = latencyText.match(/([0-9.]+)\s*sec/i);
                 if (match) {
                   const rounded = Math.round(parseFloat(match[1]));
-                  latencyText = rounded + ' seconds';
+                  latencyText = rounded + 's';
                 }
 
                 if (window.Latency) {
