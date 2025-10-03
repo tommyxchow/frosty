@@ -94,18 +94,6 @@ abstract class VideoStoreBase with Store {
           onMessageReceived: (message) {
             _paused = false;
             if (Platform.isAndroid) pip.setIsPlaying(true);
-            videoWebViewController.runJavaScript('''
-              (function() {
-                const video = document.getElementsByTagName("video")[0];
-                if (video) {
-                  video.muted = false;
-                  video.volume = 1.0;
-                  if (video.textTracks && video.textTracks.length > 0) {
-                    video.textTracks[0].mode = "hidden";
-                  }
-                }
-              })();
-              ''');
           },
         )
         ..addJavaScriptChannel(
@@ -363,8 +351,28 @@ abstract class VideoStoreBase with Store {
             const videoOverlay = document.querySelector('.video-player__overlay');
             if(!videoOverlay) return;
             hide();
-            const videoOverlayObserver = new MutationObserver(hide);
-            videoOverlayObserver.observe(videoOverlay, { childList: true, subtree: true });
+
+            // Disconnect previous observer if exists to prevent memory leaks
+            if (window._hideOverlayObserver) {
+              window._hideOverlayObserver.disconnect();
+            }
+
+            // Smart observer: only hide when target elements actually appear in mutations
+            window._hideOverlayObserver = new MutationObserver((mutations) => {
+              for (const mutation of mutations) {
+                for (const node of mutation.addedNodes) {
+                  // Only run hide() if a target element or its container was added
+                  if (node.nodeType === Node.ELEMENT_NODE &&
+                      (node.classList?.contains('top-bar') ||
+                       node.classList?.contains('player-controls') ||
+                       node.querySelector?.('.top-bar, .player-controls, #channel-player-disclosures'))) {
+                    hide();
+                    return;
+                  }
+                }
+              }
+            });
+            window._hideOverlayObserver.observe(videoOverlay, { childList: true, subtree: true });
             observer.disconnect();
           });
           observer.observe(document.body, { childList: true, subtree: true });
@@ -543,6 +551,7 @@ abstract class VideoStoreBase with Store {
                 resolve(element);
               }
             });
+            // Must use subtree to detect nested elements in the player
             observer.observe(document.body, { childList: true, subtree: true });
 
             // Always set timeout with default of 30 seconds
@@ -573,6 +582,9 @@ abstract class VideoStoreBase with Store {
               });
               videoElement.addEventListener("playing", () => {
                 VideoPlaying.postMessage("video playing");
+                // Ensure video is unmuted and captions are hidden
+                videoElement.muted = false;
+                videoElement.volume = 1.0;
                 if (videoElement.textTracks && videoElement.textTracks.length > 0) {
                   videoElement.textTracks[0].mode = "hidden";
                 }
@@ -810,7 +822,8 @@ abstract class VideoStoreBase with Store {
     // The Video widget loads about:blank during disposal (video.dart:63-65),
     // which automatically clears all JavaScript state, including:
     //   - Event listeners (play/pause/pip)
-    //   - Latency tracker (HLS manifest polling + fetch interception)
+    //   - Latency tracker intermittent cycling
+    //   - MutationObservers (_hideOverlayObserver)
     //   - JavaScript channels
     // Attempting cleanup here causes a race condition crash.
   }
