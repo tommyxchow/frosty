@@ -731,13 +731,22 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Refreshes the stream webview and updates the stream info.
+  ///
+  /// Performs a hard refresh by loading about:blank first to completely clear
+  /// the webview state, then immediately reloads the video URL. This is more
+  /// reliable than a soft reload when the webview is sluggish.
   @action
-  void handleRefresh() {
+  Future<void> handleRefresh() async {
     HapticFeedback.lightImpact();
     _paused = true;
     _firstTimeSettingQuality = true;
     _isInPipMode = false;
-    videoWebViewController.reload();
+
+    // Hard refresh: clear everything by loading blank page first
+    await videoWebViewController.loadRequest(Uri.parse('about:blank'));
+    // Then immediately load the video URL for a fresh start
+    await videoWebViewController.loadRequest(Uri.parse(videoUrl));
+
     updateStreamInfo();
   }
 

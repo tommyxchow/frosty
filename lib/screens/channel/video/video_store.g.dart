@@ -231,6 +231,16 @@ mixin _$VideoStore on VideoStoreBase, Store {
     );
   }
 
+  late final _$handleRefreshAsyncAction = AsyncAction(
+    'VideoStoreBase.handleRefresh',
+    context: context,
+  );
+
+  @override
+  Future<void> handleRefresh() {
+    return _$handleRefreshAsyncAction.run(() => super.handleRefresh());
+  }
+
   late final _$VideoStoreBaseActionController = ActionController(
     name: 'VideoStoreBase',
     context: context,
@@ -267,18 +277,6 @@ mixin _$VideoStore on VideoStoreBase, Store {
     );
     try {
       return super.handleToggleOverlay();
-    } finally {
-      _$VideoStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void handleRefresh() {
-    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
-      name: 'VideoStoreBase.handleRefresh',
-    );
-    try {
-      return super.handleRefresh();
     } finally {
       _$VideoStoreBaseActionController.endAction(_$actionInfo);
     }
