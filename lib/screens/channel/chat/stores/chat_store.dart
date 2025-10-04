@@ -549,6 +549,10 @@ abstract class ChatStoreBase with Store {
       Uri.parse('wss://events.7tv.io/v3'),
     );
 
+    // Track the current connection to prevent stale delayed callbacks
+    final connectionId = DateTime.now().millisecondsSinceEpoch;
+    var currentConnectionId = connectionId;
+
     void listener(dynamic data) {
       // debugPrint(data);
       final decoded = jsonDecode(data);
@@ -598,14 +602,24 @@ abstract class ChatStoreBase with Store {
         if (!settings.showVideo || settings.chatDelay == 0) {
           listener(data);
         } else {
+          final capturedConnectionId = currentConnectionId;
           Future.delayed(
             Duration(seconds: settings.chatDelay.toInt()),
-            () => listener(data),
+            () {
+              // Only process if this is still the active connection
+              if (capturedConnectionId == currentConnectionId) {
+                listener(data);
+              }
+            },
           );
         }
       },
       onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
-      onDone: () => debugPrint('7TV events done'),
+      onDone: () {
+        // Invalidate the current connection to cancel pending delayed callbacks
+        currentConnectionId = 0;
+        debugPrint('7TV events done');
+      },
     );
 
     _sevenTVChannel?.sink.add(jsonEncode(subscribePayload));
@@ -618,27 +632,41 @@ abstract class ChatStoreBase with Store {
       Uri.parse('wss://irc-ws.chat.twitch.tv:443'),
     );
 
+    // Track the current connection to prevent stale delayed callbacks
+    final connectionId = DateTime.now().millisecondsSinceEpoch;
+    var currentConnectionId = connectionId;
+
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
       (data) {
         if (!settings.showVideo || settings.chatDelay == 0) {
           _handleIRCData(data.toString());
         } else {
+          final capturedConnectionId = currentConnectionId;
           Future.delayed(
             Duration(seconds: settings.chatDelay.toInt()),
-            () => _handleIRCData(data.toString()),
+            () {
+              // Only process if this is still the active connection
+              if (capturedConnectionId == currentConnectionId) {
+                _handleIRCData(data.toString());
+              }
+            },
           );
         }
       },
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
       onDone: () async {
+        // Invalidate the current connection to cancel pending delayed callbacks
+        currentConnectionId = 0;
+
         if (_shouldDisconnect) {
           _sevenTVChannel?.sink.close(1000);
           return;
         }
 
         if (_retries >= _maxRetries) {
-          messageBuffer.add(
+          // Add directly to messages, not buffer, so it shows immediately
+          _messages.add(
             IRCMessage.createNotice(message: 'Disconnected from chat'),
           );
           return;
@@ -648,7 +676,8 @@ abstract class ChatStoreBase with Store {
           // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
           final notice =
               'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          messageBuffer.add(IRCMessage.createNotice(message: notice));
+          // Add directly to messages, not buffer, so it shows immediately
+          _messages.add(IRCMessage.createNotice(message: notice));
         }
 
         await Future.delayed(Duration(seconds: _backoffTime));
@@ -658,7 +687,8 @@ abstract class ChatStoreBase with Store {
 
         // Increment the retry count and attempt the reconnect.
         _retries++;
-        messageBuffer.add(
+        // Add directly to messages, not buffer, so it shows immediately
+        _messages.add(
           IRCMessage.createNotice(
             message: 'Reconnecting to chat (attempt $_retries)...',
           ),
