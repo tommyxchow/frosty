@@ -353,6 +353,11 @@ abstract class VideoStoreBase with Store {
             if(!videoOverlay) return;
             hide();
 
+            // Retry hide() a few times to catch elements that appear with timing variations
+            setTimeout(hide, 300);
+            setTimeout(hide, 800);
+            setTimeout(hide, 1500);
+
             // Disconnect previous observer if exists to prevent memory leaks
             if (window._hideOverlayObserver) {
               window._hideOverlayObserver.disconnect();
@@ -366,7 +371,8 @@ abstract class VideoStoreBase with Store {
                   if (node.nodeType === Node.ELEMENT_NODE &&
                       (node.classList?.contains('top-bar') ||
                        node.classList?.contains('player-controls') ||
-                       node.querySelector?.('.top-bar, .player-controls, #channel-player-disclosures'))) {
+                       node.matches?.('[data-a-target="player-overlay-preview-background"]') ||
+                       node.querySelector?.('.top-bar, .player-controls, #channel-player-disclosures, [data-a-target="player-overlay-preview-background"]'))) {
                     hide();
                     return;
                   }
@@ -602,6 +608,9 @@ abstract class VideoStoreBase with Store {
 
             if (!videoElement.paused) {
               VideoPlaying.postMessage("video playing");
+              // Ensure video is unmuted and captions are hidden
+              videoElement.muted = false;
+              videoElement.volume = 1.0;
               if (videoElement.textTracks && videoElement.textTracks.length > 0) {
                 videoElement.textTracks[0].mode = "hidden";
               }
