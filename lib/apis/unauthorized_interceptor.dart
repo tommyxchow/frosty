@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/onboarding/login_webview.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:provider/provider.dart';
 
 /// Dio interceptor that catches 401 Unauthorized errors and shows a login dialog

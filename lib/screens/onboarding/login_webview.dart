@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/widgets/app_bar.dart';
-import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/frosty_app_bar.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

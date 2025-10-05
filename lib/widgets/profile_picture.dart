@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/apis/twitch_api.dart';
-import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
 import 'package:provider/provider.dart';
 
 class ProfilePicture extends StatefulWidget {

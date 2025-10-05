@@ -8,7 +8,7 @@ import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
-import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
 import 'package:provider/provider.dart';

@@ -7,8 +7,8 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:frosty/widgets/cached_image.dart';
-import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:provider/provider.dart';
 
 class RecentEmotesPanel extends StatelessWidget {

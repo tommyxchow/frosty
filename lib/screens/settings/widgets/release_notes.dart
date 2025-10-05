@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -65,38 +66,47 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
         children: [
           // Main scrollable content
           Positioned.fill(
-            child: Markdown(
-              padding: EdgeInsets.fromLTRB(
-                16,
-                MediaQuery.of(context).padding.top + kToolbarHeight,
-                16,
-                16,
-              ),
+            child: FrostyScrollbar(
               controller: _scrollController,
-              data: releaseNotes,
-              styleSheet: MarkdownStyleSheet(
-                h2: const TextStyle(fontSize: 20),
-                h3: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                h3Padding: const EdgeInsets.only(top: 16),
-                h4: const TextStyle(fontSize: 14),
-                h4Padding: const EdgeInsets.only(top: 16),
-                p: const TextStyle(fontSize: 14),
-                horizontalRuleDecoration: const BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.transparent, width: 32),
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + kToolbarHeight,
+              ),
+              child: Markdown(
+                padding: EdgeInsets.fromLTRB(
+                  16,
+                  MediaQuery.of(context).padding.top + kToolbarHeight,
+                  16,
+                  16,
+                ),
+                controller: _scrollController,
+                data: releaseNotes,
+                styleSheet: MarkdownStyleSheet(
+                  h2: const TextStyle(fontSize: 20),
+                  h3: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  h3Padding: const EdgeInsets.only(top: 16),
+                  h4: const TextStyle(fontSize: 14),
+                  h4Padding: const EdgeInsets.only(top: 16),
+                  p: const TextStyle(fontSize: 14),
+                  horizontalRuleDecoration: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.transparent, width: 32),
+                    ),
                   ),
                 ),
+                onTapLink: (text, href, title) {
+                  if (href != null) {
+                    launchUrlString(
+                      href,
+                      mode: context.read<SettingsStore>().launchUrlExternal
+                          ? LaunchMode.externalApplication
+                          : LaunchMode.inAppBrowserView,
+                    );
+                  }
+                },
               ),
-              onTapLink: (text, href, title) {
-                if (href != null) {
-                  launchUrlString(
-                    href,
-                    mode: context.read<SettingsStore>().launchUrlExternal
-                        ? LaunchMode.externalApplication
-                        : LaunchMode.inAppBrowserView,
-                  );
-                }
-              },
             ),
           ),
           // Blurred app bar overlay

@@ -10,7 +10,7 @@ import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/screens/settings/widgets/settings_muted_words.dart';
 import 'package:frosty/utils/context_extensions.dart';
-import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/settings_page_layout.dart';
 import 'package:url_launcher/url_launcher.dart';

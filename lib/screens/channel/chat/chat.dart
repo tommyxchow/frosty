@@ -8,8 +8,8 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils/context_extensions.dart';
+import 'package:frosty/widgets/frosty_page_view.dart';
 import 'package:frosty/widgets/frosty_scrollbar.dart';
-import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;

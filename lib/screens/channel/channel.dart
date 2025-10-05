@@ -17,7 +17,7 @@ import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
-import 'package:frosty/widgets/notification.dart';
+import 'package:frosty/widgets/frosty_notification.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';

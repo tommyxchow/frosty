@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_section.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
-import 'package:frosty/widgets/page_view.dart';
+import 'package:frosty/widgets/frosty_page_view.dart';
 
 class EmoteMenuPanel extends StatelessWidget {
   final ChatStore chatStore;

@@ -9,7 +9,7 @@ import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
-import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;

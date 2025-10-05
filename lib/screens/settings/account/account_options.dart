@@ -3,7 +3,7 @@ import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/settings/account/blocked_users.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
-import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:frosty/widgets/frosty_scrollbar.dart';
 
 class AccountOptions extends StatelessWidget {
