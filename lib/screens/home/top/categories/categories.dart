@@ -7,6 +7,7 @@ import 'package:frosty/screens/home/top/categories/categories_store.dart';
 import 'package:frosty/screens/home/top/categories/category_card.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:provider/provider.dart';
 
@@ -113,8 +114,12 @@ class _CategoriesState extends State<Categories>
             );
           }
 
-          return Scrollbar(
+          return FrostyScrollbar(
             controller: widget.scrollController,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + kToolbarHeight,
+              bottom: 64 + MediaQuery.of(context).padding.bottom,
+            ),
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               controller: widget.scrollController,

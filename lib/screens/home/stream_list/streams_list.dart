@@ -11,6 +11,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/expandable_section_header.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/skeleton_loader.dart';
@@ -244,8 +245,12 @@ class _StreamsListState extends State<StreamsList>
               Column(
                 children: [
                   Expanded(
-                    child: Scrollbar(
+                    child: FrostyScrollbar(
                       controller: _listStore.scrollController,
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top + extraTopPadding,
+                        bottom: MediaQuery.of(context).padding.bottom,
+                      ),
                       child: CustomScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
                         controller: _listStore.scrollController,

@@ -4,6 +4,7 @@ import 'package:frosty/screens/settings/account/blocked_users.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/dialog.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 
 class AccountOptions extends StatelessWidget {
   final AuthStore authStore;
@@ -36,31 +37,33 @@ class AccountOptions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      shrinkWrap: true,
-      primary: false,
-      children: [
-        SettingsTileRoute(
-          leading: const Icon(Icons.person_rounded),
-          title: 'My channel',
-          useScaffold: false,
-          child: VideoChat(
-            userId: authStore.user.details!.id,
-            userName: authStore.user.details!.displayName,
-            userLogin: authStore.user.details!.login,
+    return FrostyScrollbar(
+      child: ListView(
+        shrinkWrap: true,
+        primary: false,
+        children: [
+          SettingsTileRoute(
+            leading: const Icon(Icons.person_rounded),
+            title: 'My channel',
+            useScaffold: false,
+            child: VideoChat(
+              userId: authStore.user.details!.id,
+              userName: authStore.user.details!.displayName,
+              userLogin: authStore.user.details!.login,
+            ),
           ),
-        ),
-        SettingsTileRoute(
-          leading: const Icon(Icons.block_rounded),
-          title: 'Blocked users',
-          child: BlockedUsers(authStore: authStore),
-        ),
-        ListTile(
-          leading: const Icon(Icons.logout_rounded),
-          title: const Text('Log out'),
-          onTap: () => _showLogoutDialog(context),
-        ),
-      ],
+          SettingsTileRoute(
+            leading: const Icon(Icons.block_rounded),
+            title: 'Blocked users',
+            child: BlockedUsers(authStore: authStore),
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout_rounded),
+            title: const Text('Log out'),
+            onTap: () => _showLogoutDialog(context),
+          ),
+        ],
+      ),
     );
   }
 }

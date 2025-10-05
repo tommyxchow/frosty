@@ -10,6 +10,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
@@ -70,8 +71,13 @@ class _SearchState extends State<Search> {
                   );
                 }
 
-                return Scrollbar(
+                return FrostyScrollbar(
                   controller: widget.scrollController,
+                  padding: EdgeInsets.only(
+                    top:
+                        MediaQuery.of(context).padding.top + _kSearchBarHeight,
+                    bottom: MediaQuery.of(context).padding.bottom,
+                  ),
                   child: ListView(
                     controller: widget.scrollController,
                     padding: EdgeInsets.only(
@@ -125,8 +131,12 @@ class _SearchState extends State<Search> {
                   ),
                 );
               }
-              return Scrollbar(
+              return FrostyScrollbar(
                 controller: widget.scrollController,
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + _kSearchBarHeight,
+                  bottom: MediaQuery.of(context).padding.bottom,
+                ),
                 child: CustomScrollView(
                   controller: widget.scrollController,
                   slivers: [

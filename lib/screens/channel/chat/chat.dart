@@ -8,6 +8,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils/context_extensions.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/page_view.dart';
 
 class Chat extends StatelessWidget {
@@ -42,8 +43,16 @@ class Chat extends StatelessWidget {
                         style: context.defaultTextStyle.copyWith(
                           fontSize: chatStore.settings.fontSize,
                         ),
-                        child: Scrollbar(
+                        child: FrostyScrollbar(
                           controller: chatStore.scrollController,
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).padding.top,
+                            bottom:
+                                68 +
+                                (chatStore.assetsStore.showEmoteMenu
+                                    ? 0
+                                    : MediaQuery.of(context).padding.bottom),
+                          ),
                           child: Observer(
                             builder: (context) {
                               return ListView.builder(

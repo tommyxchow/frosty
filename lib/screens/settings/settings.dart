@@ -11,6 +11,7 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/video_settings.dart';
 import 'package:frosty/screens/settings/widgets/settings_tile_route.dart';
 import 'package:frosty/widgets/blurred_container.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_icons/simple_icons.dart';
@@ -76,32 +77,37 @@ class Settings extends StatelessWidget {
       body: Stack(
         children: [
           // Main scrollable content
-          ListView(
+          FrostyScrollbar(
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
+              top: MediaQuery.of(context).padding.top + kToolbarHeight,
             ),
-            children: [
-              const SectionHeader('Account', isFirst: true),
-              ProfileCard(authStore: context.read<AuthStore>()),
-              const SectionHeader('Customize'),
-              SettingsTileRoute(
-                leading: const Icon(Icons.settings_outlined),
-                title: 'General',
-                child: GeneralSettings(settingsStore: settingsStore),
+            child: ListView(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
               ),
-              SettingsTileRoute(
-                leading: const Icon(Icons.tv_rounded),
-                title: 'Video',
-                child: VideoSettings(settingsStore: settingsStore),
-              ),
-              SettingsTileRoute(
-                leading: const Icon(Icons.chat_outlined),
-                title: 'Chat',
-                child: ChatSettings(settingsStore: settingsStore),
-              ),
-              const SectionHeader('Other'),
-              OtherSettings(settingsStore: settingsStore),
-            ],
+              children: [
+                const SectionHeader('Account', isFirst: true),
+                ProfileCard(authStore: context.read<AuthStore>()),
+                const SectionHeader('Customize'),
+                SettingsTileRoute(
+                  leading: const Icon(Icons.settings_outlined),
+                  title: 'General',
+                  child: GeneralSettings(settingsStore: settingsStore),
+                ),
+                SettingsTileRoute(
+                  leading: const Icon(Icons.tv_rounded),
+                  title: 'Video',
+                  child: VideoSettings(settingsStore: settingsStore),
+                ),
+                SettingsTileRoute(
+                  leading: const Icon(Icons.chat_outlined),
+                  title: 'Chat',
+                  child: ChatSettings(settingsStore: settingsStore),
+                ),
+                const SectionHeader('Other'),
+                OtherSettings(settingsStore: settingsStore),
+              ],
+            ),
           ),
           // Blurred app bar overlay
           Positioned(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 
 /// A reusable layout for settings pages that handles common functionality:
 /// - Orientation detection
@@ -48,12 +49,16 @@ class _SettingsPageLayoutState extends State<SettingsPageLayout> {
 
     final content = Stack(
       children: [
-        ListView(
+        FrostyScrollbar(
           controller: _scrollController,
-          padding: widget.additionalPadding != null
-              ? widget.additionalPadding!.add(listPadding)
-              : listPadding,
-          children: widget.children,
+          padding: EdgeInsets.only(top: borderTop.toDouble()),
+          child: ListView(
+            controller: _scrollController,
+            padding: widget.additionalPadding != null
+                ? widget.additionalPadding!.add(listPadding)
+                : listPadding,
+            children: widget.children,
+          ),
         ),
         Positioned(
           top: borderTop.toDouble(),

@@ -14,6 +14,7 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:intl/intl.dart';
 
@@ -519,7 +520,7 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
 
   Widget _buildColorList() {
     return Expanded(
-      child: Scrollbar(
+      child: FrostyScrollbar(
         controller: widget.scrollController,
         child: ListView(
           padding: EdgeInsets.zero,

@@ -8,6 +8,7 @@ import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -81,7 +82,7 @@ class _ChattersListState extends State<ChattersList> {
               child: Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
-                  Scrollbar(
+                  FrostyScrollbar(
                     controller: widget.chatDetailsStore.scrollController,
                     child: Observer(
                       builder: (context) {

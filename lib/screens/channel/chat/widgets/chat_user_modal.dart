@@ -5,6 +5,7 @@ import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
 
@@ -105,14 +106,16 @@ class _ChatUserModalState extends State<ChatUserModal> {
                     style: DefaultTextStyle.of(context).style.copyWith(
                       fontSize: widget.chatStore.settings.fontSize,
                     ),
-                    child: ListView.builder(
-                      reverse: true,
-                      primary: false,
-                      itemCount: userMessages.length,
-                      itemBuilder: (context, index) => ChatMessage(
-                        ircMessage: userMessages[index],
-                        chatStore: widget.chatStore,
-                        isModal: true,
+                    child: FrostyScrollbar(
+                      child: ListView.builder(
+                        reverse: true,
+                        primary: false,
+                        itemCount: userMessages.length,
+                        itemBuilder: (context, index) => ChatMessage(
+                          ircMessage: userMessages[index],
+                          chatStore: widget.chatStore,
+                          isModal: true,
+                        ),
                       ),
                     ),
                   ),

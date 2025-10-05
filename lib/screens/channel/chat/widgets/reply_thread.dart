@@ -5,6 +5,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class ReplyThread extends StatelessWidget {
@@ -64,24 +65,26 @@ class ReplyThread extends StatelessWidget {
                       ),
                     ),
                   Flexible(
-                    child: ListView(
-                      primary: false,
-                      children: chatStore.messages
-                          .where(
-                            (message) =>
-                                message.tags['reply-parent-msg-id'] ==
-                                selectedMessage.tags['reply-parent-msg-id'],
-                          )
-                          .map(
-                            (message) => ChatMessage(
-                              isModal: true,
-                              showReplyHeader: false,
-                              isInReplyThread: true,
-                              ircMessage: message,
-                              chatStore: chatStore,
-                            ),
-                          )
-                          .toList(),
+                    child: FrostyScrollbar(
+                      child: ListView(
+                        primary: false,
+                        children: chatStore.messages
+                            .where(
+                              (message) =>
+                                  message.tags['reply-parent-msg-id'] ==
+                                  selectedMessage.tags['reply-parent-msg-id'],
+                            )
+                            .map(
+                              (message) => ChatMessage(
+                                isModal: true,
+                                showReplyHeader: false,
+                                isInReplyThread: true,
+                                ircMessage: message,
+                                chatStore: chatStore,
+                              ),
+                            )
+                            .toList(),
+                      ),
                     ),
                   ),
                 ],
