@@ -290,6 +290,18 @@ mixin _$ChatStore on ChatStoreBase, Store {
     return _$getAssetsAsyncAction.run(() => super.getAssets());
   }
 
+  late final _$connectToChatAsyncAction = AsyncAction(
+    'ChatStoreBase.connectToChat',
+    context: context,
+  );
+
+  @override
+  Future<void> connectToChat({bool isReconnect = false}) {
+    return _$connectToChatAsyncAction.run(
+      () => super.connectToChat(isReconnect: isReconnect),
+    );
+  }
+
   late final _$getRecentMessageAsyncAction = AsyncAction(
     'ChatStoreBase.getRecentMessage',
     context: context,
@@ -336,18 +348,6 @@ mixin _$ChatStore on ChatStoreBase, Store {
     );
     try {
       return super.listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
-    } finally {
-      _$ChatStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void connectToChat({bool isReconnect = false}) {
-    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-      name: 'ChatStoreBase.connectToChat',
-    );
-    try {
-      return super.connectToChat(isReconnect: isReconnect);
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }

@@ -226,14 +226,11 @@ abstract class ChatStoreBase with Store {
 
     // Start chat delay countdown when toggling video on
     reactions.add(
-      reaction(
-        (_) => settings.showVideo,
-        (showVideo) {
-          if (showVideo && settings.chatDelay > 0) {
-            _startChatDelayCountdown();
-          }
-        },
-      ),
+      reaction((_) => settings.showVideo, (showVideo) {
+        if (showVideo && settings.chatDelay > 0) {
+          _startChatDelayCountdown();
+        }
+      }),
     );
 
     assetsStore.init();
@@ -442,14 +439,13 @@ abstract class ChatStoreBase with Store {
           (timer) => addMessages(),
         );
 
-        getAssets().then((_) {
-          if (!settings.show7TVEmotes) return;
-
+        // Set up 7TV real-time listener (assets already fetched in connectToChat)
+        if (settings.show7TVEmotes) {
           final emoteSetId = assetsStore.sevenTvEmoteSetId;
           if (emoteSetId != null && !_shouldDisconnect) {
             listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
           }
-        });
+        }
 
         // Reset exponential backoff if successfully connected.
         _retries = 0;
@@ -590,15 +586,12 @@ abstract class ChatStoreBase with Store {
           listener(data);
         } else {
           final capturedConnectionId = currentConnectionId;
-          Future.delayed(
-            Duration(seconds: settings.chatDelay.toInt()),
-            () {
-              // Only process if this is still the active connection
-              if (capturedConnectionId == currentConnectionId) {
-                listener(data);
-              }
-            },
-          );
+          Future.delayed(Duration(seconds: settings.chatDelay.toInt()), () {
+            // Only process if this is still the active connection
+            if (capturedConnectionId == currentConnectionId) {
+              listener(data);
+            }
+          });
         }
       },
       onError: (error) => debugPrint('7TV events error: ${error.toString()}'),
@@ -613,7 +606,10 @@ abstract class ChatStoreBase with Store {
   }
 
   @action
-  void connectToChat({bool isReconnect = false}) {
+  Future<void> connectToChat({bool isReconnect = false}) async {
+    // Fetch assets first so they're available for all messages
+    getAssets();
+
     _channel?.sink.close(1000);
     _channel = WebSocketChannel.connect(
       Uri.parse('wss://irc-ws.chat.twitch.tv:443'),
@@ -635,15 +631,12 @@ abstract class ChatStoreBase with Store {
           _handleIRCData(data.toString());
         } else {
           final capturedConnectionId = currentConnectionId;
-          Future.delayed(
-            Duration(seconds: settings.chatDelay.toInt()),
-            () {
-              // Only process if this is still the active connection
-              if (capturedConnectionId == currentConnectionId) {
-                _handleIRCData(data.toString());
-              }
-            },
-          );
+          Future.delayed(Duration(seconds: settings.chatDelay.toInt()), () {
+            // Only process if this is still the active connection
+            if (capturedConnectionId == currentConnectionId) {
+              _handleIRCData(data.toString());
+            }
+          });
         }
       },
       onError: (error) => debugPrint('Chat error: ${error.toString()}'),
@@ -675,7 +668,8 @@ abstract class ChatStoreBase with Store {
           var remainingSeconds = _backoffTime;
           _messages.add(
             IRCMessage.createNotice(
-              message: 'Connection lost. Reconnecting in ${remainingSeconds}s...',
+              message:
+                  'Connection lost. Reconnecting in ${remainingSeconds}s...',
             ),
           );
 
@@ -693,7 +687,8 @@ abstract class ChatStoreBase with Store {
 
             if (index != -1 && remainingSeconds > 0) {
               _messages[index] = IRCMessage.createNotice(
-                message: 'Connection lost. Reconnecting in ${remainingSeconds}s...',
+                message:
+                    'Connection lost. Reconnecting in ${remainingSeconds}s...',
               );
               return true; // Continue loop
             } else {
@@ -771,31 +766,30 @@ abstract class ChatStoreBase with Store {
     );
 
     // Update countdown every second
-    _chatDelayCountdownTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        remainingSeconds--;
+    _chatDelayCountdownTimer = Timer.periodic(const Duration(seconds: 1), (
+      timer,
+    ) {
+      remainingSeconds--;
 
-        // Find and replace the countdown message
-        final index = _messages.indexWhere(
-          (msg) => msg.message?.contains('Chat will sync in') ?? false,
-        );
+      // Find and replace the countdown message
+      final index = _messages.indexWhere(
+        (msg) => msg.message?.contains('Chat will sync in') ?? false,
+      );
 
-        if (index != -1) {
-          if (remainingSeconds > 0) {
-            _messages[index] = IRCMessage.createNotice(
-              message: 'Chat will sync in ${remainingSeconds}s...',
-            );
-          } else {
-            // Remove countdown message when done
-            _messages.removeAt(index);
-            timer.cancel();
-          }
+      if (index != -1) {
+        if (remainingSeconds > 0) {
+          _messages[index] = IRCMessage.createNotice(
+            message: 'Chat will sync in ${remainingSeconds}s...',
+          );
         } else {
+          // Remove countdown message when done
+          _messages.removeAt(index);
           timer.cancel();
         }
-      },
-    );
+      } else {
+        timer.cancel();
+      }
+    });
   }
 
   /// Sends the given string message by the logged-in user and adds it to [_messages].
@@ -813,7 +807,8 @@ abstract class ChatStoreBase with Store {
     if (_channel == null || _channel?.closeCode != null) {
       messageBuffer.add(
         IRCMessage.createNotice(
-          message: 'Cannot send message - chat is disconnected. Reconnecting...',
+          message:
+              'Cannot send message - chat is disconnected. Reconnecting...',
         ),
       );
     } else {
@@ -825,7 +820,9 @@ abstract class ChatStoreBase with Store {
       _sendingTimeoutTimer = Timer(const Duration(seconds: 10), () {
         if (_isSendingMessage) {
           _isSendingMessage = false;
-          updateNotification('Message failed to send. Try again or check connection.');
+          updateNotification(
+            'Message failed to send. Try again or check connection.',
+          );
         }
       });
 
