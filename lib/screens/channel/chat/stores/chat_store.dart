@@ -233,6 +233,15 @@ abstract class ChatStoreBase with Store {
       }),
     );
 
+    // Start chat delay countdown when chatDelay is set (for auto sync mode)
+    reactions.add(
+      reaction((_) => settings.chatDelay, (chatDelay) {
+        if (settings.autoSyncChatDelay && settings.showVideo && chatDelay > 0) {
+          _startChatDelayCountdown();
+        }
+      }),
+    );
+
     assetsStore.init();
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));

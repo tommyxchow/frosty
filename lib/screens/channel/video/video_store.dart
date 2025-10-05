@@ -418,7 +418,10 @@ abstract class VideoStoreBase with Store {
         window._latencyTracker = {
           CYCLE_INTERVAL: 20000,
           STATS_ACTIVE_TIME: 2000,
+          INITIAL_RETRY_INTERVAL: 3000,
+          MAX_INITIAL_RETRIES: 4,
           cycleCount: 0,
+          hasInitialLatency: false,
 
           async init() {
             await this._cycleStatsPanel();
@@ -438,9 +441,16 @@ abstract class VideoStoreBase with Store {
             await this._disableStats();
 
             const totalActiveTime = Date.now() - cycleStart;
-            const idleTime = this.CYCLE_INTERVAL - totalActiveTime;
 
-            setTimeout(() => this._cycleStatsPanel(), idleTime);
+            // Use quick retries until we get initial latency or exceed max retries
+            let nextInterval;
+            if (!this.hasInitialLatency && this.cycleCount < this.MAX_INITIAL_RETRIES) {
+              nextInterval = this.INITIAL_RETRY_INTERVAL;
+            } else {
+              nextInterval = this.CYCLE_INTERVAL - totalActiveTime;
+            }
+
+            setTimeout(() => this._cycleStatsPanel(), nextInterval);
           },
 
           async _enableStats() {
@@ -511,6 +521,7 @@ abstract class VideoStoreBase with Store {
                 if (match) {
                   const rounded = Math.round(parseFloat(match[1]));
                   latencyText = rounded + 's';
+                  this.hasInitialLatency = true;
                 }
 
                 if (window.Latency) {
