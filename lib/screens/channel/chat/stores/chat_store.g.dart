@@ -342,12 +342,12 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
-  void connectToChat() {
+  void connectToChat({bool isReconnect = false}) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
       name: 'ChatStoreBase.connectToChat',
     );
     try {
-      return super.connectToChat();
+      return super.connectToChat(isReconnect: isReconnect);
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
@@ -360,6 +360,18 @@ mixin _$ChatStore on ChatStoreBase, Store {
     );
     try {
       return super.addMessages();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _startChatDelayCountdown() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase._startChatDelayCountdown',
+    );
+    try {
+      return super._startChatDelayCountdown();
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }

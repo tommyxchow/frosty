@@ -104,6 +104,9 @@ abstract class ChatStoreBase with Store {
   /// Timer used for resetting the sending state if no USERSTATE is received.
   Timer? _sendingTimeoutTimer;
 
+  /// Timer used for updating the chat delay countdown message.
+  Timer? _chatDelayCountdownTimer;
+
   /// The current timer for the sleep timer if active.
   Timer? sleepTimer;
 
@@ -221,37 +224,21 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
+    // Start chat delay countdown when toggling video on
+    reactions.add(
+      reaction(
+        (_) => settings.showVideo,
+        (showVideo) {
+          if (showVideo && settings.chatDelay > 0) {
+            _startChatDelayCountdown();
+          }
+        },
+      ),
+    );
+
     assetsStore.init();
 
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
-
-    if (settings.showVideo && settings.chatDelay > 0) {
-      _messages.add(
-        IRCMessage.createNotice(
-          message:
-              'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
-        ),
-      );
-    }
-
-    reactions.add(
-      reaction((_) => settings.showVideo, (showVideo) {
-        if (settings.chatDelay > 0) {
-          if (showVideo) {
-            _messages.add(
-              IRCMessage.createNotice(
-                message:
-                    'Waiting ${settings.chatDelay.toInt()} ${settings.chatDelay == 1.0 ? 'second' : 'seconds'} due to message delay setting...',
-              ),
-            );
-          } else {
-            _messages.add(
-              IRCMessage.createNotice(message: 'Removing message delay...'),
-            );
-          }
-        }
-      }),
-    );
 
     if (settings.showRecentMessages) {
       getRecentMessage().then((_) => connectToChat());
@@ -626,11 +613,16 @@ abstract class ChatStoreBase with Store {
   }
 
   @action
-  void connectToChat() {
+  void connectToChat({bool isReconnect = false}) {
     _channel?.sink.close(1000);
     _channel = WebSocketChannel.connect(
       Uri.parse('wss://irc-ws.chat.twitch.tv:443'),
     );
+
+    // Only show chat delay countdown on initial connection or video toggle, not on reconnects
+    if (!isReconnect && settings.showVideo && settings.chatDelay > 0) {
+      _startChatDelayCountdown();
+    }
 
     // Track the current connection to prevent stale delayed callbacks
     final connectionId = DateTime.now().millisecondsSinceEpoch;
@@ -659,6 +651,9 @@ abstract class ChatStoreBase with Store {
         // Invalidate the current connection to cancel pending delayed callbacks
         currentConnectionId = 0;
 
+        // Cancel chat delay countdown when disconnecting
+        _chatDelayCountdownTimer?.cancel();
+
         if (_shouldDisconnect) {
           _sevenTVChannel?.sink.close(1000);
           return;
@@ -667,20 +662,47 @@ abstract class ChatStoreBase with Store {
         if (_retries >= _maxRetries) {
           // Add directly to messages, not buffer, so it shows immediately
           _messages.add(
-            IRCMessage.createNotice(message: 'Disconnected from chat'),
+            IRCMessage.createNotice(
+              message:
+                  'Chat disconnected. Please check your connection and refresh to reconnect.',
+            ),
           );
           return;
         }
 
         if (_backoffTime > 0) {
-          // Add notice that chat was disconnected and then wait the backoff time before reconnecting.
-          final notice =
-              'Disconnected from chat, waiting $_backoffTime ${_backoffTime == 1 ? 'second' : 'seconds'} before reconnecting...';
-          // Add directly to messages, not buffer, so it shows immediately
-          _messages.add(IRCMessage.createNotice(message: notice));
-        }
+          // Show countdown message for backoff time
+          var remainingSeconds = _backoffTime;
+          _messages.add(
+            IRCMessage.createNotice(
+              message: 'Connection lost. Reconnecting in ${remainingSeconds}s...',
+            ),
+          );
 
-        await Future.delayed(Duration(seconds: _backoffTime));
+          // Update countdown every second
+          await Future.doWhile(() async {
+            await Future.delayed(const Duration(seconds: 1));
+            remainingSeconds--;
+
+            // Find and replace the countdown message
+            final index = _messages.indexWhere(
+              (msg) =>
+                  msg.message?.contains('Connection lost. Reconnecting in') ??
+                  false,
+            );
+
+            if (index != -1 && remainingSeconds > 0) {
+              _messages[index] = IRCMessage.createNotice(
+                message: 'Connection lost. Reconnecting in ${remainingSeconds}s...',
+              );
+              return true; // Continue loop
+            } else {
+              // Remove countdown message when done
+              if (index != -1) _messages.removeAt(index);
+              return false; // Exit loop
+            }
+          });
+        }
 
         // Increase the backoff time for the next retry.
         _backoffTime == 0 ? _backoffTime++ : _backoffTime *= 2;
@@ -690,11 +712,11 @@ abstract class ChatStoreBase with Store {
         // Add directly to messages, not buffer, so it shows immediately
         _messages.add(
           IRCMessage.createNotice(
-            message: 'Reconnecting to chat (attempt $_retries)...',
+            message: 'Reconnecting... (attempt $_retries of $_maxRetries)',
           ),
         );
         _channelListener?.cancel();
-        connectToChat();
+        connectToChat(isReconnect: true);
       },
     );
 
@@ -728,6 +750,54 @@ abstract class ChatStoreBase with Store {
     messageBuffer.clear();
   }
 
+  /// Starts and manages the chat delay countdown message.
+  @action
+  void _startChatDelayCountdown() {
+    _chatDelayCountdownTimer?.cancel();
+
+    // Flush any buffered messages first to ensure countdown is at the bottom
+    if (messageBuffer.isNotEmpty) {
+      _messages.addAll(messageBuffer);
+      messageBuffer.clear();
+    }
+
+    var remainingSeconds = settings.chatDelay.toInt();
+
+    // Add initial countdown message
+    _messages.add(
+      IRCMessage.createNotice(
+        message: 'Chat will sync in ${remainingSeconds}s...',
+      ),
+    );
+
+    // Update countdown every second
+    _chatDelayCountdownTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        remainingSeconds--;
+
+        // Find and replace the countdown message
+        final index = _messages.indexWhere(
+          (msg) => msg.message?.contains('Chat will sync in') ?? false,
+        );
+
+        if (index != -1) {
+          if (remainingSeconds > 0) {
+            _messages[index] = IRCMessage.createNotice(
+              message: 'Chat will sync in ${remainingSeconds}s...',
+            );
+          } else {
+            // Remove countdown message when done
+            _messages.removeAt(index);
+            timer.cancel();
+          }
+        } else {
+          timer.cancel();
+        }
+      },
+    );
+  }
+
   /// Sends the given string message by the logged-in user and adds it to [_messages].
   @action
   void sendMessage(String message) {
@@ -743,7 +813,7 @@ abstract class ChatStoreBase with Store {
     if (_channel == null || _channel?.closeCode != null) {
       messageBuffer.add(
         IRCMessage.createNotice(
-          message: 'Failed to send message: disconnected from chat.',
+          message: 'Cannot send message - chat is disconnected. Reconnecting...',
         ),
       );
     } else {
@@ -755,7 +825,7 @@ abstract class ChatStoreBase with Store {
       _sendingTimeoutTimer = Timer(const Duration(seconds: 10), () {
         if (_isSendingMessage) {
           _isSendingMessage = false;
-          updateNotification('Message sending timed out');
+          updateNotification('Message failed to send. Try again or check connection.');
         }
       });
 
@@ -903,6 +973,7 @@ abstract class ChatStoreBase with Store {
     _messageBufferTimer?.cancel();
     _notificationTimer?.cancel();
     _sendingTimeoutTimer?.cancel();
+    _chatDelayCountdownTimer?.cancel();
     sleepTimer?.cancel();
 
     // Cancel WebSocket subscriptions
