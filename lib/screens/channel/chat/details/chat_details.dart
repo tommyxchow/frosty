@@ -309,8 +309,7 @@ class _ChatDetailsState extends State<ChatDetails> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            Divider(indent: 16, endIndent: 16),
+            const SizedBox(height: 8),
           ],
           Observer(
             builder: (context) {
@@ -318,7 +317,7 @@ class _ChatDetailsState extends State<ChatDetails> {
               final label = showVideo ? 'Chat only' : 'Show video';
               return ListTile(
                 leading: Icon(
-                  showVideo ? Icons.chat_outlined : Icons.tv_outlined,
+                  showVideo ? Icons.chat_rounded : Icons.tv_rounded,
                 ),
                 title: Text(label),
                 onTap: () {
@@ -328,15 +327,33 @@ class _ChatDetailsState extends State<ChatDetails> {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.sync_rounded),
+            title: const Text('Refresh emotes and badges'),
+            trailing: _buildRefreshTrailingWidget(),
+            enabled: !_isRefreshingAssets,
+            onTap: _isRefreshingAssets ? null : _handleRefreshAssets,
+          ),
+          ListTile(
+            leading: const Icon(Icons.wifi_off_rounded),
+            title: const Text('Reconnect'),
+            onTap: () {
+              Navigator.of(context).pop();
+              widget.chatStore.updateNotification('Reconnecting to chat...');
+              widget.chatStore.connectToChat();
+            },
+          ),
           if (widget.chatStore.auth.isLoggedIn)
             ListTile(
-              leading: const Icon(Icons.palette_outlined),
+              leading: const Icon(Icons.palette_rounded),
               title: const Text('Username color'),
+              trailing: const Icon(Icons.chevron_right),
               onTap: () => _showChatColorPicker(context),
             ),
           ListTile(
-            leading: const Icon(Icons.people_outline),
+            leading: const Icon(Icons.people_rounded),
             title: const Text('Chatters'),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () => showModalBottomSheetWithProperFocus(
               isScrollControlled: true,
               context: context,
@@ -357,38 +374,35 @@ class _ChatDetailsState extends State<ChatDetails> {
                   ? formatTimeLeft(widget.chatStore.timeRemaining)
                   : 'Sleep timer';
               return ListTile(
-                leading: Icon(hasTimer ? Icons.timer : Icons.timer_outlined),
+                leading: Icon(
+                  hasTimer ? Icons.timer_rounded : Icons.timer_rounded,
+                  color: hasTimer
+                      ? Theme.of(context).colorScheme.primary
+                      : null,
+                ),
                 title: Text(
                   label,
                   style: hasTimer
-                      ? const TextStyle(
-                          fontFeatures: [FontFeature.tabularFigures()],
+                      ? TextStyle(
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                          color: Theme.of(context).colorScheme.primary,
                         )
                       : null,
                 ),
+                trailing: hasTimer
+                    ? Icon(
+                        Icons.chevron_right,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : const Icon(Icons.chevron_right),
                 onTap: () => _showSleepTimer(context),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.refresh_rounded),
-            title: const Text('Refresh emotes and badges'),
-            trailing: _buildRefreshTrailingWidget(),
-            enabled: !_isRefreshingAssets,
-            onTap: _isRefreshingAssets ? null : _handleRefreshAssets,
-          ),
-          ListTile(
-            leading: const Icon(Icons.refresh_rounded),
-            title: const Text('Reconnect'),
-            onTap: () {
-              Navigator.of(context).pop();
-              widget.chatStore.updateNotification('Reconnecting to chat...');
-              widget.chatStore.connectToChat();
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings_outlined),
+            leading: const Icon(Icons.settings_rounded),
             title: const Text('Settings'),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
