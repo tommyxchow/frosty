@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -338,10 +339,36 @@ class ChatMessage extends StatelessWidget {
             );
             break;
           case Command.notice:
-            renderMessage = Text.rich(
-              TextSpan(text: ircMessage.message),
-              style: TextStyle(color: messageHeaderTextColor),
-            );
+            if (ircMessage.actionCallback != null &&
+                ircMessage.actionLabel != null) {
+              renderMessage = Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: ircMessage.message ?? '',
+                      style: TextStyle(color: messageHeaderTextColor),
+                    ),
+                    TextSpan(text: ' '),
+                    TextSpan(
+                      text: ircMessage.actionLabel!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = ircMessage.actionCallback,
+                    ),
+                  ],
+                ),
+              );
+            } else {
+              renderMessage = Text.rich(
+                TextSpan(text: ircMessage.message),
+                style: TextStyle(color: messageHeaderTextColor),
+              );
+            }
             break;
           case Command.userNotice:
             if (chatStore.settings.showUserNotices) {

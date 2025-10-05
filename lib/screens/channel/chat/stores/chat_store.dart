@@ -656,8 +656,13 @@ abstract class ChatStoreBase with Store {
           // Add directly to messages, not buffer, so it shows immediately
           _messages.add(
             IRCMessage.createNotice(
-              message:
-                  'Chat disconnected. Please check your connection and refresh to reconnect.',
+              message: 'Chat disconnected. Please check your connection.',
+              actionCallback: () {
+                _retries = 0;
+                _backoffTime = 0;
+                connectToChat(isReconnect: true);
+              },
+              actionLabel: 'Reconnect',
             ),
           );
           return;

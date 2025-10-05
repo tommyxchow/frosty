@@ -39,6 +39,8 @@ class IRCMessage {
   List<String>? split;
   bool? action;
   bool? mention;
+  final VoidCallback? actionCallback;
+  final String? actionLabel;
 
   IRCMessage({
     required this.raw,
@@ -50,6 +52,8 @@ class IRCMessage {
     this.split,
     this.action,
     this.mention,
+    this.actionCallback,
+    this.actionLabel,
   });
 
   /// Applies the given CLEARCHAT message to the provided messages and buffer.
@@ -1125,8 +1129,19 @@ class IRCMessage {
     );
   }
 
-  factory IRCMessage.createNotice({required String message}) =>
-      IRCMessage(raw: '', tags: {}, command: Command.notice, message: message);
+  factory IRCMessage.createNotice({
+    required String message,
+    VoidCallback? actionCallback,
+    String? actionLabel,
+  }) =>
+      IRCMessage(
+        raw: '',
+        tags: {},
+        command: Command.notice,
+        message: message,
+        actionCallback: actionCallback,
+        actionLabel: actionLabel,
+      );
 }
 
 /// The object representation of the IRC ROOMSTATE message.
