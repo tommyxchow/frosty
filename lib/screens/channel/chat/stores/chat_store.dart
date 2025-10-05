@@ -433,6 +433,8 @@ abstract class ChatStoreBase with Store {
         );
 
         // Activate the message buffer.
+        // Cancel any existing timer before creating a new one to prevent duplicates on reconnect.
+        _messageBufferTimer?.cancel();
         // Create a timer that will add messages from the buffer every 200 milliseconds.
         _messageBufferTimer = Timer.periodic(
           const Duration(milliseconds: 200),
@@ -609,6 +611,9 @@ abstract class ChatStoreBase with Store {
   Future<void> connectToChat({bool isReconnect = false}) async {
     // Fetch assets first so they're available for all messages
     getAssets();
+
+    // Cancel existing listener to prevent duplicate message processing
+    _channelListener?.cancel();
 
     _channel?.sink.close(1000);
     _channel = WebSocketChannel.connect(
