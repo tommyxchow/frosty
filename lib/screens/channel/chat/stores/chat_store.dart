@@ -107,6 +107,9 @@ abstract class ChatStoreBase with Store {
   /// Timer used for updating the chat delay countdown message.
   Timer? _chatDelayCountdownTimer;
 
+  /// Future tracking recent messages fetch to prevent race condition with buffer timer.
+  Future<void>? _recentMessagesFuture;
+
   /// The current timer for the sleep timer if active.
   Timer? sleepTimer;
 
@@ -238,10 +241,9 @@ abstract class ChatStoreBase with Store {
     _messages.add(IRCMessage.createNotice(message: 'Connecting to chat...'));
 
     if (settings.showRecentMessages) {
-      getRecentMessage().then((_) => connectToChat());
-    } else {
-      connectToChat();
+      _recentMessagesFuture = getRecentMessage();
     }
+    connectToChat();
 
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
@@ -434,10 +436,22 @@ abstract class ChatStoreBase with Store {
 
         // Activate the message buffer.
         // Create a timer that will add messages from the buffer every 200 milliseconds.
-        _messageBufferTimer = Timer.periodic(
-          const Duration(milliseconds: 200),
-          (timer) => addMessages(),
-        );
+        // If recent messages are being fetched, wait for them first to prevent ordering issues.
+        void startBufferTimer() {
+          _messageBufferTimer = Timer.periodic(
+            const Duration(milliseconds: 200),
+            (timer) => addMessages(),
+          );
+        }
+
+        if (_recentMessagesFuture != null) {
+          _recentMessagesFuture!.then((_) {
+            startBufferTimer();
+            _recentMessagesFuture = null; // Clear after use
+          });
+        } else {
+          startBufferTimer();
+        }
 
         // Set up 7TV real-time listener (assets already fetched in connectToChat)
         if (settings.show7TVEmotes) {
