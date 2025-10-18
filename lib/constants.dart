@@ -21,6 +21,9 @@ const zeroWidthEmotes = [
 /// Regex for matching strings that contain lower or upper case English characters.
 final regexEnglish = RegExp(r'[a-zA-Z]');
 
+/// Regex for matching strings that contain only numeric characters.
+final regexNumbersOnly = RegExp(r'^\d+$');
+
 /// Regex for matching URLs and file names in text.
 final regexLink = RegExp(
   r'(?<![A-Za-z0-9_.-])' // left boundary

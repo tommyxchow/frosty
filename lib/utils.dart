@@ -85,11 +85,23 @@ Color adjustChatNameColor(
 }
 
 String getReadableName(String displayName, String username) {
-  if (!regexEnglish.hasMatch(displayName)) {
-    return '$displayName ($username)';
+  // If display name equals username, don't add redundant parentheses
+  if (displayName == username) {
+    return displayName;
   }
 
-  return displayName;
+  // If display name contains only digits, don't add username
+  if (regexNumbersOnly.hasMatch(displayName)) {
+    return displayName;
+  }
+
+  // If display name contains English letters, don't add username
+  if (regexEnglish.hasMatch(displayName)) {
+    return displayName;
+  }
+
+  // Otherwise (non-English characters, possibly with numbers), add username
+  return '$displayName ($username)';
 }
 
 var _isIPad = false;
