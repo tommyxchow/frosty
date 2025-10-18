@@ -10,7 +10,6 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -92,14 +91,7 @@ class _HomeState extends State<Home> {
 
               return BlurredContainer(
                 gradientDirection: GradientDirection.up,
-                child: Column(
-                  children: [
-                    const Expanded(child: SizedBox.expand()),
-                    AnimatedScrollBorder(
-                      scrollController: _homeStore.followedScrollController,
-                    ),
-                  ],
-                ),
+                child: const SizedBox.expand(),
               );
             },
           ),
@@ -152,99 +144,70 @@ class _HomeState extends State<Home> {
         ),
         bottomNavigationBar: BlurredContainer(
           gradientDirection: GradientDirection.down,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Observer(
-                builder: (_) {
-                  ScrollController scrollController;
-                  if (isLoggedIn && _homeStore.selectedIndex == 0) {
-                    // Following tab
-                    scrollController = _homeStore.followedScrollController;
-                  } else if (_homeStore.selectedIndex == (isLoggedIn ? 1 : 0)) {
-                    // Top tab
-                    scrollController =
-                        _homeStore.topSectionScrollControllers[_homeStore
-                            .topSectionCurrentIndex];
-                  } else {
-                    // Search tab
-                    scrollController = _homeStore.searchScrollController;
-                  }
-
-                  return AnimatedScrollBorder(
-                    scrollController: scrollController,
-                    position: ScrollBorderPosition.bottom,
-                  );
-                },
-              ),
-              Observer(
-                builder: (_) => Theme(
-                  data: Theme.of(
-                    context,
-                  ).copyWith(splashFactory: NoSplash.splashFactory),
-                  child: NavigationBar(
-                    backgroundColor: Colors.transparent,
-                    surfaceTintColor: Colors.transparent,
-                    elevation: 0,
-                    destinations: [
-                      if (_authStore.isLoggedIn)
-                        NavigationDestination(
-                          icon: Icon(
-                            Icons.favorite_border_rounded,
-                            color: _homeStore.selectedIndex == 0
-                                ? theme.colorScheme.onSurface
-                                : theme.colorScheme.onSurfaceVariant.withValues(
-                                    alpha: 0.6,
-                                  ),
-                          ),
-                          selectedIcon: Icon(
-                            Icons.favorite_rounded,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                          label: 'Following',
-                          tooltip: 'Following',
-                        ),
-                      NavigationDestination(
-                        icon: Icon(
-                          Icons.arrow_upward_rounded,
-                          color:
-                              _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
-                              ? theme.colorScheme.onSurface
-                              : theme.colorScheme.onSurfaceVariant.withValues(
-                                  alpha: 0.6,
-                                ),
-                        ),
-                        selectedIcon: Icon(
-                          Icons.arrow_upward_rounded,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                        label: 'Top',
-                        tooltip: 'Top',
+          child: Observer(
+            builder: (_) => Theme(
+              data: Theme.of(
+                context,
+              ).copyWith(splashFactory: NoSplash.splashFactory),
+              child: NavigationBar(
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+                destinations: [
+                  if (_authStore.isLoggedIn)
+                    NavigationDestination(
+                      icon: Icon(
+                        Icons.favorite_border_rounded,
+                        color: _homeStore.selectedIndex == 0
+                            ? theme.colorScheme.onSurface
+                            : theme.colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.6,
+                              ),
                       ),
-                      NavigationDestination(
-                        icon: Icon(
-                          Icons.search_rounded,
-                          color:
-                              _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
-                              ? theme.colorScheme.onSurface
-                              : theme.colorScheme.onSurfaceVariant.withValues(
-                                  alpha: 0.6,
-                                ),
-                        ),
-                        selectedIcon: Icon(
-                          Icons.search_rounded,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                        label: 'Search',
-                        tooltip: 'Search',
+                      selectedIcon: Icon(
+                        Icons.favorite_rounded,
+                        color: theme.colorScheme.onSurface,
                       ),
-                    ],
-                    selectedIndex: _homeStore.selectedIndex,
-                    onDestinationSelected: _homeStore.handleTap,
+                      label: 'Following',
+                      tooltip: 'Following',
+                    ),
+                  NavigationDestination(
+                    icon: Icon(
+                      Icons.arrow_upward_rounded,
+                      color: _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
+                    ),
+                    selectedIcon: Icon(
+                      Icons.arrow_upward_rounded,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    label: 'Top',
+                    tooltip: 'Top',
                   ),
-                ),
+                  NavigationDestination(
+                    icon: Icon(
+                      Icons.search_rounded,
+                      color: _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
+                    ),
+                    selectedIcon: Icon(
+                      Icons.search_rounded,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                    label: 'Search',
+                    tooltip: 'Search',
+                  ),
+                ],
+                selectedIndex: _homeStore.selectedIndex,
+                onDestinationSelected: _homeStore.handleTap,
               ),
-            ],
+            ),
           ),
         ),
       ),

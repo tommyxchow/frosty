@@ -14,7 +14,6 @@ import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils/context_extensions.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/frosty_notification.dart';
@@ -333,15 +332,7 @@ class _VideoChatState extends State<VideoChat>
             ),
             flexibleSpace: BlurredContainer(
               gradientDirection: GradientDirection.up,
-              child: Column(
-                children: [
-                  const Expanded(child: SizedBox.expand()),
-                  AnimatedScrollBorder(
-                    scrollController: _chatStore.scrollController,
-                    isReversed: true,
-                  ),
-                ],
-              ),
+              child: const SizedBox.expand(),
             ),
           );
         }
@@ -604,7 +595,6 @@ class _VideoChatState extends State<VideoChat>
                             aspectRatio: 16 / 9,
                             child: Container(), // Placeholder for video space
                           ),
-                          const Divider(),
                         ],
                         Expanded(child: chat),
                       ],

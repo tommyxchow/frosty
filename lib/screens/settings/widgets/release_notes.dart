@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:provider/provider.dart';
@@ -123,13 +122,6 @@ class _ReleaseNotesState extends State<ReleaseNotes> {
               ),
               child: const SizedBox(height: kToolbarHeight),
             ),
-          ),
-          // Animated scroll border
-          Positioned(
-            top: MediaQuery.of(context).padding.top + kToolbarHeight,
-            left: 0,
-            right: 0,
-            child: AnimatedScrollBorder(scrollController: _scrollController),
           ),
         ],
       ),

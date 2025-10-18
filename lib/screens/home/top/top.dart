@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/home/top/categories/categories.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 
 class TopSection extends StatefulWidget {
@@ -59,24 +57,12 @@ class _TopSectionState extends State<TopSection>
               left: MediaQuery.of(context).padding.left,
               right: MediaQuery.of(context).padding.right,
             ),
-            child: Column(
-              children: [
-                TabBar(
-                  isScrollable: true,
-                  controller: _tabBarController,
-                  tabs: const [
-                    Tab(child: Text('Streams')),
-                    Tab(child: Text('Categories')),
-                  ],
-                ),
-                Observer(
-                  builder: (_) => AnimatedScrollBorder(
-                    scrollController:
-                        widget.homeStore.topSectionScrollControllers[widget
-                            .homeStore
-                            .topSectionCurrentIndex],
-                  ),
-                ),
+            child: TabBar(
+              isScrollable: true,
+              controller: _tabBarController,
+              tabs: const [
+                Tab(child: Text('Streams')),
+                Tab(child: Text('Categories')),
               ],
             ),
           ),

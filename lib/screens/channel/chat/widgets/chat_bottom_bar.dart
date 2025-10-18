@@ -7,7 +7,6 @@ import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
 
@@ -79,7 +78,6 @@ class ChatBottomBar extends StatelessWidget {
 
         final bottomBarContent = Column(
           children: [
-            AnimatedScrollBorder(scrollController: chatStore.scrollController),
             if (chatStore.replyingToMessage != null) ...[
               const Divider(),
               ListTile(
