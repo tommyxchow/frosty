@@ -294,23 +294,22 @@ class _ChatDetailsState extends State<ChatDetails> {
         final hasActiveModes = _hasActiveModes();
 
         final children = [
-          if (hasActiveModes) ...[
-            const SectionHeader('Active chat modes', isFirst: true),
-            SizedBox(
-              height: 48,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  Observer(
-                    builder: (context) =>
-                        ChatModes(roomState: widget.chatDetailsStore.roomState),
-                  ),
-                ],
+          if (hasActiveModes)
+            ListTile(
+              title: SizedBox(
+                height: 48,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    Observer(
+                      builder: (context) => ChatModes(
+                        roomState: widget.chatDetailsStore.roomState,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 8),
-          ],
           Observer(
             builder: (context) {
               final showVideo = widget.chatStore.settings.showVideo;
