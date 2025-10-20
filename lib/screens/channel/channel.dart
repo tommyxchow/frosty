@@ -417,7 +417,6 @@ class _VideoChatState extends State<VideoChat>
                                                 .landscapeChatLeftSide,
                                             showHandle:
                                                 _videoStore.overlayVisible,
-                                            showDividerLine: false,
                                             onDragStart: () {
                                               setState(() {
                                                 _isDividerDragging = true;

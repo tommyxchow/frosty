@@ -140,8 +140,8 @@ class _DraggableDividerState extends State<DraggableDivider> {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Background divider line
-              if (widget.showDividerLine)
+              // Background divider line - show only during interaction
+              if (_isDragging || _isHovered)
                 Center(
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 150),
