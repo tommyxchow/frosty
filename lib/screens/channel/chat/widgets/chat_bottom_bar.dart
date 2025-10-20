@@ -195,13 +195,35 @@ class ChatBottomBar extends StatelessWidget {
                       chatStore.settings.chatWidth < 0.3 &&
                       chatStore.settings.showVideo &&
                       context.isLandscape)
-                    IconButton(
-                      tooltip: 'Enter a message',
-                      onPressed: () {
-                        chatStore.expandChat = true;
-                        chatStore.safeRequestFocus();
+                    Builder(
+                      builder: (context) {
+                        final isDisabledDueToDelay =
+                            chatStore.settings.showVideo &&
+                            chatStore.settings.chatDelay > 0;
+                        final isDisabled =
+                            !chatStore.auth.isLoggedIn || isDisabledDueToDelay;
+
+                        return GestureDetector(
+                          onTap: () {
+                            // Show notification when trying to tap disabled button due to chat delay
+                            if (isDisabledDueToDelay) {
+                              chatStore.updateNotification(
+                                'Chatting is disabled due to message delay',
+                              );
+                            }
+                          },
+                          child: IconButton(
+                            tooltip: 'Enter a message',
+                            onPressed: isDisabled
+                                ? null
+                                : () {
+                                    chatStore.expandChat = true;
+                                    chatStore.safeRequestFocus();
+                                  },
+                            icon: const Icon(Icons.edit),
+                          ),
+                        );
                       },
-                      icon: const Icon(Icons.edit),
                     )
                   else
                     Expanded(
