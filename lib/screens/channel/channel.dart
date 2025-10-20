@@ -573,7 +573,7 @@ class _VideoChatState extends State<VideoChat>
                                   },
                                 ),
                               )
-                      : chat,
+                      : SafeArea(child: chat),
                 );
               }
 
