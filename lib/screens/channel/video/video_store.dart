@@ -55,7 +55,10 @@ abstract class VideoStoreBase with Store {
             if (!settingsStore.autoSyncChatDelay) return;
 
             // Parse latency from abbreviated format: "5s" -> 5.0
-            final numericPart = receivedLatency.replaceAll(RegExp(r'[^0-9.]'), '');
+            final numericPart = receivedLatency.replaceAll(
+              RegExp(r'[^0-9.]'),
+              '',
+            );
             final latencyAsDouble = double.tryParse(numericPart);
 
             if (latencyAsDouble != null) {
@@ -100,13 +103,21 @@ abstract class VideoStoreBase with Store {
         ..addJavaScriptChannel(
           'PipEntered',
           onMessageReceived: (message) {
+            _overlayWasVisibleBeforePip = _overlayVisible;
             _isInPipMode = true;
+            _overlayTimer?.cancel();
+            _overlayVisible = true;
           },
         )
         ..addJavaScriptChannel(
           'PipExited',
           onMessageReceived: (message) {
             _isInPipMode = false;
+            if (_overlayWasVisibleBeforePip) {
+              _scheduleOverlayHide();
+            } else {
+              _overlayVisible = false;
+            }
           },
         )
         ..setNavigationDelegate(
@@ -132,7 +143,10 @@ abstract class VideoStoreBase with Store {
         );
 
   /// The timer that handles hiding the overlay automatically
-  late Timer _overlayTimer;
+  Timer? _overlayTimer;
+
+  /// Tracks the pre-PiP overlay visibility so we can restore it on exit.
+  bool _overlayWasVisibleBeforePip = true;
 
   /// The timer that handles periodic stream info updates
   Timer? _streamInfoTimer;
@@ -217,10 +231,7 @@ abstract class VideoStoreBase with Store {
     }
 
     // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
-    _overlayTimer = Timer(
-      const Duration(seconds: 5),
-      () => _overlayVisible = false,
-    );
+    _scheduleOverlayHide();
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
     _disposeOverlayReaction = reaction(
@@ -239,22 +250,14 @@ abstract class VideoStoreBase with Store {
         // In chat-only mode, start the timer for automatic updates
         _startStreamInfoTimer();
         // Ensure overlay timer is active for clean UI
-        _overlayTimer.cancel();
-        _overlayTimer = Timer(
-          const Duration(seconds: 5),
-          () => _overlayVisible = false,
-        );
+        _scheduleOverlayHide();
       }
     });
 
     // Check initial state and start timer if already in chat-only mode
     if (!settingsStore.showVideo) {
       _startStreamInfoTimer();
-      _overlayTimer.cancel();
-      _overlayTimer = Timer(
-        const Duration(seconds: 5),
-        () => _overlayVisible = false,
-      );
+      _scheduleOverlayHide();
     }
 
     // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
@@ -642,7 +645,12 @@ abstract class VideoStoreBase with Store {
   /// Called whenever the video/overlay is tapped.
   @action
   void handleVideoTap() {
-    _overlayTimer.cancel();
+    if (_isInPipMode) {
+      _overlayVisible = true;
+      return;
+    }
+
+    _overlayTimer?.cancel();
 
     if (_overlayVisible) {
       _overlayVisible = false;
@@ -650,10 +658,7 @@ abstract class VideoStoreBase with Store {
       updateStreamInfo(forceUpdate: true);
 
       _overlayVisible = true;
-      _overlayTimer = Timer(
-        const Duration(seconds: 5),
-        () => _overlayVisible = false,
-      );
+      _scheduleOverlayHide();
     }
   }
 
@@ -673,6 +678,23 @@ abstract class VideoStoreBase with Store {
     if (_streamInfoTimer?.isActive == true) {
       _streamInfoTimer?.cancel();
     }
+  }
+
+  void _scheduleOverlayHide([Duration delay = const Duration(seconds: 5)]) {
+    _overlayTimer?.cancel();
+
+    if (_isInPipMode) {
+      _overlayVisible = true;
+      return;
+    }
+
+    _overlayTimer = Timer(delay, () {
+      if (_isInPipMode) return;
+
+      runInAction(() {
+        _overlayVisible = false;
+      });
+    });
   }
 
   /// Handles app resume event for immediate stream info refresh in chat-only mode.
@@ -706,7 +728,7 @@ abstract class VideoStoreBase with Store {
       // Clear offline info when stream is live
       _offlineChannelInfo = null;
     } catch (e) {
-      _overlayTimer.cancel();
+      _overlayTimer?.cancel();
       _streamInfo = null;
       _paused = true;
 
@@ -719,10 +741,7 @@ abstract class VideoStoreBase with Store {
 
       // Restart overlay timer in chat-only mode even on error
       if (!settingsStore.showVideo) {
-        _overlayTimer = Timer(
-          const Duration(seconds: 5),
-          () => _overlayVisible = false,
-        );
+        _scheduleOverlayHide();
       }
     }
   }
@@ -739,12 +758,7 @@ abstract class VideoStoreBase with Store {
 
       if (settingsStore.showOverlay) {
         _overlayVisible = true;
-
-        _overlayTimer.cancel();
-        _overlayTimer = Timer(
-          const Duration(seconds: 3),
-          () => _overlayVisible = false,
-        );
+        _scheduleOverlayHide(const Duration(seconds: 3));
       }
     }
 
@@ -841,7 +855,7 @@ abstract class VideoStoreBase with Store {
       });
     }
 
-    _overlayTimer.cancel();
+    _overlayTimer?.cancel();
     _streamInfoTimer?.cancel();
 
     _disposeOverlayReaction();
