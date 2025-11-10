@@ -76,6 +76,11 @@ class ChatBottomBar extends StatelessWidget {
         final isFullscreenOverlay =
             chatStore.settings.fullScreen && context.isLandscape;
 
+        final hasChatDelay =
+            chatStore.settings.showVideo && chatStore.settings.chatDelay > 0;
+        const delayTooltipMessage = 'Chatting is disabled due to message delay';
+        const loginTooltipMessage = 'Log in to chat';
+
         final bottomBarContent = Column(
           children: [
             if (chatStore.replyingToMessage != null) ...[
@@ -197,21 +202,18 @@ class ChatBottomBar extends StatelessWidget {
                       context.isLandscape)
                     Builder(
                       builder: (context) {
-                        final isDisabledDueToDelay =
-                            chatStore.settings.showVideo &&
-                            chatStore.settings.chatDelay > 0;
                         final isDisabled =
-                            !chatStore.auth.isLoggedIn || isDisabledDueToDelay;
+                            !chatStore.auth.isLoggedIn || hasChatDelay;
 
                         return GestureDetector(
-                          onTap: () {
-                            // Show notification when trying to tap disabled button due to chat delay
-                            if (isDisabledDueToDelay) {
-                              chatStore.updateNotification(
-                                'Chatting is disabled due to message delay',
-                              );
-                            }
-                          },
+                          onTap: isDisabled
+                              ? () {
+                                  final message = hasChatDelay
+                                      ? delayTooltipMessage
+                                      : loginTooltipMessage;
+                                  chatStore.updateNotification(message);
+                                }
+                              : null,
                           child: IconButton(
                             tooltip: 'Enter a message',
                             onPressed: isDisabled
@@ -229,23 +231,20 @@ class ChatBottomBar extends StatelessWidget {
                     Expanded(
                       child: Observer(
                         builder: (context) {
-                          final isDisabledDueToDelay =
-                              chatStore.settings.showVideo &&
-                              chatStore.settings.chatDelay > 0;
                           final isDisabled =
                               !chatStore.auth.isLoggedIn ||
                               chatStore.isSendingMessage ||
-                              isDisabledDueToDelay;
+                              hasChatDelay;
 
                           return GestureDetector(
-                            onTap: () {
-                              // Show notification when trying to tap disabled input due to chat delay
-                              if (isDisabledDueToDelay) {
-                                chatStore.updateNotification(
-                                  'Chatting is disabled due to message delay',
-                                );
-                              }
-                            },
+                            onTap: isDisabled && !chatStore.isSendingMessage
+                                ? () {
+                                    final message = hasChatDelay
+                                        ? delayTooltipMessage
+                                        : loginTooltipMessage;
+                                    chatStore.updateNotification(message);
+                                  }
+                                : null,
                             child: TextField(
                               textInputAction: TextInputAction.send,
                               focusNode: chatStore.textFieldFocusNode,
@@ -276,7 +275,7 @@ class ChatBottomBar extends StatelessWidget {
                                           : chatStore.replyingToMessage != null
                                           ? 'Reply'
                                           : 'Chat'
-                                    : 'Log in',
+                                    : loginTooltipMessage,
                               ),
                               controller: chatStore.textController,
                               onSubmitted: chatStore.sendMessage,
@@ -329,8 +328,7 @@ class ChatBottomBar extends StatelessWidget {
                           onPressed:
                               chatStore.auth.isLoggedIn &&
                                   !chatStore.isSendingMessage &&
-                                  !(chatStore.settings.showVideo &&
-                                      chatStore.settings.chatDelay > 0)
+                                  !hasChatDelay
                               ? () => chatStore.sendMessage(
                                   chatStore.textController.text,
                                 )
