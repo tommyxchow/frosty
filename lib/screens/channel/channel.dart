@@ -416,7 +416,9 @@ class _VideoChatState extends State<VideoChat>
                                             isResizableOnLeft: settingsStore
                                                 .landscapeChatLeftSide,
                                             showHandle:
-                                                _videoStore.overlayVisible,
+                                                _videoStore.overlayVisible &&
+                                                settingsStore
+                                                    .fullScreenChatOverlay,
                                             onDragStart: () {
                                               setState(() {
                                                 _isDividerDragging = true;
