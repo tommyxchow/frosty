@@ -5,12 +5,16 @@ class AlertMessage extends StatelessWidget {
   final String message;
   final Color? color;
   final bool centered;
+  final IconData? trailingIcon;
+  final VoidCallback? onTrailingIconPressed;
 
   const AlertMessage({
     super.key,
     required this.message,
     this.centered = true,
     this.color,
+    this.trailingIcon,
+    this.onTrailingIconPressed,
   });
 
   @override
@@ -35,6 +39,19 @@ class AlertMessage extends StatelessWidget {
             ),
           ),
         ),
+        if (trailingIcon != null) ...[
+          const SizedBox(width: 8),
+          IconButton(
+            icon: Icon(
+              trailingIcon,
+              color: color ?? defaultColor,
+            ),
+            onPressed: onTrailingIconPressed,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            iconSize: 20,
+          ),
+        ],
       ],
     );
   }

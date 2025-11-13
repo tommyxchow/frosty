@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:advanced_in_app_review/advanced_in_app_review.dart';
+import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
@@ -13,16 +15,19 @@ import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/firebase_options.dart';
+import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/widgets/alert_message.dart';
 import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -110,6 +115,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final AppLinks _appLinks = AppLinks();
+  StreamSubscription<Uri>? _linkSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -120,6 +128,8 @@ class _MyAppState extends State<MyApp> {
         .setMinLaunchTimes(5)
         .setMinSecondsBeforeShowDialog(3)
         .monitor();
+
+    _initDeepLinks();
   }
 
   @override
@@ -127,8 +137,8 @@ class _MyAppState extends State<MyApp> {
     return Observer(
       builder: (context) {
         final settingsStore = context.read<SettingsStore>();
-        final themes =
-            FrostyThemes(colorSchemeSeed: Color(settingsStore.accentColor));
+        final themes = 
+		    FrostyThemes(colorSchemeSeed: Color(settingsStore.accentColor));
 
         return Provider<FrostyThemes>(
           create: (_) => themes,
@@ -147,5 +157,87 @@ class _MyAppState extends State<MyApp> {
         );
       },
     );
+  }
+
+  Future<void> _initDeepLinks() async {
+    try {
+      // Handle links when app is already open
+      _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+        handleDeepLink(uri);
+      });
+
+      // Handle the initial link if app was opened from a link
+      final initialLink = await _appLinks.getInitialLink();
+      if (initialLink != null) {
+        handleDeepLink(initialLink);
+      }
+    } catch (e) {
+      debugPrint('Failed to initialize deep links: $e');
+    }
+  }
+
+  Future<void> handleDeepLink(Uri uri) async {
+    final failureSnackbar = SnackBar(
+      content: AlertMessage(
+        message: 'Unable to navigate to \'$uri\'',
+        centered: false,
+        trailingIcon: Icons.open_in_browser_rounded,
+        // Fallback, allow user to open URL outside app
+        onTrailingIconPressed: () async {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.inAppWebView, // Force browser
+          );
+        },
+      ),
+    );
+
+    // Handle channel links
+    if (uri.pathSegments.isNotEmpty) {
+      final channelName = uri.pathSegments.first;
+
+      try {
+        final twitchApi = context.read<TwitchApi>();
+        final authStore = context.read<AuthStore>();
+
+        final user = await twitchApi.getUser(
+          userLogin: channelName,
+          headers: authStore.headersTwitch,
+        );
+
+        final route = MaterialPageRoute(
+          builder: (context) => VideoChat(
+            userId: user.id,
+            userName: user.displayName,
+            userLogin: user.login,
+          ),
+        );
+
+        if (navigatorKey.currentState == null) return;
+
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => navigatorKey.currentState?.push(route),
+        );
+      } catch (e) {
+        // If we get here, there was most likely an error with the Twitch API call and/or this isn't really a channel link
+        debugPrint('Failed to open link $uri due to error: $e');
+
+        if (navigatorKey.currentContext == null) return;
+        ScaffoldMessenger.of(navigatorKey.currentContext!)
+            .showSnackBar(failureSnackbar);
+      }
+    }
+    // TODO: Here we can implement handlers for other types of links
+    else {
+      // If we get here, it's a link format that we're unable to handle
+      if (navigatorKey.currentContext == null) return;
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(failureSnackbar);
+    }
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
   }
 }
