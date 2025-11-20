@@ -442,9 +442,23 @@ class IRCMessage {
     bool launchExternal,
     TextStyle? textStyle,
     void Function(String)? onTapPingedUser,
+    void Function()? onTapDeletedMessage,
   ) {
     if (!showMessage) {
-      span.add(const TextSpan(text: ' <message deleted>'));
+      span.add(
+        TextSpan(
+          text: ' <message deleted>',
+          style: onTapDeletedMessage != null
+              ? textStyle?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                )
+              : null,
+          recognizer: onTapDeletedMessage != null
+              ? (TapGestureRecognizer()..onTap = onTapDeletedMessage)
+              : null,
+        ),
+      );
       return;
     }
 
@@ -638,6 +652,7 @@ class IRCMessage {
     required bool launchExternal,
     void Function()? onTapName,
     void Function(String)? onTapPingedUser,
+    void Function()? onTapDeletedMessage,
     bool showMessage = true,
     Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
@@ -686,6 +701,7 @@ class IRCMessage {
       launchExternal,
       textStyle,
       onTapPingedUser,
+      onTapDeletedMessage,
     );
 
     return span;

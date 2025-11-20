@@ -325,7 +325,16 @@ class ChatMessage extends StatelessWidget {
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
                         badgeScale: chatStore.settings.badgeScale,
-                        showMessage: chatStore.settings.showDeletedMessages,
+                        showMessage:
+                            chatStore.settings.showDeletedMessages ||
+                            chatStore.revealedMessageIds.contains(
+                              ircMessage.tags['id'],
+                            ),
+                        onTapDeletedMessage: () {
+                          if (ircMessage.tags['id'] != null) {
+                            chatStore.revealMessage(ircMessage.tags['id']!);
+                          }
+                        },
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
                         channelIdToUserTwitch:

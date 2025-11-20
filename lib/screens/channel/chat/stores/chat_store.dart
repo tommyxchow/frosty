@@ -98,6 +98,14 @@ abstract class ChatStoreBase with Store {
   /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
   final messageBuffer = ObservableList<IRCMessage>();
 
+  /// The set of message IDs that have been revealed by the user (for deleted messages).
+  final revealedMessageIds = ObservableSet<String>();
+
+  @action
+  void revealMessage(String id) {
+    revealedMessageIds.add(id);
+  }
+
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
 
