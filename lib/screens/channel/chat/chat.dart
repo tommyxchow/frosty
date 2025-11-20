@@ -86,6 +86,19 @@ class Chat extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // Prevents accidental chat scrolling when swiping down from the top edge
+                    // to access system UI (Notification Center/Control Center) in landscape mode.
+                    if (context.isLandscape)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: 24,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onVerticalDragStart: (_) {},
+                        ),
+                      ),
                     Positioned(
                       left: 0,
                       right: 0,
