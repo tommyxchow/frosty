@@ -123,6 +123,21 @@ class ChatMessage extends StatelessWidget {
           ListTile(
             onTap: () async {
               await copyMessage();
+
+              final hasChatDelay =
+                  chatStore.settings.showVideo &&
+                  chatStore.settings.chatDelay > 0;
+
+              if (hasChatDelay) {
+                chatStore.updateNotification(
+                  'Chatting is disabled due to message delay (${chatStore.settings.chatDelay.toInt()}s)',
+                );
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+                return;
+              }
+
               // Paste the copied message into the text controller
               chatStore.textController.text = ircMessage.message ?? '';
               chatStore.safeRequestFocus();

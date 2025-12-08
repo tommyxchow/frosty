@@ -78,7 +78,8 @@ class ChatBottomBar extends StatelessWidget {
 
         final hasChatDelay =
             chatStore.settings.showVideo && chatStore.settings.chatDelay > 0;
-        const delayTooltipMessage = 'Chatting is disabled due to message delay';
+        final delayTooltipMessage =
+            'Chatting is disabled due to message delay (${chatStore.settings.chatDelay.toInt()}s)';
         const loginTooltipMessage = 'Log in to chat';
 
         final bottomBarContent = Column(
