@@ -284,28 +284,6 @@ class ChatBottomBar extends StatelessWidget {
                         },
                       ),
                     ),
-                  if (chatStore.settings.showVideo &&
-                      chatStore.settings.chatDelay > 0)
-                    Tooltip(
-                      message:
-                          'Message delay: ${chatStore.settings.chatDelay.toInt()} seconds${chatStore.settings.autoSyncChatDelay ? ' (auto-synced)' : ''}',
-                      preferBelow: false,
-                      triggerMode: TooltipTriggerMode.tap,
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 12),
-                        width: 38,
-                        child: Text(
-                          '${chatStore.settings.chatDelay.toInt()}s',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontWeight: FontWeight.w500,
-                            overflow: TextOverflow.ellipsis,
-                            fontFeatures: [const FontFeature.tabularFigures()],
-                          ),
-                        ),
-                      ),
-                    ),
                   if (chatStore.showSendButton &&
                       (chatStore.settings.chatWidth >= 0.3 ||
                           chatStore.expandChat ||

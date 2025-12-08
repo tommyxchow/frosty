@@ -130,33 +130,6 @@ class VideoOverlay extends StatelessWidget {
       },
     );
 
-    final latencyTooltip = Tooltip(
-      message: 'Latency to broadcaster',
-      preferBelow: false,
-      child: Row(
-        spacing: 4,
-        children: [
-          Icon(
-            Icons.speed_rounded,
-            size: 14,
-            color: surfaceColor,
-            shadows: _iconShadow,
-          ),
-          Observer(
-            builder: (context) => Text(
-              videoStore.latency ?? 'N/A',
-              style: TextStyle(
-                color: surfaceColor,
-                fontWeight: FontWeight.w500,
-                fontFeatures: const [FontFeature.tabularFigures()],
-                shadows: _textShadow,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
     final refreshButton = Tooltip(
       message: 'Refresh',
       preferBelow: false,
@@ -454,6 +427,7 @@ class VideoOverlay extends StatelessWidget {
                               Tooltip(
                                 message: 'Stream uptime',
                                 preferBelow: false,
+                                triggerMode: TooltipTriggerMode.tap,
                                 child: Row(
                                   spacing: 6,
                                   children: [
@@ -513,7 +487,35 @@ class VideoOverlay extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              if (context.isLandscape) latencyTooltip,
+                              Tooltip(
+                                message: 'Latency to broadcaster',
+                                preferBelow: false,
+                                triggerMode: TooltipTriggerMode.tap,
+                                child: Row(
+                                  spacing: 4,
+                                  children: [
+                                    Icon(
+                                      Icons.speed_rounded,
+                                      size: 14,
+                                      color: surfaceColor,
+                                      shadows: _iconShadow,
+                                    ),
+                                    Observer(
+                                      builder: (context) => Text(
+                                        videoStore.latency ?? '—',
+                                        style: TextStyle(
+                                          color: surfaceColor,
+                                          fontWeight: FontWeight.w500,
+                                          fontFeatures: const [
+                                            FontFeature.tabularFigures(),
+                                          ],
+                                          shadows: _textShadow,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
