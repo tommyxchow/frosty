@@ -115,6 +115,9 @@ abstract class ChatStoreBase with Store {
   /// Timer used for updating the chat delay countdown message.
   Timer? _chatDelayCountdownTimer;
 
+  /// Reference to the current countdown message for direct updates (avoids O(n) search).
+  IRCMessage? _countdownMessage;
+
   /// The current timer for the sleep timer if active.
   Timer? sleepTimer;
 
@@ -232,19 +235,26 @@ abstract class ChatStoreBase with Store {
       ),
     );
 
-    // Start chat delay countdown when toggling video on
+    // Start chat delay countdown when toggling video on, cancel when off
     reactions.add(
       reaction((_) => settings.showVideo, (showVideo) {
         if (showVideo && settings.chatDelay > 0) {
           _startChatDelayCountdown();
+        } else if (!showVideo) {
+          _cancelChatDelayCountdown();
         }
       }),
     );
 
     // Start chat delay countdown when chatDelay is set (for auto sync mode)
+    // Cancel countdown if delay becomes 0
     reactions.add(
       reaction((_) => settings.chatDelay, (chatDelay) {
-        if (settings.autoSyncChatDelay && settings.showVideo && chatDelay > 0) {
+        if (chatDelay == 0) {
+          _cancelChatDelayCountdown();
+        } else if (settings.autoSyncChatDelay &&
+            settings.showVideo &&
+            chatDelay > 0) {
           _startChatDelayCountdown();
         }
       }),
@@ -667,7 +677,7 @@ abstract class ChatStoreBase with Store {
         currentConnectionId = 0;
 
         // Cancel chat delay countdown when disconnecting
-        _chatDelayCountdownTimer?.cancel();
+        _cancelChatDelayCountdown();
 
         if (_shouldDisconnect) {
           _sevenTVChannel?.sink.close(1000);
@@ -772,10 +782,24 @@ abstract class ChatStoreBase with Store {
     messageBuffer.clear();
   }
 
+  /// Cancels the chat delay countdown and removes the countdown message.
+  @action
+  void _cancelChatDelayCountdown() {
+    _chatDelayCountdownTimer?.cancel();
+    _chatDelayCountdownTimer = null;
+
+    // Remove the countdown message if it exists
+    if (_countdownMessage != null) {
+      _messages.remove(_countdownMessage);
+      _countdownMessage = null;
+    }
+  }
+
   /// Starts and manages the chat delay countdown message.
   @action
   void _startChatDelayCountdown() {
-    _chatDelayCountdownTimer?.cancel();
+    // Cancel any existing countdown first (prevents duplicate messages)
+    _cancelChatDelayCountdown();
 
     // Flush any buffered messages first to ensure countdown is at the bottom
     if (messageBuffer.isNotEmpty) {
@@ -785,12 +809,11 @@ abstract class ChatStoreBase with Store {
 
     var remainingSeconds = settings.chatDelay.toInt();
 
-    // Add initial countdown message
-    _messages.add(
-      IRCMessage.createNotice(
-        message: 'Chat will sync in ${remainingSeconds}s...',
-      ),
+    // Create and store reference to the countdown message
+    _countdownMessage = IRCMessage.createNotice(
+      message: 'Chat will sync in ${remainingSeconds}s...',
     );
+    _messages.add(_countdownMessage!);
 
     // Update countdown every second
     _chatDelayCountdownTimer = Timer.periodic(const Duration(seconds: 1), (
@@ -798,24 +821,39 @@ abstract class ChatStoreBase with Store {
     ) {
       remainingSeconds--;
 
-      // Find and replace the countdown message
-      final index = _messages.indexWhere(
-        (msg) => msg.message?.contains('Chat will sync in') ?? false,
-      );
+      // Use runInAction for proper MobX reactivity in async callbacks
+      runInAction(() {
+        // Check if countdown message still exists in the list
+        // (could be removed by message limit cleanup)
+        if (_countdownMessage == null ||
+            !_messages.contains(_countdownMessage)) {
+          timer.cancel();
+          _countdownMessage = null;
+          _chatDelayCountdownTimer = null;
+          return;
+        }
 
-      if (index != -1) {
-        if (remainingSeconds > 0) {
-          _messages[index] = IRCMessage.createNotice(
-            message: 'Chat will sync in ${remainingSeconds}s...',
-          );
+        final index = _messages.indexOf(_countdownMessage!);
+        if (index != -1) {
+          if (remainingSeconds > 0) {
+            // Create new message and update reference
+            _countdownMessage = IRCMessage.createNotice(
+              message: 'Chat will sync in ${remainingSeconds}s...',
+            );
+            _messages[index] = _countdownMessage!;
+          } else {
+            // Remove countdown message when done
+            _messages.removeAt(index);
+            _countdownMessage = null;
+            _chatDelayCountdownTimer = null;
+            timer.cancel();
+          }
         } else {
-          // Remove countdown message when done
-          _messages.removeAt(index);
+          _countdownMessage = null;
+          _chatDelayCountdownTimer = null;
           timer.cancel();
         }
-      } else {
-        timer.cancel();
-      }
+      });
     });
   }
 
@@ -997,7 +1035,7 @@ abstract class ChatStoreBase with Store {
     _messageBufferTimer?.cancel();
     _notificationTimer?.cancel();
     _sendingTimeoutTimer?.cancel();
-    _chatDelayCountdownTimer?.cancel();
+    _cancelChatDelayCountdown();
     sleepTimer?.cancel();
 
     // Cancel WebSocket subscriptions
