@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/animated_scroll_border.dart';
 import 'package:frosty/widgets/live_indicator.dart';
 import 'package:frosty/widgets/profile_picture.dart';
+import 'package:frosty/widgets/section_header.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/uptime.dart';
 
-/// Data class returned when a channel is selected in the AddChatDialog.
+/// Data class returned when a channel is selected in the AddChatSheet.
 class AddChatResult {
   final String channelId;
   final String channelLogin;
@@ -22,30 +26,32 @@ class AddChatResult {
   });
 }
 
-/// Dialog for adding a new chat tab by searching for a Twitch channel.
-class AddChatDialog extends StatefulWidget {
+/// Bottom sheet for adding a new chat tab by searching for a Twitch channel.
+class AddChatSheet extends StatefulWidget {
   final TwitchApi twitchApi;
 
-  const AddChatDialog({super.key, required this.twitchApi});
+  const AddChatSheet({super.key, required this.twitchApi});
 
-  /// Shows the dialog and returns the selected channel info, or null if cancelled.
+  /// Shows the bottom sheet and returns the selected channel info, or null if cancelled.
   static Future<AddChatResult?> show(
     BuildContext context,
     TwitchApi twitchApi,
   ) {
-    return showDialog<AddChatResult>(
+    return showModalBottomSheetWithProperFocus<AddChatResult>(
       context: context,
-      builder: (context) => AddChatDialog(twitchApi: twitchApi),
+      isScrollControlled: true,
+      builder: (context) => AddChatSheet(twitchApi: twitchApi),
     );
   }
 
   @override
-  State<AddChatDialog> createState() => _AddChatDialogState();
+  State<AddChatSheet> createState() => _AddChatSheetState();
 }
 
-class _AddChatDialogState extends State<AddChatDialog> {
+class _AddChatSheetState extends State<AddChatSheet> {
   final _textController = TextEditingController();
   final _focusNode = FocusNode();
+  final _scrollController = ScrollController();
 
   Timer? _debounce;
   bool _isLoading = false;
@@ -55,10 +61,8 @@ class _AddChatDialogState extends State<AddChatDialog> {
   @override
   void initState() {
     super.initState();
-    // Auto-focus the text field
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
+    _textController.addListener(() => setState(() {}));
+    _focusNode.addListener(() => setState(() {}));
   }
 
   @override
@@ -66,6 +70,7 @@ class _AddChatDialogState extends State<AddChatDialog> {
     _debounce?.cancel();
     _textController.dispose();
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -122,78 +127,101 @@ class _AddChatDialogState extends State<AddChatDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add Chat'),
-      content: SizedBox(
-        width: double.maxFinite,
-        height: 400,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _textController,
-              focusNode: _focusNode,
-              decoration: InputDecoration(
-                hintText: 'Search for a channel...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _textController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _textController.clear();
-                          _onSearchChanged('');
-                        },
-                      )
-                    : null,
+            const SectionHeader('Add Chat', isFirst: true),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+              child: TextField(
+                controller: _textController,
+                focusNode: _focusNode,
+                autocorrect: false,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  hintText: 'Search for a channel',
+                  suffixIcon:
+                      _focusNode.hasFocus || _textController.text.isNotEmpty
+                      ? IconButton(
+                          tooltip: _textController.text.isEmpty
+                              ? 'Cancel'
+                              : 'Clear',
+                          onPressed: () {
+                            if (_textController.text.isEmpty) {
+                              _focusNode.unfocus();
+                            }
+                            _textController.clear();
+                            _onSearchChanged('');
+                          },
+                          icon: const Icon(Icons.close_rounded),
+                        )
+                      : null,
+                ),
+                onChanged: _onSearchChanged,
+                textInputAction: TextInputAction.search,
               ),
-              onChanged: _onSearchChanged,
-              textInputAction: TextInputAction.search,
             ),
-            const SizedBox(height: 16),
+            AnimatedScrollBorder(scrollController: _scrollController),
             Expanded(child: _buildResults()),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-      ],
     );
   }
 
   Widget _buildResults() {
     if (_textController.text.isEmpty) {
-      return const Center(
-        child: Text(
-          'Enter a channel name to search',
-          style: TextStyle(color: Colors.grey),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'Search for a channel to add',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       );
     }
 
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return ListView.builder(
+        controller: _scrollController,
+        itemCount: 8,
+        itemBuilder: (context, index) => ChannelSkeletonLoader(index: index),
+      );
     }
 
     if (_errorMessage != null) {
       return Center(
-        child: AlertMessage(message: _errorMessage!),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: AlertMessage(message: _errorMessage!),
+        ),
       );
     }
 
     if (_results.isEmpty) {
-      return const Center(
-        child: Text(
-          'No channels found',
-          style: TextStyle(color: Colors.grey),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'No channels found',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       );
     }
 
     return ListView.builder(
-      shrinkWrap: true,
+      controller: _scrollController,
+      padding: EdgeInsets.zero,
       itemCount: _results.length,
       itemBuilder: (context, index) {
         final channel = _results[index];
@@ -205,9 +233,10 @@ class _AddChatDialogState extends State<AddChatDialog> {
         return ListTile(
           leading: ProfilePicture(
             userLogin: channel.broadcasterLogin,
+            radius: 16,
           ),
           title: Text(displayName),
-          subtitle: channel.isLive && channel.startedAt.isNotEmpty
+          subtitle: channel.isLive
               ? Row(
                   spacing: 6,
                   children: [
@@ -215,10 +244,13 @@ class _AddChatDialogState extends State<AddChatDialog> {
                     Uptime(startTime: channel.startedAt),
                   ],
                 )
-              : Text(channel.isLive ? 'Live' : 'Offline'),
+              : null,
           onTap: () => _selectChannel(channel),
         );
       },
     );
   }
 }
+
+// Keep backward compatibility alias
+typedef AddChatDialog = AddChatSheet;

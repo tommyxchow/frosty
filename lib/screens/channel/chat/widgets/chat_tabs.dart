@@ -14,11 +14,7 @@ class ChatTabs extends StatelessWidget {
   final ChatTabsStore chatTabsStore;
   final EdgeInsetsGeometry? listPadding;
 
-  const ChatTabs({
-    super.key,
-    required this.chatTabsStore,
-    this.listPadding,
-  });
+  const ChatTabs({super.key, required this.chatTabsStore, this.listPadding});
 
   Future<void> _handleAddChat(BuildContext context) async {
     if (!chatTabsStore.canAddTab) {
@@ -31,10 +27,7 @@ class ChatTabs extends StatelessWidget {
       return;
     }
 
-    final result = await AddChatDialog.show(
-      context,
-      chatTabsStore.twitchApi,
-    );
+    final result = await AddChatSheet.show(context, chatTabsStore.twitchApi);
 
     if (result != null) {
       final added = chatTabsStore.addTab(
@@ -185,10 +178,7 @@ class ChatTabs extends StatelessWidget {
       child: InputChip(
         label: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 100),
-          child: Text(
-            displayName,
-            overflow: TextOverflow.ellipsis,
-          ),
+          child: Text(displayName, overflow: TextOverflow.ellipsis),
         ),
         selected: isActive,
         showCheckmark: false,
