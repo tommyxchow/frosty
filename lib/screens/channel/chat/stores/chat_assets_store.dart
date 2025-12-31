@@ -8,6 +8,7 @@ import 'package:frosty/models/badges.dart';
 import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/shared_chat_session.dart';
 import 'package:frosty/models/user.dart';
+import 'package:frosty/stores/global_assets_store.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +21,7 @@ abstract class ChatAssetsStoreBase with Store {
   final BTTVApi bttvApi;
   final FFZApi ffzApi;
   final SevenTVApi sevenTVApi;
+  final GlobalAssetsStore globalAssetsStore;
 
   /// Contains any custom FFZ mod and vip badges for the channel.
   RoomFFZ? ffzRoomInfo;
@@ -36,25 +38,43 @@ abstract class ChatAssetsStoreBase with Store {
 
   @computed
   List<Emote> get bttvEmotes =>
-      _emoteToObject.values.where((emote) => isBTTV(emote)).toList();
+      emoteToObject.values.where((emote) => isBTTV(emote)).toList();
 
   @computed
   List<Emote> get ffzEmotes =>
-      _emoteToObject.values.where((emote) => isFFZ(emote)).toList();
+      emoteToObject.values.where((emote) => isFFZ(emote)).toList();
 
   @computed
   List<Emote> get sevenTVEmotes =>
-      _emoteToObject.values.where((emote) => is7TV(emote)).toList();
-
-  /// The map of badges ids to their object representation.
-  final twitchBadgesToObject = ObservableMap<String, ChatBadge>();
+      emoteToObject.values.where((emote) => is7TV(emote)).toList();
 
   @readonly
   var _recentEmotes = ObservableList<Emote>();
 
-  /// The map of emote words to their image or GIF URL. May be used by anyone in the chat.
+  /// Channel-specific emotes only (not global).
   @readonly
-  var _emoteToObject = ObservableMap<String, Emote>();
+  var _channelEmoteToObject = ObservableMap<String, Emote>();
+
+  /// Channel-specific Twitch badges (overrides globals).
+  @readonly
+  var _channelTwitchBadges = <String, ChatBadge>{};
+
+  /// Combined emotes: global + channel. Channel emotes take precedence.
+  @computed
+  Map<String, Emote> get emoteToObject {
+    final combined = Map<String, Emote>.from(globalAssetsStore.globalEmoteMap);
+    combined.addAll(_channelEmoteToObject);
+    return combined;
+  }
+
+  /// Combined Twitch badges: global + channel. Channel badges take precedence.
+  @computed
+  Map<String, ChatBadge> get twitchBadgesToObject {
+    final combined =
+        Map<String, ChatBadge>.from(globalAssetsStore.twitchGlobalBadges);
+    combined.addAll(_channelTwitchBadges);
+    return combined;
+  }
 
   /// The emotes that are "owned" and may be used by the current user.
   @readonly
@@ -66,17 +86,16 @@ abstract class ChatAssetsStoreBase with Store {
   // ignore: prefer_final_fields
   var _userEmoteSectionToEmotes = <String, List<Emote>>{};
 
-  /// The map of user IDs to their FFZ badges.
-  @readonly
-  var _userToFFZBadges = <String, List<ChatBadge>>{};
+  /// The map of user IDs to their FFZ badges (from global store).
+  Map<String, List<ChatBadge>> get userToFFZBadges =>
+      globalAssetsStore.ffzBadges;
 
   /// The map of user IDs to their 7TV badges.
   @readonly
   var _userTo7TVBadges = <String, List<ChatBadge>>{};
 
-  /// The map of user IDs to their BTTV badge.
-  @readonly
-  var _userToBTTVBadges = <String, ChatBadge>{};
+  /// The map of user IDs to their BTTV badge (from global store).
+  Map<String, ChatBadge> get userToBTTVBadges => globalAssetsStore.bttvBadges;
 
   /// Whether or not the emote menu is visible.
   @observable
@@ -105,6 +124,7 @@ abstract class ChatAssetsStoreBase with Store {
     required this.bttvApi,
     required this.ffzApi,
     required this.sevenTVApi,
+    required this.globalAssetsStore,
   });
 
   @action
@@ -129,7 +149,8 @@ abstract class ChatAssetsStoreBase with Store {
     });
   }
 
-  /// Fetches global and channel assets (badges and emotes) and stores them in [_emoteToUrl]
+  /// Fetches channel-specific assets (badges and emotes).
+  /// Global assets are loaded via [globalAssetsStore] and combined automatically.
   @action
   Future<void> assetsFuture({
     required String channelId,
@@ -143,90 +164,68 @@ abstract class ChatAssetsStoreBase with Store {
     bool showBTTVBadges = true,
     bool showFFZEmotes = true,
     bool showFFZBadges = true,
-  }) =>
-      // Fetch the global and channel's assets (emotes & badges).
-      // Async awaits are placed in a list so they are performed in parallel.
-      //
-      // Emotes
+  }) async {
+    // Fetch global (cached) and channel-specific assets in parallel
+    await Future.wait([
+      // Global assets (cached across all tabs - only fetches once)
+      globalAssetsStore.ensureLoaded(
+        showTwitchEmotes: showTwitchEmotes,
+        showTwitchBadges: showTwitchBadges,
+        show7TVEmotes: show7TVEmotes,
+        showBTTVEmotes: showBTTVEmotes,
+        showBTTVBadges: showBTTVBadges,
+        showFFZEmotes: showFFZEmotes,
+        showFFZBadges: showFFZBadges,
+      ),
+      // Channel-specific emotes
       Future.wait([
-        Future.wait([
-              if (showTwitchEmotes) ...[
-                twitchApi.getEmotesGlobal().catchError(onEmoteError),
-                twitchApi
-                    .getEmotesChannel(id: channelId)
-                    .then((emotes) {
-                      _userEmoteSectionToEmotes.update(
-                        'Channel Emotes',
-                        (existingEmoteSet) => [...existingEmoteSet, ...emotes],
-                        ifAbsent: () => emotes.toList(),
-                      );
-
-                      return emotes;
-                    })
-                    .catchError(onEmoteError),
-              ],
-              if (show7TVEmotes) ...[
-                sevenTVApi.getEmotesGlobal().catchError(onEmoteError),
-                sevenTVApi
-                    .getEmotesChannel(id: channelId)
-                    .then((data) {
-                      final (setId, emotes) = data;
-                      sevenTvEmoteSetId = setId;
-                      return emotes;
-                    })
-                    .catchError(onEmoteError),
-              ],
-              if (showBTTVEmotes) ...[
-                bttvApi.getEmotesGlobal().catchError(onEmoteError),
-                bttvApi
-                    .getEmotesChannel(id: channelId)
-                    .catchError(onEmoteError),
-              ],
-              if (showFFZEmotes) ...[
-                ffzApi.getEmotesGlobal().catchError(onEmoteError),
-                ffzApi
-                    .getRoomInfo(id: channelId)
-                    .then((ffzRoom) {
-                      final (roomInfo, emotes) = ffzRoom;
-
-                      ffzRoomInfo = roomInfo;
-                      return emotes;
-                    })
-                    .catchError(onEmoteError),
-              ],
-            ])
-            .then((assets) => assets.expand((list) => list))
-            .then(
-              (emotes) => _emoteToObject = <String, Emote>{
-                for (final emote in emotes) emote.name: emote,
-              }.asObservable(),
-            ),
-        // Badges
-        Future.wait([
-          // Get global badges first, then channel badges to avoid badge conflicts.
-          // We want the channel badges to override the global badges.
-          if (showTwitchBadges)
-            twitchApi
-                .getBadgesGlobal()
-                .then((badges) => twitchBadgesToObject.addAll(badges))
-                .then(
-                  (_) => twitchApi
-                      .getBadgesChannel(id: channelId)
-                      .then((badges) => twitchBadgesToObject.addAll(badges))
-                      .catchError(onBadgeError),
-                ),
-          if (showFFZBadges)
-            ffzApi
-                .getBadges()
-                .then((badges) => _userToFFZBadges = badges)
-                .catchError(onBadgeError),
-          if (showBTTVBadges)
-            bttvApi
-                .getBadges()
-                .then((badges) => _userToBTTVBadges = badges)
-                .catchError(onBadgeError),
-        ]),
-      ]);
+        if (showTwitchEmotes)
+          twitchApi
+              .getEmotesChannel(id: channelId)
+              .then((emotes) {
+                _userEmoteSectionToEmotes.update(
+                  'Channel Emotes',
+                  (existingEmoteSet) => [...existingEmoteSet, ...emotes],
+                  ifAbsent: () => emotes.toList(),
+                );
+                return emotes;
+              })
+              .catchError(onEmoteError),
+        if (show7TVEmotes)
+          sevenTVApi
+              .getEmotesChannel(id: channelId)
+              .then((data) {
+                final (setId, emotes) = data;
+                sevenTvEmoteSetId = setId;
+                return emotes;
+              })
+              .catchError(onEmoteError),
+        if (showBTTVEmotes)
+          bttvApi.getEmotesChannel(id: channelId).catchError(onEmoteError),
+        if (showFFZEmotes)
+          ffzApi
+              .getRoomInfo(id: channelId)
+              .then((ffzRoom) {
+                final (roomInfo, emotes) = ffzRoom;
+                ffzRoomInfo = roomInfo;
+                return emotes;
+              })
+              .catchError(onEmoteError),
+      ])
+          .then((assets) => assets.expand((list) => list))
+          .then(
+            (emotes) => _channelEmoteToObject = <String, Emote>{
+              for (final emote in emotes) emote.name: emote,
+            }.asObservable(),
+          ),
+      // Channel badges (Twitch only - FFZ/BTTV badges are global)
+      if (showTwitchBadges)
+        twitchApi
+            .getBadgesChannel(id: channelId)
+            .then((badges) => _channelTwitchBadges = badges)
+            .catchError(onBadgeError),
+    ]);
+  }
 
   /// Fetch and merge assets for all participants in a shared chat session.
   /// Safe to call multiple times; only new participant channels will be fetched.
@@ -272,7 +271,7 @@ abstract class ChatAssetsStoreBase with Store {
               showFFZEmotes: showFFZEmotes,
             ).then((emotes) {
               for (final emote in emotes) {
-                _emoteToObject[emote.name] = emote;
+                _channelEmoteToObject[emote.name] = emote;
               }
             }),
       ),
@@ -384,7 +383,7 @@ abstract class ChatAssetsStoreBase with Store {
   }) async {
     try {
       final badges = await twitchApi.getBadgesChannel(id: id);
-      twitchBadgesToObject.addAll(badges);
+      _channelTwitchBadges = {..._channelTwitchBadges, ...badges};
     } catch (e) {
       onBadgeError(e);
     }

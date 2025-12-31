@@ -101,6 +101,18 @@ mixin _$ChatTabsStore on ChatTabsStoreBase, Store {
   );
 
   @override
+  void activateTab(int index) {
+    final _$actionInfo = _$ChatTabsStoreBaseActionController.startAction(
+      name: 'ChatTabsStoreBase.activateTab',
+    );
+    try {
+      return super.activateTab(index);
+    } finally {
+      _$ChatTabsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   bool addTab({
     required String channelId,
     required String channelLogin,

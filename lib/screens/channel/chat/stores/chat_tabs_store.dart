@@ -7,6 +7,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/stores/global_assets_store.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -79,6 +80,7 @@ abstract class ChatTabsStoreBase with Store {
   /// Global stores passed to each ChatStore.
   final AuthStore authStore;
   final SettingsStore settingsStore;
+  final GlobalAssetsStore globalAssetsStore;
 
   /// The list of open chat tabs.
   @readonly
@@ -115,6 +117,7 @@ abstract class ChatTabsStoreBase with Store {
     required this.sevenTVApi,
     required this.authStore,
     required this.settingsStore,
+    required this.globalAssetsStore,
     required String primaryChannelId,
     required String primaryChannelLogin,
     required String primaryDisplayName,
@@ -157,6 +160,7 @@ abstract class ChatTabsStoreBase with Store {
         ffzApi: ffzApi,
         bttvApi: bttvApi,
         sevenTVApi: sevenTVApi,
+        globalAssetsStore: globalAssetsStore,
       ),
     );
   }

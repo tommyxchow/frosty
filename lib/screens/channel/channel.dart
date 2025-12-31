@@ -66,6 +66,7 @@ class _VideoChatState extends State<VideoChat>
     sevenTVApi: context.sevenTVApi,
     authStore: context.authStore,
     settingsStore: context.settingsStore,
+    globalAssetsStore: context.globalAssetsStore,
     primaryChannelId: widget.userId,
     primaryChannelLogin: widget.userLogin,
     primaryDisplayName: widget.userName,

@@ -20,6 +20,7 @@ import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/stores/global_assets_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:mobx/mobx.dart';
@@ -77,6 +78,14 @@ void main() async {
   final ffzApiService = FFZApi(dioClient);
   final sevenTVApiService = SevenTVApi(dioClient);
 
+  // Create global assets store (shared cache for global emotes/badges)
+  final globalAssetsStore = GlobalAssetsStore(
+    twitchApi: twitchApiService,
+    bttvApi: bttvApiService,
+    ffzApi: ffzApiService,
+    sevenTVApi: sevenTVApiService,
+  );
+
   // Create and initialize the authentication store
   final authStore = AuthStore(twitchApi: twitchApiService);
 
@@ -97,6 +106,7 @@ void main() async {
         Provider<BTTVApi>.value(value: bttvApiService),
         Provider<FFZApi>.value(value: ffzApiService),
         Provider<SevenTVApi>.value(value: sevenTVApiService),
+        Provider<GlobalAssetsStore>.value(value: globalAssetsStore),
       ],
       child: MyApp(firstRun: firstRun),
     ),

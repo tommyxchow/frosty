@@ -5,6 +5,7 @@ import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/stores/global_assets_store.dart';
 import 'package:provider/provider.dart';
 
 /// Static utility class for orientation-related operations
@@ -80,6 +81,9 @@ extension ContextExtensions on BuildContext {
 
   /// Gets SevenTVApi from provider
   SevenTVApi get sevenTVApi => read<SevenTVApi>();
+
+  /// Gets GlobalAssetsStore from provider
+  GlobalAssetsStore get globalAssetsStore => read<GlobalAssetsStore>();
 
   // ===== ORIENTATION =====
 
