@@ -144,6 +144,34 @@ class ChatTabs extends StatelessWidget {
     );
   }
 
+  Future<void> _confirmRemoveTab(
+    BuildContext context,
+    int index,
+    String displayName,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Remove $displayName?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      HapticFeedback.lightImpact();
+      chatTabsStore.removeTab(index);
+    }
+  }
+
   Widget _buildTab(BuildContext context, int index) {
     final tabInfo = chatTabsStore.tabs[index];
     final isActive = index == chatTabsStore.activeTabIndex;
@@ -174,10 +202,7 @@ class ChatTabs extends StatelessWidget {
         },
         onDeleted: tabInfo.isPrimary
             ? null
-            : () {
-                HapticFeedback.lightImpact();
-                chatTabsStore.removeTab(index);
-              },
+            : () => _confirmRemoveTab(context, index, displayName),
         deleteButtonTooltipMessage: 'Close chat',
       ),
     );
