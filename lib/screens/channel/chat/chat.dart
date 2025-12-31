@@ -15,7 +15,16 @@ class Chat extends StatelessWidget {
   final ChatStore chatStore;
   final EdgeInsetsGeometry? listPadding;
 
-  const Chat({super.key, required this.chatStore, this.listPadding});
+  /// Callback to add a new chat tab.
+  /// Passes this to ChatBottomBar for the ChatDetails menu.
+  final VoidCallback onAddChat;
+
+  const Chat({
+    super.key,
+    required this.chatStore,
+    this.listPadding,
+    required this.onAddChat,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +112,10 @@ class Chat extends StatelessWidget {
                       left: 0,
                       right: 0,
                       bottom: 0,
-                      child: ChatBottomBar(chatStore: chatStore),
+                      child: ChatBottomBar(
+                        chatStore: chatStore,
+                        onAddChat: onAddChat,
+                      ),
                     ),
                     AnimatedPadding(
                       duration: const Duration(milliseconds: 200),

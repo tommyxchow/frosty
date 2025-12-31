@@ -318,6 +318,18 @@ mixin _$ChatStore on ChatStoreBase, Store {
   );
 
   @override
+  void revealMessage(String id) {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase.revealMessage',
+    );
+    try {
+      return super.revealMessage(id);
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void _handleIRCData(String data) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
       name: 'ChatStoreBase._handleIRCData',
@@ -360,6 +372,18 @@ mixin _$ChatStore on ChatStoreBase, Store {
     );
     try {
       return super.addMessages();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _cancelChatDelayCountdown() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase._cancelChatDelayCountdown',
+    );
+    try {
+      return super._cancelChatDelayCountdown();
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }

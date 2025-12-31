@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/screens/channel/chat/chat.dart';
-import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
-import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
+import 'package:frosty/screens/channel/chat/widgets/chat_tabs.dart';
 import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
@@ -60,23 +59,16 @@ class _VideoChatState extends State<VideoChat>
   late AnimationController _animationController;
   late Animation<double> _springBackAnimation;
 
-  late final ChatStore _chatStore = ChatStore(
+  late final ChatTabsStore _chatTabsStore = ChatTabsStore(
     twitchApi: context.twitchApi,
-    channelName: widget.userLogin,
-    channelId: widget.userId,
-    displayName: widget.userName,
-    auth: context.authStore,
-    settings: context.settingsStore,
-    chatDetailsStore: ChatDetailsStore(
-      twitchApi: context.twitchApi,
-      channelName: widget.userLogin,
-    ),
-    assetsStore: ChatAssetsStore(
-      twitchApi: context.twitchApi,
-      ffzApi: context.ffzApi,
-      bttvApi: context.bttvApi,
-      sevenTVApi: context.sevenTVApi,
-    ),
+    bttvApi: context.bttvApi,
+    ffzApi: context.ffzApi,
+    sevenTVApi: context.sevenTVApi,
+    authStore: context.authStore,
+    settingsStore: context.settingsStore,
+    primaryChannelId: widget.userId,
+    primaryChannelLogin: widget.userLogin,
+    primaryDisplayName: widget.userName,
   );
 
   late final VideoStore _videoStore = VideoStore(
@@ -202,9 +194,12 @@ class _VideoChatState extends State<VideoChat>
     });
   }
 
+  /// Convenience getter for the currently active chat store.
+  ChatStore get _chatStore => _chatTabsStore.activeChatStore;
+
   @override
   Widget build(BuildContext context) {
-    final settingsStore = _chatStore.settings;
+    final settingsStore = _chatTabsStore.settingsStore;
 
     final player = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
@@ -265,13 +260,14 @@ class _VideoChatState extends State<VideoChat>
 
     final chat = Observer(
       builder: (context) {
-        final bool chatOnly = !_chatStore.settings.showVideo;
+        final bool chatOnly = !settingsStore.showVideo;
 
         return Stack(
           children: [
-            Chat(
+            ChatTabs(
               key: _chatKey,
-              chatStore: _chatStore,
+              chatTabsStore: _chatTabsStore,
+              // In chat-only mode, account for the blurred AppBar height
               listPadding: chatOnly
                   ? EdgeInsets.only(top: context.safePaddingTop)
                   : null,
@@ -356,11 +352,10 @@ class _VideoChatState extends State<VideoChat>
                       : const Duration(milliseconds: 200),
                   width: _chatStore.expandChat
                       ? context.screenWidth / 2
-                      : context.screenWidth * _chatStore.settings.chatWidth,
-                  color: _chatStore.settings.fullScreen
+                      : context.screenWidth * settingsStore.chatWidth,
+                  color: settingsStore.fullScreen
                       ? Colors.black.withValues(
-                          alpha:
-                              _chatStore.settings.fullScreenChatOverlayOpacity,
+                          alpha: settingsStore.fullScreenChatOverlayOpacity,
                         )
                       : context.scaffoldColor,
                   child: chat,
@@ -407,7 +402,7 @@ class _VideoChatState extends State<VideoChat>
                                         final totalWidth = constraints.maxWidth;
                                         final chatWidth = _chatStore.expandChat
                                             ? 0.5
-                                            : _chatStore.settings.chatWidth;
+                                            : settingsStore.chatWidth;
 
                                         final draggableDivider = Observer(
                                           builder: (_) => DraggableDivider(
@@ -426,7 +421,7 @@ class _VideoChatState extends State<VideoChat>
                                             },
                                             onDrag: (newWidth) {
                                               if (!_chatStore.expandChat) {
-                                                _chatStore.settings.chatWidth =
+                                                settingsStore.chatWidth =
                                                     newWidth;
                                               }
                                             },
@@ -492,7 +487,7 @@ class _VideoChatState extends State<VideoChat>
                                     final availableWidth = constraints.maxWidth;
                                     final chatWidth = _chatStore.expandChat
                                         ? 0.5
-                                        : _chatStore.settings.chatWidth;
+                                        : settingsStore.chatWidth;
 
                                     // Create the landscape chat container with proper styling
                                     final chatContainer = AnimatedContainer(
@@ -501,10 +496,9 @@ class _VideoChatState extends State<VideoChat>
                                           ? Duration.zero
                                           : const Duration(milliseconds: 200),
                                       width: availableWidth * chatWidth,
-                                      color: _chatStore.settings.fullScreen
+                                      color: settingsStore.fullScreen
                                           ? Colors.black.withValues(
-                                              alpha: _chatStore
-                                                  .settings
+                                              alpha: settingsStore
                                                   .fullScreenChatOverlayOpacity,
                                             )
                                           : context.scaffoldColor,
@@ -525,8 +519,7 @@ class _VideoChatState extends State<VideoChat>
                                         },
                                         onDrag: (newWidth) {
                                           if (!_chatStore.expandChat) {
-                                            _chatStore.settings.chatWidth =
-                                                newWidth;
+                                            settingsStore.chatWidth = newWidth;
                                           }
                                         },
                                         onDragEnd: () {
@@ -709,7 +702,7 @@ class _VideoChatState extends State<VideoChat>
     // Remove observer for app lifecycle events
     WidgetsBinding.instance.removeObserver(this);
 
-    _chatStore.dispose();
+    _chatTabsStore.dispose();
 
     _videoStore.dispose();
 

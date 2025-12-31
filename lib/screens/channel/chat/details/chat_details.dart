@@ -23,11 +23,16 @@ class ChatDetails extends StatefulWidget {
   final ChatStore chatStore;
   final String userLogin;
 
+  /// Callback to add a new chat tab.
+  /// Shows an "Add chat" option in the menu.
+  final VoidCallback onAddChat;
+
   const ChatDetails({
     super.key,
     required this.chatDetailsStore,
     required this.chatStore,
     required this.userLogin,
+    required this.onAddChat,
   });
 
   @override
@@ -365,6 +370,12 @@ class _ChatDetailsState extends State<ChatDetails> {
                 ),
               ),
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.add_comment_rounded),
+            title: const Text('Add chat'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: widget.onAddChat,
           ),
           Observer(
             builder: (context) {

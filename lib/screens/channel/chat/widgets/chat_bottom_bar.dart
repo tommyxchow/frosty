@@ -13,7 +13,15 @@ import 'package:frosty/widgets/frosty_cached_network_image.dart';
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
 
-  const ChatBottomBar({super.key, required this.chatStore});
+  /// Callback to add a new chat tab.
+  /// Passes this to ChatDetails to show "Add chat" option.
+  final VoidCallback onAddChat;
+
+  const ChatBottomBar({
+    super.key,
+    required this.chatStore,
+    required this.onAddChat,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -326,6 +334,7 @@ class ChatBottomBar extends StatelessWidget {
                           chatDetailsStore: chatStore.chatDetailsStore,
                           chatStore: chatStore,
                           userLogin: chatStore.channelName,
+                          onAddChat: onAddChat,
                         ),
                       ),
                     ),
