@@ -7,9 +7,37 @@ import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 part 'chat_tabs_store.g.dart';
+
+/// Lightweight data class for persisting chat tab info to settings.
+/// Does NOT include ChatStore since WebSocket connections cannot be persisted.
+@JsonSerializable()
+class PersistedChatTab {
+  final String channelId;
+  final String channelLogin;
+  final String displayName;
+
+  const PersistedChatTab({
+    required this.channelId,
+    required this.channelLogin,
+    required this.displayName,
+  });
+
+  factory PersistedChatTab.fromJson(Map<String, dynamic> json) =>
+      _$PersistedChatTabFromJson(json);
+  Map<String, dynamic> toJson() => _$PersistedChatTabToJson(this);
+
+  /// Create from a ChatTabInfo (for syncing current tabs to settings).
+  factory PersistedChatTab.fromChatTabInfo(ChatTabInfo info) => PersistedChatTab(
+        channelId: info.channelId,
+        channelLogin: info.channelLogin,
+        displayName: info.displayName,
+      );
+}
 
 /// Data class holding information about a chat tab.
 class ChatTabInfo {
@@ -85,12 +113,20 @@ abstract class ChatTabsStoreBase with Store {
     required String primaryChannelLogin,
     required String primaryDisplayName,
   }) {
+    // Enable wakelock once for all chat tabs
+    WakelockPlus.enable();
+
     // Initialize with the primary channel tab
     _addPrimaryTab(
       channelId: primaryChannelId,
       channelLogin: primaryChannelLogin,
       displayName: primaryDisplayName,
     );
+
+    // Restore persisted secondary tabs if feature is enabled
+    if (settingsStore.persistChatTabs) {
+      _restoreSecondaryTabs(primaryChannelId: primaryChannelId);
+    }
   }
 
   /// Creates a ChatStore for a given channel.
@@ -142,6 +178,51 @@ abstract class ChatTabsStoreBase with Store {
     );
   }
 
+  /// Restores secondary tabs from settings.
+  void _restoreSecondaryTabs({required String primaryChannelId}) {
+    for (final persisted in settingsStore.secondaryTabs) {
+      // Skip if this is the same as the primary tab (already added)
+      if (persisted.channelId == primaryChannelId) {
+        continue;
+      }
+
+      // Skip if at max capacity
+      if (_tabs.length >= maxTabs) {
+        break;
+      }
+
+      final chatStore = _createChatStore(
+        channelId: persisted.channelId,
+        channelLogin: persisted.channelLogin,
+        displayName: persisted.displayName,
+      );
+
+      _tabs.add(
+        ChatTabInfo(
+          channelId: persisted.channelId,
+          channelLogin: persisted.channelLogin,
+          displayName: persisted.displayName,
+          chatStore: chatStore,
+          isPrimary: false,
+        ),
+      );
+    }
+  }
+
+  /// Syncs current secondary tabs to settings for persistence.
+  void _syncSecondaryTabsToSettings() {
+    if (!settingsStore.persistChatTabs) return;
+
+    // Get all non-primary tabs and convert to PersistedChatTab
+    final secondaryTabs = _tabs
+        .where((tab) => !tab.isPrimary)
+        .map(PersistedChatTab.fromChatTabInfo)
+        .toList();
+
+    // Update settings (autorun will handle persistence)
+    settingsStore.secondaryTabs = secondaryTabs;
+  }
+
   /// Adds a new chat tab for the given channel.
   /// Returns true if the tab was added, false if at limit or duplicate.
   @action
@@ -184,6 +265,10 @@ abstract class ChatTabsStoreBase with Store {
 
     // Switch to the new tab
     activeTabIndex = _tabs.length - 1;
+
+    // Sync to settings for persistence
+    _syncSecondaryTabsToSettings();
+
     return true;
   }
 
@@ -214,6 +299,9 @@ abstract class ChatTabsStoreBase with Store {
       activeTabIndex--;
     }
 
+    // Sync to settings for persistence
+    _syncSecondaryTabsToSettings();
+
     return true;
   }
 
@@ -242,5 +330,8 @@ abstract class ChatTabsStoreBase with Store {
       tab.chatStore.dispose();
     }
     _tabs.clear();
+
+    // Disable wakelock once after all tabs disposed
+    WakelockPlus.disable();
   }
 }

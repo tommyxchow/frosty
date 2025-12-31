@@ -66,6 +66,12 @@ SettingsStore _$SettingsStoreFromJson(
   ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
   ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
   ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
+  ..persistChatTabs = json['persistChatTabs'] as bool? ?? true
+  ..secondaryTabs =
+      (json['secondaryTabs'] as List<dynamic>?)
+          ?.map((e) => PersistedChatTab.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      []
   ..mutedWords =
       (json['mutedWords'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -122,6 +128,8 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showFFZEmotes': instance.showFFZEmotes,
   'showFFZBadges': instance.showFFZBadges,
   'showRecentMessages': instance.showRecentMessages,
+  'persistChatTabs': instance.persistChatTabs,
+  'secondaryTabs': instance.secondaryTabs,
   'mutedWords': instance.mutedWords,
   'matchWholeWord': instance.matchWholeWord,
   'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
@@ -854,6 +862,42 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$persistChatTabsAtom = Atom(
+    name: '_SettingsStoreBase.persistChatTabs',
+    context: context,
+  );
+
+  @override
+  bool get persistChatTabs {
+    _$persistChatTabsAtom.reportRead();
+    return super.persistChatTabs;
+  }
+
+  @override
+  set persistChatTabs(bool value) {
+    _$persistChatTabsAtom.reportWrite(value, super.persistChatTabs, () {
+      super.persistChatTabs = value;
+    });
+  }
+
+  late final _$secondaryTabsAtom = Atom(
+    name: '_SettingsStoreBase.secondaryTabs',
+    context: context,
+  );
+
+  @override
+  List<PersistedChatTab> get secondaryTabs {
+    _$secondaryTabsAtom.reportRead();
+    return super.secondaryTabs;
+  }
+
+  @override
+  set secondaryTabs(List<PersistedChatTab> value) {
+    _$secondaryTabsAtom.reportWrite(value, super.secondaryTabs, () {
+      super.secondaryTabs = value;
+    });
+  }
+
   late final _$mutedWordsAtom = Atom(
     name: '_SettingsStoreBase.mutedWords',
     context: context,
@@ -1087,6 +1131,8 @@ showBTTVBadges: ${showBTTVBadges},
 showFFZEmotes: ${showFFZEmotes},
 showFFZBadges: ${showFFZBadges},
 showRecentMessages: ${showRecentMessages},
+persistChatTabs: ${persistChatTabs},
+secondaryTabs: ${secondaryTabs},
 mutedWords: ${mutedWords},
 matchWholeWord: ${matchWholeWord},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},

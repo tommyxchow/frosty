@@ -203,6 +203,19 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.emoteMenuButtonOnLeft = newValue,
           ),
+          SettingsListSwitch(
+            title: 'Persist chat tabs',
+            subtitle: const Text(
+              'Secondary chat tabs are remembered when switching channels.',
+            ),
+            value: settingsStore.persistChatTabs,
+            onChanged: (newValue) {
+              settingsStore.persistChatTabs = newValue;
+              if (!newValue) {
+                settingsStore.secondaryTabs = [];
+              }
+            },
+          ),
           const SectionHeader('Landscape mode'),
           SettingsListSwitch(
             title: 'Move chat left',

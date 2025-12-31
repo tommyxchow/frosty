@@ -1,3 +1,4 @@
+import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:mobx/mobx.dart';
 
@@ -151,6 +152,10 @@ abstract class _SettingsStoreBase with Store {
   // Recent messages defaults
   static const defaultShowRecentMessages = false;
 
+  // Chat tabs defaults
+  static const defaultPersistChatTabs = true;
+  static const defaultSecondaryTabs = <PersistedChatTab>[];
+
   // Message sizing options
   @JsonKey(defaultValue: defaultBadgeScale)
   @observable
@@ -271,6 +276,15 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showRecentMessages = defaultShowRecentMessages;
 
+  // Chat tabs
+  @JsonKey(defaultValue: defaultPersistChatTabs)
+  @observable
+  var persistChatTabs = defaultPersistChatTabs;
+
+  @JsonKey(defaultValue: defaultSecondaryTabs)
+  @observable
+  var secondaryTabs = defaultSecondaryTabs;
+
   @JsonKey(defaultValue: defaultMutedWords)
   @observable
   List<String> mutedWords = defaultMutedWords;
@@ -319,6 +333,9 @@ abstract class _SettingsStoreBase with Store {
     showFFZBadges = defaultShowFFZBadges;
 
     showRecentMessages = defaultShowRecentMessages;
+
+    persistChatTabs = defaultPersistChatTabs;
+    secondaryTabs = defaultSecondaryTabs;
   }
 
   // * Other settings

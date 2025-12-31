@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
@@ -159,75 +157,60 @@ class Chat extends StatelessWidget {
                 ),
               ),
             ),
-            PopScope(
-              canPop: Platform.isIOS,
-              onPopInvokedWithResult: (didPop, _) {
-                if (didPop) return;
-
-                // If pressing the back button on Android while the emote menu
-                // is open, close it instead of going back to the streams list.
-                if (chatStore.assetsStore.showEmoteMenu) {
-                  chatStore.assetsStore.showEmoteMenu = false;
-                } else {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: AnimatedContainer(
-                curve: Curves.ease,
-                duration: const Duration(milliseconds: 200),
-                height: chatStore.assetsStore.showEmoteMenu
-                    ? context.screenHeight / (context.isPortrait ? 3 : 2)
-                    : 0,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 100),
-                  switchInCurve: Curves.easeOut,
-                  switchOutCurve: Curves.easeIn,
-                  child: chatStore.assetsStore.showEmoteMenu
-                      ? ClipRect(
-                          child: Column(
-                            children: [
-                              const Divider(),
-                              Expanded(
-                                child: FrostyPageView(
-                                  headers: [
-                                    'Recent',
-                                    if (chatStore.settings.showTwitchEmotes)
-                                      'Twitch',
-                                    if (chatStore.settings.show7TVEmotes) '7TV',
-                                    if (chatStore.settings.showBTTVEmotes)
-                                      'BTTV',
-                                    if (chatStore.settings.showFFZEmotes) 'FFZ',
-                                  ],
-                                  children: [
-                                    RecentEmotesPanel(chatStore: chatStore),
-                                    if (chatStore.settings.showTwitchEmotes)
-                                      EmoteMenuPanel(
-                                        chatStore: chatStore,
-                                        twitchEmotes: chatStore
-                                            .assetsStore
-                                            .userEmoteSectionToEmotes,
-                                      ),
-                                    ...[
-                                      if (chatStore.settings.show7TVEmotes)
-                                        chatStore.assetsStore.sevenTVEmotes,
-                                      if (chatStore.settings.showBTTVEmotes)
-                                        chatStore.assetsStore.bttvEmotes,
-                                      if (chatStore.settings.showFFZEmotes)
-                                        chatStore.assetsStore.ffzEmotes,
-                                    ].map(
-                                      (emotes) => EmoteMenuPanel(
-                                        chatStore: chatStore,
-                                        emotes: emotes,
-                                      ),
+            AnimatedContainer(
+              curve: Curves.ease,
+              duration: const Duration(milliseconds: 200),
+              height: chatStore.assetsStore.showEmoteMenu
+                  ? context.screenHeight / (context.isPortrait ? 3 : 2)
+                  : 0,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 100),
+                switchInCurve: Curves.easeOut,
+                switchOutCurve: Curves.easeIn,
+                child: chatStore.assetsStore.showEmoteMenu
+                    ? ClipRect(
+                        child: Column(
+                          children: [
+                            const Divider(),
+                            Expanded(
+                              child: FrostyPageView(
+                                headers: [
+                                  'Recent',
+                                  if (chatStore.settings.showTwitchEmotes)
+                                    'Twitch',
+                                  if (chatStore.settings.show7TVEmotes) '7TV',
+                                  if (chatStore.settings.showBTTVEmotes) 'BTTV',
+                                  if (chatStore.settings.showFFZEmotes) 'FFZ',
+                                ],
+                                children: [
+                                  RecentEmotesPanel(chatStore: chatStore),
+                                  if (chatStore.settings.showTwitchEmotes)
+                                    EmoteMenuPanel(
+                                      chatStore: chatStore,
+                                      twitchEmotes: chatStore
+                                          .assetsStore
+                                          .userEmoteSectionToEmotes,
                                     ),
-                                  ],
-                                ),
+                                  ...[
+                                    if (chatStore.settings.show7TVEmotes)
+                                      chatStore.assetsStore.sevenTVEmotes,
+                                    if (chatStore.settings.showBTTVEmotes)
+                                      chatStore.assetsStore.bttvEmotes,
+                                    if (chatStore.settings.showFFZEmotes)
+                                      chatStore.assetsStore.ffzEmotes,
+                                  ].map(
+                                    (emotes) => EmoteMenuPanel(
+                                      chatStore: chatStore,
+                                      emotes: emotes,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        )
-                      : null,
-                ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : null,
               ),
             ),
           ],

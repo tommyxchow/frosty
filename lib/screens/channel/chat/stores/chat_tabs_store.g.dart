@@ -3,6 +3,24 @@
 part of 'chat_tabs_store.dart';
 
 // **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+PersistedChatTab _$PersistedChatTabFromJson(Map<String, dynamic> json) =>
+    PersistedChatTab(
+      channelId: json['channelId'] as String,
+      channelLogin: json['channelLogin'] as String,
+      displayName: json['displayName'] as String,
+    );
+
+Map<String, dynamic> _$PersistedChatTabToJson(PersistedChatTab instance) =>
+    <String, dynamic>{
+      'channelId': instance.channelId,
+      'channelLogin': instance.channelLogin,
+      'displayName': instance.displayName,
+    };
+
+// **************************************************************************
 // StoreGenerator
 // **************************************************************************
 

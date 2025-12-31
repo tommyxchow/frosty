@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -5,7 +7,6 @@ import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/add_chat_dialog.dart';
 import 'package:frosty/utils.dart';
-import 'package:frosty/widgets/blurred_container.dart';
 
 /// Widget that displays multiple chat tabs with a tab bar.
 /// Wraps the existing Chat widget and manages tab switching.
@@ -73,30 +74,42 @@ class ChatTabs extends StatelessWidget {
             ? listPadding!.add(EdgeInsets.only(top: tabBarHeight))
             : EdgeInsets.only(top: tabBarHeight);
 
-        return Stack(
-          children: [
-            // Chat content with IndexedStack to preserve state
-            Positioned.fill(
-              child: IndexedStack(
-                index: activeIndex,
-                children: tabs.map((tabInfo) {
-                  return Chat(
-                    key: ValueKey(tabInfo.channelId),
-                    chatStore: tabInfo.chatStore,
-                    listPadding: adjustedPadding,
-                    onAddChat: () => _handleAddChat(context),
-                  );
-                }).toList(),
+        return PopScope(
+          canPop: Platform.isIOS,
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop) return;
+
+            // If pressing the back button on Android while the emote menu
+            // is open, close it instead of going back to the streams list.
+            final activeStore = chatTabsStore.activeChatStore;
+            if (activeStore.assetsStore.showEmoteMenu) {
+              activeStore.assetsStore.showEmoteMenu = false;
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
+          child: Stack(
+            children: [
+              // Chat content with IndexedStack to preserve state
+              Positioned.fill(
+                child: IndexedStack(
+                  index: activeIndex,
+                  children: tabs.map((tabInfo) {
+                    return Chat(
+                      key: ValueKey(tabInfo.channelId),
+                      chatStore: tabInfo.chatStore,
+                      listPadding: adjustedPadding,
+                      onAddChat: () => _handleAddChat(context),
+                    );
+                  }).toList(),
+                ),
               ),
-            ),
-            // Tab bar (only visible when more than 1 tab)
-            if (showTabBar)
-              Positioned(
-                top: topInset,
-                left: 0,
-                right: 0,
-                child: BlurredContainer(
-                  gradientDirection: GradientDirection.up,
+              // Tab bar (only visible when more than 1 tab)
+              if (showTabBar)
+                Positioned(
+                  top: topInset,
+                  left: 0,
+                  right: 0,
                   child: SizedBox(
                     height: 48,
                     child: Row(
@@ -124,8 +137,8 @@ class ChatTabs extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-          ],
+            ],
+          ),
         );
       },
     );
