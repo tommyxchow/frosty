@@ -88,9 +88,13 @@ class ChatTabs extends StatelessWidget {
                 child: IndexedStack(
                   index: activeIndex,
                   children: tabs.map((tabInfo) {
+                    // Show placeholder for non-activated tabs
+                    if (tabInfo.chatStore == null) {
+                      return const SizedBox.shrink();
+                    }
                     return Chat(
                       key: ValueKey(tabInfo.channelId),
-                      chatStore: tabInfo.chatStore,
+                      chatStore: tabInfo.chatStore!,
                       listPadding: adjustedPadding,
                       onAddChat: () => _handleAddChat(context),
                     );
@@ -168,6 +172,7 @@ class ChatTabs extends StatelessWidget {
   Widget _buildTab(BuildContext context, int index) {
     final tabInfo = chatTabsStore.tabs[index];
     final isActive = index == chatTabsStore.activeTabIndex;
+    final isActivated = tabInfo.isActivated;
     final displayName = getReadableName(
       tabInfo.displayName,
       tabInfo.channelLogin,
@@ -178,7 +183,19 @@ class ChatTabs extends StatelessWidget {
       child: InputChip(
         label: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 100),
-          child: Text(displayName, overflow: TextOverflow.ellipsis),
+          child: Text(
+            displayName,
+            overflow: TextOverflow.ellipsis,
+            style: isActivated
+                ? null
+                : TextStyle(
+                    color: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.color
+                        ?.withValues(alpha: 0.5),
+                  ),
+          ),
         ),
         selected: isActive,
         showCheckmark: false,

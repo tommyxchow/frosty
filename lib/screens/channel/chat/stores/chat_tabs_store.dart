@@ -44,16 +44,21 @@ class ChatTabInfo {
   final String channelId;
   final String channelLogin;
   final String displayName;
-  final ChatStore chatStore;
+
+  /// The ChatStore for this tab. Null until the tab is activated (lazy loading).
+  ChatStore? chatStore;
 
   /// Whether this is the primary tab (first tab, cannot be removed).
   final bool isPrimary;
 
-  const ChatTabInfo({
+  /// Whether this tab has been activated (chatStore created).
+  bool get isActivated => chatStore != null;
+
+  ChatTabInfo({
     required this.channelId,
     required this.channelLogin,
     required this.displayName,
-    required this.chatStore,
+    this.chatStore,
     required this.isPrimary,
   });
 }
@@ -88,8 +93,9 @@ abstract class ChatTabsStoreBase with Store {
   ChatTabInfo get activeTab => _tabs[activeTabIndex];
 
   /// Returns the ChatStore of the currently active tab.
+  /// The active tab is always activated, so this should never be null.
   @computed
-  ChatStore get activeChatStore => _tabs[activeTabIndex].chatStore;
+  ChatStore get activeChatStore => _tabs[activeTabIndex].chatStore!;
 
   /// Whether we can add more tabs (under the limit).
   @computed
@@ -155,6 +161,21 @@ abstract class ChatTabsStoreBase with Store {
     );
   }
 
+  /// Activates a tab by creating its ChatStore if not already activated.
+  @action
+  void activateTab(int index) {
+    if (index < 0 || index >= _tabs.length) return;
+
+    final tab = _tabs[index];
+    if (tab.chatStore != null) return; // Already activated
+
+    tab.chatStore = _createChatStore(
+      channelId: tab.channelId,
+      channelLogin: tab.channelLogin,
+      displayName: tab.displayName,
+    );
+  }
+
   /// Adds the primary tab (called during initialization).
   void _addPrimaryTab({
     required String channelId,
@@ -178,7 +199,7 @@ abstract class ChatTabsStoreBase with Store {
     );
   }
 
-  /// Restores secondary tabs from settings.
+  /// Restores secondary tabs from settings (lazy - no ChatStore created).
   void _restoreSecondaryTabs({required String primaryChannelId}) {
     for (final persisted in settingsStore.secondaryTabs) {
       // Skip if this is the same as the primary tab (already added)
@@ -191,18 +212,12 @@ abstract class ChatTabsStoreBase with Store {
         break;
       }
 
-      final chatStore = _createChatStore(
-        channelId: persisted.channelId,
-        channelLogin: persisted.channelLogin,
-        displayName: persisted.displayName,
-      );
-
+      // Add tab without ChatStore (lazy loading)
       _tabs.add(
         ChatTabInfo(
           channelId: persisted.channelId,
           channelLogin: persisted.channelLogin,
           displayName: persisted.displayName,
-          chatStore: chatStore,
           isPrimary: false,
         ),
       );
@@ -242,29 +257,24 @@ abstract class ChatTabsStoreBase with Store {
     );
     if (existingIndex != -1) {
       // Switch to existing tab instead of adding duplicate
-      activeTabIndex = existingIndex;
+      setActiveTab(existingIndex);
       return false;
     }
 
-    // Create and add the new tab
-    final chatStore = _createChatStore(
-      channelId: channelId,
-      channelLogin: channelLogin,
-      displayName: displayName,
-    );
-
+    // Add the new tab (lazy - no ChatStore yet)
     _tabs.add(
       ChatTabInfo(
         channelId: channelId,
         channelLogin: channelLogin,
         displayName: displayName,
-        chatStore: chatStore,
         isPrimary: false,
       ),
     );
 
-    // Switch to the new tab
-    activeTabIndex = _tabs.length - 1;
+    // Switch to the new tab (this will activate it)
+    final newIndex = _tabs.length - 1;
+    activateTab(newIndex);
+    activeTabIndex = newIndex;
 
     // Sync to settings for persistence
     _syncSecondaryTabsToSettings();
@@ -286,8 +296,8 @@ abstract class ChatTabsStoreBase with Store {
       return false;
     }
 
-    // Dispose the ChatStore before removing
-    _tabs[index].chatStore.dispose();
+    // Dispose the ChatStore before removing (if activated)
+    _tabs[index].chatStore?.dispose();
 
     // Remove the tab
     _tabs.removeAt(index);
@@ -298,6 +308,9 @@ abstract class ChatTabsStoreBase with Store {
     } else if (activeTabIndex > index) {
       activeTabIndex--;
     }
+
+    // Ensure the new active tab is activated (in case it was lazy)
+    activateTab(activeTabIndex);
 
     // Sync to settings for persistence
     _syncSecondaryTabsToSettings();
@@ -311,15 +324,22 @@ abstract class ChatTabsStoreBase with Store {
     if (index >= 0 && index < _tabs.length) {
       // Clear text input and emote menu when switching tabs
       if (index != activeTabIndex) {
-        // Close emote menu if open
-        _tabs[activeTabIndex].chatStore.assetsStore.showEmoteMenu = false;
-        // Unfocus input
-        _tabs[activeTabIndex].chatStore.unfocusInput();
-        // Clear text input
-        _tabs[activeTabIndex].chatStore.textController.clear();
-        // Clear reply state
-        _tabs[activeTabIndex].chatStore.replyingToMessage = null;
+        final currentStore = _tabs[activeTabIndex].chatStore;
+        if (currentStore != null) {
+          // Close emote menu if open
+          currentStore.assetsStore.showEmoteMenu = false;
+          // Unfocus input
+          currentStore.unfocusInput();
+          // Clear text input
+          currentStore.textController.clear();
+          // Clear reply state
+          currentStore.replyingToMessage = null;
+        }
       }
+
+      // Activate the target tab if not already activated
+      activateTab(index);
+
       activeTabIndex = index;
     }
   }
@@ -327,7 +347,7 @@ abstract class ChatTabsStoreBase with Store {
   /// Disposes all ChatStores and cleans up resources.
   void dispose() {
     for (final tab in _tabs) {
-      tab.chatStore.dispose();
+      tab.chatStore?.dispose();
     }
     _tabs.clear();
 
