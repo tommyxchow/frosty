@@ -7,6 +7,7 @@ import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/add_chat_dialog.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/widgets/profile_picture.dart';
 
 /// Widget that displays multiple chat tabs with a tab bar.
 /// Wraps the existing Chat widget and manages tab switching.
@@ -109,28 +110,14 @@ class ChatTabs extends StatelessWidget {
                   right: 0,
                   child: SizedBox(
                     height: 48,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: tabs.length,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 4,
-                              vertical: 6,
-                            ),
-                            itemBuilder: (context, index) {
-                              return _buildTab(context, index);
-                            },
-                          ),
-                        ),
-                        if (chatTabsStore.canAddTab)
-                          IconButton(
-                            icon: const Icon(Icons.add),
-                            tooltip: 'Add chat',
-                            onPressed: () => _handleAddChat(context),
-                          ),
-                      ],
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: tabs.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(width: 4),
+                      itemBuilder: (context, index) =>
+                          _buildTab(context, index),
                     ),
                   ),
                 ),
@@ -178,40 +165,34 @@ class ChatTabs extends StatelessWidget {
       tabInfo.channelLogin,
     );
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: InputChip(
-        label: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 100),
-          child: Text(
-            displayName,
-            overflow: TextOverflow.ellipsis,
-            style: isActivated
-                ? null
-                : TextStyle(
-                    color: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.color
-                        ?.withValues(alpha: 0.5),
-                  ),
-          ),
-        ),
-        selected: isActive,
-        showCheckmark: false,
-        visualDensity: VisualDensity.compact,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        onPressed: () {
-          if (!isActive) {
-            HapticFeedback.selectionClick();
-            chatTabsStore.setActiveTab(index);
-          }
-        },
-        onDeleted: tabInfo.isPrimary
+    final avatar = ProfilePicture(userLogin: tabInfo.channelLogin, radius: 12);
+
+    return InputChip(
+      avatar: isActivated ? avatar : Opacity(opacity: 0.5, child: avatar),
+      label: Text(
+        displayName,
+        style: isActivated
             ? null
-            : () => _confirmRemoveTab(context, index, displayName),
-        deleteButtonTooltipMessage: 'Close chat',
+            : TextStyle(
+                color: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+              ),
       ),
+      selected: isActive,
+      showCheckmark: false,
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      onPressed: () {
+        if (!isActive) {
+          HapticFeedback.selectionClick();
+          chatTabsStore.setActiveTab(index);
+        }
+      },
+      onDeleted: tabInfo.isPrimary
+          ? null
+          : () => _confirmRemoveTab(context, index, displayName),
+      deleteButtonTooltipMessage: 'Close chat',
     );
   }
 }
