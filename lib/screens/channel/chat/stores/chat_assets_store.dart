@@ -70,8 +70,9 @@ abstract class ChatAssetsStoreBase with Store {
   /// Combined Twitch badges: global + channel. Channel badges take precedence.
   @computed
   Map<String, ChatBadge> get twitchBadgesToObject {
-    final combined =
-        Map<String, ChatBadge>.from(globalAssetsStore.twitchGlobalBadges);
+    final combined = Map<String, ChatBadge>.from(
+      globalAssetsStore.twitchGlobalBadges,
+    );
     combined.addAll(_channelTwitchBadges);
     return combined;
   }
@@ -179,39 +180,39 @@ abstract class ChatAssetsStoreBase with Store {
       ),
       // Channel-specific emotes
       Future.wait([
-        if (showTwitchEmotes)
-          twitchApi
-              .getEmotesChannel(id: channelId)
-              .then((emotes) {
-                _userEmoteSectionToEmotes.update(
-                  'Channel Emotes',
-                  (existingEmoteSet) => [...existingEmoteSet, ...emotes],
-                  ifAbsent: () => emotes.toList(),
-                );
-                return emotes;
-              })
-              .catchError(onEmoteError),
-        if (show7TVEmotes)
-          sevenTVApi
-              .getEmotesChannel(id: channelId)
-              .then((data) {
-                final (setId, emotes) = data;
-                sevenTvEmoteSetId = setId;
-                return emotes;
-              })
-              .catchError(onEmoteError),
-        if (showBTTVEmotes)
-          bttvApi.getEmotesChannel(id: channelId).catchError(onEmoteError),
-        if (showFFZEmotes)
-          ffzApi
-              .getRoomInfo(id: channelId)
-              .then((ffzRoom) {
-                final (roomInfo, emotes) = ffzRoom;
-                ffzRoomInfo = roomInfo;
-                return emotes;
-              })
-              .catchError(onEmoteError),
-      ])
+            if (showTwitchEmotes)
+              twitchApi
+                  .getEmotesChannel(id: channelId)
+                  .then((emotes) {
+                    _userEmoteSectionToEmotes.update(
+                      'Channel Emotes',
+                      (existingEmoteSet) => [...existingEmoteSet, ...emotes],
+                      ifAbsent: () => emotes.toList(),
+                    );
+                    return emotes;
+                  })
+                  .catchError(onEmoteError),
+            if (show7TVEmotes)
+              sevenTVApi
+                  .getEmotesChannel(id: channelId)
+                  .then((data) {
+                    final (setId, emotes) = data;
+                    sevenTvEmoteSetId = setId;
+                    return emotes;
+                  })
+                  .catchError(onEmoteError),
+            if (showBTTVEmotes)
+              bttvApi.getEmotesChannel(id: channelId).catchError(onEmoteError),
+            if (showFFZEmotes)
+              ffzApi
+                  .getRoomInfo(id: channelId)
+                  .then((ffzRoom) {
+                    final (roomInfo, emotes) = ffzRoom;
+                    ffzRoomInfo = roomInfo;
+                    return emotes;
+                  })
+                  .catchError(onEmoteError),
+          ])
           .then((assets) => assets.expand((list) => list))
           .then(
             (emotes) => _channelEmoteToObject = <String, Emote>{

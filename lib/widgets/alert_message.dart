@@ -57,13 +57,10 @@ class AlertMessage extends StatelessWidget {
               style: TextStyle(color: color ?? defaultColor),
             ),
           ),
-         if (trailingIcon != null) ...[
+          if (trailingIcon != null) ...[
             const SizedBox(width: 8),
             IconButton(
-              icon: Icon(
-                trailingIcon,
-                color: color ?? defaultColor,
-              ),
+              icon: Icon(trailingIcon, color: color ?? defaultColor),
               onPressed: onTrailingIconPressed,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),

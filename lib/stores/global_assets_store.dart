@@ -222,24 +222,22 @@ abstract class GlobalAssetsStoreBase with Store {
             }),
       // BTTV badges (global - provider ID to badge mapping)
       if (showBTTVBadges)
-        bttvApi
-            .getBadges()
-            .then((badges) => _bttvBadges = badges)
-            .catchError((e) {
-              debugPrint('GlobalAssetsStore badge error: $e');
-              _bttvBadges = <String, ChatBadge>{};
-              return _bttvBadges;
-            }),
+        bttvApi.getBadges().then((badges) => _bttvBadges = badges).catchError((
+          e,
+        ) {
+          debugPrint('GlobalAssetsStore badge error: $e');
+          _bttvBadges = <String, ChatBadge>{};
+          return _bttvBadges;
+        }),
       // FFZ badges (global - user ID to badges mapping)
       if (showFFZBadges)
-        ffzApi
-            .getBadges()
-            .then((badges) => _ffzBadges = badges)
-            .catchError((e) {
-              debugPrint('GlobalAssetsStore badge error: $e');
-              _ffzBadges = <String, List<ChatBadge>>{};
-              return _ffzBadges;
-            }),
+        ffzApi.getBadges().then((badges) => _ffzBadges = badges).catchError((
+          e,
+        ) {
+          debugPrint('GlobalAssetsStore badge error: $e');
+          _ffzBadges = <String, List<ChatBadge>>{};
+          return _ffzBadges;
+        }),
     ]);
   }
 }

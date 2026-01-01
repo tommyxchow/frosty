@@ -31,7 +31,9 @@ class FrostyScrollbar extends StatelessWidget {
       controller: controller,
       thickness: 5,
       radius: const Radius.circular(2.5),
-      thumbColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+      thumbColor: Theme.of(
+        context,
+      ).colorScheme.onSurface.withValues(alpha: 0.3),
       interactive: true,
       minThumbLength: 48,
       padding: padding,

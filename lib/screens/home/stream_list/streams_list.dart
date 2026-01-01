@@ -248,7 +248,9 @@ class _StreamsListState extends State<StreamsList>
                     child: FrostyScrollbar(
                       controller: _listStore.scrollController,
                       padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).padding.top + extraTopPadding,
+                        top:
+                            MediaQuery.of(context).padding.top +
+                            extraTopPadding,
                         bottom: MediaQuery.of(context).padding.bottom,
                       ),
                       child: CustomScrollView(

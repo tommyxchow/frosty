@@ -33,7 +33,8 @@ class PersistedChatTab {
   Map<String, dynamic> toJson() => _$PersistedChatTabToJson(this);
 
   /// Create from a ChatTabInfo (for syncing current tabs to settings).
-  factory PersistedChatTab.fromChatTabInfo(ChatTabInfo info) => PersistedChatTab(
+  factory PersistedChatTab.fromChatTabInfo(ChatTabInfo info) =>
+      PersistedChatTab(
         channelId: info.channelId,
         channelLogin: info.channelLogin,
         displayName: info.displayName,
@@ -256,9 +257,7 @@ abstract class ChatTabsStoreBase with Store {
     }
 
     // Check for duplicate channel
-    final existingIndex = _tabs.indexWhere(
-      (tab) => tab.channelId == channelId,
-    );
+    final existingIndex = _tabs.indexWhere((tab) => tab.channelId == channelId);
     if (existingIndex != -1) {
       // Switch to existing tab instead of adding duplicate
       setActiveTab(existingIndex);
