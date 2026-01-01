@@ -27,7 +27,6 @@ import 'package:frosty/stores/global_assets_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -216,12 +215,8 @@ class _MyAppState extends State<MyApp> {
 
       try {
         final twitchApi = context.read<TwitchApi>();
-        final authStore = context.read<AuthStore>();
 
-        final user = await twitchApi.getUser(
-          userLogin: channelName,
-          headers: authStore.headersTwitch,
-        );
+        final user = await twitchApi.getUser(userLogin: channelName);
 
         final route = MaterialPageRoute(
           builder: (context) => VideoChat(
@@ -241,15 +236,18 @@ class _MyAppState extends State<MyApp> {
         debugPrint('Failed to open link $uri due to error: $e');
 
         if (navigatorKey.currentContext == null) return;
-        ScaffoldMessenger.of(navigatorKey.currentContext!)
-            .showSnackBar(failureSnackbar);
+        ScaffoldMessenger.of(
+          navigatorKey.currentContext!,
+        ).showSnackBar(failureSnackbar);
       }
     }
     // TODO: Here we can implement handlers for other types of links
     else {
       // If we get here, it's a link format that we're unable to handle
       if (navigatorKey.currentContext == null) return;
-      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(failureSnackbar);
+      ScaffoldMessenger.of(
+        navigatorKey.currentContext!,
+      ).showSnackBar(failureSnackbar);
     }
   }
 
