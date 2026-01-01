@@ -68,6 +68,7 @@ dependencies:
     flutter_colorpicker: ^1.1.0
     path_provider: ^2.1.5
     dio: ^5.9.0
+    app_links: ^6.4.1
 
 dev_dependencies:
     flutter_test:
