@@ -2,9 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Development Workflow
+
+**Plan Mode - In-Depth Planning**: When in plan mode, conduct thorough discussion before coding:
+
+- Ask clarifying questions about technical implementation, UI/UX concerns, tradeoffs, and edge cases
+- Ensure all requirements and non-obvious decisions are clear
+- Don't begin implementation until all important details are resolved
+
+**Pattern Consistency**: When implementing new code:
+
+- Search the codebase to find existing usages and implementations
+- Prefer following established patterns, styles, and practices for consistency
+
 ## Development Commands
 
 **Build and Development**
+
 - `flutter pub get` - Install dependencies
 - `flutter run` - Run the app on connected device/emulator
 - `flutter build apk` - Build Android APK
@@ -13,16 +27,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `flutter test` - Run tests (note: no test suite currently exists)
 
 **Code Generation (Required for MobX stores and JSON serialization)**
+
 - `flutter packages pub run build_runner build` - Generate code once
 - `flutter packages pub run build_runner watch` - Watch and regenerate code on changes
 - `flutter packages pub run build_runner build --delete-conflicting-outputs` - Force rebuild all generated files
 
 **Asset Generation**
+
 - `flutter pub run flutter_native_splash:create` - Generate native splash screens
 - `flutter pub run flutter_launcher_icons:main` - Generate app launcher icons
 
 **Environment Variables**
 Use `--dart-define` to set environment variables (required for Twitch API access):
+
 ```bash
 flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YOUR_TWITCH_CLIENT_SECRET
 ```
@@ -32,6 +49,7 @@ flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YO
 **State Management**: MobX with code generation. All stores end with `Store` and have corresponding `.g.dart` generated files.
 
 **Key Directories**:
+
 - `lib/screens/` - UI screens organized by feature (home, channel, settings, onboarding)
   - Each screen has its own MobX stores in a `stores/` subdirectory
 - `lib/models/` - Data models with JSON serialization (uses .g.dart files)
@@ -40,12 +58,14 @@ flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YO
 - `lib/utils/` - Utility modules including context extensions
 
 **Main Application Flow**:
+
 1. App starts in `main.dart` with Firebase initialization and dependency injection via Provider
 2. Authentication handled by `AuthStore` using Twitch OAuth
 3. Settings persisted via `SettingsStore` with SharedPreferences and MobX `autorun()`
 4. API services share a common Dio HTTP client for efficient connection reuse
 
 **Global Stores** (provided at app root in `main.dart`):
+
 - `AuthStore` - Authentication state and token management
 - `SettingsStore` - User preferences with automatic persistence
 
@@ -60,6 +80,7 @@ flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YO
 ## Authentication & Token Management
 
 **Two-tier Token System**:
+
 - Default app token for unauthenticated requests
 - Optional user token stored in Flutter Secure Storage
 - Automatic token validation on startup with fallback
@@ -69,6 +90,7 @@ flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YO
 ## MobX Store Implementation
 
 **Store Pattern**: All stores follow `StoreBase with _$StoreName` pattern:
+
 ```dart
 class SomeStore = SomeStoreBase with _$SomeStore;
 
@@ -96,6 +118,7 @@ After any changes to MobX stores or `@JsonSerializable()` models, run the build_
 ## Code Style
 
 Analysis rules enforced via `analysis_options.yaml`:
+
 - `prefer_single_quotes` - Use single quotes for strings
 - `always_use_package_imports` - Package imports over relative imports
 - `require_trailing_commas` - Trailing commas on multi-line constructs
