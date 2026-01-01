@@ -563,7 +563,6 @@ class TwitchApi {
     }
   }
 
-  // Unblocks the user with the given ID and returns true on success or false on failure.
   Future<List<dynamic>> getRecentMessages({
     required String userLogin,
   }) async {
@@ -580,5 +579,101 @@ class TwitchApi {
     } else {
       return Future.error('Failed to get recent messages for $userLogin');
     }
+  }
+
+  /// Returns a list of broadcaster IDs for channels the authenticated user moderates.
+  Future<List<String>> getModeratedChannels({
+    required String id,
+    required Map<String, String> headers,
+  }) async {
+    final url = Uri.parse(
+      'https://api.twitch.tv/helix/moderation/channels?user_id=$id',
+    );
+
+    // This endpoint requires the 'user:read:moderated_channels' scope.
+    final response = await _client.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      final data = decoded['data'] as List;
+      
+      final List<String> moderatedChannelIds = [];
+      for (final channelData in data) {
+        if (channelData is Map && channelData.containsKey('broadcaster_id')) {
+          moderatedChannelIds.add(channelData['broadcaster_id'] as String);
+        }
+      }
+      return moderatedChannelIds;
+    } else {
+      String message = 'Failed to get moderated channels';
+      try {
+        final decodedBody = jsonDecode(response.body);
+        if (decodedBody is Map && decodedBody.containsKey('message')) {
+          message = decodedBody['message'];
+        }
+      } catch (_) {
+        // Ignore decoding error, use default message
+      }
+      return Future.error(
+        'Failed to get moderated channels for user $id: $message (Status ${response.statusCode})',
+      );
+    }
+  }
+
+  /// Deletes a specific chat message.
+  Future<bool> deleteChatMessage({
+    required String broadcasterId,
+    required String moderatorId,
+    required String messageId,
+    required Map<String, String> headers,
+  }) async {
+    final url = Uri.parse(
+      'https://api.twitch.tv/helix/moderation/chat?broadcaster_id=$broadcasterId&moderator_id=$moderatorId&message_id=$messageId',
+    );
+
+    // This endpoint requires the `moderator:manage:chat_messages` scope.
+    final response = await _client.delete(url, headers: headers);
+    // A 204 No Content response indicates success.
+    return response.statusCode == 204;
+  }
+
+  /// Bans or times out a user from a channel.
+  ///
+  /// The optional `duration` in seconds will timeout the user. If omitted, the user is banned.
+  /// The optional `reason` will be displayed to the banned user and other moderators.
+  Future<bool> banUser({
+    required String broadcasterId,
+    required String moderatorId,
+    required String userIdToBan,
+    required Map<String, String> headers,
+    int? duration,
+    String? reason,
+  }) async {
+    final url = Uri.parse(
+      'https://api.twitch.tv/helix/moderation/bans?broadcaster_id=$broadcasterId&moderator_id=$moderatorId',
+    );
+
+    final Map<String, dynamic> requestBody = {
+      'data': {
+        'user_id': userIdToBan,
+        if (duration != null) 'duration': duration,
+        if (reason != null) 'reason': reason,
+      }
+    };
+
+    // This endpoint requires the `moderator:manage:banned_users` scope.
+    final response = await _client.post(
+      url,
+      headers: {...headers, 'Content-Type': 'application/json'},
+      body: jsonEncode(requestBody),
+    );
+
+    // A 200 OK response indicates success.
+    if (response.statusCode == 200) {
+      final decoded = jsonDecode(response.body);
+      final data = decoded['data'] as List;
+      return data.isNotEmpty;
+    }
+    return false;
   }
 }
