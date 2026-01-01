@@ -4,6 +4,7 @@ December 29, 2025
 
 ### New Features
 
+- **Multi chat tabs**: Open multiple chat tabs to follow conversations from different channels simultaneously, with optional tab persistence.
 - **Resizable chat & video**: You can now resize the chat and video areas in landscape mode by dragging the divider to your preferred position.
 - **Offline followed channels**: A new section in the Following tab allows you to see which of your followed channels are currently offline.
 - **Custom username colors**: Personalize your presence in chat with a new color selection feature and contrast-aware adjustments for better readability.
