@@ -4,27 +4,20 @@ December 29, 2025
 
 ### New Features
 
-- **Multi chat tabs**: Open multiple chat tabs to follow conversations from different channels simultaneously, with optional tab persistence.
-- **Resizable chat & video**: You can now resize the chat and video areas in landscape mode by dragging the divider to your preferred position.
-- **Offline followed channels**: A new section in the Following tab allows you to see which of your followed channels are currently offline.
-- **Custom username colors**: Personalize your presence in chat with a new color selection feature and contrast-aware adjustments for better readability.
-- **Shared chat support**: Frosty now detects when streamers are in a "Shared Chat" (collab), showing colored borders to indicate which channel a message came from and automatically loading all relevant emotes.
-- **Random accent color button**: Quickly find a new look for the app with a random color generator for the accent color in settings.
-- **Tap to show deleted messages**: Messages deleted by moderators can now be revealed with a simple tap.
-- **Enhanced photo viewer**: View profile pictures and emotes in full resolution with a new blurred background and intuitive swipe-to-dismiss gestures.
-- **Haptic feedback**: Added subtle vibrations when performing certain actions, like long-pressing messages or using the new swipe gesture, for a more tactile feel.
-- **Inline reconnect**: If your chat connection drops, Frosty now attempts to reconnect silently in the background without interrupting your viewing experience.
+- Open multiple chat tabs for different channels with drag-to-reorder. Tabs are saved between sessions by default (configurable in settings).
+- Resize the chat and video areas in landscape mode by dragging the divider.
+- A new section in the Following tab shows which of your followed channels are currently offline.
+- Change your chat username color from the chat details menu.
+- A new randomize button for the accent color theme in settings.
+- View emotes and stream thumbnails in full resolution with swipe-to-dismiss gestures.
+- [Android] Open Twitch channel links directly in Frosty instead of the browser or Twitch app.
 
 ### Improvements
 
-- **Enhanced Picture-in-Picture (PiP)**: Significant improvements to PiP mode, including a new swipe-down gesture to enter PiP and better reliability on iOS.
-- **Redesigned video overlay**: A cleaner, more modern overlay with improved gradients, text shadows for better readability, and a dedicated offline indicator.
-- **Modern blurred effects**: Introduced blurred containers for app bars, overlays, and dialogs for a more premium, cohesive look.
-- **Smoother loading animations**: Replaced traditional loading spinners with pulsing placeholders that match the app's layout, making the interface feel more stable while content loads.
-- **Optimized landscape layout**: Improved handling for devices with screen cutouts (notches) to ensure the UI is always fully visible.
-- **Consistent UI styling**: Standardized scrollbars, dialogs, and dividers across the entire app for a more polished experience.
-- **Performance & reliability**: The app's networking and data handling have been completely rewritten to be faster and more reliable.
-- **Enhanced chat interactions**: Improved formatting for chat replies, added "Copy and Paste" functionality for messages, and a clearer countdown for chat delays.
+- Swipe down to enter Picture-in-Picture mode, and press the PiP button again to exit.
+- Redesigned the video overlay and added stream details to the app bar in chat-only mode.
+- Networking and data handling have been completely rewritten to be faster and more reliable.
+- Improved formatting for chat replies, quick copy-to-input for messages, and a clearer countdown for chat delays.
 
 ### Bug Fixes
 
