@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Workflow
 
-**Plan Mode - In-Depth Planning**: When in plan mode, conduct thorough discussion before coding:
+**Plan Mode - In-Depth Planning**: When in plan mode, interview thoroughly before coding:
 
-- Ask clarifying questions about technical implementation, UI/UX concerns, tradeoffs, and edge cases
-- Ensure all requirements and non-obvious decisions are clear
+- Ask detailed questions about technical implementation, UI/UX concerns, tradeoffs, and edge cases
+- Continue asking questions until all requirements and non-obvious decisions are clear
 - Don't begin implementation until all important details are resolved
 
 **Pattern Consistency**: When implementing new code:
