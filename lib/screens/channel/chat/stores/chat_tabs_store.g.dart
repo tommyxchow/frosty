@@ -145,6 +145,18 @@ mixin _$ChatTabsStore on ChatTabsStoreBase, Store {
   }
 
   @override
+  void reorderTab(int oldIndex, int newIndex) {
+    final _$actionInfo = _$ChatTabsStoreBaseActionController.startAction(
+      name: 'ChatTabsStoreBase.reorderTab',
+    );
+    try {
+      return super.reorderTab(oldIndex, newIndex);
+    } finally {
+      _$ChatTabsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void setActiveTab(int index) {
     final _$actionInfo = _$ChatTabsStoreBaseActionController.startAction(
       name: 'ChatTabsStoreBase.setActiveTab',

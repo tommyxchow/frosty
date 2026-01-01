@@ -111,14 +111,30 @@ class ChatTabs extends StatelessWidget {
                   right: 0,
                   child: SizedBox(
                     height: 48,
-                    child: ListView.separated(
+                    child: ReorderableListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: tabs.length,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(width: 4),
-                      itemBuilder: (context, index) =>
-                          _buildTab(context, index),
+                      onReorder: (oldIndex, newIndex) {
+                        HapticFeedback.lightImpact();
+                        chatTabsStore.reorderTab(oldIndex, newIndex);
+                      },
+                      proxyDecorator: (child, index, animation) {
+                        return Material(
+                          color: Colors.transparent,
+                          child: child,
+                        );
+                      },
+                      itemBuilder: (context, index) {
+                        final tabInfo = chatTabsStore.tabs[index];
+                        return Padding(
+                          key: ValueKey(tabInfo.channelId),
+                          padding: EdgeInsets.only(
+                            right: index < tabs.length - 1 ? 4 : 0,
+                          ),
+                          child: _buildTab(context, index),
+                        );
+                      },
                     ),
                   ),
                 ),
