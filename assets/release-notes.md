@@ -10,7 +10,7 @@ December 29, 2025
 - Change your chat username color from the chat details menu.
 - A new randomize button for the accent color theme in settings.
 - View emotes and stream thumbnails in full resolution with swipe-to-dismiss gestures.
-- [Android] Open Twitch channel links directly in Frosty instead of the browser or Twitch app.
+- [Android] Open Twitch channel links directly in Frosty instead of the browser or Twitch app (by @micahmo on GitHub).
 
 ### Improvements
 
@@ -21,6 +21,7 @@ December 29, 2025
 
 ### Bug Fixes
 
+- Fixed chat text input not unfocusing when tapping outside of it (by @zeykafx on GitHub).
 - Fixed missing badges and emotes in historical messages upon initial connection.
 - Fixed accidental chat scrolling when accessing system UI gestures in landscape mode.
 - Fixed chat reconnection issues when a chat delay was active.
