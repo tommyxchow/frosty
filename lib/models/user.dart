@@ -10,12 +10,7 @@ class UserTwitch {
   final String displayName;
   final String profileImageUrl;
 
-  const UserTwitch(
-    this.id,
-    this.login,
-    this.displayName,
-    this.profileImageUrl,
-  );
+  const UserTwitch(this.id, this.login, this.displayName, this.profileImageUrl);
 
   factory UserTwitch.fromJson(Map<String, dynamic> json) =>
       _$UserTwitchFromJson(json);
@@ -27,11 +22,7 @@ class UserBlockedTwitch {
   final String userLogin;
   final String displayName;
 
-  const UserBlockedTwitch(
-    this.userId,
-    this.userLogin,
-    this.displayName,
-  );
+  const UserBlockedTwitch(this.userId, this.userLogin, this.displayName);
 
   factory UserBlockedTwitch.fromJson(Map<String, dynamic> json) =>
       _$UserBlockedTwitchFromJson(json);

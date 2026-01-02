@@ -10,16 +10,14 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OtherSettings extends StatefulWidget {
   final SettingsStore settingsStore;
 
-  const OtherSettings({
-    super.key,
-    required this.settingsStore,
-  });
+  const OtherSettings({super.key, required this.settingsStore});
 
   @override
   State<OtherSettings> createState() => _OtherSettingsState();
@@ -29,15 +27,15 @@ class _OtherSettingsState extends State<OtherSettings> {
   Future<void> _showConfirmDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog.adaptive(
-        title: const Text('Reset all settings'),
-        content: const Text('Are you sure you want to reset all settings?'),
+      builder: (context) => FrostyDialog(
+        title: 'Reset all settings',
+        message: 'Are you sure you want to reset all settings?',
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () {
               HapticFeedback.heavyImpact();
 
@@ -54,7 +52,7 @@ class _OtherSettingsState extends State<OtherSettings> {
                 ),
               );
             },
-            child: const Text('Yes'),
+            child: const Text('Reset'),
           ),
         ],
       ),
@@ -89,11 +87,9 @@ class _OtherSettingsState extends State<OtherSettings> {
         ListTile(
           leading: const Icon(Icons.notes_rounded),
           title: const Text('Release notes'),
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const ReleaseNotes(),
-            ),
-          ),
+          onTap: () => Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => const ReleaseNotes())),
         ),
         ListTile(
           leading: const Icon(Icons.launch_rounded),
@@ -141,12 +137,15 @@ class _OtherSettingsState extends State<OtherSettings> {
             onChanged: (newValue) {
               widget.settingsStore.shareCrashLogsAndAnalytics = newValue;
 
-              FirebaseCrashlytics.instance
-                  .setCrashlyticsCollectionEnabled(newValue);
-              FirebaseAnalytics.instance
-                  .setAnalyticsCollectionEnabled(newValue);
-              FirebasePerformance.instance
-                  .setPerformanceCollectionEnabled(newValue);
+              FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+                newValue,
+              );
+              FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(
+                newValue,
+              );
+              FirebasePerformance.instance.setPerformanceCollectionEnabled(
+                newValue,
+              );
             },
           ),
         ),

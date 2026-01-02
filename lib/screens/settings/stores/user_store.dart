@@ -22,15 +22,15 @@ abstract class UserStoreBase with Store {
   UserStoreBase({required this.twitchApi});
 
   @action
-  Future<void> init({required Map<String, String> headers}) async {
+  Future<void> init() async {
     // Get and update the current user's info.
-    _details = await twitchApi.getUserInfo(headers: headers);
+    _details = await twitchApi.getUserInfo();
 
     // Get and update the current user's list of blocked users.
     // Don't use await because having a huge list of blocked users will block the UI.
     if (_details?.id != null) {
       twitchApi
-          .getUserBlockedList(id: _details!.id, headers: headers)
+          .getUserBlockedList(id: _details!.id)
           .then((blockedUsers) => _blockedUsers = blockedUsers.asObservable());
     }
 
@@ -43,10 +43,8 @@ abstract class UserStoreBase with Store {
   Future<void> block({
     required String targetId,
     required String displayName,
-    required Map<String, String> headers,
   }) async {
-    final success =
-        await twitchApi.blockUser(userId: targetId, headers: headers);
+    final success = await twitchApi.blockUser(userId: targetId);
 
     if (success) {
       _blockedUsers.add(UserBlockedTwitch(targetId, displayName, displayName));
@@ -54,24 +52,14 @@ abstract class UserStoreBase with Store {
   }
 
   @action
-  Future<void> unblock({
-    required String targetId,
-    required Map<String, String> headers,
-  }) async {
-    final success =
-        await twitchApi.unblockUser(userId: targetId, headers: headers);
-    if (success) await refreshBlockedUsers(headers: headers);
+  Future<void> unblock({required String targetId}) async {
+    final success = await twitchApi.unblockUser(userId: targetId);
+    if (success) await refreshBlockedUsers();
   }
 
   @action
-  Future<void> refreshBlockedUsers({
-    required Map<String, String> headers,
-  }) async =>
-      _blockedUsers = (await twitchApi.getUserBlockedList(
-        id: _details!.id,
-        headers: headers,
-      ))
-          .asObservable();
+  Future<void> refreshBlockedUsers() async => _blockedUsers =
+      (await twitchApi.getUserBlockedList(id: _details!.id)).asObservable();
 
   @action
   void dispose() {

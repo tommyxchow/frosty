@@ -10,6 +10,7 @@ import 'package:frosty/screens/settings/settings.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -59,13 +60,41 @@ class _HomeState extends State<Home> {
     SystemChrome.setPreferredOrientations([]);
 
     final isLoggedIn = _authStore.isLoggedIn && _authStore.user.details != null;
+    final theme = Theme.of(context);
 
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        extendBody: true,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           centerTitle: false,
-          shape: const Border(),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          titleSpacing: 16,
+          systemOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: theme.brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+          ),
+          flexibleSpace: Observer(
+            builder: (_) {
+              // Only show flexible space on Following tab
+              final isOnFollowingTab =
+                  isLoggedIn && _homeStore.selectedIndex == 0;
+
+              // Only show flexible space when on Following tab
+              if (!isOnFollowingTab) return const SizedBox.shrink();
+
+              return BlurredContainer(
+                gradientDirection: GradientDirection.up,
+                child: const SizedBox.expand(),
+              );
+            },
+          ),
           title: Observer(
             builder: (_) {
               final titles = [
@@ -99,55 +128,78 @@ class _HomeState extends State<Home> {
             ),
           ],
         ),
-        body: SafeArea(
-          child: Observer(
-            builder: (_) => IndexedStack(
-              index: _homeStore.selectedIndex,
-              children: [
-                if (_authStore.isLoggedIn)
-                  StreamsList(
-                    listType: ListType.followed,
-                    scrollController: _homeStore.followedScrollController,
-                  ),
-                TopSection(
-                  homeStore: _homeStore,
+        body: Observer(
+          builder: (_) => IndexedStack(
+            index: _homeStore.selectedIndex,
+            children: [
+              if (_authStore.isLoggedIn)
+                StreamsList(
+                  listType: ListType.followed,
+                  scrollController: _homeStore.followedScrollController,
                 ),
-                Search(
-                  scrollController: _homeStore.searchScrollController,
-                ),
-              ],
-            ),
+              TopSection(homeStore: _homeStore),
+              Search(scrollController: _homeStore.searchScrollController),
+            ],
           ),
         ),
-        bottomNavigationBar: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Divider(),
-            Observer(
-              builder: (_) => NavigationBar(
+        bottomNavigationBar: BlurredContainer(
+          gradientDirection: GradientDirection.down,
+          child: Observer(
+            builder: (_) => Theme(
+              data: Theme.of(
+                context,
+              ).copyWith(splashFactory: NoSplash.splashFactory),
+              child: NavigationBar(
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
                 destinations: [
                   if (_authStore.isLoggedIn)
-                    const NavigationDestination(
+                    NavigationDestination(
                       icon: Icon(
                         Icons.favorite_border_rounded,
+                        color: _homeStore.selectedIndex == 0
+                            ? theme.colorScheme.onSurface
+                            : theme.colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.6,
+                              ),
                       ),
-                      selectedIcon: Icon(Icons.favorite_rounded),
+                      selectedIcon: Icon(
+                        Icons.favorite_rounded,
+                        color: theme.colorScheme.onSurface,
+                      ),
                       label: 'Following',
                       tooltip: 'Following',
                     ),
-                  const NavigationDestination(
+                  NavigationDestination(
                     icon: Icon(
                       Icons.arrow_upward_rounded,
+                      color: _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
                     ),
-                    selectedIcon: Icon(Icons.arrow_upward_rounded),
+                    selectedIcon: Icon(
+                      Icons.arrow_upward_rounded,
+                      color: theme.colorScheme.onSurface,
+                    ),
                     label: 'Top',
                     tooltip: 'Top',
                   ),
-                  const NavigationDestination(
+                  NavigationDestination(
                     icon: Icon(
                       Icons.search_rounded,
+                      color: _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
                     ),
-                    selectedIcon: Icon(Icons.search_rounded),
+                    selectedIcon: Icon(
+                      Icons.search_rounded,
+                      color: theme.colorScheme.onSurface,
+                    ),
                     label: 'Search',
                     tooltip: 'Search',
                   ),
@@ -156,7 +208,7 @@ class _HomeState extends State<Home> {
                 onDestinationSelected: _homeStore.handleTap,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

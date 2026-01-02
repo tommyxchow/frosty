@@ -5,6 +5,8 @@ class AlertMessage extends StatelessWidget {
   final String message;
   final Color? color;
   final bool centered;
+  final EdgeInsetsGeometry? padding;
+  final bool vertical;
   final IconData? trailingIcon;
   final VoidCallback? onTrailingIconPressed;
 
@@ -13,46 +15,68 @@ class AlertMessage extends StatelessWidget {
     required this.message,
     this.centered = true,
     this.color,
+    this.padding,
+    this.vertical = false,
     this.trailingIcon,
     this.onTrailingIconPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    final defaultColor =
-        Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5);
+    final defaultColor = Theme.of(
+      context,
+    ).colorScheme.onSurface.withValues(alpha: vertical ? 0.6 : 1);
 
-    return Row(
-      mainAxisAlignment:
-          centered ? MainAxisAlignment.center : MainAxisAlignment.start,
-      children: [
-        Icon(
-          Icons.info_outline_rounded,
-          color: color ?? defaultColor,
-        ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
+    final Widget widget;
+
+    if (vertical) {
+      widget = Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          Icon(Icons.info_outline_rounded, color: color ?? defaultColor),
+          Text(
             message,
-            style: TextStyle(
-              color: color ?? defaultColor,
-            ),
-          ),
-        ),
-        if (trailingIcon != null) ...[
-          const SizedBox(width: 8),
-          IconButton(
-            icon: Icon(
-              trailingIcon,
-              color: color ?? defaultColor,
-            ),
-            onPressed: onTrailingIconPressed,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            iconSize: 20,
+            textAlign: centered ? TextAlign.center : TextAlign.start,
+            style: TextStyle(color: color ?? defaultColor),
           ),
         ],
-      ],
-    );
+      );
+    } else {
+      widget = Row(
+        mainAxisAlignment: centered
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
+        spacing: 8,
+        children: [
+          Icon(Icons.info_outline_rounded, color: color ?? defaultColor),
+          Flexible(
+            child: Text(
+              message,
+              style: TextStyle(color: color ?? defaultColor),
+            ),
+          ),
+          if (trailingIcon != null) ...[
+            const SizedBox(width: 8),
+            IconButton(
+              icon: Icon(trailingIcon, color: color ?? defaultColor),
+              onPressed: onTrailingIconPressed,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              iconSize: 20,
+            ),
+          ],
+        ],
+      );
+    }
+
+    final effectivePadding =
+        padding ??
+        (vertical ? const EdgeInsets.symmetric(horizontal: 24) : null);
+
+    return effectivePadding != null
+        ? Padding(padding: effectivePadding, child: widget)
+        : widget;
   }
 }

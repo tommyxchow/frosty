@@ -5,17 +5,28 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
-import 'package:frosty/widgets/animated_scroll_border.dart';
-import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/utils/context_extensions.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
+import 'package:frosty/widgets/blurred_container.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
 
-  const ChatBottomBar({super.key, required this.chatStore});
+  /// Callback to add a new chat tab.
+  /// Passes this to ChatDetails to show "Add chat" option.
+  final VoidCallback onAddChat;
+
+  const ChatBottomBar({
+    super.key,
+    required this.chatStore,
+    required this.onAddChat,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final isEmotesEnabled = chatStore.settings.showTwitchEmotes ||
+    final isEmotesEnabled =
+        chatStore.settings.showTwitchEmotes ||
         chatStore.settings.show7TVEmotes ||
         chatStore.settings.showBTTVEmotes ||
         chatStore.settings.showFFZEmotes;
@@ -34,7 +45,7 @@ class ChatBottomBar extends StatelessWidget {
                     : Icons.emoji_emotions_outlined,
               ),
               onPressed: () {
-                FocusScope.of(context).unfocus();
+                chatStore.unfocusInput();
                 chatStore.assetsStore.showEmoteMenu =
                     !chatStore.assetsStore.showEmoteMenu;
               },
@@ -44,18 +55,19 @@ class ChatBottomBar extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final matchingEmotes = [
-          ...chatStore.assetsStore.userEmoteToObject.values,
-          ...chatStore.assetsStore.bttvEmotes,
-          ...chatStore.assetsStore.ffzEmotes,
-          ...chatStore.assetsStore.sevenTVEmotes,
-        ]
-            .where(
-              (emote) => emote.name.toLowerCase().contains(
+        final matchingEmotes =
+            [
+                  ...chatStore.assetsStore.userEmoteToObject.values,
+                  ...chatStore.assetsStore.bttvEmotes,
+                  ...chatStore.assetsStore.ffzEmotes,
+                  ...chatStore.assetsStore.sevenTVEmotes,
+                ]
+                .where(
+                  (emote) => emote.name.toLowerCase().contains(
                     chatStore.inputText.split(' ').last.toLowerCase(),
                   ),
-            )
-            .toList();
+                )
+                .toList();
 
         final matchingChatters = chatStore.chatDetailsStore.chatUsers
             .where(
@@ -69,9 +81,17 @@ class ChatBottomBar extends StatelessWidget {
             )
             .toList();
 
-        return Column(
+        final isFullscreenOverlay =
+            chatStore.settings.fullScreen && context.isLandscape;
+
+        final hasChatDelay =
+            chatStore.settings.showVideo && chatStore.settings.chatDelay > 0;
+        final delayTooltipMessage =
+            'Chatting is disabled due to message delay (${chatStore.settings.chatDelay.toInt()}s)';
+        const loginTooltipMessage = 'Log in to chat';
+
+        final bottomBarContent = Column(
           children: [
-            AnimatedScrollBorder(scrollController: chatStore.scrollController),
             if (chatStore.replyingToMessage != null) ...[
               const Divider(),
               ListTile(
@@ -87,16 +107,16 @@ class ChatBottomBar extends StatelessWidget {
                         assetsStore: chatStore.assetsStore,
                         emoteScale: chatStore.settings.emoteScale,
                         badgeScale: chatStore.settings.badgeScale,
-                        useReadableColors: chatStore.settings.useReadableColors,
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
+                        currentChannelId: chatStore.channelId,
                       ),
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: DefaultTextStyle.of(context)
-                        .style
-                        .copyWith(fontSize: chatStore.settings.fontSize),
+                    style: context.defaultTextStyle.copyWith(
+                      fontSize: chatStore.settings.fontSize,
+                    ),
                   ),
                 ),
                 trailing: IconButton(
@@ -138,7 +158,8 @@ class ChatBottomBar extends StatelessWidget {
                         child: FrostyCachedNetworkImage(
                           imageUrl: matchingEmotes[index].url,
                           useFade: false,
-                          height: matchingEmotes[index].height?.toDouble() ??
+                          height:
+                              matchingEmotes[index].height?.toDouble() ??
                               defaultEmoteSize,
                           width: matchingEmotes[index].width?.toDouble(),
                         ),
@@ -170,10 +191,10 @@ class ChatBottomBar extends StatelessWidget {
                       chatStore.textController.text = split.join(' ');
                       chatStore.textController.selection =
                           TextSelection.fromPosition(
-                        TextPosition(
-                          offset: chatStore.textController.text.length,
-                        ),
-                      );
+                            TextPosition(
+                              offset: chatStore.textController.text.length,
+                            ),
+                          );
                     },
                     child: Text(matchingChatters[index]),
                   ),
@@ -187,67 +208,136 @@ class ChatBottomBar extends StatelessWidget {
                   if (!chatStore.expandChat &&
                       chatStore.settings.chatWidth < 0.3 &&
                       chatStore.settings.showVideo &&
-                      MediaQuery.of(context).orientation ==
-                          Orientation.landscape)
-                    IconButton(
-                      tooltip: 'Enter a message',
-                      onPressed: () {
-                        chatStore.expandChat = true;
-                        chatStore.textFieldFocusNode.requestFocus();
+                      context.isLandscape)
+                    Builder(
+                      builder: (context) {
+                        final isDisabled =
+                            !chatStore.auth.isLoggedIn || hasChatDelay;
+
+                        return GestureDetector(
+                          onTap: isDisabled
+                              ? () {
+                                  final message = hasChatDelay
+                                      ? delayTooltipMessage
+                                      : loginTooltipMessage;
+                                  chatStore.updateNotification(message);
+                                }
+                              : null,
+                          child: IconButton(
+                            tooltip: 'Enter a message',
+                            onPressed: isDisabled
+                                ? null
+                                : () {
+                                    chatStore.expandChat = true;
+                                    chatStore.safeRequestFocus();
+                                  },
+                            icon: const Icon(Icons.edit),
+                          ),
+                        );
                       },
-                      icon: const Icon(Icons.edit),
                     )
                   else
                     Expanded(
-                      child: TextField(
-                        textInputAction: TextInputAction.send,
-                        focusNode: chatStore.textFieldFocusNode,
-                        minLines: 1,
-                        maxLines: 3,
-                        enabled: chatStore.auth.isLoggedIn ? true : false,
-                        decoration: InputDecoration(
-                          prefixIcon: chatStore.settings.emoteMenuButtonOnLeft
-                              ? emoteMenuButton
-                              : null,
-                          suffixIcon: chatStore.settings.emoteMenuButtonOnLeft
-                              ? null
-                              : emoteMenuButton,
-                          hintMaxLines: 1,
-                          hintText: chatStore.auth.isLoggedIn
-                              ? 'Send a ${chatStore.replyingToMessage != null ? 'reply' : 'message'} ${chatStore.settings.chatDelay == 0 || !chatStore.settings.showVideo ? '' : '(${chatStore.settings.chatDelay.toInt()}s delay)'}'
-                              : 'Log in to chat',
-                        ),
-                        controller: chatStore.textController,
-                        onSubmitted: chatStore.sendMessage,
-                        onTapOutside: (_) {
-                          chatStore.textFieldFocusNode.unfocus();
+                      child: Observer(
+                        builder: (context) {
+                          final isDisabled =
+                              !chatStore.auth.isLoggedIn ||
+                              chatStore.isSendingMessage ||
+                              hasChatDelay;
+
+                          return GestureDetector(
+                            onTap: isDisabled && !chatStore.isSendingMessage
+                                ? () {
+                                    final message = hasChatDelay
+                                        ? delayTooltipMessage
+                                        : loginTooltipMessage;
+                                    chatStore.updateNotification(message);
+                                  }
+                                : null,
+                            child: TextField(
+                              textInputAction: TextInputAction.send,
+                              focusNode: chatStore.textFieldFocusNode,
+                              minLines: 1,
+                              maxLines: 3,
+                              // Disable text field when sending message, when not logged in, or when chat delay is active
+                              enabled: !isDisabled,
+                              decoration: InputDecoration(
+                                prefixIcon:
+                                    chatStore.settings.emoteMenuButtonOnLeft
+                                    ? emoteMenuButton
+                                    : null,
+                                suffixIcon: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 8,
+                                  children: [
+                                    if (!chatStore
+                                            .settings
+                                            .emoteMenuButtonOnLeft &&
+                                        emoteMenuButton != null)
+                                      emoteMenuButton,
+                                  ],
+                                ),
+                                hintMaxLines: 1,
+                                hintText: chatStore.auth.isLoggedIn
+                                    ? chatStore.isSendingMessage
+                                          ? 'Sending...'
+                                          : chatStore.replyingToMessage != null
+                                          ? 'Reply'
+                                          : 'Chat'
+                                    : loginTooltipMessage,
+                              ),
+                              controller: chatStore.textController,
+                              onSubmitted: chatStore.sendMessage,
+                              onTapOutside: (_) {
+                                chatStore.textFieldFocusNode.unfocus();
+                              },
+                            ),
+                          );
                         },
                       ),
                     ),
                   if (chatStore.showSendButton &&
                       (chatStore.settings.chatWidth >= 0.3 ||
                           chatStore.expandChat ||
-                          MediaQuery.of(context).orientation ==
-                              Orientation.portrait))
-                    IconButton(
-                      tooltip: 'Send',
-                      icon: const Icon(Icons.send_rounded),
-                      onPressed: chatStore.auth.isLoggedIn
-                          ? () => chatStore
-                              .sendMessage(chatStore.textController.text)
-                          : null,
+                          context.isPortrait))
+                    Observer(
+                      builder: (context) {
+                        return IconButton(
+                          tooltip: chatStore.isSendingMessage
+                              ? 'Sending...'
+                              : 'Send',
+                          icon: chatStore.isSendingMessage
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.send_rounded),
+                          onPressed:
+                              chatStore.auth.isLoggedIn &&
+                                  !chatStore.isSendingMessage &&
+                                  !hasChatDelay
+                              ? () => chatStore.sendMessage(
+                                  chatStore.textController.text,
+                                )
+                              : null,
+                        );
+                      },
                     )
                   else
                     IconButton(
                       icon: Icon(Icons.adaptive.more_rounded),
                       tooltip: 'More',
-                      onPressed: () => showModalBottomSheet(
+                      onPressed: () => showModalBottomSheetWithProperFocus(
                         isScrollControlled: true,
                         context: context,
                         builder: (_) => ChatDetails(
                           chatDetailsStore: chatStore.chatDetailsStore,
                           chatStore: chatStore,
                           userLogin: chatStore.channelName,
+                          onAddChat: onAddChat,
                         ),
                       ),
                     ),
@@ -256,6 +346,25 @@ class ChatBottomBar extends StatelessWidget {
             ),
           ],
         );
+
+        return isFullscreenOverlay
+            ? Padding(
+                padding: EdgeInsets.only(
+                  bottom: chatStore.assetsStore.showEmoteMenu
+                      ? 0
+                      : MediaQuery.of(context).padding.bottom,
+                ),
+                child: bottomBarContent,
+              )
+            : BlurredContainer(
+                gradientDirection: GradientDirection.down,
+                padding: EdgeInsets.only(
+                  bottom: chatStore.assetsStore.showEmoteMenu
+                      ? 0
+                      : MediaQuery.of(context).padding.bottom,
+                ),
+                child: bottomBarContent,
+              );
       },
     );
   }

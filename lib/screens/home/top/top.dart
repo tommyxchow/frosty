@@ -3,14 +3,12 @@ import 'package:frosty/screens/home/home_store.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/home/top/categories/categories.dart';
+import 'package:frosty/widgets/blurred_container.dart';
 
 class TopSection extends StatefulWidget {
   final HomeStore homeStore;
 
-  const TopSection({
-    super.key,
-    required this.homeStore,
-  });
+  const TopSection({super.key, required this.homeStore});
 
   @override
   State<TopSection> createState() => _TopSectionState();
@@ -30,20 +28,9 @@ class _TopSectionState extends State<TopSection>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
       children: [
-        TabBar(
-          isScrollable: true,
-          controller: _tabBarController,
-          tabs: const [
-            Tab(
-              child: Text('Streams'),
-            ),
-            Tab(child: Text('Categories')),
-          ],
-        ),
-        Expanded(
+        Positioned.fill(
           child: TabBarView(
             controller: _tabBarController,
             children: [
@@ -57,6 +44,27 @@ class _TopSectionState extends State<TopSection>
                     widget.homeStore.topSectionScrollControllers[1],
               ),
             ],
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: BlurredContainer(
+            gradientDirection: GradientDirection.up,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: MediaQuery.of(context).padding.left,
+              right: MediaQuery.of(context).padding.right,
+            ),
+            child: TabBar(
+              isScrollable: true,
+              controller: _tabBarController,
+              tabs: const [
+                Tab(child: Text('Streams')),
+                Tab(child: Text('Categories')),
+              ],
+            ),
           ),
         ),
       ],

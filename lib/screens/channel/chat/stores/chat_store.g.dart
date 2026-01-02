@@ -12,13 +12,16 @@ mixin _$ChatStore on ChatStoreBase, Store {
   Computed<List<IRCMessage>>? _$renderMessagesComputed;
 
   @override
-  List<IRCMessage> get renderMessages => (_$renderMessagesComputed ??=
-          Computed<List<IRCMessage>>(() => super.renderMessages,
-              name: 'ChatStoreBase.renderMessages'))
-      .value;
+  List<IRCMessage> get renderMessages =>
+      (_$renderMessagesComputed ??= Computed<List<IRCMessage>>(
+        () => super.renderMessages,
+        name: 'ChatStoreBase.renderMessages',
+      )).value;
 
-  late final _$timeRemainingAtom =
-      Atom(name: 'ChatStoreBase.timeRemaining', context: context);
+  late final _$timeRemainingAtom = Atom(
+    name: 'ChatStoreBase.timeRemaining',
+    context: context,
+  );
 
   @override
   Duration get timeRemaining {
@@ -33,8 +36,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$_notificationAtom =
-      Atom(name: 'ChatStoreBase._notification', context: context);
+  late final _$_notificationAtom = Atom(
+    name: 'ChatStoreBase._notification',
+    context: context,
+  );
 
   String? get notification {
     _$_notificationAtom.reportRead();
@@ -51,8 +56,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$_messagesAtom =
-      Atom(name: 'ChatStoreBase._messages', context: context);
+  late final _$_messagesAtom = Atom(
+    name: 'ChatStoreBase._messages',
+    context: context,
+  );
 
   ObservableList<IRCMessage> get messages {
     _$_messagesAtom.reportRead();
@@ -69,8 +76,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$_autoScrollAtom =
-      Atom(name: 'ChatStoreBase._autoScroll', context: context);
+  late final _$_autoScrollAtom = Atom(
+    name: 'ChatStoreBase._autoScroll',
+    context: context,
+  );
 
   bool get autoScroll {
     _$_autoScrollAtom.reportRead();
@@ -87,8 +96,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$_inputTextAtom =
-      Atom(name: 'ChatStoreBase._inputText', context: context);
+  late final _$_inputTextAtom = Atom(
+    name: 'ChatStoreBase._inputText',
+    context: context,
+  );
 
   String get inputText {
     _$_inputTextAtom.reportRead();
@@ -105,8 +116,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$_showSendButtonAtom =
-      Atom(name: 'ChatStoreBase._showSendButton', context: context);
+  late final _$_showSendButtonAtom = Atom(
+    name: 'ChatStoreBase._showSendButton',
+    context: context,
+  );
 
   bool get showSendButton {
     _$_showSendButtonAtom.reportRead();
@@ -123,8 +136,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$_showEmoteAutocompleteAtom =
-      Atom(name: 'ChatStoreBase._showEmoteAutocomplete', context: context);
+  late final _$_showEmoteAutocompleteAtom = Atom(
+    name: 'ChatStoreBase._showEmoteAutocomplete',
+    context: context,
+  );
 
   bool get showEmoteAutocomplete {
     _$_showEmoteAutocompleteAtom.reportRead();
@@ -136,14 +151,19 @@ mixin _$ChatStore on ChatStoreBase, Store {
 
   @override
   set _showEmoteAutocomplete(bool value) {
-    _$_showEmoteAutocompleteAtom
-        .reportWrite(value, super._showEmoteAutocomplete, () {
-      super._showEmoteAutocomplete = value;
-    });
+    _$_showEmoteAutocompleteAtom.reportWrite(
+      value,
+      super._showEmoteAutocomplete,
+      () {
+        super._showEmoteAutocomplete = value;
+      },
+    );
   }
 
-  late final _$_showMentionAutocompleteAtom =
-      Atom(name: 'ChatStoreBase._showMentionAutocomplete', context: context);
+  late final _$_showMentionAutocompleteAtom = Atom(
+    name: 'ChatStoreBase._showMentionAutocomplete',
+    context: context,
+  );
 
   bool get showMentionAutocomplete {
     _$_showMentionAutocompleteAtom.reportRead();
@@ -155,14 +175,59 @@ mixin _$ChatStore on ChatStoreBase, Store {
 
   @override
   set _showMentionAutocomplete(bool value) {
-    _$_showMentionAutocompleteAtom
-        .reportWrite(value, super._showMentionAutocomplete, () {
-      super._showMentionAutocomplete = value;
+    _$_showMentionAutocompleteAtom.reportWrite(
+      value,
+      super._showMentionAutocomplete,
+      () {
+        super._showMentionAutocomplete = value;
+      },
+    );
+  }
+
+  late final _$_isSendingMessageAtom = Atom(
+    name: 'ChatStoreBase._isSendingMessage',
+    context: context,
+  );
+
+  bool get isSendingMessage {
+    _$_isSendingMessageAtom.reportRead();
+    return super._isSendingMessage;
+  }
+
+  @override
+  bool get _isSendingMessage => isSendingMessage;
+
+  @override
+  set _isSendingMessage(bool value) {
+    _$_isSendingMessageAtom.reportWrite(value, super._isSendingMessage, () {
+      super._isSendingMessage = value;
     });
   }
 
-  late final _$_userStateAtom =
-      Atom(name: 'ChatStoreBase._userState', context: context);
+  late final _$_isInSharedChatModeAtom = Atom(
+    name: 'ChatStoreBase._isInSharedChatMode',
+    context: context,
+  );
+
+  bool get isInSharedChatMode {
+    _$_isInSharedChatModeAtom.reportRead();
+    return super._isInSharedChatMode;
+  }
+
+  @override
+  bool get _isInSharedChatMode => isInSharedChatMode;
+
+  @override
+  set _isInSharedChatMode(bool value) {
+    _$_isInSharedChatModeAtom.reportWrite(value, super._isInSharedChatMode, () {
+      super._isInSharedChatMode = value;
+    });
+  }
+
+  late final _$_userStateAtom = Atom(
+    name: 'ChatStoreBase._userState',
+    context: context,
+  );
 
   USERSTATE get userState {
     _$_userStateAtom.reportRead();
@@ -179,8 +244,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$expandChatAtom =
-      Atom(name: 'ChatStoreBase.expandChat', context: context);
+  late final _$expandChatAtom = Atom(
+    name: 'ChatStoreBase.expandChat',
+    context: context,
+  );
 
   @override
   bool get expandChat {
@@ -195,8 +262,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$replyingToMessageAtom =
-      Atom(name: 'ChatStoreBase.replyingToMessage', context: context);
+  late final _$replyingToMessageAtom = Atom(
+    name: 'ChatStoreBase.replyingToMessage',
+    context: context,
+  );
 
   @override
   IRCMessage? get replyingToMessage {
@@ -211,29 +280,60 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
-  late final _$getAssetsAsyncAction =
-      AsyncAction('ChatStoreBase.getAssets', context: context);
+  late final _$getAssetsAsyncAction = AsyncAction(
+    'ChatStoreBase.getAssets',
+    context: context,
+  );
 
   @override
   Future<void> getAssets() {
     return _$getAssetsAsyncAction.run(() => super.getAssets());
   }
 
-  late final _$getRecentMessageAsyncAction =
-      AsyncAction('ChatStoreBase.getRecentMessage', context: context);
+  late final _$connectToChatAsyncAction = AsyncAction(
+    'ChatStoreBase.connectToChat',
+    context: context,
+  );
+
+  @override
+  Future<void> connectToChat({bool isReconnect = false}) {
+    return _$connectToChatAsyncAction.run(
+      () => super.connectToChat(isReconnect: isReconnect),
+    );
+  }
+
+  late final _$getRecentMessageAsyncAction = AsyncAction(
+    'ChatStoreBase.getRecentMessage',
+    context: context,
+  );
 
   @override
   Future<void> getRecentMessage() {
     return _$getRecentMessageAsyncAction.run(() => super.getRecentMessage());
   }
 
-  late final _$ChatStoreBaseActionController =
-      ActionController(name: 'ChatStoreBase', context: context);
+  late final _$ChatStoreBaseActionController = ActionController(
+    name: 'ChatStoreBase',
+    context: context,
+  );
+
+  @override
+  void revealMessage(String id) {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase.revealMessage',
+    );
+    try {
+      return super.revealMessage(id);
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void _handleIRCData(String data) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase._handleIRCData');
+      name: 'ChatStoreBase._handleIRCData',
+    );
     try {
       return super._handleIRCData(data);
     } finally {
@@ -244,7 +344,8 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   void resumeScroll() {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.resumeScroll');
+      name: 'ChatStoreBase.resumeScroll',
+    );
     try {
       return super.resumeScroll();
     } finally {
@@ -255,7 +356,8 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   void listenToSevenTVEmoteSet({required String emoteSetId}) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.listenToSevenTVEmoteSet');
+      name: 'ChatStoreBase.listenToSevenTVEmoteSet',
+    );
     try {
       return super.listenToSevenTVEmoteSet(emoteSetId: emoteSetId);
     } finally {
@@ -264,20 +366,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
-  void connectToChat() {
-    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.connectToChat');
-    try {
-      return super.connectToChat();
-    } finally {
-      _$ChatStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void addMessages() {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.addMessages');
+      name: 'ChatStoreBase.addMessages',
+    );
     try {
       return super.addMessages();
     } finally {
@@ -286,9 +378,34 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
+  void _cancelChatDelayCountdown() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase._cancelChatDelayCountdown',
+    );
+    try {
+      return super._cancelChatDelayCountdown();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _startChatDelayCountdown() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase._startChatDelayCountdown',
+    );
+    try {
+      return super._startChatDelayCountdown();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void sendMessage(String message) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.sendMessage');
+      name: 'ChatStoreBase.sendMessage',
+    );
     try {
       return super.sendMessage(message);
     } finally {
@@ -299,7 +416,8 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   void addEmote(Emote emote, {bool autocompleteMode = false}) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.addEmote');
+      name: 'ChatStoreBase.addEmote',
+    );
     try {
       return super.addEmote(emote, autocompleteMode: autocompleteMode);
     } finally {
@@ -310,7 +428,8 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   void updateNotification(String notificationMessage) {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.updateNotification');
+      name: 'ChatStoreBase.updateNotification',
+    );
     try {
       return super.updateNotification(notificationMessage);
     } finally {
@@ -319,13 +438,30 @@ mixin _$ChatStore on ChatStoreBase, Store {
   }
 
   @override
-  void updateSleepTimer(
-      {required Duration duration, required VoidCallback onTimerFinished}) {
+  void clearNotification() {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.updateSleepTimer');
+      name: 'ChatStoreBase.clearNotification',
+    );
+    try {
+      return super.clearNotification();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateSleepTimer({
+    required Duration duration,
+    required VoidCallback onTimerFinished,
+  }) {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase.updateSleepTimer',
+    );
     try {
       return super.updateSleepTimer(
-          duration: duration, onTimerFinished: onTimerFinished);
+        duration: duration,
+        onTimerFinished: onTimerFinished,
+      );
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }
@@ -334,9 +470,34 @@ mixin _$ChatStore on ChatStoreBase, Store {
   @override
   void cancelSleepTimer() {
     final _$actionInfo = _$ChatStoreBaseActionController.startAction(
-        name: 'ChatStoreBase.cancelSleepTimer');
+      name: 'ChatStoreBase.cancelSleepTimer',
+    );
     try {
       return super.cancelSleepTimer();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void unfocusInput() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase.unfocusInput',
+    );
+    try {
+      return super.unfocusInput();
+    } finally {
+      _$ChatStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void safeRequestFocus() {
+    final _$actionInfo = _$ChatStoreBaseActionController.startAction(
+      name: 'ChatStoreBase.safeRequestFocus',
+    );
+    try {
+      return super.safeRequestFocus();
     } finally {
       _$ChatStoreBaseActionController.endAction(_$actionInfo);
     }

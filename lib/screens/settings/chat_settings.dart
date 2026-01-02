@@ -9,8 +9,10 @@ import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_slider.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/screens/settings/widgets/settings_muted_words.dart';
-import 'package:frosty/widgets/cached_image.dart';
+import 'package:frosty/utils/context_extensions.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
 import 'package:frosty/widgets/section_header.dart';
+import 'package:frosty/widgets/settings_page_layout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ChatSettings extends StatefulWidget {
@@ -30,25 +32,19 @@ class _ChatSettingsState extends State<ChatSettings> {
     final settingsStore = widget.settingsStore;
 
     return Observer(
-      builder: (context) => ListView(
-        padding: const EdgeInsets.only(top: 16),
+      builder: (context) => SettingsPageLayout(
         children: [
-          const SectionHeader(
-            'Message sizing',
-            isFirst: true,
-          ),
+          const SectionHeader('Message sizing', isFirst: true),
           ExpansionTile(
-            title: const Text(
-              'Preview',
-            ),
+            title: const Text('Preview'),
             children: [
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 child: DefaultTextStyle(
-                  style: DefaultTextStyle.of(context)
-                      .style
-                      .copyWith(fontSize: settingsStore.fontSize),
+                  style: DefaultTextStyle.of(
+                    context,
+                  ).style.copyWith(fontSize: settingsStore.fontSize),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -80,20 +76,17 @@ class _ChatSettingsState extends State<ChatSettings> {
                             ),
                           ],
                         ),
-                        textScaler:
-                            TextScaler.linear(settingsStore.messageScale),
+                        textScaler: settingsStore.messageScale.textScaler,
                       ),
                       SizedBox(height: settingsStore.messageSpacing),
                       Text(
                         'Hello! Here\'s a text preview.',
-                        textScaler:
-                            TextScaler.linear(settingsStore.messageScale),
+                        textScaler: settingsStore.messageScale.textScaler,
                       ),
                       SizedBox(height: settingsStore.messageSpacing),
                       Text(
                         'And another for spacing without an emote!',
-                        textScaler:
-                            TextScaler.linear(settingsStore.messageScale),
+                        textScaler: settingsStore.messageScale.textScaler,
                       ),
                     ],
                   ),
@@ -147,14 +140,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader('Message appearance'),
           SettingsListSwitch(
-            title: 'Use readable name colors',
-            subtitle: const Text(
-              'Adjusts the lightness value of overly bright and dark names.',
-            ),
-            value: settingsStore.useReadableColors,
-            onChanged: (newValue) => settingsStore.useReadableColors = newValue,
-          ),
-          SettingsListSwitch(
             title: 'Show deleted messages',
             subtitle: const Text(
               'Restores the original message of deleted messages.',
@@ -178,7 +163,7 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader('Delay and latency'),
           SettingsListSwitch(
-            title: 'Sync message delay with stream latency (experimental)',
+            title: 'Sync message delay and stream latency',
             value: settingsStore.autoSyncChatDelay,
             onChanged: (newValue) => settingsStore.autoSyncChatDelay = newValue,
           ),
@@ -210,11 +195,6 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           const SectionHeader('Layout'),
           SettingsListSwitch(
-            title: 'Show bottom bar',
-            value: settingsStore.showBottomBar,
-            onChanged: (newValue) => settingsStore.showBottomBar = newValue,
-          ),
-          SettingsListSwitch(
             title: 'Move emote menu button left',
             subtitle: const Text(
               'Places the emote menu button on the left side to avoid accidental presses.',
@@ -224,10 +204,17 @@ class _ChatSettingsState extends State<ChatSettings> {
                 settingsStore.emoteMenuButtonOnLeft = newValue,
           ),
           SettingsListSwitch(
-            title: 'Move notifications to bottom',
-            value: settingsStore.chatNotificationsOnBottom,
-            onChanged: (newValue) =>
-                settingsStore.chatNotificationsOnBottom = newValue,
+            title: 'Persist chat tabs',
+            subtitle: const Text(
+              'Secondary chat tabs are remembered when switching channels.',
+            ),
+            value: settingsStore.persistChatTabs,
+            onChanged: (newValue) {
+              settingsStore.persistChatTabs = newValue;
+              if (!newValue) {
+                settingsStore.secondaryTabs = [];
+              }
+            },
           ),
           const SectionHeader('Landscape mode'),
           SettingsListSwitch(
@@ -238,8 +225,9 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SettingsListSwitch(
             title: 'Force vertical chat',
-            subtitle:
-                const Text('Intended for tablets and other larger displays.'),
+            subtitle: const Text(
+              'Intended for tablets and other larger displays.',
+            ),
             value: settingsStore.landscapeForceVerticalChat,
             onChanged: (newValue) =>
                 settingsStore.landscapeForceVerticalChat = newValue,
@@ -252,17 +240,9 @@ class _ChatSettingsState extends State<ChatSettings> {
                 landscapeCutoutNames[settingsStore.landscapeCutout.index],
             options: landscapeCutoutNames,
             onChanged: (newValue) => settingsStore.landscapeCutout =
-                LandscapeCutoutType
-                    .values[landscapeCutoutNames.indexOf(newValue)],
-          ),
-          SettingsListSlider(
-            title: 'Chat width',
-            trailing: '${(settingsStore.chatWidth * 100).toStringAsFixed(0)}%',
-            value: settingsStore.chatWidth,
-            min: 0.2,
-            max: 0.6,
-            divisions: 8,
-            onChanged: (newValue) => settingsStore.chatWidth = newValue,
+                LandscapeCutoutType.values[landscapeCutoutNames.indexOf(
+                  newValue,
+                )],
           ),
           SettingsListSlider(
             title: 'Chat overlay opacity',
@@ -274,16 +254,6 @@ class _ChatSettingsState extends State<ChatSettings> {
             divisions: 10,
             onChanged: (newValue) =>
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
-          ),
-          const SectionHeader('Sleep'),
-          SettingsListSwitch(
-            title: 'Prevent sleep in chat-only mode',
-            subtitle: const Text(
-              'Requires restarting the chat in order to take effect.',
-            ),
-            value: settingsStore.chatOnlyPreventSleep,
-            onChanged: (newValue) =>
-                settingsStore.chatOnlyPreventSleep = newValue,
           ),
           const SectionHeader('Muted keywords'),
           SettingsMutedWords(settingsStore: settingsStore),
@@ -357,13 +327,11 @@ class _ChatSettingsState extends State<ChatSettings> {
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => launchUrl(
-                            Uri.parse(
-                              'https://recent-messages.robotty.de/',
-                            ),
-                            mode: settingsStore.launchUrlExternal
-                                ? LaunchMode.externalApplication
-                                : LaunchMode.inAppBrowserView,
-                          ),
+                        Uri.parse('https://recent-messages.robotty.de/'),
+                        mode: settingsStore.launchUrlExternal
+                            ? LaunchMode.externalApplication
+                            : LaunchMode.inAppBrowserView,
+                      ),
                   ),
                 ],
               ),

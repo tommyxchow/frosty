@@ -1,77 +1,30 @@
-## v4.9.6
+## v5.0.0
 
-June 14, 2025
-
-### Bug Fixes
-
-- [Android] Fix missing stream quality options
-
----
-
-## v4.9.5
-
-June 13, 2025
-
-### Bug Fixes
-
-- Fix stream latency no longer updating
-
----
-
-## v4.9.4
-
-June 6, 2025
-
-### Bug Fixes
-
-- Fix video stats blocking when using custom overlay
-
----
-
-## v4.9.3
-
-May 26, 2025
-
-### Bug Fixes
-
-- Fix missing 7TV emotes on some channels
-- Fix sleep timer menu border styling
-
----
-
-## v4.9.2
-
-April 7, 2025
-
-### Bug Fixes
-
-- Fix large cache size (by @Artiu on GitHub)
-
----
-
-## v4.9.1
-
-April 4, 2025
-
-### Bug Fixes
-
-- [Android] Fix overlay latency and stream qualities, persist last chosen stream quality (by @Artiu on GitHub)
-
----
-
-## v4.9.0
-
-December 30, 2024
+January 1, 2026
 
 ### New Features
 
-- [Android] Added new "Use enhanced rendering" option in video settings
+- Open multiple chat tabs for different channels with drag-to-reorder. Tabs are saved between sessions by default (configurable in settings).
+- Resize the chat and video areas in landscape mode by dragging the divider.
+- A new section in the Following tab shows which of your followed channels are currently offline.
+- Change your chat username color from the chat details menu.
+- A new randomize button for the accent color theme in settings.
+- View emotes and stream thumbnails in full resolution with swipe-to-dismiss gestures.
+- [Android] Open Twitch channel links directly in Frosty instead of the browser or Twitch app (by @micahmo on GitHub).
+
+### Improvements
+
+- Swipe down to enter Picture-in-Picture mode, and press the PiP button again to exit.
+- Redesigned the video overlay and added stream details to the app bar in chat-only mode.
+- Networking and data handling have been completely rewritten to be faster and more reliable.
+- Improved formatting for chat replies, quick copy-to-input for messages, and a clearer countdown for chat delays.
 
 ### Bug Fixes
 
-- Fixed incorrect badge order and spacing for FFZ bots
-- Fixed missing emotes on channels that don't have 7TV enabled
+- Fixed chat text input not unfocusing when tapping outside of it (by @zeykafx on GitHub).
+- Fixed missing badges and emotes in historical messages upon initial connection.
+- Fixed accidental chat scrolling when accessing system UI gestures in landscape mode.
+- Fixed chat reconnection issues when a chat delay was active.
+- Fixed duplicate message cases and various UI stability issues.
 
-#### See all release notes at https://github.com/tommyxchow/frosty/releases
-
----
+#### See all release notes at [https://github.com/tommyxchow/frosty/releases](https://github.com/tommyxchow/frosty/releases)

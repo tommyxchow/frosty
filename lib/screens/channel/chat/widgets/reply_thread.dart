@@ -5,6 +5,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/section_header.dart';
 
 class ReplyThread extends StatelessWidget {
@@ -41,9 +42,9 @@ class ReplyThread extends StatelessWidget {
               textScaler: TextScaler.linear(chatStore.settings.messageScale),
             ),
             child: DefaultTextStyle(
-              style: DefaultTextStyle.of(context)
-                  .style
-                  .copyWith(fontSize: chatStore.settings.fontSize),
+              style: DefaultTextStyle.of(
+                context,
+              ).style.copyWith(fontSize: chatStore.settings.fontSize),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
@@ -54,39 +55,36 @@ class ReplyThread extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(12, 0, 12, 8),
                   ),
                   if (replyParent != null)
-                    ChatMessage(
-                      ircMessage: replyParent,
-                      chatStore: chatStore,
-                    )
+                    ChatMessage(ircMessage: replyParent, chatStore: chatStore)
                   else
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                       child: Text(
                         '$replyName: $replyBody',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
-                  const Divider(),
                   Flexible(
-                    child: ListView(
-                      primary: false,
-                      children: chatStore.messages
-                          .where(
-                            (message) =>
-                                message.tags['reply-parent-msg-id'] ==
-                                selectedMessage.tags['reply-parent-msg-id'],
-                          )
-                          .map(
-                            (message) => ChatMessage(
-                              isModal: true,
-                              showReplyHeader: false,
-                              ircMessage: message,
-                              chatStore: chatStore,
-                            ),
-                          )
-                          .toList(),
+                    child: FrostyScrollbar(
+                      child: ListView(
+                        primary: false,
+                        children: chatStore.messages
+                            .where(
+                              (message) =>
+                                  message.tags['reply-parent-msg-id'] ==
+                                  selectedMessage.tags['reply-parent-msg-id'],
+                            )
+                            .map(
+                              (message) => ChatMessage(
+                                isModal: true,
+                                showReplyHeader: false,
+                                isInReplyThread: true,
+                                ircMessage: message,
+                                chatStore: chatStore,
+                              ),
+                            )
+                            .toList(),
+                      ),
                     ),
                   ),
                 ],

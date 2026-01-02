@@ -3,7 +3,9 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
 
@@ -36,10 +38,8 @@ class _ChatUserModalState extends State<ChatUserModal> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            contentPadding: const EdgeInsets.all(12),
-            leading: ProfilePicture(
-              userLogin: widget.username,
-            ),
+            contentPadding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+            leading: ProfilePicture(userLogin: widget.username),
             title: Row(
               children: [
                 Flexible(
@@ -64,13 +64,13 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       widget.chatStore.textController.text =
                           '@${widget.username} ';
                       Navigator.pop(context);
-                      widget.chatStore.textFieldFocusNode.requestFocus();
+                      widget.chatStore.safeRequestFocus();
                     },
                     icon: const Icon(Icons.reply_rounded),
                   ),
                 IconButton(
                   tooltip: 'More',
-                  onPressed: () => showModalBottomSheet(
+                  onPressed: () => showModalBottomSheetWithProperFocus(
                     context: context,
                     builder: (context) => UserActionsModal(
                       authStore: widget.chatStore.auth,
@@ -84,7 +84,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
               ],
             ),
           ),
-          const Divider(),
+          const Divider(indent: 12, endIndent: 12),
           Expanded(
             child: Observer(
               builder: (context) {
@@ -103,17 +103,19 @@ class _ChatUserModalState extends State<ChatUserModal> {
                     ),
                   ),
                   child: DefaultTextStyle(
-                    style: DefaultTextStyle.of(context)
-                        .style
-                        .copyWith(fontSize: widget.chatStore.settings.fontSize),
-                    child: ListView.builder(
-                      reverse: true,
-                      primary: false,
-                      itemCount: userMessages.length,
-                      itemBuilder: (context, index) => ChatMessage(
-                        ircMessage: userMessages[index],
-                        chatStore: widget.chatStore,
-                        isModal: true,
+                    style: DefaultTextStyle.of(context).style.copyWith(
+                      fontSize: widget.chatStore.settings.fontSize,
+                    ),
+                    child: FrostyScrollbar(
+                      child: ListView.builder(
+                        reverse: true,
+                        primary: false,
+                        itemCount: userMessages.length,
+                        itemBuilder: (context, index) => ChatMessage(
+                          ircMessage: userMessages[index],
+                          chatStore: widget.chatStore,
+                          isModal: true,
+                        ),
                       ),
                     ),
                   ),

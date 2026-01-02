@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -29,6 +31,15 @@ abstract class AuthBase with Store {
   /// Whether the token is valid or not.
   var _tokenIsValid = false;
 
+  /// Timer used to retry authentication when offline or on transient failures.
+  Timer? _reconnectTimer;
+
+  /// Retry count for reconnection attempts.
+  var _reconnectAttempts = 0;
+
+  /// Maximum number of reconnection attempts before giving up.
+  static const _maxReconnectAttempts = 5;
+
   /// The MobX store containing information relevant to the current user.
   final UserStore user;
 
@@ -42,8 +53,10 @@ abstract class AuthBase with Store {
 
   /// Authentication headers for Twitch API requests.
   @computed
-  Map<String, String> get headersTwitch =>
-      {'Authorization': 'Bearer $_token', 'Client-Id': clientId};
+  Map<String, String> get headersTwitch => {
+    'Authorization': 'Bearer $_token',
+    'Client-Id': clientId,
+  };
 
   /// Error flag that will be non-null and contain an error message if login failed.
   @readonly
@@ -70,8 +83,9 @@ abstract class AuthBase with Store {
     if (request.url == 'https://www.twitch.tv/?no-reload=true') {
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
-        navigatorKey.currentState
-            ?.push(MaterialPageRoute(builder: (context) => routeAfter));
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(builder: (context) => routeAfter),
+        );
       } else {
         // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
         navigatorKey.currentState?.pop();
@@ -92,34 +106,41 @@ abstract class AuthBase with Store {
         NavigationDelegate(
           onNavigationRequest: (request) =>
               handleNavigation(request: request, routeAfter: routeAfter),
-          onPageFinished: (_) => webViewController.runJavaScript(
-            '''
-            {
-              function modifyElement(element) {
-                element.style.maxHeight = '20vh';
-                element.style.overflow = 'auto';
-              }
-
-              const observer = new MutationObserver((mutations) => {
-                for (let mutation of mutations) {
-                  if (mutation.type === 'childList') {
-                    const element = document.querySelector('.fAVISI');
-                    if (element) {
-                      modifyElement(element);
-                      observer.disconnect();
-                      break;
-                    }
+          onWebResourceError: (error) {
+            debugPrint('Auth WebView error: ${error.description}');
+          },
+          onPageFinished: (_) async {
+            try {
+              await webViewController.runJavaScript('''
+                {
+                  function modifyElement(element) {
+                    element.style.maxHeight = '20vh';
+                    element.style.overflow = 'auto';
                   }
-                }
-              });
 
-              observer.observe(document.body, {
-                childList: true,
-                subtree: true
-              });
+                  const observer = new MutationObserver((mutations) => {
+                    for (let mutation of mutations) {
+                      if (mutation.type === 'childList') {
+                        const element = document.querySelector('.fAVISI');
+                        if (element) {
+                          modifyElement(element);
+                          observer.disconnect();
+                          break;
+                        }
+                      }
+                    }
+                  });
+
+                  observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                  });
+                }
+                ''');
+            } catch (e) {
+              debugPrint('Auth WebView JavaScript error: $e');
             }
-            ''',
-          ),
+          },
         ),
       )
       ..loadRequest(
@@ -132,7 +153,7 @@ abstract class AuthBase with Store {
             'redirect_uri': 'https://twitch.tv/login',
             'response_type': 'token',
             'scope':
-                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users',
+                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users user:manage:chat_color',
             'force_verify': 'true',
           },
         ),
@@ -156,31 +177,24 @@ abstract class AuthBase with Store {
 
     void onPressed() {
       if (isBlocked) {
-        user.unblock(targetId: targetUserId, headers: headersTwitch);
+        user.unblock(targetId: targetUserId);
       } else {
-        user.block(
-          targetId: targetUserId,
-          displayName: targetUser,
-          headers: headersTwitch,
-        );
+        user.block(targetId: targetUserId, displayName: targetUser);
       }
       Navigator.pop(context);
     }
 
     return showDialog(
       context: context,
-      builder: (context) => AlertDialog.adaptive(
-        title: Text(title),
-        content: Text(message),
+      builder: (context) => FrostyDialog(
+        title: title,
+        message: message,
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Cancel'),
           ),
-          TextButton(
-            onPressed: onPressed,
-            child: const Text('Yes'),
-          ),
+          FilledButton(onPressed: onPressed, child: const Text('Yes')),
         ],
       ),
     );
@@ -206,16 +220,26 @@ abstract class AuthBase with Store {
           await _storage.write(key: _defaultTokenKey, value: _token);
         }
       } else {
-        // Validate the existing token.
-        _tokenIsValid = await twitchApi.validateToken(token: _token!);
+        // Validate the existing token. If it fails, start reconnect loop.
+        try {
+          _tokenIsValid = await twitchApi.validateToken(token: _token!);
+        } on ApiException catch (e) {
+          debugPrint('Token validation failed: $e');
+          _isLoggedIn = false;
+          _startReconnectLoop();
+          return;
+        }
 
         // If the token is invalid, logout.
         if (!_tokenIsValid) return await logout();
 
         // Initialize the user store.
-        await user.init(headers: headersTwitch);
+        await user.init();
 
-        if (user.details != null) _isLoggedIn = true;
+        if (user.details != null) {
+          _isLoggedIn = true;
+          _stopReconnectLoop();
+        }
       }
 
       _error = null;
@@ -240,10 +264,13 @@ abstract class AuthBase with Store {
       await _storage.write(key: _userTokenKey, value: token);
 
       // Initialize the user with the new token.
-      await user.init(headers: headersTwitch);
+      await user.init();
 
       // Set the login status to logged in.
-      if (user.details != null) _isLoggedIn = true;
+      if (user.details != null) {
+        _isLoggedIn = true;
+        _stopReconnectLoop();
+      }
     } catch (e) {
       debugPrint('Login failed due to $e');
     }
@@ -253,6 +280,7 @@ abstract class AuthBase with Store {
   @action
   Future<void> logout() async {
     try {
+      _stopReconnectLoop();
       // Delete the existing user token.
       await _storage.delete(key: _userTokenKey);
       _token = null;
@@ -276,5 +304,50 @@ abstract class AuthBase with Store {
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  void _startReconnectLoop() {
+    if (_reconnectTimer != null) return;
+    _reconnectAttempts = 0;
+    _reconnectTimer = Timer.periodic(const Duration(seconds: 10), (_) async {
+      try {
+        _reconnectAttempts++;
+        if (_reconnectAttempts > _maxReconnectAttempts) {
+          await logout();
+          return;
+        }
+
+        final stored = await _storage.read(key: _userTokenKey);
+        if (stored == null) {
+          _stopReconnectLoop();
+          return;
+        }
+
+        final isValid = await twitchApi.validateToken(token: stored);
+        if (!isValid) {
+          await logout();
+          return;
+        }
+
+        // Token valid again — restore session.
+        _token = stored;
+        await user.init();
+        if (user.details != null) {
+          _isLoggedIn = true;
+          _error = null;
+          _stopReconnectLoop();
+        }
+      } on ApiException catch (_) {
+        // Continue trying
+      } catch (e) {
+        debugPrint('Reconnect loop error: $e');
+      }
+    });
+  }
+
+  void _stopReconnectLoop() {
+    _reconnectTimer?.cancel();
+    _reconnectTimer = null;
+    _reconnectAttempts = 0;
   }
 }

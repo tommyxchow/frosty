@@ -35,12 +35,7 @@ class BadgeInfoFFZ {
   final String color;
   final BadgeUrlsFFZ urls;
 
-  const BadgeInfoFFZ(
-    this.id,
-    this.title,
-    this.color,
-    this.urls,
-  );
+  const BadgeInfoFFZ(this.id, this.title, this.color, this.urls);
 
   factory BadgeInfoFFZ.fromJson(Map<String, dynamic> json) =>
       _$BadgeInfoFFZFromJson(json);
@@ -55,11 +50,7 @@ class BadgeUrlsFFZ {
   @JsonKey(name: '4')
   final String url4x;
 
-  const BadgeUrlsFFZ(
-    this.url1x,
-    this.url2x,
-    this.url4x,
-  );
+  const BadgeUrlsFFZ(this.url1x, this.url2x, this.url4x);
 
   factory BadgeUrlsFFZ.fromJson(Map<String, dynamic> json) =>
       _$BadgeUrlsFFZFromJson(json);
@@ -71,11 +62,7 @@ class BadgeInfo7TV {
   final List<List<String>> urls;
   final List<String> users;
 
-  BadgeInfo7TV(
-    this.tooltip,
-    this.urls,
-    this.users,
-  );
+  BadgeInfo7TV(this.tooltip, this.urls, this.users);
 
   factory BadgeInfo7TV.fromJson(Map<String, dynamic> json) =>
       _$BadgeInfo7TVFromJson(json);
@@ -86,10 +73,7 @@ class BadgeInfoBTTV {
   final String providerId;
   final BadgeDetailsBTTV badge;
 
-  BadgeInfoBTTV(
-    this.providerId,
-    this.badge,
-  );
+  BadgeInfoBTTV(this.providerId, this.badge);
 
   factory BadgeInfoBTTV.fromJson(Map<String, dynamic> json) =>
       _$BadgeInfoBTTVFromJson(json);
@@ -100,10 +84,7 @@ class BadgeDetailsBTTV {
   final String description;
   final String svg;
 
-  BadgeDetailsBTTV(
-    this.description,
-    this.svg,
-  );
+  BadgeDetailsBTTV(this.description, this.svg);
 
   factory BadgeDetailsBTTV.fromJson(Map<String, dynamic> json) =>
       _$BadgeDetailsBTTVFromJson(json);
@@ -123,29 +104,29 @@ class ChatBadge {
   });
 
   factory ChatBadge.fromTwitch(BadgeInfoTwitch badge) => ChatBadge(
-        name: badge.title,
-        url: badge.imageUrl4x,
-        type: BadgeType.twitch,
-      );
+    name: badge.title,
+    url: badge.imageUrl4x,
+    type: BadgeType.twitch,
+  );
 
   factory ChatBadge.fromBTTV(BadgeInfoBTTV badge) => ChatBadge(
-        name: badge.badge.description,
-        url: badge.badge.svg,
-        type: BadgeType.bttv,
-      );
+    name: badge.badge.description,
+    url: badge.badge.svg,
+    type: BadgeType.bttv,
+  );
 
   factory ChatBadge.fromFFZ(BadgeInfoFFZ badge) => ChatBadge(
-        name: badge.title,
-        url: badge.urls.url4x,
-        color: badge.color,
-        type: BadgeType.ffz,
-      );
+    name: badge.title,
+    url: badge.urls.url4x,
+    color: badge.color,
+    type: BadgeType.ffz,
+  );
 
   factory ChatBadge.from7TV(BadgeInfo7TV badge) => ChatBadge(
-        name: badge.tooltip,
-        url: badge.urls[2][1],
-        type: BadgeType.sevenTV,
-      );
+    name: badge.tooltip,
+    url: badge.urls[2][1],
+    type: BadgeType.sevenTV,
+  );
 }
 
 enum BadgeType {

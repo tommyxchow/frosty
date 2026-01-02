@@ -10,10 +10,7 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 class Video extends StatefulWidget {
   final VideoStore videoStore;
 
-  const Video({
-    super.key,
-    required this.videoStore,
-  });
+  const Video({super.key, required this.videoStore});
 
   @override
   State<Video> createState() => _VideoState();
@@ -24,8 +21,9 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     if (widget.videoStore.settingsStore.showVideo) {
-      widget.videoStore.videoWebViewController
-          .loadRequest(Uri.parse(widget.videoStore.videoUrl));
+      widget.videoStore.videoWebViewController.loadRequest(
+        Uri.parse(widget.videoStore.videoUrl),
+      );
     }
     WidgetsBinding.instance.addObserver(this);
   }
@@ -62,8 +60,9 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    widget.videoStore.videoWebViewController
-        .loadRequest(Uri.parse('about:blank'));
+    widget.videoStore.videoWebViewController.loadRequest(
+      Uri.parse('about:blank'),
+    );
 
     super.dispose();
   }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
-import 'package:frosty/widgets/cached_image.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 
 /// A tappable card widget that displays a category's box art and name under.
 class CategoryCard extends StatelessWidget {
@@ -26,17 +26,21 @@ class CategoryCard extends StatelessWidget {
     return InkWell(
       onTap: isTappable
           ? () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CategoryStreams(
-                    categoryId: category.id,
-                  ),
-                ),
-              )
+              context,
+              MaterialPageRoute(
+                builder: (context) => CategoryStreams(categoryId: category.id),
+              ),
+            )
           : null,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.only(
+          top: 8,
+          bottom: 8,
+          left: 16 + MediaQuery.of(context).padding.left,
+          right: 16 + MediaQuery.of(context).padding.right,
+        ),
         child: Row(
+          spacing: 16,
           children: [
             SizedBox(
               width: 80,
@@ -50,22 +54,19 @@ class CategoryCard extends StatelessWidget {
                       null,
                       '${artWidth}x$artHeight.jpg',
                     ),
-                    placeholder: (context, url) => ColoredBox(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      child: const LoadingIndicator(),
+                    placeholder: (context, url) => const SkeletonLoader(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
             Flexible(
               child: Text(
                 category.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
           ],

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -49,7 +51,6 @@ abstract class CategoriesStoreBase with Store {
 
     try {
       final result = await twitchApi.getTopCategories(
-        headers: authStore.headersTwitch,
         cursor: _categoriesCursor,
       );
 
@@ -62,9 +63,14 @@ abstract class CategoriesStoreBase with Store {
 
       _error = null;
     } on SocketException {
-      _error = 'Failed to connect';
+      _error = 'Unable to connect to Twitch';
+      debugPrint('Categories SocketException: No internet connection');
+    } on ApiException catch (e) {
+      _error = e.message;
+      debugPrint('Categories ApiException: $e');
     } catch (e) {
-      _error = e.toString();
+      _error = 'Something went wrong loading categories';
+      debugPrint('Categories error: $e');
     }
 
     _isLoading = false;

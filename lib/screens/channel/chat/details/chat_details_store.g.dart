@@ -12,13 +12,16 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
   Computed<Iterable<String>>? _$filteredUsersComputed;
 
   @override
-  Iterable<String> get filteredUsers => (_$filteredUsersComputed ??=
-          Computed<Iterable<String>>(() => super.filteredUsers,
-              name: 'ChatDetailsStoreBase.filteredUsers'))
-      .value;
+  Iterable<String> get filteredUsers =>
+      (_$filteredUsersComputed ??= Computed<Iterable<String>>(
+        () => super.filteredUsers,
+        name: 'ChatDetailsStoreBase.filteredUsers',
+      )).value;
 
-  late final _$roomStateAtom =
-      Atom(name: 'ChatDetailsStoreBase.roomState', context: context);
+  late final _$roomStateAtom = Atom(
+    name: 'ChatDetailsStoreBase.roomState',
+    context: context,
+  );
 
   @override
   ROOMSTATE get roomState {
@@ -33,8 +36,10 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
     });
   }
 
-  late final _$showJumpButtonAtom =
-      Atom(name: 'ChatDetailsStoreBase.showJumpButton', context: context);
+  late final _$showJumpButtonAtom = Atom(
+    name: 'ChatDetailsStoreBase.showJumpButton',
+    context: context,
+  );
 
   @override
   bool get showJumpButton {
@@ -49,8 +54,10 @@ mixin _$ChatDetailsStore on ChatDetailsStoreBase, Store {
     });
   }
 
-  late final _$_filterTextAtom =
-      Atom(name: 'ChatDetailsStoreBase._filterText', context: context);
+  late final _$_filterTextAtom = Atom(
+    name: 'ChatDetailsStoreBase._filterText',
+    context: context,
+  );
 
   String get filterText {
     _$_filterTextAtom.reportRead();

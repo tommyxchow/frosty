@@ -5,9 +5,10 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
-import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/animated_scroll_border.dart';
+import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/scroll_to_top_button.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -46,8 +47,8 @@ class _ChattersListState extends State<ChattersList> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(Icons.filter_list_rounded),
                     hintText: 'Filter chatters',
-                    suffixIcon: widget
-                                .chatDetailsStore.textFieldFocusNode.hasFocus ||
+                    suffixIcon:
+                        widget.chatDetailsStore.textFieldFocusNode.hasFocus ||
                             widget.chatDetailsStore.filterText.isNotEmpty
                         ? IconButton(
                             tooltip: widget.chatDetailsStore.filterText.isEmpty
@@ -81,7 +82,7 @@ class _ChattersListState extends State<ChattersList> {
               child: Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
-                  Scrollbar(
+                  FrostyScrollbar(
                     controller: widget.chatDetailsStore.scrollController,
                     child: Observer(
                       builder: (context) {
@@ -108,11 +109,14 @@ class _ChattersListState extends State<ChattersList> {
                             if (widget.chatDetailsStore.chatUsers.isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
-                                child:
-                                    AlertMessage(message: 'No chatters found'),
+                                child: AlertMessage(
+                                  message: 'No chatters found',
+                                ),
                               )
                             else if (widget
-                                .chatDetailsStore.filteredUsers.isEmpty)
+                                .chatDetailsStore
+                                .filteredUsers
+                                .isEmpty)
                               const SliverFillRemaining(
                                 hasScrollBody: false,
                                 child: AlertMessage(
@@ -133,19 +137,18 @@ class _ChattersListState extends State<ChattersList> {
                                     ),
                                   ),
                                   onTap: () async {
-                                    final userInfo =
-                                        await context.read<TwitchApi>().getUser(
-                                              headers: context
-                                                  .read<AuthStore>()
-                                                  .headersTwitch,
-                                              userLogin: widget.chatDetailsStore
-                                                  .filteredUsers
-                                                  .elementAt(index),
-                                            );
+                                    final userInfo = await context
+                                        .read<TwitchApi>()
+                                        .getUser(
+                                          userLogin: widget
+                                              .chatDetailsStore
+                                              .filteredUsers
+                                              .elementAt(index),
+                                        );
 
                                     if (!context.mounted) return;
 
-                                    showModalBottomSheet(
+                                    showModalBottomSheetWithProperFocus(
                                       isScrollControlled: true,
                                       context: context,
                                       builder: (context) => ChatUserModal(
@@ -158,7 +161,9 @@ class _ChattersListState extends State<ChattersList> {
                                   },
                                 ),
                                 itemCount: widget
-                                    .chatDetailsStore.filteredUsers.length,
+                                    .chatDetailsStore
+                                    .filteredUsers
+                                    .length,
                               ),
                           ],
                         );

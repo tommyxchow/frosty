@@ -36,10 +36,7 @@ class StreamsTwitch {
   final List<StreamTwitch> data;
   final Map<String, String> pagination;
 
-  const StreamsTwitch(
-    this.data,
-    this.pagination,
-  );
+  const StreamsTwitch(this.data, this.pagination);
 
   factory StreamsTwitch.fromJson(Map<String, dynamic> json) =>
       _$StreamsTwitchFromJson(json);

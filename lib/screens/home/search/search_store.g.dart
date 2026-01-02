@@ -9,8 +9,10 @@ part of 'search_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SearchStore on SearchStoreBase, Store {
-  late final _$_searchTextAtom =
-      Atom(name: 'SearchStoreBase._searchText', context: context);
+  late final _$_searchTextAtom = Atom(
+    name: 'SearchStoreBase._searchText',
+    context: context,
+  );
 
   String get searchText {
     _$_searchTextAtom.reportRead();
@@ -27,8 +29,10 @@ mixin _$SearchStore on SearchStoreBase, Store {
     });
   }
 
-  late final _$_searchHistoryAtom =
-      Atom(name: 'SearchStoreBase._searchHistory', context: context);
+  late final _$_searchHistoryAtom = Atom(
+    name: 'SearchStoreBase._searchHistory',
+    context: context,
+  );
 
   ObservableList<String> get searchHistory {
     _$_searchHistoryAtom.reportRead();
@@ -45,8 +49,10 @@ mixin _$SearchStore on SearchStoreBase, Store {
     });
   }
 
-  late final _$_channelFutureAtom =
-      Atom(name: 'SearchStoreBase._channelFuture', context: context);
+  late final _$_channelFutureAtom = Atom(
+    name: 'SearchStoreBase._channelFuture',
+    context: context,
+  );
 
   ObservableFuture<List<ChannelQuery>>? get channelFuture {
     _$_channelFutureAtom.reportRead();
@@ -63,8 +69,10 @@ mixin _$SearchStore on SearchStoreBase, Store {
     });
   }
 
-  late final _$_categoryFutureAtom =
-      Atom(name: 'SearchStoreBase._categoryFuture', context: context);
+  late final _$_categoryFutureAtom = Atom(
+    name: 'SearchStoreBase._categoryFuture',
+    context: context,
+  );
 
   ObservableFuture<CategoriesTwitch?>? get categoryFuture {
     _$_categoryFutureAtom.reportRead();
@@ -81,21 +89,26 @@ mixin _$SearchStore on SearchStoreBase, Store {
     });
   }
 
-  late final _$initAsyncAction =
-      AsyncAction('SearchStoreBase.init', context: context);
+  late final _$initAsyncAction = AsyncAction(
+    'SearchStoreBase.init',
+    context: context,
+  );
 
   @override
   Future<void> init() {
     return _$initAsyncAction.run(() => super.init());
   }
 
-  late final _$SearchStoreBaseActionController =
-      ActionController(name: 'SearchStoreBase', context: context);
+  late final _$SearchStoreBaseActionController = ActionController(
+    name: 'SearchStoreBase',
+    context: context,
+  );
 
   @override
   void handleQuery(String query) {
     final _$actionInfo = _$SearchStoreBaseActionController.startAction(
-        name: 'SearchStoreBase.handleQuery');
+      name: 'SearchStoreBase.handleQuery',
+    );
     try {
       return super.handleQuery(query);
     } finally {

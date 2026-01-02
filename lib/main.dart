@@ -10,9 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frosty/apis/bttv_api.dart';
+import 'package:frosty/apis/dio_client.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/apis/twitch_auth_interceptor.dart';
+import 'package:frosty/apis/unauthorized_interceptor.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/firebase_options.dart';
 import 'package:frosty/screens/channel/channel.dart';
@@ -20,10 +23,10 @@ import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/stores/global_assets_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
-import 'package:http/http.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,9 +37,7 @@ void main() async {
 
   CustomCacheManager.removeOrphanedCacheFiles();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
@@ -72,27 +73,45 @@ void main() async {
   // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
-  /// Initialize API services with a common client.
+  /// Initialize API services with a common Dio client.
   /// This will prevent every request from creating a new client instance.
-  final client = Client();
-  final twitchApiService = TwitchApi(client);
-  final bttvApiService = BTTVApi(client);
-  final ffzApiService = FFZApi(client);
-  final sevenTVApiService = SevenTVApi(client);
+  final dioClient = DioClient.createClient();
+
+  // Create API services
+  final twitchApiService = TwitchApi(dioClient);
+  final bttvApiService = BTTVApi(dioClient);
+  final ffzApiService = FFZApi(dioClient);
+  final sevenTVApiService = SevenTVApi(dioClient);
+
+  // Create global assets store (shared cache for global emotes/badges)
+  final globalAssetsStore = GlobalAssetsStore(
+    twitchApi: twitchApiService,
+    bttvApi: bttvApiService,
+    ffzApi: ffzApiService,
+    sevenTVApi: sevenTVApiService,
+  );
 
   // Create and initialize the authentication store
   final authStore = AuthStore(twitchApi: twitchApiService);
+
+  // Add the auth interceptor to the Dio client after AuthStore creation
+  dioClient.interceptors.add(TwitchAuthInterceptor(authStore));
+
+  // Add the unauthorized interceptor to catch 401 errors
+  dioClient.interceptors.add(UnauthorizedInterceptor(authStore));
+
   await authStore.init();
 
   runApp(
     MultiProvider(
       providers: [
-        Provider<AuthStore>(create: (_) => authStore),
-        Provider<SettingsStore>(create: (_) => settingsStore),
-        Provider<TwitchApi>(create: (_) => twitchApiService),
-        Provider<BTTVApi>(create: (_) => bttvApiService),
-        Provider<FFZApi>(create: (_) => ffzApiService),
-        Provider<SevenTVApi>(create: (_) => sevenTVApiService),
+        Provider<AuthStore>.value(value: authStore),
+        Provider<SettingsStore>.value(value: settingsStore),
+        Provider<TwitchApi>.value(value: twitchApiService),
+        Provider<BTTVApi>.value(value: bttvApiService),
+        Provider<FFZApi>.value(value: ffzApiService),
+        Provider<SevenTVApi>.value(value: sevenTVApiService),
+        Provider<GlobalAssetsStore>.value(value: globalAssetsStore),
       ],
       child: MyApp(firstRun: firstRun),
     ),
@@ -105,10 +124,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 class MyApp extends StatefulWidget {
   final bool firstRun;
 
-  const MyApp({
-    super.key,
-    this.firstRun = false,
-  });
+  const MyApp({super.key, this.firstRun = false});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -137,8 +153,9 @@ class _MyAppState extends State<MyApp> {
     return Observer(
       builder: (context) {
         final settingsStore = context.read<SettingsStore>();
-        final themes = 
-		    FrostyThemes(colorSchemeSeed: Color(settingsStore.accentColor));
+        final themes = FrostyThemes(
+          colorSchemeSeed: Color(settingsStore.accentColor),
+        );
 
         return Provider<FrostyThemes>(
           create: (_) => themes,
@@ -149,8 +166,8 @@ class _MyAppState extends State<MyApp> {
             themeMode: settingsStore.themeType == ThemeType.system
                 ? ThemeMode.system
                 : settingsStore.themeType == ThemeType.light
-                    ? ThemeMode.light
-                    : ThemeMode.dark,
+                ? ThemeMode.light
+                : ThemeMode.dark,
             home: widget.firstRun ? const OnboardingIntro() : const Home(),
             navigatorKey: navigatorKey,
           ),
@@ -198,12 +215,8 @@ class _MyAppState extends State<MyApp> {
 
       try {
         final twitchApi = context.read<TwitchApi>();
-        final authStore = context.read<AuthStore>();
 
-        final user = await twitchApi.getUser(
-          userLogin: channelName,
-          headers: authStore.headersTwitch,
-        );
+        final user = await twitchApi.getUser(userLogin: channelName);
 
         final route = MaterialPageRoute(
           builder: (context) => VideoChat(
@@ -223,15 +236,18 @@ class _MyAppState extends State<MyApp> {
         debugPrint('Failed to open link $uri due to error: $e');
 
         if (navigatorKey.currentContext == null) return;
-        ScaffoldMessenger.of(navigatorKey.currentContext!)
-            .showSnackBar(failureSnackbar);
+        ScaffoldMessenger.of(
+          navigatorKey.currentContext!,
+        ).showSnackBar(failureSnackbar);
       }
     }
     // TODO: Here we can implement handlers for other types of links
     else {
       // If we get here, it's a link format that we're unable to handle
       if (navigatorKey.currentContext == null) return;
-      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(failureSnackbar);
+      ScaffoldMessenger.of(
+        navigatorKey.currentContext!,
+      ).showSnackBar(failureSnackbar);
     }
   }
 

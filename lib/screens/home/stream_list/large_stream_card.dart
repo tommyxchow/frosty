@@ -4,15 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
-import 'package:frosty/screens/channel/video/video_bar.dart';
+import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
-import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
-import 'package:frosty/widgets/cached_image.dart';
-import 'package:frosty/widgets/loading_indicator.dart';
-import 'package:frosty/widgets/uptime.dart';
+import 'package:frosty/utils/modal_bottom_sheet.dart';
+import 'package:frosty/widgets/frosty_cached_network_image.dart';
+import 'package:frosty/widgets/skeleton_loader.dart';
 import 'package:frosty/widgets/user_actions_modal.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class LargeStreamCard extends StatelessWidget {
@@ -45,98 +43,32 @@ class LargeStreamCard extends StatelessWidget {
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
     final thumbnailWidth = min((size.width * pixelRatio) ~/ 1, 1920);
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
-    final surfaceColor =
-        context.watch<FrostyThemes>().dark.colorScheme.onSurface;
 
-    final thumbnail = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
-      child: Stack(
-        alignment: Alignment.bottomLeft,
-        children: [
-          Container(
-            foregroundDecoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.8, 1.0],
-                colors: [
-                  Colors.transparent,
-                  Colors.black,
-                ],
-              ),
+    final thumbnail = SizedBox(
+      width: double.infinity,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: FrostyCachedNetworkImage(
+            imageUrl: streamInfo.thumbnailUrl.replaceFirst(
+              '-{width}x{height}',
+              '-${thumbnailWidth}x$thumbnailHeight',
             ),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: FrostyCachedNetworkImage(
-                imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-                  '-{width}x{height}',
-                  '-${thumbnailWidth}x$thumbnailHeight',
-                ),
-                cacheKey: cacheKey,
-                placeholder: (context, url) => ColoredBox(
-                  color: Theme.of(context).colorScheme.surfaceContainer,
-                  child: const LoadingIndicator(),
-                ),
-                useOldImageOnUrlChange: true,
-              ),
+            cacheKey: cacheKey,
+            placeholder: (context, url) => const SkeletonLoader(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
             ),
+            useOldImageOnUrlChange: true,
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Tooltip(
-                  message: 'Stream uptime',
-                  preferBelow: false,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.circle,
-                        color: Colors.red,
-                        size: 10,
-                      ),
-                      const SizedBox(width: 4),
-                      Uptime(
-                        startTime: streamInfo.startedAt,
-                        style: TextStyle(
-                          color: surfaceColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Tooltip(
-                  message: 'Viewer count',
-                  preferBelow: false,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.visibility,
-                        size: 14,
-                        color: surfaceColor,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        NumberFormat().format(streamInfo.viewerCount),
-                        style: TextStyle(
-                          color: surfaceColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
 
-    final streamerName =
-        getReadableName(streamInfo.userName, streamInfo.userLogin);
+    final streamerName = getReadableName(
+      streamInfo.userName,
+      streamInfo.userLogin,
+    );
 
     return InkWell(
       onTap: () => Navigator.push(
@@ -152,7 +84,7 @@ class LargeStreamCard extends StatelessWidget {
       onLongPress: () {
         HapticFeedback.mediumImpact();
 
-        showModalBottomSheet(
+        showModalBottomSheetWithProperFocus(
           context: context,
           builder: (context) => UserActionsModal(
             authStore: context.read<AuthStore>(),
@@ -165,17 +97,20 @@ class LargeStreamCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: showThumbnail ? 12 : 4,
-          horizontal: 16,
+        padding: EdgeInsets.only(
+          top: showThumbnail ? 12 : 4,
+          bottom: showThumbnail ? 12 : 4,
+          left: 16 + MediaQuery.of(context).padding.left,
+          right: 16 + MediaQuery.of(context).padding.right,
         ),
         child: Column(
           children: [
             if (showThumbnail) thumbnail,
-            VideoBar(
+            StreamInfoBar(
               streamInfo: streamInfo,
               showCategory: showCategory,
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              tooltipTriggerMode: TooltipTriggerMode.longPress,
             ),
           ],
         ),

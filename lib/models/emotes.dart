@@ -12,12 +12,7 @@ class EmoteTwitch {
   final String? emoteType;
   final String? ownerId;
 
-  const EmoteTwitch(
-    this.id,
-    this.name,
-    this.emoteType,
-    this.ownerId,
-  );
+  const EmoteTwitch(this.id, this.name, this.emoteType, this.ownerId);
 
   factory EmoteTwitch.fromJson(Map<String, dynamic> json) =>
       _$EmoteTwitchFromJson(json);
@@ -29,10 +24,7 @@ class EmoteBTTV {
   final String id;
   final String code;
 
-  const EmoteBTTV(
-    this.id,
-    this.code,
-  );
+  const EmoteBTTV(this.id, this.code);
 
   factory EmoteBTTV.fromJson(Map<String, dynamic> json) =>
       _$EmoteBTTVFromJson(json);
@@ -43,10 +35,7 @@ class EmoteBTTVChannel {
   final List<EmoteBTTV> channelEmotes;
   final List<EmoteBTTV> sharedEmotes;
 
-  const EmoteBTTVChannel(
-    this.channelEmotes,
-    this.sharedEmotes,
-  );
+  const EmoteBTTVChannel(this.channelEmotes, this.sharedEmotes);
 
   factory EmoteBTTVChannel.fromJson(Map<String, dynamic> json) =>
       _$EmoteBTTVChannelFromJson(json);
@@ -59,11 +48,7 @@ class RoomFFZ {
   final ImagesFFZ? vipBadge;
   final ImagesFFZ? modUrls;
 
-  const RoomFFZ(
-    this.set,
-    this.vipBadge,
-    this.modUrls,
-  );
+  const RoomFFZ(this.set, this.vipBadge, this.modUrls);
 
   factory RoomFFZ.fromJson(Map<String, dynamic> json) =>
       _$RoomFFZFromJson(json);
@@ -78,11 +63,7 @@ class ImagesFFZ {
   @JsonKey(name: '4')
   final String? url4x;
 
-  const ImagesFFZ(
-    this.url1x,
-    this.url2x,
-    this.url4x,
-  );
+  const ImagesFFZ(this.url1x, this.url2x, this.url4x);
 
   factory ImagesFFZ.fromJson(Map<String, dynamic> json) =>
       _$ImagesFFZFromJson(json);
@@ -93,10 +74,7 @@ class OwnerFFZ {
   final String displayName;
   final String name;
 
-  const OwnerFFZ({
-    required this.displayName,
-    required this.name,
-  });
+  const OwnerFFZ({required this.displayName, required this.name});
 
   factory OwnerFFZ.fromJson(Map<String, dynamic> json) =>
       _$OwnerFFZFromJson(json);
@@ -130,11 +108,7 @@ class Emote7TV {
   final String name;
   final Emote7TVData data;
 
-  const Emote7TV(
-    this.id,
-    this.name,
-    this.data,
-  );
+  const Emote7TV(this.id, this.name, this.data);
 
   factory Emote7TV.fromJson(Map<String, dynamic> json) =>
       _$Emote7TVFromJson(json);
@@ -145,10 +119,7 @@ class Owner7TV {
   final String username;
   final String displayName;
 
-  const Owner7TV({
-    required this.username,
-    required this.displayName,
-  });
+  const Owner7TV({required this.username, required this.displayName});
 
   factory Owner7TV.fromJson(Map<String, dynamic> json) =>
       _$Owner7TVFromJson(json);
@@ -162,13 +133,7 @@ class Emote7TVData {
   final Owner7TV? owner;
   final Emote7TVHost host;
 
-  const Emote7TVData(
-    this.id,
-    this.name,
-    this.flags,
-    this.owner,
-    this.host,
-  );
+  const Emote7TVData(this.id, this.name, this.flags, this.owner, this.host);
 
   factory Emote7TVData.fromJson(Map<String, dynamic> json) =>
       _$Emote7TVDataFromJson(json);
@@ -179,10 +144,7 @@ class Emote7TVHost {
   final String url;
   final List<Emote7TVFile> files;
 
-  Emote7TVHost(
-    this.url,
-    this.files,
-  );
+  Emote7TVHost(this.url, this.files);
 
   factory Emote7TVHost.fromJson(Map<String, dynamic> json) =>
       _$Emote7TVHostFromJson(json);
@@ -195,12 +157,7 @@ class Emote7TVFile {
   final int height;
   final String format;
 
-  Emote7TVFile(
-    this.name,
-    this.width,
-    this.height,
-    this.format,
-  );
+  Emote7TVFile(this.name, this.width, this.height, this.format);
 
   factory Emote7TVFile.fromJson(Map<String, dynamic> json) =>
       _$Emote7TVFileFromJson(json);
@@ -234,36 +191,37 @@ class Emote {
   });
 
   factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) => Emote(
-        name: emote.name,
-        zeroWidth: false,
-        url:
-            'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
-        type: type,
-        ownerId: emote.ownerId,
-      );
+    name: emote.name,
+    zeroWidth: false,
+    url:
+        'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
+    type: type,
+    ownerId: emote.ownerId,
+  );
 
   factory Emote.fromBTTV(EmoteBTTV emote, EmoteType type) => Emote(
-        name: emote.code,
-        zeroWidth: zeroWidthEmotes.contains(emote.code),
-        url: 'https://cdn.betterttv.net/emote/${emote.id}/3x',
-        type: type,
-      );
+    name: emote.code,
+    zeroWidth: zeroWidthEmotes.contains(emote.code),
+    url: 'https://cdn.betterttv.net/emote/${emote.id}/3x',
+    type: type,
+  );
 
   factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
-        name: emote.name,
-        zeroWidth: false,
-        width: emote.width,
-        height: emote.height,
-        url: emote.animated?.url4x ??
-            emote.animated?.url2x ??
-            emote.animated?.url1x ??
-            emote.urls.url4x ??
-            emote.urls.url2x ??
-            emote.urls.url1x,
-        type: type,
-        ownerDisplayName: emote.owner.displayName,
-        ownerUsername: emote.owner.name,
-      );
+    name: emote.name,
+    zeroWidth: false,
+    width: emote.width,
+    height: emote.height,
+    url:
+        emote.animated?.url4x ??
+        emote.animated?.url2x ??
+        emote.animated?.url1x ??
+        emote.urls.url4x ??
+        emote.urls.url2x ??
+        emote.urls.url1x,
+    type: type,
+    ownerDisplayName: emote.owner.displayName,
+    ownerUsername: emote.owner.name,
+  );
 
   factory Emote.from7TV(Emote7TV emote, EmoteType type) {
     final emoteData = emote.data;
