@@ -18,7 +18,14 @@ class SearchResultsCategories extends StatelessWidget {
       builder: (context) {
         final future = searchStore.categoryFuture;
 
+        // Show skeletons immediately while waiting for debounce.
         if (future == null) {
+          if (searchStore.isSearching) {
+            return SliverList.builder(
+              itemCount: 8,
+              itemBuilder: (context, index) => const CategorySkeletonLoader(),
+            );
+          }
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 

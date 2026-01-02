@@ -72,7 +72,15 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
       builder: (context) {
         final future = widget.searchStore.channelFuture;
 
+        // Show skeletons immediately while waiting for debounce.
         if (future == null) {
+          if (widget.searchStore.isSearching) {
+            return SliverList.builder(
+              itemCount: 8,
+              itemBuilder: (context, index) =>
+                  ChannelSkeletonLoader(index: index),
+            );
+          }
           return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/category.dart';
@@ -19,11 +21,16 @@ abstract class SearchStoreBase with Store {
 
   final textFieldFocusNode = FocusNode();
 
+  Timer? _debounceTimer;
+
   @readonly
   var _searchText = '';
 
   @readonly
   var _searchHistory = ObservableList<String>();
+
+  @readonly
+  var _isSearching = false;
 
   @readonly
   ObservableFuture<List<ChannelQuery>>? _channelFuture;
@@ -57,14 +64,47 @@ abstract class SearchStoreBase with Store {
     );
   }
 
+  /// Debounced handler for search-as-you-type.
+  @action
+  void onSearchTextChanged(String query) {
+    _debounceTimer?.cancel();
+
+    if (query.isEmpty) {
+      _isSearching = false;
+      _channelFuture = null;
+      _categoryFuture = null;
+      return;
+    }
+
+    // Show loading state immediately for responsive feedback.
+    _isSearching = true;
+
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      runInAction(() => _performSearch(query));
+    });
+  }
+
   /// Obtain the channels and categories that match the provided [query].
+  /// Adds the query to search history.
   @action
   void handleQuery(String query) {
     if (query.isEmpty) return;
 
+    // Cancel any pending debounce since we're searching immediately.
+    _debounceTimer?.cancel();
+
     // Move the query to the most recent result (top of the stack).
     _searchHistory.remove(query);
     _searchHistory.insert(0, query);
+
+    _performSearch(query);
+  }
+
+  /// Performs the actual search API calls.
+  @action
+  void _performSearch(String query) {
+    // Futures are now pending, so isSearching can be cleared.
+    _isSearching = false;
 
     // Fetch the matching channels, sort it by live status, and then set it.
     _channelFuture = twitchApi.searchChannels(query: query).then((channels) {
@@ -96,6 +136,7 @@ abstract class SearchStoreBase with Store {
   }
 
   void dispose() {
+    _debounceTimer?.cancel();
     textEditingController.dispose();
     textFieldFocusNode.dispose();
   }

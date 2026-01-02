@@ -41,7 +41,7 @@ class _SearchState extends State<Search> {
         Positioned.fill(
           child: Observer(
             builder: (context) {
-              if (_searchStore.textEditingController.text.isEmpty) {
+              if (_searchStore.searchText.isEmpty) {
                 if (_searchStore.searchHistory.isEmpty) {
                   // Keep controller attached so borders stay in sync
                   return CustomScrollView(
@@ -202,6 +202,7 @@ class _SearchState extends State<Search> {
                         controller: _searchStore.textEditingController,
                         focusNode: _searchStore.textFieldFocusNode,
                         autocorrect: false,
+                        onChanged: _searchStore.onSearchTextChanged,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.search_rounded),
                           hintText: 'Search channels or categories',
@@ -218,6 +219,7 @@ class _SearchState extends State<Search> {
                                       _searchStore.textFieldFocusNode.unfocus();
                                     }
                                     _searchStore.textEditingController.clear();
+                                    _searchStore.onSearchTextChanged('');
                                     // Ensure borders reset: scroll back to top and trigger listeners
                                     if (widget.scrollController.hasClients) {
                                       widget.scrollController.animateTo(

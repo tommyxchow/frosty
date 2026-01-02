@@ -49,6 +49,26 @@ mixin _$SearchStore on SearchStoreBase, Store {
     });
   }
 
+  late final _$_isSearchingAtom = Atom(
+    name: 'SearchStoreBase._isSearching',
+    context: context,
+  );
+
+  bool get isSearching {
+    _$_isSearchingAtom.reportRead();
+    return super._isSearching;
+  }
+
+  @override
+  bool get _isSearching => isSearching;
+
+  @override
+  set _isSearching(bool value) {
+    _$_isSearchingAtom.reportWrite(value, super._isSearching, () {
+      super._isSearching = value;
+    });
+  }
+
   late final _$_channelFutureAtom = Atom(
     name: 'SearchStoreBase._channelFuture',
     context: context,
@@ -105,12 +125,36 @@ mixin _$SearchStore on SearchStoreBase, Store {
   );
 
   @override
+  void onSearchTextChanged(String query) {
+    final _$actionInfo = _$SearchStoreBaseActionController.startAction(
+      name: 'SearchStoreBase.onSearchTextChanged',
+    );
+    try {
+      return super.onSearchTextChanged(query);
+    } finally {
+      _$SearchStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void handleQuery(String query) {
     final _$actionInfo = _$SearchStoreBaseActionController.startAction(
       name: 'SearchStoreBase.handleQuery',
     );
     try {
       return super.handleQuery(query);
+    } finally {
+      _$SearchStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _performSearch(String query) {
+    final _$actionInfo = _$SearchStoreBaseActionController.startAction(
+      name: 'SearchStoreBase._performSearch',
+    );
+    try {
+      return super._performSearch(query);
     } finally {
       _$SearchStoreBaseActionController.endAction(_$actionInfo);
     }
