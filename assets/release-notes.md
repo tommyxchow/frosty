@@ -1,6 +1,6 @@
 ## v5.0.0
 
-December 29, 2025
+January 1, 2026
 
 ### New Features
 
