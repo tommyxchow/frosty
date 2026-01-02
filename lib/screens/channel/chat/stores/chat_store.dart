@@ -117,6 +117,10 @@ abstract class ChatStoreBase with Store {
   /// Reference to the current countdown message for direct updates (avoids O(n) search).
   IRCMessage? _countdownMessage;
 
+  /// Tracks whether the initial chat delay sync has completed for the current session.
+  /// Prevents the countdown from re-appearing when latency updates arrive after initial sync.
+  bool _chatDelaySyncCompleted = false;
+
   /// The current timer for the sleep timer if active.
   Timer? sleepTimer;
 
@@ -238,6 +242,7 @@ abstract class ChatStoreBase with Store {
           _startChatDelayCountdown();
         } else if (!showVideo) {
           _cancelChatDelayCountdown();
+          _chatDelaySyncCompleted = false;
         }
       }),
     );
@@ -248,9 +253,11 @@ abstract class ChatStoreBase with Store {
       reaction((_) => settings.chatDelay, (chatDelay) {
         if (chatDelay == 0) {
           _cancelChatDelayCountdown();
+          _chatDelaySyncCompleted = false;
         } else if (settings.autoSyncChatDelay &&
             settings.showVideo &&
-            chatDelay > 0) {
+            chatDelay > 0 &&
+            !_chatDelaySyncCompleted) {
           _startChatDelayCountdown();
         }
       }),
@@ -674,6 +681,7 @@ abstract class ChatStoreBase with Store {
 
         // Cancel chat delay countdown when disconnecting
         _cancelChatDelayCountdown();
+        _chatDelaySyncCompleted = false;
 
         if (_shouldDisconnect) {
           _sevenTVChannel?.sink.close(1000);
@@ -842,6 +850,7 @@ abstract class ChatStoreBase with Store {
             _messages.removeAt(index);
             _countdownMessage = null;
             _chatDelayCountdownTimer = null;
+            _chatDelaySyncCompleted = true;
             timer.cancel();
           }
         } else {
