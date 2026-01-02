@@ -107,10 +107,6 @@ void main() {
       });
 
       test('does not match email addresses as URLs', () {
-        // The regex is for URLs/files, not email
-        // Check if email patterns cause false positives
-        final text = 'user@example.com';
-        // Should match example.com part but not the whole email
         expect(regexLink.hasMatch('example.com'), isTrue);
       });
     });

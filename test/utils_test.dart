@@ -151,7 +151,6 @@ void main() {
               adjusted45 = adjustChatNameColor(
                 context,
                 greyColor,
-                targetContrast: 4.5,
               );
               adjusted30 = adjustChatNameColor(
                 context,

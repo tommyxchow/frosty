@@ -297,7 +297,6 @@ void main() {
         raw: '',
         command: Command.clearChat,
         tags: {},
-        message: null,
       );
 
       IRCMessage.clearChat(
