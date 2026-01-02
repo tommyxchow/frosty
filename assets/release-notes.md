@@ -1,3 +1,19 @@
+## v5.0.1
+
+January 2, 2026
+
+### Improvements
+
+- [Android] Enhanced video rendering is now enabled by default for better performance. Disable in settings if you experience crashes.
+- [Android] Re-enabled Flutter Impeller rendering engine for better performance.
+- Restored the "Show latency" setting in video overlay options.
+
+### Bug Fixes
+
+- [Android] Potentially fixed crash on app startup related to secure storage.
+
+---
+
 ## v5.0.0
 
 January 1, 2026
