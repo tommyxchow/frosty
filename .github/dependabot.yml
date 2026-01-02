@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # Keep GitHub Actions up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # Keep Ruby gems (fastlane) up to date
+  - package-ecosystem: "bundler"
+    directory: "/android"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "bundler"
+    directory: "/ios"
+    schedule:
+      interval: "monthly"
+
+  # Keep Dart/Flutter packages up to date
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
