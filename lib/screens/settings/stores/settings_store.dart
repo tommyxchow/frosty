@@ -64,7 +64,7 @@ abstract class _SettingsStoreBase with Store {
   // Player defaults
   static const defaultShowVideo = true;
   static const defaultDefaultToHighestQuality = false;
-  static const defaultUseEnhancedRendering = false;
+  static const defaultUseEnhancedRendering = true;
 
   // Overlay defaults
   static const defaultShowOverlay = true;

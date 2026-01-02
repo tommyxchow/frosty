@@ -22,7 +22,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
   ..showVideo = json['showVideo'] as bool? ?? true
   ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
-  ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? false
+  ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? true
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
   ..showLatency = json['showLatency'] as bool? ?? true

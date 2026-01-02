@@ -35,7 +35,7 @@ class VideoSettings extends StatelessWidget {
             SettingsListSwitch(
               title: 'Use enhanced rendering',
               subtitle: const Text(
-                'Enables a newer WebView rendering method that improves performance. May cause random crashes on some devices.',
+                'Uses a faster WebView rendering method. Disable if you experience crashes while watching streams.',
               ),
               value: settingsStore.useEnhancedRendering,
               onChanged: (newValue) =>
