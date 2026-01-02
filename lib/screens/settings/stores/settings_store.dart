@@ -69,6 +69,7 @@ abstract class _SettingsStoreBase with Store {
   // Overlay defaults
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
+  static const defaultShowLatency = true;
 
   // Player options
   @JsonKey(defaultValue: defaultShowVideo)
@@ -92,6 +93,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var toggleableOverlay = defaultToggleableOverlay;
 
+  @JsonKey(defaultValue: defaultShowLatency)
+  @observable
+  var showLatency = defaultShowLatency;
+
   @action
   void resetVideoSettings() {
     showVideo = defaultShowVideo;
@@ -100,6 +105,7 @@ abstract class _SettingsStoreBase with Store {
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
+    showLatency = defaultShowLatency;
   }
 
   // * Chat Settings

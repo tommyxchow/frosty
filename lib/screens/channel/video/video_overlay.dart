@@ -487,35 +487,36 @@ class VideoOverlay extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Tooltip(
-                                message: 'Latency to broadcaster',
-                                preferBelow: false,
-                                triggerMode: TooltipTriggerMode.tap,
-                                child: Row(
-                                  spacing: 4,
-                                  children: [
-                                    Icon(
-                                      Icons.speed_rounded,
-                                      size: 14,
-                                      color: surfaceColor,
-                                      shadows: _iconShadow,
-                                    ),
-                                    Observer(
-                                      builder: (context) => Text(
-                                        videoStore.latency ?? '—',
-                                        style: TextStyle(
-                                          color: surfaceColor,
-                                          fontWeight: FontWeight.w500,
-                                          fontFeatures: const [
-                                            FontFeature.tabularFigures(),
-                                          ],
-                                          shadows: _textShadow,
+                              if (settingsStore.showLatency)
+                                Tooltip(
+                                  message: 'Latency to broadcaster',
+                                  preferBelow: false,
+                                  triggerMode: TooltipTriggerMode.tap,
+                                  child: Row(
+                                    spacing: 4,
+                                    children: [
+                                      Icon(
+                                        Icons.speed_rounded,
+                                        size: 14,
+                                        color: surfaceColor,
+                                        shadows: _iconShadow,
+                                      ),
+                                      Observer(
+                                        builder: (context) => Text(
+                                          videoStore.latency ?? '—',
+                                          style: TextStyle(
+                                            color: surfaceColor,
+                                            fontWeight: FontWeight.w500,
+                                            fontFeatures: const [
+                                              FontFeature.tabularFigures(),
+                                            ],
+                                            shadows: _textShadow,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),

@@ -25,6 +25,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? false
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
+  ..showLatency = json['showLatency'] as bool? ?? true
   ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
   ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
   ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
@@ -101,6 +102,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'useEnhancedRendering': instance.useEnhancedRendering,
   'showOverlay': instance.showOverlay,
   'toggleableOverlay': instance.toggleableOverlay,
+  'showLatency': instance.showLatency,
   'badgeScale': instance.badgeScale,
   'emoteScale': instance.emoteScale,
   'messageScale': instance.messageScale,
@@ -349,6 +351,24 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set toggleableOverlay(bool value) {
     _$toggleableOverlayAtom.reportWrite(value, super.toggleableOverlay, () {
       super.toggleableOverlay = value;
+    });
+  }
+
+  late final _$showLatencyAtom = Atom(
+    name: '_SettingsStoreBase.showLatency',
+    context: context,
+  );
+
+  @override
+  bool get showLatency {
+    _$showLatencyAtom.reportRead();
+    return super.showLatency;
+  }
+
+  @override
+  set showLatency(bool value) {
+    _$showLatencyAtom.reportWrite(value, super.showLatency, () {
+      super.showLatency = value;
     });
   }
 
@@ -1104,6 +1124,7 @@ defaultToHighestQuality: ${defaultToHighestQuality},
 useEnhancedRendering: ${useEnhancedRendering},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
+showLatency: ${showLatency},
 badgeScale: ${badgeScale},
 emoteScale: ${emoteScale},
 messageScale: ${messageScale},

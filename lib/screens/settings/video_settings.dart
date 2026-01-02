@@ -58,6 +58,14 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.toggleableOverlay,
             onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
           ),
+          SettingsListSwitch(
+            title: 'Show latency',
+            subtitle: const Text(
+              'Displays the stream latency in the video overlay.',
+            ),
+            value: settingsStore.showLatency,
+            onChanged: (newValue) => settingsStore.showLatency = newValue,
+          ),
         ],
       ),
     );
