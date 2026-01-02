@@ -54,11 +54,16 @@ void main() async {
 
   // Workaround for clearing stored tokens on uninstall.
   // If first time running app, will clear all tokens in the secure storage.
+  // Run non-blocking to avoid ANR on slow Android devices (especially Android 14).
   if (firstRun) {
     debugPrint('Clearing secure storage...');
     const storage = FlutterSecureStorage();
 
-    await storage.deleteAll();
+    // Don't block - run in background after app starts.
+    // This is safe because first run means no active session depends on this data.
+    unawaited(storage.deleteAll().catchError((e) {
+      debugPrint('Error clearing secure storage: $e');
+    }));
   }
 
   await initUtils();
@@ -183,8 +188,11 @@ class _MyAppState extends State<MyApp> {
         handleDeepLink(uri);
       });
 
-      // Handle the initial link if app was opened from a link
-      final initialLink = await _appLinks.getInitialLink();
+      // Handle the initial link if app was opened from a link.
+      // Add timeout to prevent indefinite blocking on certain Android lifecycle states.
+      final initialLink = await _appLinks
+          .getInitialLink()
+          .timeout(const Duration(seconds: 3), onTimeout: () => null);
       if (initialLink != null) {
         handleDeepLink(initialLink);
       }
