@@ -31,18 +31,21 @@ class Chat extends StatelessWidget {
         return Column(
           children: [
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  if (chatStore.assetsStore.showEmoteMenu) {
-                    chatStore.assetsStore.showEmoteMenu = false;
-                  } else if (chatStore.textFieldFocusNode.hasFocus) {
-                    chatStore.unfocusInput();
-                  }
-                },
-                child: Stack(
-                  alignment: AlignmentDirectional.bottomCenter,
-                  children: [
-                    MediaQuery(
+              child: Stack(
+                alignment: AlignmentDirectional.bottomCenter,
+                children: [
+                  // Wrap only the message list with GestureDetector
+                  // so taps on ChatBottomBar don't trigger unfocus
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      if (chatStore.assetsStore.showEmoteMenu) {
+                        chatStore.assetsStore.showEmoteMenu = false;
+                      } else if (chatStore.textFieldFocusNode.hasFocus) {
+                        chatStore.unfocusInput();
+                      }
+                    },
+                    child: MediaQuery(
                       data: MediaQuery.of(context).copyWith(
                         textScaler: chatStore.settings.messageScale.textScaler,
                       ),
@@ -93,68 +96,66 @@ class Chat extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Prevents accidental chat scrolling when swiping down from the top edge
-                    // to access system UI (Notification Center/Control Center) in landscape mode.
-                    if (context.isLandscape)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: 24,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.translucent,
-                          onVerticalDragStart: (_) {},
-                        ),
-                      ),
+                  ),
+                  // Prevents accidental chat scrolling when swiping down from the top edge
+                  // to access system UI (Notification Center/Control Center) in landscape mode.
+                  if (context.isLandscape)
                     Positioned(
+                      top: 0,
                       left: 0,
                       right: 0,
-                      bottom: 0,
-                      child: ChatBottomBar(
-                        chatStore: chatStore,
-                        onAddChat: onAddChat,
+                      height: 24,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onVerticalDragStart: (_) {},
                       ),
                     ),
-                    AnimatedPadding(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.only(
-                        left: 4,
-                        top: 4,
-                        right: 4,
-                        bottom:
-                            68 +
-                            (chatStore.assetsStore.showEmoteMenu
-                                ? 0
-                                : MediaQuery.of(context).padding.bottom),
-                      ),
-                      child: Observer(
-                        builder: (_) => AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          switchInCurve: Curves.easeOut,
-                          switchOutCurve: Curves.easeIn,
-                          child: chatStore.autoScroll
-                              ? null
-                              : ElevatedButton.icon(
-                                  onPressed: chatStore.resumeScroll,
-                                  icon: const Icon(
-                                    Icons.arrow_downward_rounded,
-                                  ),
-                                  label: Text(
-                                    chatStore.messageBuffer.isNotEmpty
-                                        ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
-                                        : 'Resume scroll',
-                                    style: const TextStyle(
-                                      fontFeatures: [
-                                        FontFeature.tabularFigures(),
-                                      ],
-                                    ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: ChatBottomBar(
+                      chatStore: chatStore,
+                      onAddChat: onAddChat,
+                    ),
+                  ),
+                  AnimatedPadding(
+                    duration: const Duration(milliseconds: 200),
+                    padding: EdgeInsets.only(
+                      left: 4,
+                      top: 4,
+                      right: 4,
+                      bottom:
+                          68 +
+                          (chatStore.assetsStore.showEmoteMenu
+                              ? 0
+                              : MediaQuery.of(context).padding.bottom),
+                    ),
+                    child: Observer(
+                      builder: (_) => AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        switchInCurve: Curves.easeOut,
+                        switchOutCurve: Curves.easeIn,
+                        child: chatStore.autoScroll
+                            ? null
+                            : ElevatedButton.icon(
+                                onPressed: chatStore.resumeScroll,
+                                icon: const Icon(Icons.arrow_downward_rounded),
+                                label: Text(
+                                  chatStore.messageBuffer.isNotEmpty
+                                      ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
+                                      : 'Resume scroll',
+                                  style: const TextStyle(
+                                    fontFeatures: [
+                                      FontFeature.tabularFigures(),
+                                    ],
                                   ),
                                 ),
-                        ),
+                              ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             AnimatedContainer(

@@ -84,10 +84,10 @@ class ChatBottomBar extends StatelessWidget {
         final isFullscreenOverlay =
             chatStore.settings.fullScreen && context.isLandscape;
 
+        // Check if chat delay is active (for indicator only, doesn't block input)
         final hasChatDelay =
             chatStore.settings.showVideo && chatStore.settings.chatDelay > 0;
-        final delayTooltipMessage =
-            'Chatting is disabled due to message delay (${chatStore.settings.chatDelay.toInt()}s)';
+
         const loginTooltipMessage = 'Log in to chat';
 
         final bottomBarContent = Column(
@@ -128,40 +128,44 @@ class ChatBottomBar extends StatelessWidget {
                 ),
               ),
             ],
+            // Wrap autocomplete sections with TextFieldTapRegion so taps
+            // on them don't trigger TextField's onTapOutside callback.
             if (chatStore.settings.autocomplete &&
                 chatStore.showEmoteAutocomplete &&
                 matchingEmotes.isNotEmpty) ...[
               const Divider(),
-              SizedBox(
-                height: 50,
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(4),
-                  itemCount: matchingEmotes.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) => InkWell(
-                    onTap: () => chatStore.addEmote(
-                      matchingEmotes[index],
-                      autocompleteMode: true,
-                    ),
-                    onLongPress: () {
-                      HapticFeedback.lightImpact();
+              TextFieldTapRegion(
+                child: SizedBox(
+                  height: 50,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(4),
+                    itemCount: matchingEmotes.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) => InkWell(
+                      onTap: () => chatStore.addEmote(
+                        matchingEmotes[index],
+                        autocompleteMode: true,
+                      ),
+                      onLongPress: () {
+                        HapticFeedback.lightImpact();
 
-                      IRCMessage.showEmoteDetailsBottomSheet(
-                        context,
-                        emote: matchingEmotes[index],
-                        launchExternal: chatStore.settings.launchUrlExternal,
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Center(
-                        child: FrostyCachedNetworkImage(
-                          imageUrl: matchingEmotes[index].url,
-                          useFade: false,
-                          height:
-                              matchingEmotes[index].height?.toDouble() ??
-                              defaultEmoteSize,
-                          width: matchingEmotes[index].width?.toDouble(),
+                        IRCMessage.showEmoteDetailsBottomSheet(
+                          context,
+                          emote: matchingEmotes[index],
+                          launchExternal: chatStore.settings.launchUrlExternal,
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Center(
+                          child: FrostyCachedNetworkImage(
+                            imageUrl: matchingEmotes[index].url,
+                            useFade: false,
+                            height:
+                                matchingEmotes[index].height?.toDouble() ??
+                                defaultEmoteSize,
+                            width: matchingEmotes[index].width?.toDouble(),
+                          ),
                         ),
                       ),
                     ),
@@ -173,30 +177,32 @@ class ChatBottomBar extends StatelessWidget {
                 chatStore.showMentionAutocomplete &&
                 matchingChatters.isNotEmpty) ...[
               const Divider(),
-              SizedBox(
-                height: 50,
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(4),
-                  itemCount: matchingChatters.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) => TextButton(
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                    onPressed: () {
-                      final split = chatStore.textController.text.split(' ')
-                        ..removeLast()
-                        ..add('@${matchingChatters[index]} ');
+              TextFieldTapRegion(
+                child: SizedBox(
+                  height: 50,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(4),
+                    itemCount: matchingChatters.length,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) => TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                      onPressed: () {
+                        final split = chatStore.textController.text.split(' ')
+                          ..removeLast()
+                          ..add('@${matchingChatters[index]} ');
 
-                      chatStore.textController.text = split.join(' ');
-                      chatStore.textController.selection =
-                          TextSelection.fromPosition(
-                            TextPosition(
-                              offset: chatStore.textController.text.length,
-                            ),
-                          );
-                    },
-                    child: Text(matchingChatters[index]),
+                        chatStore.textController.text = split.join(' ');
+                        chatStore.textController.selection =
+                            TextSelection.fromPosition(
+                              TextPosition(
+                                offset: chatStore.textController.text.length,
+                              ),
+                            );
+                      },
+                      child: Text(matchingChatters[index]),
+                    ),
                   ),
                 ),
               ),
@@ -211,16 +217,14 @@ class ChatBottomBar extends StatelessWidget {
                       context.isLandscape)
                     Builder(
                       builder: (context) {
-                        final isDisabled =
-                            !chatStore.auth.isLoggedIn || hasChatDelay;
+                        final isDisabled = !chatStore.auth.isLoggedIn;
 
                         return GestureDetector(
                           onTap: isDisabled
                               ? () {
-                                  final message = hasChatDelay
-                                      ? delayTooltipMessage
-                                      : loginTooltipMessage;
-                                  chatStore.updateNotification(message);
+                                  chatStore.updateNotification(
+                                    loginTooltipMessage,
+                                  );
                                 }
                               : null,
                           child: IconButton(
@@ -242,16 +246,14 @@ class ChatBottomBar extends StatelessWidget {
                         builder: (context) {
                           final isDisabled =
                               !chatStore.auth.isLoggedIn ||
-                              chatStore.isSendingMessage ||
-                              hasChatDelay;
+                              chatStore.isSendingMessage;
 
                           return GestureDetector(
                             onTap: isDisabled && !chatStore.isSendingMessage
                                 ? () {
-                                    final message = hasChatDelay
-                                        ? delayTooltipMessage
-                                        : loginTooltipMessage;
-                                    chatStore.updateNotification(message);
+                                    chatStore.updateNotification(
+                                      loginTooltipMessage,
+                                    );
                                   }
                                 : null,
                             child: TextField(
@@ -259,7 +261,7 @@ class ChatBottomBar extends StatelessWidget {
                               focusNode: chatStore.textFieldFocusNode,
                               minLines: 1,
                               maxLines: 3,
-                              // Disable text field when sending message, when not logged in, or when chat delay is active
+                              // Disable text field when sending message or when not logged in
                               enabled: !isDisabled,
                               decoration: InputDecoration(
                                 prefixIcon:
@@ -283,6 +285,8 @@ class ChatBottomBar extends StatelessWidget {
                                           ? 'Sending...'
                                           : chatStore.replyingToMessage != null
                                           ? 'Reply'
+                                          : hasChatDelay
+                                          ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
                                           : 'Chat'
                                     : loginTooltipMessage,
                               ),
@@ -317,8 +321,7 @@ class ChatBottomBar extends StatelessWidget {
                               : const Icon(Icons.send_rounded),
                           onPressed:
                               chatStore.auth.isLoggedIn &&
-                                  !chatStore.isSendingMessage &&
-                                  !hasChatDelay
+                                  !chatStore.isSendingMessage
                               ? () => chatStore.sendMessage(
                                   chatStore.textController.text,
                                 )

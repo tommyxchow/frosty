@@ -74,14 +74,23 @@ class ChatTabs extends StatelessWidget {
           onPopInvokedWithResult: (didPop, _) {
             if (didPop) return;
 
-            // If pressing the back button on Android while the emote menu
-            // is open, close it instead of going back to the streams list.
+            // On Android back gesture, close overlays first before navigating back
             final activeStore = chatTabsStore.activeChatStore;
+
+            // Priority 1: Close emote menu
             if (activeStore.assetsStore.showEmoteMenu) {
               activeStore.assetsStore.showEmoteMenu = false;
-            } else {
-              Navigator.of(context).pop();
+              return;
             }
+
+            // Priority 2: Unfocus keyboard
+            if (activeStore.textFieldFocusNode.hasFocus) {
+              activeStore.unfocusInput();
+              return;
+            }
+
+            // Priority 3: Navigate back
+            Navigator.of(context).pop();
           },
           child: Stack(
             children: [
