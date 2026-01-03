@@ -69,6 +69,7 @@ dependencies:
     path_provider: ^2.1.5
     dio: ^5.9.0
     app_links: ^7.0.0
+    extended_text_field: ^16.0.2
 
 dev_dependencies:
     flutter_test:

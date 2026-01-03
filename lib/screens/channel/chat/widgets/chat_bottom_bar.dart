@@ -1,3 +1,4 @@
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -8,6 +9,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/blurred_container.dart';
+import 'package:frosty/widgets/chat_input/emote_text_span_builder.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
 
 class ChatBottomBar extends StatelessWidget {
@@ -256,13 +258,20 @@ class ChatBottomBar extends StatelessWidget {
                                     );
                                   }
                                 : null,
-                            child: TextField(
+                            child: ExtendedTextField(
                               textInputAction: TextInputAction.send,
                               focusNode: chatStore.textFieldFocusNode,
                               minLines: 1,
                               maxLines: 3,
                               // Disable text field when sending message or when not logged in
                               enabled: !isDisabled,
+                              specialTextSpanBuilder: EmoteTextSpanBuilder(
+                                emoteToObject: chatStore.assetsStore.emoteToObject,
+                                userEmoteToObject:
+                                    chatStore.assetsStore.userEmoteToObject,
+                                emoteSize:
+                                    chatStore.settings.emoteScale * defaultEmoteSize,
+                              ),
                               decoration: InputDecoration(
                                 prefixIcon:
                                     chatStore.settings.emoteMenuButtonOnLeft
