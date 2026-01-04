@@ -114,13 +114,19 @@ class RecentEmotesPanel extends StatelessWidget {
                 ),
               SliverFillRemaining(
                 hasScrollBody: false,
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: TextButton.icon(
-                      onPressed: () => _showClearDialog(context),
-                      icon: const Icon(Icons.clear_all_rounded),
-                      label: const Text('Clear recent emotes'),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: TextButton.icon(
+                          onPressed: () => _showClearDialog(context),
+                          icon: const Icon(Icons.clear_all_rounded),
+                          label: const Text('Clear recent emotes'),
+                        ),
+                      ),
                     ),
                   ),
                 ),
