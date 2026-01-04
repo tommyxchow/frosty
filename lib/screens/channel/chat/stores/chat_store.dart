@@ -28,6 +28,28 @@ abstract class ChatStoreBase with Store {
   /// The maximum ammount of messages to render when autoscroll is enabled.
   static const _renderMessageLimit = 100;
 
+  /// IRC commands that should bypass chat delay.
+  /// These are confirmations/state updates rather than chat messages to sync.
+  static const _delayBypassCommands = {
+    'USERSTATE',
+    'GLOBALUSERSTATE',
+    'ROOMSTATE',
+  };
+
+  /// Checks if IRC data contains a command that should bypass the chat delay.
+  /// Returns true if any message in the data contains a bypass command.
+  bool _shouldBypassDelay(String data) {
+    for (final message in data.trimRight().split('\r\n')) {
+      if (message.startsWith('@')) {
+        final parts = message.split(' ');
+        if (parts.length >= 3 && _delayBypassCommands.contains(parts[2])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   final TwitchApi twitchApi;
 
   /// The amount of messages to free (remove) when the [_messageLimit] is reached.
@@ -108,9 +130,6 @@ abstract class ChatStoreBase with Store {
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
 
-  /// Timer used for resetting the sending state if no USERSTATE is received.
-  Timer? _sendingTimeoutTimer;
-
   /// Timer used for updating the chat delay countdown message.
   Timer? _chatDelayCountdownTimer;
 
@@ -167,10 +186,6 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _showMentionAutocomplete = false;
 
-  /// Whether a message is currently being sent and waiting for server confirmation.
-  @readonly
-  var _isSendingMessage = false;
-
   /// Whether the chat is currently in shared chat mode (based on source-room-id tag presence).
   @readonly
   var _isInSharedChatMode = false;
@@ -184,9 +199,6 @@ abstract class ChatStoreBase with Store {
 
   @observable
   IRCMessage? replyingToMessage;
-
-  /// Public getter for whether a message is currently being sent.
-  bool get isSendingMessage => _isSendingMessage;
 
   /// Public getter for whether the chat is in shared chat mode.
   bool get isInSharedChatMode => _isInSharedChatMode;
@@ -413,12 +425,8 @@ abstract class ChatStoreBase with Store {
 
             if (toSend != null && parsedIRCMessage.tags['id'] != null) {
               toSend!.tags['id'] = parsedIRCMessage.tags['id']!;
-              textController.clear();
               messageBuffer.add(toSend!);
               toSend = null;
-              // Reset sending state since message was successfully sent
-              _sendingTimeoutTimer?.cancel();
-              _isSendingMessage = false;
             }
             break;
           case Command.globalUserState:
@@ -662,14 +670,19 @@ abstract class ChatStoreBase with Store {
     // Listen for new messages and forward them to the handler.
     _channelListener = _channel?.stream.listen(
       (data) {
-        if (!settings.showVideo || settings.chatDelay == 0) {
-          _handleIRCData(data.toString());
+        final dataStr = data.toString();
+
+        // Process immediately if delay is disabled or command should bypass delay
+        if (!settings.showVideo ||
+            settings.chatDelay == 0 ||
+            _shouldBypassDelay(dataStr)) {
+          _handleIRCData(dataStr);
         } else {
           final capturedConnectionId = currentConnectionId;
           Future.delayed(Duration(seconds: settings.chatDelay.toInt()), () {
             // Only process if this is still the active connection
             if (capturedConnectionId == currentConnectionId) {
-              _handleIRCData(data.toString());
+              _handleIRCData(dataStr);
             }
           });
         }
@@ -868,12 +881,6 @@ abstract class ChatStoreBase with Store {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) return;
 
-    // Prevent sending multiple messages simultaneously
-    if (_isSendingMessage) {
-      updateNotification('Please wait, sending previous message...');
-      return;
-    }
-
     if (_channel == null || _channel?.closeCode != null) {
       messageBuffer.add(
         IRCMessage.createNotice(
@@ -881,56 +888,46 @@ abstract class ChatStoreBase with Store {
               'Cannot send message - chat is disconnected. Reconnecting...',
         ),
       );
-    } else {
-      // Set sending state to true
-      _isSendingMessage = true;
+      return;
+    }
 
-      // Start a timeout timer to reset sending state if no USERSTATE is received
-      _sendingTimeoutTimer?.cancel();
-      _sendingTimeoutTimer = Timer(const Duration(seconds: 10), () {
-        if (_isSendingMessage) {
-          _isSendingMessage = false;
-          updateNotification(
-            'Message failed to send. Try again or check connection.',
-          );
-        }
-      });
+    // Send the message to the IRC chat room.
+    _channel?.sink.add(
+      '${replyingToMessage != null ? '@reply-parent-msg-id=${replyingToMessage!.tags['id']} ' : ''}PRIVMSG #$channelName :$message',
+    );
 
-      // Send the message to the IRC chat room.
-      _channel?.sink.add(
-        '${replyingToMessage != null ? '@reply-parent-msg-id=${replyingToMessage!.tags['id']} ' : ''}PRIVMSG #$channelName :$message',
-      );
+    // Clear text field immediately (optimistic UI)
+    textController.clear();
 
-      // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
-      var userStateString = _userState.raw;
-      if (userStateString != null) {
-        if (message.length > 3 && message.substring(0, 3) == '/me') {
-          userStateString +=
-              ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
-        } else {
-          userStateString +=
-              ' :${replyingToMessage?.tags['display-name'] != null ? '@${replyingToMessage!.tags['display-name']} ' : ''}${message.trim()}';
-        }
-
-        final userChatMessage = IRCMessage.fromString(userStateString);
-        userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
-        if (auth.isLoggedIn && auth.user.details != null) {
-          userChatMessage.tags['user-id'] = auth.user.details!.id;
-        }
-
-        if (replyingToMessage != null &&
-            replyingToMessage!.tags['id'] != null) {
-          userChatMessage.tags['reply-parent-msg-id'] =
-              replyingToMessage!.tags['id']!;
-          userChatMessage.tags['reply-parent-display-name'] =
-              replyingToMessage!.tags['display-name']!;
-          userChatMessage.tags['reply-parent-msg-body'] =
-              replyingToMessage!.message!;
-        }
-
-        replyingToMessage = null;
-        toSend = userChatMessage;
+    // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
+    var userStateString = _userState.raw;
+    if (userStateString != null) {
+      if (message.length > 3 && message.substring(0, 3) == '/me') {
+        userStateString +=
+            ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
+      } else {
+        userStateString +=
+            ' :${replyingToMessage?.tags['display-name'] != null ? '@${replyingToMessage!.tags['display-name']} ' : ''}${message.trim()}';
       }
+
+      final userChatMessage = IRCMessage.fromString(userStateString);
+      userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
+      if (auth.isLoggedIn && auth.user.details != null) {
+        userChatMessage.tags['user-id'] = auth.user.details!.id;
+      }
+
+      if (replyingToMessage != null &&
+          replyingToMessage!.tags['id'] != null) {
+        userChatMessage.tags['reply-parent-msg-id'] =
+            replyingToMessage!.tags['id']!;
+        userChatMessage.tags['reply-parent-display-name'] =
+            replyingToMessage!.tags['display-name']!;
+        userChatMessage.tags['reply-parent-msg-body'] =
+            replyingToMessage!.message!;
+      }
+
+      replyingToMessage = null;
+      toSend = userChatMessage;
     }
   }
 
@@ -1039,7 +1036,6 @@ abstract class ChatStoreBase with Store {
 
     _messageBufferTimer?.cancel();
     _notificationTimer?.cancel();
-    _sendingTimeoutTimer?.cancel();
     _cancelChatDelayCountdown();
     sleepTimer?.cancel();
 

@@ -246,12 +246,10 @@ class ChatBottomBar extends StatelessWidget {
                     Expanded(
                       child: Observer(
                         builder: (context) {
-                          final isDisabled =
-                              !chatStore.auth.isLoggedIn ||
-                              chatStore.isSendingMessage;
+                          final isLoggedIn = chatStore.auth.isLoggedIn;
 
                           return GestureDetector(
-                            onTap: isDisabled && !chatStore.isSendingMessage
+                            onTap: !isLoggedIn
                                 ? () {
                                     chatStore.updateNotification(
                                       loginTooltipMessage,
@@ -263,8 +261,7 @@ class ChatBottomBar extends StatelessWidget {
                               focusNode: chatStore.textFieldFocusNode,
                               minLines: 1,
                               maxLines: 3,
-                              // Disable text field when sending message or when not logged in
-                              enabled: !isDisabled,
+                              enabled: isLoggedIn,
                               specialTextSpanBuilder: EmoteTextSpanBuilder(
                                 emoteToObject: chatStore.assetsStore.emoteToObject,
                                 userEmoteToObject:
@@ -289,14 +286,12 @@ class ChatBottomBar extends StatelessWidget {
                                   ],
                                 ),
                                 hintMaxLines: 1,
-                                hintText: chatStore.auth.isLoggedIn
-                                    ? chatStore.isSendingMessage
-                                          ? 'Sending...'
-                                          : chatStore.replyingToMessage != null
-                                          ? 'Reply'
-                                          : hasChatDelay
-                                          ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
-                                          : 'Chat'
+                                hintText: isLoggedIn
+                                    ? chatStore.replyingToMessage != null
+                                        ? 'Reply'
+                                        : hasChatDelay
+                                            ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
+                                            : 'Chat'
                                     : loginTooltipMessage,
                               ),
                               controller: chatStore.textController,
@@ -313,30 +308,14 @@ class ChatBottomBar extends StatelessWidget {
                       (chatStore.settings.chatWidth >= 0.3 ||
                           chatStore.expandChat ||
                           context.isPortrait))
-                    Observer(
-                      builder: (context) {
-                        return IconButton(
-                          tooltip: chatStore.isSendingMessage
-                              ? 'Sending...'
-                              : 'Send',
-                          icon: chatStore.isSendingMessage
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.send_rounded),
-                          onPressed:
-                              chatStore.auth.isLoggedIn &&
-                                  !chatStore.isSendingMessage
-                              ? () => chatStore.sendMessage(
-                                  chatStore.textController.text,
-                                )
-                              : null,
-                        );
-                      },
+                    IconButton(
+                      tooltip: 'Send',
+                      icon: const Icon(Icons.send_rounded),
+                      onPressed: chatStore.auth.isLoggedIn
+                          ? () => chatStore.sendMessage(
+                              chatStore.textController.text,
+                            )
+                          : null,
                     )
                   else
                     IconButton(
