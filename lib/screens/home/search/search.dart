@@ -147,7 +147,7 @@ class _SearchState extends State<Search> {
                           isFirst: true,
                           padding: EdgeInsets.fromLTRB(
                             16 + MediaQuery.of(context).padding.left,
-                            12,
+                            16,
                             16 + MediaQuery.of(context).padding.right,
                             8,
                           ),
