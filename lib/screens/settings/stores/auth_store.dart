@@ -87,8 +87,7 @@ abstract class AuthBase with Store {
           MaterialPageRoute(builder: (context) => routeAfter),
         );
       } else {
-        // Pop twice, once to dismiss the WebView and again to dismiss the Login dialog.
-        navigatorKey.currentState?.pop();
+        // Pop the WebView to return to the previous screen
         navigatorKey.currentState?.pop();
       }
     }

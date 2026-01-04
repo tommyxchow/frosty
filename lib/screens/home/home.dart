@@ -59,7 +59,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([]);
 
-    final isLoggedIn = _authStore.isLoggedIn && _authStore.user.details != null;
     final theme = Theme.of(context);
 
     return GestureDetector(
@@ -82,11 +81,10 @@ class _HomeState extends State<Home> {
           ),
           flexibleSpace: Observer(
             builder: (_) {
-              // Only show flexible space on Following tab
+              // Only show flexible space on Following tab (when logged in)
               final isOnFollowingTab =
-                  isLoggedIn && _homeStore.selectedIndex == 0;
+                  _authStore.isLoggedIn && _homeStore.selectedIndex == 0;
 
-              // Only show flexible space when on Following tab
               if (!isOnFollowingTab) return const SizedBox.shrink();
 
               return BlurredContainer(
@@ -107,24 +105,31 @@ class _HomeState extends State<Home> {
             },
           ),
           actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: IconButton(
-                tooltip: 'Settings',
-                icon: isLoggedIn
-                    ? ProfilePicture(
-                        userLogin: _authStore.user.details!.login,
-                        radius: 16,
-                      )
-                    : const Icon(Icons.settings_rounded),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        Settings(settingsStore: context.read<SettingsStore>()),
+            Observer(
+              builder: (_) {
+                final isLoggedIn =
+                    _authStore.isLoggedIn && _authStore.user.details != null;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    tooltip: 'Settings',
+                    icon: isLoggedIn
+                        ? ProfilePicture(
+                            userLogin: _authStore.user.details!.login,
+                            radius: 16,
+                          )
+                        : const Icon(Icons.settings_rounded),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Settings(
+                          settingsStore: context.read<SettingsStore>(),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -174,7 +179,9 @@ class _HomeState extends State<Home> {
                   NavigationDestination(
                     icon: Icon(
                       Icons.arrow_upward_rounded,
-                      color: _homeStore.selectedIndex == (isLoggedIn ? 1 : 0)
+                      color:
+                          _homeStore.selectedIndex ==
+                              (_authStore.isLoggedIn ? 1 : 0)
                           ? theme.colorScheme.onSurface
                           : theme.colorScheme.onSurfaceVariant.withValues(
                               alpha: 0.6,
@@ -190,7 +197,9 @@ class _HomeState extends State<Home> {
                   NavigationDestination(
                     icon: Icon(
                       Icons.search_rounded,
-                      color: _homeStore.selectedIndex == (isLoggedIn ? 2 : 1)
+                      color:
+                          _homeStore.selectedIndex ==
+                              (_authStore.isLoggedIn ? 2 : 1)
                           ? theme.colorScheme.onSurface
                           : theme.colorScheme.onSurfaceVariant.withValues(
                               alpha: 0.6,
