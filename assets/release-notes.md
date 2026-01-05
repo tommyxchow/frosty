@@ -1,3 +1,23 @@
+## v5.0.2
+
+January 4, 2026
+
+### Improvements
+
+- Inline emote support in the chat text field.
+- Search page now uses type-to-search for faster navigation.
+- Restored ability to send messages while chat delay is active.
+- Restored chat delay input indicator.
+- Redesigned the reply bar.
+
+### Bug Fixes
+
+- Fixed reply bar and autocomplete bar blocking the bottom of chat.
+- Fixed clear recent emotes button sizing.
+- Fixed black screen when logging in.
+
+---
+
 ## v5.0.1
 
 January 2, 2026
