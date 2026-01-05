@@ -58,7 +58,7 @@ class Chat extends StatelessWidget {
                           padding: EdgeInsets.only(
                             top: MediaQuery.of(context).padding.top,
                             bottom:
-                                68 +
+                                chatStore.bottomBarHeight +
                                 (chatStore.assetsStore.showEmoteMenu
                                     ? 0
                                     : MediaQuery.of(context).padding.bottom),
@@ -70,7 +70,7 @@ class Chat extends StatelessWidget {
                                 padding: (listPadding ?? EdgeInsets.zero).add(
                                   EdgeInsets.only(
                                     bottom:
-                                        68 +
+                                        chatStore.bottomBarHeight +
                                         (chatStore.assetsStore.showEmoteMenu
                                             ? 0
                                             : MediaQuery.of(
@@ -126,7 +126,7 @@ class Chat extends StatelessWidget {
                       top: 4,
                       right: 4,
                       bottom:
-                          68 +
+                          chatStore.bottomBarHeight +
                           (chatStore.assetsStore.showEmoteMenu
                               ? 0
                               : MediaQuery.of(context).padding.bottom),

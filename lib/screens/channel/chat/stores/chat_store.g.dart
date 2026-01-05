@@ -17,6 +17,29 @@ mixin _$ChatStore on ChatStoreBase, Store {
         () => super.renderMessages,
         name: 'ChatStoreBase.renderMessages',
       )).value;
+  Computed<List<Emote>>? _$matchingEmotesComputed;
+
+  @override
+  List<Emote> get matchingEmotes =>
+      (_$matchingEmotesComputed ??= Computed<List<Emote>>(
+        () => super.matchingEmotes,
+        name: 'ChatStoreBase.matchingEmotes',
+      )).value;
+  Computed<List<String>>? _$matchingChattersComputed;
+
+  @override
+  List<String> get matchingChatters =>
+      (_$matchingChattersComputed ??= Computed<List<String>>(
+        () => super.matchingChatters,
+        name: 'ChatStoreBase.matchingChatters',
+      )).value;
+  Computed<double>? _$bottomBarHeightComputed;
+
+  @override
+  double get bottomBarHeight => (_$bottomBarHeightComputed ??= Computed<double>(
+    () => super.bottomBarHeight,
+    name: 'ChatStoreBase.bottomBarHeight',
+  )).value;
 
   late final _$timeRemainingAtom = Atom(
     name: 'ChatStoreBase.timeRemaining',
@@ -489,7 +512,10 @@ mixin _$ChatStore on ChatStoreBase, Store {
 timeRemaining: ${timeRemaining},
 expandChat: ${expandChat},
 replyingToMessage: ${replyingToMessage},
-renderMessages: ${renderMessages}
+renderMessages: ${renderMessages},
+matchingEmotes: ${matchingEmotes},
+matchingChatters: ${matchingChatters},
+bottomBarHeight: ${bottomBarHeight}
     ''';
   }
 }

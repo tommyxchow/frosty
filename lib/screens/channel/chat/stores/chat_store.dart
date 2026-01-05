@@ -36,6 +36,12 @@ abstract class ChatStoreBase with Store {
     'ROOMSTATE',
   };
 
+  /// Base height of the bottom bar (input field area).
+  static const _baseBottomBarHeight = 68.0;
+
+  /// Height of the autocomplete bar (SizedBox + Divider).
+  static const _autocompleteHeight = 51.0;
+
   /// Checks if IRC data contains a command that should bypass the chat delay.
   /// Returns true if any message in the data contains a bypass command.
   bool _shouldBypassDelay(String data) {
@@ -202,6 +208,47 @@ abstract class ChatStoreBase with Store {
 
   /// Public getter for whether the chat is in shared chat mode.
   bool get isInSharedChatMode => _isInSharedChatMode;
+
+  /// Emotes matching the current autocomplete search term.
+  @computed
+  List<Emote> get matchingEmotes {
+    if (!_showEmoteAutocomplete) return const [];
+    final searchTerm = _inputText.split(' ').last.toLowerCase();
+    if (searchTerm.isEmpty) return const [];
+
+    return [
+      ...assetsStore.userEmoteToObject.values,
+      ...assetsStore.bttvEmotes,
+      ...assetsStore.ffzEmotes,
+      ...assetsStore.sevenTVEmotes,
+    ].where((emote) => emote.name.toLowerCase().contains(searchTerm)).toList();
+  }
+
+  /// Chatters matching the current mention autocomplete search term.
+  @computed
+  List<String> get matchingChatters {
+    if (!_showMentionAutocomplete) return const [];
+    final searchTerm =
+        _inputText.split(' ').last.replaceFirst('@', '').toLowerCase();
+    return chatDetailsStore.chatUsers
+        .where((chatter) => chatter.contains(searchTerm))
+        .toList();
+  }
+
+  /// Current bottom bar height based on visible overlays.
+  /// Used to dynamically adjust chat message list padding.
+  @computed
+  double get bottomBarHeight {
+    var height = _baseBottomBarHeight;
+
+    if (settings.autocomplete &&
+        ((_showEmoteAutocomplete && matchingEmotes.isNotEmpty) ||
+            (_showMentionAutocomplete && matchingChatters.isNotEmpty))) {
+      height += _autocompleteHeight;
+    }
+
+    return height;
+  }
 
   ChatStoreBase({
     required this.twitchApi,

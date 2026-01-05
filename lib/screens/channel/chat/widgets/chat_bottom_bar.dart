@@ -57,31 +57,8 @@ class ChatBottomBar extends StatelessWidget {
 
     return Observer(
       builder: (context) {
-        final matchingEmotes =
-            [
-                  ...chatStore.assetsStore.userEmoteToObject.values,
-                  ...chatStore.assetsStore.bttvEmotes,
-                  ...chatStore.assetsStore.ffzEmotes,
-                  ...chatStore.assetsStore.sevenTVEmotes,
-                ]
-                .where(
-                  (emote) => emote.name.toLowerCase().contains(
-                    chatStore.inputText.split(' ').last.toLowerCase(),
-                  ),
-                )
-                .toList();
-
-        final matchingChatters = chatStore.chatDetailsStore.chatUsers
-            .where(
-              (chatter) => chatter.contains(
-                chatStore.inputText
-                    .split(' ')
-                    .last
-                    .replaceFirst('@', '')
-                    .toLowerCase(),
-              ),
-            )
-            .toList();
+        final matchingEmotes = chatStore.matchingEmotes;
+        final matchingChatters = chatStore.matchingChatters;
 
         final isFullscreenOverlay =
             chatStore.settings.fullScreen && context.isLandscape;
