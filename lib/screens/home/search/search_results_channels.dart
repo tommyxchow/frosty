@@ -57,11 +57,11 @@ class _SearchResultsChannelsState extends State<SearchResultsChannels> {
       debugPrint('Search channels error: $error');
       final snackBar = SnackBar(
         content: AlertMessage(
-          message: 'Unable to follow channel',
+          message: 'Unable to find channel',
           centered: false,
         ),
       );
-
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
