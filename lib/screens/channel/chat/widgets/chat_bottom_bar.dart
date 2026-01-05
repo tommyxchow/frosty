@@ -73,37 +73,57 @@ class ChatBottomBar extends StatelessWidget {
           children: [
             if (chatStore.replyingToMessage != null) ...[
               const Divider(),
-              ListTile(
-                contentPadding: const EdgeInsets.only(left: 16),
-                leading: const Icon(Icons.reply),
-                title: Tooltip(
-                  message: chatStore.replyingToMessage!.message,
-                  preferBelow: false,
-                  child: Text.rich(
-                    TextSpan(
-                      children: chatStore.replyingToMessage!.generateSpan(
-                        context,
-                        assetsStore: chatStore.assetsStore,
-                        emoteScale: chatStore.settings.emoteScale,
-                        badgeScale: chatStore.settings.badgeScale,
-                        launchExternal: chatStore.settings.launchUrlExternal,
-                        timestamp: chatStore.settings.timestampType,
-                        currentChannelId: chatStore.channelId,
+              TextFieldTapRegion(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(
+                        color: Theme.of(context).colorScheme.secondary,
+                        width: 4,
                       ),
                     ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.defaultTextStyle.copyWith(
-                      fontSize: chatStore.settings.fontSize,
-                    ),
                   ),
-                ),
-                trailing: IconButton(
-                  tooltip: 'Cancel reply',
-                  onPressed: () {
-                    chatStore.replyingToMessage = null;
-                  },
-                  icon: const Icon(Icons.close),
+                  // Left: 8px so text aligns at 12px (4px border + 8px padding)
+                  // Right: 4px to give close button some breathing room
+                  padding: const EdgeInsets.only(left: 8, right: 4),
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Tooltip(
+                          message: chatStore.replyingToMessage!.message ?? '',
+                          preferBelow: false,
+                          child: Text.rich(
+                            TextSpan(
+                              children:
+                                  chatStore.replyingToMessage!.generateSpan(
+                                context,
+                                assetsStore: chatStore.assetsStore,
+                                emoteScale: chatStore.settings.emoteScale,
+                                badgeScale: chatStore.settings.badgeScale,
+                                launchExternal:
+                                    chatStore.settings.launchUrlExternal,
+                                timestamp: chatStore.settings.timestampType,
+                                currentChannelId: chatStore.channelId,
+                              ),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: context.defaultTextStyle.copyWith(
+                              fontSize: chatStore.settings.fontSize,
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Cancel reply',
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => chatStore.replyingToMessage = null,
+                        icon: const Icon(Icons.close, size: 20),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

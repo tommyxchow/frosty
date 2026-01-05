@@ -42,6 +42,9 @@ abstract class ChatStoreBase with Store {
   /// Height of the autocomplete bar (SizedBox + Divider).
   static const _autocompleteHeight = 51.0;
 
+  /// Height of the reply bar (Container + Divider).
+  static const _replyBarHeight = 41.0;
+
   /// Checks if IRC data contains a command that should bypass the chat delay.
   /// Returns true if any message in the data contains a bypass command.
   bool _shouldBypassDelay(String data) {
@@ -241,6 +244,12 @@ abstract class ChatStoreBase with Store {
   double get bottomBarHeight {
     var height = _baseBottomBarHeight;
 
+    // Add reply bar height when replying to a message.
+    if (replyingToMessage != null) {
+      height += _replyBarHeight;
+    }
+
+    // Add autocomplete bar height when showing matches.
     if (settings.autocomplete &&
         ((_showEmoteAutocomplete && matchingEmotes.isNotEmpty) ||
             (_showMentionAutocomplete && matchingChatters.isNotEmpty))) {
