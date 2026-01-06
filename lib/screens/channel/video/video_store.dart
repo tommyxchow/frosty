@@ -114,9 +114,11 @@ abstract class VideoStoreBase with Store {
           onMessageReceived: (message) {
             _isInPipMode = false;
             if (_overlayWasVisibleBeforePip) {
+              _updateLatencyTrackerVisibility(true);
               _scheduleOverlayHide();
             } else {
               _overlayVisible = false;
+              _updateLatencyTrackerVisibility(false);
             }
           },
         )
@@ -151,6 +153,9 @@ abstract class VideoStoreBase with Store {
   /// The timer that handles periodic stream info updates
   Timer? _streamInfoTimer;
 
+  /// Timer for periodic JavaScript state cleanup to prevent memory accumulation.
+  Timer? _jsCleanupTimer;
+
   /// Tracks the last time stream info was updated to prevent double refresh
   DateTime? _lastStreamInfoUpdate;
 
@@ -161,6 +166,9 @@ abstract class VideoStoreBase with Store {
   late final ReactionDisposer _disposeVideoModeReaction;
 
   ReactionDisposer? _disposeAndroidAutoPipReaction;
+
+  /// Disposes the latency settings reaction.
+  ReactionDisposer? _disposeLatencySettingsReaction;
 
   /// If the video is currently paused.
   ///
@@ -230,7 +238,7 @@ abstract class VideoStoreBase with Store {
           .setMediaPlaybackRequiresUserGesture(false);
     }
 
-    // Initialize the [_overlayTimer] to hide the overlay automatically after 5 seconds.
+    // Initialize the [_overlayTimer] to auto-hide the overlay after a delay (default 5 seconds).
     _scheduleOverlayHide();
 
     // Initialize a reaction that will reload the webview whenever the overlay is toggled.
@@ -273,7 +281,37 @@ abstract class VideoStoreBase with Store {
 
     updateStreamInfo();
 
-    // Stream info timer will be started when entering chat-only mode
+    // Initialize periodic JavaScript cleanup timer (every 10 minutes)
+    // This prevents memory accumulation during long viewing sessions
+    _jsCleanupTimer = Timer.periodic(
+      const Duration(minutes: 10),
+      (_) => _performJsSoftReset(),
+    );
+
+    // React to changes in latency-related settings mid-session
+    // This handles the case where user toggles autoSyncChatDelay or showLatency
+    // while already watching a stream
+    _disposeLatencySettingsReaction = reaction(
+      (_) => (settingsStore.showLatency, settingsStore.autoSyncChatDelay),
+      (values) async {
+        final (showLatency, autoSync) = values;
+        // Only act if overlay is enabled (latency tracker only works with custom overlay)
+        if (!settingsStore.showOverlay) return;
+
+        if (showLatency || autoSync) {
+          // Start tracker if either setting is now enabled
+          // The init() method is idempotent - won't double-start if already running
+          await _listenOnLatencyChanges();
+        } else {
+          // Stop tracker if both settings are now disabled
+          try {
+            videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
+          } catch (e) {
+            debugPrint(e.toString());
+          }
+        }
+      },
+    );
   }
 
   @action
@@ -335,57 +373,45 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  /// Hides the default Twitch overlay elements using CSS injection.
+  ///
+  /// This approach is far more efficient than JavaScript DOM manipulation:
+  /// - CSS rules are applied by the browser's native rendering engine
+  /// - No MutationObserver overhead watching the entire DOM tree
+  /// - Handles dynamically added elements automatically via CSS cascade
+  /// - Single one-time observer that disconnects immediately after player loads
   Future<void> _hideDefaultOverlay() async {
     try {
       await videoWebViewController.runJavaScript('''
         {
-          const hideElements = (...el) => {
-            el.forEach((el) => {
-              el?.style.setProperty("display", "none", "important");
-            })
-          }
-          const hide = () => {
-            const topBar = document.querySelector(".top-bar");
-            const playerControls = document.querySelector(".player-controls");
-            const channelDisclosures = document.querySelector("#channel-player-disclosures");
-            const videoPreviewOverlay = document.querySelector('[data-a-target="player-overlay-preview-background"]');
-            hideElements(topBar, playerControls, channelDisclosures, videoPreviewOverlay);
-          }
-          const observer = new MutationObserver(() => {
-            const videoOverlay = document.querySelector('.video-player__overlay');
-            if(!videoOverlay) return;
-            hide();
-
-            // Retry hide() a few times to catch elements that appear with timing variations
-            setTimeout(hide, 300);
-            setTimeout(hide, 800);
-            setTimeout(hide, 1500);
-
-            // Disconnect previous observer if exists to prevent memory leaks
-            if (window._hideOverlayObserver) {
-              window._hideOverlayObserver.disconnect();
-            }
-
-            // Smart observer: only hide when target elements actually appear in mutations
-            window._hideOverlayObserver = new MutationObserver((mutations) => {
-              for (const mutation of mutations) {
-                for (const node of mutation.addedNodes) {
-                  // Only run hide() if a target element or its container was added
-                  if (node.nodeType === Node.ELEMENT_NODE &&
-                      (node.classList?.contains('top-bar') ||
-                       node.classList?.contains('player-controls') ||
-                       node.matches?.('[data-a-target="player-overlay-preview-background"]') ||
-                       node.querySelector?.('.top-bar, .player-controls, #channel-player-disclosures, [data-a-target="player-overlay-preview-background"]'))) {
-                    hide();
-                    return;
-                  }
-                }
+          if (!document.getElementById('frosty-overlay-styles')) {
+            const style = document.createElement('style');
+            style.id = 'frosty-overlay-styles';
+            style.textContent = `
+              .top-bar,
+              .player-controls,
+              #channel-player-disclosures,
+              [data-a-target="player-overlay-preview-background"],
+              [data-a-target="player-overlay-video-stats"] {
+                display: none !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
               }
-            });
-            window._hideOverlayObserver.observe(videoOverlay, { childList: true, subtree: true });
-            observer.disconnect();
+            `;
+            document.head.appendChild(style);
+          }
+
+          // Single one-time observer just to detect when player loads
+          // Disconnects immediately - CSS handles everything after
+          const observer = new MutationObserver((_, obs) => {
+            if (document.querySelector('.video-player__overlay')) {
+              obs.disconnect();
+            }
           });
           observer.observe(document.body, { childList: true, subtree: true });
+
+          // Safety timeout: disconnect observer if player never loads
+          setTimeout(() => observer.disconnect(), 30000);
         }
       ''');
     } catch (e) {
@@ -411,26 +437,68 @@ abstract class VideoStoreBase with Store {
     }
   }
 
-  /// Sets up intermittent stats panel latency tracking.
+  /// Sets up visibility-aware latency tracking.
   ///
-  /// Toggles the stats panel on/off cyclically to minimize CPU overhead.
-  /// The panel is only active ~10% of the time (2s on, 18s off, every 20s).
+  /// Key optimizations over previous implementation:
+  /// - Only tracks when overlay is visible (pauses when hidden)
+  /// - Properly clears setTimeout IDs to prevent accumulation
+  /// - Has explicit stop() method for cleanup
+  /// - Skips cycles entirely when overlay hidden (saves CPU)
   Future<void> _listenOnLatencyChanges() async {
     try {
       await videoWebViewController.runJavaScript(r'''
         window._latencyTracker = {
-          CYCLE_INTERVAL: 20000,
-          STATS_ACTIVE_TIME: 2000,
+          CYCLE_INTERVAL: 60000,
+          STATS_ACTIVE_TIME: 1500,
           INITIAL_RETRY_INTERVAL: 3000,
           MAX_INITIAL_RETRIES: 4,
+
           cycleCount: 0,
           hasInitialLatency: false,
+          timeoutId: null,
+          isRunning: false,
+          overlayVisible: true,
 
-          async init() {
-            await this._cycleStatsPanel();
+          init() {
+            if (this.isRunning) return;
+            this.isRunning = true;
+            this._cycle();
           },
 
-          async _cycleStatsPanel() {
+          stop() {
+            this.isRunning = false;
+            if (this.timeoutId) {
+              clearTimeout(this.timeoutId);
+              this.timeoutId = null;
+            }
+          },
+
+          setOverlayVisible(visible) {
+            this.overlayVisible = visible;
+            // Resume immediately when overlay becomes visible
+            if (visible && this.isRunning && !this.timeoutId) {
+              this._cycle();
+            }
+          },
+
+          async _cycle() {
+            // Clear timeout ID synchronously at entry to prevent race conditions
+            // (e.g., setOverlayVisible calling _cycle while timeout is firing)
+            const currentTimeoutId = this.timeoutId;
+            this.timeoutId = null;
+            if (currentTimeoutId) {
+              clearTimeout(currentTimeoutId);
+            }
+
+            if (!this.isRunning) return;
+
+            // Skip cycle entirely if overlay not visible - major CPU savings
+            if (!this.overlayVisible) {
+              // Check again in 5 seconds in case overlay becomes visible
+              this.timeoutId = setTimeout(() => this._cycle(), 5000);
+              return;
+            }
+
             this.cycleCount++;
             const cycleStart = Date.now();
 
@@ -445,7 +513,7 @@ abstract class VideoStoreBase with Store {
 
             const totalActiveTime = Date.now() - cycleStart;
 
-            // Use quick retries until we get initial latency or exceed max retries
+            // Calculate next interval
             let nextInterval;
             if (!this.hasInitialLatency && this.cycleCount < this.MAX_INITIAL_RETRIES) {
               nextInterval = this.INITIAL_RETRY_INTERVAL;
@@ -453,7 +521,8 @@ abstract class VideoStoreBase with Store {
               nextInterval = this.CYCLE_INTERVAL - totalActiveTime;
             }
 
-            setTimeout(() => this._cycleStatsPanel(), nextInterval);
+            // Schedule next cycle
+            this.timeoutId = setTimeout(() => this._cycle(), Math.max(nextInterval, 1000));
           },
 
           async _enableStats() {
@@ -473,11 +542,6 @@ abstract class VideoStoreBase with Store {
                 const statsCheckbox = await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input');
                 if (statsCheckbox && !statsCheckbox.checked) {
                   statsCheckbox.click();
-                }
-
-                const statsOverlay = await _asyncQuerySelector('[data-a-target="player-overlay-video-stats"]');
-                if (statsOverlay) {
-                  statsOverlay.style.display = 'none';
                 }
 
                 settingsBtn.click();
@@ -544,6 +608,65 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  /// Updates the latency tracker's overlay visibility state.
+  ///
+  /// When overlay is hidden, the latency tracker pauses its polling cycle
+  /// to save CPU. When overlay becomes visible again, it resumes.
+  ///
+  /// However, if autoSyncChatDelay is enabled, the tracker always runs
+  /// regardless of overlay visibility to keep chat delay accurate.
+  void _updateLatencyTrackerVisibility(bool visible) {
+    // Skip if latency tracking isn't active at all
+    if (!settingsStore.showLatency && !settingsStore.autoSyncChatDelay) return;
+
+    // If auto-sync is enabled, always keep tracker running (don't pause on hide)
+    // to ensure chat delay stays synchronized even during long viewing sessions
+    if (settingsStore.autoSyncChatDelay) {
+      // Always report visible to keep tracking active
+      try {
+        videoWebViewController.runJavaScript(
+          'window._latencyTracker?.setOverlayVisible(true)',
+        );
+      } catch (e) {
+        debugPrint(e.toString());
+      }
+      return;
+    }
+
+    // Only pause/resume based on visibility if just showLatency is enabled
+    try {
+      videoWebViewController.runJavaScript(
+        'window._latencyTracker?.setOverlayVisible($visible)',
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Performs a soft reset of JavaScript state to prevent memory accumulation.
+  ///
+  /// This runs periodically during long viewing sessions to clear accumulated
+  /// state without requiring a full page reload. Resets:
+  /// - Promise queue (clears any stale promise chains)
+  /// - Queue length counter
+  /// - Generation counter (prevents stale callbacks from decrementing length)
+  ///
+  /// Only resets if queue is idle to avoid orphaning in-flight operations
+  /// (which could leave the settings menu open).
+  void _performJsSoftReset() {
+    try {
+      videoWebViewController.runJavaScript('''
+        // Only reset if queue is idle to avoid orphaning in-flight operations
+        if (window._promiseQueueLength === 0) {
+          window._PROMISE_QUEUE = Promise.resolve();
+          window._promiseQueueGen = (window._promiseQueueGen || 0) + 1;
+        }
+      ''');
+    } catch (e) {
+      debugPrint('JS soft reset error: $e');
+    }
+  }
+
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
@@ -551,10 +674,37 @@ abstract class VideoStoreBase with Store {
       // Declare `window` level utility methods and add event listeners to notify the JavaScript channels when the video plays and pauses.
       try {
         await videoWebViewController.runJavaScript('''
+          // Promise queue with length limit and generation tracking
+          // Generation tracking prevents counter from going negative when queue resets
           window._PROMISE_QUEUE = Promise.resolve();
+          window._promiseQueueLength = 0;
+          window._promiseQueueGen = 0;
 
           window._queuePromise = (method) => {
-            window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(method, method);
+            window._promiseQueueLength++;
+
+            // Reset queue if it gets too long (prevents memory accumulation)
+            if (window._promiseQueueLength > 30) {
+              window._PROMISE_QUEUE = Promise.resolve();
+              window._promiseQueueLength = 1;
+              window._promiseQueueGen++;
+            }
+
+            const myGen = window._promiseQueueGen;
+
+            window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(async () => {
+              try {
+                await method();
+              } catch (e) {
+                console.warn('Queue promise error:', e);
+              } finally {
+                // Only decrement if still same generation (not reset)
+                if (myGen === window._promiseQueueGen) {
+                  window._promiseQueueLength--;
+                }
+              }
+            });
+
             return window._PROMISE_QUEUE;
           };
           window._asyncQuerySelector = (selector, timeout = 30000) => new Promise((resolve) => {
@@ -633,7 +783,12 @@ abstract class VideoStoreBase with Store {
         ''');
         if (settingsStore.showOverlay) {
           await _hideDefaultOverlay();
-          await _listenOnLatencyChanges();
+          // Start latency tracking if either:
+          // - showLatency is enabled (user wants to see it on overlay), OR
+          // - autoSyncChatDelay is enabled (needs latency data for syncing)
+          if (settingsStore.showLatency || settingsStore.autoSyncChatDelay) {
+            await _listenOnLatencyChanges();
+          }
           await updateStreamQualities();
         }
       } catch (e) {
@@ -654,10 +809,14 @@ abstract class VideoStoreBase with Store {
 
     if (_overlayVisible) {
       _overlayVisible = false;
+      // Notify latency tracker to pause when overlay hidden
+      _updateLatencyTrackerVisibility(false);
     } else {
       updateStreamInfo(forceUpdate: true);
 
       _overlayVisible = true;
+      // Notify latency tracker to resume when overlay visible
+      _updateLatencyTrackerVisibility(true);
       _scheduleOverlayHide();
     }
   }
@@ -677,6 +836,7 @@ abstract class VideoStoreBase with Store {
   void _stopStreamInfoTimer() {
     if (_streamInfoTimer?.isActive == true) {
       _streamInfoTimer?.cancel();
+      _streamInfoTimer = null;
     }
   }
 
@@ -694,6 +854,8 @@ abstract class VideoStoreBase with Store {
       runInAction(() {
         _overlayVisible = false;
       });
+      // Notify latency tracker to pause when overlay auto-hides
+      _updateLatencyTrackerVisibility(false);
     });
   }
 
@@ -777,6 +939,13 @@ abstract class VideoStoreBase with Store {
     _firstTimeSettingQuality = true;
     _isInPipMode = false;
 
+    // Stop latency tracker immediately to free up JS main thread for refresh
+    try {
+      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
+    } catch (e) {
+      // Ignore - may not exist yet
+    }
+
     // Hard refresh: clear everything by loading blank page first
     await videoWebViewController.loadRequest(Uri.parse('about:blank'));
     // Then immediately load the video URL for a fresh start
@@ -857,18 +1026,20 @@ abstract class VideoStoreBase with Store {
 
     _overlayTimer?.cancel();
     _streamInfoTimer?.cancel();
+    _jsCleanupTimer?.cancel();
 
     _disposeOverlayReaction();
     _disposeVideoModeReaction();
     _disposeAndroidAutoPipReaction?.call();
+    _disposeLatencySettingsReaction?.call();
 
-    // Note: JavaScript cleanup and channel removal are unnecessary here.
-    // The Video widget loads about:blank during disposal (video.dart:63-65),
-    // which automatically clears all JavaScript state, including:
-    //   - Event listeners (play/pause/pip)
-    //   - Latency tracker intermittent cycling
-    //   - MutationObservers (_hideOverlayObserver)
-    //   - JavaScript channels
-    // Attempting cleanup here causes a race condition crash.
+    // Explicitly stop latency tracker as defense-in-depth.
+    // The Video widget also loads about:blank during disposal which clears
+    // all JavaScript state, but this provides an extra safety layer.
+    try {
+      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
+    } catch (e) {
+      // Ignore - page may already be unloading
+    }
   }
 }
