@@ -65,5 +65,4 @@ random/
 **/fastlane/metadata/review_information
 
 # ai
-.claude
-.cursor
+.claude/settings.local.json
