@@ -301,34 +301,35 @@ class ChatBottomBar extends StatelessWidget {
                         },
                       ),
                     ),
-                  if (chatStore.showSendButton &&
-                      (chatStore.settings.chatWidth >= 0.3 ||
-                          chatStore.expandChat ||
-                          context.isPortrait))
-                    IconButton(
-                      tooltip: 'Send',
-                      icon: const Icon(Icons.send_rounded),
-                      onPressed: chatStore.auth.isLoggedIn
-                          ? () => chatStore.sendMessage(
-                              chatStore.textController.text,
-                            )
-                          : null,
-                    )
-                  else
-                    IconButton(
-                      icon: Icon(Icons.adaptive.more_rounded),
-                      tooltip: 'More',
-                      onPressed: () => showModalBottomSheetWithProperFocus(
-                        isScrollControlled: true,
-                        context: context,
-                        builder: (_) => ChatDetails(
-                          chatDetailsStore: chatStore.chatDetailsStore,
-                          chatStore: chatStore,
-                          userLogin: chatStore.channelName,
-                          onAddChat: onAddChat,
-                        ),
-                      ),
-                    ),
+                  TextFieldTapRegion(
+                    child: chatStore.showSendButton &&
+                            (chatStore.settings.chatWidth >= 0.3 ||
+                                chatStore.expandChat ||
+                                context.isPortrait)
+                        ? IconButton(
+                            tooltip: 'Send',
+                            icon: const Icon(Icons.send_rounded),
+                            onPressed: chatStore.auth.isLoggedIn
+                                ? () => chatStore.sendMessage(
+                                    chatStore.textController.text,
+                                  )
+                                : null,
+                          )
+                        : IconButton(
+                            icon: Icon(Icons.adaptive.more_rounded),
+                            tooltip: 'More',
+                            onPressed: () => showModalBottomSheetWithProperFocus(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (_) => ChatDetails(
+                                chatDetailsStore: chatStore.chatDetailsStore,
+                                chatStore: chatStore,
+                                userLogin: chatStore.channelName,
+                                onAddChat: onAddChat,
+                              ),
+                            ),
+                          ),
+                  ),
                 ],
               ),
             ),
