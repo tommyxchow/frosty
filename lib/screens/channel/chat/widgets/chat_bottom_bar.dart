@@ -244,6 +244,8 @@ class ChatBottomBar extends StatelessWidget {
                       child: Observer(
                         builder: (context) {
                           final isLoggedIn = chatStore.auth.isLoggedIn;
+                          final isWaitingForAck = chatStore.isWaitingForAck;
+                          final isEnabled = isLoggedIn && !isWaitingForAck;
 
                           return GestureDetector(
                             onTap: !isLoggedIn
@@ -258,7 +260,7 @@ class ChatBottomBar extends StatelessWidget {
                               focusNode: chatStore.textFieldFocusNode,
                               minLines: 1,
                               maxLines: 3,
-                              enabled: isLoggedIn,
+                              enabled: isEnabled,
                               specialTextSpanBuilder: EmoteTextSpanBuilder(
                                 emoteToObject: chatStore.assetsStore.emoteToObject,
                                 userEmoteToObject:
@@ -284,11 +286,13 @@ class ChatBottomBar extends StatelessWidget {
                                 ),
                                 hintMaxLines: 1,
                                 hintText: isLoggedIn
-                                    ? chatStore.replyingToMessage != null
-                                        ? 'Reply'
-                                        : hasChatDelay
-                                            ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
-                                            : 'Chat'
+                                    ? isWaitingForAck
+                                        ? 'Sending...'
+                                        : chatStore.replyingToMessage != null
+                                            ? 'Reply'
+                                            : hasChatDelay
+                                                ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
+                                                : 'Chat'
                                     : loginTooltipMessage,
                               ),
                               controller: chatStore.textController,
@@ -306,14 +310,28 @@ class ChatBottomBar extends StatelessWidget {
                             (chatStore.settings.chatWidth >= 0.3 ||
                                 chatStore.expandChat ||
                                 context.isPortrait)
-                        ? IconButton(
-                            tooltip: 'Send',
-                            icon: const Icon(Icons.send_rounded),
-                            onPressed: chatStore.auth.isLoggedIn
-                                ? () => chatStore.sendMessage(
-                                    chatStore.textController.text,
-                                  )
-                                : null,
+                        ? Observer(
+                            builder: (context) => IconButton(
+                              tooltip: chatStore.isWaitingForAck
+                                  ? 'Sending...'
+                                  : 'Send',
+                              icon: chatStore.isWaitingForAck
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.send_rounded),
+                              onPressed:
+                                  chatStore.auth.isLoggedIn &&
+                                      !chatStore.isWaitingForAck
+                                  ? () => chatStore.sendMessage(
+                                      chatStore.textController.text,
+                                    )
+                                  : null,
+                            ),
                           )
                         : IconButton(
                             icon: Icon(Icons.adaptive.more_rounded),

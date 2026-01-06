@@ -34,6 +34,35 @@ abstract class ChatStoreBase with Store {
     'USERSTATE',
     'GLOBALUSERSTATE',
     'ROOMSTATE',
+    'NOTICE', // Rejection notices need immediate feedback
+  };
+
+  /// NOTICE msg-id values indicating message was rejected (from Twitch IRC docs).
+  /// https://dev.twitch.tv/docs/irc/msg-id/
+  static const _rejectionMsgIds = {
+    // Rate limiting
+    'msg_slowmode',
+    'msg_ratelimit',
+    'msg_duplicate',
+    // User restrictions
+    'msg_banned',
+    'msg_timedout',
+    'msg_channel_blocked',
+    'msg_suspended',
+    // Room mode restrictions
+    'msg_emoteonly',
+    'msg_subsonly',
+    'msg_followersonly',
+    'msg_followersonly_followed',
+    'msg_followersonly_zero',
+    'msg_r9k',
+    // Verification requirements
+    'msg_verified_email',
+    'msg_requires_verified_phone_number',
+    // Moderation
+    'msg_rejected',
+    'msg_rejected_mandatory',
+    'msg_bad_characters',
   };
 
   /// Base height of the bottom bar (input field area).
@@ -139,6 +168,9 @@ abstract class ChatStoreBase with Store {
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
 
+  /// Timer used for resetting the sending state if no acknowledgment is received.
+  Timer? _sendingTimeoutTimer;
+
   /// Timer used for updating the chat delay countdown message.
   Timer? _chatDelayCountdownTimer;
 
@@ -199,6 +231,10 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _isInSharedChatMode = false;
 
+  /// Whether we're waiting for server acknowledgment of a sent message.
+  @readonly
+  var _isWaitingForAck = false;
+
   /// The logged-in user's appearance in chat.
   @readonly
   var _userState = const USERSTATE();
@@ -211,6 +247,9 @@ abstract class ChatStoreBase with Store {
 
   /// Public getter for whether the chat is in shared chat mode.
   bool get isInSharedChatMode => _isInSharedChatMode;
+
+  /// Public getter for whether we're waiting for message acknowledgment.
+  bool get isWaitingForAck => _isWaitingForAck;
 
   /// Emotes matching the current autocomplete search term.
   @computed
@@ -430,6 +469,23 @@ abstract class ChatStoreBase with Store {
           case Command.privateMessage:
           case Command.notice:
           case Command.userNotice:
+            // Check if this is a rejection notice for a pending message
+            if (parsedIRCMessage.command == Command.notice &&
+                _isWaitingForAck) {
+              final msgId = parsedIRCMessage.tags['msg-id'];
+              if (msgId != null && _rejectionMsgIds.contains(msgId)) {
+                // Message was rejected - clear pending but preserve text field for retry
+                _sendingTimeoutTimer?.cancel();
+                _isWaitingForAck = false;
+                toSend = null;
+
+                // Show notification with Twitch's rejection message
+                if (parsedIRCMessage.message != null) {
+                  updateNotification(parsedIRCMessage.message!);
+                }
+              }
+            }
+
             // Update shared chat mode based on source-room-id tag presence
             final wasShared = _isInSharedChatMode;
             _isInSharedChatMode = parsedIRCMessage.tags.containsKey(
@@ -479,10 +535,23 @@ abstract class ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
 
-            if (toSend != null && parsedIRCMessage.tags['id'] != null) {
-              toSend!.tags['id'] = parsedIRCMessage.tags['id']!;
+            // USERSTATE arrival confirms message was sent, even without id tag
+            if (toSend != null) {
+              final messageId = parsedIRCMessage.tags['id'];
+              if (messageId != null) {
+                toSend!.tags['id'] = messageId;
+              } else {
+                // Fallback ID for edge cases where Twitch doesn't provide one
+                toSend!.tags['id'] =
+                    'local-${DateTime.now().millisecondsSinceEpoch}';
+              }
               messageBuffer.add(toSend!);
               toSend = null;
+              // Reset sending state and clear text/reply after successful confirmation
+              _sendingTimeoutTimer?.cancel();
+              _isWaitingForAck = false;
+              textController.clear();
+              replyingToMessage = null;
             }
             break;
           case Command.globalUserState:
@@ -937,6 +1006,12 @@ abstract class ChatStoreBase with Store {
     // Do not send if the message is blank/empty.
     if (message.isEmpty) return;
 
+    // Prevent double-sending while waiting for server acknowledgment
+    if (_isWaitingForAck) {
+      updateNotification('Please wait, sending previous message...');
+      return;
+    }
+
     if (_channel == null || _channel?.closeCode != null) {
       messageBuffer.add(
         IRCMessage.createNotice(
@@ -947,13 +1022,32 @@ abstract class ChatStoreBase with Store {
       return;
     }
 
+    // Set waiting state for UI feedback
+    _isWaitingForAck = true;
+
     // Send the message to the IRC chat room.
     _channel?.sink.add(
       '${replyingToMessage != null ? '@reply-parent-msg-id=${replyingToMessage!.tags['id']} ' : ''}PRIVMSG #$channelName :$message',
     );
 
-    // Clear text field immediately (optimistic UI)
-    textController.clear();
+    // Text field and reply state cleared on USERSTATE confirmation (not optimistically)
+    // to preserve message text if Twitch rejects it (e.g., slow mode)
+
+    // Start timeout timer in case server doesn't respond (network failure)
+    // Must be outside userStateString conditional to always have a safety net
+    _sendingTimeoutTimer?.cancel();
+    _sendingTimeoutTimer = Timer(const Duration(seconds: 10), () {
+      // Guard against execution after disposal
+      if (_shouldDisconnect) return;
+
+      if (_isWaitingForAck) {
+        _isWaitingForAck = false;
+        toSend = null;
+        updateNotification(
+          'Message may not have been sent. Please try again.',
+        );
+      }
+    });
 
     // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
     var userStateString = _userState.raw;
@@ -977,12 +1071,11 @@ abstract class ChatStoreBase with Store {
         userChatMessage.tags['reply-parent-msg-id'] =
             replyingToMessage!.tags['id']!;
         userChatMessage.tags['reply-parent-display-name'] =
-            replyingToMessage!.tags['display-name']!;
+            replyingToMessage!.tags['display-name'] ?? '';
         userChatMessage.tags['reply-parent-msg-body'] =
-            replyingToMessage!.message!;
+            replyingToMessage!.message ?? '';
       }
 
-      replyingToMessage = null;
       toSend = userChatMessage;
     }
   }
@@ -1092,6 +1185,7 @@ abstract class ChatStoreBase with Store {
 
     _messageBufferTimer?.cancel();
     _notificationTimer?.cancel();
+    _sendingTimeoutTimer?.cancel();
     _cancelChatDelayCountdown();
     sleepTimer?.cancel();
 

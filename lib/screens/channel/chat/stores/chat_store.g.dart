@@ -227,6 +227,26 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$_isWaitingForAckAtom = Atom(
+    name: 'ChatStoreBase._isWaitingForAck',
+    context: context,
+  );
+
+  bool get isWaitingForAck {
+    _$_isWaitingForAckAtom.reportRead();
+    return super._isWaitingForAck;
+  }
+
+  @override
+  bool get _isWaitingForAck => isWaitingForAck;
+
+  @override
+  set _isWaitingForAck(bool value) {
+    _$_isWaitingForAckAtom.reportWrite(value, super._isWaitingForAck, () {
+      super._isWaitingForAck = value;
+    });
+  }
+
   late final _$_userStateAtom = Atom(
     name: 'ChatStoreBase._userState',
     context: context,
