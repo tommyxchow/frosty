@@ -22,7 +22,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..launchUrlExternal = json['launchUrlExternal'] as bool? ?? false
   ..showVideo = json['showVideo'] as bool? ?? true
   ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
-  ..useEnhancedRendering = json['useEnhancedRendering'] as bool? ?? true
+  ..useTextureRendering = json['useTextureRendering'] as bool? ?? true
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
   ..showLatency = json['showLatency'] as bool? ?? true
@@ -99,7 +99,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'launchUrlExternal': instance.launchUrlExternal,
   'showVideo': instance.showVideo,
   'defaultToHighestQuality': instance.defaultToHighestQuality,
-  'useEnhancedRendering': instance.useEnhancedRendering,
+  'useTextureRendering': instance.useTextureRendering,
   'showOverlay': instance.showOverlay,
   'toggleableOverlay': instance.toggleableOverlay,
   'showLatency': instance.showLatency,
@@ -296,26 +296,22 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     );
   }
 
-  late final _$useEnhancedRenderingAtom = Atom(
-    name: '_SettingsStoreBase.useEnhancedRendering',
+  late final _$useTextureRenderingAtom = Atom(
+    name: '_SettingsStoreBase.useTextureRendering',
     context: context,
   );
 
   @override
-  bool get useEnhancedRendering {
-    _$useEnhancedRenderingAtom.reportRead();
-    return super.useEnhancedRendering;
+  bool get useTextureRendering {
+    _$useTextureRenderingAtom.reportRead();
+    return super.useTextureRendering;
   }
 
   @override
-  set useEnhancedRendering(bool value) {
-    _$useEnhancedRenderingAtom.reportWrite(
-      value,
-      super.useEnhancedRendering,
-      () {
-        super.useEnhancedRendering = value;
-      },
-    );
+  set useTextureRendering(bool value) {
+    _$useTextureRenderingAtom.reportWrite(value, super.useTextureRendering, () {
+      super.useTextureRendering = value;
+    });
   }
 
   late final _$showOverlayAtom = Atom(
@@ -1121,7 +1117,7 @@ largeStreamCard: ${largeStreamCard},
 launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
-useEnhancedRendering: ${useEnhancedRendering},
+useTextureRendering: ${useTextureRendering},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 showLatency: ${showLatency},

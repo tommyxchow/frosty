@@ -64,7 +64,7 @@ abstract class _SettingsStoreBase with Store {
   // Player defaults
   static const defaultShowVideo = true;
   static const defaultDefaultToHighestQuality = false;
-  static const defaultUseEnhancedRendering = true;
+  static const defaultUseTextureRendering = true;
 
   // Overlay defaults
   static const defaultShowOverlay = true;
@@ -80,9 +80,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var defaultToHighestQuality = defaultDefaultToHighestQuality;
 
-  @JsonKey(defaultValue: defaultUseEnhancedRendering)
+  @JsonKey(defaultValue: defaultUseTextureRendering)
   @observable
-  var useEnhancedRendering = defaultUseEnhancedRendering;
+  var useTextureRendering = defaultUseTextureRendering;
 
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
@@ -101,7 +101,7 @@ abstract class _SettingsStoreBase with Store {
   void resetVideoSettings() {
     showVideo = defaultShowVideo;
     defaultToHighestQuality = defaultDefaultToHighestQuality;
-    useEnhancedRendering = defaultUseEnhancedRendering;
+    useTextureRendering = defaultUseTextureRendering;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;

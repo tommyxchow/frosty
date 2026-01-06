@@ -47,7 +47,7 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
         params: AndroidWebViewWidgetCreationParams(
           controller: widget.videoStore.videoWebViewController.platform,
           displayWithHybridComposition:
-              !widget.videoStore.settingsStore.useEnhancedRendering,
+              !widget.videoStore.settingsStore.useTextureRendering,
         ),
       );
     } else {

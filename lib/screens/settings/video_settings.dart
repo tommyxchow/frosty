@@ -33,13 +33,13 @@ class VideoSettings extends StatelessWidget {
             ),
           if (Platform.isAndroid)
             SettingsListSwitch(
-              title: 'Use enhanced rendering',
+              title: 'Use fast video rendering',
               subtitle: const Text(
                 'Uses a faster WebView rendering method. Disable if you experience crashes while watching streams.',
               ),
-              value: settingsStore.useEnhancedRendering,
+              value: settingsStore.useTextureRendering,
               onChanged: (newValue) =>
-                  settingsStore.useEnhancedRendering = newValue,
+                  settingsStore.useTextureRendering = newValue,
             ),
           const SectionHeader('Overlay'),
           SettingsListSwitch(
