@@ -363,6 +363,11 @@ class ChatMessage extends StatelessWidget {
             );
             break;
           case Command.notice:
+            // Use tabular figures so countdown numbers don't shift horizontally
+            final noticeStyle = TextStyle(
+              color: messageHeaderTextColor,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            );
             if (ircMessage.actionCallback != null &&
                 ircMessage.actionLabel != null) {
               renderMessage = Text.rich(
@@ -370,7 +375,7 @@ class ChatMessage extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: ircMessage.message ?? '',
-                      style: TextStyle(color: messageHeaderTextColor),
+                      style: noticeStyle,
                     ),
                     TextSpan(text: ' '),
                     TextSpan(
@@ -390,7 +395,7 @@ class ChatMessage extends StatelessWidget {
             } else {
               renderMessage = Text.rich(
                 TextSpan(text: ircMessage.message),
-                style: TextStyle(color: messageHeaderTextColor),
+                style: noticeStyle,
               );
             }
             break;

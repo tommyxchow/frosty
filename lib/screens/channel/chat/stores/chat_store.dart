@@ -132,6 +132,12 @@ abstract class ChatStoreBase with Store {
   // The current time to wait between retries for exponential backoff.
   var _backoffTime = 0;
 
+  // Reference to the reconnect message for in-place updates.
+  IRCMessage? _reconnectMessage;
+
+  // Timestamp when reconnection started, for calculating elapsed time.
+  DateTime? _reconnectStartTime;
+
   /// The scroll controller that controls auto-scroll and resume-scroll behavior.
   final scrollController = ScrollController();
 
@@ -612,6 +618,22 @@ abstract class ChatStoreBase with Store {
           }
         }
 
+        // Transform reconnect message to summary on successful connection
+        if (_reconnectMessage != null && _reconnectStartTime != null) {
+          final elapsed =
+              DateTime.now().difference(_reconnectStartTime!).inSeconds;
+          final attempts = _retries;
+          final index = _messages.indexOf(_reconnectMessage!);
+          if (index != -1) {
+            _messages[index] = IRCMessage.createNotice(
+              message:
+                  'Reconnected ($attempts ${attempts == 1 ? 'attempt' : 'attempts'}, ${elapsed}s)',
+            );
+          }
+        }
+        _reconnectMessage = null;
+        _reconnectStartTime = null;
+
         // Reset exponential backoff if successfully connected.
         _retries = 0;
         _backoffTime = 0;
@@ -827,6 +849,14 @@ abstract class ChatStoreBase with Store {
         }
 
         if (_retries >= _maxRetries) {
+          // Remove the reconnect message before showing final disconnect notice
+          if (_reconnectMessage != null) {
+            final index = _messages.indexOf(_reconnectMessage!);
+            if (index != -1) _messages.removeAt(index);
+            _reconnectMessage = null;
+          }
+          _reconnectStartTime = null;
+
           // Add directly to messages, not buffer, so it shows immediately
           _messages.add(
             IRCMessage.createNotice(
@@ -842,53 +872,78 @@ abstract class ChatStoreBase with Store {
           return;
         }
 
+        // Increment the retry count.
+        _retries++;
+
+        // Start exponential backoff only after first failed attempt (capped at 8s).
+        // First retry is immediate to catch brief network hiccups.
+        if (_retries > 1) {
+          final newBackoff = _backoffTime == 0 ? 1 : _backoffTime * 2;
+          _backoffTime = newBackoff > 8 ? 8 : newBackoff;
+        }
+
+        // Helper to update the single reconnect message in place (or add if first time)
+        void updateReconnectMessage(String text) {
+          final msg = IRCMessage.createNotice(message: text);
+          if (_reconnectMessage == null) {
+            _reconnectStartTime ??= DateTime.now(); // Record when reconnection started
+            _reconnectMessage = msg;
+            _messages.add(_reconnectMessage!);
+          } else {
+            final index = _messages.indexOf(_reconnectMessage!);
+            if (index != -1) {
+              _reconnectMessage = msg;
+              _messages[index] = _reconnectMessage!;
+            } else {
+              // Reference was lost (e.g., message limit cleanup) - re-add
+              _reconnectMessage = msg;
+              _messages.add(_reconnectMessage!);
+            }
+          }
+        }
+
+        // Countdown phase (if backoff time > 0)
         if (_backoffTime > 0) {
-          // Show countdown message for backoff time
           var remainingSeconds = _backoffTime;
-          _messages.add(
-            IRCMessage.createNotice(
-              message:
-                  'Connection lost. Reconnecting in ${remainingSeconds}s...',
-            ),
+          updateReconnectMessage(
+            'Reconnecting in ${remainingSeconds}s... (attempt $_retries of $_maxRetries)',
           );
 
           // Update countdown every second
           await Future.doWhile(() async {
             await Future.delayed(const Duration(seconds: 1));
-            remainingSeconds--;
 
-            // Find and replace the countdown message
-            final index = _messages.indexWhere(
-              (msg) =>
-                  msg.message?.contains('Connection lost. Reconnecting in') ??
-                  false,
-            );
-
-            if (index != -1 && remainingSeconds > 0) {
-              _messages[index] = IRCMessage.createNotice(
-                message:
-                    'Connection lost. Reconnecting in ${remainingSeconds}s...',
-              );
-              return true; // Continue loop
-            } else {
-              // Remove countdown message when done
-              if (index != -1) _messages.removeAt(index);
+            // Abort countdown if dispose was called
+            if (_shouldDisconnect) {
+              if (_reconnectMessage != null) {
+                final index = _messages.indexOf(_reconnectMessage!);
+                if (index != -1) _messages.removeAt(index);
+                _reconnectMessage = null;
+              }
+              _reconnectStartTime = null;
               return false; // Exit loop
             }
+
+            remainingSeconds--;
+
+            if (remainingSeconds > 0) {
+              updateReconnectMessage(
+                'Reconnecting in ${remainingSeconds}s... (attempt $_retries of $_maxRetries)',
+              );
+              return true; // Continue loop
+            }
+            return false; // Exit loop
           });
+
+          // Don't proceed with reconnection if disposed
+          if (_shouldDisconnect) return;
         }
 
-        // Increase the backoff time for the next retry.
-        _backoffTime == 0 ? _backoffTime++ : _backoffTime *= 2;
-
-        // Increment the retry count and attempt the reconnect.
-        _retries++;
-        // Add directly to messages, not buffer, so it shows immediately
-        _messages.add(
-          IRCMessage.createNotice(
-            message: 'Reconnecting... (attempt $_retries of $_maxRetries)',
-          ),
+        // Attempting phase - update same message, no add/remove
+        updateReconnectMessage(
+          'Reconnecting... (attempt $_retries of $_maxRetries)',
         );
+
         _channelListener?.cancel();
         connectToChat(isReconnect: true);
       },
