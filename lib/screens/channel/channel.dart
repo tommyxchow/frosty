@@ -195,6 +195,74 @@ class _VideoChatState extends State<VideoChat>
     });
   }
 
+  /// Wraps a video widget with PiP swipe-down gesture handling.
+  ///
+  /// Provides visual feedback (translate + scale), haptic feedback,
+  /// and an instructional overlay during the drag gesture.
+  Widget _buildPipGestureWrapper({required Widget child, double? aspectRatio}) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_animationController, _springBackAnimation]),
+      builder: (context, _) {
+        final currentDragDistance = _isPipDragging
+            ? _pipDragDistance
+            : _springBackAnimation.value;
+
+        final scaleFactor =
+            1.0 - (currentDragDistance / _pipMaxDragDistance * 0.1);
+
+        Widget content = child;
+        if (aspectRatio != null) {
+          content = AspectRatio(aspectRatio: aspectRatio, child: child);
+        }
+
+        return Transform.translate(
+          offset: Offset(0, currentDragDistance),
+          child: Transform.scale(
+            scale: scaleFactor.clamp(0.9, 1.0),
+            child: Stack(
+              children: [
+                GestureDetector(
+                  onPanStart: _handlePipDragStart,
+                  onPanUpdate: _handlePipDragUpdate,
+                  onPanEnd: _handlePipDragEnd,
+                  onPanCancel: _handlePipDragCancel,
+                  child: content,
+                ),
+                if (!_videoStore.isInPipMode)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      ignoring: !(_isPipDragging && _pipDragDistance > 0),
+                      child: AnimatedOpacity(
+                        opacity: (_isPipDragging && _pipDragDistance > 0)
+                            ? 1.0
+                            : 0.0,
+                        duration: const Duration(milliseconds: 150),
+                        curve: Curves.easeOut,
+                        child: Container(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          child: const Center(
+                            child: Text(
+                              'Swipe down to enter picture-in-picture',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   /// Convenience getter for the currently active chat store.
   ChatStore get _chatStore => _chatTabsStore.activeChatStore;
 
@@ -396,7 +464,7 @@ class _VideoChatState extends State<VideoChat>
                       ? settingsStore.fullScreen
                             ? Stack(
                                 children: [
-                                  player,
+                                  _buildPipGestureWrapper(child: player),
                                   if (settingsStore.showOverlay)
                                     LayoutBuilder(
                                       builder: (context, constraints) {
@@ -539,10 +607,20 @@ class _VideoChatState extends State<VideoChat>
                                                   .landscapeChatLeftSide
                                               ? [
                                                   chatContainer,
-                                                  Expanded(child: video),
+                                                  Expanded(
+                                                    child:
+                                                        _buildPipGestureWrapper(
+                                                          child: video,
+                                                        ),
+                                                  ),
                                                 ]
                                               : [
-                                                  Expanded(child: video),
+                                                  Expanded(
+                                                    child:
+                                                        _buildPipGestureWrapper(
+                                                          child: video,
+                                                        ),
+                                                  ),
                                                   chatContainer,
                                                 ],
                                         ),
@@ -599,81 +677,9 @@ class _VideoChatState extends State<VideoChat>
                         top: 0,
                         left: 0,
                         right: 0,
-                        child: AnimatedBuilder(
-                          animation: Listenable.merge([
-                            _animationController,
-                            _springBackAnimation,
-                          ]),
-                          builder: (context, child) {
-                            // Calculate current drag distance from either manual drag or animation
-                            final currentDragDistance = _isPipDragging
-                                ? _pipDragDistance
-                                : (_springBackAnimation.value);
-
-                            // Simple scale effect for visual feedback
-                            final scaleFactor =
-                                1.0 -
-                                (currentDragDistance /
-                                    _pipMaxDragDistance *
-                                    0.1);
-
-                            return Transform.translate(
-                              offset: Offset(0, currentDragDistance),
-                              child: Transform.scale(
-                                scale: scaleFactor.clamp(0.9, 1.0),
-                                child: Stack(
-                                  children: [
-                                    GestureDetector(
-                                      onPanStart: _handlePipDragStart,
-                                      onPanUpdate: _handlePipDragUpdate,
-                                      onPanEnd: _handlePipDragEnd,
-                                      onPanCancel: _handlePipDragCancel,
-                                      child: AspectRatio(
-                                        aspectRatio: 16 / 9,
-                                        child: video,
-                                      ),
-                                    ),
-                                    // Simple text overlay that follows the video with smooth opacity animation
-                                    if (!_videoStore.isInPipMode)
-                                      Positioned.fill(
-                                        child: IgnorePointer(
-                                          ignoring:
-                                              !(_isPipDragging &&
-                                                  _pipDragDistance > 0),
-                                          child: AnimatedOpacity(
-                                            opacity:
-                                                (_isPipDragging &&
-                                                    _pipDragDistance > 0)
-                                                ? 1.0
-                                                : 0.0,
-                                            duration: const Duration(
-                                              milliseconds: 150,
-                                            ),
-                                            curve: Curves.easeOut,
-                                            child: Container(
-                                              color: Colors.black.withValues(
-                                                alpha: 0.4,
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  'Swipe down to enter picture-in-picture',
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
+                        child: _buildPipGestureWrapper(
+                          child: video,
+                          aspectRatio: 16 / 9,
                         ),
                       ),
                   ],
