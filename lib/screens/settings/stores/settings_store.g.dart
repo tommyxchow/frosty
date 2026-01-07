@@ -25,7 +25,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..useTextureRendering = json['useTextureRendering'] as bool? ?? true
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
-  ..showLatency = json['showLatency'] as bool? ?? true
+  ..showLatency = json['showLatency'] as bool? ?? false
   ..badgeScale = (json['badgeScale'] as num?)?.toDouble() ?? 1.0
   ..emoteScale = (json['emoteScale'] as num?)?.toDouble() ?? 1.0
   ..messageScale = (json['messageScale'] as num?)?.toDouble() ?? 1.0
