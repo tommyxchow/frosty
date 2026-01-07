@@ -1,3 +1,20 @@
+## v5.0.3
+
+January 6, 2026
+
+### Improvements
+
+- Reconnection messages now update in place instead of spamming chat.
+- Chat now shows sending status and relevant error notifications when messages fail to send.
+- [Android] The "Enhanced rendering" video setting has been renamed to "Fast video rendering" and reset to enabled for all users.
+
+### Bug Fixes
+
+- Fixed send button not working in landscape mode.
+- Fixed text field input being cleared before server confirmation.
+
+---
+
 ## v5.0.2
 
 January 4, 2026
