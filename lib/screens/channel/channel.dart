@@ -541,6 +541,7 @@ class _VideoChatState extends State<VideoChat>
                                 ],
                               )
                             : SafeArea(
+                                bottom: false,
                                 left:
                                     settingsStore.landscapeCutout !=
                                         LandscapeCutoutType.left &&
