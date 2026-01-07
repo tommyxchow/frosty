@@ -279,8 +279,11 @@ abstract class ChatStoreBase with Store {
   @computed
   List<String> get matchingChatters {
     if (!_showMentionAutocomplete) return const [];
-    final searchTerm =
-        _inputText.split(' ').last.replaceFirst('@', '').toLowerCase();
+    final searchTerm = _inputText
+        .split(' ')
+        .last
+        .replaceFirst('@', '')
+        .toLowerCase();
     return chatDetailsStore.chatUsers
         .where((chatter) => chatter.contains(searchTerm))
         .toList();
@@ -623,8 +626,9 @@ abstract class ChatStoreBase with Store {
 
         // Transform reconnect message to summary on successful connection
         if (_reconnectMessage != null && _reconnectStartTime != null) {
-          final elapsed =
-              DateTime.now().difference(_reconnectStartTime!).inSeconds;
+          final elapsed = DateTime.now()
+              .difference(_reconnectStartTime!)
+              .inSeconds;
           final attempts = _retries;
           final index = _messages.indexOf(_reconnectMessage!);
           if (index != -1) {
@@ -896,7 +900,8 @@ abstract class ChatStoreBase with Store {
         void updateReconnectMessage(String text) {
           final msg = IRCMessage.createNotice(message: text);
           if (_reconnectMessage == null) {
-            _reconnectStartTime ??= DateTime.now(); // Record when reconnection started
+            _reconnectStartTime ??=
+                DateTime.now(); // Record when reconnection started
             _reconnectMessage = msg;
             _messages.add(_reconnectMessage!);
           } else {
@@ -1108,9 +1113,7 @@ abstract class ChatStoreBase with Store {
       if (_isWaitingForAck) {
         _isWaitingForAck = false;
         toSend = null;
-        updateNotification(
-          'Message may not have been sent. Please try again.',
-        );
+        updateNotification('Message may not have been sent. Please try again.');
       }
     });
 
@@ -1131,8 +1134,7 @@ abstract class ChatStoreBase with Store {
         userChatMessage.tags['user-id'] = auth.user.details!.id;
       }
 
-      if (replyingToMessage != null &&
-          replyingToMessage!.tags['id'] != null) {
+      if (replyingToMessage != null && replyingToMessage!.tags['id'] != null) {
         userChatMessage.tags['reply-parent-msg-id'] =
             replyingToMessage!.tags['id']!;
         userChatMessage.tags['reply-parent-display-name'] =

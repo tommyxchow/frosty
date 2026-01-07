@@ -305,7 +305,9 @@ abstract class VideoStoreBase with Store {
         } else {
           // Stop tracker if both settings are now disabled
           try {
-            videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
+            videoWebViewController.runJavaScript(
+              'window._latencyTracker?.stop()',
+            );
           } catch (e) {
             debugPrint(e.toString());
           }

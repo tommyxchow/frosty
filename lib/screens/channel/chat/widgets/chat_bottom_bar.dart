@@ -96,17 +96,17 @@ class ChatBottomBar extends StatelessWidget {
                           preferBelow: false,
                           child: Text.rich(
                             TextSpan(
-                              children:
-                                  chatStore.replyingToMessage!.generateSpan(
-                                context,
-                                assetsStore: chatStore.assetsStore,
-                                emoteScale: chatStore.settings.emoteScale,
-                                badgeScale: chatStore.settings.badgeScale,
-                                launchExternal:
-                                    chatStore.settings.launchUrlExternal,
-                                timestamp: chatStore.settings.timestampType,
-                                currentChannelId: chatStore.channelId,
-                              ),
+                              children: chatStore.replyingToMessage!
+                                  .generateSpan(
+                                    context,
+                                    assetsStore: chatStore.assetsStore,
+                                    emoteScale: chatStore.settings.emoteScale,
+                                    badgeScale: chatStore.settings.badgeScale,
+                                    launchExternal:
+                                        chatStore.settings.launchUrlExternal,
+                                    timestamp: chatStore.settings.timestampType,
+                                    currentChannelId: chatStore.channelId,
+                                  ),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -265,11 +265,13 @@ class ChatBottomBar extends StatelessWidget {
                               maxLines: 3,
                               enabled: isEnabled,
                               specialTextSpanBuilder: EmoteTextSpanBuilder(
-                                emoteToObject: chatStore.assetsStore.emoteToObject,
+                                emoteToObject:
+                                    chatStore.assetsStore.emoteToObject,
                                 userEmoteToObject:
                                     chatStore.assetsStore.userEmoteToObject,
                                 emoteSize:
-                                    chatStore.settings.emoteScale * defaultEmoteSize,
+                                    chatStore.settings.emoteScale *
+                                    defaultEmoteSize,
                               ),
                               decoration: InputDecoration(
                                 prefixIcon:
@@ -291,16 +293,16 @@ class ChatBottomBar extends StatelessWidget {
                                 hintText: !isLoggedIn
                                     ? loginTooltipMessage
                                     : !isConnected
-                                        ? (hasConnected
-                                            ? 'Chat disconnected'
-                                            : 'Connecting...')
-                                        : isWaitingForAck
-                                            ? 'Sending...'
-                                            : chatStore.replyingToMessage != null
-                                                ? 'Reply'
-                                                : hasChatDelay
-                                                    ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
-                                                    : 'Chat',
+                                    ? (hasConnected
+                                          ? 'Chat disconnected'
+                                          : 'Connecting...')
+                                    : isWaitingForAck
+                                    ? 'Sending...'
+                                    : chatStore.replyingToMessage != null
+                                    ? 'Reply'
+                                    : hasChatDelay
+                                    ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
+                                    : 'Chat',
                               ),
                               controller: chatStore.textController,
                               onSubmitted: chatStore.sendMessage,
@@ -313,7 +315,8 @@ class ChatBottomBar extends StatelessWidget {
                       ),
                     ),
                   TextFieldTapRegion(
-                    child: chatStore.showSendButton &&
+                    child:
+                        chatStore.showSendButton &&
                             (chatStore.settings.chatWidth >= 0.3 ||
                                 chatStore.expandChat ||
                                 context.isPortrait)
@@ -344,16 +347,18 @@ class ChatBottomBar extends StatelessWidget {
                         : IconButton(
                             icon: Icon(Icons.adaptive.more_rounded),
                             tooltip: 'More',
-                            onPressed: () => showModalBottomSheetWithProperFocus(
-                              isScrollControlled: true,
-                              context: context,
-                              builder: (_) => ChatDetails(
-                                chatDetailsStore: chatStore.chatDetailsStore,
-                                chatStore: chatStore,
-                                userLogin: chatStore.channelName,
-                                onAddChat: onAddChat,
-                              ),
-                            ),
+                            onPressed: () =>
+                                showModalBottomSheetWithProperFocus(
+                                  isScrollControlled: true,
+                                  context: context,
+                                  builder: (_) => ChatDetails(
+                                    chatDetailsStore:
+                                        chatStore.chatDetailsStore,
+                                    chatStore: chatStore,
+                                    userLogin: chatStore.channelName,
+                                    onAddChat: onAddChat,
+                                  ),
+                                ),
                           ),
                   ),
                 ],
