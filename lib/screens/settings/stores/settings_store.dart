@@ -215,7 +215,7 @@ abstract class _SettingsStoreBase with Store {
 
   @JsonKey(defaultValue: defaultShowUserNotices)
   @observable
-  var showUserNotices = defaultHighlightFirstTimeChatter;
+  var showUserNotices = defaultShowUserNotices;
 
   // Layout options
   @JsonKey(defaultValue: defaultEmoteMenuButtonOnLeft)

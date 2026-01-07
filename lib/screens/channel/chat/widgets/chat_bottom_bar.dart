@@ -245,7 +245,10 @@ class ChatBottomBar extends StatelessWidget {
                         builder: (context) {
                           final isLoggedIn = chatStore.auth.isLoggedIn;
                           final isWaitingForAck = chatStore.isWaitingForAck;
-                          final isEnabled = isLoggedIn && !isWaitingForAck;
+                          final isConnected = chatStore.isConnected;
+                          final hasConnected = chatStore.hasConnected;
+                          final isEnabled =
+                              isLoggedIn && !isWaitingForAck && isConnected;
 
                           return GestureDetector(
                             onTap: !isLoggedIn
@@ -285,15 +288,19 @@ class ChatBottomBar extends StatelessWidget {
                                   ],
                                 ),
                                 hintMaxLines: 1,
-                                hintText: isLoggedIn
-                                    ? isWaitingForAck
-                                        ? 'Sending...'
-                                        : chatStore.replyingToMessage != null
-                                            ? 'Reply'
-                                            : hasChatDelay
-                                                ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
-                                                : 'Chat'
-                                    : loginTooltipMessage,
+                                hintText: !isLoggedIn
+                                    ? loginTooltipMessage
+                                    : !isConnected
+                                        ? (hasConnected
+                                            ? 'Chat disconnected'
+                                            : 'Connecting...')
+                                        : isWaitingForAck
+                                            ? 'Sending...'
+                                            : chatStore.replyingToMessage != null
+                                                ? 'Reply'
+                                                : hasChatDelay
+                                                    ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
+                                                    : 'Chat',
                               ),
                               controller: chatStore.textController,
                               onSubmitted: chatStore.sendMessage,
@@ -326,7 +333,8 @@ class ChatBottomBar extends StatelessWidget {
                                   : const Icon(Icons.send_rounded),
                               onPressed:
                                   chatStore.auth.isLoggedIn &&
-                                      !chatStore.isWaitingForAck
+                                      !chatStore.isWaitingForAck &&
+                                      chatStore.isConnected
                                   ? () => chatStore.sendMessage(
                                       chatStore.textController.text,
                                     )

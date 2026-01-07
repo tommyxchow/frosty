@@ -247,6 +247,46 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$_isConnectedAtom = Atom(
+    name: 'ChatStoreBase._isConnected',
+    context: context,
+  );
+
+  bool get isConnected {
+    _$_isConnectedAtom.reportRead();
+    return super._isConnected;
+  }
+
+  @override
+  bool get _isConnected => isConnected;
+
+  @override
+  set _isConnected(bool value) {
+    _$_isConnectedAtom.reportWrite(value, super._isConnected, () {
+      super._isConnected = value;
+    });
+  }
+
+  late final _$_hasConnectedAtom = Atom(
+    name: 'ChatStoreBase._hasConnected',
+    context: context,
+  );
+
+  bool get hasConnected {
+    _$_hasConnectedAtom.reportRead();
+    return super._hasConnected;
+  }
+
+  @override
+  bool get _hasConnected => hasConnected;
+
+  @override
+  set _hasConnected(bool value) {
+    _$_hasConnectedAtom.reportWrite(value, super._hasConnected, () {
+      super._hasConnected = value;
+    });
+  }
+
   late final _$_userStateAtom = Atom(
     name: 'ChatStoreBase._userState',
     context: context,

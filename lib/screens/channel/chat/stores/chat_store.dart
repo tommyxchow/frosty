@@ -241,6 +241,15 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _isWaitingForAck = false;
 
+  /// Whether the chat WebSocket is currently connected.
+  @readonly
+  var _isConnected = false;
+
+  /// Whether we've successfully connected at least once (to distinguish
+  /// "connecting" from "disconnected" in the UI).
+  @readonly
+  var _hasConnected = false;
+
   /// The logged-in user's appearance in chat.
   @readonly
   var _userState = const USERSTATE();
@@ -250,12 +259,6 @@ abstract class ChatStoreBase with Store {
 
   @observable
   IRCMessage? replyingToMessage;
-
-  /// Public getter for whether the chat is in shared chat mode.
-  bool get isInSharedChatMode => _isInSharedChatMode;
-
-  /// Public getter for whether we're waiting for message acknowledgment.
-  bool get isWaitingForAck => _isWaitingForAck;
 
   /// Emotes matching the current autocomplete search term.
   @computed
@@ -637,6 +640,10 @@ abstract class ChatStoreBase with Store {
         // Reset exponential backoff if successfully connected.
         _retries = 0;
         _backoffTime = 0;
+
+        // Mark connection as established for UI
+        _isConnected = true;
+        _hasConnected = true;
       }
     }
   }
@@ -838,6 +845,9 @@ abstract class ChatStoreBase with Store {
       onDone: () async {
         // Invalidate the current connection to cancel pending delayed callbacks
         currentConnectionId = 0;
+
+        // Mark connection as disconnected for UI
+        _isConnected = false;
 
         // Cancel chat delay countdown when disconnecting
         _cancelChatDelayCountdown();
