@@ -541,7 +541,6 @@ class _VideoChatState extends State<VideoChat>
                                 ],
                               )
                             : NativeDeviceOrientationReader(
-                                useSensor: true,
                                 builder: (context) {
                                   final orientation =
                                       NativeDeviceOrientationReader.orientation(
@@ -559,19 +558,12 @@ class _VideoChatState extends State<VideoChat>
                                     fillLeft = true;
                                     fillRight = true;
                                   } else {
-                                    switch (orientation) {
-                                      case NativeDeviceOrientation
-                                          .landscapeRight:
-                                        fillLeft = true;
-                                        fillRight = false;
-                                      case NativeDeviceOrientation
-                                          .landscapeLeft:
-                                        fillLeft = false;
-                                        fillRight = true;
-                                      default:
-                                        fillLeft = false;
-                                        fillRight = false;
-                                    }
+                                    fillLeft =
+                                        orientation ==
+                                        NativeDeviceOrientation.landscapeRight;
+                                    fillRight =
+                                        orientation ==
+                                        NativeDeviceOrientation.landscapeLeft;
                                   }
 
                                   return SafeArea(
