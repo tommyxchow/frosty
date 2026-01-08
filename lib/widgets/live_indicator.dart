@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// A live indicator widget that displays a red dot with a ping animation.
-/// Used to indicate when a channel or stream is currently live.
 class LiveIndicator extends StatefulWidget {
-  /// The size of the indicator dot.
   final double size;
-
-  /// The color of the indicator. Defaults to red.
   final Color color;
 
   const LiveIndicator({
@@ -20,7 +15,7 @@ class LiveIndicator extends StatefulWidget {
 }
 
 class _LiveIndicatorState extends State<LiveIndicator>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   // ===========================================================================
   // CONFIGURABLE ANIMATION PARAMETERS
   // ===========================================================================
@@ -45,150 +40,94 @@ class _LiveIndicatorState extends State<LiveIndicator>
   // STATE VARIABLES
   // ===========================================================================
 
-  AnimationController? _pingController;
-  Animation<double>? _pingScale;
-  Animation<double>? _pingOpacity;
+  late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _initAnimations();
-  }
-
-  @override
-  void didUpdateWidget(LiveIndicator oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Reinitialize animations if widget properties changed during hot reload
-    if (oldWidget.size != widget.size || oldWidget.color != widget.color) {
-      _disposeAnimations();
-      _initAnimations();
-    }
-  }
-
-  void _initAnimations() {
-    _pingController = AnimationController(
-      duration: _animationDuration,
-      vsync: this,
-    )..repeat();
-
-    _pingScale = Tween<double>(
-      begin: _pingScaleStart,
-      end: _pingScaleEnd,
-    ).animate(CurvedAnimation(parent: _pingController!, curve: Curves.easeOut));
-
-    _pingOpacity = Tween<double>(
-      begin: _pingOpacityStart,
-      end: _pingOpacityEnd,
-    ).animate(CurvedAnimation(parent: _pingController!, curve: Curves.easeOut));
-  }
-
-  void _disposeAnimations() {
-    _pingController?.dispose();
-    _pingController = null;
-    _pingScale = null;
-    _pingOpacity = null;
+    _controller = AnimationController(duration: _animationDuration, vsync: this)
+      ..repeat();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _disposeAnimations();
+    _controller.dispose();
     super.dispose();
-  }
-
-  // Ensure animations refresh properly during hot reload/hot restart in debug.
-  @override
-  void reassemble() {
-    super.reassemble();
-    _disposeAnimations();
-    _initAnimations();
-  }
-
-  // Handle app lifecycle (e.g., returning from background) to keep animation running.
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_pingController == null) return;
-    switch (state) {
-      case AppLifecycleState.resumed:
-        if (!_pingController!.isAnimating) {
-          _pingController!.repeat();
-        }
-        break;
-      case AppLifecycleState.inactive:
-      case AppLifecycleState.paused:
-      case AppLifecycleState.detached:
-        _pingController!.stop();
-        break;
-      case AppLifecycleState.hidden:
-        _pingController!.stop();
-        break;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Handle case where animations aren't initialized (hot reload issue)
-    if (_pingController == null || _pingScale == null || _pingOpacity == null) {
-      _initAnimations();
-      return Container(
-        width: widget.size,
-        height: widget.size,
-        decoration: BoxDecoration(color: widget.color, shape: BoxShape.circle),
-      );
-    }
-
-    return AnimatedBuilder(
-      animation: _pingController!,
-      builder: (context, child) {
-        final pingSize = widget.size * _pingScale!.value;
-        return SizedBox(
-          width: widget.size,
-          height: widget.size,
-          child: Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              // Ping ring rendered outside without affecting layout
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: OverflowBox(
-                    maxWidth: pingSize,
-                    maxHeight: pingSize,
-                    child: Center(
-                      child: Opacity(
-                        opacity: _pingOpacity!.value,
-                        child: Container(
-                          width: pingSize,
-                          height: pingSize,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: widget.color.withValues(
-                                alpha: _borderOpacity,
-                              ),
-                              width: _borderWidth,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Static center dot
-              Container(
-                width: widget.size,
-                height: widget.size,
-                decoration: BoxDecoration(
-                  color: widget.color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    return RepaintBoundary(
+      child: CustomPaint(
+        size: Size(widget.size, widget.size),
+        painter: _PingPainter(
+          animation: _controller,
+          color: widget.color,
+          scaleStart: _pingScaleStart,
+          scaleEnd: _pingScaleEnd,
+          opacityStart: _pingOpacityStart,
+          opacityEnd: _pingOpacityEnd,
+          borderWidth: _borderWidth,
+          borderOpacity: _borderOpacity,
+        ),
+      ),
     );
+  }
+}
+
+class _PingPainter extends CustomPainter {
+  final Animation<double> animation;
+  final Color color;
+
+  final double scaleStart;
+  final double scaleEnd;
+  final double opacityStart;
+  final double opacityEnd;
+  final double borderWidth;
+  final double borderOpacity;
+
+  _PingPainter({
+    required this.animation,
+    required this.color,
+    required this.scaleStart,
+    required this.scaleEnd,
+    required this.opacityStart,
+    required this.opacityEnd,
+    required this.borderWidth,
+    required this.borderOpacity,
+  }) : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final baseRadius = size.width / 2;
+
+    final dotPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(center, baseRadius, dotPaint);
+
+    final progress = Curves.easeOut.transform(animation.value);
+
+    final currentScale = scaleStart + (scaleEnd - scaleStart) * progress;
+    final currentOpacity =
+        opacityStart + (opacityEnd - opacityStart) * progress;
+
+    if (currentOpacity > 0) {
+      final pingRadius = baseRadius * currentScale;
+
+      final borderPaint = Paint()
+        ..color = color.withValues(alpha: currentOpacity * borderOpacity)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = borderWidth;
+
+      canvas.drawCircle(center, pingRadius, borderPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PingPainter oldDelegate) {
+    return oldDelegate.color != color || oldDelegate.animation != animation;
   }
 }
