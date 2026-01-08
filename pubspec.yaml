@@ -70,6 +70,7 @@ dependencies:
     dio: ^5.9.0
     app_links: ^7.0.0
     extended_text_field: ^16.0.2
+    native_device_orientation: ^2.1.0
 
 dev_dependencies:
     flutter_test:

@@ -49,12 +49,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
   ..landscapeForceVerticalChat =
       json['landscapeForceVerticalChat'] as bool? ?? false
-  ..landscapeCutout =
-      $enumDecodeNullable(
-        _$LandscapeCutoutTypeEnumMap,
-        json['landscapeCutout'],
-      ) ??
-      LandscapeCutoutType.none
+  ..landscapeFillAllEdges = json['landscapeFillAllEdges'] as bool? ?? false
   ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.2
   ..fullScreenChatOverlayOpacity =
       (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
@@ -89,56 +84,55 @@ SettingsStore _$SettingsStoreFromJson(
           .toList() ??
       [];
 
-Map<String, dynamic> _$SettingsStoreToJson(
-  SettingsStore instance,
-) => <String, dynamic>{
-  'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
-  'accentColor': instance.accentColor,
-  'showThumbnails': instance.showThumbnails,
-  'largeStreamCard': instance.largeStreamCard,
-  'launchUrlExternal': instance.launchUrlExternal,
-  'showVideo': instance.showVideo,
-  'defaultToHighestQuality': instance.defaultToHighestQuality,
-  'useTextureRendering': instance.useTextureRendering,
-  'showOverlay': instance.showOverlay,
-  'toggleableOverlay': instance.toggleableOverlay,
-  'showLatency': instance.showLatency,
-  'badgeScale': instance.badgeScale,
-  'emoteScale': instance.emoteScale,
-  'messageScale': instance.messageScale,
-  'messageSpacing': instance.messageSpacing,
-  'fontSize': instance.fontSize,
-  'showDeletedMessages': instance.showDeletedMessages,
-  'showChatMessageDividers': instance.showChatMessageDividers,
-  'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
-  'autoSyncChatDelay': instance.autoSyncChatDelay,
-  'chatDelay': instance.chatDelay,
-  'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
-  'showUserNotices': instance.showUserNotices,
-  'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
-  'landscapeChatLeftSide': instance.landscapeChatLeftSide,
-  'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
-  'landscapeCutout': _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
-  'chatWidth': instance.chatWidth,
-  'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
-  'autocomplete': instance.autocomplete,
-  'showTwitchEmotes': instance.showTwitchEmotes,
-  'showTwitchBadges': instance.showTwitchBadges,
-  'show7TVEmotes': instance.show7TVEmotes,
-  'showBTTVEmotes': instance.showBTTVEmotes,
-  'showBTTVBadges': instance.showBTTVBadges,
-  'showFFZEmotes': instance.showFFZEmotes,
-  'showFFZBadges': instance.showFFZBadges,
-  'showRecentMessages': instance.showRecentMessages,
-  'persistChatTabs': instance.persistChatTabs,
-  'secondaryTabs': instance.secondaryTabs,
-  'mutedWords': instance.mutedWords,
-  'matchWholeWord': instance.matchWholeWord,
-  'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
-  'fullScreen': instance.fullScreen,
-  'fullScreenChatOverlay': instance.fullScreenChatOverlay,
-  'pinnedChannelIds': instance.pinnedChannelIds,
-};
+Map<String, dynamic> _$SettingsStoreToJson(SettingsStore instance) =>
+    <String, dynamic>{
+      'themeType': _$ThemeTypeEnumMap[instance.themeType]!,
+      'accentColor': instance.accentColor,
+      'showThumbnails': instance.showThumbnails,
+      'largeStreamCard': instance.largeStreamCard,
+      'launchUrlExternal': instance.launchUrlExternal,
+      'showVideo': instance.showVideo,
+      'defaultToHighestQuality': instance.defaultToHighestQuality,
+      'useTextureRendering': instance.useTextureRendering,
+      'showOverlay': instance.showOverlay,
+      'toggleableOverlay': instance.toggleableOverlay,
+      'showLatency': instance.showLatency,
+      'badgeScale': instance.badgeScale,
+      'emoteScale': instance.emoteScale,
+      'messageScale': instance.messageScale,
+      'messageSpacing': instance.messageSpacing,
+      'fontSize': instance.fontSize,
+      'showDeletedMessages': instance.showDeletedMessages,
+      'showChatMessageDividers': instance.showChatMessageDividers,
+      'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
+      'autoSyncChatDelay': instance.autoSyncChatDelay,
+      'chatDelay': instance.chatDelay,
+      'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
+      'showUserNotices': instance.showUserNotices,
+      'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
+      'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+      'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
+      'landscapeFillAllEdges': instance.landscapeFillAllEdges,
+      'chatWidth': instance.chatWidth,
+      'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
+      'autocomplete': instance.autocomplete,
+      'showTwitchEmotes': instance.showTwitchEmotes,
+      'showTwitchBadges': instance.showTwitchBadges,
+      'show7TVEmotes': instance.show7TVEmotes,
+      'showBTTVEmotes': instance.showBTTVEmotes,
+      'showBTTVBadges': instance.showBTTVBadges,
+      'showFFZEmotes': instance.showFFZEmotes,
+      'showFFZBadges': instance.showFFZBadges,
+      'showRecentMessages': instance.showRecentMessages,
+      'persistChatTabs': instance.persistChatTabs,
+      'secondaryTabs': instance.secondaryTabs,
+      'mutedWords': instance.mutedWords,
+      'matchWholeWord': instance.matchWholeWord,
+      'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
+      'fullScreen': instance.fullScreen,
+      'fullScreenChatOverlay': instance.fullScreenChatOverlay,
+      'pinnedChannelIds': instance.pinnedChannelIds,
+    };
 
 const _$ThemeTypeEnumMap = {
   ThemeType.system: 'system',
@@ -150,13 +144,6 @@ const _$TimestampTypeEnumMap = {
   TimestampType.disabled: 'disabled',
   TimestampType.twelve: 'twelve',
   TimestampType.twentyFour: 'twentyFour',
-};
-
-const _$LandscapeCutoutTypeEnumMap = {
-  LandscapeCutoutType.none: 'none',
-  LandscapeCutoutType.left: 'left',
-  LandscapeCutoutType.right: 'right',
-  LandscapeCutoutType.both: 'both',
 };
 
 // **************************************************************************
@@ -658,22 +645,26 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     );
   }
 
-  late final _$landscapeCutoutAtom = Atom(
-    name: '_SettingsStoreBase.landscapeCutout',
+  late final _$landscapeFillAllEdgesAtom = Atom(
+    name: '_SettingsStoreBase.landscapeFillAllEdges',
     context: context,
   );
 
   @override
-  LandscapeCutoutType get landscapeCutout {
-    _$landscapeCutoutAtom.reportRead();
-    return super.landscapeCutout;
+  bool get landscapeFillAllEdges {
+    _$landscapeFillAllEdgesAtom.reportRead();
+    return super.landscapeFillAllEdges;
   }
 
   @override
-  set landscapeCutout(LandscapeCutoutType value) {
-    _$landscapeCutoutAtom.reportWrite(value, super.landscapeCutout, () {
-      super.landscapeCutout = value;
-    });
+  set landscapeFillAllEdges(bool value) {
+    _$landscapeFillAllEdgesAtom.reportWrite(
+      value,
+      super.landscapeFillAllEdges,
+      () {
+        super.landscapeFillAllEdges = value;
+      },
+    );
   }
 
   late final _$chatWidthAtom = Atom(
@@ -1136,7 +1127,7 @@ showUserNotices: ${showUserNotices},
 emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
 landscapeChatLeftSide: ${landscapeChatLeftSide},
 landscapeForceVerticalChat: ${landscapeForceVerticalChat},
-landscapeCutout: ${landscapeCutout},
+landscapeFillAllEdges: ${landscapeFillAllEdges},
 chatWidth: ${chatWidth},
 fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
 autocomplete: ${autocomplete},

@@ -135,7 +135,7 @@ abstract class _SettingsStoreBase with Store {
   // Landscape mode defaults
   static const defaultLandscapeChatLeftSide = false;
   static const defaultLandscapeForceVerticalChat = false;
-  static const defaultLandscapeCutout = LandscapeCutoutType.none;
+  static const defaultLandscapeFillAllEdges = false;
   static const defaultChatWidth = 0.2;
   static const defaultFullScreenChatOverlayOpacity = 0.5;
 
@@ -231,9 +231,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;
 
-  @JsonKey(defaultValue: defaultLandscapeCutout)
+  @JsonKey(defaultValue: defaultLandscapeFillAllEdges)
   @observable
-  var landscapeCutout = defaultLandscapeCutout;
+  var landscapeFillAllEdges = defaultLandscapeFillAllEdges;
 
   @JsonKey(defaultValue: defaultChatWidth)
   @observable
@@ -321,7 +321,7 @@ abstract class _SettingsStoreBase with Store {
 
     landscapeChatLeftSide = defaultLandscapeChatLeftSide;
     landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;
-    landscapeCutout = defaultLandscapeCutout;
+    landscapeFillAllEdges = defaultLandscapeFillAllEdges;
     chatWidth = defaultChatWidth;
     fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
 
@@ -398,6 +398,3 @@ const timestampNames = ['Disabled', '12-hour', '24-hour'];
 
 enum TimestampType { disabled, twelve, twentyFour }
 
-const landscapeCutoutNames = ['None', 'Left', 'Right', 'Both'];
-
-enum LandscapeCutoutType { none, left, right, both }
