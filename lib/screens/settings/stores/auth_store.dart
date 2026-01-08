@@ -98,7 +98,13 @@ abstract class AuthBase with Store {
 
   WebViewController createAuthWebViewController({Widget? routeAfter}) {
     final webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted);
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      // Use a standard Chrome user agent to allow Google OAuth sign-in.
+      // Google blocks OAuth in embedded WebViews (error 403: disallowed_useragent)
+      // by detecting the "; wv" marker. This generic Chrome UA works cross-platform.
+      ..setUserAgent(
+        'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      );
 
     return webViewController
       ..setNavigationDelegate(
