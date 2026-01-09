@@ -444,12 +444,6 @@ class _VideoChatState extends State<VideoChat>
                             .dark
                             .colorScheme
                             .onSurface,
-                        shadows: settingsStore.fullScreen && context.isLandscape
-                            ? const [
-                                Shadow(blurRadius: 8),
-                                Shadow(blurRadius: 4, offset: Offset(1, 1)),
-                              ]
-                            : null,
                       ),
                       child: landscapeChat,
                     ),
