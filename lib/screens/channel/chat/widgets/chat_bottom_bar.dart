@@ -367,21 +367,35 @@ class ChatBottomBar extends StatelessWidget {
           ],
         );
 
+        // Don't add bottom padding when:
+        // - Emote menu is open: The emote menu provides its own bottom boundary
+        // - In horizontal landscape mode: System is in immersive mode and home
+        //   indicator is on the side (left/right), not the content bottom.
+        //   SafeArea handles left/right insets for the notch.
+        // Note: landscapeForceVerticalChat uses portrait layout in landscape
+        // orientation with normal (non-immersive) system UI, so it still needs
+        // bottom padding.
+        final isHorizontalLandscape =
+            context.isLandscape &&
+            !chatStore.settings.landscapeForceVerticalChat;
+        final needsBottomPadding =
+            !chatStore.assetsStore.showEmoteMenu && !isHorizontalLandscape;
+
         return isFullscreenOverlay
             ? Padding(
                 padding: EdgeInsets.only(
-                  bottom: chatStore.assetsStore.showEmoteMenu
-                      ? 0
-                      : MediaQuery.of(context).padding.bottom,
+                  bottom: needsBottomPadding
+                      ? MediaQuery.of(context).padding.bottom
+                      : 0,
                 ),
                 child: bottomBarContent,
               )
             : BlurredContainer(
                 gradientDirection: GradientDirection.down,
                 padding: EdgeInsets.only(
-                  bottom: chatStore.assetsStore.showEmoteMenu
-                      ? 0
-                      : MediaQuery.of(context).padding.bottom,
+                  bottom: needsBottomPadding
+                      ? MediaQuery.of(context).padding.bottom
+                      : 0,
                 ),
                 child: bottomBarContent,
               );
