@@ -511,23 +511,25 @@ class _VideoChatState extends State<VideoChat>
                                                       overlayChat,
                                                     ],
                                             ),
-                                            Positioned(
-                                              top: 0,
-                                              bottom: 0,
-                                              left:
-                                                  settingsStore
-                                                      .landscapeChatLeftSide
-                                                  ? (totalWidth * chatWidth) -
-                                                        12
-                                                  : null,
-                                              right:
-                                                  !settingsStore
-                                                      .landscapeChatLeftSide
-                                                  ? (totalWidth * chatWidth) -
-                                                        12
-                                                  : null,
-                                              child: draggableDivider,
-                                            ),
+                                            if (settingsStore
+                                                .fullScreenChatOverlay)
+                                              Positioned(
+                                                top: 0,
+                                                bottom: 0,
+                                                left:
+                                                    settingsStore
+                                                        .landscapeChatLeftSide
+                                                    ? (totalWidth * chatWidth) -
+                                                          12
+                                                    : null,
+                                                right:
+                                                    !settingsStore
+                                                        .landscapeChatLeftSide
+                                                    ? (totalWidth * chatWidth) -
+                                                          12
+                                                    : null,
+                                                child: draggableDivider,
+                                              ),
                                           ],
                                         );
                                       },
