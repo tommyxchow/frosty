@@ -1,3 +1,16 @@
+## v5.0.5
+
+January 9, 2026
+
+### Bug Fixes
+
+- Fixed lag/frame drops in overlay chat mode.
+- Fixed draggable divider still interactable in fullscreen mode.
+- Fixed landscape bottom padding in chat bottom bar.
+- [iOS] Fixed user agent breaking login.
+
+---
+
 ## v5.0.4
 
 January 8, 2026
