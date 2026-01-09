@@ -10,12 +10,12 @@ import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/frosty_notification.dart';
-import 'package:native_device_orientation/native_device_orientation.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
@@ -444,12 +444,6 @@ class _VideoChatState extends State<VideoChat>
                             .dark
                             .colorScheme
                             .onSurface,
-                        shadows: settingsStore.fullScreen && context.isLandscape
-                            ? const [
-                                Shadow(blurRadius: 8),
-                                Shadow(blurRadius: 4, offset: Offset(1, 1)),
-                              ]
-                            : null,
                       ),
                       child: landscapeChat,
                     ),
@@ -517,19 +511,134 @@ class _VideoChatState extends State<VideoChat>
                                                       overlayChat,
                                                     ],
                                             ),
+                                            if (settingsStore
+                                                .fullScreenChatOverlay)
+                                              Positioned(
+                                                top: 0,
+                                                bottom: 0,
+                                                left:
+                                                    settingsStore
+                                                        .landscapeChatLeftSide
+                                                    ? (totalWidth * chatWidth) -
+                                                          12
+                                                    : null,
+                                                right:
+                                                    !settingsStore
+                                                        .landscapeChatLeftSide
+                                                    ? (totalWidth * chatWidth) -
+                                                          12
+                                                    : null,
+                                                child: draggableDivider,
+                                              ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                ],
+                              )
+                            : SafeArea(
+                                bottom: false,
+                                left: settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.left &&
+                                    settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.both,
+                                right: settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.right &&
+                                    settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.both,
+                                child: LayoutBuilder(
+                                      builder: (context, constraints) {
+                                        final availableWidth =
+                                            constraints.maxWidth;
+                                        final chatWidth = _chatStore.expandChat
+                                            ? 0.5
+                                            : settingsStore.chatWidth;
+
+                                        // Create the landscape chat container with proper styling
+                                        final chatContainer = AnimatedContainer(
+                                          curve: Curves.ease,
+                                          duration: _isDividerDragging
+                                              ? Duration.zero
+                                              : const Duration(
+                                                  milliseconds: 200,
+                                                ),
+                                          width: availableWidth * chatWidth,
+                                          color: settingsStore.fullScreen
+                                              ? Colors.black.withValues(
+                                                  alpha: settingsStore
+                                                      .fullScreenChatOverlayOpacity,
+                                                )
+                                              : context.scaffoldColor,
+                                          child: chat,
+                                        );
+
+                                        final draggableDivider = Observer(
+                                          builder: (_) => DraggableDivider(
+                                            currentWidth: chatWidth,
+                                            maxWidth: 0.6,
+                                            isResizableOnLeft: settingsStore
+                                                .landscapeChatLeftSide,
+                                            showHandle:
+                                                _videoStore.overlayVisible,
+                                            onDragStart: () {
+                                              setState(() {
+                                                _isDividerDragging = true;
+                                              });
+                                            },
+                                            onDrag: (newWidth) {
+                                              if (!_chatStore.expandChat) {
+                                                settingsStore.chatWidth =
+                                                    newWidth;
+                                              }
+                                            },
+                                            onDragEnd: () {
+                                              setState(() {
+                                                _isDividerDragging = false;
+                                              });
+                                            },
+                                          ),
+                                        );
+
+                                        return Stack(
+                                          children: [
+                                            Row(
+                                              children:
+                                                  settingsStore
+                                                      .landscapeChatLeftSide
+                                                  ? [
+                                                      chatContainer,
+                                                      Expanded(
+                                                        child:
+                                                            _buildPipGestureWrapper(
+                                                              child: video,
+                                                            ),
+                                                      ),
+                                                    ]
+                                                  : [
+                                                      Expanded(
+                                                        child:
+                                                            _buildPipGestureWrapper(
+                                                              child: video,
+                                                            ),
+                                                      ),
+                                                      chatContainer,
+                                                    ],
+                                            ),
                                             Positioned(
                                               top: 0,
                                               bottom: 0,
                                               left:
                                                   settingsStore
                                                       .landscapeChatLeftSide
-                                                  ? (totalWidth * chatWidth) -
+                                                  ? (availableWidth *
+                                                            chatWidth) -
                                                         12
                                                   : null,
                                               right:
                                                   !settingsStore
                                                       .landscapeChatLeftSide
-                                                  ? (totalWidth * chatWidth) -
+                                                  ? (availableWidth *
+                                                            chatWidth) -
                                                         12
                                                   : null,
                                               child: draggableDivider,
@@ -538,136 +647,7 @@ class _VideoChatState extends State<VideoChat>
                                         );
                                       },
                                     ),
-                                ],
-                              )
-                            : NativeDeviceOrientationReader(
-                                useSensor: true,
-                                builder: (context) {
-                                  final orientation =
-                                      NativeDeviceOrientationReader.orientation(
-                                        context,
-                                      );
-
-                                  // Determine which side to fill based on setting
-                                  final bool fillLeft;
-                                  final bool fillRight;
-
-                                  if (settingsStore.landscapeFillAllEdges) {
-                                    fillLeft = true;
-                                    fillRight = true;
-                                  } else {
-                                    // Auto mode: fill the physical bottom side (opposite of notch)
-                                    // landscapeLeft = notch on left → fill right
-                                    // landscapeRight = notch on right → fill left
-                                    fillLeft =
-                                        orientation ==
-                                        NativeDeviceOrientation.landscapeRight;
-                                    fillRight =
-                                        orientation ==
-                                        NativeDeviceOrientation.landscapeLeft;
-                                  }
-
-                                  return SafeArea(
-                                    bottom: false,
-                                    left: !fillLeft,
-                                    right: !fillRight,
-                                    child: LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    final availableWidth = constraints.maxWidth;
-                                    final chatWidth = _chatStore.expandChat
-                                        ? 0.5
-                                        : settingsStore.chatWidth;
-
-                                    // Create the landscape chat container with proper styling
-                                    final chatContainer = AnimatedContainer(
-                                      curve: Curves.ease,
-                                      duration: _isDividerDragging
-                                          ? Duration.zero
-                                          : const Duration(milliseconds: 200),
-                                      width: availableWidth * chatWidth,
-                                      color: settingsStore.fullScreen
-                                          ? Colors.black.withValues(
-                                              alpha: settingsStore
-                                                  .fullScreenChatOverlayOpacity,
-                                            )
-                                          : context.scaffoldColor,
-                                      child: chat,
-                                    );
-
-                                    final draggableDivider = Observer(
-                                      builder: (_) => DraggableDivider(
-                                        currentWidth: chatWidth,
-                                        maxWidth: 0.6,
-                                        isResizableOnLeft:
-                                            settingsStore.landscapeChatLeftSide,
-                                        showHandle: _videoStore.overlayVisible,
-                                        onDragStart: () {
-                                          setState(() {
-                                            _isDividerDragging = true;
-                                          });
-                                        },
-                                        onDrag: (newWidth) {
-                                          if (!_chatStore.expandChat) {
-                                            settingsStore.chatWidth = newWidth;
-                                          }
-                                        },
-                                        onDragEnd: () {
-                                          setState(() {
-                                            _isDividerDragging = false;
-                                          });
-                                        },
-                                      ),
-                                    );
-
-                                    return Stack(
-                                      children: [
-                                        Row(
-                                          children:
-                                              settingsStore
-                                                  .landscapeChatLeftSide
-                                              ? [
-                                                  chatContainer,
-                                                  Expanded(
-                                                    child:
-                                                        _buildPipGestureWrapper(
-                                                          child: video,
-                                                        ),
-                                                  ),
-                                                ]
-                                              : [
-                                                  Expanded(
-                                                    child:
-                                                        _buildPipGestureWrapper(
-                                                          child: video,
-                                                        ),
-                                                  ),
-                                                  chatContainer,
-                                                ],
-                                        ),
-                                        Positioned(
-                                          top: 0,
-                                          bottom: 0,
-                                          left:
-                                              settingsStore
-                                                  .landscapeChatLeftSide
-                                              ? (availableWidth * chatWidth) -
-                                                    12
-                                              : null,
-                                          right:
-                                              !settingsStore
-                                                  .landscapeChatLeftSide
-                                              ? (availableWidth * chatWidth) -
-                                                    12
-                                              : null,
-                                          child: draggableDivider,
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                  );
-                                },
-                              )
+                                  )
                       : SafeArea(child: chat),
                 );
               }

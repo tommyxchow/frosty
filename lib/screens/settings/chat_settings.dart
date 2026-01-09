@@ -232,14 +232,17 @@ class _ChatSettingsState extends State<ChatSettings> {
             onChanged: (newValue) =>
                 settingsStore.landscapeForceVerticalChat = newValue,
           ),
-          SettingsListSwitch(
-            title: 'Fill all edges',
-            subtitle: const Text(
-              'Fills both edges instead of just the bottom edge.',
-            ),
-            value: settingsStore.landscapeFillAllEdges,
-            onChanged: (newValue) =>
-                settingsStore.landscapeFillAllEdges = newValue,
+          SettingsListSelect(
+            title: 'Fill notch side',
+            subtitle:
+                'Overrides and fills the available space in devices with a display notch.',
+            selectedOption:
+                landscapeCutoutNames[settingsStore.landscapeCutout.index],
+            options: landscapeCutoutNames,
+            onChanged: (newValue) => settingsStore.landscapeCutout =
+                LandscapeCutoutType.values[landscapeCutoutNames.indexOf(
+                  newValue,
+                )],
           ),
           SettingsListSlider(
             title: 'Chat overlay opacity',

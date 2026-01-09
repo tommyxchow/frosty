@@ -1,3 +1,33 @@
+## v5.0.5
+
+January 9, 2026
+
+### Bug Fixes
+
+- Fixed lag/frame drops in overlay chat mode.
+- Fixed draggable divider still interactable in fullscreen mode.
+- Fixed landscape bottom padding in chat bottom bar.
+- [iOS] Fixed user agent breaking login.
+
+---
+
+## v5.0.4
+
+January 8, 2026
+
+### Improvements
+
+- Swipe down to PiP gesture now works in landscape mode.
+- The rotate button now adjusts to your device's physical orientation instead of always rotating to the same direction.
+- Replaced "Fill notch side" setting with "Fill all edges" and made edge padding auto-adjust based on device rotation.
+
+### Bug Fixes
+
+- Fixed Google login not working.
+- [iOS] Fixed bottom safe area in landscape mode.
+
+---
+
 ## v5.0.3
 
 January 6, 2026

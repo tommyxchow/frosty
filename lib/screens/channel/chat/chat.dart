@@ -53,46 +53,58 @@ class Chat extends StatelessWidget {
                         style: context.defaultTextStyle.copyWith(
                           fontSize: chatStore.settings.fontSize,
                         ),
-                        child: FrostyScrollbar(
-                          controller: chatStore.scrollController,
-                          padding: EdgeInsets.only(
-                            top: MediaQuery.of(context).padding.top,
-                            bottom:
-                                chatStore.bottomBarHeight +
-                                (chatStore.assetsStore.showEmoteMenu
-                                    ? 0
-                                    : MediaQuery.of(context).padding.bottom),
-                          ),
-                          child: Observer(
-                            builder: (context) {
-                              return ListView.builder(
-                                reverse: true,
-                                padding: (listPadding ?? EdgeInsets.zero).add(
-                                  EdgeInsets.only(
-                                    bottom:
-                                        chatStore.bottomBarHeight +
-                                        (chatStore.assetsStore.showEmoteMenu
-                                            ? 0
-                                            : MediaQuery.of(
-                                                context,
-                                              ).padding.bottom),
-                                  ),
-                                ),
-                                addAutomaticKeepAlives: false,
-                                controller: chatStore.scrollController,
-                                itemCount: chatStore.renderMessages.length,
-                                itemBuilder: (context, index) => ChatMessage(
-                                  ircMessage:
-                                      chatStore.renderMessages[chatStore
-                                              .renderMessages
-                                              .length -
-                                          1 -
-                                          index],
-                                  chatStore: chatStore,
-                                ),
-                              );
-                            },
-                          ),
+                        child: Builder(
+                          builder: (context) {
+                            // Don't add bottom padding in horizontal landscape
+                            // (immersive mode with home indicator on side).
+                            // landscapeForceVerticalChat uses portrait layout
+                            // with normal system UI, so still needs padding.
+                            final isHorizontalLandscape =
+                                context.isLandscape &&
+                                !chatStore.settings.landscapeForceVerticalChat;
+                            final bottomPadding =
+                                chatStore.assetsStore.showEmoteMenu ||
+                                    isHorizontalLandscape
+                                ? 0.0
+                                : MediaQuery.of(context).padding.bottom;
+
+                            return FrostyScrollbar(
+                              controller: chatStore.scrollController,
+                              padding: EdgeInsets.only(
+                                top: MediaQuery.of(context).padding.top,
+                                bottom:
+                                    chatStore.bottomBarHeight + bottomPadding,
+                              ),
+                              child: Observer(
+                                builder: (context) {
+                                  return ListView.builder(
+                                    reverse: true,
+                                    padding: (listPadding ?? EdgeInsets.zero)
+                                        .add(
+                                          EdgeInsets.only(
+                                            bottom:
+                                                chatStore.bottomBarHeight +
+                                                bottomPadding,
+                                          ),
+                                        ),
+                                    addAutomaticKeepAlives: false,
+                                    controller: chatStore.scrollController,
+                                    itemCount: chatStore.renderMessages.length,
+                                    itemBuilder: (context, index) =>
+                                        ChatMessage(
+                                          ircMessage:
+                                              chatStore.renderMessages[chatStore
+                                                      .renderMessages
+                                                      .length -
+                                                  1 -
+                                                  index],
+                                          chatStore: chatStore,
+                                        ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -119,41 +131,51 @@ class Chat extends StatelessWidget {
                       onAddChat: onAddChat,
                     ),
                   ),
-                  AnimatedPadding(
-                    duration: const Duration(milliseconds: 200),
-                    padding: EdgeInsets.only(
-                      left: 4,
-                      top: 4,
-                      right: 4,
-                      bottom:
-                          chatStore.bottomBarHeight +
-                          (chatStore.assetsStore.showEmoteMenu
-                              ? 0
-                              : MediaQuery.of(context).padding.bottom),
-                    ),
-                    child: Observer(
-                      builder: (_) => AnimatedSwitcher(
+                  Builder(
+                    builder: (context) {
+                      final isHorizontalLandscape =
+                          context.isLandscape &&
+                          !chatStore.settings.landscapeForceVerticalChat;
+                      return AnimatedPadding(
                         duration: const Duration(milliseconds: 200),
-                        switchInCurve: Curves.easeOut,
-                        switchOutCurve: Curves.easeIn,
-                        child: chatStore.autoScroll
-                            ? null
-                            : ElevatedButton.icon(
-                                onPressed: chatStore.resumeScroll,
-                                icon: const Icon(Icons.arrow_downward_rounded),
-                                label: Text(
-                                  chatStore.messageBuffer.isNotEmpty
-                                      ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
-                                      : 'Resume scroll',
-                                  style: const TextStyle(
-                                    fontFeatures: [
-                                      FontFeature.tabularFigures(),
-                                    ],
+                        padding: EdgeInsets.only(
+                          left: 4,
+                          top: 4,
+                          right: 4,
+                          bottom:
+                              chatStore.bottomBarHeight +
+                              (chatStore.assetsStore.showEmoteMenu ||
+                                      isHorizontalLandscape
+                                  ? 0
+                                  : MediaQuery.of(context).padding.bottom),
+                        ),
+                        child: Observer(
+                          builder: (_) => AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 200),
+                            switchInCurve: Curves.easeOut,
+                            switchOutCurve: Curves.easeIn,
+                            child: chatStore.autoScroll
+                                ? null
+                                : ElevatedButton.icon(
+                                    onPressed: chatStore.resumeScroll,
+                                    icon: const Icon(
+                                      Icons.arrow_downward_rounded,
+                                    ),
+                                    label: Text(
+                                      chatStore.messageBuffer.isNotEmpty
+                                          ? '${chatStore.messageBuffer.length} new ${chatStore.messageBuffer.length == 1 ? 'message' : 'messages'}'
+                                          : 'Resume scroll',
+                                      style: const TextStyle(
+                                        fontFeatures: [
+                                          FontFeature.tabularFigures(),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                      ),
-                    ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
