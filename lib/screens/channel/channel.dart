@@ -10,12 +10,12 @@ import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/frosty_notification.dart';
-import 'package:native_device_orientation/native_device_orientation.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
@@ -536,37 +536,17 @@ class _VideoChatState extends State<VideoChat>
                                     ),
                                 ],
                               )
-                            : NativeDeviceOrientationReader(
-                                builder: (context) {
-                                  final orientation =
-                                      NativeDeviceOrientationReader.orientation(
-                                        context,
-                                      );
-
-                                  // Determine which edges to fill based on orientation
-                                  // Auto mode fills the physical bottom (opposite of notch):
-                                  // landscapeLeft = notch on left -> fill right
-                                  // landscapeRight = notch on right -> fill left
-                                  final bool fillLeft;
-                                  final bool fillRight;
-
-                                  if (settingsStore.landscapeFillAllEdges) {
-                                    fillLeft = true;
-                                    fillRight = true;
-                                  } else {
-                                    fillLeft =
-                                        orientation ==
-                                        NativeDeviceOrientation.landscapeRight;
-                                    fillRight =
-                                        orientation ==
-                                        NativeDeviceOrientation.landscapeLeft;
-                                  }
-
-                                  return SafeArea(
-                                    bottom: false,
-                                    left: !fillLeft,
-                                    right: !fillRight,
-                                    child: LayoutBuilder(
+                            : SafeArea(
+                                bottom: false,
+                                left: settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.left &&
+                                    settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.both,
+                                right: settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.right &&
+                                    settingsStore.landscapeCutout !=
+                                        LandscapeCutoutType.both,
+                                child: LayoutBuilder(
                                       builder: (context, constraints) {
                                         final availableWidth =
                                             constraints.maxWidth;
@@ -667,9 +647,7 @@ class _VideoChatState extends State<VideoChat>
                                         );
                                       },
                                     ),
-                                  );
-                                },
-                              )
+                                  )
                       : SafeArea(child: chat),
                 );
               }
