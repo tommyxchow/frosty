@@ -15,19 +15,20 @@ Frosty is a cross-platform Flutter app for Twitch that supports third-party emot
 - `flutter build apk` - Build Android APK
 - `flutter build ios` - Build iOS app
 - `flutter analyze` - Run static analysis and lint checks
+- `flutter test` - Run all tests
 
 ### Code Generation (REQUIRED)
 
 All MobX stores and JSON models require code generation. **Always run after any MobX or model changes:**
 
 ```bash
-flutter packages pub run build_runner build --delete-conflicting-outputs
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 **Alternative commands:**
 
-- `flutter packages pub run build_runner build` - Generate code once
-- `flutter packages pub run build_runner watch` - Watch and regenerate code on changes
+- `dart run build_runner build` - Generate code once
+- `dart run build_runner watch` - Watch and regenerate code on changes
 
 Generated `.g.dart` files are excluded from linting but must be committed to source control.
 
@@ -45,7 +46,9 @@ flutter run --dart-define=clientId=YOUR_TWITCH_CLIENT_ID --dart-define=secret=YO
 
 - **Store Pattern**: Each feature has stores in `lib/screens/{feature}/stores/` (not at screen root)
 - **Naming**: All stores end with `Store` suffix and have corresponding `.g.dart` files
-- **Global Stores**: `AuthStore` and `SettingsStore` in `lib/screens/settings/stores/`
+- **Global Stores**:
+  - `AuthStore`, `SettingsStore` in `lib/screens/settings/stores/`
+  - `GlobalAssetsStore` (shared emote/badge cache) in `lib/stores/`
 - **Dependency Injection**: Stores are provided via Provider in `main.dart` with shared HTTP client
 
 ### API Service Architecture
@@ -97,7 +100,7 @@ lib/screens/{feature}/
 ### Model Generation
 
 - **JSON Serialization**: Models use `@JsonSerializable()` with `.g.dart` companions
-- **Emote Architecture**: Base `Emote` class with platform-specific factories (`Emote.fromTwitch()`, `Emote.fromBTTV()`)
+- **Emote Architecture**: Base `Emote` class with platform-specific factories (`Emote.fromTwitch()`, `Emote.fromBTTV()`, `Emote.fromFFZ()`, `Emote.from7TV()`)
 
 ## Key Integration Points
 
@@ -140,7 +143,7 @@ Analysis rules in `analysis_options.yaml`:
 - Package imports: `always_use_package_imports`
 - Trailing commas: `require_trailing_commas`
 - Final locals: `prefer_final_locals`
-- Additional rules: `directives_ordering`, `avoid_void_async`, `always_declare_return_types`
+- Additional rules: `directives_ordering`, `avoid_void_async`, `always_declare_return_types`, `avoid_redundant_argument_values`, `unnecessary_parenthesis`
 
 **Important**: `.g.dart` files are excluded from analysis but must be committed to source control.
 
@@ -166,7 +169,8 @@ autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
 
 ### Error Handling
 
-Use `Future.error()` for API failures, not exceptions.
+API services use typed exceptions via `BaseApiClient` (`lib/apis/base_api_client.dart`):
+- `ApiException`, `NetworkException`, `TimeoutException`, `ServerException`, `NotFoundException`, `UnauthorizedException`
 
 ## MobX Store Implementation
 
@@ -174,7 +178,7 @@ Use `Future.error()` for API failures, not exceptions.
 
 All stores follow `StoreBase with _$StoreName` pattern:
 
-- Generate `.g.dart` files with `flutter packages pub run build_runner build`
+- Generate `.g.dart` files with `dart run build_runner build`
 - Use `@observable`, `@action`, and `@computed` annotations
 - Settings store uses `@JsonSerializable()` with automatic persistence via `autorun()`
 
@@ -204,5 +208,9 @@ Settings automatically saved to SharedPreferences via MobX `autorun()` reaction.
 - **iOS/Android**: Native platform features via plugins
 - **Custom Cache**: `CustomCacheManager` for media caching
 - **PiP Mode**: Custom implementation via git dependency
+
+## Commit Convention
+
+Commits use lowercase, descriptive messages without prefixes (e.g., `fix landscape bottom padding in chat bottom bar`, `add swipe pip gesture support`). Keep commits tightly scoped.
 
 When working with this codebase, always consider MobX code generation requirements and the shared HTTP client pattern for API efficiency.
