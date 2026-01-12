@@ -5,10 +5,10 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: c209688d9f5a5f26b2fb47a188131a6fb9e876ae9e47af3737c0b4f58a93470d
+      sha256: "5b7468c326d2f8a4f630056404ca0d291ade42918f4a3c6233618e724f39da8e"
       url: "https://pub.dev"
     source: hosted
-    version: "91.0.0"
+    version: "92.0.0"
   _flutterfire_internals:
     dependency: transitive
     description:
@@ -29,10 +29,10 @@ packages:
     dependency: transitive
     description:
       name: analyzer
-      sha256: f51c8499b35f9b26820cfe914828a6a98a94efd5cc78b37bb7d03debae3a1d08
+      sha256: "70e4b1ef8003c64793a9e268a551a82869a8a96f39deb73dea28084b0e8bf75e"
       url: "https://pub.dev"
     source: hosted
-    version: "8.4.1"
+    version: "9.0.0"
   ansicolor:
     dependency: transitive
     description:
@@ -684,10 +684,10 @@ packages:
     dependency: "direct dev"
     description:
       name: json_serializable
-      sha256: c5b2ee75210a0f263c6c7b9eeea80553dbae96ea1bf57f02484e806a3ffdffa3
+      sha256: "6b253f7851cf1626a05c8b49c792e04a14897349798c03798137f2b5f7e0b5b1"
       url: "https://pub.dev"
     source: hosted
-    version: "6.11.2"
+    version: "6.11.3"
   leak_tracker:
     dependency: transitive
     description:
@@ -772,18 +772,18 @@ packages:
     dependency: "direct main"
     description:
       name: mobx
-      sha256: bf1a90e5bcfd2851fc6984e20eef69557c65d9e4d0a88f5be4cf72c9819ce6b0
+      sha256: "25ea9a3ee69243d578fb6288721d8eeb18550d0391c32f896d377d994154bff2"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.0"
+    version: "2.6.0"
   mobx_codegen:
     dependency: "direct dev"
     description:
       name: mobx_codegen
-      sha256: "471b02d0cf7f64d1366944e9dc64353674807d31e48faba2201918cc1601876d"
+      sha256: "406051a76157fb0a562700110bd2bedd85c959b1cd2d3df740c706bc07539c33"
       url: "https://pub.dev"
     source: hosted
-    version: "2.7.4"
+    version: "2.7.6"
   native_device_orientation:
     dependency: "direct main"
     description:
@@ -1082,10 +1082,10 @@ packages:
     dependency: transitive
     description:
       name: source_helper
-      sha256: "6a3c6cc82073a8797f8c4dc4572146114a39652851c157db37e964d9c7038723"
+      sha256: e82b1996c63da42aa3e6a34cc1ec17427728a1baf72ed017717a5669a7123f0d
       url: "https://pub.dev"
     source: hosted
-    version: "1.3.8"
+    version: "1.3.9"
   source_span:
     dependency: transitive
     description:
