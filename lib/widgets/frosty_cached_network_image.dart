@@ -5,6 +5,7 @@ import 'package:frosty/cache_manager.dart';
 /// A wrapper around [CachedNetworkImage] that adds custom defaults for Frosty.
 class FrostyCachedNetworkImage extends StatelessWidget {
   final String imageUrl;
+  final ImageWidgetBuilder? imageBuilder;
   final String? cacheKey;
   final double? width;
   final double? height;
@@ -18,6 +19,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
   const FrostyCachedNetworkImage({
     super.key,
     required this.imageUrl,
+    this.imageBuilder,
     this.cacheKey,
     this.width,
     this.height,
@@ -33,6 +35,7 @@ class FrostyCachedNetworkImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return CachedNetworkImage(
       imageUrl: imageUrl,
+      imageBuilder: imageBuilder,
       cacheKey: cacheKey,
       width: width,
       height: height,

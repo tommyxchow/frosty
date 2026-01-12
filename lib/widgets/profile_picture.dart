@@ -59,25 +59,36 @@ class _ProfilePictureState extends State<ProfilePicture> {
     final diameter = widget.radius * 2;
     final placeholderColor = Theme.of(context).colorScheme.surfaceContainer;
 
-    return ClipOval(
-      child: FutureBuilder<String>(
-        future: _getProfileImageUrl(),
-        builder: (context, snapshot) {
-          return snapshot.hasData
-              ? FrostyCachedNetworkImage(
-                  width: diameter,
-                  height: diameter,
-                  imageUrl: snapshot.data!,
-                  placeholder: (context, url) =>
-                      ColoredBox(color: placeholderColor),
-                )
-              : Container(
-                  color: placeholderColor,
-                  width: diameter,
-                  height: diameter,
-                );
-        },
+    final placeholder = Container(
+      decoration: BoxDecoration(
+        color: placeholderColor,
+        shape: BoxShape.circle,
       ),
+      width: diameter,
+      height: diameter,
+    );
+
+    return FutureBuilder<String>(
+      future: _getProfileImageUrl(),
+      builder: (context, snapshot) {
+        return snapshot.hasData
+            ? FrostyCachedNetworkImage(
+                width: diameter,
+                height: diameter,
+                imageUrl: snapshot.data!,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                placeholder: (context, url) => placeholder,
+              )
+            : placeholder;
+      },
     );
   }
 }

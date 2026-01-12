@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 /// Gradient direction for the blurred container
@@ -25,8 +23,6 @@ class BlurConfig {
 class BlurredContainer extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
-  final double? sigmaX;
-  final double? sigmaY;
   final double? backgroundAlpha;
   final bool? forceDarkMode;
   final GradientDirection gradientDirection;
@@ -35,8 +31,6 @@ class BlurredContainer extends StatelessWidget {
     super.key,
     required this.child,
     this.padding,
-    this.sigmaX,
-    this.sigmaY,
     this.backgroundAlpha,
     this.forceDarkMode,
     this.gradientDirection = GradientDirection.none,
@@ -105,18 +99,13 @@ class BlurredContainer extends StatelessWidget {
       );
     }
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: sigmaX ?? BlurConfig.sigmaX,
-          sigmaY: sigmaY ?? BlurConfig.sigmaY,
-        ),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: padding,
-          decoration: decoration,
-          child: child,
-        ),
+    return Container(
+      color: backgroundColor.withValues(alpha: adaptiveAlpha),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: padding,
+        decoration: decoration,
+        child: child,
       ),
     );
   }

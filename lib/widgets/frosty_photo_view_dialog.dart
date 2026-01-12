@@ -96,13 +96,7 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
       alignment: Alignment.topCenter,
       children: [
         // Very weak blurred background behind the image (fills the screen)
-        BlurredContainer(
-          sigmaX: 4.0,
-          sigmaY: 4.0,
-          // Use a very low alpha so the blur is subtle
-          backgroundAlpha: 0,
-          child: const SizedBox.expand(),
-        ),
+        BlurredContainer(backgroundAlpha: 0, child: const SizedBox.expand()),
         // Use a GestureDetector so we can track vertical drags and translate the
         // PhotoView accordingly. When the photo is zoomed (not initial) we disable dragging.
         GestureDetector(
