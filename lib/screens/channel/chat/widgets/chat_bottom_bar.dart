@@ -106,6 +106,9 @@ class ChatBottomBar extends StatelessWidget {
                                         chatStore.settings.launchUrlExternal,
                                     timestamp: chatStore.settings.timestampType,
                                     currentChannelId: chatStore.channelId,
+                                    disableEmoteAnimations: chatStore
+                                        .settings
+                                        .disableEmoteAnimations,
                                   ),
                             ),
                             maxLines: 1,
@@ -152,13 +155,18 @@ class ChatBottomBar extends StatelessWidget {
                           context,
                           emote: matchingEmotes[index],
                           launchExternal: chatStore.settings.launchUrlExternal,
+                          disableEmoteAnimations:
+                              chatStore.settings.disableEmoteAnimations,
                         );
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Center(
                           child: FrostyCachedNetworkImage(
-                            imageUrl: matchingEmotes[index].url,
+                            imageUrl: matchingEmotes[index].getDisplayUrl(
+                              disableAnimations:
+                                  chatStore.settings.disableEmoteAnimations,
+                            ),
                             useFade: false,
                             height:
                                 matchingEmotes[index].height?.toDouble() ??
@@ -272,6 +280,8 @@ class ChatBottomBar extends StatelessWidget {
                                 emoteSize:
                                     chatStore.settings.emoteScale *
                                     defaultEmoteSize,
+                                disableEmoteAnimations:
+                                    chatStore.settings.disableEmoteAnimations,
                               ),
                               decoration: InputDecoration(
                                 prefixIcon:

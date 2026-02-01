@@ -18,10 +18,14 @@ class EmoteTextSpanBuilder extends SpecialTextSpanBuilder {
   /// The height to render emotes at.
   final double emoteSize;
 
+  /// Whether to disable animated emotes and show static versions.
+  final bool disableEmoteAnimations;
+
   EmoteTextSpanBuilder({
     required this.emoteToObject,
     required this.userEmoteToObject,
     required this.emoteSize,
+    this.disableEmoteAnimations = false,
   });
 
   @override
@@ -100,7 +104,9 @@ class EmoteTextSpanBuilder extends SpecialTextSpanBuilder {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 1),
         child: FrostyCachedNetworkImage(
-          imageUrl: emote.url,
+          imageUrl: emote.getDisplayUrl(
+            disableAnimations: disableEmoteAnimations,
+          ),
           height: height,
           width: width,
           useFade: false,
