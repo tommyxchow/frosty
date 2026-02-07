@@ -9,7 +9,6 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
-import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
 import 'package:frosty/widgets/frosty_photo_view_dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
@@ -98,24 +97,25 @@ class StreamCard extends StatelessWidget {
           ),
           Container(
             margin: const EdgeInsets.all(3),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
-            clipBehavior: Clip.antiAlias,
-            child: BlurredContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              sigmaX: 8.0, // Less blur for subtlety
-              sigmaY: 8.0, // Less blur for subtlety
-              forceDarkMode: true,
-              child: Uptime(
-                startTime: streamInfo.startedAt,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: context
-                      .watch<FrostyThemes>()
-                      .dark
-                      .colorScheme
-                      .onSurface,
-                ),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.55),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
+                width: 0.5,
+              ),
+            ),
+            child: Uptime(
+              startTime: streamInfo.startedAt,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: context
+                    .watch<FrostyThemes>()
+                    .dark
+                    .colorScheme
+                    .onSurface,
               ),
             ),
           ),
