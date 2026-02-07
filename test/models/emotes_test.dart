@@ -34,6 +34,19 @@ void main() {
 
       expect(emote.ownerId, '67890');
     });
+
+    test('handles null owner ID', () {
+      final twitchEmote = EmoteTwitch(
+        '25',
+        'Kappa',
+        'bitstier',
+        null,
+      );
+
+      final emote = Emote.fromTwitch(twitchEmote, EmoteType.twitchGlobal);
+
+      expect(emote.ownerId, isNull);
+    });
   });
 
   group('Emote.fromBTTV', () {
@@ -47,53 +60,21 @@ void main() {
       expect(emote.type, EmoteType.bttvGlobal);
     });
 
-    test('marks SoSnowy as zero-width', () {
-      final bttvEmote = EmoteBTTV('snowyid', 'SoSnowy');
-
-      final emote = Emote.fromBTTV(bttvEmote, EmoteType.bttvGlobal);
-
-      expect(emote.zeroWidth, isTrue);
-    });
-
-    test('marks IceCold as zero-width', () {
-      final bttvEmote = EmoteBTTV('iceid', 'IceCold');
-
-      final emote = Emote.fromBTTV(bttvEmote, EmoteType.bttvChannel);
-
-      expect(emote.zeroWidth, isTrue);
-    });
-
-    test('marks SantaHat as zero-width', () {
-      final bttvEmote = EmoteBTTV('santaid', 'SantaHat');
-
-      final emote = Emote.fromBTTV(bttvEmote, EmoteType.bttvShared);
-
-      expect(emote.zeroWidth, isTrue);
-    });
-
-    test('marks TopHat as zero-width', () {
-      final bttvEmote = EmoteBTTV('topid', 'TopHat');
-
-      final emote = Emote.fromBTTV(bttvEmote, EmoteType.bttvGlobal);
-
-      expect(emote.zeroWidth, isTrue);
-    });
-
-    test('marks cvMask as zero-width', () {
-      final bttvEmote = EmoteBTTV('maskid', 'cvMask');
-
-      final emote = Emote.fromBTTV(bttvEmote, EmoteType.bttvGlobal);
-
-      expect(emote.zeroWidth, isTrue);
-    });
-
-    test('marks cvHazmat as zero-width', () {
-      final bttvEmote = EmoteBTTV('hazmatid', 'cvHazmat');
-
-      final emote = Emote.fromBTTV(bttvEmote, EmoteType.bttvGlobal);
-
-      expect(emote.zeroWidth, isTrue);
-    });
+    for (final name in [
+      'SoSnowy',
+      'IceCold',
+      'SantaHat',
+      'TopHat',
+      'ReinDeer',
+      'CandyCane',
+      'cvMask',
+      'cvHazmat',
+    ]) {
+      test('marks $name as zero-width', () {
+        final emote = Emote.fromBTTV(EmoteBTTV('id', name), EmoteType.bttvGlobal);
+        expect(emote.zeroWidth, isTrue);
+      });
+    }
 
     test('regular emotes are not zero-width', () {
       final bttvEmote = EmoteBTTV('regularid', 'RegularEmote');
@@ -213,6 +194,29 @@ void main() {
 
       // Should use animated 2x since animated 4x is not available
       expect(emote.url, 'https://cdn.ffz.net/anim/2x.gif');
+    });
+
+    test('animated with only 1x falls back to animated 1x', () {
+      final ffzEmote = EmoteFFZ(
+        'AnimOnly1x',
+        24,
+        24,
+        const OwnerFFZ(displayName: 'Owner', name: 'owner'),
+        const ImagesFFZ(
+          'https://cdn.ffz.net/static/1x.png',
+          'https://cdn.ffz.net/static/2x.png',
+          'https://cdn.ffz.net/static/4x.png',
+        ),
+        const ImagesFFZ(
+          'https://cdn.ffz.net/anim/1x.gif',
+          null, // No animated 2x
+          null, // No animated 4x
+        ),
+      );
+
+      final emote = Emote.fromFFZ(ffzEmote, EmoteType.ffzGlobal);
+
+      expect(emote.url, 'https://cdn.ffz.net/anim/1x.gif');
     });
   });
 
@@ -470,6 +474,27 @@ void main() {
       expect(EmoteType.bttvShared.toString(), 'BetterTTV shared emote');
       expect(EmoteType.sevenTVGlobal.toString(), '7TV global emote');
       expect(EmoteType.sevenTVChannel.toString(), '7TV channel emote');
+    });
+  });
+
+  group('EmoteBTTVChannel', () {
+    test('combines channel and shared emotes', () {
+      final json = {
+        'channelEmotes': [
+          {'id': 'ch1', 'code': 'ChannelEmote'},
+        ],
+        'sharedEmotes': [
+          {'id': 'sh1', 'code': 'SharedEmote1'},
+          {'id': 'sh2', 'code': 'SharedEmote2'},
+        ],
+      };
+
+      final result = EmoteBTTVChannel.fromJson(json);
+
+      expect(result.channelEmotes.length, 1);
+      expect(result.channelEmotes.first.code, 'ChannelEmote');
+      expect(result.sharedEmotes.length, 2);
+      expect(result.sharedEmotes.first.code, 'SharedEmote1');
     });
   });
 

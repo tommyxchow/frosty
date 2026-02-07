@@ -152,6 +152,20 @@ const messageWithEmoji =
     'tmi-sent-ts=1234567890123;turbo=0;user-id=14141;user-type= '
     ':emojiuser!emojiuser@emojiuser.tmi.twitch.tv PRIVMSG #channel :Hello 😀🎉 World';
 
+/// A message with empty body (edge case)
+const messageEmptyBody =
+    '@badge-info=;badges=;color=#FF0000;display-name=EmptyMsg;emotes=;'
+    'id=empty-123;mod=0;room-id=12345;subscriber=0;'
+    'tmi-sent-ts=1234567890123;turbo=0;user-id=16161;user-type= '
+    ':emptymsg!emptymsg@emptymsg.tmi.twitch.tv PRIVMSG #channel :';
+
+/// A message containing only emotes (no text words)
+const messageOnlyEmotes =
+    '@badge-info=;badges=;color=#FF0000;display-name=EmoteOnly;'
+    'emotes=25:0-4,6-10;id=emoteonly-123;mod=0;room-id=12345;subscriber=0;'
+    'tmi-sent-ts=1234567890123;turbo=0;user-id=17171;user-type= '
+    ':emoteonly!emoteonly@emoteonly.tmi.twitch.tv PRIVMSG #channel :Kappa Kappa';
+
 /// A message with a URL
 const messageWithUrl =
     '@badge-info=;badges=;color=#9400D3;display-name=LinkUser;emotes=;'

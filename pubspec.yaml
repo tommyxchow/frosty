@@ -87,6 +87,8 @@ dev_dependencies:
     mobx_codegen: ^2.0.6
     flutter_native_splash: ^2.0.5
     flutter_launcher_icons: ^0.14.1
+    mocktail: ^1.0.4
+    http_mock_adapter: ^0.6.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frosty/utils.dart';
@@ -289,6 +291,49 @@ void main() {
           reason: 'Color $color should be readable',
         );
       }
+    });
+
+    testWidgets('adjusted color meets WCAG AA 4.5:1 contrast ratio',
+        (tester) async {
+      late Color adjustedColor;
+      const darkBackground = Color(0xFF121212);
+      const darkBlue = Color(0xFF0000AA);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark().copyWith(
+            scaffoldBackgroundColor: darkBackground,
+          ),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                adjustedColor = adjustChatNameColor(context, darkBlue);
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+
+      // Compute WCAG contrast ratio manually
+      double linearize(double c) => c <= 0.03928
+          ? c / 12.92
+          : math.pow((c + 0.055) / 1.055, 2.4).toDouble();
+
+      double luminance(Color c) {
+        return 0.2126 * linearize(c.r) +
+            0.7152 * linearize(c.g) +
+            0.0722 * linearize(c.b);
+      }
+
+      final l1 = luminance(adjustedColor);
+      final l2 = luminance(darkBackground);
+      final hi = l1 > l2 ? l1 : l2;
+      final lo = l1 > l2 ? l2 : l1;
+      final ratio = (hi + 0.05) / (lo + 0.05);
+
+      expect(ratio, greaterThanOrEqualTo(4.5),
+          reason: 'Adjusted color should meet WCAG AA 4.5:1 contrast ratio');
     });
   });
 }

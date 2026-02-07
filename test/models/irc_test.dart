@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/irc.dart';
 
 import '../fixtures/irc_messages.dart';
@@ -173,7 +174,7 @@ void main() {
         expect(msg.mention, isFalse);
       });
 
-      test('mention is null when userLogin not provided', () {
+      test('mention is false when userLogin not provided', () {
         final msg = IRCMessage.fromString(basicPrivmsg);
         expect(msg.mention, isFalse);
       });
@@ -227,6 +228,17 @@ void main() {
 
         expect(msg.tags['source-room-id'], '99999');
         expect(msg.tags['room-id'], '12345');
+      });
+
+      test('parses message with URL in split', () {
+        final msg = IRCMessage.fromString(messageWithUrl);
+
+        expect(msg.message, contains('https://twitch.tv/channel'));
+        expect(msg.split, isNotNull);
+        expect(
+          msg.split!.any((word) => regexLink.hasMatch(word)),
+          isTrue,
+        );
       });
     });
   });
@@ -453,6 +465,126 @@ void main() {
       // Unchanged values should keep original
       expect(updated.r9k, '0');
       expect(updated.subMode, '0');
+    });
+  });
+
+  group('IRCMessage.clearChat — buffered messages', () {
+    test('marks buffered messages from banned user', () {
+      final messages = <IRCMessage>[];
+      final bufferedMessages = [
+        IRCMessage(
+          raw: '',
+          command: Command.privateMessage,
+          tags: {'id': 'buf-1'},
+          user: 'banneduser',
+          message: 'Buffered msg',
+        ),
+        IRCMessage(
+          raw: '',
+          command: Command.privateMessage,
+          tags: {'id': 'buf-2'},
+          user: 'innocentuser',
+          message: 'Other msg',
+        ),
+      ];
+
+      final clearChatMsg = IRCMessage(
+        raw: '',
+        command: Command.clearChat,
+        tags: {'ban-duration': '600'},
+        message: 'banneduser',
+      );
+
+      IRCMessage.clearChat(
+        messages: messages,
+        bufferedMessages: bufferedMessages,
+        ircMessage: clearChatMsg,
+      );
+
+      expect(bufferedMessages[0].command, Command.clearChat);
+      expect(bufferedMessages[0].tags['ban-duration'], '600');
+      expect(bufferedMessages[1].command, Command.privateMessage);
+    });
+
+    test('full chat clear also clears buffered messages', () {
+      final messages = [
+        IRCMessage(
+          raw: '',
+          command: Command.privateMessage,
+          tags: {},
+          message: 'msg',
+        ),
+      ];
+      final bufferedMessages = [
+        IRCMessage(
+          raw: '',
+          command: Command.privateMessage,
+          tags: {},
+          message: 'buffered',
+        ),
+      ];
+
+      final clearAllMsg = IRCMessage(
+        raw: '',
+        command: Command.clearChat,
+        tags: {},
+      );
+
+      IRCMessage.clearChat(
+        messages: messages,
+        bufferedMessages: bufferedMessages,
+        ircMessage: clearAllMsg,
+      );
+
+      expect(bufferedMessages, isEmpty);
+    });
+  });
+
+  group('IRCMessage.clearMessage — buffered messages', () {
+    test('marks buffered message by ID', () {
+      final messages = <IRCMessage>[];
+      final bufferedMessages = [
+        IRCMessage(
+          raw: '',
+          command: Command.privateMessage,
+          tags: {'id': 'buf-target'},
+          user: 'someuser',
+          message: 'To be deleted',
+        ),
+      ];
+
+      final clearMsg = IRCMessage(
+        raw: '',
+        command: Command.clearMessage,
+        tags: {'target-msg-id': 'buf-target'},
+      );
+
+      IRCMessage.clearMessage(
+        messages: messages,
+        bufferedMessages: bufferedMessages,
+        ircMessage: clearMsg,
+      );
+
+      expect(bufferedMessages.first.command, Command.clearMessage);
+    });
+  });
+
+  group('IRCMessage edge cases', () {
+    test('parses message with empty body', () {
+      final msg = IRCMessage.fromString(messageEmptyBody);
+
+      expect(msg.command, Command.privateMessage);
+      // Empty trailing content after the colon
+      expect(msg.message, isEmpty);
+    });
+
+    test('parses emote-only message', () {
+      final msg = IRCMessage.fromString(messageOnlyEmotes);
+
+      expect(msg.command, Command.privateMessage);
+      expect(msg.message, 'Kappa Kappa');
+      expect(msg.localEmotes, isNotNull);
+      expect(msg.localEmotes!.containsKey('Kappa'), isTrue);
     });
   });
 
