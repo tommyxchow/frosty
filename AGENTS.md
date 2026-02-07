@@ -1,150 +1,27 @@
 # AGENTS.md
 
-## Development Workflow
+## Workflow
 
-**Plan Mode**: When in plan mode, interview thoroughly before coding:
-- Ask detailed questions about technical implementation, UI/UX concerns, tradeoffs, and edge cases
-- Continue asking questions until all requirements and non-obvious decisions are clear
-- Don't begin implementation until all important details are resolved
+- In plan mode, interview thoroughly — ask about UI/UX, tradeoffs, and edge cases before coding
+- When new code supersedes existing functionality, find and remove everything it makes redundant
+- Favor parallel tool calls and subagents when tasks are independent
 
-**Pattern Consistency**: When implementing new code:
-- Search the codebase to find existing usages and implementations
-- Prefer following established patterns, styles, and practices for consistency
+## Architecture (non-obvious bits)
 
-**Dead Code Cleanup**: When new code replaces or supersedes existing functionality:
-- Identify and remove anything the new code makes redundant
-- Clean up any remaining references or imports to the removed code
+- Screens live in `lib/screens/{feature}/` with co-located `stores/` subdirectories — don't create top-level store files
+- All API services extend `BaseApiClient` (`lib/apis/base_api_client.dart`) — don't create standalone API classes
+- MobX stores use a generated mixin pattern — see `lib/screens/settings/stores/auth_store.dart` for the canonical example
 
-**Parallelization**: Favor parallel tool calls and subagents whenever tasks are independent (e.g., reading multiple files, running searches, exploring different parts of the codebase). Don't do things sequentially when they can be done concurrently.
+## Gotchas
 
-## Development Commands
+- Run requires Twitch credentials: `flutter run --dart-define=clientId=YOUR_ID --dart-define=secret=YOUR_SECRET`
+- After changing MobX stores or `@JsonSerializable` models, run `dart run build_runner build`. Never edit `.g.dart` files directly. Use `--delete-conflicting-outputs` if the build fails on stale generated files. Commit `.g.dart` files to source control.
+- The secure storage cleanup in `main.dart` looks unnecessary but handles an Android/iOS edge case where secure storage persists after uninstall. Don't remove it.
+- Use package imports (`import 'package:frosty/...'`), not relative imports
+- Always include trailing commas
+- Use single quotes
+- Run `flutter analyze` after making changes. Run `flutter test` if changes touch testable logic.
 
-**Common Commands:**
-- `flutter pub get` - Install dependencies
-- `flutter run --dart-define=clientId=YOUR_CLIENT_ID --dart-define=secret=YOUR_CLIENT_SECRET` - Run with Twitch API credentials
-- `flutter analyze` - Run static analysis and lint checks
-- `flutter test` - Run all tests
-- `flutter test test/path/to/test.dart` - Run a single test file
-- `flutter build apk` / `flutter build ios` - Build release binaries
+## Commits
 
-**Code Generation** (required after changing MobX stores or `@JsonSerializable` models):
-- `dart run build_runner build` - Generate once
-- `dart run build_runner build --delete-conflicting-outputs` - Force rebuild all
-- `dart run build_runner watch` - Watch mode for development
-
-Generated `.g.dart` files are excluded from linting but must be committed to source control. Never edit `.g.dart` files directly — they are overwritten by build_runner.
-
-## Architecture Overview
-
-**State Management**: MobX with code generation. All stores end with `Store` and have corresponding `.g.dart` generated files.
-
-**Key Directories**:
-- `lib/screens/` - UI screens organized by feature (home, channel, settings, onboarding)
-- `lib/models/` - Data models with JSON serialization (uses .g.dart files)
-- `lib/apis/` - API services for Twitch, BTTV, FFZ, and 7TV
-- `lib/widgets/` - Reusable UI components
-- `lib/utils/` - Utility modules including context extensions
-- `lib/services/` - Application services (e.g., shared timer service)
-
-**Screen Organization**: `lib/screens/{feature}/` contains `{feature}.dart` (main UI), `stores/` subdirectory with MobX stores, and feature sub-components.
-
-**Main Application Flow**:
-1. App starts in `main.dart` with Firebase initialization and dependency injection via Provider
-2. Authentication handled by `AuthStore` using Twitch OAuth
-3. Settings persisted via `SettingsStore` with SharedPreferences and MobX `autorun()`
-4. API services share a common Dio HTTP client for efficient connection reuse
-
-**Global Stores** (injected via Provider in `main.dart`):
-- `AuthStore` (`lib/screens/settings/stores/`) - Authentication state and token management
-- `SettingsStore` (`lib/screens/settings/stores/`) - User preferences with automatic persistence via MobX `autorun()`
-- `UserStore` (`lib/screens/settings/stores/`) - Current user profile data
-- `GlobalAssetsStore` (`lib/stores/`) - Shared cache for global emotes and badges across all chat tabs
-
-## HTTP & API Architecture
-
-**Shared HTTP Client**: Single Dio instance configured in `DioClient.createClient()` with:
-- Connection pooling and keep-alive headers for efficiency
-- Optimized timeouts: 8s connect, 15s receive, 10s send
-- Frosty User-Agent header for Twitch API compatibility
-
-**Authentication Interceptor**: `TwitchAuthInterceptor` automatically injects auth headers for Twitch API URLs. `UnauthorizedInterceptor` catches 401 errors for token refresh.
-
-**Two-tier Token System**: Default app token for unauthenticated requests + optional user token in Flutter Secure Storage.
-
-**BaseApiClient Pattern**: All API services (`TwitchApi`, `BTTVApi`, `FFZApi`, `SevenTVApi`) extend `BaseApiClient` which provides:
-- Generic GET/POST/PUT/DELETE methods with centralized error handling
-- Automatic conversion of `DioException` to typed exceptions
-
-**Exception Hierarchy**: `ApiException` base class with `NetworkException`, `TimeoutException`, `ServerException`, `NotFoundException`, `UnauthorizedException` (see `lib/apis/base_api_client.dart`).
-
-## MobX Store Implementation
-
-**Store Pattern**: All stores follow `StoreBase with _$StoreName` pattern:
-
-```dart
-class SomeStore = SomeStoreBase with _$SomeStore;
-
-abstract class SomeStoreBase with Store {
-  @observable
-  var someValue = '';
-
-  @action
-  void updateValue(String value) => someValue = value;
-
-  @computed
-  String get derivedValue => someValue.toUpperCase();
-}
-```
-
-**MobX Reactions** (for side effects and persistence):
-
-```dart
-// Auto-save settings whenever they change (in main.dart)
-autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
-
-// React to specific state changes
-reaction((_) => authStore.isLoggedIn, (_) => _selectedIndex = 0);
-```
-
-## Chat System Architecture
-
-- **Real-time IRC**: WebSocket connection to Twitch IRC with custom `IRCMessage` parsing
-- **Third-party Emotes**: Asynchronous loading of BTTV, FFZ, and 7TV assets via dedicated APIs
-- **Message Management**: 5000 message limit with 20% batch removal optimization
-- **Assets Store**: `ChatAssetsStore` manages channel-specific emotes/badges
-- **User Interaction**: Blocking, reporting, and moderation capabilities
-
-## Additional Patterns
-
-**Emote Architecture**: Base `Emote` class with platform-specific factories: `Emote.fromTwitch()`, `Emote.fromBTTV()`, `Emote.fromFFZ()`, `Emote.from7TV()`.
-
-**Custom Cache Manager**: Uses 30-day stale period and 10k max objects. `CustomCacheManager.removeOrphanedCacheFiles()` runs on startup to clean files not in database.
-
-**Secure Storage Cleanup**: First-run detection clears Flutter Secure Storage to handle Android/iOS uninstall edge case where secure storage persists but app data is wiped.
-
-**Authentication Flow**:
-- OAuth via WebView with custom JavaScript injection for seamless Twitch login
-- Token storage in FlutterSecureStorage
-- Auto-refresh and validation logic in `AuthStore`
-
-## Code Style
-
-**Common lint mistakes to avoid:**
-- Always use package imports, not relative imports (`import 'package:frosty/...'`)
-- Always include trailing commas in argument lists and widget trees
-- Use single quotes for strings
-
-Full lint rules are enforced by `flutter analyze` — run it after making changes to catch issues early.
-
-## Testing
-
-Tests live in `test/` mirroring the `lib/` structure:
-- `test/models/` - Model unit tests (badges, emotes, IRC parsing)
-- `test/fixtures/` - Shared test data (e.g., IRC message fixtures)
-- `test/regex_test.dart`, `test/utils_test.dart` - Utility tests
-
-Run with `flutter test` or `flutter test test/path/to/file.dart` for a single file.
-
-## Commit Convention
-
-Commits use lowercase, descriptive messages without prefixes (e.g., `fix landscape bottom padding in chat bottom bar`, `add swipe pip gesture support`). Keep commits tightly scoped.
+Lowercase, no prefixes (e.g., `fix landscape bottom padding in chat bottom bar`). Keep commits tightly scoped.
