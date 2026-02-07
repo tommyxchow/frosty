@@ -24,7 +24,7 @@ class FrostyDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (message != null) Text(message!),
-            if (content != null) content!,
+            ?content,
             if (actions != null) ...[
               const SizedBox(height: 16),
               Row(
