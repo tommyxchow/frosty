@@ -11,6 +11,12 @@
 - Search the codebase to find existing usages and implementations
 - Prefer following established patterns, styles, and practices for consistency
 
+**Dead Code Cleanup**: When new code replaces or supersedes existing functionality:
+- Identify and remove anything the new code makes redundant
+- Clean up any remaining references or imports to the removed code
+
+**Parallelization**: Favor parallel tool calls and subagents whenever tasks are independent (e.g., reading multiple files, running searches, exploring different parts of the codebase). Don't do things sequentially when they can be done concurrently.
+
 ## Development Commands
 
 **Common Commands:**
@@ -26,7 +32,7 @@
 - `dart run build_runner build --delete-conflicting-outputs` - Force rebuild all
 - `dart run build_runner watch` - Watch mode for development
 
-Generated `.g.dart` files are excluded from linting but must be committed to source control.
+Generated `.g.dart` files are excluded from linting but must be committed to source control. Never edit `.g.dart` files directly — they are overwritten by build_runner.
 
 ## Architecture Overview
 
@@ -38,6 +44,7 @@ Generated `.g.dart` files are excluded from linting but must be committed to sou
 - `lib/apis/` - API services for Twitch, BTTV, FFZ, and 7TV
 - `lib/widgets/` - Reusable UI components
 - `lib/utils/` - Utility modules including context extensions
+- `lib/services/` - Application services (e.g., shared timer service)
 
 **Screen Organization**: `lib/screens/{feature}/` contains `{feature}.dart` (main UI), `stores/` subdirectory with MobX stores, and feature sub-components.
 
@@ -50,6 +57,7 @@ Generated `.g.dart` files are excluded from linting but must be committed to sou
 **Global Stores** (injected via Provider in `main.dart`):
 - `AuthStore` (`lib/screens/settings/stores/`) - Authentication state and token management
 - `SettingsStore` (`lib/screens/settings/stores/`) - User preferences with automatic persistence via MobX `autorun()`
+- `UserStore` (`lib/screens/settings/stores/`) - Current user profile data
 - `GlobalAssetsStore` (`lib/stores/`) - Shared cache for global emotes and badges across all chat tabs
 
 ## HTTP & API Architecture
@@ -121,10 +129,21 @@ reaction((_) => authStore.isLoggedIn, (_) => _selectedIndex = 0);
 
 ## Code Style
 
-**Lint Rules** (from `analysis_options.yaml`):
-- `prefer_single_quotes`, `always_use_package_imports`, `require_trailing_commas`
-- `prefer_final_locals`, `prefer_final_in_for_each`, `avoid_redundant_argument_values`
-- `directives_ordering`, `avoid_void_async`, `always_declare_return_types`, `unnecessary_parenthesis`
+**Common lint mistakes to avoid:**
+- Always use package imports, not relative imports (`import 'package:frosty/...'`)
+- Always include trailing commas in argument lists and widget trees
+- Use single quotes for strings
+
+Full lint rules are enforced by `flutter analyze` — run it after making changes to catch issues early.
+
+## Testing
+
+Tests live in `test/` mirroring the `lib/` structure:
+- `test/models/` - Model unit tests (badges, emotes, IRC parsing)
+- `test/fixtures/` - Shared test data (e.g., IRC message fixtures)
+- `test/regex_test.dart`, `test/utils_test.dart` - Utility tests
+
+Run with `flutter test` or `flutter test test/path/to/file.dart` for a single file.
 
 ## Commit Convention
 
