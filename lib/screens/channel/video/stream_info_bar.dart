@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
+import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/live_indicator.dart';
@@ -45,21 +46,6 @@ class StreamInfoBar extends StatelessWidget {
     this.displayName,
   });
 
-  static const _iconShadow = [
-    Shadow(
-      offset: Offset(0, 1),
-      blurRadius: 4,
-      color: Color.fromRGBO(0, 0, 0, 0.3),
-    ),
-  ];
-
-  static const _textShadow = [
-    Shadow(
-      offset: Offset(0, 1),
-      blurRadius: 4,
-      color: Color.fromRGBO(0, 0, 0, 0.3),
-    ),
-  ];
 
   TextStyle _getBaseTextStyle(
     BuildContext context,
@@ -70,7 +56,7 @@ class StreamInfoBar extends StatelessWidget {
           fontSize: fontSize,
           fontWeight: fontWeight,
           color: textColor,
-          shadows: showTextShadows ? _textShadow : null,
+          shadows: showTextShadows ? kOverlayShadow : null,
         ) ??
         const TextStyle();
   }
@@ -82,7 +68,7 @@ class StreamInfoBar extends StatelessWidget {
           color:
               textColor?.withValues(alpha: 0.7) ??
               context.bodySmallColor?.withValues(alpha: 0.7),
-          shadows: showTextShadows ? _textShadow : null,
+          shadows: showTextShadows ? kOverlayShadow : null,
         ) ??
         const TextStyle();
   }
@@ -199,7 +185,7 @@ class StreamInfoBar extends StatelessWidget {
                           size: secondLineSize,
                           color: (textColor ?? context.bodySmallColor)
                               ?.withValues(alpha: 0.7),
-                          shadows: _iconShadow,
+                          shadows: kOverlayShadow,
                         ),
                         const SizedBox(width: 4),
                         Flexible(
@@ -270,7 +256,7 @@ class StreamInfoBar extends StatelessWidget {
                             Icons.visibility,
                             size: secondLineSize,
                             color: textColor ?? context.bodySmallColor,
-                            shadows: _iconShadow,
+                            shadows: kOverlayShadow,
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -295,7 +281,7 @@ class StreamInfoBar extends StatelessWidget {
                             Icons.gamepad,
                             size: secondLineSize,
                             color: textColor ?? context.bodySmallColor,
-                            shadows: _iconShadow,
+                            shadows: kOverlayShadow,
                           ),
                           const SizedBox(width: 4),
                           Flexible(

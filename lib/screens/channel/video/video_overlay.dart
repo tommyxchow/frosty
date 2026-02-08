@@ -33,21 +33,21 @@ class VideoOverlay extends StatelessWidget {
     required this.settingsStore,
   });
 
-  static const _iconShadow = [
-    Shadow(
-      offset: Offset(0, 1),
-      blurRadius: 4,
-      color: Color.fromRGBO(0, 0, 0, 0.3),
-    ),
-  ];
-
-  static const _textShadow = [
-    Shadow(
-      offset: Offset(0, 1),
-      blurRadius: 4,
-      color: Color.fromRGBO(0, 0, 0, 0.3),
-    ),
-  ];
+  static BoxDecoration _overlayGradient({required bool fromTop}) =>
+      BoxDecoration(
+        gradient: LinearGradient(
+          begin: fromTop ? Alignment.topCenter : Alignment.bottomCenter,
+          end: fromTop ? Alignment.bottomCenter : Alignment.topCenter,
+          colors: const [
+            Colors.black,
+            Color.fromRGBO(0, 0, 0, 0.78),
+            Color.fromRGBO(0, 0, 0, 0.48),
+            Color.fromRGBO(0, 0, 0, 0.12),
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.25, 0.5, 0.8, 1.0],
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ class VideoOverlay extends StatelessWidget {
       icon: Icon(
         Icons.adaptive.arrow_back_rounded,
         color: surfaceColor,
-        shadows: _iconShadow,
+        shadows: kOverlayShadow,
       ),
       onPressed: Navigator.of(context).pop,
     );
@@ -75,14 +75,14 @@ class VideoOverlay extends StatelessWidget {
         onPressed: () => videoStore.settingsStore.fullScreenChatOverlay =
             !videoStore.settingsStore.fullScreenChatOverlay,
         icon: videoStore.settingsStore.fullScreenChatOverlay
-            ? Icon(Icons.chat_rounded, shadows: _iconShadow)
-            : Icon(Icons.chat_outlined, shadows: _iconShadow),
+            ? Icon(Icons.chat_rounded, shadows: kOverlayShadow)
+            : Icon(Icons.chat_outlined, shadows: kOverlayShadow),
         color: surfaceColor,
       ),
     );
 
     final videoSettingsButton = IconButton(
-      icon: Icon(Icons.settings, shadows: _iconShadow),
+      icon: Icon(Icons.settings, shadows: kOverlayShadow),
       color: surfaceColor,
       onPressed: () {
         videoStore.updateStreamQualities();
@@ -138,7 +138,7 @@ class VideoOverlay extends StatelessWidget {
         icon: Icon(
           Icons.refresh_rounded,
           color: surfaceColor,
-          shadows: _iconShadow,
+          shadows: kOverlayShadow,
         ),
         onPressed: videoStore.handleRefresh,
       ),
@@ -155,7 +155,7 @@ class VideoOverlay extends StatelessWidget {
               ? Icons.fullscreen_exit_rounded
               : Icons.fullscreen_rounded,
           color: surfaceColor,
-          shadows: _iconShadow,
+          shadows: kOverlayShadow,
         ),
         onPressed: () => videoStore.settingsStore.fullScreen =
             !videoStore.settingsStore.fullScreen,
@@ -171,7 +171,7 @@ class VideoOverlay extends StatelessWidget {
         icon: Icon(
           Icons.screen_rotation_rounded,
           color: surfaceColor,
-          shadows: _iconShadow,
+          shadows: kOverlayShadow,
         ),
         onPressed: () async {
           if (context.isPortrait) {
@@ -221,73 +221,8 @@ class VideoOverlay extends StatelessWidget {
         final streamInfo = videoStore.streamInfo;
         final offlineChannelInfo = videoStore.offlineChannelInfo;
 
-        // Top gradient - fades from top to bottom, covers top cluster area
-        final topGradient = BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.black, // Solid black for controls
-              Colors.black.withValues(alpha: 0.95), // Strong coverage
-              Colors.black.withValues(alpha: 0.88), // Still very strong
-              Colors.black.withValues(alpha: 0.78), // Strong transition
-              Colors.black.withValues(alpha: 0.65), // Begin smooth fade
-              Colors.black.withValues(alpha: 0.48), // Faster fade
-              Colors.black.withValues(alpha: 0.32), // Quick transition
-              Colors.black.withValues(alpha: 0.18), // Rapid fade
-              Colors.black.withValues(alpha: 0.08), // Very light
-              Colors.black.withValues(alpha: 0.02), // Nearly gone
-              Colors.transparent, // Transparent end
-            ],
-            stops: [
-              0.0, // Top: Full black - solid area for controls
-              0.1, // Maintain strong coverage for readability
-              0.2, // Still strong black
-              0.3, // Begin gradual fade
-              0.42, // Smooth transition
-              0.52, // Faster fade point
-              0.62, // Quick transition
-              0.7, // Rapid fade
-              0.8, // Very light
-              0.9, // Nearly gone
-              1.0, // Bottom: Fully transparent
-            ],
-          ),
-        );
-
-        // Bottom gradient - fades from bottom to top, covers bottom cluster area
-        final bottomGradient = BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-            colors: [
-              Colors.black, // Solid black for controls
-              Colors.black.withValues(alpha: 0.95), // Strong coverage
-              Colors.black.withValues(alpha: 0.88), // Still very strong
-              Colors.black.withValues(alpha: 0.78), // Strong transition
-              Colors.black.withValues(alpha: 0.65), // Begin smooth fade
-              Colors.black.withValues(alpha: 0.48), // Faster fade
-              Colors.black.withValues(alpha: 0.32), // Quick transition
-              Colors.black.withValues(alpha: 0.18), // Rapid fade
-              Colors.black.withValues(alpha: 0.08), // Very light
-              Colors.black.withValues(alpha: 0.02), // Nearly gone
-              Colors.transparent, // Transparent end
-            ],
-            stops: [
-              0.0, // Bottom: Full black - solid area for controls
-              0.1, // Maintain strong coverage for readability
-              0.2, // Still strong black
-              0.3, // Begin gradual fade
-              0.42, // Smooth transition
-              0.52, // Faster fade point
-              0.62, // Quick transition
-              0.7, // Rapid fade
-              0.8, // Very light
-              0.9, // Nearly gone
-              1.0, // Top: Fully transparent
-            ],
-          ),
-        );
+        final topGradient = _overlayGradient(fromTop: true);
+        final bottomGradient = _overlayGradient(fromTop: false);
 
         if (streamInfo == null) {
           return Stack(
@@ -465,7 +400,7 @@ class VideoOverlay extends StatelessWidget {
                                       style: TextStyle(
                                         color: surfaceColor,
                                         fontWeight: FontWeight.w500,
-                                        shadows: _textShadow,
+                                        shadows: kOverlayShadow,
                                       ),
                                     ),
                                   ],
@@ -495,7 +430,7 @@ class VideoOverlay extends StatelessWidget {
                                       Icon(
                                         Icons.visibility,
                                         size: 14,
-                                        shadows: _iconShadow,
+                                        shadows: kOverlayShadow,
                                         color: surfaceColor,
                                       ),
                                       Text(
@@ -508,7 +443,7 @@ class VideoOverlay extends StatelessWidget {
                                           fontFeatures: const [
                                             FontFeature.tabularFigures(),
                                           ],
-                                          shadows: _textShadow,
+                                          shadows: kOverlayShadow,
                                         ),
                                       ),
                                     ],
@@ -527,7 +462,7 @@ class VideoOverlay extends StatelessWidget {
                                         Icons.speed_rounded,
                                         size: 14,
                                         color: surfaceColor,
-                                        shadows: _iconShadow,
+                                        shadows: kOverlayShadow,
                                       ),
                                       Observer(
                                         builder: (context) => Text(
@@ -538,7 +473,7 @@ class VideoOverlay extends StatelessWidget {
                                             fontFeatures: const [
                                               FontFeature.tabularFigures(),
                                             ],
-                                            shadows: _textShadow,
+                                            shadows: kOverlayShadow,
                                           ),
                                         ),
                                       ),
@@ -566,7 +501,7 @@ class VideoOverlay extends StatelessWidget {
                                     ? Icons.picture_in_picture_alt_outlined
                                     : Icons.picture_in_picture_alt_rounded,
                                 color: surfaceColor,
-                                shadows: _iconShadow,
+                                shadows: kOverlayShadow,
                               ),
                               onPressed: videoStore.togglePictureInPicture,
                             ),

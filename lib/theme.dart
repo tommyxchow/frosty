@@ -2,6 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+/// Shared shadow for overlay controls and text on top of video content.
+const kOverlayShadow = [
+  Shadow(
+    offset: Offset(0, 1),
+    blurRadius: 4,
+    color: Color.fromRGBO(0, 0, 0, 0.3),
+  ),
+];
+
 class FrostyThemes {
   final Color colorSchemeSeed;
 
