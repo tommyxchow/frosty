@@ -241,10 +241,28 @@ abstract class VideoStoreBase with Store {
     // Initialize the [_overlayTimer] to auto-hide the overlay after a delay (default 5 seconds).
     _scheduleOverlayHide();
 
-    // Initialize a reaction that will reload the webview whenever the overlay is toggled.
+    // Initialize a reaction that incrementally applies/removes overlay customizations
+    // without reloading the webview (which would tear down the HLS stream).
     _disposeOverlayReaction = reaction(
       (_) => settingsStore.showOverlay,
-      (_) => videoWebViewController.loadRequest(Uri.parse(videoUrl)),
+      (showOverlay) async {
+        if (showOverlay) {
+          await _hideDefaultOverlay();
+          if (settingsStore.showLatency || settingsStore.autoSyncChatDelay) {
+            await _listenOnLatencyChanges();
+          }
+          await updateStreamQualities();
+        } else {
+          _showDefaultOverlay();
+          try {
+            videoWebViewController.runJavaScript(
+              'window._latencyTracker?.stop()',
+            );
+          } catch (e) {
+            debugPrint(e.toString());
+          }
+        }
+      },
     );
 
     // Initialize a reaction to manage stream info timer based on video mode
@@ -321,26 +339,33 @@ abstract class VideoStoreBase with Store {
     try {
       await videoWebViewController.runJavaScript(r'''
       _queuePromise(async () => {
-        // Open the settings → quality submenu
-        (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
-        (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
+        const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
+        if (!settingsBtn) return;
 
-        // Wait until at least one quality option is rendered
-        await _asyncQuerySelector(
-          '[data-a-target="player-settings-menu"] input[name="player-settings-submenu-quality-option"] + label'
-        );
+        try {
+          settingsBtn.click();
 
-        // Grab every label, normalise whitespace, return as array
-        const qualities = Array.from(
-          document.querySelectorAll(
+          const qualityItem = await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]');
+          if (!qualityItem) return;
+          qualityItem.click();
+
+          // Wait until at least one quality option is rendered
+          await _asyncQuerySelector(
             '[data-a-target="player-settings-menu"] input[name="player-settings-submenu-quality-option"] + label'
-          )
-        ).map(l => l.textContent.replace(/\s+/g, ' ').trim());
+          );
 
-        StreamQualities.postMessage(JSON.stringify(qualities));
+          // Grab every label, normalise whitespace, return as array
+          const qualities = Array.from(
+            document.querySelectorAll(
+              '[data-a-target="player-settings-menu"] input[name="player-settings-submenu-quality-option"] + label'
+            )
+          ).map(l => l.textContent.replace(/\s+/g, ' ').trim());
 
-        // Close the settings panel again
-        (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+          StreamQualities.postMessage(JSON.stringify(qualities));
+        } finally {
+          // Always close the settings panel
+          settingsBtn.click();
+        }
       });
     ''');
     } catch (e) {
@@ -362,11 +387,24 @@ abstract class VideoStoreBase with Store {
     try {
       await videoWebViewController.runJavaScript('''
         _queuePromise(async () => {
-          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
-          (await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]')).click();
-          await _asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] input');
-          [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')][$newStreamQualityIndex].click();
-          (await _asyncQuerySelector('[data-a-target="player-settings-button"]')).click();
+          const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
+          if (!settingsBtn) return;
+
+          try {
+            settingsBtn.click();
+
+            const qualityItem = await _asyncQuerySelector('[data-a-target="player-settings-menu-item-quality"]');
+            if (!qualityItem) return;
+            qualityItem.click();
+
+            await _asyncQuerySelector('[data-a-target="player-settings-submenu-quality-option"] input');
+            const inputs = [...document.querySelectorAll('[data-a-target="player-settings-submenu-quality-option"] input')];
+            if (inputs[$newStreamQualityIndex]) {
+              inputs[$newStreamQualityIndex].click();
+            }
+          } finally {
+            settingsBtn.click();
+          }
         });
       ''');
       _streamQualityIndex = newStreamQualityIndex;
@@ -377,11 +415,8 @@ abstract class VideoStoreBase with Store {
 
   /// Hides the default Twitch overlay elements using CSS injection.
   ///
-  /// This approach is far more efficient than JavaScript DOM manipulation:
-  /// - CSS rules are applied by the browser's native rendering engine
-  /// - No MutationObserver overhead watching the entire DOM tree
-  /// - Handles dynamically added elements automatically via CSS cascade
-  /// - Single one-time observer that disconnects immediately after player loads
+  /// CSS rules apply automatically to present and future DOM elements,
+  /// so no MutationObserver is needed.
   Future<void> _hideDefaultOverlay() async {
     try {
       await videoWebViewController.runJavaScript('''
@@ -402,20 +437,20 @@ abstract class VideoStoreBase with Store {
             `;
             document.head.appendChild(style);
           }
-
-          // Single one-time observer just to detect when player loads
-          // Disconnects immediately - CSS handles everything after
-          const observer = new MutationObserver((_, obs) => {
-            if (document.querySelector('.video-player__overlay')) {
-              obs.disconnect();
-            }
-          });
-          observer.observe(document.body, { childList: true, subtree: true });
-
-          // Safety timeout: disconnect observer if player never loads
-          setTimeout(() => observer.disconnect(), 30000);
         }
       ''');
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Removes the custom CSS that hides Twitch's default overlay,
+  /// restoring the native Twitch player controls.
+  void _showDefaultOverlay() {
+    try {
+      videoWebViewController.runJavaScript(
+        "document.getElementById('frosty-overlay-styles')?.remove();",
+      );
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -496,22 +531,27 @@ abstract class VideoStoreBase with Store {
 
             // Skip cycle entirely if overlay not visible - major CPU savings
             if (!this.overlayVisible) {
-              // Check again in 5 seconds in case overlay becomes visible
               this.timeoutId = setTimeout(() => this._cycle(), 5000);
+              return;
+            }
+
+            // Defer if another operation (e.g., quality selection) is using the settings menu
+            if (window._promiseQueueLength > 0) {
+              this.timeoutId = setTimeout(() => this._cycle(), 2000);
               return;
             }
 
             this.cycleCount++;
             const cycleStart = Date.now();
 
-            await this._enableStats();
+            await this._setStatsEnabled(true);
 
             // Wait longer on first cycle for stats to populate
             const waitTime = this.cycleCount === 1 ? 3000 : this.STATS_ACTIVE_TIME;
             await new Promise(resolve => setTimeout(resolve, waitTime));
 
             this._readLatency();
-            await this._disableStats();
+            await this._setStatsEnabled(false);
 
             const totalActiveTime = Date.now() - cycleStart;
 
@@ -527,7 +567,7 @@ abstract class VideoStoreBase with Store {
             this.timeoutId = setTimeout(() => this._cycle(), Math.max(nextInterval, 1000));
           },
 
-          async _enableStats() {
+          async _setStatsEnabled(enable) {
             try {
               await _queuePromise(async () => {
                 const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
@@ -542,7 +582,7 @@ abstract class VideoStoreBase with Store {
                 advancedItem.click();
 
                 const statsCheckbox = await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input');
-                if (statsCheckbox && !statsCheckbox.checked) {
+                if (statsCheckbox && statsCheckbox.checked !== enable) {
                   statsCheckbox.click();
                 }
 
@@ -550,32 +590,6 @@ abstract class VideoStoreBase with Store {
               });
             } catch (error) {
               // Silently fail - stats panel may not be available
-            }
-          },
-
-          async _disableStats() {
-            try {
-              await _queuePromise(async () => {
-                const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
-                if (!settingsBtn) return;
-                settingsBtn.click();
-
-                const advancedItem = await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]');
-                if (!advancedItem) {
-                  settingsBtn.click();
-                  return;
-                }
-                advancedItem.click();
-
-                const statsCheckbox = await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input');
-                if (statsCheckbox && statsCheckbox.checked) {
-                  statsCheckbox.click();
-                }
-
-                settingsBtn.click();
-              });
-            } catch (error) {
-              // Silently fail
             }
           },
 
@@ -709,7 +723,7 @@ abstract class VideoStoreBase with Store {
 
             return window._PROMISE_QUEUE;
           };
-          window._asyncQuerySelector = (selector, timeout = 30000) => new Promise((resolve) => {
+          window._asyncQuerySelector = (selector, timeout = 10000) => new Promise((resolve) => {
             let element = document.querySelector(selector);
             if (element) {
               return resolve(element);
@@ -727,7 +741,7 @@ abstract class VideoStoreBase with Store {
             // Must use subtree to detect nested elements in the player
             observer.observe(document.body, { childList: true, subtree: true });
 
-            // Always set timeout with default of 30 seconds
+            // Always set timeout with default of 10 seconds
             timeoutId = setTimeout(() => {
               observer.disconnect();
               resolve(undefined);
@@ -742,6 +756,9 @@ abstract class VideoStoreBase with Store {
               console.warn("Video element not found within timeout");
               return;
             }
+
+            // Cache for reuse in play/pause/PiP calls
+            window._videoEl = videoElement;
 
             // Prevent duplicate event listener registration
             if (!videoElement._listenersAdded) {
@@ -961,11 +978,11 @@ abstract class VideoStoreBase with Store {
     try {
       if (_paused) {
         videoWebViewController.runJavaScript(
-          'document.getElementsByTagName("video")[0].play();',
+          '(window._videoEl || document.getElementsByTagName("video")[0])?.play();',
         );
       } else {
         videoWebViewController.runJavaScript(
-          'document.getElementsByTagName("video")[0].pause();',
+          '(window._videoEl || document.getElementsByTagName("video")[0])?.pause();',
         );
       }
     } catch (e) {
@@ -983,7 +1000,7 @@ abstract class VideoStoreBase with Store {
         pip.enterPipMode(autoEnter: true);
       } else if (Platform.isIOS) {
         videoWebViewController.runJavaScript(
-          'document.getElementsByTagName("video")[0].requestPictureInPicture();',
+          '(window._videoEl || document.getElementsByTagName("video")[0])?.requestPictureInPicture();',
         );
       }
     } catch (e) {
