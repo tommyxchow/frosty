@@ -91,14 +91,17 @@ class _VideoChatState extends State<VideoChat>
     );
 
     // Spring-back animation with smooth easing
-    _springBackAnimation =
-        Tween<double>(begin: 0, end: 0).animate(
-          CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-        )..addListener(() {
-          setState(() {
-            _pipDragDistance = _springBackAnimation.value;
-          });
-        });
+    _springBackAnimation = Tween<double>(begin: 0, end: 0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    // Attach listener to the controller (not the derived animation) so it
+    // survives _springBackAnimation being reassigned in _animateSpringBack.
+    _animationController.addListener(() {
+      setState(() {
+        _pipDragDistance = _springBackAnimation.value;
+      });
+    });
 
     // Register as observer for app lifecycle events
     WidgetsBinding.instance.addObserver(this);
@@ -201,7 +204,7 @@ class _VideoChatState extends State<VideoChat>
   /// and an instructional overlay during the drag gesture.
   Widget _buildPipGestureWrapper({required Widget child, double? aspectRatio}) {
     return AnimatedBuilder(
-      animation: Listenable.merge([_animationController, _springBackAnimation]),
+      animation: _animationController,
       builder: (context, _) {
         final currentDragDistance = _isPipDragging
             ? _pipDragDistance
@@ -321,9 +324,12 @@ class _VideoChatState extends State<VideoChat>
 
     final video = Observer(
       builder: (context) {
-        if (!_videoStore.settingsStore.showOverlay) return player;
-
-        return Stack(children: [player, overlay]);
+        return Stack(
+          children: [
+            player,
+            if (_videoStore.settingsStore.showOverlay) overlay,
+          ],
+        );
       },
     );
 
