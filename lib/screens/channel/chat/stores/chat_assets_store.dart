@@ -443,5 +443,19 @@ abstract class ChatAssetsStoreBase with Store {
     }
   }
 
+  /// Adds a channel emote (e.g., from a live 7TV event).
+  /// Mutates the observable `_channelEmoteToObject` so `emoteToObject` recomputes.
+  @action
+  void addChannelEmote(Emote emote) {
+    _channelEmoteToObject[emote.name] = emote;
+  }
+
+  /// Removes a channel emote by name (e.g., from a live 7TV event).
+  /// Mutates the observable `_channelEmoteToObject` so `emoteToObject` recomputes.
+  @action
+  void removeChannelEmote(String emoteName) {
+    _channelEmoteToObject.remove(emoteName);
+  }
+
   void dispose() => _disposeReaction();
 }

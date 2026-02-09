@@ -23,6 +23,8 @@ abstract class SearchStoreBase with Store {
 
   Timer? _debounceTimer;
 
+  ReactionDisposer? _disposeReaction;
+
   @readonly
   var _searchText = '';
 
@@ -53,7 +55,7 @@ abstract class SearchStoreBase with Store {
         ObservableList<String>();
 
     // Create a reaction that will limit the history to 8 entries and update it to local storage automatically.
-    autorun((_) {
+    _disposeReaction = autorun((_) {
       if (_searchHistory.length > 8) _searchHistory.removeLast();
       prefs.setStringList('search_history', _searchHistory);
     });
@@ -136,6 +138,7 @@ abstract class SearchStoreBase with Store {
   }
 
   void dispose() {
+    _disposeReaction?.call();
     _debounceTimer?.cancel();
     textEditingController.dispose();
     textFieldFocusNode.dispose();

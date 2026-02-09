@@ -320,6 +320,35 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
     );
   }
 
+  late final _$ChatAssetsStoreBaseActionController = ActionController(
+    name: 'ChatAssetsStoreBase',
+    context: context,
+  );
+
+  @override
+  void addChannelEmote(Emote emote) {
+    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+      name: 'ChatAssetsStoreBase.addChannelEmote',
+    );
+    try {
+      return super.addChannelEmote(emote);
+    } finally {
+      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void removeChannelEmote(String emoteName) {
+    final _$actionInfo = _$ChatAssetsStoreBaseActionController.startAction(
+      name: 'ChatAssetsStoreBase.removeChannelEmote',
+    );
+    try {
+      return super.removeChannelEmote(emoteName);
+    } finally {
+      _$ChatAssetsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
   @override
   String toString() {
     return '''

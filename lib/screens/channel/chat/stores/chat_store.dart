@@ -750,7 +750,7 @@ abstract class ChatStoreBase with Store {
 
         final emote = Emote.from7TV(pushedEmote, EmoteType.sevenTVChannel);
 
-        assetsStore.emoteToObject[emote.name] = emote;
+        assetsStore.addChannelEmote(emote);
 
         messageBuffer.add(
           IRCMessage.createNotice(
@@ -763,9 +763,7 @@ abstract class ChatStoreBase with Store {
 
         if (pulledEmote == null) return;
 
-        assetsStore.emoteToObject.removeWhere(
-          (name, _) => name == pulledEmote.name,
-        );
+        assetsStore.removeChannelEmote(pulledEmote.name);
 
         messageBuffer.add(
           IRCMessage.createNotice(

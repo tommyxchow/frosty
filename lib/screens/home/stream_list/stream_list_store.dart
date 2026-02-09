@@ -143,7 +143,7 @@ abstract class ListStoreBase with Store {
   @readonly
   String? _error;
 
-  ReactionDisposer? _pinnedStreamsReactioniDisposer;
+  ReactionDisposer? _pinnedStreamsReactionDisposer;
   ReactionDisposer? _offlineChannelsExpansionDisposer;
 
   ListStoreBase({
@@ -166,7 +166,7 @@ abstract class ListStoreBase with Store {
     }
 
     if (listType == ListType.followed) {
-      _pinnedStreamsReactioniDisposer = reaction(
+      _pinnedStreamsReactionDisposer = reaction(
         (_) => settingsStore.pinnedChannelIds,
         (_) => getPinnedStreams(),
       );
@@ -347,7 +347,7 @@ abstract class ListStoreBase with Store {
   }
 
   void dispose() {
-    _pinnedStreamsReactioniDisposer?.call();
+    _pinnedStreamsReactionDisposer?.call();
     _offlineChannelsExpansionDisposer?.call();
 
     scrollController?.dispose();
