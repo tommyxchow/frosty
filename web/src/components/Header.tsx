@@ -1,24 +1,22 @@
-import { donateLink, githubLink } from '@/lib/constants';
-import Image from 'next/image';
-import Link from 'next/link';
-import { SiBuymeacoffee, SiGithub } from 'react-icons/si';
-import { ThemeToggle } from './ThemeToggle';
+import { donateLink, githubLink } from '@/lib/constants'
+import Image from 'next/image'
+import Link from 'next/link'
+import { SiBuymeacoffee, SiGithub } from 'react-icons/si'
+import { ThemeToggle } from './ThemeToggle'
 
 export function Header() {
   return (
-    <header className='sticky top-0 z-50 flex w-full max-w-screen-lg justify-between gap-4 divide-x divide-neutral-300 border-b border-inherit bg-inherit dark:divide-neutral-900 dark:from-black'>
+    <header className='divide-border border-border sticky top-0 z-50 flex w-full max-w-screen-lg justify-between gap-4 divide-x border-b bg-inherit'>
       <Link
-        className='flex items-center gap-2 border-r border-inherit px-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
+        className='border-border hover:bg-accent flex items-center gap-2 border-r px-4 transition'
         href='/'
       >
-        <div className='relative size-8'>
-          <Image alt='Logo' src={`/logo.svg`} layout='fill' priority />
-        </div>
+        <Image alt='Logo' src='/logo.svg' width={32} height={32} priority />
       </Link>
 
-      <div className='flex items-center divide-x divide-inherit'>
+      <div className='divide-border flex items-center divide-x'>
         <a
-          className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
+          className='hover:bg-accent p-4 transition'
           href={donateLink}
           target='_blank'
           rel='noreferrer'
@@ -27,7 +25,7 @@ export function Header() {
         </a>
 
         <a
-          className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
+          className='hover:bg-accent p-4 transition'
           href={githubLink}
           target='_blank'
           rel='noreferrer'
@@ -38,5 +36,5 @@ export function Header() {
         <ThemeToggle />
       </div>
     </header>
-  );
+  )
 }

@@ -1,8 +1,8 @@
-import screenshotCategories from '@/assets/screenshot-categories.png';
-import screenshotChannel from '@/assets/screenshot-channel.png';
-import screenshotFollowing from '@/assets/screenshot-following.png';
-import screenshotSettings from '@/assets/screenshot-settings.png';
-import { FeatureCard } from '@/components/FeatureCard';
+import screenshotCategories from '@/assets/screenshot-categories.png'
+import screenshotChannel from '@/assets/screenshot-channel.png'
+import screenshotFollowing from '@/assets/screenshot-following.png'
+import screenshotSettings from '@/assets/screenshot-settings.png'
+import { FeatureCard } from '@/components/FeatureCard'
 import {
   appStoreLink,
   bttvLink,
@@ -12,13 +12,13 @@ import {
   playStoreLink,
   sevenTvLink,
   twitchLink,
-} from '@/lib/constants';
-import Image from 'next/image';
-import Marquee from 'react-fast-marquee';
-import { SiApple, SiGoogleplay } from 'react-icons/si';
+} from '@/lib/constants'
+import Image from 'next/image'
+import Marquee from 'react-fast-marquee'
+import { SiApple, SiGoogleplay } from 'react-icons/si'
 
-const NUM_ROWS = 10;
-const NUM_COLUMNS = 40;
+const NUM_ROWS = 10
+const NUM_COLUMNS = 40
 
 const coreFeatures = [
   {
@@ -37,7 +37,7 @@ const coreFeatures = [
     caption: 'Customize a variety of settings',
     screenshot: screenshotSettings,
   },
-];
+]
 
 const faqs = [
   {
@@ -86,18 +86,18 @@ const faqs = [
       </>
     ),
   },
-];
+]
 
 export default function Home() {
   const downloadButtons = (
-    <div className='grid w-full grid-cols-2 divide-x divide-neutral-300 border-y border-neutral-300 font-semibold dark:divide-neutral-900 dark:border-neutral-900'>
+    <div className='divide-border border-border grid w-full grid-cols-2 divide-x border-y font-semibold'>
       <a
         className='flex items-center justify-center gap-2 p-4 transition hover:bg-blue-700 hover:text-neutral-100 dark:hover:bg-blue-800'
         href={appStoreLink}
         target='_blank'
         rel='noreferrer'
       >
-        <SiApple className='text-blue-500 dark:text-blue-500' />
+        <SiApple className='text-blue-500' />
         App Store
       </a>
       <a
@@ -110,7 +110,7 @@ export default function Home() {
         Google Play
       </a>
     </div>
-  );
+  )
 
   return (
     <article className='flex flex-col'>
@@ -137,7 +137,7 @@ export default function Home() {
           </div>
           <div className='z-10 justify-self-center p-8 pt-16'>
             <video
-              className='h-[75vh] max-h-[800px] border border-neutral-300 bg-black object-contain py-4 dark:border-neutral-900'
+              className='border-border h-[75vh] max-h-[800px] border bg-black object-contain py-4'
               src='/video.webm'
               autoPlay
               loop
@@ -148,7 +148,7 @@ export default function Home() {
           </div>
         </div>
 
-        <h1 className='text-pretty p-8 pb-16 text-center text-xl font-semibold decoration-2 underline-offset-4 md:text-2xl'>
+        <h1 className='p-8 pb-16 text-center text-xl font-semibold text-pretty decoration-2 underline-offset-4 md:text-2xl'>
           Frosty lets you watch{' '}
           <a
             className='text-twitch-purple underline'
@@ -204,13 +204,13 @@ export default function Home() {
           Frequently asked questions
         </h2>
 
-        <div className='w-full divide-y divide-neutral-300 border-y border-neutral-300 dark:divide-neutral-900 dark:border-neutral-900'>
+        <div className='divide-border border-border w-full divide-y border-y'>
           {faqs.map((faq, index) => (
             <details key={index}>
-              <summary className='p-8 font-medium transition hover:cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-900'>
+              <summary className='hover:bg-accent p-8 font-medium transition hover:cursor-pointer'>
                 {faq.question}
               </summary>
-              <p className='border-t border-neutral-300 px-12 py-8 text-neutral-600 dark:border-neutral-900 dark:text-neutral-300'>
+              <p className='border-border text-muted-foreground border-t px-12 py-8'>
                 {faq.answer}
               </p>
             </details>
@@ -218,5 +218,5 @@ export default function Home() {
         </div>
       </section>
     </article>
-  );
+  )
 }

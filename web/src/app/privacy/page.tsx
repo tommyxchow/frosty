@@ -1,6 +1,6 @@
 export default function Privacy() {
   return (
-    <article className='prose prose-neutral mt-32 !max-w-none dark:prose-invert'>
+    <article className='prose prose-neutral dark:prose-invert mt-32 !max-w-none'>
       <h1>Privacy policy for Frosty</h1>
       <p>Last updated: May 2023</p>
 
@@ -73,5 +73,5 @@ export default function Privacy() {
         please feel free to contact us at contact@frostyapp.io.
       </p>
     </article>
-  );
+  )
 }
