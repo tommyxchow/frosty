@@ -56,8 +56,12 @@ export default defineConfig(
         },
       ],
       '@typescript-eslint/no-unnecessary-condition': 'error',
+      '@typescript-eslint/no-misused-promises': [
+        'error',
+        { checksVoidReturn: { attributes: false } },
+      ],
       '@eslint-react/jsx-shorthand-boolean': 'error',
-      '@eslint-react/no-array-index-key': 'off',
+      '@eslint-react/no-array-index-key': 'warn',
 
       // Redundant with react-you-might-not-need-an-effect
       '@eslint-react/hooks-extra/no-direct-set-state-in-use-effect': 'off',
