@@ -44,24 +44,24 @@ class LargeStreamCard extends StatelessWidget {
     final thumbnailWidth = min((size.width * pixelRatio) ~/ 1, 1920);
     final thumbnailHeight = min((thumbnailWidth * (9 / 16)).toInt(), 1080);
 
-    final thumbnail = SizedBox(
-      width: double.infinity,
-      child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: FrostyCachedNetworkImage(
-            imageUrl: streamInfo.thumbnailUrl.replaceFirst(
-              '-{width}x{height}',
-              '-${thumbnailWidth}x$thumbnailHeight',
-            ),
-            cacheKey: cacheKey,
-            placeholder: (context, url) => const SkeletonLoader(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
-            ),
-            useOldImageOnUrlChange: true,
+    final thumbnail = AspectRatio(
+      aspectRatio: 16 / 9,
+      child: FrostyCachedNetworkImage(
+        imageUrl: streamInfo.thumbnailUrl.replaceFirst(
+          '-{width}x{height}',
+          '-${thumbnailWidth}x$thumbnailHeight',
+        ),
+        imageBuilder: (context, imageProvider) => Container(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
           ),
         ),
+        cacheKey: cacheKey,
+        placeholder: (context, url) => const SkeletonLoader(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
+        useOldImageOnUrlChange: true,
       ),
     );
 

@@ -58,6 +58,12 @@ class StreamCard extends StatelessWidget {
           '-{width}x{height}',
           '-${thumbnailWidth}x$thumbnailHeight',
         ),
+        imageBuilder: (context, imageProvider) => Container(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+          ),
+        ),
         cacheKey: cacheKey,
         placeholder: (context, url) => const SkeletonLoader(
           borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -80,47 +86,38 @@ class StreamCard extends StatelessWidget {
 
     final fontColor = DefaultTextStyle.of(context).style.color;
 
-    final imageSection = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
-      child: Stack(
-        alignment: AlignmentDirectional.bottomEnd,
-        children: [
-          GestureDetector(
-            onLongPress: () => showDialog(
-              context: context,
-              builder: (context) => FrostyPhotoViewDialog(
-                imageUrl: streamInfo
-                    .thumbnailUrl, // Pass original URL with {width}x{height} placeholder
-                cacheKey: cacheKey,
-              ),
+    final imageSection = Stack(
+      alignment: AlignmentDirectional.bottomEnd,
+      children: [
+        GestureDetector(
+          onLongPress: () => showDialog(
+            context: context,
+            builder: (context) => FrostyPhotoViewDialog(
+              imageUrl: streamInfo
+                  .thumbnailUrl, // Pass original URL with {width}x{height} placeholder
+              cacheKey: cacheKey,
             ),
-            child: thumbnail,
           ),
-          Container(
-            margin: const EdgeInsets.all(3),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
-            clipBehavior: Clip.antiAlias,
-            child: BlurredContainer(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-              sigmaX: 8.0, // Less blur for subtlety
-              sigmaY: 8.0, // Less blur for subtlety
-              forceDarkMode: true,
-              child: Uptime(
-                startTime: streamInfo.startedAt,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: context
-                      .watch<FrostyThemes>()
-                      .dark
-                      .colorScheme
-                      .onSurface,
-                ),
+          child: thumbnail,
+        ),
+        Container(
+          margin: const EdgeInsets.all(3),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
+          clipBehavior: Clip.antiAlias,
+          child: BlurredContainer(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+            forceDarkMode: true,
+            child: Uptime(
+              startTime: streamInfo.startedAt,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: context.watch<FrostyThemes>().dark.colorScheme.onSurface,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
 
     final streamInfoSection = Padding(
