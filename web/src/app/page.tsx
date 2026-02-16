@@ -125,7 +125,7 @@ export default function Home() {
         <h1 className='p-8 pb-16 text-center text-xl font-semibold text-pretty decoration-2 underline-offset-4 md:text-2xl'>
           Frosty lets you watch{' '}
           <a
-            className='text-twitch-purple underline'
+            className='text-primary underline'
             href={twitchLink}
             target='_blank'
             rel='noreferrer'
@@ -134,7 +134,7 @@ export default function Home() {
           </a>{' '}
           with{' '}
           <a
-            className='text-twitch-purple underline'
+            className='text-primary underline'
             href={sevenTvLink}
             target='_blank'
             rel='noreferrer'
@@ -143,7 +143,7 @@ export default function Home() {
           </a>
           ,{' '}
           <a
-            className='text-twitch-purple underline'
+            className='text-primary underline'
             href={bttvLink}
             target='_blank'
             rel='noreferrer'
@@ -152,7 +152,7 @@ export default function Home() {
           </a>
           , and{' '}
           <a
-            className='text-twitch-purple underline'
+            className='text-primary underline'
             href={ffzLink}
             target='_blank'
             rel='noreferrer'
