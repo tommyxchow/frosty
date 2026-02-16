@@ -13,25 +13,7 @@ import {
   sevenTvLink,
   twitchLink,
 } from '@/lib/constants'
-import Image from 'next/image'
-import Marquee from 'react-fast-marquee'
 import { SiApple, SiGoogleplay } from 'react-icons/si'
-
-const NUM_ROWS = 10
-const NUM_COLUMNS = 40
-
-const marqueeRows: { id: string; direction: 'left' | 'right' }[] = Array.from(
-  { length: NUM_ROWS },
-  (_, rowNumber) => ({
-    id: `marquee-row-${rowNumber}`,
-    direction: rowNumber % 2 ? 'left' : 'right',
-  }),
-)
-
-const emoteColumns = Array.from(
-  { length: NUM_COLUMNS },
-  (_, columnNumber) => `emote-column-${columnNumber}`,
-)
 
 const coreFeatures = [
   {
@@ -128,37 +110,16 @@ export default function Home() {
   return (
     <article className='flex flex-col'>
       <section>
-        <div className='grid w-full items-center [&>*]:col-start-1 [&>*]:row-start-1'>
-          <div className='flex flex-col gap-4'>
-            {marqueeRows.map((row) => (
-              <Marquee
-                key={row.id}
-                direction={row.direction}
-              >
-                {emoteColumns.map((column) => (
-                  <Image
-                    key={`${row.id}-${column}`}
-                    width={32}
-                    height={32}
-                    alt='pepeD'
-                    unoptimized
-                    src='https://cdn.7tv.app/emote/6072a16fdcae02001b44e614/4x.webp'
-                  />
-                ))}
-              </Marquee>
-            ))}
-          </div>
-          <div className='z-10 justify-self-center p-8 pt-16'>
-            <video
-              className='border-border h-[75vh] max-h-[800px] border bg-black object-contain py-4'
-              src='/video.webm'
-              autoPlay
-              loop
-              muted
-              playsInline
-              disableRemotePlayback
-            />
-          </div>
+        <div className='flex justify-center p-8 pt-16'>
+          <video
+            className='border-border h-[75vh] max-h-[800px] border bg-black object-contain py-4'
+            src='/video.webm'
+            autoPlay
+            loop
+            muted
+            playsInline
+            disableRemotePlayback
+          />
         </div>
 
         <h1 className='p-8 pb-16 text-center text-xl font-semibold text-pretty decoration-2 underline-offset-4 md:text-2xl'>
