@@ -31,8 +31,8 @@ Next.js 16 landing page for [Frosty](https://frostyapp.io) using the App Router 
 ### Source Structure
 
 - `src/app/` - App Router pages and layouts
-- `src/components/` - React components (`ui/` subdirectory for shadcn — add with `pnpm dlx shadcn@latest add <component>`)
-- `src/lib/` - Utilities (`cn()` for className merging)
+- `src/components/` - React components (`ui/` subdirectory for shadcn `base-vega` style — add with `pnpm dlx shadcn@latest add <component>`)
+- `src/lib/` - Utilities (`cn()` for className merging, `constants.ts` for external links)
 - `src/assets/` - Static images (screenshots)
 
 ### Cloudflare Workers
@@ -63,8 +63,13 @@ Notable strict rules enforced:
 - `@typescript-eslint/no-unnecessary-condition` - No redundant conditions
 - `@typescript-eslint/no-misused-promises` - Prevent floating promises (`checksVoidReturn.attributes` disabled for JSX)
 - `@eslint-react/jsx-shorthand-boolean` - Use shorthand boolean JSX props
+- `@eslint-react/no-array-index-key` - Warn on array index as key
 - `react-you-might-not-need-an-effect` - Avoid unnecessary useEffect
 - Unused variables must be prefixed with `_`
+
+## Commits
+
+Lowercase, no prefixes (e.g., `remove marquee emote background from hero section`). Keep commits tightly scoped.
 
 ## Dev Tooling
 
