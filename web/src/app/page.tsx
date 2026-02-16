@@ -20,6 +20,19 @@ import { SiApple, SiGoogleplay } from 'react-icons/si'
 const NUM_ROWS = 10
 const NUM_COLUMNS = 40
 
+const marqueeRows: { id: string; direction: 'left' | 'right' }[] = Array.from(
+  { length: NUM_ROWS },
+  (_, rowNumber) => ({
+    id: `marquee-row-${rowNumber}`,
+    direction: rowNumber % 2 ? 'left' : 'right',
+  }),
+)
+
+const emoteColumns = Array.from(
+  { length: NUM_COLUMNS },
+  (_, columnNumber) => `emote-column-${columnNumber}`,
+)
+
 const coreFeatures = [
   {
     caption: 'See and pin followed channels',
@@ -117,14 +130,14 @@ export default function Home() {
       <section>
         <div className='grid w-full items-center [&>*]:col-start-1 [&>*]:row-start-1'>
           <div className='flex flex-col gap-4'>
-            {Array.from({ length: NUM_ROWS }).map((_, rowIndex) => (
+            {marqueeRows.map((row) => (
               <Marquee
-                key={rowIndex}
-                direction={rowIndex % 2 ? 'left' : 'right'}
+                key={row.id}
+                direction={row.direction}
               >
-                {Array.from({ length: NUM_COLUMNS }).map((_, colIndex) => (
+                {emoteColumns.map((column) => (
                   <Image
-                    key={colIndex}
+                    key={`${row.id}-${column}`}
                     width={32}
                     height={32}
                     alt='pepeD'
@@ -192,8 +205,8 @@ export default function Home() {
       {downloadButtons}
 
       <section className='flex flex-col gap-16 p-16 md:grid md:grid-cols-2'>
-        {coreFeatures.map((feature, index) => (
-          <FeatureCard key={index} {...feature} />
+        {coreFeatures.map((feature) => (
+          <FeatureCard key={feature.caption} {...feature} />
         ))}
       </section>
 
@@ -205,8 +218,8 @@ export default function Home() {
         </h2>
 
         <div className='divide-border border-border w-full divide-y border-y'>
-          {faqs.map((faq, index) => (
-            <details key={index}>
+          {faqs.map((faq) => (
+            <details key={faq.question}>
               <summary className='hover:bg-accent p-8 font-medium transition hover:cursor-pointer'>
                 {faq.question}
               </summary>
