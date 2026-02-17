@@ -126,19 +126,27 @@ function PhoneMedia({
     }
   }, [isCurrent, media.type])
 
-  if (media.type === 'video') {
-    return (
-      <video
-        ref={videoRef}
-        src={media.src}
-        loop
-        muted
-        playsInline
-        className='size-full object-cover'
-      />
-    )
-  }
-  return <Image src={media.src} alt={title} fill className='object-cover' />
+  return (
+    <div className='relative size-full bg-black py-3'>
+      {media.type === 'video' ? (
+        <video
+          ref={videoRef}
+          src={media.src}
+          loop
+          muted
+          playsInline
+          className='size-full object-contain'
+        />
+      ) : (
+        <Image
+          src={media.src}
+          alt={title}
+          fill
+          className='object-contain'
+        />
+      )}
+    </div>
+  )
 }
 
 const STEP_MOBILE = 220
