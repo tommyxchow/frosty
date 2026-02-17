@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -14,25 +15,17 @@ import {
   emailLink,
   githubLink,
 } from '@/lib/constants'
-import { Copy, Github, Heart, Mail, Shield } from 'lucide-react'
+import { Copy, Github, Heart, Mail, Menu, Shield } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'sonner'
 
-function ContactDropdown({ iconOnly }: { iconOnly?: boolean }) {
+function ContactDropdown() {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          iconOnly ? (
-            <Button variant='ghost' size='icon' aria-label='Contact' />
-          ) : (
-            <Button variant='ghost' />
-          )
-        }
-      >
+      <DropdownMenuTrigger render={<Button variant='ghost' />}>
         <Mail />
-        {iconOnly ? null : 'Contact'}
+        Contact
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuItem render={<a href={emailLink} />}>
@@ -64,10 +57,12 @@ export function Header() {
 
         {/* Desktop actions */}
         <div className='hidden items-center gap-1 lg:flex'>
-          <ContactDropdown />
-          <Button variant='ghost' render={<Link href='/privacy' />}>
-            <Shield />
-            Privacy
+          <Button
+            variant='ghost'
+            render={<a href={githubLink} target='_blank' rel='noreferrer' />}
+          >
+            <Github />
+            GitHub
           </Button>
           <Button
             variant='ghost'
@@ -76,40 +71,16 @@ export function Header() {
             <Heart />
             Donate
           </Button>
-          <Button
-            variant='ghost'
-            render={<a href={githubLink} target='_blank' rel='noreferrer' />}
-          >
-            <Github />
-            GitHub
+          <Button variant='ghost' render={<Link href='/privacy' />}>
+            <Shield />
+            Privacy
           </Button>
+          <ContactDropdown />
           <ThemeToggle />
         </div>
 
         {/* Mobile actions */}
         <div className='flex items-center gap-1 lg:hidden'>
-          <ContactDropdown iconOnly />
-          <Button
-            variant='ghost'
-            size='icon'
-            render={<Link href='/privacy' aria-label='Privacy' />}
-          >
-            <Shield />
-          </Button>
-          <Button
-            variant='ghost'
-            size='icon'
-            render={
-              <a
-                href={donateLink}
-                target='_blank'
-                rel='noreferrer'
-                aria-label='Donate'
-              />
-            }
-          >
-            <Heart />
-          </Button>
           <Button
             variant='ghost'
             size='icon'
@@ -125,6 +96,47 @@ export function Header() {
             <Github />
           </Button>
           <ThemeToggle />
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button variant='ghost' size='icon' aria-label='Menu' />
+              }
+            >
+              <Menu />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem
+                render={
+                  <a
+                    href={donateLink}
+                    target='_blank'
+                    rel='noreferrer'
+                  />
+                }
+              >
+                <Heart />
+                Donate
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href='/privacy' />}>
+                <Shield />
+                Privacy
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem render={<a href={emailLink} />}>
+                <Mail />
+                Send email
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  void navigator.clipboard.writeText(emailAddress)
+                  toast.success('Email copied to clipboard')
+                }}
+              >
+                <Copy />
+                Copy email
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </nav>
     </header>
