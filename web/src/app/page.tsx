@@ -146,10 +146,10 @@ function Carousel() {
   }, [])
 
   return (
-    <div className='flex h-full flex-col gap-2 md:justify-center md:gap-3'>
-      {/* Phone track — edge to edge, swipeable */}
+    <div className='flex h-full flex-col items-center justify-center gap-4'>
+      {/* Phone track with overlay arrows */}
       <div
-        className='relative min-h-0 flex-1 touch-pan-y overflow-hidden'
+        className='relative min-h-0 h-full w-full shrink max-h-120 touch-pan-y overflow-hidden md:max-h-200'
         onTouchStart={(e) => {
           touchStart.current = e.touches[0]!.clientX
         }}
@@ -185,14 +185,14 @@ function Carousel() {
             >
               <div
                 className={cn(
-                  'flex h-full items-center justify-center py-2',
+                  'flex h-full items-center justify-center',
                   offset !== 0 && 'pointer-events-auto cursor-pointer',
                 )}
                 onMouseEnter={offset !== 0 ? () => setHovered(i) : undefined}
                 onMouseLeave={offset !== 0 ? () => setHovered(null) : undefined}
                 onClick={offset !== 0 ? () => go(offset) : undefined}
               >
-                <PhoneFrame className='h-full max-h-100 max-w-48 md:max-h-190 md:max-w-88'>
+                <PhoneFrame className='h-full max-h-110 max-w-48 md:max-h-190 md:max-w-88'>
                   <PhoneMedia
                     media={feature.media}
                     title={feature.title}
@@ -203,59 +203,64 @@ function Carousel() {
             </motion.div>
           )
         })}
-      </div>
 
-      {/* Dot indicator */}
-      <div className='flex justify-center gap-1.5'>
-        {features.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            aria-label={`Go to slide ${String(i + 1)}`}
-            className={cn(
-              'size-1.5 rounded-full transition-colors',
-              i === current
-                ? 'bg-foreground'
-                : 'bg-foreground/25 hover:bg-foreground/50',
-            )}
-          />
-        ))}
-      </div>
-
-      {/* Arrows + description — same line */}
-      <div className='flex items-center gap-2 px-4 md:px-8'>
-        <Button
-          variant='ghost'
-          size='icon'
-          className='shrink-0'
-          onClick={() => go(-1)}
-          aria-label='Previous feature'
-        >
-          <ChevronLeft />
-        </Button>
-        <div className='min-w-0 flex-1 text-center'>
-          <AnimatePresence mode='wait'>
-            <motion.p
-              key={current}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className='text-muted-foreground text-sm'
+        {/* Arrow overlays */}
+        <AnimatePresence>
+          {current > 0 && (
+            <motion.div
+              key='prev'
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className='absolute left-1 top-1/2 z-10 -translate-y-1/2'
             >
-              {features[current]?.description}
-            </motion.p>
-          </AnimatePresence>
-        </div>
-        <Button
-          variant='ghost'
-          size='icon'
-          className='shrink-0'
-          onClick={() => go(1)}
-          aria-label='Next feature'
-        >
-          <ChevronRight />
-        </Button>
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => go(-1)}
+                aria-label='Previous feature'
+              >
+                <ChevronLeft />
+              </Button>
+            </motion.div>
+          )}
+          {current < features.length - 1 && (
+            <motion.div
+              key='next'
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className='absolute right-1 top-1/2 z-10 -translate-y-1/2'
+            >
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => go(1)}
+                aria-label='Next feature'
+              >
+                <ChevronRight />
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Description */}
+      <div className='px-4 text-center'>
+        <AnimatePresence mode='wait'>
+          <motion.p
+            key={current}
+            initial={{ opacity: 0, y: 4, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -4, filter: 'blur(4px)' }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className='text-muted-foreground text-sm'
+          >
+            {features[current]?.description}
+          </motion.p>
+        </AnimatePresence>
       </div>
     </div>
   )
@@ -265,7 +270,7 @@ export default function Home() {
   return (
     <div className='grid h-dvh grid-rows-[auto_1fr] gap-2 p-2 md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
-      <div className='flex flex-col gap-4 rounded-3xl p-4 md:p-6'>
+      <div className='flex flex-col gap-4 rounded-3xl p-2'>
         <Header />
 
         <div className='flex flex-1 flex-col items-center justify-center gap-4 text-center'>
@@ -283,7 +288,7 @@ export default function Home() {
       </div>
 
       {/* Right cell — carousel */}
-      <div className='bg-muted/50 dark:bg-muted/30 flex flex-col overflow-hidden rounded-3xl py-3 md:py-6'>
+      <div className='bg-muted/50 dark:bg-muted/30 flex flex-col overflow-hidden rounded-3xl py-4'>
         <Carousel />
       </div>
     </div>
