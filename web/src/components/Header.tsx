@@ -1,3 +1,5 @@
+'use client'
+
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import {
@@ -6,10 +8,42 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { donateLink, emailLink, githubLink } from '@/lib/constants'
-import { Github, Heart, Mail, Menu } from 'lucide-react'
+import {
+  donateLink,
+  emailAddress,
+  emailLink,
+  githubLink,
+} from '@/lib/constants'
+import { Copy, Github, Heart, Mail, Menu } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { toast } from 'sonner'
+
+function ContactDropdown() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button variant='ghost' />}>
+        <Mail />
+        Contact
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuItem render={<a href={emailLink} />}>
+          <Mail />
+          Send email
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            void navigator.clipboard.writeText(emailAddress)
+            toast.success('Email copied to clipboard')
+          }}
+        >
+          <Copy />
+          Copy email
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export function Header() {
   return (
@@ -22,10 +56,7 @@ export function Header() {
 
         {/* Desktop actions */}
         <div className='hidden items-center gap-1 lg:flex'>
-          <Button variant='ghost' render={<a href={emailLink} />}>
-            <Mail />
-            Contact
-          </Button>
+          <ContactDropdown />
           <Button
             variant='ghost'
             render={<a href={donateLink} target='_blank' rel='noreferrer' />}
@@ -57,7 +88,15 @@ export function Header() {
             <DropdownMenuContent align='end'>
               <DropdownMenuItem render={<a href={emailLink} />}>
                 <Mail />
-                Contact
+                Email us
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  void navigator.clipboard.writeText(emailAddress)
+                }
+              >
+                <Copy />
+                Copy email
               </DropdownMenuItem>
               <DropdownMenuItem
                 render={

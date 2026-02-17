@@ -1,5 +1,6 @@
 'use client'
 
+import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from 'next-themes'
 import { useEffect } from 'react'
 
@@ -19,6 +20,7 @@ export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider attribute='class' disableTransitionOnChange>
       {children}
+      <Toaster position='top-center' />
     </ThemeProvider>
   )
 }
