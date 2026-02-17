@@ -293,7 +293,7 @@ export default function Home() {
   return (
     <div className='grid h-dvh grid-rows-[2fr_3fr] gap-2 p-2 md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
-      <div className='relative flex flex-col gap-4 overflow-hidden rounded-3xl p-2'>
+      <div className='bg-muted/50 dark:bg-muted/30 relative flex flex-col gap-4 overflow-hidden rounded-3xl p-2'>
         <EmotePhysicsBackground />
         <div className='relative z-10'>
           <Header />
@@ -342,7 +342,7 @@ export default function Home() {
       </div>
 
       {/* Right cell — carousel */}
-      <div className='bg-muted/50 dark:bg-muted/30 flex flex-col overflow-hidden rounded-3xl py-4'>
+      <div className='flex flex-col overflow-hidden rounded-3xl py-4'>
         <Carousel />
       </div>
     </div>
