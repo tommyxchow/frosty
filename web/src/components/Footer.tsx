@@ -1,31 +1,19 @@
-import { emailLink, githubLink } from '@/lib/constants'
+import { tommyLink } from '@/lib/constants'
 
 export function Footer() {
   return (
-    <footer className='flex flex-col items-center justify-between gap-6 border-t py-8 md:flex-row'>
-      <p className='text-muted-foreground text-xs'>
-        © {new Date().getFullYear()} Frosty for Twitch. Built by{' '}
+    <footer className='absolute inset-x-0 bottom-8 z-30 text-center'>
+      <p className='text-muted-foreground/60 text-xs'>
+        Made by{' '}
         <a
-          href={githubLink}
-          className='text-foreground hover:text-primary font-medium underline underline-offset-4'
+          href={tommyLink}
+          target='_blank'
+          rel='noreferrer'
+          className='hover:text-muted-foreground underline underline-offset-4'
         >
           Tommy Chow
         </a>
       </p>
-      <div className='flex gap-6'>
-        <a
-          href={githubLink}
-          className='text-muted-foreground hover:text-foreground text-xs'
-        >
-          GitHub
-        </a>
-        <a
-          href={emailLink}
-          className='text-muted-foreground hover:text-foreground text-xs'
-        >
-          Contact
-        </a>
-      </div>
     </footer>
   )
 }

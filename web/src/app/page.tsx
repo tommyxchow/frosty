@@ -4,6 +4,7 @@ import screenshotCategories from '@/assets/screenshot-categories.png'
 import screenshotFollowing from '@/assets/screenshot-following.png'
 import screenshotSettings from '@/assets/screenshot-settings.png'
 import { EmotePhysicsBackground } from '@/components/EmotePhysicsBackground'
+import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import {
@@ -381,6 +382,9 @@ export default function Home() {
           <motion.div variants={item}>
             <DownloadButtons />
           </motion.div>
+        </motion.div>
+        <motion.div variants={item} className='z-30'>
+          <Footer />
         </motion.div>
       </motion.div>
 

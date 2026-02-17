@@ -14,7 +14,7 @@ import {
   emailLink,
   githubLink,
 } from '@/lib/constants'
-import { Copy, Github, Heart, Mail } from 'lucide-react'
+import { Copy, Github, Heart, Mail, Shield } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -65,6 +65,10 @@ export function Header() {
         {/* Desktop actions */}
         <div className='hidden items-center gap-1 lg:flex'>
           <ContactDropdown />
+          <Button variant='ghost' render={<Link href='/privacy' />}>
+            <Shield />
+            Privacy
+          </Button>
           <Button
             variant='ghost'
             render={<a href={donateLink} target='_blank' rel='noreferrer' />}
@@ -85,6 +89,13 @@ export function Header() {
         {/* Mobile actions */}
         <div className='flex items-center gap-1 lg:hidden'>
           <ContactDropdown iconOnly />
+          <Button
+            variant='ghost'
+            size='icon'
+            render={<Link href='/privacy' aria-label='Privacy' />}
+          >
+            <Shield />
+          </Button>
           <Button
             variant='ghost'
             size='icon'
