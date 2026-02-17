@@ -15,9 +15,24 @@ const fontMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Frosty for Twitch',
-  description: 'Frosty lets you watch Twitch with 7TV, BTTV, and FFZ emotes',
   metadataBase: new URL('https://frostyapp.io'),
+  title: {
+    default: 'Frosty for Twitch',
+    template: '%s — Frosty',
+  },
+  description:
+    'A fast, open-source Twitch client for iOS and Android with native 7TV, BTTV, and FFZ emote support.',
+  openGraph: {
+    siteName: 'Frosty',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+  alternates: {
+    canonical: '/',
+  },
 }
 
 export default function RootLayout({

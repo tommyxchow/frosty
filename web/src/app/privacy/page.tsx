@@ -1,3 +1,14 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Privacy Policy',
+  description:
+    'Privacy policy for Frosty, an open-source Twitch client for iOS and Android.',
+  alternates: {
+    canonical: '/privacy',
+  },
+}
+
 export default function Privacy() {
   return (
     <article className='prose prose-neutral dark:prose-invert mt-32 !max-w-none'>
