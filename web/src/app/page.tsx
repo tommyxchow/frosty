@@ -17,7 +17,13 @@ import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import Image, { type StaticImageData } from 'next/image'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 import { SiApple, SiGoogleplay } from 'react-icons/si'
 
 const features = [
@@ -162,21 +168,29 @@ function PhoneMedia({
 
 const STEP_MOBILE = 220
 const STEP_DESKTOP = 370
+const stepQuery = '(min-width: 768px)'
+function subscribeStep(callback: () => void) {
+  const mq = window.matchMedia(stepQuery)
+  mq.addEventListener('change', callback)
+  return () => mq.removeEventListener('change', callback)
+}
+function getStepSnapshot() {
+  return window.matchMedia(stepQuery).matches ? STEP_DESKTOP : STEP_MOBILE
+}
+function getStepServerSnapshot() {
+  return STEP_DESKTOP
+}
 
 function Carousel() {
   const [current, setCurrent] = useState(0)
   const [hovered, setHovered] = useState<number | null>(null)
-  const [step, setStep] = useState(STEP_DESKTOP)
+  const step = useSyncExternalStore(
+    subscribeStep,
+    getStepSnapshot,
+    getStepServerSnapshot,
+  )
 
-  useEffect(() => {
-    const update = () =>
-      setStep(window.innerWidth >= 768 ? STEP_DESKTOP : STEP_MOBILE)
-    update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [])
-
-  const touchStart = useRef(0)
+  const touchStartRef = useRef(0)
 
   const go = useCallback((delta: number) => {
     setCurrent((prev) =>
@@ -190,10 +204,10 @@ function Carousel() {
       <div
         className='relative h-full max-h-120 min-h-0 w-full shrink touch-pan-y overflow-hidden md:max-h-200'
         onTouchStart={(e) => {
-          touchStart.current = e.touches[0]!.clientX
+          touchStartRef.current = e.touches[0]!.clientX
         }}
         onTouchEnd={(e) => {
-          const delta = e.changedTouches[0]!.clientX - touchStart.current
+          const delta = e.changedTouches[0]!.clientX - touchStartRef.current
           if (delta > 50) go(-1)
           else if (delta < -50) go(1)
         }}
@@ -206,7 +220,7 @@ function Carousel() {
 
           return (
             <motion.div
-              key={i}
+              key={feature.title}
               initial={{ x: offset * step, opacity: 0 }}
               animate={{
                 x: offset * step,
