@@ -1,33 +1,41 @@
 'use client'
 
+import screenshotCategories from '@/assets/screenshot-categories.png'
+import screenshotFollowing from '@/assets/screenshot-following.png'
+import screenshotSettings from '@/assets/screenshot-settings.png'
 import { Header } from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { appStoreLink, emailLink, playStoreLink } from '@/lib/constants'
+import { appStoreLink, playStoreLink } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useState } from 'react'
+import Image, { type StaticImageData } from 'next/image'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { SiApple, SiGoogleplay } from 'react-icons/si'
 
 const features = [
   {
     title: 'Native emotes',
     description: '7TV, BetterTTV, and FrankerFaceZ — no extensions required.',
+    media: { type: 'video' as const, src: '/video.webm' },
   },
   {
     title: 'Followed channels',
     description:
       'See who is live, pin favorites, and browse your followed list.',
+    media: { type: 'image' as const, src: screenshotFollowing },
   },
   {
     title: 'Explore categories',
     description:
       'Discover streams and categories with a fast, fluid interface.',
+    media: { type: 'image' as const, src: screenshotCategories },
   },
   {
     title: 'Deeply customizable',
     description:
       'Themes, autocomplete, sleep timers, and local message history.',
+    media: { type: 'image' as const, src: screenshotSettings },
   },
 ]
 
@@ -56,29 +64,166 @@ function DownloadButtons() {
   )
 }
 
-function PhoneSkeleton({ className }: { className?: string }) {
+function PhoneFrame({
+  children,
+  className,
+}: {
+  children?: React.ReactNode
+  className?: string
+}) {
   return (
-    <div className={className}>
-      <div className='border-border/50 aspect-[6/13] w-full overflow-hidden rounded-[44px] border bg-black p-[5px] shadow-xl'>
-        <Skeleton className='size-full rounded-[40px]' />
+    <div className={cn('aspect-[6/13]', className)}>
+      <div className='border-border/50 size-full overflow-hidden rounded-4xl border bg-black p-1 shadow-xl'>
+        <div className='relative size-full overflow-hidden rounded-4xl'>
+          {children}
+        </div>
       </div>
     </div>
   )
 }
 
-const STEP = 240
+function PhoneMedia({
+  media,
+  title,
+  isCurrent,
+}: {
+  media:
+    | { type: 'video'; src: string }
+    | { type: 'image'; src: StaticImageData }
+  title: string
+  isCurrent: boolean
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    if (media.type !== 'video') return
+    const video = videoRef.current
+    if (!video) return
+    if (isCurrent) {
+      void video.play()
+    } else {
+      video.pause()
+    }
+  }, [isCurrent, media.type])
+
+  if (media.type === 'video') {
+    return (
+      <video
+        ref={videoRef}
+        src={media.src}
+        loop
+        muted
+        playsInline
+        className='size-full object-cover'
+      />
+    )
+  }
+  return <Image src={media.src} alt={title} fill className='object-cover' />
+}
+
+const STEP_MOBILE = 220
+const STEP_DESKTOP = 370
 
 function Carousel() {
   const [current, setCurrent] = useState(0)
+  const [hovered, setHovered] = useState<number | null>(null)
+  const [step, setStep] = useState(STEP_DESKTOP)
+
+  useEffect(() => {
+    const update = () =>
+      setStep(window.innerWidth >= 768 ? STEP_DESKTOP : STEP_MOBILE)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
+  const touchStart = useRef(0)
 
   const go = useCallback((delta: number) => {
-    setCurrent((prev) => (prev + delta + features.length) % features.length)
+    setCurrent((prev) =>
+      Math.max(0, Math.min(features.length - 1, prev + delta)),
+    )
   }, [])
 
   return (
-    <div className='flex h-full flex-col items-center justify-center gap-8'>
-      {/* Arrows + sliding track */}
-      <div className='flex w-full items-center justify-center gap-2'>
+    <div className='flex h-full flex-col gap-2 md:justify-center md:gap-3'>
+      {/* Phone track — edge to edge, swipeable */}
+      <div
+        className='relative min-h-0 flex-1 touch-pan-y overflow-hidden'
+        onTouchStart={(e) => {
+          touchStart.current = e.touches[0]!.clientX
+        }}
+        onTouchEnd={(e) => {
+          const delta = e.changedTouches[0]!.clientX - touchStart.current
+          if (delta > 50) go(-1)
+          else if (delta < -50) go(1)
+        }}
+      >
+        {/* Animated phones on the track */}
+        {features.map((feature, i) => {
+          const offset = i - current
+
+          if (Math.abs(offset) > 2) return null
+
+          return (
+            <motion.div
+              key={i}
+              initial={{ x: offset * step, opacity: 0 }}
+              animate={{
+                x: offset * step,
+                opacity:
+                  offset === 0
+                    ? 1
+                    : Math.abs(offset) === 1
+                      ? hovered === i
+                        ? 0.5
+                        : 0.25
+                      : 0,
+              }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className='pointer-events-none absolute inset-0 flex items-center justify-center'
+            >
+              <div
+                className={cn(
+                  'flex h-full items-center justify-center py-2',
+                  offset !== 0 && 'pointer-events-auto cursor-pointer',
+                )}
+                onMouseEnter={offset !== 0 ? () => setHovered(i) : undefined}
+                onMouseLeave={offset !== 0 ? () => setHovered(null) : undefined}
+                onClick={offset !== 0 ? () => go(offset) : undefined}
+              >
+                <PhoneFrame className='h-full max-h-100 max-w-48 md:max-h-190 md:max-w-88'>
+                  <PhoneMedia
+                    media={feature.media}
+                    title={feature.title}
+                    isCurrent={offset === 0}
+                  />
+                </PhoneFrame>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* Dot indicator */}
+      <div className='flex justify-center gap-1.5'>
+        {features.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            aria-label={`Go to slide ${String(i + 1)}`}
+            className={cn(
+              'size-1.5 rounded-full transition-colors',
+              i === current
+                ? 'bg-foreground'
+                : 'bg-foreground/25 hover:bg-foreground/50',
+            )}
+          />
+        ))}
+      </div>
+
+      {/* Arrows + description — same line */}
+      <div className='flex items-center gap-2 px-4 md:px-8'>
         <Button
           variant='ghost'
           size='icon'
@@ -88,46 +233,20 @@ function Carousel() {
         >
           <ChevronLeft />
         </Button>
-
-        {/* Track — overflow clips offscreen phones */}
-        <div className='relative w-full overflow-hidden'>
-          {/* Hidden reference phone for container height */}
-          <div className='pointer-events-none invisible'>
-            <PhoneSkeleton className='mx-auto w-[180px] md:w-[220px]' />
-          </div>
-
-          {/* Animated phones on the track */}
-          {features.map((_feature, i) => {
-            let offset = i - current
-            if (offset > features.length / 2) offset -= features.length
-            if (offset < -features.length / 2) offset += features.length
-
-            if (Math.abs(offset) > 2) return null
-
-            return (
-              <motion.div
-                key={i}
-                animate={{
-                  x: offset * STEP,
-                  opacity:
-                    offset === 0 ? 1 : Math.abs(offset) === 1 ? 0.25 : 0,
-                }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className='pointer-events-none absolute inset-0 flex justify-center'
-              >
-                <div
-                  className={
-                    offset !== 0 ? 'pointer-events-auto cursor-pointer' : ''
-                  }
-                  onClick={offset !== 0 ? () => go(offset) : undefined}
-                >
-                  <PhoneSkeleton className='w-[180px] md:w-[220px]' />
-                </div>
-              </motion.div>
-            )
-          })}
+        <div className='min-w-0 flex-1 text-center'>
+          <AnimatePresence mode='wait'>
+            <motion.p
+              key={current}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className='text-muted-foreground text-sm'
+            >
+              {features[current]?.description}
+            </motion.p>
+          </AnimatePresence>
         </div>
-
         <Button
           variant='ghost'
           size='icon'
@@ -138,33 +257,19 @@ function Carousel() {
           <ChevronRight />
         </Button>
       </div>
-
-      {/* Description — directly below images */}
-      <AnimatePresence mode='wait'>
-        <motion.p
-          key={current}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className='text-muted-foreground text-center text-sm'
-        >
-          {features[current]?.description}
-        </motion.p>
-      </AnimatePresence>
     </div>
   )
 }
 
 export default function Home() {
   return (
-    <div className='grid min-h-dvh gap-2 p-2 md:grid-cols-2'>
+    <div className='grid h-dvh grid-rows-[auto_1fr] gap-2 p-2 md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
-      <div className='order-last flex flex-col rounded-3xl p-4 md:order-none md:p-6'>
+      <div className='flex flex-col gap-4 rounded-3xl p-4 md:p-6'>
         <Header />
 
         <div className='flex flex-1 flex-col items-center justify-center gap-4 text-center'>
-          <h1 className='text-2xl font-bold tracking-tight text-balance md:text-3xl'>
+          <h1 className='text-lg font-medium tracking-tight text-balance md:text-3xl md:font-bold'>
             Watch Twitch with <span className='text-primary'>emotes</span>
           </h1>
           <p className='text-muted-foreground max-w-sm text-sm text-balance'>
@@ -175,17 +280,10 @@ export default function Home() {
             <DownloadButtons />
           </div>
         </div>
-
-        <footer className='text-muted-foreground flex items-center justify-between text-xs'>
-          <p>© {new Date().getFullYear()} Frosty</p>
-          <a href={emailLink} className='hover:text-foreground'>
-            Contact
-          </a>
-        </footer>
       </div>
 
       {/* Right cell — carousel */}
-      <div className='bg-muted/30 flex flex-col rounded-3xl p-6 md:p-10'>
+      <div className='bg-muted/50 dark:bg-muted/30 flex flex-col overflow-hidden rounded-3xl py-3 md:py-6'>
         <Carousel />
       </div>
     </div>
