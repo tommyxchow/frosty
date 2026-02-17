@@ -45,6 +45,22 @@ const features = [
   },
 ]
 
+// ─── Entrance animation variants ─────────────────────────────────────────────
+const item = {
+  hidden: { opacity: 0, y: 20, filter: 'blur(4px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.5, ease: 'easeOut' as const },
+  },
+}
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+}
+
 function DownloadButtons() {
   return (
     <div className='flex flex-wrap justify-center gap-3'>
@@ -291,16 +307,24 @@ function Carousel() {
 
 export default function Home() {
   return (
-    <div className='grid h-dvh grid-rows-[2fr_3fr] gap-2 p-2 md:grid-cols-2 md:grid-rows-none'>
+    <div className='grid h-dvh overflow-hidden grid-rows-[2fr_3fr] md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
-      <div className='bg-muted/50 dark:bg-muted/30 relative flex flex-col gap-4 overflow-hidden rounded-3xl p-2'>
+      <motion.div
+        className='bg-muted/50 dark:bg-muted/30 relative flex flex-col gap-4 overflow-hidden rounded-3xl p-2'
+        initial='hidden'
+        animate='visible'
+        variants={staggerContainer}
+      >
         <EmotePhysicsBackground />
-        <div className='relative z-10'>
+        <motion.div variants={item} className='relative z-10'>
           <Header />
-        </div>
+        </motion.div>
 
-        <div className='relative z-10 flex flex-1 flex-col items-center justify-center gap-4 text-center md:gap-6'>
-          <div className='flex flex-col gap-3 md:gap-4'>
+        <motion.div
+          variants={staggerContainer}
+          className='relative z-10 flex flex-1 flex-col items-center justify-center gap-4 text-center md:gap-6'
+        >
+          <motion.div variants={item} className='flex flex-col gap-3 md:gap-4'>
             <h1 className='text-2xl font-semibold tracking-tight text-pretty md:text-4xl'>
               Watch Twitch on mobile with
               <br />
@@ -336,15 +360,22 @@ export default function Home() {
               A fast, open-source Twitch client for iOS and Android with native
               7TV, BTTV, and FFZ support.
             </p>
-          </div>
-          <DownloadButtons />
-        </div>
-      </div>
+          </motion.div>
+          <motion.div variants={item}>
+            <DownloadButtons />
+          </motion.div>
+        </motion.div>
+      </motion.div>
 
       {/* Right cell — carousel */}
-      <div className='flex flex-col overflow-hidden rounded-3xl py-4'>
+      <motion.div
+        className='flex flex-col overflow-hidden rounded-3xl py-4'
+        initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.6, ease: 'easeOut', delay: 0.4 }}
+      >
         <Carousel />
-      </div>
+      </motion.div>
     </div>
   )
 }
