@@ -3,6 +3,7 @@
 import screenshotCategories from '@/assets/screenshot-categories.png'
 import screenshotFollowing from '@/assets/screenshot-following.png'
 import screenshotSettings from '@/assets/screenshot-settings.png'
+import { EmotePhysicsBackground } from '@/components/EmotePhysicsBackground'
 import { Header } from '@/components/Header'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,8 +34,7 @@ const features = [
   },
   {
     title: 'Explore categories',
-    description:
-      'Browse top streams and trending categories across Twitch.',
+    description: 'Browse top streams and trending categories across Twitch.',
     media: { type: 'image' as const, src: screenshotCategories },
   },
   {
@@ -49,33 +49,33 @@ function DownloadButtons() {
   return (
     <div className='flex flex-wrap justify-center gap-3'>
       <Button
-        variant='secondary'
+        variant='outline'
         size='lg'
-        className='h-14 rounded-xl px-6'
+        className='bg-background h-14 rounded-xl px-6'
         render={<a href={appStoreLink} target='_blank' rel='noreferrer' />}
       >
         <SiApple className='mr-2.5 size-6 text-blue-500 dark:text-blue-400' />
         <div className='flex flex-col items-start'>
-          <span className='text-xs font-normal leading-tight opacity-60'>
+          <span className='text-xs leading-tight font-normal opacity-60'>
             Download on the
           </span>
-          <span className='text-base font-semibold leading-tight'>
+          <span className='text-base leading-tight font-semibold'>
             App Store
           </span>
         </div>
       </Button>
       <Button
-        variant='secondary'
+        variant='outline'
         size='lg'
-        className='h-14 rounded-xl px-6'
+        className='bg-background h-14 rounded-xl px-6'
         render={<a href={playStoreLink} target='_blank' rel='noreferrer' />}
       >
         <SiGoogleplay className='mr-2.5 size-5 text-green-500 dark:text-green-400' />
         <div className='flex flex-col items-start'>
-          <span className='text-xs font-normal leading-tight opacity-60'>
+          <span className='text-xs leading-tight font-normal opacity-60'>
             Get it on
           </span>
-          <span className='text-base font-semibold leading-tight'>
+          <span className='text-base leading-tight font-semibold'>
             Google Play
           </span>
         </div>
@@ -138,12 +138,7 @@ function PhoneMedia({
           className='size-full object-contain'
         />
       ) : (
-        <Image
-          src={media.src}
-          alt={title}
-          fill
-          className='object-contain'
-        />
+        <Image src={media.src} alt={title} fill className='object-contain' />
       )}
     </div>
   )
@@ -177,7 +172,7 @@ function Carousel() {
     <div className='flex h-full flex-col items-center justify-center gap-4'>
       {/* Phone track with overlay arrows */}
       <div
-        className='relative min-h-0 h-full w-full shrink max-h-120 touch-pan-y overflow-hidden md:max-h-200'
+        className='relative h-full max-h-120 min-h-0 w-full shrink touch-pan-y overflow-hidden md:max-h-200'
         onTouchStart={(e) => {
           touchStart.current = e.touches[0]!.clientX
         }}
@@ -241,7 +236,7 @@ function Carousel() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className='absolute left-1 top-1/2 z-10 -translate-y-1/2'
+              className='absolute top-1/2 left-1 z-10 -translate-y-1/2'
             >
               <Button
                 variant='ghost'
@@ -260,7 +255,7 @@ function Carousel() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 8 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className='absolute right-1 top-1/2 z-10 -translate-y-1/2'
+              className='absolute top-1/2 right-1 z-10 -translate-y-1/2'
             >
               <Button
                 variant='ghost'
@@ -298,21 +293,48 @@ export default function Home() {
   return (
     <div className='grid h-dvh grid-rows-[2fr_3fr] gap-2 p-2 md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
-      <div className='flex flex-col gap-4 rounded-3xl p-2'>
-        <Header />
+      <div className='relative flex flex-col gap-4 overflow-hidden rounded-3xl p-2'>
+        <EmotePhysicsBackground />
+        <div className='relative z-10'>
+          <Header />
+        </div>
 
-        <div className='flex flex-1 flex-col items-center justify-center gap-4 text-center md:gap-6'>
+        <div className='relative z-10 flex flex-1 flex-col items-center justify-center gap-4 text-center md:gap-6'>
           <div className='flex flex-col gap-3 md:gap-4'>
-            <h1 className='text-pretty text-2xl font-semibold tracking-tight md:text-4xl'>
+            <h1 className='text-2xl font-semibold tracking-tight text-pretty md:text-4xl'>
               Watch Twitch on mobile with
               <br />
-              <a href={sevenTvLink} target='_blank' rel='noreferrer' className='text-primary underline'>7TV</a>,{' '}
-              <a href={bttvLink} target='_blank' rel='noreferrer' className='text-primary underline'>BTTV</a>, and{' '}
-              <a href={ffzLink} target='_blank' rel='noreferrer' className='text-primary underline'>FFZ</a> emotes
+              <a
+                href={sevenTvLink}
+                target='_blank'
+                rel='noreferrer'
+                className='text-primary underline'
+              >
+                7TV
+              </a>
+              ,{' '}
+              <a
+                href={bttvLink}
+                target='_blank'
+                rel='noreferrer'
+                className='text-primary underline'
+              >
+                BTTV
+              </a>
+              , and{' '}
+              <a
+                href={ffzLink}
+                target='_blank'
+                rel='noreferrer'
+                className='text-primary underline'
+              >
+                FFZ
+              </a>{' '}
+              emotes
             </h1>
             <p className='text-muted-foreground mx-auto max-w-sm text-sm text-balance md:text-base'>
-              A fast, open-source Twitch client for iOS and Android with
-              native 7TV, BTTV, and FFZ support.
+              A fast, open-source Twitch client for iOS and Android with native
+              7TV, BTTV, and FFZ support.
             </p>
           </div>
           <DownloadButtons />

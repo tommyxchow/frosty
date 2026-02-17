@@ -74,9 +74,7 @@ export function Header() {
           </Button>
           <Button
             variant='ghost'
-            render={
-              <a href={githubLink} target='_blank' rel='noreferrer' />
-            }
+            render={<a href={githubLink} target='_blank' rel='noreferrer' />}
           >
             <Github />
             GitHub
