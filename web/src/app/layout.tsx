@@ -1,5 +1,3 @@
-import { Footer } from '@/components/Footer'
-import { Header } from '@/components/Header'
 import { Providers } from '@/components/Providers'
 import { type Metadata } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
@@ -31,15 +29,13 @@ export default function RootLayout({
     >
       <body
         className={twJoin(
-          'border-border selection:bg-primary selection:text-primary-foreground mx-auto flex min-h-dvh max-w-screen-lg flex-col font-sans underline-offset-4 antialiased lg:border-x',
+          'selection:bg-primary selection:text-primary-foreground min-h-dvh font-sans underline-offset-4 antialiased',
           fontSans.variable,
           fontMono.variable,
         )}
       >
         <Providers>
-          <Header />
-          <main className='grow'>{children}</main>
-          <Footer />
+          <main>{children}</main>
         </Providers>
       </body>
     </html>

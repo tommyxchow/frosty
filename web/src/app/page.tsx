@@ -1,196 +1,193 @@
-import screenshotCategories from '@/assets/screenshot-categories.png'
-import screenshotChannel from '@/assets/screenshot-channel.png'
-import screenshotFollowing from '@/assets/screenshot-following.png'
-import screenshotSettings from '@/assets/screenshot-settings.png'
-import { FeatureCard } from '@/components/FeatureCard'
-import {
-  appStoreLink,
-  bttvLink,
-  emailLink,
-  ffzLink,
-  githubLink,
-  playStoreLink,
-  sevenTvLink,
-  twitchLink,
-} from '@/lib/constants'
+'use client'
+
+import { Header } from '@/components/Header'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { appStoreLink, emailLink, playStoreLink } from '@/lib/constants'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useCallback, useState } from 'react'
 import { SiApple, SiGoogleplay } from 'react-icons/si'
 
-const coreFeatures = [
+const features = [
   {
-    caption: 'See and pin followed channels',
-    screenshot: screenshotFollowing,
+    title: 'Native emotes',
+    description: '7TV, BetterTTV, and FrankerFaceZ — no extensions required.',
   },
   {
-    caption: 'Explore top streams and categories',
-    screenshot: screenshotCategories,
+    title: 'Followed channels',
+    description:
+      'See who is live, pin favorites, and browse your followed list.',
   },
   {
-    caption: 'Watch and chat with 7TV, BTTV, and FFZ emotes',
-    screenshot: screenshotChannel,
+    title: 'Explore categories',
+    description:
+      'Discover streams and categories with a fast, fluid interface.',
   },
   {
-    caption: 'Customize a variety of settings',
-    screenshot: screenshotSettings,
-  },
-]
-
-const faqs = [
-  {
-    question: 'Why are some Twitch features not in Frosty?',
-    answer:
-      'The Twitch API only exposes a limited set of functionality to developers. Features like predictions, polls, pinned messages, VODs with chat, stream qualities, total view count for categories and more are not available.',
-  },
-  {
-    question: 'Why is the stream delayed on iOS?',
-    answer:
-      'There is a delay of around 15 seconds due to how the native iOS player works. As a workaround, Frosty has a message delay option that lets you set the delay (in seconds) before each message is rendered.',
-  },
-  {
-    question: 'Is ad block planned?',
-    answer:
-      'Ad block is not planned because it would probably violate the Twitch terms of service.',
-  },
-  {
-    question: 'Will Frosty support Apple/Android TV?',
-    answer:
-      "Not yet, because Flutter (the framework that Frosty is built upon) doesn't officially support TVs.",
-  },
-  {
-    question: 'Where can I report a bug or request a new feature?',
-    answer: (
-      <>
-        You can open a new issue on the{' '}
-        <a
-          className='underline'
-          href={githubLink}
-          target='_blank'
-          rel='noreferrer'
-        >
-          GitHub repo
-        </a>{' '}
-        or email{' '}
-        <a
-          className='underline'
-          href={emailLink}
-          target='_blank'
-          rel='noreferrer'
-        >
-          contact@frostyapp.io
-        </a>
-        .
-      </>
-    ),
+    title: 'Deeply customizable',
+    description:
+      'Themes, autocomplete, sleep timers, and local message history.',
   },
 ]
 
-export default function Home() {
-  const downloadButtons = (
-    <div className='divide-border border-border grid w-full grid-cols-2 divide-x border-y font-semibold'>
-      <a
-        className='flex items-center justify-center gap-2 p-4 transition hover:bg-blue-700 hover:text-neutral-100 dark:hover:bg-blue-800'
-        href={appStoreLink}
-        target='_blank'
-        rel='noreferrer'
+function DownloadButtons() {
+  return (
+    <div className='flex flex-wrap justify-center gap-3'>
+      <Button
+        variant='default'
+        size='lg'
+        className='h-11 rounded-full px-6 font-semibold'
+        render={<a href={appStoreLink} target='_blank' rel='noreferrer' />}
       >
-        <SiApple className='text-blue-500' />
+        <SiApple className='mr-2 size-4' />
         App Store
-      </a>
-      <a
-        className='flex items-center justify-center gap-2 p-4 transition hover:bg-green-700 hover:text-neutral-100 dark:hover:bg-green-800'
-        href={playStoreLink}
-        target='_blank'
-        rel='noreferrer'
+      </Button>
+      <Button
+        variant='outline'
+        size='lg'
+        className='h-11 rounded-full px-6 font-semibold'
+        render={<a href={playStoreLink} target='_blank' rel='noreferrer' />}
       >
-        <SiGoogleplay className='text-green-500 dark:text-green-400' />
+        <SiGoogleplay className='mr-2 size-3.5' />
         Google Play
-      </a>
+      </Button>
     </div>
   )
+}
+
+function PhoneSkeleton({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      <div className='border-border/50 aspect-[6/13] w-full overflow-hidden rounded-[44px] border bg-black p-[5px] shadow-xl'>
+        <Skeleton className='size-full rounded-[40px]' />
+      </div>
+    </div>
+  )
+}
+
+const STEP = 240
+
+function Carousel() {
+  const [current, setCurrent] = useState(0)
+
+  const go = useCallback((delta: number) => {
+    setCurrent((prev) => (prev + delta + features.length) % features.length)
+  }, [])
 
   return (
-    <article className='flex flex-col'>
-      <section>
-        <div className='flex justify-center p-8 pt-16'>
-          <video
-            className='border-border h-[75vh] max-h-[800px] border bg-black object-contain py-4'
-            src='/video.webm'
-            autoPlay
-            loop
-            muted
-            playsInline
-            disableRemotePlayback
-          />
+    <div className='flex h-full flex-col items-center justify-center gap-8'>
+      {/* Arrows + sliding track */}
+      <div className='flex w-full items-center justify-center gap-2'>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='shrink-0'
+          onClick={() => go(-1)}
+          aria-label='Previous feature'
+        >
+          <ChevronLeft />
+        </Button>
+
+        {/* Track — overflow clips offscreen phones */}
+        <div className='relative w-full overflow-hidden'>
+          {/* Hidden reference phone for container height */}
+          <div className='pointer-events-none invisible'>
+            <PhoneSkeleton className='mx-auto w-[180px] md:w-[220px]' />
+          </div>
+
+          {/* Animated phones on the track */}
+          {features.map((_feature, i) => {
+            let offset = i - current
+            if (offset > features.length / 2) offset -= features.length
+            if (offset < -features.length / 2) offset += features.length
+
+            if (Math.abs(offset) > 2) return null
+
+            return (
+              <motion.div
+                key={i}
+                animate={{
+                  x: offset * STEP,
+                  opacity:
+                    offset === 0 ? 1 : Math.abs(offset) === 1 ? 0.25 : 0,
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className='pointer-events-none absolute inset-0 flex justify-center'
+              >
+                <div
+                  className={
+                    offset !== 0 ? 'pointer-events-auto cursor-pointer' : ''
+                  }
+                  onClick={offset !== 0 ? () => go(offset) : undefined}
+                >
+                  <PhoneSkeleton className='w-[180px] md:w-[220px]' />
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
 
-        <h1 className='p-8 pb-16 text-center text-xl font-semibold text-pretty decoration-2 underline-offset-4 md:text-2xl'>
-          Frosty lets you watch{' '}
-          <a
-            className='text-primary underline'
-            href={twitchLink}
-            target='_blank'
-            rel='noreferrer'
-          >
-            Twitch
-          </a>{' '}
-          with{' '}
-          <a
-            className='text-primary underline'
-            href={sevenTvLink}
-            target='_blank'
-            rel='noreferrer'
-          >
-            7TV
-          </a>
-          ,{' '}
-          <a
-            className='text-primary underline'
-            href={bttvLink}
-            target='_blank'
-            rel='noreferrer'
-          >
-            BTTV
-          </a>
-          , and{' '}
-          <a
-            className='text-primary underline'
-            href={ffzLink}
-            target='_blank'
-            rel='noreferrer'
-          >
-            FFZ
-          </a>{' '}
-          emotes
-        </h1>
-      </section>
+        <Button
+          variant='ghost'
+          size='icon'
+          className='shrink-0'
+          onClick={() => go(1)}
+          aria-label='Next feature'
+        >
+          <ChevronRight />
+        </Button>
+      </div>
 
-      {downloadButtons}
+      {/* Description — directly below images */}
+      <AnimatePresence mode='wait'>
+        <motion.p
+          key={current}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          className='text-muted-foreground text-center text-sm'
+        >
+          {features[current]?.description}
+        </motion.p>
+      </AnimatePresence>
+    </div>
+  )
+}
 
-      <section className='flex flex-col gap-16 p-16 md:grid md:grid-cols-2'>
-        {coreFeatures.map((feature) => (
-          <FeatureCard key={feature.caption} {...feature} />
-        ))}
-      </section>
+export default function Home() {
+  return (
+    <div className='grid min-h-dvh gap-2 p-2 md:grid-cols-2'>
+      {/* Left cell — intro */}
+      <div className='order-last flex flex-col rounded-3xl p-4 md:order-none md:p-6'>
+        <Header />
 
-      {downloadButtons}
-
-      <section className='flex flex-col items-center' id='faq'>
-        <h2 className='p-8 text-lg font-semibold md:text-xl'>
-          Frequently asked questions
-        </h2>
-
-        <div className='divide-border border-border w-full divide-y border-y'>
-          {faqs.map((faq) => (
-            <details key={faq.question}>
-              <summary className='hover:bg-accent p-8 font-medium transition hover:cursor-pointer'>
-                {faq.question}
-              </summary>
-              <p className='border-border text-muted-foreground border-t px-12 py-8'>
-                {faq.answer}
-              </p>
-            </details>
-          ))}
+        <div className='flex flex-1 flex-col items-center justify-center gap-4 text-center'>
+          <h1 className='text-2xl font-bold tracking-tight text-balance md:text-3xl'>
+            Watch Twitch with <span className='text-primary'>emotes</span>
+          </h1>
+          <p className='text-muted-foreground max-w-sm text-sm text-balance'>
+            A fast, open-source Twitch client for iOS and Android with native
+            7TV, BTTV, and FFZ support.
+          </p>
+          <div className='pt-2'>
+            <DownloadButtons />
+          </div>
         </div>
-      </section>
-    </article>
+
+        <footer className='text-muted-foreground flex items-center justify-between text-xs'>
+          <p>© {new Date().getFullYear()} Frosty</p>
+          <a href={emailLink} className='hover:text-foreground'>
+            Contact
+          </a>
+        </footer>
+      </div>
+
+      {/* Right cell — carousel */}
+      <div className='bg-muted/30 flex flex-col rounded-3xl p-6 md:p-10'>
+        <Carousel />
+      </div>
+    </div>
   )
 }

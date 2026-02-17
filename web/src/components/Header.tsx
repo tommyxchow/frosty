@@ -1,40 +1,44 @@
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/button'
 import { donateLink, githubLink } from '@/lib/constants'
+import { Github } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { SiBuymeacoffee, SiGithub } from 'react-icons/si'
-import { ThemeToggle } from './ThemeToggle'
 
 export function Header() {
   return (
-    <header className='divide-border border-border sticky top-0 z-50 flex w-full max-w-screen-lg justify-between gap-4 divide-x border-b bg-inherit'>
-      <Link
-        className='border-border hover:bg-accent flex items-center gap-2 border-r px-4 transition'
-        href='/'
-      >
-        <Image alt='Logo' src='/logo.svg' width={32} height={32} priority />
-      </Link>
+    <header>
+      <nav className='flex items-center justify-between'>
+        <Link href='/' className='flex items-center gap-2'>
+          <Image src='/logo.svg' alt='' width={28} height={28} />
+          <span className='font-semibold'>Frosty</span>
+        </Link>
 
-      <div className='divide-border flex items-center divide-x'>
-        <a
-          className='hover:bg-accent p-4 transition'
-          href={donateLink}
-          target='_blank'
-          rel='noreferrer'
-        >
-          <SiBuymeacoffee className='size-6' />
-        </a>
-
-        <a
-          className='hover:bg-accent p-4 transition'
-          href={githubLink}
-          target='_blank'
-          rel='noreferrer'
-        >
-          <SiGithub className='size-6' />
-        </a>
-
-        <ThemeToggle />
-      </div>
+        <div className='flex items-center gap-1'>
+          <Button
+            variant='ghost'
+            size='sm'
+            render={<a href={donateLink} target='_blank' rel='noreferrer' />}
+          >
+            Donate
+          </Button>
+          <Button
+            variant='ghost'
+            size='icon'
+            render={
+              <a
+                href={githubLink}
+                target='_blank'
+                rel='noreferrer'
+                aria-label='GitHub'
+              />
+            }
+          >
+            <Github />
+          </Button>
+          <ThemeToggle />
+        </div>
+      </nav>
     </header>
   )
 }
