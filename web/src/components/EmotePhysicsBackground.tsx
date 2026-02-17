@@ -12,15 +12,21 @@ const EMOTE_IDS = [
   '01F6MZGCNG000255K4X1K7NTHR', // GIGACHAD
   '01HTKMB7680004B0MV8TERR9A4', // AURA
   '01F00Z3A9G0007E4VV006YKSK9', // OMEGALUL
+  '01HMBMJPV0000D32KQCYBK4S1D', // aga
+  '01F71VQYHR000D3ZZ6Q11NR7TV', // WW
+  '01FS5ZCFG0000500DPPCXJWCP8', // o7
+  '01F7CTADRG000351ERP2WA0ME9', // FLASHBANG
+  '01F6T8NM9R0007M5BTFWSP1YSJ', // Clueless
+  '01F22WE74G000F9Q0G00A2DE8N', // LULW
+  '01F6TCFKM0000CBRZV8MZ7ZGGH', // Deadass
+  '01F6MG1HPR0009K1N00D4GG63Z', // ICANT
   '01FHNBZRW8000C3ZWT2Z63JS92', // Sadge
   '01EZTCN91800012PTN006Q50PR', // Pog
-  '01F6T8NM9R0007M5BTFWSP1YSJ', // Clueless
   '01FFWH9WV80000JT8GHDKHJNZC', // Aware
   '01F010F9GR0007E4VV006YKSKN', // PepeLaugh
   '01F6MA6Y100002B6P5MWZ5D916', // Hmm
   '01F6NACCD80006SZ7ZW5FMWKWK', // Prayge
   '01FG1NDHJR0001XDR7G9054X2Q', // HUH
-  '01G7YR9X5G0003Z50SB3FM5WR4', // Happi
   '01GFBTYEV80008P4E5PB4NX0XC', // DIESOFCRINGE
   '01F6MDFCSR0000WDA7ERT623YT', // NODDERS
   '01F6MQ33FG000FFJ97ZB8MWV52', // catJAM
@@ -30,7 +36,7 @@ const EMOTE_IDS = [
   '01F6MMQCM80009C9ZSNZT3GTK1', // PagChomp
   '01FAJR9X80000136YH153JYZTB', // modCheck
   '01G7RNEB2R00029YRR37CZ24HX', // LockIn
-  '01F6MG1HPR0009K1N00D4GG63Z', // ICANT
+  '01G7YR9X5G0003Z50SB3FM5WR4', // Happi
   '01GBEBQQN00001RAQMJBWFVDXF', // COOKING
   '01JJ0D0C2XWZ640NP4WJKB8MYX', // Cooked
   '01GY1RDSR8000ENJJARE9FMTJR', // SLAY
@@ -43,7 +49,7 @@ const EMOTE_URLS = EMOTE_IDS.map(
 )
 
 // ─── Physics constants ───────────────────────────────────────────────────────
-const PARTICLE_COUNT = 25
+const PARTICLE_COUNT = 30
 const EMOTE_SIZE = 40
 const TARGET_OPACITY = 0.3
 const INITIAL_SPEED = 0.4
@@ -65,6 +71,8 @@ interface ParticleState {
   vy: number
   rotation: number
   rotationSpeed: number
+  halfW: number
+  measured: boolean
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -96,6 +104,8 @@ function createParticle(w: number, h: number): ParticleState {
     vy: Math.sin(angle) * INITIAL_SPEED,
     rotation: rand(-0.3, 0.3),
     rotationSpeed: rand(-0.003, 0.003),
+    halfW: EMOTE_SIZE / 2,
+    measured: false,
   }
 }
 
@@ -158,10 +168,10 @@ export function EmotePhysicsBackground() {
       if (width > 0 && height > 0) {
         w = width
         h = height
-        const half = EMOTE_SIZE / 2
+        const halfH = EMOTE_SIZE / 2
         for (const p of particles) {
-          p.x = Math.max(half, Math.min(p.x, w - half))
-          p.y = Math.max(half, Math.min(p.y, h - half))
+          p.x = Math.max(p.halfW, Math.min(p.x, w - p.halfW))
+          p.y = Math.max(halfH, Math.min(p.y, h - halfH))
         }
       }
     })
@@ -188,10 +198,10 @@ export function EmotePhysicsBackground() {
       const zoneRadiusX = (w * CENTER_ZONE_X) / 2
       const zoneRadiusY = (h * CENTER_ZONE_Y) / 2
 
+      // Per-particle forces, friction, speed limits, and integration
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
-        const el = elements[i]
-        if (p === undefined || el === undefined) continue
+        if (p === undefined) continue
 
         // Center avoidance — soft elliptical repulsion
         const cdx = p.x - centerX
@@ -244,20 +254,75 @@ export function EmotePhysicsBackground() {
         p.x += p.vx
         p.y += p.vy
 
-        // Wall bounce
-        const half = EMOTE_SIZE / 2
-        if (p.x - half < 0) {
-          p.x = half
+        // Lazily measure actual rendered width once image loads
+        const el = elements[i]
+        if (
+          el !== undefined &&
+          !p.measured &&
+          el.naturalWidth > 0 &&
+          el.naturalHeight > 0
+        ) {
+          p.halfW = ((el.naturalWidth / el.naturalHeight) * EMOTE_SIZE) / 2
+          p.measured = true
+        }
+      }
+
+      // Particle-particle elastic collision
+      const halfH = EMOTE_SIZE / 2
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i]
+        if (a === undefined) continue
+        const rA = Math.max(a.halfW, halfH)
+        for (let j = i + 1; j < particles.length; j++) {
+          const b = particles[j]
+          if (b === undefined) continue
+          const rB = Math.max(b.halfW, halfH)
+          const dx = b.x - a.x
+          const dy = b.y - a.y
+          const distSq = dx * dx + dy * dy
+          const minDist = rA + rB
+          if (distSq < minDist * minDist && distSq > 0.01) {
+            const dist = Math.sqrt(distSq)
+            const nx = dx / dist
+            const ny = dy / dist
+            // Separate overlapping particles
+            const overlap = (minDist - dist) / 2
+            a.x -= nx * overlap
+            a.y -= ny * overlap
+            b.x += nx * overlap
+            b.y += ny * overlap
+            // Elastic velocity exchange along collision normal
+            const dvx = a.vx - b.vx
+            const dvy = a.vy - b.vy
+            const dvDotN = dvx * nx + dvy * ny
+            if (dvDotN > 0) {
+              a.vx -= dvDotN * nx * RESTITUTION
+              a.vy -= dvDotN * ny * RESTITUTION
+              b.vx += dvDotN * nx * RESTITUTION
+              b.vy += dvDotN * ny * RESTITUTION
+            }
+          }
+        }
+      }
+
+      // Wall bounce and DOM write
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i]
+        const el = elements[i]
+        if (p === undefined || el === undefined) continue
+
+        if (p.x - p.halfW < 0) {
+          p.x = p.halfW
           p.vx = Math.abs(p.vx) * RESTITUTION
-        } else if (p.x + half > w) {
-          p.x = w - half
+        } else if (p.x + p.halfW > w) {
+          p.x = w - p.halfW
           p.vx = -Math.abs(p.vx) * RESTITUTION
         }
-        if (p.y - half < 0) {
-          p.y = half
+        if (p.y - halfH < 0) {
+          p.y = halfH
           p.vy = Math.abs(p.vy) * RESTITUTION
-        } else if (p.y + half > h) {
-          p.y = h - half
+        } else if (p.y + halfH > h) {
+          p.y = h - halfH
           p.vy = -Math.abs(p.vy) * RESTITUTION
         }
 
@@ -265,7 +330,7 @@ export function EmotePhysicsBackground() {
         p.rotation += p.rotationSpeed
 
         // Write to DOM — only transform, no layout thrash
-        el.style.transform = `translate3d(${p.x - half}px, ${p.y - half}px, 0) rotate(${p.rotation}rad)`
+        el.style.transform = `translate3d(${p.x - p.halfW}px, ${p.y - halfH}px, 0) rotate(${p.rotation}rad)`
       }
 
       rafId = requestAnimationFrame(tick)
@@ -302,7 +367,6 @@ export function EmotePhysicsBackground() {
           transition={{ duration: 0.6, delay: i * 0.04, ease: 'easeOut' }}
           className='pointer-events-none absolute top-0 left-0 select-none'
           style={{
-            width: EMOTE_SIZE,
             height: EMOTE_SIZE,
             willChange: 'transform',
           }}

@@ -287,7 +287,7 @@ function Carousel() {
       </div>
 
       {/* Description */}
-      <div className='px-4 text-center'>
+      <div className='min-h-10 px-4 text-center'>
         <AnimatePresence mode='wait'>
           <motion.p
             key={current}
@@ -307,22 +307,25 @@ function Carousel() {
 
 export default function Home() {
   return (
-    <div className='grid h-dvh overflow-hidden grid-rows-[2fr_3fr] md:grid-cols-2 md:grid-rows-none'>
+    <div className='grid h-dvh grid-rows-[2fr_4fr] overflow-hidden md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
       <motion.div
-        className='bg-muted/50 dark:bg-muted/30 relative flex flex-col gap-4 overflow-hidden rounded-3xl p-2'
+        className='bg-muted/50 dark:bg-muted/30 relative flex flex-col gap-4 overflow-hidden'
         initial='hidden'
         animate='visible'
         variants={staggerContainer}
       >
         <EmotePhysicsBackground />
-        <motion.div variants={item} className='relative z-10'>
+        <motion.div
+          variants={item}
+          className='absolute inset-x-0 top-0 z-20 p-4'
+        >
           <Header />
         </motion.div>
 
         <motion.div
           variants={staggerContainer}
-          className='relative z-10 flex flex-1 flex-col items-center justify-center gap-4 text-center md:gap-6'
+          className='relative z-10 flex min-h-full flex-col items-center justify-center gap-4 text-center md:gap-6'
         >
           <motion.div variants={item} className='flex flex-col gap-3 md:gap-4'>
             <h1 className='text-2xl font-semibold tracking-tight text-pretty md:text-4xl'>
@@ -369,7 +372,7 @@ export default function Home() {
 
       {/* Right cell — carousel */}
       <motion.div
-        className='flex flex-col overflow-hidden rounded-3xl py-4'
+        className='flex flex-col overflow-hidden py-4'
         initial={{ opacity: 0, y: 30, filter: 'blur(4px)' }}
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ duration: 0.6, ease: 'easeOut', delay: 0.4 }}
