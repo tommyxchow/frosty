@@ -5,7 +5,13 @@ import screenshotFollowing from '@/assets/screenshot-following.png'
 import screenshotSettings from '@/assets/screenshot-settings.png'
 import { Header } from '@/components/Header'
 import { Button } from '@/components/ui/button'
-import { appStoreLink, playStoreLink } from '@/lib/constants'
+import {
+  appStoreLink,
+  bttvLink,
+  ffzLink,
+  playStoreLink,
+  sevenTvLink,
+} from '@/lib/constants'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -16,7 +22,7 @@ import { SiApple, SiGoogleplay } from 'react-icons/si'
 const features = [
   {
     title: 'Native emotes',
-    description: '7TV, BetterTTV, and FrankerFaceZ — no extensions required.',
+    description: 'Watch and chat with 7TV, BetterTTV, and FrankerFaceZ emotes.',
     media: { type: 'video' as const, src: '/video.webm' },
   },
   {
@@ -28,7 +34,7 @@ const features = [
   {
     title: 'Explore categories',
     description:
-      'Discover streams and categories with a fast, fluid interface.',
+      'Browse top streams and trending categories across Twitch.',
     media: { type: 'image' as const, src: screenshotCategories },
   },
   {
@@ -43,22 +49,36 @@ function DownloadButtons() {
   return (
     <div className='flex flex-wrap justify-center gap-3'>
       <Button
-        variant='default'
+        variant='secondary'
         size='lg'
-        className='h-11 rounded-full px-6 font-semibold'
+        className='h-14 rounded-xl px-6'
         render={<a href={appStoreLink} target='_blank' rel='noreferrer' />}
       >
-        <SiApple className='mr-2 size-4' />
-        App Store
+        <SiApple className='mr-2.5 size-6 text-blue-500 dark:text-blue-400' />
+        <div className='flex flex-col items-start'>
+          <span className='text-xs font-normal leading-tight opacity-60'>
+            Download on the
+          </span>
+          <span className='text-base font-semibold leading-tight'>
+            App Store
+          </span>
+        </div>
       </Button>
       <Button
-        variant='outline'
+        variant='secondary'
         size='lg'
-        className='h-11 rounded-full px-6 font-semibold'
+        className='h-14 rounded-xl px-6'
         render={<a href={playStoreLink} target='_blank' rel='noreferrer' />}
       >
-        <SiGoogleplay className='mr-2 size-3.5' />
-        Google Play
+        <SiGoogleplay className='mr-2.5 size-5 text-green-500 dark:text-green-400' />
+        <div className='flex flex-col items-start'>
+          <span className='text-xs font-normal leading-tight opacity-60'>
+            Get it on
+          </span>
+          <span className='text-base font-semibold leading-tight'>
+            Google Play
+          </span>
+        </div>
       </Button>
     </div>
   )
@@ -268,22 +288,26 @@ function Carousel() {
 
 export default function Home() {
   return (
-    <div className='grid h-dvh grid-rows-[auto_1fr] gap-2 p-2 md:grid-cols-2 md:grid-rows-none'>
+    <div className='grid h-dvh grid-rows-[2fr_3fr] gap-2 p-2 md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
       <div className='flex flex-col gap-4 rounded-3xl p-2'>
         <Header />
 
-        <div className='flex flex-1 flex-col items-center justify-center gap-4 text-center'>
-          <h1 className='text-lg font-medium tracking-tight text-balance md:text-3xl md:font-bold'>
-            Watch Twitch with <span className='text-primary'>emotes</span>
-          </h1>
-          <p className='text-muted-foreground max-w-sm text-sm text-balance'>
-            A fast, open-source Twitch client for iOS and Android with native
-            7TV, BTTV, and FFZ support.
-          </p>
-          <div className='pt-2'>
-            <DownloadButtons />
+        <div className='flex flex-1 flex-col items-center justify-center gap-4 text-center md:gap-6'>
+          <div className='flex flex-col gap-3 md:gap-4'>
+            <h1 className='text-pretty text-2xl font-semibold tracking-tight md:text-4xl'>
+              Watch Twitch on mobile with
+              <br />
+              <a href={sevenTvLink} target='_blank' rel='noreferrer' className='text-primary underline'>7TV</a>,{' '}
+              <a href={bttvLink} target='_blank' rel='noreferrer' className='text-primary underline'>BTTV</a>, and{' '}
+              <a href={ffzLink} target='_blank' rel='noreferrer' className='text-primary underline'>FFZ</a> emotes
+            </h1>
+            <p className='text-muted-foreground mx-auto max-w-sm text-sm text-balance md:text-base'>
+              A fast, open-source Twitch client for iOS and Android with
+              native 7TV, BTTV, and FFZ support.
+            </p>
           </div>
+          <DownloadButtons />
         </div>
       </div>
 

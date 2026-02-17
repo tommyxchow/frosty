@@ -4,7 +4,11 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import { twJoin } from 'tailwind-merge'
 import './globals.css'
 
-const fontSans = Inter({ subsets: ['latin'], variable: '--font-sans' })
+const fontSans = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  axes: ['opsz'],
+})
 const fontMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
