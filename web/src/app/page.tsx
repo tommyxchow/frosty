@@ -267,7 +267,7 @@ function Carousel() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className='absolute top-1/2 left-1 z-10 -translate-y-1/2'
+              className='absolute top-1/2 left-4 z-10 -translate-y-1/2'
             >
               <Button
                 variant='ghost'
@@ -286,7 +286,7 @@ function Carousel() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 8 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className='absolute top-1/2 right-1 z-10 -translate-y-1/2'
+              className='absolute top-1/2 right-4 z-10 -translate-y-1/2'
             >
               <Button
                 variant='ghost'
