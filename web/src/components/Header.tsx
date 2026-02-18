@@ -1,42 +1,144 @@
-import { donateLink, githubLink } from '@/lib/constants';
-import Image from 'next/image';
-import Link from 'next/link';
-import { SiBuymeacoffee, SiGithub } from 'react-icons/si';
-import { ThemeToggle } from './ThemeToggle';
+'use client'
+
+import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  donateLink,
+  emailAddress,
+  emailLink,
+  githubLink,
+} from '@/lib/constants'
+import { Copy, Github, Heart, Mail, Menu, Shield } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { toast } from 'sonner'
+
+function ContactDropdown() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button variant='ghost' />}>
+        <Mail />
+        Contact
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuItem render={<a href={emailLink} />}>
+          <Mail />
+          Send email
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
+            void navigator.clipboard.writeText(emailAddress)
+            toast.success('Email copied to clipboard')
+          }}
+        >
+          <Copy />
+          Copy email
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
 export function Header() {
   return (
-    <header className='sticky top-0 z-50 flex w-full max-w-screen-lg justify-between gap-4 divide-x divide-neutral-300 border-b border-inherit bg-inherit dark:divide-neutral-900 dark:from-black'>
-      <Link
-        className='flex items-center gap-2 border-r border-inherit px-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
-        href='/'
-      >
-        <div className='relative size-8'>
-          <Image alt='Logo' src={`/logo.svg`} layout='fill' priority />
+    <header>
+      <nav className='flex items-center justify-between'>
+        <Link href='/' className='flex items-center gap-2'>
+          <Image src='/logo.svg' alt='' width={28} height={28} />
+          <span className='font-semibold'>Frosty</span>
+        </Link>
+
+        {/* Desktop actions */}
+        <div className='hidden items-center gap-1 lg:flex'>
+          <Button
+            variant='ghost'
+            render={<a href={githubLink} target='_blank' rel='noreferrer' />}
+          >
+            <Github />
+            GitHub
+          </Button>
+          <Button
+            variant='ghost'
+            render={<a href={donateLink} target='_blank' rel='noreferrer' />}
+          >
+            <Heart />
+            Donate
+          </Button>
+          <Button variant='ghost' render={<Link href='/privacy' />}>
+            <Shield />
+            Privacy
+          </Button>
+          <ContactDropdown />
+          <ThemeToggle />
         </div>
-      </Link>
 
-      <div className='flex items-center divide-x divide-inherit'>
-        <a
-          className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
-          href={donateLink}
-          target='_blank'
-          rel='noreferrer'
-        >
-          <SiBuymeacoffee className='size-6' />
-        </a>
-
-        <a
-          className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
-          href={githubLink}
-          target='_blank'
-          rel='noreferrer'
-        >
-          <SiGithub className='size-6' />
-        </a>
-
-        <ThemeToggle />
-      </div>
+        {/* Mobile actions */}
+        <div className='flex items-center gap-1 lg:hidden'>
+          <Button
+            variant='ghost'
+            size='icon'
+            render={
+              <a
+                href={githubLink}
+                target='_blank'
+                rel='noreferrer'
+                aria-label='GitHub'
+              />
+            }
+          >
+            <Github />
+          </Button>
+          <ThemeToggle />
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button variant='ghost' size='icon' aria-label='Menu' />
+              }
+            >
+              <Menu />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='end'>
+              <DropdownMenuItem
+                render={
+                  <a
+                    href={donateLink}
+                    target='_blank'
+                    rel='noreferrer'
+                  />
+                }
+              >
+                <Heart />
+                Donate
+              </DropdownMenuItem>
+              <DropdownMenuItem render={<Link href='/privacy' />}>
+                <Shield />
+                Privacy
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem render={<a href={emailLink} />}>
+                <Mail />
+                Send email
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  void navigator.clipboard.writeText(emailAddress)
+                  toast.success('Email copied to clipboard')
+                }}
+              >
+                <Copy />
+                Copy email
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </nav>
     </header>
-  );
+  )
 }

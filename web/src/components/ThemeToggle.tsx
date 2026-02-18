@@ -1,33 +1,52 @@
-'use client';
+'use client'
 
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
-import { HiMoon, HiSun } from 'react-icons/hi2';
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Monitor, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme()
 
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    // eslint-disable-next-line -- intentional hydration pattern
+    setMounted(true)
+  }, [])
 
-  if (!mounted) return <div className='size-6' />;
-
-  const isDarkMode = resolvedTheme === 'dark';
+  if (!mounted) return <div className='size-9' />
 
   return (
-    <button
-      className='p-4 transition hover:bg-neutral-200 dark:hover:bg-neutral-900'
-      aria-label={`Toggle ${isDarkMode ? 'light mode' : 'dark mode'}`}
-      onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
-    >
-      {isDarkMode ? (
-        <HiSun className='size-6' />
-      ) : (
-        <HiMoon className='size-6' />
-      )}
-    </button>
-  );
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label='Toggle theme'
+        render={<Button variant='ghost' size='icon' />}
+      >
+        {theme === 'dark' && <Moon />}
+        {theme === 'light' && <Sun />}
+        {theme === 'system' && <Monitor />}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuItem onClick={() => setTheme('light')}>
+          <Sun className='mr-2' />
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('dark')}>
+          <Moon className='mr-2' />
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme('system')}>
+          <Monitor className='mr-2' />
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }

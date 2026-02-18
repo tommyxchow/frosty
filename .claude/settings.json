@@ -9,5 +9,8 @@
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true
   },
+  "enabledMcpjsonServers": [
+    "next-devtools"
+  ],
   "outputStyle": "Explanatory"
 }

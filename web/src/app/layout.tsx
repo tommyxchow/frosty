@@ -1,38 +1,62 @@
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
-import { Providers } from '@/components/Providers';
-import { type Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { twJoin } from 'tailwind-merge';
-import './globals.css';
+import { Providers } from '@/components/Providers'
+import { type Metadata } from 'next'
+import { Inter, JetBrains_Mono } from 'next/font/google'
+import { twJoin } from 'tailwind-merge'
+import './globals.css'
 
-const fontSans = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const fontSans = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  axes: ['opsz'],
+})
+const fontMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+})
 
 export const metadata: Metadata = {
-  title: 'Frosty for Twitch',
-  description: 'Frosty lets you watch Twitch with 7TV, BTTV, and FFZ emotes',
   metadataBase: new URL('https://frostyapp.io'),
-};
+  title: {
+    default: 'Frosty for Twitch',
+    template: '%s — Frosty',
+  },
+  description:
+    'A fast, open-source Twitch client for iOS and Android with native 7TV, BTTV, and FFZ emote support.',
+  openGraph: {
+    siteName: 'Frosty',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+  alternates: {
+    canonical: '/',
+  },
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html
+      lang='en'
+      style={{ colorScheme: 'light dark' }}
+      suppressHydrationWarning
+    >
       <body
         className={twJoin(
-          'mx-auto min-h-screen max-w-screen-lg border-neutral-300 bg-neutral-100 font-sans text-neutral-950 dark:border-neutral-900 dark:bg-black dark:text-neutral-100 lg:border-x',
+          'selection:bg-primary selection:text-primary-foreground min-h-dvh font-sans underline-offset-4 antialiased',
           fontSans.variable,
+          fontMono.variable,
         )}
       >
         <Providers>
-          <Header />
-          <main className='grow'>{children}</main>
-          <Footer />
+          <main>{children}</main>
         </Providers>
       </body>
     </html>
-  );
+  )
 }
