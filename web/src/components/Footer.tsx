@@ -9,7 +9,7 @@ export function Footer() {
           href={tommyLink}
           target='_blank'
           rel='noreferrer'
-          className='hover:text-muted-foreground underline underline-offset-4'
+          className='underline underline-offset-4 transition-colors hover:text-muted-foreground'
         >
           Tommy Chow
         </a>
