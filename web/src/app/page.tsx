@@ -192,18 +192,34 @@ function Carousel() {
   )
 
   const touchStartRef = useRef(0)
+  const regionRef = useRef<HTMLDivElement>(null)
 
   const go = useCallback((delta: number) => {
     setCurrent((prev) =>
       Math.max(0, Math.min(features.length - 1, prev + delta)),
     )
+    regionRef.current?.focus()
   }, [])
 
   return (
     <div className='flex h-full flex-col items-center justify-center gap-4'>
       {/* Phone track with overlay arrows */}
       <div
-        className='relative h-full max-h-120 min-h-0 w-full shrink touch-pan-y overflow-hidden md:max-h-200'
+        ref={regionRef}
+        role='region'
+        aria-roledescription='carousel'
+        aria-label='App features'
+        tabIndex={0}
+        className='relative h-full max-h-120 min-h-0 w-full shrink touch-pan-y overflow-hidden focus-visible:outline-none md:max-h-200'
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowLeft') {
+            e.preventDefault()
+            go(-1)
+          } else if (e.key === 'ArrowRight') {
+            e.preventDefault()
+            go(1)
+          }
+        }}
         onTouchStart={(e) => {
           touchStartRef.current = e.touches[0]!.clientX
         }}
@@ -222,6 +238,9 @@ function Carousel() {
           return (
             <motion.div
               key={feature.title}
+              role='group'
+              aria-roledescription='slide'
+              aria-label={`${i + 1} of ${features.length}: ${feature.title}`}
               initial={{ x: offset * step, opacity: 0 }}
               animate={{
                 x: offset * step,
@@ -240,11 +259,24 @@ function Carousel() {
               <div
                 className={cn(
                   'flex h-full items-center justify-center',
-                  offset !== 0 && 'pointer-events-auto cursor-pointer',
+                  Math.abs(offset) === 1 && 'pointer-events-auto cursor-pointer',
                 )}
-                onMouseEnter={offset !== 0 ? () => setHovered(i) : undefined}
-                onMouseLeave={offset !== 0 ? () => setHovered(null) : undefined}
-                onClick={offset !== 0 ? () => go(offset) : undefined}
+                {...(Math.abs(offset) === 1
+                  ? {
+                      role: 'button',
+                      tabIndex: 0,
+                      'aria-label': `Go to ${feature.title}`,
+                      onMouseEnter: () => setHovered(i),
+                      onMouseLeave: () => setHovered(null),
+                      onClick: () => go(offset),
+                      onKeyDown: (e: React.KeyboardEvent) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          go(offset)
+                        }
+                      },
+                    }
+                  : undefined)}
               >
                 <PhoneFrame className='h-full max-h-110 max-w-48 md:max-h-190 md:max-w-88'>
                   <PhoneMedia
@@ -302,7 +334,10 @@ function Carousel() {
       </div>
 
       {/* Description */}
-      <div className='min-h-10 px-4 text-center'>
+      <span className='sr-only' aria-live='polite' aria-atomic>
+        {features[current]?.title}: {features[current]?.description}
+      </span>
+      <div className='min-h-10 px-4 text-center' aria-hidden>
         <AnimatePresence mode='wait'>
           <motion.p
             key={current}
@@ -374,9 +409,9 @@ export default function Home() {
               </a>{' '}
               emotes
             </h1>
-            <p className='text-muted-foreground mx-auto max-w-sm text-sm text-balance md:text-base'>
-              A fast, open-source Twitch client for iOS and Android with native
-              7TV, BTTV, and FFZ support.
+            <p className='text-muted-foreground mx-auto max-w-md text-sm text-balance md:max-w-lg md:text-base'>
+              Frosty is a fast, open-source Twitch client for iOS and Android
+              with native 7TV, BTTV, and FFZ support.
             </p>
           </motion.div>
           <motion.div variants={item}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { Toaster } from '@/components/ui/sonner'
+import { MotionConfig } from 'motion/react'
 import { ThemeProvider } from 'next-themes'
 import { useEffect } from 'react'
 
@@ -18,9 +19,11 @@ export function Providers({ children }: ProvidersProps) {
   }, [])
 
   return (
-    <ThemeProvider attribute='class' disableTransitionOnChange>
-      {children}
-      <Toaster position='top-center' />
-    </ThemeProvider>
+    <MotionConfig reducedMotion='user'>
+      <ThemeProvider attribute='class' disableTransitionOnChange>
+        {children}
+        <Toaster position='top-center' />
+      </ThemeProvider>
+    </MotionConfig>
   )
 }
