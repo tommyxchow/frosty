@@ -35,6 +35,8 @@
     "binding": "IMAGES",
   },
   "minify": true,
+  "keep_names": false,
+  "upload_source_maps": true,
   "keep_vars": true,
   "observability": {
     "enabled": true,
