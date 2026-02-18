@@ -41,11 +41,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang='en'
-      style={{ colorScheme: 'light dark' }}
-      suppressHydrationWarning
-    >
+    <html lang='en' suppressHydrationWarning>
       <body
         className={twJoin(
           'selection:bg-primary selection:text-primary-foreground min-h-dvh font-sans underline-offset-4 antialiased',
