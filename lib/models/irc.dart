@@ -442,8 +442,9 @@ class IRCMessage {
     bool launchExternal,
     TextStyle? textStyle,
     void Function(String)? onTapPingedUser,
-    void Function()? onTapDeletedMessage,
-  ) {
+    void Function()? onTapDeletedMessage, {
+    bool disableEmoteAnimations = false,
+  }) {
     if (!showMessage) {
       span.add(
         TextSpan(
@@ -493,6 +494,7 @@ class IRCMessage {
               emoteScale,
               textStyle,
               launchExternal,
+              disableEmoteAnimations: disableEmoteAnimations,
             );
           } else {
             localSpan.add(
@@ -504,6 +506,7 @@ class IRCMessage {
                     : emoteSize,
                 width: emote.width != null ? emote.width! * emoteScale : null,
                 launchExternal: launchExternal,
+                disableEmoteAnimations: disableEmoteAnimations,
               ),
             );
             localSpan.add(const TextSpan(text: ' '));
@@ -550,8 +553,9 @@ class IRCMessage {
     double emoteSize,
     double emoteScale,
     TextStyle? textStyle,
-    bool launchExternal,
-  ) {
+    bool launchExternal, {
+    bool disableEmoteAnimations = false,
+  }) {
     final emoteStack = <Emote>[];
     var index = startIndex;
 
@@ -578,7 +582,9 @@ class IRCMessage {
         ),
       ...emoteStack.reversed.map(
         (emote) => FrostyCachedNetworkImage(
-          imageUrl: emote.url,
+          imageUrl: emote.getDisplayUrl(
+            disableAnimations: disableEmoteAnimations,
+          ),
           height: emote.height != null ? emote.height! * emoteScale : emoteSize,
           width: emote.width != null ? emote.width! * emoteScale : emoteSize,
           useFade: false,
@@ -602,12 +608,18 @@ class IRCMessage {
                 if (nextWordIsEmoji)
                   Text(emoji, style: textStyle?.copyWith(fontSize: 40)),
                 ...emoteStack.reversed.map(
-                  (emote) =>
-                      FrostyCachedNetworkImage(imageUrl: emote.url, width: 56),
+                  (emote) => FrostyCachedNetworkImage(
+                    imageUrl: emote.getDisplayUrl(
+                      disableAnimations: disableEmoteAnimations,
+                    ),
+                    width: 56,
+                  ),
                 ),
               ],
             ),
-            url: emoteStack.last.url,
+            url: emoteStack.last.getDisplayUrl(
+              disableAnimations: disableEmoteAnimations,
+            ),
             title: nextWordIsEmoji
                 ? emoji
                 : '${emoteStack.last.name} (${emoteStack.last.type})',
@@ -657,6 +669,7 @@ class IRCMessage {
     Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
     String? currentChannelId,
+    bool disableEmoteAnimations = false,
   }) {
     final emoteToObject = assetsStore.emoteToObject;
     final badgeSize = defaultBadgeSize * badgeScale;
@@ -702,6 +715,7 @@ class IRCMessage {
       textStyle,
       onTapPingedUser,
       onTapDeletedMessage,
+      disableEmoteAnimations: disableEmoteAnimations,
     );
 
     return span;
@@ -786,6 +800,7 @@ class IRCMessage {
     required double height,
     required double? width,
     required bool launchExternal,
+    bool disableEmoteAnimations = false,
   }) {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
@@ -794,9 +809,12 @@ class IRCMessage {
           context,
           emote: emote,
           launchExternal: launchExternal,
+          disableEmoteAnimations: disableEmoteAnimations,
         ),
         child: FrostyCachedNetworkImage(
-          imageUrl: emote.url,
+          imageUrl: emote.getDisplayUrl(
+            disableAnimations: disableEmoteAnimations,
+          ),
           height: height,
           width: width,
           useFade: false,
@@ -848,11 +866,15 @@ class IRCMessage {
     BuildContext context, {
     required Emote emote,
     required bool launchExternal,
+    bool disableEmoteAnimations = false,
   }) {
+    final displayUrl = emote.getDisplayUrl(
+      disableAnimations: disableEmoteAnimations,
+    );
     _showAssetDetailsBottomSheet(
       context,
-      leading: FrostyCachedNetworkImage(imageUrl: emote.url, width: 56),
-      url: emote.url,
+      leading: FrostyCachedNetworkImage(imageUrl: displayUrl, width: 56),
+      url: displayUrl,
       title: emote.realName != null
           ? '${emote.name} (${emote.realName})'
           : emote.name,

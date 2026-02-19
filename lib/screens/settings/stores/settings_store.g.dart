@@ -66,6 +66,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..showBTTVBadges = json['showBTTVBadges'] as bool? ?? true
   ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
   ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
+  ..disableEmoteAnimations = json['disableEmoteAnimations'] as bool? ?? false
   ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
   ..persistChatTabs = json['persistChatTabs'] as bool? ?? true
   ..secondaryTabs =
@@ -129,6 +130,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showBTTVBadges': instance.showBTTVBadges,
   'showFFZEmotes': instance.showFFZEmotes,
   'showFFZBadges': instance.showFFZBadges,
+  'disableEmoteAnimations': instance.disableEmoteAnimations,
   'showRecentMessages': instance.showRecentMessages,
   'persistChatTabs': instance.persistChatTabs,
   'secondaryTabs': instance.secondaryTabs,
@@ -860,6 +862,28 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
+  late final _$disableEmoteAnimationsAtom = Atom(
+    name: '_SettingsStoreBase.disableEmoteAnimations',
+    context: context,
+  );
+
+  @override
+  bool get disableEmoteAnimations {
+    _$disableEmoteAnimationsAtom.reportRead();
+    return super.disableEmoteAnimations;
+  }
+
+  @override
+  set disableEmoteAnimations(bool value) {
+    _$disableEmoteAnimationsAtom.reportWrite(
+      value,
+      super.disableEmoteAnimations,
+      () {
+        super.disableEmoteAnimations = value;
+      },
+    );
+  }
+
   late final _$showRecentMessagesAtom = Atom(
     name: '_SettingsStoreBase.showRecentMessages',
     context: context,
@@ -1147,6 +1171,7 @@ showBTTVEmotes: ${showBTTVEmotes},
 showBTTVBadges: ${showBTTVBadges},
 showFFZEmotes: ${showFFZEmotes},
 showFFZBadges: ${showFFZBadges},
+disableEmoteAnimations: ${disableEmoteAnimations},
 showRecentMessages: ${showRecentMessages},
 persistChatTabs: ${persistChatTabs},
 secondaryTabs: ${secondaryTabs},

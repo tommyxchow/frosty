@@ -153,11 +153,12 @@ class Emote7TVHost {
 @JsonSerializable(createToJson: false, fieldRename: FieldRename.snake)
 class Emote7TVFile {
   final String name;
+  final String? staticName;
   final int width;
   final int height;
   final String format;
 
-  Emote7TVFile(this.name, this.width, this.height, this.format);
+  Emote7TVFile(this.name, this.staticName, this.width, this.height, this.format);
 
   factory Emote7TVFile.fromJson(Map<String, dynamic> json) =>
       _$Emote7TVFileFromJson(json);
@@ -172,6 +173,7 @@ class Emote {
   final int? height;
   final bool zeroWidth;
   final String url;
+  final String? staticUrl;
   final EmoteType type;
   final String? ownerDisplayName;
   final String? ownerUsername;
@@ -184,57 +186,80 @@ class Emote {
     this.height,
     required this.zeroWidth,
     required this.url,
+    this.staticUrl,
     required this.type,
     this.ownerDisplayName,
     this.ownerUsername,
     this.ownerId,
   });
 
-  factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) => Emote(
-    name: emote.name,
-    zeroWidth: false,
-    url:
-        'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/3.0',
-    type: type,
-    ownerId: emote.ownerId,
-  );
+  /// Returns the appropriate URL based on animation preference.
+  /// When [disableAnimations] is true and a static URL exists, returns the static URL.
+  String getDisplayUrl({bool disableAnimations = false}) {
+    if (disableAnimations && staticUrl != null) {
+      return staticUrl!;
+    }
+    return url;
+  }
+
+  factory Emote.fromTwitch(EmoteTwitch emote, EmoteType type) {
+    final baseUrl = 'https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}';
+    return Emote(
+      name: emote.name,
+      zeroWidth: false,
+      url: '$baseUrl/default/dark/3.0',
+      staticUrl: '$baseUrl/static/dark/3.0',
+      type: type,
+      ownerId: emote.ownerId,
+    );
+  }
 
   factory Emote.fromBTTV(EmoteBTTV emote, EmoteType type) => Emote(
     name: emote.code,
     zeroWidth: zeroWidthEmotes.contains(emote.code),
     url: 'https://cdn.betterttv.net/emote/${emote.id}/3x',
+    staticUrl: 'https://cdn.betterttv.net/emote/${emote.id}/3x.png',
     type: type,
   );
 
-  factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) => Emote(
-    name: emote.name,
-    zeroWidth: false,
-    width: emote.width,
-    height: emote.height,
-    url:
-        emote.animated?.url4x ??
-        emote.animated?.url2x ??
-        emote.animated?.url1x ??
-        emote.urls.url4x ??
-        emote.urls.url2x ??
-        emote.urls.url1x,
-    type: type,
-    ownerDisplayName: emote.owner.displayName,
-    ownerUsername: emote.owner.name,
-  );
+  factory Emote.fromFFZ(EmoteFFZ emote, EmoteType type) {
+    final animatedUrl =
+        emote.animated?.url4x ?? emote.animated?.url2x ?? emote.animated?.url1x;
+    final staticUrlValue =
+        emote.urls.url4x ?? emote.urls.url2x ?? emote.urls.url1x;
+
+    return Emote(
+      name: emote.name,
+      zeroWidth: false,
+      width: emote.width,
+      height: emote.height,
+      url: animatedUrl ?? staticUrlValue,
+      staticUrl: animatedUrl != null ? staticUrlValue : null,
+      type: type,
+      ownerDisplayName: emote.owner.displayName,
+      ownerUsername: emote.owner.name,
+    );
+  }
 
   factory Emote.from7TV(Emote7TV emote, EmoteType type) {
     final emoteData = emote.data;
 
     final url = emoteData.host.url;
 
-    // TODO: Remove if/when Flutter natively supports AVIF.
+    // Prefer WEBP over GIF; skip AVIF (not supported by Flutter yet).
     final file = emoteData.host.files.lastWhereOrNull(
-      (file) => file.format != 'AVIF',
-    );
+          (file) => file.format == 'WEBP',
+        ) ??
+        emoteData.host.files.lastWhereOrNull(
+          (file) => file.format == 'GIF',
+        );
 
     // Check if the flag has 1 at the 8th bit.
     final isZeroWidth = (emoteData.flags & 256) == 256;
+
+    final animatedUrl = file != null ? 'https:$url/${file.name}' : '';
+    final staticUrlValue =
+        file?.staticName != null ? 'https:$url/${file!.staticName}' : null;
 
     return Emote(
       name: emote.name,
@@ -242,7 +267,8 @@ class Emote {
       width: emoteData.host.files.firstOrNull?.width,
       height: emoteData.host.files.firstOrNull?.height,
       zeroWidth: isZeroWidth,
-      url: file != null ? 'https:$url/${file.name}' : '',
+      url: animatedUrl,
+      staticUrl: staticUrlValue,
       type: type,
       ownerDisplayName: emoteData.owner?.displayName,
       ownerUsername: emoteData.owner?.username,

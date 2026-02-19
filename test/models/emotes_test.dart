@@ -3,13 +3,8 @@ import 'package:frosty/models/emotes.dart';
 
 void main() {
   group('Emote.fromTwitch', () {
-    test('creates emote with correct URL', () {
-      final twitchEmote = EmoteTwitch(
-        '25',
-        'Kappa',
-        'bitstier',
-        null,
-      );
+    test('creates emote with default and static URLs', () {
+      final twitchEmote = EmoteTwitch('25', 'Kappa', 'bitstier', null);
 
       final emote = Emote.fromTwitch(twitchEmote, EmoteType.twitchGlobal);
 
@@ -17,18 +12,17 @@ void main() {
         emote.url,
         'https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/3.0',
       );
+      expect(
+        emote.staticUrl,
+        'https://static-cdn.jtvnw.net/emoticons/v2/25/static/dark/3.0',
+      );
       expect(emote.name, 'Kappa');
       expect(emote.type, EmoteType.twitchGlobal);
       expect(emote.zeroWidth, isFalse);
     });
 
     test('preserves owner ID when provided', () {
-      final twitchEmote = EmoteTwitch(
-        '12345',
-        'SubEmote',
-        'subscriptions',
-        '67890',
-      );
+      final twitchEmote = EmoteTwitch('12345', 'SubEmote', 'subscriptions', '67890');
 
       final emote = Emote.fromTwitch(twitchEmote, EmoteType.twitchSub);
 
@@ -233,14 +227,14 @@ void main() {
           Emote7TVHost(
             '//cdn.7tv.app/emote/7tvid123',
             [
-              Emote7TVFile('1x.webp', 32, 32, 'WEBP'),
-              Emote7TVFile('2x.webp', 64, 64, 'WEBP'),
-              Emote7TVFile('3x.webp', 96, 96, 'WEBP'),
-              Emote7TVFile('4x.webp', 128, 128, 'WEBP'),
-              Emote7TVFile('1x.avif', 32, 32, 'AVIF'),
-              Emote7TVFile('2x.avif', 64, 64, 'AVIF'),
-              Emote7TVFile('3x.avif', 96, 96, 'AVIF'),
-              Emote7TVFile('4x.avif', 128, 128, 'AVIF'),
+              Emote7TVFile('1x.webp', '1x_static.webp', 32, 32, 'WEBP'),
+              Emote7TVFile('2x.webp', '2x_static.webp', 64, 64, 'WEBP'),
+              Emote7TVFile('3x.webp', '3x_static.webp', 96, 96, 'WEBP'),
+              Emote7TVFile('4x.webp', '4x_static.webp', 128, 128, 'WEBP'),
+              Emote7TVFile('1x.avif', '1x_static.avif', 32, 32, 'AVIF'),
+              Emote7TVFile('2x.avif', '2x_static.avif', 64, 64, 'AVIF'),
+              Emote7TVFile('3x.avif', '3x_static.avif', 96, 96, 'AVIF'),
+              Emote7TVFile('4x.avif', '4x_static.avif', 128, 128, 'AVIF'),
             ],
           ),
         ),
@@ -265,7 +259,7 @@ void main() {
           null,
           Emote7TVHost(
             '//cdn.7tv.app/emote/zw123',
-            [Emote7TVFile('1x.webp', 32, 32, 'WEBP')],
+            [Emote7TVFile('1x.webp', '1x_static.webp', 32, 32, 'WEBP')],
           ),
         ),
       );
@@ -286,7 +280,7 @@ void main() {
           null,
           Emote7TVHost(
             '//cdn.7tv.app/emote/regular123',
-            [Emote7TVFile('1x.webp', 32, 32, 'WEBP')],
+            [Emote7TVFile('1x.webp', '1x_static.webp', 32, 32, 'WEBP')],
           ),
         ),
       );
@@ -307,7 +301,7 @@ void main() {
           null,
           Emote7TVHost(
             '//cdn.7tv.app/emote/alias123',
-            [Emote7TVFile('1x.webp', 32, 32, 'WEBP')],
+            [Emote7TVFile('1x.webp', '1x_static.webp', 32, 32, 'WEBP')],
           ),
         ),
       );
@@ -329,7 +323,7 @@ void main() {
           null,
           Emote7TVHost(
             '//cdn.7tv.app/emote/same123',
-            [Emote7TVFile('1x.webp', 32, 32, 'WEBP')],
+            [Emote7TVFile('1x.webp', '1x_static.webp', 32, 32, 'WEBP')],
           ),
         ),
       );
@@ -351,7 +345,7 @@ void main() {
           const Owner7TV(username: 'creator', displayName: 'EmoteCreator'),
           Emote7TVHost(
             '//cdn.7tv.app/emote/owned123',
-            [Emote7TVFile('1x.webp', 32, 32, 'WEBP')],
+            [Emote7TVFile('1x.webp', '1x_static.webp', 32, 32, 'WEBP')],
           ),
         ),
       );
@@ -373,7 +367,7 @@ void main() {
           null, // No owner
           Emote7TVHost(
             '//cdn.7tv.app/emote/noowner123',
-            [Emote7TVFile('1x.webp', 32, 32, 'WEBP')],
+            [Emote7TVFile('1x.webp', '1x_static.webp', 32, 32, 'WEBP')],
           ),
         ),
       );
@@ -396,8 +390,8 @@ void main() {
           Emote7TVHost(
             '//cdn.7tv.app/emote/dim123',
             [
-              Emote7TVFile('1x.webp', 28, 32, 'WEBP'),
-              Emote7TVFile('2x.webp', 56, 64, 'WEBP'),
+              Emote7TVFile('1x.webp', '1x_static.webp', 28, 32, 'WEBP'),
+              Emote7TVFile('2x.webp', '2x_static.webp', 56, 64, 'WEBP'),
             ],
           ),
         ),
@@ -445,8 +439,8 @@ void main() {
           Emote7TVHost(
             '//cdn.7tv.app/emote/avifonly123',
             [
-              Emote7TVFile('1x.avif', 32, 32, 'AVIF'),
-              Emote7TVFile('2x.avif', 64, 64, 'AVIF'),
+              Emote7TVFile('1x.avif', '1x_static.avif', 32, 32, 'AVIF'),
+              Emote7TVFile('2x.avif', '2x_static.avif', 64, 64, 'AVIF'),
             ],
           ),
         ),

@@ -87,15 +87,22 @@ class RecentEmotesPanel extends StatelessWidget {
                           context,
                           emote: emote,
                           launchExternal: chatStore.settings.launchUrlExternal,
+                          disableEmoteAnimations:
+                              chatStore.settings.disableEmoteAnimations,
                         );
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(8),
                         child: Center(
                           child: FrostyCachedNetworkImage(
-                            imageUrl: matchingEmotes.isNotEmpty
-                                ? matchingEmotes.first.url
-                                : emote.url,
+                            imageUrl: (matchingEmotes.isNotEmpty
+                                    ? matchingEmotes.first
+                                    : emote)
+                                .getDisplayUrl(
+                                  disableAnimations: chatStore
+                                      .settings
+                                      .disableEmoteAnimations,
+                                ),
                             color: matchingEmotes.isNotEmpty
                                 ? null
                                 : const Color.fromRGBO(255, 255, 255, 0.5),

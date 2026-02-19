@@ -154,6 +154,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowBTTVBadges = true;
   static const defaultShowFFZEmotes = true;
   static const defaultShowFFZBadges = true;
+  static const defaultDisableEmoteAnimations = false;
 
   // Recent messages defaults
   static const defaultShowRecentMessages = false;
@@ -277,6 +278,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showFFZBadges = defaultShowFFZBadges;
 
+  @JsonKey(defaultValue: defaultDisableEmoteAnimations)
+  @observable
+  var disableEmoteAnimations = defaultDisableEmoteAnimations;
+
   // Recent messages
   @JsonKey(defaultValue: defaultShowRecentMessages)
   @observable
@@ -337,6 +342,7 @@ abstract class _SettingsStoreBase with Store {
     showBTTVBadges = defaultShowBTTVBadges;
     showFFZEmotes = defaultShowFFZEmotes;
     showFFZBadges = defaultShowFFZBadges;
+    disableEmoteAnimations = defaultDisableEmoteAnimations;
 
     showRecentMessages = defaultShowRecentMessages;
 

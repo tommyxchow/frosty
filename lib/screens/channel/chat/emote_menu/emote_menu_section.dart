@@ -52,13 +52,18 @@ class _EmoteMenuSectionState extends State<EmoteMenuSection>
               context,
               emote: widget.emotes[index],
               launchExternal: widget.chatStore.settings.launchUrlExternal,
+              disableEmoteAnimations:
+                  widget.chatStore.settings.disableEmoteAnimations,
             );
           },
           child: Padding(
             padding: const EdgeInsets.all(5.0),
             child: Center(
               child: FrostyCachedNetworkImage(
-                imageUrl: widget.emotes[index].url,
+                imageUrl: widget.emotes[index].getDisplayUrl(
+                  disableAnimations:
+                      widget.chatStore.settings.disableEmoteAnimations,
+                ),
                 height:
                     widget.emotes[index].height?.toDouble() ?? defaultEmoteSize,
                 width: widget.emotes[index].width?.toDouble(),

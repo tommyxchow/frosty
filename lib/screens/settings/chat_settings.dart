@@ -310,6 +310,13 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.showFFZBadges,
             onChanged: (newValue) => settingsStore.showFFZBadges = newValue,
           ),
+          SettingsListSwitch(
+            title: 'Disable emote animations',
+            subtitle: const Text('Shows static versions of animated emotes.'),
+            value: settingsStore.disableEmoteAnimations,
+            onChanged: (newValue) =>
+                settingsStore.disableEmoteAnimations = newValue,
+          ),
           const SectionHeader('Recent messages'),
           SettingsListSwitch(
             title: 'Show historical recent messages',
