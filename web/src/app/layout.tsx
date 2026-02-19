@@ -44,7 +44,7 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body
         className={twJoin(
-          'selection:bg-primary selection:text-primary-foreground min-h-dvh font-sans underline-offset-4 antialiased',
+          'selection:bg-primary selection:text-primary-foreground min-h-dvh overscroll-none font-sans underline-offset-4 antialiased',
           fontSans.variable,
           fontMono.variable,
         )}

@@ -2,7 +2,7 @@ import { tommyLink } from '@/lib/constants'
 
 export function Footer() {
   return (
-    <footer className='absolute inset-x-0 bottom-8 z-30 text-center'>
+    <footer className='relative z-30 pb-2 text-center md:pb-4'>
       <p className='text-muted-foreground/60 text-xs'>
         Made by{' '}
         <a
