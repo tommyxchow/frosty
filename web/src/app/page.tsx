@@ -259,7 +259,8 @@ function Carousel() {
               <div
                 className={cn(
                   'flex h-full items-center justify-center',
-                  Math.abs(offset) === 1 && 'pointer-events-auto cursor-pointer',
+                  Math.abs(offset) === 1 &&
+                    'pointer-events-auto cursor-pointer',
                 )}
                 {...(Math.abs(offset) === 1
                   ? {
@@ -357,7 +358,7 @@ function Carousel() {
 
 export default function Home() {
   return (
-    <div className='grid h-dvh overflow-hidden grid-rows-[auto_1fr] md:grid-cols-2 md:grid-rows-none'>
+    <div className='grid h-dvh grid-rows-[auto_1fr] overflow-hidden md:grid-cols-2 md:grid-rows-none'>
       {/* Left cell — intro */}
       <motion.div
         className='bg-muted/50 dark:bg-muted/30 relative flex flex-col gap-4 overflow-hidden px-4'

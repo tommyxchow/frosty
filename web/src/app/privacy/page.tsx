@@ -23,7 +23,7 @@ function ExtLink({
       href={href}
       target='_blank'
       rel='noreferrer'
-      className='text-muted-foreground underline decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground/40'
+      className='text-muted-foreground decoration-muted-foreground/40 hover:text-foreground hover:decoration-foreground/40 underline underline-offset-4 transition-colors'
     >
       {children}
     </a>
@@ -32,10 +32,12 @@ function ExtLink({
 
 export default function Privacy() {
   return (
-    <div className='font-mono mx-auto max-w-2xl px-6 py-12'>
+    <div className='mx-auto max-w-2xl px-6 py-12 font-mono'>
       <Link href='/' className='mb-12 flex items-center gap-2'>
         <Image src='/logo.svg' alt='' width={24} height={24} />
-        <span className='text-foreground font-sans text-sm font-semibold'>Frosty</span>
+        <span className='text-foreground font-sans text-sm font-semibold'>
+          Frosty
+        </span>
       </Link>
 
       <h1 className='text-foreground text-2xl font-bold tracking-tight'>
@@ -102,9 +104,7 @@ export default function Privacy() {
         <ExtLink href='https://www.frankerfacez.com/privacy'>FFZ</ExtLink>.
       </p>
 
-      <h3 className='text-foreground mt-8 text-base font-semibold'>
-        Firebase
-      </h3>
+      <h3 className='text-foreground mt-8 text-base font-semibold'>Firebase</h3>
       <p className='text-muted-foreground mt-2 text-sm leading-relaxed'>
         Frosty utilizes Firebase for crash reporting, performance monitoring,
         and analytics to aid in the development of new features, improvements,
