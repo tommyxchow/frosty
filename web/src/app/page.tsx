@@ -150,7 +150,7 @@ function PhoneMedia({
   }, [isCurrent, media.type])
 
   return (
-    <div className='relative size-full bg-black py-3'>
+    <div className='relative size-full bg-black'>
       {media.type === 'video' ? (
         <video
           ref={videoRef}
@@ -167,7 +167,7 @@ function PhoneMedia({
   )
 }
 
-const STEP_MOBILE = 220
+const STEP_MOBILE = 260
 const STEP_DESKTOP = 370
 const stepQuery = '(min-width: 768px)'
 function subscribeStep(callback: () => void) {
@@ -210,7 +210,7 @@ function Carousel() {
         aria-roledescription='carousel'
         aria-label='App features'
         tabIndex={0}
-        className='relative h-full max-h-120 min-h-0 w-full shrink touch-pan-y overflow-hidden focus-visible:outline-none md:max-h-200'
+        className='relative h-full max-h-130 min-h-0 w-full shrink touch-pan-y overflow-hidden focus-visible:outline-none md:max-h-200'
         onKeyDown={(e) => {
           if (e.key === 'ArrowLeft') {
             e.preventDefault()
@@ -279,7 +279,7 @@ function Carousel() {
                     }
                   : undefined)}
               >
-                <PhoneFrame className='h-full max-h-110 max-w-48 md:max-h-190 md:max-w-88'>
+                <PhoneFrame className='h-full max-h-130 max-w-60 md:max-h-190 md:max-w-88'>
                   <PhoneMedia
                     media={feature.media}
                     title={feature.title}
