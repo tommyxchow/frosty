@@ -15,9 +15,10 @@ import {
   emailLink,
   githubLink,
 } from '@/lib/constants'
-import { Copy, Github, Heart, Mail, Menu, Shield } from 'lucide-react'
+import { Copy, Heart, Mail, Menu, Shield } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { SiGithub } from 'react-icons/si'
 import { toast } from 'sonner'
 
 function ContactDropdown() {
@@ -61,7 +62,7 @@ export function Header() {
             variant='ghost'
             render={<a href={githubLink} target='_blank' rel='noreferrer' />}
           >
-            <Github />
+            <SiGithub />
             GitHub
           </Button>
           <Button
@@ -83,35 +84,22 @@ export function Header() {
         <div className='flex items-center gap-1 lg:hidden'>
           <Button
             variant='ghost'
-            size='icon'
-            render={
-              <a
-                href={githubLink}
-                target='_blank'
-                rel='noreferrer'
-                aria-label='GitHub'
-              />
-            }
+            render={<a href={githubLink} target='_blank' rel='noreferrer' />}
           >
-            <Github />
+            <SiGithub />
+            GitHub
           </Button>
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger
-              render={
-                <Button variant='ghost' size='icon' aria-label='Menu' />
-              }
+              render={<Button variant='ghost' size='icon' aria-label='Menu' />}
             >
               <Menu />
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
               <DropdownMenuItem
                 render={
-                  <a
-                    href={donateLink}
-                    target='_blank'
-                    rel='noreferrer'
-                  />
+                  <a href={donateLink} target='_blank' rel='noreferrer' />
                 }
               >
                 <Heart />
