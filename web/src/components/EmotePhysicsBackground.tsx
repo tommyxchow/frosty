@@ -247,11 +247,8 @@ export function EmotePhysicsBackground() {
       container.querySelectorAll<HTMLImageElement>('[data-emote]')
     if (elements.length === 0) return
 
-    // Assign shuffled URLs client-side to avoid hydration mismatch
+    // Shuffled once so each element keeps a stable URL across resizes
     const urls = shuffle(EMOTE_URLS)
-    elements.forEach((el, i) => {
-      if (i < urls.length) el.src = urls[i]!
-    })
 
     let cancelled = false
     let rafId = 0
@@ -263,6 +260,20 @@ export function EmotePhysicsBackground() {
     let currentPointer: { x: number; y: number } | null = null
     const particles: ParticleState[] = []
     const animations: AnimationPlaybackControls[] = []
+    let loadedCount = 0
+    const loadCleanups: (() => void)[] = []
+
+    function revealEmote(el: HTMLImageElement) {
+      const delay = loadedCount * 0.06
+      loadedCount++
+      animations.push(
+        animate(
+          el,
+          { opacity: 1, filter: ['blur(4px)', 'blur(0px)'] },
+          { duration: 0.5, delay, ease: 'easeOut' },
+        ),
+      )
+    }
 
     // ── Sync visible particle count to container size ──
     function syncCount(newW: number, newH: number, initial: boolean) {
@@ -289,14 +300,21 @@ export function EmotePhysicsBackground() {
           }
           el.style.display = ''
           el.style.height = `${newSize}px`
+          // Lazy src assignment — only fetch images that are actually active
+          if (!el.src && i < urls.length) el.src = urls[i]!
           if (initial) {
-            animations.push(
-              animate(
-                el,
-                { opacity: 1, filter: ['blur(4px)', 'blur(0px)'] },
-                { duration: 0.5, delay: i * 0.06, ease: 'easeOut' },
-              ),
-            )
+            if (el.complete && el.naturalWidth > 0) {
+              revealEmote(el)
+            } else {
+              const onLoad = () => {
+                if (!cancelled) revealEmote(el)
+              }
+              // eslint-disable-next-line @eslint-react/web-api/no-leaked-event-listener -- cleaned up via loadCleanups array
+              el.addEventListener('load', onLoad, { once: true })
+              loadCleanups.push(() => {
+                el.removeEventListener('load', onLoad)
+              })
+            }
           } else {
             el.style.opacity = '1'
             el.style.filter = ''
@@ -524,6 +542,7 @@ export function EmotePhysicsBackground() {
       cancelled = true
       cancelAnimationFrame(rafId)
       for (const a of animations) a.stop()
+      for (const cleanup of loadCleanups) cleanup()
       ro.disconnect()
       panel.removeEventListener('mousemove', onMouseMove)
       panel.removeEventListener('mouseleave', clearPointer)
@@ -540,6 +559,8 @@ export function EmotePhysicsBackground() {
           key={i}
           data-emote
           alt=''
+          decoding='async'
+          fetchPriority='low'
           draggable={false}
           crossOrigin='anonymous'
           className='pointer-events-none absolute top-0 left-0 select-none'

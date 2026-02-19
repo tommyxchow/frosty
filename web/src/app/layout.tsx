@@ -42,6 +42,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en' suppressHydrationWarning>
+      <head>
+        <link
+          rel='preconnect'
+          href='https://cdn.7tv.app'
+          crossOrigin='anonymous'
+        />
+      </head>
       <body
         className={twJoin(
           'selection:bg-primary selection:text-primary-foreground min-h-dvh overscroll-none font-sans underline-offset-4 antialiased',
