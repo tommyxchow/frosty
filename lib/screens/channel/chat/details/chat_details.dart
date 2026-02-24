@@ -537,6 +537,8 @@ class _ChatColorPickerModalState extends State<_ChatColorPickerModal> {
           badgeScale: widget.chatStore.settings.badgeScale,
           launchExternal: false, // Disable launching for preview
           style: DefaultTextStyle.of(context).style,
+          disableEmoteAnimations:
+              widget.chatStore.settings.disableEmoteAnimations,
         ),
       ),
     );

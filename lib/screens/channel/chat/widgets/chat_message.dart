@@ -106,6 +106,8 @@ class ChatMessage extends StatelessWidget {
                   channelIdToUserTwitch:
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId: chatStore.channelId,
+                  disableEmoteAnimations:
+                      chatStore.settings.disableEmoteAnimations,
                 ),
                 style: defaultTextStyle,
               ),
@@ -203,6 +205,8 @@ class ChatMessage extends StatelessWidget {
                   channelIdToUserTwitch:
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId: chatStore.channelId,
+                  disableEmoteAnimations:
+                      chatStore.settings.disableEmoteAnimations,
                 ),
               ),
             );
@@ -355,6 +359,8 @@ class ChatMessage extends StatelessWidget {
                         channelIdToUserTwitch:
                             chatStore.assetsStore.channelIdToUserTwitch,
                         currentChannelId: chatStore.channelId,
+                        disableEmoteAnimations:
+                            chatStore.settings.disableEmoteAnimations,
                       ),
                     ),
                   ),
@@ -478,6 +484,8 @@ class ChatMessage extends StatelessWidget {
                           channelIdToUserTwitch:
                               chatStore.assetsStore.channelIdToUserTwitch,
                           currentChannelId: chatStore.channelId,
+                          disableEmoteAnimations:
+                              chatStore.settings.disableEmoteAnimations,
                         ),
                       ),
                     ),
