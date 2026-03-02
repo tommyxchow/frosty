@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/models/irc.dart';
+import 'package:frosty/utils/context_extensions.dart';
 
 class ChatModes extends StatelessWidget {
   final ROOMSTATE roomState;
@@ -27,7 +28,7 @@ class ChatModes extends StatelessWidget {
                 label: 'Emote only',
                 activeLabel: 'Emote only',
                 isActive: true,
-                activeColor: const Color(0xFFFFB74D), // Slightly lighter orange
+                activeColor: context.frostyColors.emoteOnly,
               ),
             ),
           );
@@ -44,7 +45,7 @@ class ChatModes extends StatelessWidget {
                 label: 'Follower only',
                 activeLabel: 'Follower only',
                 isActive: true,
-                activeColor: const Color(0xFFF44336), // Bright red
+                activeColor: context.frostyColors.followersOnly,
                 duration: _getFollowersDuration(),
               ),
             ),
@@ -62,7 +63,7 @@ class ChatModes extends StatelessWidget {
                 label: 'Slow mode',
                 activeLabel: 'Slow mode',
                 isActive: true,
-                activeColor: const Color(0xFF2196F3), // Bright blue
+                activeColor: context.frostyColors.slowMode,
                 duration: _getSlowModeDuration(),
               ),
             ),
@@ -80,7 +81,7 @@ class ChatModes extends StatelessWidget {
                 label: 'Sub only',
                 activeLabel: 'Sub only',
                 isActive: true,
-                activeColor: const Color(0xFF4CAF50), // Bright green
+                activeColor: context.frostyColors.subOnly,
               ),
             ),
           );
@@ -97,7 +98,7 @@ class ChatModes extends StatelessWidget {
                 label: 'Unique mode',
                 activeLabel: 'Unique mode',
                 isActive: true,
-                activeColor: const Color(0xFFAB47BC), // Slightly lighter purple
+                activeColor: context.frostyColors.uniqueMode,
               ),
             ),
           );
@@ -170,7 +171,7 @@ class ChatModes extends StatelessWidget {
                   style: TextStyle(
                     color: Theme.of(
                       context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ).colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

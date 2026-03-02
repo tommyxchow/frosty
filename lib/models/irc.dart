@@ -442,8 +442,9 @@ class IRCMessage {
     bool launchExternal,
     TextStyle? textStyle,
     void Function(String)? onTapPingedUser,
-    void Function()? onTapDeletedMessage,
-  ) {
+    void Function()? onTapDeletedMessage, {
+    Color? linkColor,
+  }) {
     if (!showMessage) {
       span.add(
         TextSpan(
@@ -493,6 +494,7 @@ class IRCMessage {
               emoteScale,
               textStyle,
               launchExternal,
+              linkColor: linkColor,
             );
           } else {
             localSpan.add(
@@ -524,6 +526,7 @@ class IRCMessage {
               _createTextSpan(
                 text: word,
                 style: textStyle,
+                linkColor: linkColor,
                 launchExternal: launchExternal,
                 onTapPingedUser: onTapPingedUser,
               ),
@@ -550,8 +553,9 @@ class IRCMessage {
     double emoteSize,
     double emoteScale,
     TextStyle? textStyle,
-    bool launchExternal,
-  ) {
+    bool launchExternal, {
+    Color? linkColor,
+  }) {
     final emoteStack = <Emote>[];
     var index = startIndex;
 
@@ -631,6 +635,7 @@ class IRCMessage {
         _createTextSpan(
           text: words[index],
           style: textStyle,
+          linkColor: linkColor,
           launchExternal: launchExternal,
         ),
       );
@@ -661,6 +666,7 @@ class IRCMessage {
     final emoteToObject = assetsStore.emoteToObject;
     final badgeSize = defaultBadgeSize * badgeScale;
     final emoteSize = defaultEmoteSize * emoteScale;
+    final linkColor = Theme.of(context).colorScheme.primary;
 
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
@@ -702,6 +708,7 @@ class IRCMessage {
       textStyle,
       onTapPingedUser,
       onTapDeletedMessage,
+      linkColor: linkColor,
     );
 
     return span;
@@ -810,6 +817,7 @@ class IRCMessage {
     required String text,
     required bool launchExternal,
     TextStyle? style,
+    Color? linkColor,
     Function(String)? onTapPingedUser,
   }) {
     if (text.startsWith('@')) {
@@ -827,9 +835,9 @@ class IRCMessage {
       return TextSpan(
         text: text,
         style: style?.copyWith(
-          color: Colors.blue,
+          color: linkColor,
           decoration: TextDecoration.underline,
-          decorationColor: Colors.blue,
+          decorationColor: linkColor,
         ),
         recognizer: TapGestureRecognizer()
           ..onTap = () => launchUrl(

@@ -11,6 +11,90 @@ const kOverlayShadow = [
   ),
 ];
 
+/// App-specific semantic colors that extend Material's [ColorScheme].
+///
+/// Colors that map to Material 3 roles use [ColorScheme] directly:
+/// - Links → [ColorScheme.primary]
+/// - Mentions → [ColorScheme.error]
+/// - First-time chatters → [ColorScheme.tertiary]
+///
+/// Access via `Theme.of(context).extension<FrostyColors>()!` or the
+/// `context.frostyColors` convenience extension.
+class FrostyColors extends ThemeExtension<FrostyColors> {
+  final Color highlightedMessage;
+  final Color emoteOnly;
+  final Color followersOnly;
+  final Color slowMode;
+  final Color subOnly;
+  final Color uniqueMode;
+  final Color overlayOnSurface;
+
+  const FrostyColors({
+    required this.highlightedMessage,
+    required this.emoteOnly,
+    required this.followersOnly,
+    required this.slowMode,
+    required this.subOnly,
+    required this.uniqueMode,
+    required this.overlayOnSurface,
+  });
+
+  static const light = FrostyColors(
+    highlightedMessage: Color(0xff9146ff),
+    emoteOnly: Color(0xFFFFB74D),
+    followersOnly: Color(0xFFF44336),
+    slowMode: Color(0xFF2196F3),
+    subOnly: Color(0xFF4CAF50),
+    uniqueMode: Color(0xFFAB47BC),
+    overlayOnSurface: Colors.white,
+  );
+
+  static const dark = FrostyColors(
+    highlightedMessage: Color(0xff9146ff),
+    emoteOnly: Color(0xFFFFCC80),
+    followersOnly: Color(0xFFE57373),
+    slowMode: Color(0xFF64B5F6),
+    subOnly: Color(0xFF81C784),
+    uniqueMode: Color(0xFFBA68C8),
+    overlayOnSurface: Colors.white,
+  );
+
+  @override
+  FrostyColors copyWith({
+    Color? highlightedMessage,
+    Color? emoteOnly,
+    Color? followersOnly,
+    Color? slowMode,
+    Color? subOnly,
+    Color? uniqueMode,
+    Color? overlayOnSurface,
+  }) {
+    return FrostyColors(
+      highlightedMessage: highlightedMessage ?? this.highlightedMessage,
+      emoteOnly: emoteOnly ?? this.emoteOnly,
+      followersOnly: followersOnly ?? this.followersOnly,
+      slowMode: slowMode ?? this.slowMode,
+      subOnly: subOnly ?? this.subOnly,
+      uniqueMode: uniqueMode ?? this.uniqueMode,
+      overlayOnSurface: overlayOnSurface ?? this.overlayOnSurface,
+    );
+  }
+
+  @override
+  FrostyColors lerp(FrostyColors? other, double t) {
+    if (other is! FrostyColors) return this;
+    return FrostyColors(
+      highlightedMessage: Color.lerp(highlightedMessage, other.highlightedMessage, t)!,
+      emoteOnly: Color.lerp(emoteOnly, other.emoteOnly, t)!,
+      followersOnly: Color.lerp(followersOnly, other.followersOnly, t)!,
+      slowMode: Color.lerp(slowMode, other.slowMode, t)!,
+      subOnly: Color.lerp(subOnly, other.subOnly, t)!,
+      uniqueMode: Color.lerp(uniqueMode, other.uniqueMode, t)!,
+      overlayOnSurface: Color.lerp(overlayOnSurface, other.overlayOnSurface, t)!,
+    );
+  }
+}
+
 class FrostyThemes {
   final Color colorSchemeSeed;
 
@@ -38,6 +122,11 @@ class FrostyThemes {
     const borderWidth = 0.5;
 
     return ThemeData(
+      extensions: [
+        colorScheme.brightness == Brightness.dark
+            ? FrostyColors.dark
+            : FrostyColors.light,
+      ],
       colorScheme: colorScheme,
       fontFamily: 'Inter',
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
@@ -66,7 +155,7 @@ class FrostyThemes {
         filled: true,
         fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
         hintStyle: TextStyle(
-          color: colorScheme.onSurface.withValues(alpha: 0.6),
+          color: colorScheme.onSurfaceVariant,
           fontWeight: FontWeight.normal,
         ),
         border: OutlineInputBorder(

@@ -59,7 +59,7 @@ class ExpandableSectionHeader extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     Icons.keyboard_arrow_down,
-                    color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: context.colorScheme.onSurfaceVariant,
                     size: 20,
                   ),
                 ),

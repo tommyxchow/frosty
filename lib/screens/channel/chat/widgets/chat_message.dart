@@ -8,6 +8,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
@@ -252,7 +253,7 @@ class ChatMessage extends StatelessWidget {
                 ),
               );
             } else if (shouldHighlightFirstMessage) {
-              highlightColor = Colors.purple;
+              highlightColor = context.frostyColors.highlightedMessage;
               messageHeaderIcon = Icon(
                 Icons.auto_awesome_rounded,
                 size: messageHeaderIconSize,
@@ -266,7 +267,7 @@ class ChatMessage extends StatelessWidget {
                 ),
               );
             } else if (shouldHighlightMessage) {
-              highlightColor = const Color(0xff9146ff);
+              highlightColor = context.frostyColors.highlightedMessage;
               messageHeader = Text(
                 'Highlighted message',
                 style: TextStyle(
@@ -277,7 +278,7 @@ class ChatMessage extends StatelessWidget {
             }
 
             // If user is being mentioned in the message, highlight it red.
-            if (ircMessage.mention == true) highlightColor = Colors.red;
+            if (ircMessage.mention == true) highlightColor = context.colorScheme.error;
 
             if (messageHeader != null) {
               renderMessage = Column(
@@ -401,7 +402,7 @@ class ChatMessage extends StatelessWidget {
             break;
           case Command.userNotice:
             if (chatStore.settings.showUserNotices) {
-              highlightColor = const Color(0xff9146ff);
+              highlightColor = context.frostyColors.highlightedMessage;
               Widget? messageHeaderIcon;
               Widget? messageHeader;
 

@@ -42,7 +42,9 @@ class BlockedUsers extends StatelessWidget {
             return ListTile(
               title: Text(displayName),
               trailing: TextButton(
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                style: TextButton.styleFrom(
+                  foregroundColor: Theme.of(context).colorScheme.error,
+                ),
                 onPressed: () => authStore.showBlockDialog(
                   context,
                   targetUser: displayName,

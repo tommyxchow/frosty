@@ -16,7 +16,6 @@ import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/draggable_divider.dart';
 import 'package:frosty/widgets/frosty_notification.dart';
-import 'package:provider/provider.dart';
 import 'package:simple_pip_mode/actions/pip_actions_layout.dart';
 import 'package:simple_pip_mode/pip_widget.dart';
 
@@ -445,11 +444,7 @@ class _VideoChatState extends State<VideoChat>
                     ).dark,
                     child: DefaultTextStyle(
                       style: context.defaultTextStyle.copyWith(
-                        color: context
-                            .watch<FrostyThemes>()
-                            .dark
-                            .colorScheme
-                            .onSurface,
+                        color: context.frostyColors.overlayOnSurface,
                       ),
                       child: landscapeChat,
                     ),

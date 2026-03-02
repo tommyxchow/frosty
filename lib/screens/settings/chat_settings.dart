@@ -320,10 +320,10 @@ class _ChatSettingsState extends State<ChatSettings> {
                 children: [
                   TextSpan(
                     text: 'https://recent-messages.robotty.de/',
-                    style: const TextStyle(
-                      color: Colors.blue,
+                    style: TextStyle(
+                      color: context.colorScheme.primary,
                       decoration: TextDecoration.underline,
-                      decorationColor: Colors.blue,
+                      decorationColor: context.colorScheme.primary,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () => launchUrl(

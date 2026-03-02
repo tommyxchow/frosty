@@ -41,7 +41,7 @@ class SectionHeader extends StatelessWidget {
               fontSize: fontSize ?? 13,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
-              color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: context.colorScheme.onSurfaceVariant,
             ),
           ),
         ],

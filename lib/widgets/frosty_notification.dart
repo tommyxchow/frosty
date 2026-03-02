@@ -44,9 +44,7 @@ class FrostyNotification extends StatelessWidget {
               icon: const Icon(Icons.close_rounded, size: 20),
               visualDensity: VisualDensity.compact,
               tooltip: 'Dismiss',
-              color: Theme.of(
-                context,
-              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
         ],
       ),

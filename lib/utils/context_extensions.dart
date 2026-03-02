@@ -6,6 +6,7 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/stores/global_assets_store.dart';
+import 'package:frosty/theme.dart';
 import 'package:provider/provider.dart';
 
 /// Static utility class for orientation-related operations
@@ -44,6 +45,9 @@ extension ContextExtensions on BuildContext {
 
   /// Gets body small text color (commonly used for secondary text)
   Color? get bodySmallColor => Theme.of(this).textTheme.bodySmall?.color;
+
+  /// Gets the app's custom semantic colors
+  FrostyColors get frostyColors => Theme.of(this).extension<FrostyColors>()!;
 
   /// Gets the default text style
   TextStyle get defaultTextStyle => DefaultTextStyle.of(this).style;

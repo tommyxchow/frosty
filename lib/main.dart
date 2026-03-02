@@ -164,20 +164,17 @@ class _MyAppState extends State<MyApp> {
           colorSchemeSeed: Color(settingsStore.accentColor),
         );
 
-        return Provider<FrostyThemes>(
-          create: (_) => themes,
-          child: MaterialApp(
-            title: 'Frosty',
-            theme: themes.light,
-            darkTheme: themes.dark,
-            themeMode: settingsStore.themeType == ThemeType.system
-                ? ThemeMode.system
-                : settingsStore.themeType == ThemeType.light
-                ? ThemeMode.light
-                : ThemeMode.dark,
-            home: widget.firstRun ? const OnboardingIntro() : const Home(),
-            navigatorKey: navigatorKey,
-          ),
+        return MaterialApp(
+          title: 'Frosty',
+          theme: themes.light,
+          darkTheme: themes.dark,
+          themeMode: settingsStore.themeType == ThemeType.system
+              ? ThemeMode.system
+              : settingsStore.themeType == ThemeType.light
+              ? ThemeMode.light
+              : ThemeMode.dark,
+          home: widget.firstRun ? const OnboardingIntro() : const Home(),
+          navigatorKey: navigatorKey,
         );
       },
     );

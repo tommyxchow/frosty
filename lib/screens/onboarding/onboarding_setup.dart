@@ -9,6 +9,7 @@ import 'package:frosty/screens/onboarding/onboarding_scaffold.dart';
 import 'package:frosty/screens/onboarding/onboarding_welcome.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/accent_color_setting.dart';
 import 'package:frosty/widgets/theme_selection_setting.dart';
 import 'package:provider/provider.dart';
@@ -40,10 +41,10 @@ class OnboardingSetup extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: 'https://recent-messages.robotty.de/',
-                        style: const TextStyle(
-                          color: Colors.blue,
+                        style: TextStyle(
+                          color: context.colorScheme.primary,
                           decoration: TextDecoration.underline,
-                          decorationColor: Colors.blue,
+                          decorationColor: context.colorScheme.primary,
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () => launchUrl(

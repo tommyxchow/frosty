@@ -165,9 +165,7 @@ class _HomeState extends State<Home> {
                         Icons.favorite_border_rounded,
                         color: _homeStore.selectedIndex == 0
                             ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onSurfaceVariant.withValues(
-                                alpha: 0.6,
-                              ),
+                            : theme.colorScheme.onSurfaceVariant,
                       ),
                       selectedIcon: Icon(
                         Icons.favorite_rounded,
@@ -183,9 +181,7 @@ class _HomeState extends State<Home> {
                           _homeStore.selectedIndex ==
                               (_authStore.isLoggedIn ? 1 : 0)
                           ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant.withValues(
-                              alpha: 0.6,
-                            ),
+                          : theme.colorScheme.onSurfaceVariant,
                     ),
                     selectedIcon: Icon(
                       Icons.arrow_upward_rounded,
@@ -201,9 +197,7 @@ class _HomeState extends State<Home> {
                           _homeStore.selectedIndex ==
                               (_authStore.isLoggedIn ? 2 : 1)
                           ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant.withValues(
-                              alpha: 0.6,
-                            ),
+                          : theme.colorScheme.onSurfaceVariant,
                     ),
                     selectedIcon: Icon(
                       Icons.search_rounded,

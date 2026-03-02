@@ -17,7 +17,6 @@ import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/uptime.dart';
 import 'package:intl/intl.dart';
 import 'package:native_device_orientation/native_device_orientation.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
@@ -51,11 +50,7 @@ class VideoOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surfaceColor = context
-        .watch<FrostyThemes>()
-        .dark
-        .colorScheme
-        .onSurface;
+    final surfaceColor = context.frostyColors.overlayOnSurface;
 
     final backButton = IconButton(
       tooltip: 'Back',

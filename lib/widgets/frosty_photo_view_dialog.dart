@@ -1,10 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/cache_manager.dart';
-import 'package:frosty/theme.dart';
+import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:provider/provider.dart';
 
 class FrostyPhotoViewDialog extends StatefulWidget {
   final String imageUrl;
@@ -180,7 +179,7 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
           child: IconButton(
             icon: Icon(
               Icons.close,
-              color: context.watch<FrostyThemes>().dark.colorScheme.onSurface,
+              color: context.frostyColors.overlayOnSurface,
             ),
             onPressed: Navigator.of(context).pop,
           ),
@@ -205,11 +204,7 @@ class _FrostyPhotoViewDialogState extends State<FrostyPhotoViewDialog>
                     child: Text(
                       _isFullResolution ? 'View thumbnail' : 'View original',
                       style: TextStyle(
-                        color: context
-                            .watch<FrostyThemes>()
-                            .dark
-                            .colorScheme
-                            .onSurface,
+                        color: context.frostyColors.overlayOnSurface,
                       ),
                     ),
                   ),
