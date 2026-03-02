@@ -85,11 +85,17 @@ For a more detailed overview, visit [frostyapp.io](https://www.frostyapp.io/).
 
 3. Go to the [Twitch dev console](https://dev.twitch.tv/login) and register a new application to retrieve a **Client ID** and **Client Secret**.
 
-4. Use [`--dart-define`](https://dartcode.org/docs/using-dart-define-in-flutter/) to set the `clientId` and `secret` environment variables with your **Client ID** and **Client Secret**.
+4. Copy `.env.example` to `.env` and fill in your credentials:
+
+   ```bash
+   cp .env.example .env
+   ```
 
 5. Run `flutter pub get` to fetch all the dependencies.
 
-6. Choose an emulator or device and run the app!
+6. Choose an emulator or device and run the app! The included VS Code launch configurations will automatically read your `.env` file.
+
+7. (Optional) Run `./scripts/get-twitch-token.sh` to quickly get a user auth token. Long-press the **Anonymous** account tile in the app to log in from your clipboard.
 
 > [!IMPORTANT]
 > Frosty uses [MobX](https://mobx.netlify.app/) for state management. Please refer to the documentation about code generation, otherwise your changes within MobX stores may not be applied.
