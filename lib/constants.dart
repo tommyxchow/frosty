@@ -42,6 +42,9 @@ final regexLink = RegExp(
   caseSensitive: false,
 );
 
+/// Standard corner radius for card thumbnails and box art.
+const kCardBorderRadius = BorderRadius.all(Radius.circular(8));
+
 /// The default badge width and height.
 const defaultBadgeSize = 18.0;
 

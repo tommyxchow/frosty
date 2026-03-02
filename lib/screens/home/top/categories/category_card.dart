@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/category.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
@@ -45,7 +46,7 @@ class CategoryCard extends StatelessWidget {
             SizedBox(
               width: 80,
               child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: kCardBorderRadius,
                 child: AspectRatio(
                   aspectRatio: 3 / 4,
                   child: FrostyCachedNetworkImage(
@@ -55,7 +56,7 @@ class CategoryCard extends StatelessWidget {
                       '${artWidth}x$artHeight.jpg',
                     ),
                     placeholder: (context, url) => const SkeletonLoader(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderRadius: kCardBorderRadius,
                     ),
                   ),
                 ),

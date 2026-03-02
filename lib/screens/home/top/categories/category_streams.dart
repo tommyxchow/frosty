@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/screens/home/stream_list/stream_list_store.dart';
 import 'package:frosty/screens/home/stream_list/streams_list.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
@@ -110,9 +111,7 @@ class _CategoryStreamsState extends State<CategoryStreams> {
                                   child: AspectRatio(
                                     aspectRatio: 3 / 4,
                                     child: SkeletonLoader(
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(8),
-                                      ),
+                                      borderRadius: kCardBorderRadius,
                                     ),
                                   ),
                                 ),
@@ -180,7 +179,7 @@ class _TransparentCategoryCard extends StatelessWidget {
           SizedBox(
             width: 80,
             child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(8)),
+              borderRadius: kCardBorderRadius,
               child: AspectRatio(
                 aspectRatio: 3 / 4,
                 child: FrostyCachedNetworkImage(
@@ -190,7 +189,7 @@ class _TransparentCategoryCard extends StatelessWidget {
                     '${artWidth}x$artHeight.jpg',
                   ),
                   placeholder: (context, url) => const SkeletonLoader(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderRadius: kCardBorderRadius,
                   ),
                   fit: BoxFit.cover,
                 ),

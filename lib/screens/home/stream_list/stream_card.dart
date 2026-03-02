@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/top/categories/category_streams.dart';
@@ -59,7 +60,7 @@ class StreamCard extends StatelessWidget {
         ),
         cacheKey: cacheKey,
         placeholder: (context, url) => const SkeletonLoader(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
+          borderRadius: kCardBorderRadius,
         ),
         useOldImageOnUrlChange: true,
       ),
@@ -80,7 +81,7 @@ class StreamCard extends StatelessWidget {
     final fontColor = DefaultTextStyle.of(context).style.color;
 
     final imageSection = ClipRRect(
-      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      borderRadius: kCardBorderRadius,
       child: Stack(
         alignment: AlignmentDirectional.bottomEnd,
         children: [

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/channel/video/stream_info_bar.dart';
@@ -47,7 +48,7 @@ class LargeStreamCard extends StatelessWidget {
     final thumbnail = SizedBox(
       width: double.infinity,
       child: ClipRRect(
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        borderRadius: kCardBorderRadius,
         child: AspectRatio(
           aspectRatio: 16 / 9,
           child: FrostyCachedNetworkImage(
@@ -57,7 +58,7 @@ class LargeStreamCard extends StatelessWidget {
             ),
             cacheKey: cacheKey,
             placeholder: (context, url) => const SkeletonLoader(
-              borderRadius: BorderRadius.all(Radius.circular(8)),
+              borderRadius: kCardBorderRadius,
             ),
             useOldImageOnUrlChange: true,
           ),

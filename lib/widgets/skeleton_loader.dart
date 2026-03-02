@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:frosty/constants.dart';
 
 /// A skeleton loading widget that displays a pulsing placeholder
 class SkeletonLoader extends StatefulWidget {
@@ -152,7 +153,7 @@ class CategorySkeletonLoader extends StatelessWidget {
             child: AspectRatio(
               aspectRatio: 3 / 4,
               child: const SkeletonLoader(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+                borderRadius: kCardBorderRadius,
               ),
             ),
           ),
@@ -198,7 +199,7 @@ class StreamCardSkeletonLoader extends StatelessWidget {
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child: const SkeletonLoader(
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderRadius: kCardBorderRadius,
                 ),
               ),
             ),
@@ -391,11 +392,11 @@ class LargeStreamCardSkeletonLoader extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: kCardBorderRadius,
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: const SkeletonLoader(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    borderRadius: kCardBorderRadius,
                   ),
                 ),
               ),
