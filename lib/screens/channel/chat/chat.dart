@@ -6,6 +6,7 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_bottom_bar.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_message.dart';
 import 'package:frosty/utils/context_extensions.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:frosty/widgets/frosty_page_view.dart';
 import 'package:frosty/widgets/frosty_scrollbar.dart';
 
@@ -192,6 +193,47 @@ class Chat extends StatelessWidget {
                                   if (chatStore.settings.showBTTVEmotes) 'BTTV',
                                   if (chatStore.settings.showFFZEmotes) 'FFZ',
                                 ],
+                                tabActions: {
+                                  if (chatStore
+                                      .assetsStore
+                                      .recentEmotes
+                                      .isNotEmpty)
+                                    0: IconButton(
+                                      onPressed: () => showDialog(
+                                        context: context,
+                                        builder: (context) => FrostyDialog(
+                                          title: 'Clear recent emotes',
+                                          message:
+                                              'Are you sure you want to clear your recent emotes?',
+                                          actions: [
+                                            TextButton(
+                                              onPressed:
+                                                  Navigator.of(context).pop,
+                                              child: const Text('Cancel'),
+                                            ),
+                                            FilledButton(
+                                              onPressed: () {
+                                                chatStore
+                                                    .assetsStore
+                                                    .recentEmotes
+                                                    .clear();
+                                                chatStore.updateNotification(
+                                                  'Recent emotes cleared',
+                                                );
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Clear'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.delete_outline_rounded,
+                                      ),
+                                      tooltip: 'Clear recent emotes',
+                                      iconSize: 20,
+                                    ),
+                                },
                                 children: [
                                   RecentEmotesPanel(chatStore: chatStore),
                                   if (chatStore.settings.showTwitchEmotes)
