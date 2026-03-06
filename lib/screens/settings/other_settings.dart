@@ -4,15 +4,12 @@ import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/frosty_dialog.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OtherSettings extends StatefulWidget {
   final SettingsStore settingsStore;
@@ -64,42 +61,11 @@ class _OtherSettingsState extends State<OtherSettings> {
     return Column(
       children: [
         ListTile(
-          leading: const Icon(Icons.info_outline_rounded),
-          title: const Text('About Frosty'),
-          onTap: () async {
-            final packageInfo = await PackageInfo.fromPlatform();
-
-            if (!context.mounted) return;
-
-            showAboutDialog(
-              context: context,
-              applicationIcon: SvgPicture.asset(
-                'assets/icons/logo.svg',
-                height: 80,
-              ),
-              applicationName: packageInfo.appName,
-              applicationVersion:
-                  'Version ${packageInfo.version} (${packageInfo.buildNumber})',
-              applicationLegalese: '\u{a9} 2026 Tommy Chow',
-            );
-          },
-        ),
-        ListTile(
           leading: const Icon(Icons.notes_rounded),
           title: const Text('Release notes'),
           onTap: () => Navigator.of(
             context,
           ).push(MaterialPageRoute(builder: (context) => const ReleaseNotes())),
-        ),
-        ListTile(
-          leading: const Icon(Icons.launch_rounded),
-          title: const Text('FAQ'),
-          onTap: () => launchUrl(
-            Uri.parse('https://www.frostyapp.io/#faq'),
-            mode: widget.settingsStore.launchUrlExternal
-                ? LaunchMode.externalApplication
-                : LaunchMode.inAppBrowserView,
-          ),
         ),
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded),
