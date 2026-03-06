@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/screens/settings/account/widgets/profile_card.dart';
@@ -49,8 +47,7 @@ class Settings extends StatelessWidget {
         ),
         title: const Text('Settings'),
         actions: [
-          if (Platform.isAndroid)
-            IconButton(
+          IconButton(
               tooltip: 'Support Frosty',
               onPressed: () => launchUrl(
                 Uri.parse('https://www.buymeacoffee.com/tommychow'),
