@@ -27,6 +27,8 @@ void main() {
       expect(store.timestampType, TimestampType.disabled);
       expect(store.autoSyncChatDelay, isFalse);
       expect(store.chatDelay, 0.0);
+      expect(store.syncedChatDelay, 0.0);
+      expect(store.effectiveChatDelay, 0.0);
       expect(store.highlightFirstTimeChatter, isTrue);
       expect(store.showUserNotices, isTrue);
       expect(store.emoteMenuButtonOnLeft, isFalse);
@@ -63,6 +65,7 @@ void main() {
       store.showThumbnails = false;
       store.fontSize = 16.0;
       store.chatDelay = 5.0;
+      store.syncedChatDelay = 8.0;
       store.showVideo = false;
       store.timestampType = TimestampType.twelve;
       store.landscapeCutout = LandscapeCutoutType.both;
@@ -77,6 +80,8 @@ void main() {
       expect(restored.showThumbnails, isFalse);
       expect(restored.fontSize, 16.0);
       expect(restored.chatDelay, 5.0);
+      expect(restored.syncedChatDelay, 0.0);
+      expect(json.containsKey('syncedChatDelay'), isFalse);
       expect(restored.showVideo, isFalse);
       expect(restored.timestampType, TimestampType.twelve);
       expect(restored.landscapeCutout, LandscapeCutoutType.both);
@@ -85,9 +90,7 @@ void main() {
     });
 
     test('unknown ThemeType enum value falls back to system', () {
-      final store = SettingsStore.fromJson({
-        'themeType': 'nonexistent_theme',
-      });
+      final store = SettingsStore.fromJson({'themeType': 'nonexistent_theme'});
       expect(store.themeType, ThemeType.system);
     });
 
@@ -147,6 +150,7 @@ void main() {
       store.showDeletedMessages = true;
       store.timestampType = TimestampType.twentyFour;
       store.chatDelay = 10.0;
+      store.syncedChatDelay = 7.0;
       store.emoteMenuButtonOnLeft = true;
       store.landscapeCutout = LandscapeCutoutType.right;
       store.chatWidth = 0.5;
@@ -162,6 +166,7 @@ void main() {
       expect(store.showDeletedMessages, isFalse);
       expect(store.timestampType, TimestampType.disabled);
       expect(store.chatDelay, 0.0);
+      expect(store.syncedChatDelay, 0.0);
       expect(store.emoteMenuButtonOnLeft, isFalse);
       expect(store.landscapeCutout, LandscapeCutoutType.none);
       expect(store.chatWidth, 0.2);
@@ -235,6 +240,19 @@ void main() {
 
       expect(store.showLatency, isFalse);
       expect(store.fontSize, 20.0); // Should remain changed
+    });
+
+    test('effectiveChatDelay uses synced value only during auto sync', () {
+      final store = SettingsStore.fromJson({});
+
+      store.chatDelay = 4.0;
+      store.syncedChatDelay = 9.0;
+
+      expect(store.effectiveChatDelay, 4.0);
+
+      store.autoSyncChatDelay = true;
+
+      expect(store.effectiveChatDelay, 9.0);
     });
   });
 

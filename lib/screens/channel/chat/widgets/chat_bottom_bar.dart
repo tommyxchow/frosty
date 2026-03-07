@@ -63,9 +63,11 @@ class ChatBottomBar extends StatelessWidget {
         final isFullscreenOverlay =
             chatStore.settings.fullScreen && context.isLandscape;
 
+        final effectiveChatDelay = chatStore.settings.effectiveChatDelay;
+
         // Check if chat delay is active (for indicator only, doesn't block input)
         final hasChatDelay =
-            chatStore.settings.showVideo && chatStore.settings.chatDelay > 0;
+            chatStore.settings.showVideo && effectiveChatDelay > 0;
 
         const loginTooltipMessage = 'Log in to chat';
 
@@ -301,7 +303,7 @@ class ChatBottomBar extends StatelessWidget {
                                     : chatStore.replyingToMessage != null
                                     ? 'Reply'
                                     : hasChatDelay
-                                    ? 'Chat (${chatStore.settings.chatDelay.toInt()}s delay)'
+                                    ? 'Chat (${effectiveChatDelay.toInt()}s delay)'
                                     : 'Chat',
                               ),
                               controller: chatStore.textController,

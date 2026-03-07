@@ -125,13 +125,14 @@ class ChatMessage extends StatelessWidget {
             onTap: () async {
               await copyMessage();
 
+              final effectiveChatDelay = chatStore.settings.effectiveChatDelay;
+
               final hasChatDelay =
-                  chatStore.settings.showVideo &&
-                  chatStore.settings.chatDelay > 0;
+                  chatStore.settings.showVideo && effectiveChatDelay > 0;
 
               if (hasChatDelay) {
                 chatStore.updateNotification(
-                  'Chatting is disabled due to message delay (${chatStore.settings.chatDelay.toInt()}s)',
+                  'Chatting is disabled due to message delay (${effectiveChatDelay.toInt()}s)',
                 );
                 if (context.mounted) {
                   Navigator.pop(context);
@@ -278,7 +279,9 @@ class ChatMessage extends StatelessWidget {
             }
 
             // If user is being mentioned in the message, highlight it red.
-            if (ircMessage.mention == true) highlightColor = context.colorScheme.error;
+            if (ircMessage.mention == true) {
+              highlightColor = context.colorScheme.error;
+            }
 
             if (messageHeader != null) {
               renderMessage = Column(
