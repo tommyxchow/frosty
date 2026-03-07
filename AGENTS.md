@@ -1,5 +1,7 @@
 # AGENTS.md
 
+> **Monorepo note:** `web/` is a separate Next.js landing page with its own `AGENTS.md`. This file covers the Flutter app only.
+
 ## Workflow
 
 - In plan mode, interview thoroughly — ask about UI/UX, tradeoffs, and edge cases before coding
@@ -40,6 +42,13 @@ dart run build_runner build --delete-conflicting-outputs             # Same, but
 - Use package imports (`import 'package:frosty/...'`), not relative imports
 - Always include trailing commas
 - Use single quotes
+
+## Testing
+
+- `flutter test` runs all tests; `flutter test test/path/to/file.dart` for a single file
+- HTTP mocking: `http_mock_adapter` (`DioAdapter`) — use full URLs in `onGet`/`onPost`
+- General mocking: `mocktail` (no codegen required)
+- Fixtures live in `test/fixtures/` (e.g., `irc_messages.dart`, `api_responses.dart`)
 
 ## Commits
 
