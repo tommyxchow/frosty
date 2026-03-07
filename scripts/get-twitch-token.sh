@@ -46,7 +46,11 @@ REDIRECT_URI="https://twitch.tv/login"
 URL="https://id.twitch.tv/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${SCOPES}&force_verify=true"
 
 echo "Opening Twitch authorization in your browser..."
-open "$URL"
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) start "$URL" ;;
+  Darwin*)              open "$URL" ;;
+  *)                    xdg-open "$URL" ;;
+esac
 
 echo ""
 echo "After authorizing, copy the full URL from the address bar and paste it here:"
@@ -84,7 +88,11 @@ if [ -z "$TOKEN" ]; then
   exit 1
 fi
 
-echo "$TOKEN" | tr -d '\n' | pbcopy
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) echo "$TOKEN" | tr -d '\n' | clip ;;
+  Darwin*)              echo "$TOKEN" | tr -d '\n' | pbcopy ;;
+  *)                    echo "$TOKEN" | tr -d '\n' | xclip -selection clipboard ;;
+esac
 
 echo "Token copied to clipboard!"
 echo ""
