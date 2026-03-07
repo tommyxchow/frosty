@@ -52,13 +52,12 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([]);
     checkAndShowReleaseNotes();
   }
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([]);
-
     final theme = Theme.of(context);
 
     return GestureDetector(
