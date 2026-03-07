@@ -41,6 +41,14 @@ class VideoSettings extends StatelessWidget {
               onChanged: (newValue) =>
                   settingsStore.useTextureRendering = newValue,
             ),
+          SettingsListSwitch(
+            title: 'Keep screen awake',
+            subtitle: const Text(
+              'Prevents the screen from sleeping while a channel is open.',
+            ),
+            value: settingsStore.keepScreenAwake,
+            onChanged: (newValue) => settingsStore.keepScreenAwake = newValue,
+          ),
           const SectionHeader('Overlay'),
           SettingsListSwitch(
             title: 'Use custom video overlay',

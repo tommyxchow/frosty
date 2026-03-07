@@ -124,7 +124,9 @@ abstract class ChatTabsStoreBase with Store {
     required String primaryDisplayName,
   }) {
     // Enable wakelock once for all chat tabs
-    WakelockPlus.enable();
+    if (settingsStore.keepScreenAwake) {
+      WakelockPlus.enable();
+    }
 
     // Initialize with the primary channel tab
     _addPrimaryTab(

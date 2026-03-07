@@ -23,6 +23,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..showVideo = json['showVideo'] as bool? ?? true
   ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
   ..useTextureRendering = json['useTextureRendering'] as bool? ?? true
+  ..keepScreenAwake = json['keepScreenAwake'] as bool? ?? true
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
   ..showLatency = json['showLatency'] as bool? ?? false
@@ -100,6 +101,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showVideo': instance.showVideo,
   'defaultToHighestQuality': instance.defaultToHighestQuality,
   'useTextureRendering': instance.useTextureRendering,
+  'keepScreenAwake': instance.keepScreenAwake,
   'showOverlay': instance.showOverlay,
   'toggleableOverlay': instance.toggleableOverlay,
   'showLatency': instance.showLatency,
@@ -166,6 +168,15 @@ const _$LandscapeCutoutTypeEnumMap = {
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SettingsStore on _SettingsStoreBase, Store {
+  Computed<double>? _$effectiveChatDelayComputed;
+
+  @override
+  double get effectiveChatDelay =>
+      (_$effectiveChatDelayComputed ??= Computed<double>(
+        () => super.effectiveChatDelay,
+        name: '_SettingsStoreBase.effectiveChatDelay',
+      )).value;
+
   late final _$themeTypeAtom = Atom(
     name: '_SettingsStoreBase.themeType',
     context: context,
@@ -311,6 +322,24 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set useTextureRendering(bool value) {
     _$useTextureRenderingAtom.reportWrite(value, super.useTextureRendering, () {
       super.useTextureRendering = value;
+    });
+  }
+
+  late final _$keepScreenAwakeAtom = Atom(
+    name: '_SettingsStoreBase.keepScreenAwake',
+    context: context,
+  );
+
+  @override
+  bool get keepScreenAwake {
+    _$keepScreenAwakeAtom.reportRead();
+    return super.keepScreenAwake;
+  }
+
+  @override
+  set keepScreenAwake(bool value) {
+    _$keepScreenAwakeAtom.reportWrite(value, super.keepScreenAwake, () {
+      super.keepScreenAwake = value;
     });
   }
 
@@ -549,6 +578,24 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set chatDelay(double value) {
     _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
       super.chatDelay = value;
+    });
+  }
+
+  late final _$syncedChatDelayAtom = Atom(
+    name: '_SettingsStoreBase.syncedChatDelay',
+    context: context,
+  );
+
+  @override
+  double get syncedChatDelay {
+    _$syncedChatDelayAtom.reportRead();
+    return super.syncedChatDelay;
+  }
+
+  @override
+  set syncedChatDelay(double value) {
+    _$syncedChatDelayAtom.reportWrite(value, super.syncedChatDelay, () {
+      super.syncedChatDelay = value;
     });
   }
 
@@ -1118,6 +1165,7 @@ launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
 useTextureRendering: ${useTextureRendering},
+keepScreenAwake: ${keepScreenAwake},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 showLatency: ${showLatency},
@@ -1131,6 +1179,7 @@ showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
 autoSyncChatDelay: ${autoSyncChatDelay},
 chatDelay: ${chatDelay},
+syncedChatDelay: ${syncedChatDelay},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
 emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
@@ -1155,7 +1204,8 @@ matchWholeWord: ${matchWholeWord},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay},
-pinnedChannelIds: ${pinnedChannelIds}
+pinnedChannelIds: ${pinnedChannelIds},
+effectiveChatDelay: ${effectiveChatDelay}
     ''';
   }
 }

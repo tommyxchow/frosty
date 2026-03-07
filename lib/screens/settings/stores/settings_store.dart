@@ -65,6 +65,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowVideo = true;
   static const defaultDefaultToHighestQuality = false;
   static const defaultUseTextureRendering = true;
+  static const defaultKeepScreenAwake = true;
 
   // Overlay defaults
   static const defaultShowOverlay = true;
@@ -84,6 +85,10 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var useTextureRendering = defaultUseTextureRendering;
 
+  @JsonKey(defaultValue: defaultKeepScreenAwake)
+  @observable
+  var keepScreenAwake = defaultKeepScreenAwake;
+
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
   @observable
@@ -102,6 +107,7 @@ abstract class _SettingsStoreBase with Store {
     showVideo = defaultShowVideo;
     defaultToHighestQuality = defaultDefaultToHighestQuality;
     useTextureRendering = defaultUseTextureRendering;
+    keepScreenAwake = defaultKeepScreenAwake;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
@@ -208,6 +214,14 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var chatDelay = defaultChatDelay;
 
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @observable
+  var syncedChatDelay = defaultChatDelay;
+
+  @computed
+  double get effectiveChatDelay =>
+      autoSyncChatDelay ? syncedChatDelay : chatDelay;
+
   // Alert options
   @JsonKey(defaultValue: defaultHighlightFirstTimeChatter)
   @observable
@@ -313,6 +327,7 @@ abstract class _SettingsStoreBase with Store {
 
     autoSyncChatDelay = defaultAutoSyncChatDelay;
     chatDelay = defaultChatDelay;
+    syncedChatDelay = defaultChatDelay;
 
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
     showUserNotices = defaultShowUserNotices;
@@ -401,4 +416,3 @@ enum TimestampType { disabled, twelve, twentyFour }
 const landscapeCutoutNames = ['None', 'Left', 'Right', 'Both'];
 
 enum LandscapeCutoutType { none, left, right, both }
-
