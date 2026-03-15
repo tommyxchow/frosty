@@ -31,7 +31,7 @@ class NativeVideo extends StatelessWidget {
                   key: ObjectKey(controller),
                   controller: controller,
                 ),
-              if (controller != null && nativeVideoStore.loading && !isOffline)
+              if (controller != null && !nativeVideoStore.hasPlayedOnce && !isOffline)
                 const ColoredBox(
                   color: Colors.black,
                   child: SizedBox.expand(),

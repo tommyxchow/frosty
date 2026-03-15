@@ -75,6 +75,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _paused = true;
 
   @readonly
+  var _hasPlayedOnce = false;
+
+  @readonly
   var _overlayVisible = true;
 
   @readonly
@@ -299,6 +302,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         case PlayerActivityState.playing:
           _loading = false;
           _paused = false;
+          _hasPlayedOnce = true;
           _initializing = false;
           _isQualitySwitching = false;
           _stallRecoveryTimer?.cancel();
@@ -534,6 +538,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     }
     _loading = true;
     _paused = true;
+    _hasPlayedOnce = false;
     _userPaused = false;
     _stallRecoveryAttempt = 0;
     _highLatencyCount = 0;

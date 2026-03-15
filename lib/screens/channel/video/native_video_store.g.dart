@@ -77,6 +77,26 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
     });
   }
 
+  late final _$_hasPlayedOnceAtom = Atom(
+    name: 'NativeVideoStoreBase._hasPlayedOnce',
+    context: context,
+  );
+
+  bool get hasPlayedOnce {
+    _$_hasPlayedOnceAtom.reportRead();
+    return super._hasPlayedOnce;
+  }
+
+  @override
+  bool get _hasPlayedOnce => hasPlayedOnce;
+
+  @override
+  set _hasPlayedOnce(bool value) {
+    _$_hasPlayedOnceAtom.reportWrite(value, super._hasPlayedOnce, () {
+      super._hasPlayedOnce = value;
+    });
+  }
+
   late final _$_overlayVisibleAtom = Atom(
     name: 'NativeVideoStoreBase._overlayVisible',
     context: context,
