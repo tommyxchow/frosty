@@ -344,7 +344,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         case PlayerActivityState.stopped:
         case PlayerActivityState.completed:
         case PlayerActivityState.idle:
-          _paused = true;
+          if (!_isInPipMode) {
+            _paused = true;
+          }
           _isQualitySwitching = false;
           _stallRecoveryTimer?.cancel();
         default:
@@ -679,6 +681,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   @override
   @action
   void handleAppResume() {
+    if (_isInPipMode) return;
     updateStreamInfo(forceUpdate: true);
     if (!_userPaused && !_initializing && _controller != null) {
       _controller!.play();

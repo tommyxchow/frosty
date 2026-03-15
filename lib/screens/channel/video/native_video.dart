@@ -31,6 +31,11 @@ class NativeVideo extends StatelessWidget {
                   key: ObjectKey(controller),
                   controller: controller,
                 ),
+              if (controller != null && nativeVideoStore.loading && !isOffline)
+                const ColoredBox(
+                  color: Colors.black,
+                  child: SizedBox.expand(),
+                ),
               if (error != null)
                 Align(
                   alignment: const Alignment(0, 0.3),
