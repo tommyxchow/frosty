@@ -101,8 +101,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: e926301
-      resolved-ref: e926301a6d013afa5d2e23b6acb741d6e56cd095
+      ref: frosty-patches
+      resolved-ref: "32a65d1f66f8596880aa6d3850264c49034454ae"
       url: "https://github.com/tommyxchow/flutter-native-video-player.git"
     source: git
     version: "0.4.11"
