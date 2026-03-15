@@ -90,6 +90,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _streamQualityIndex = 0;
 
   @override
+  @computed
   String get streamQuality =>
       _availableStreamQualities.elementAtOrNull(_streamQualityIndex) ?? 'Auto';
 
@@ -113,17 +114,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     required this.authStore,
     required this.settingsStore,
   }) {
-    _controller = NativeVideoPlayerController(
-      id: _nextId++,
-      autoPlay: true,
-      showNativeControls: false,
-      mediaInfo: NativeVideoPlayerMediaInfo(
-        title: displayName,
-        subtitle: 'Frosty — Twitch',
-        artworkUrl: _profileImageUrl,
-      ),
-    );
-    _controller!.addActivityListener(_handleActivityEvent);
+    _controller = _createController();
     _scheduleOverlayHide();
     updateStreamInfo();
     _initPlayer();
@@ -139,6 +130,21 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     }
   }
 
+  NativeVideoPlayerController _createController() {
+    final controller = NativeVideoPlayerController(
+      id: _nextId++,
+      autoPlay: true,
+      showNativeControls: false,
+      mediaInfo: NativeVideoPlayerMediaInfo(
+        title: displayName,
+        subtitle: 'Frosty — Twitch',
+        artworkUrl: _profileImageUrl,
+      ),
+    );
+    controller.addActivityListener(_handleActivityEvent);
+    return controller;
+  }
+
   @action
   Future<void> _initPlayer() async {
     if (_initInFlight) return;
@@ -152,8 +158,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
           login: userLogin,
           authToken: authToken,
         );
-      } catch (_) {
+      } catch (e) {
         if (authToken != null) {
+          debugPrint('NativeVideoStore: auth token failed, retrying without: $e');
           token = await twitchGqlApi.getPlaybackAccessToken(login: userLogin);
         } else {
           rethrow;
@@ -177,7 +184,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
             artworkUrl: _profileImageUrl,
           ));
         }
-      }).catchError((_) {});
+      }).catchError((e) {
+        debugPrint('NativeVideoStore: profile image fetch failed: $e');
+      });
 
       await _controller!.initialize();
       if (_disposed) {
@@ -241,12 +250,14 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
               _pendingQualityIndex = 1;
             } else {
               SharedPreferences.getInstance().then((prefs) {
-                if (_disposed) return;
+                if (_disposed || _pendingQualityIndex != null) return;
                 final lastQuality = prefs.getString(kLastStreamQualityKey);
                 if (lastQuality != null) {
                   final index = _availableStreamQualities.indexOf(lastQuality);
                   if (index != -1) _pendingQualityIndex = index;
                 }
+              }).catchError((e) {
+                debugPrint('NativeVideoStore: failed to read last quality: $e');
               });
             }
           }
@@ -310,7 +321,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
           if (_initializing && event.state == PlayerActivityState.buffering) {
             _initializing = false;
           }
-          if (!_userPaused) _startStallRecoveryTimer();
+          if (!_userPaused && !_initializing) _startStallRecoveryTimer();
         case PlayerActivityState.error:
           _loading = false;
           _initializing = false;
@@ -416,7 +427,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         !_loading &&
         !_userPaused) {
       _highLatencyCount++;
-      if (_highLatencyCount == 1) {
+      if (_isInPipMode || _highLatencyCount == 1) {
+        // During PiP, only seek to live edge — handleRefresh() disposes
+        // the controller which kills PiP.
         debugPrint(
           'NativeVideoStore: high latency (${rounded}s), seeking to live edge',
         );
@@ -528,6 +541,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _isInPipMode = false;
     _lastPipWasAutomatic = false;
     _manualPipRequested = false;
+    _overlayWasVisibleBeforePip = true;
     _latency = null;
     _availableStreamQualities = [];
     _qualityObjects = [];
@@ -544,17 +558,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _qualitiesSub?.cancel();
     _controller?.removeActivityListener(_handleActivityEvent);
     _controller?.dispose();
-    _controller = NativeVideoPlayerController(
-      id: _nextId++,
-      autoPlay: true,
-      showNativeControls: false,
-      mediaInfo: NativeVideoPlayerMediaInfo(
-        title: displayName,
-        subtitle: _streamInfo?.title ?? 'Twitch',
-        artworkUrl: _profileImageUrl,
-      ),
-    );
-    _controller!.addActivityListener(_handleActivityEvent);
+    _controller = _createController();
 
     _initPlayer();
     updateStreamInfo();
@@ -611,7 +615,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       await _controller!.setQuality(NativeVideoPlayerQuality.auto());
     } else {
       final qualityIndex = index - 1;
-      if (qualityIndex < _qualityObjects.length) {
+      if (qualityIndex >= 0 && qualityIndex < _qualityObjects.length) {
         await _controller!.setQuality(_qualityObjects[qualityIndex]);
       }
     }
@@ -656,13 +660,16 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       Channel? channel;
       try {
         channel = await twitchApi.getChannel(userId: userId);
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('NativeVideoStore: channel info fallback failed: $e');
+      }
 
       runInAction(() {
         _overlayTimer?.cancel();
         _latencyTimer?.cancel();
         _stallRecoveryTimer?.cancel();
         _loading = false;
+        _latency = null;
         _streamInfo = null;
         _offlineChannelInfo = channel;
       });

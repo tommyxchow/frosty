@@ -79,7 +79,7 @@ dependencies:
     better_native_video_player:
         git:
             url: https://github.com/tommyxchow/flutter-native-video-player.git
-            ref: 0d573ff
+            ref: e926301
 
 dev_dependencies:
     flutter_test:
