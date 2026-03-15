@@ -482,10 +482,14 @@ class ChatMessage extends StatelessWidget {
                 messageHeaderIcon = Icon(
                   Icons.campaign_rounded,
                   size: messageHeaderIconSize,
+                  color: messageHeaderTextColor,
                 );
-                messageHeader = const Text(
+                messageHeader = Text(
                   'Announcement',
-                  style: TextStyle(fontWeight: messageHeaderFontWeight),
+                  style: TextStyle(
+                    fontWeight: messageHeaderFontWeight,
+                    color: messageHeaderTextColor,
+                  ),
                 );
               }
 

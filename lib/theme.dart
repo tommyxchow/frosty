@@ -196,6 +196,23 @@ class FrostyThemes {
           ),
         ),
       ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          letterSpacing: -0.011,
+          height: 1.5,
+        ),
+        subtitleTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+          fontSize: 13,
+          height: 1.4,
+        ),
+        leadingAndTrailingTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+        ),
+      ),
       navigationBarTheme: NavigationBarThemeData(
         elevation: 0,
         backgroundColor: backgroundColor,

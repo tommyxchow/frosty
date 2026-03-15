@@ -166,9 +166,8 @@ class _HomeState extends State<Home> {
                     NavigationDestination(
                       icon: Icon(
                         Icons.favorite_border_rounded,
-                        color: _homeStore.selectedIndex == 0
-                            ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.5),
                       ),
                       selectedIcon: Icon(
                         Icons.favorite_rounded,
@@ -180,11 +179,8 @@ class _HomeState extends State<Home> {
                   NavigationDestination(
                     icon: Icon(
                       Icons.arrow_upward_rounded,
-                      color:
-                          _homeStore.selectedIndex ==
-                              (_authStore.isLoggedIn ? 1 : 0)
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.5),
                     ),
                     selectedIcon: Icon(
                       Icons.arrow_upward_rounded,
@@ -196,11 +192,8 @@ class _HomeState extends State<Home> {
                   NavigationDestination(
                     icon: Icon(
                       Icons.search_rounded,
-                      color:
-                          _homeStore.selectedIndex ==
-                              (_authStore.isLoggedIn ? 2 : 1)
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.5),
                     ),
                     selectedIcon: Icon(
                       Icons.search_rounded,

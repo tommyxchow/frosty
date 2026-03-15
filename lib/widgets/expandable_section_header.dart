@@ -49,11 +49,11 @@ class ExpandableSectionHeader extends StatelessWidget {
                   child: Text(
                     text.toUpperCase(),
                     style: TextStyle(
-                      fontSize: fontSize ?? 13,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                      color: context.colorScheme.onSurface.withValues(
-                        alpha: 0.6,
+                      fontSize: fontSize ?? 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.8,
+                      color: context.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.5,
                       ),
                     ),
                   ),
@@ -63,7 +63,9 @@ class ExpandableSectionHeader extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: Icon(
                     Icons.keyboard_arrow_down,
-                    color: context.colorScheme.onSurfaceVariant,
+                    color: context.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.5,
+                    ),
                     size: 20,
                   ),
                 ),

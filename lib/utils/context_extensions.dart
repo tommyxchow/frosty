@@ -3,6 +3,7 @@ import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/apis/twitch_gql_api.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/stores/global_assets_store.dart';
@@ -70,6 +71,9 @@ extension ContextExtensions on BuildContext {
 
   /// Gets TwitchApi from provider
   TwitchApi get twitchApi => read<TwitchApi>();
+
+  /// Gets TwitchGqlApi from provider
+  TwitchGqlApi get twitchGqlApi => read<TwitchGqlApi>();
 
   /// Gets AuthStore from provider
   AuthStore get authStore => read<AuthStore>();

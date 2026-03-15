@@ -25,12 +25,12 @@ class GeneralSettings extends StatelessWidget {
           AccentColorSetting(settingsStore: settingsStore),
           const SectionHeader('Stream card'),
           SettingsListSwitch(
-            title: 'Use large stream card',
+            title: 'Large stream cards',
             value: settingsStore.largeStreamCard,
             onChanged: (newValue) => settingsStore.largeStreamCard = newValue,
           ),
           SettingsListSwitch(
-            title: 'Show thumbnail',
+            title: 'Show thumbnails',
             value: settingsStore.showThumbnails,
             onChanged: (newValue) => settingsStore.showThumbnails = newValue,
           ),

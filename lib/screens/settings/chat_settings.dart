@@ -15,26 +15,67 @@ import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/settings_page_layout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ChatSettings extends StatefulWidget {
+class ChatSettings extends StatelessWidget {
   final SettingsStore settingsStore;
 
   const ChatSettings({super.key, required this.settingsStore});
 
   @override
-  State<ChatSettings> createState() => _ChatSettingsState();
-}
-
-class _ChatSettingsState extends State<ChatSettings> {
-  var showPreview = false;
-
-  @override
   Widget build(BuildContext context) {
-    final settingsStore = widget.settingsStore;
-
     return Observer(
       builder: (context) => SettingsPageLayout(
         children: [
-          const SectionHeader('Message sizing', isFirst: true),
+          const SectionHeader('General', isFirst: true),
+          SettingsListSwitch(
+            title: 'Keep screen on',
+            subtitle: const Text(
+              'Prevents the screen from sleeping while a channel is open.',
+            ),
+            value: settingsStore.keepScreenAwake,
+            onChanged: (newValue) =>
+                settingsStore.keepScreenAwake = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Autocomplete',
+            subtitle: const Text(
+              'Shows matching emotes and mentions while typing.',
+            ),
+            value: settingsStore.autocomplete,
+            onChanged: (newValue) =>
+                settingsStore.autocomplete = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Load recent messages',
+            subtitle: Text.rich(
+              TextSpan(
+                text:
+                    'Loads historical recent messages in chat through a third-party API service at ',
+                children: [
+                  TextSpan(
+                    text: 'https://recent-messages.robotty.de/',
+                    style: TextStyle(
+                      color: context.colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                      decorationColor: context.colorScheme.primary,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => launchUrl(
+                        Uri.parse(
+                          'https://recent-messages.robotty.de/',
+                        ),
+                        mode: settingsStore.launchUrlExternal
+                            ? LaunchMode.externalApplication
+                            : LaunchMode.inAppBrowserView,
+                      ),
+                  ),
+                ],
+              ),
+            ),
+            value: settingsStore.showRecentMessages,
+            onChanged: (newValue) =>
+                settingsStore.showRecentMessages = newValue,
+          ),
+          const SectionHeader('Message sizing'),
           ExpansionTile(
             title: const Text('Preview'),
             children: [
@@ -57,21 +98,27 @@ class _ChatSettingsState extends State<ChatSettings> {
                                 imageUrl:
                                     'https://static-cdn.jtvnw.net/badges/v1/bbbe0db0-a598-423e-86d0-f9fb98ca1933/3',
                                 height:
-                                    defaultBadgeSize * settingsStore.badgeScale,
+                                    defaultBadgeSize *
+                                    settingsStore.badgeScale,
                                 width:
-                                    defaultBadgeSize * settingsStore.badgeScale,
+                                    defaultBadgeSize *
+                                    settingsStore.badgeScale,
                               ),
                             ),
-                            const TextSpan(text: ' Badge and emote preview. '),
+                            const TextSpan(
+                              text: ' Badge and emote preview. ',
+                            ),
                             WidgetSpan(
                               alignment: PlaceholderAlignment.middle,
                               child: FrostyCachedNetworkImage(
                                 imageUrl:
                                     'https://static-cdn.jtvnw.net/emoticons/v2/425618/default/dark/3.0',
                                 height:
-                                    defaultEmoteSize * settingsStore.emoteScale,
+                                    defaultEmoteSize *
+                                    settingsStore.emoteScale,
                                 width:
-                                    defaultEmoteSize * settingsStore.emoteScale,
+                                    defaultEmoteSize *
+                                    settingsStore.emoteScale,
                               ),
                             ),
                           ],
@@ -123,11 +170,13 @@ class _ChatSettingsState extends State<ChatSettings> {
           ),
           SettingsListSlider(
             title: 'Message spacing',
-            trailing: '${settingsStore.messageSpacing.toStringAsFixed(0)}px',
+            trailing:
+                '${settingsStore.messageSpacing.toStringAsFixed(0)}px',
             value: settingsStore.messageSpacing,
             max: 30.0,
             divisions: 15,
-            onChanged: (newValue) => settingsStore.messageSpacing = newValue,
+            onChanged: (newValue) =>
+                settingsStore.messageSpacing = newValue,
           ),
           SettingsListSlider(
             title: 'Font size',
@@ -155,32 +204,35 @@ class _ChatSettingsState extends State<ChatSettings> {
                 settingsStore.showChatMessageDividers = newValue,
           ),
           SettingsListSelect(
-            title: 'Message timestamps',
-            selectedOption: timestampNames[settingsStore.timestampType.index],
+            title: 'Timestamps',
+            selectedOption:
+                timestampNames[settingsStore.timestampType.index],
             options: timestampNames,
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay and latency'),
+          const SectionHeader('Delay'),
           SettingsListSwitch(
-            title: 'Sync message delay and stream latency',
+            title: 'Auto-sync chat delay',
             value: settingsStore.autoSyncChatDelay,
-            onChanged: (newValue) => settingsStore.autoSyncChatDelay = newValue,
+            onChanged: (newValue) =>
+                settingsStore.autoSyncChatDelay = newValue,
           ),
           if (!settingsStore.autoSyncChatDelay)
             SettingsListSlider(
-              title: 'Message delay',
+              title: 'Chat delay',
               trailing: '${settingsStore.chatDelay.toInt()} seconds',
               subtitle:
                   'Adds a delay before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}',
               value: settingsStore.chatDelay,
               max: 30.0,
               divisions: 30,
-              onChanged: (newValue) => settingsStore.chatDelay = newValue,
+              onChanged: (newValue) =>
+                  settingsStore.chatDelay = newValue,
             ),
           const SectionHeader('Alerts'),
           SettingsListSwitch(
-            title: 'Highlight first time chatters',
+            title: 'Highlight first-time chatters',
             value: settingsStore.highlightFirstTimeChatter,
             onChanged: (newValue) =>
                 settingsStore.highlightFirstTimeChatter = newValue,
@@ -188,25 +240,26 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Show notices',
             subtitle: const Text(
-              'Shows notices such as subs and re-subs, announcements, and raids.',
+              'Shows notices such as subs, announcements, and raids.',
             ),
             value: settingsStore.showUserNotices,
-            onChanged: (newValue) => settingsStore.showUserNotices = newValue,
+            onChanged: (newValue) =>
+                settingsStore.showUserNotices = newValue,
           ),
           const SectionHeader('Layout'),
           SettingsListSwitch(
-            title: 'Move emote menu button left',
+            title: 'Emote menu on left',
             subtitle: const Text(
-              'Places the emote menu button on the left side to avoid accidental presses.',
+              'Places the emote menu button on the left side.',
             ),
             value: settingsStore.emoteMenuButtonOnLeft,
             onChanged: (newValue) =>
                 settingsStore.emoteMenuButtonOnLeft = newValue,
           ),
           SettingsListSwitch(
-            title: 'Persist chat tabs',
+            title: 'Remember chat tabs',
             subtitle: const Text(
-              'Secondary chat tabs are remembered when switching channels.',
+              'Secondary chat tabs are kept when switching channels.',
             ),
             value: settingsStore.persistChatTabs,
             onChanged: (newValue) {
@@ -216,9 +269,9 @@ class _ChatSettingsState extends State<ChatSettings> {
               }
             },
           ),
-          const SectionHeader('Landscape mode'),
+          const SectionHeader('Landscape'),
           SettingsListSwitch(
-            title: 'Move chat left',
+            title: 'Chat on left side',
             value: settingsStore.landscapeChatLeftSide,
             onChanged: (newValue) =>
                 settingsStore.landscapeChatLeftSide = newValue,
@@ -226,16 +279,16 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Force vertical chat',
             subtitle: const Text(
-              'Intended for tablets and other larger displays.',
+              'Intended for tablets and larger displays.',
             ),
             value: settingsStore.landscapeForceVerticalChat,
             onChanged: (newValue) =>
                 settingsStore.landscapeForceVerticalChat = newValue,
           ),
           SettingsListSelect(
-            title: 'Fill notch side',
+            title: 'Notch fill',
             subtitle:
-                'Overrides and fills the available space in devices with a display notch.',
+                'Fills the display cutout area on the selected side.',
             selectedOption:
                 landscapeCutoutNames[settingsStore.landscapeCutout.index],
             options: landscapeCutoutNames,
@@ -245,17 +298,17 @@ class _ChatSettingsState extends State<ChatSettings> {
                 )],
           ),
           SettingsListSlider(
-            title: 'Chat overlay opacity',
+            title: 'Overlay chat opacity',
             trailing:
                 '${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%',
             subtitle:
-                'Sets the opacity (transparency) of the overlay chat in fullscreen mode.',
+                'Opacity of the chat overlay in fullscreen mode.',
             value: settingsStore.fullScreenChatOverlayOpacity,
             divisions: 10,
             onChanged: (newValue) =>
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
-          const SectionHeader('Muted keywords'),
+          const SectionHeader('Filtering'),
           SettingsMutedWords(settingsStore: settingsStore),
           SettingsListSwitch(
             title: 'Match whole words',
@@ -263,82 +316,51 @@ class _ChatSettingsState extends State<ChatSettings> {
               'Only matches whole words instead of partial matches.',
             ),
             value: settingsStore.matchWholeWord,
-            onChanged: (newValue) => settingsStore.matchWholeWord = newValue,
-          ),
-          const SectionHeader('Autocomplete'),
-          SettingsListSwitch(
-            title: 'Show autocomplete bar',
-            subtitle: const Text(
-              'Shows a bar containing matching emotes and mentions while typing.',
-            ),
-            value: settingsStore.autocomplete,
-            onChanged: (newValue) => settingsStore.autocomplete = newValue,
+            onChanged: (newValue) =>
+                settingsStore.matchWholeWord = newValue,
           ),
           const SectionHeader('Emotes and badges'),
           SettingsListSwitch(
-            title: 'Show Twitch emotes',
+            title: 'Twitch emotes',
             value: settingsStore.showTwitchEmotes,
-            onChanged: (newValue) => settingsStore.showTwitchEmotes = newValue,
-          ),
-          SettingsListSwitch(
-            title: 'Show Twitch badges',
-            value: settingsStore.showTwitchBadges,
-            onChanged: (newValue) => settingsStore.showTwitchBadges = newValue,
-          ),
-          SettingsListSwitch(
-            title: 'Show 7TV emotes',
-            value: settingsStore.show7TVEmotes,
-            onChanged: (newValue) => settingsStore.show7TVEmotes = newValue,
-          ),
-          SettingsListSwitch(
-            title: 'Show BTTV emotes',
-            value: settingsStore.showBTTVEmotes,
-            onChanged: (newValue) => settingsStore.showBTTVEmotes = newValue,
-          ),
-          SettingsListSwitch(
-            title: 'Show BTTV badges',
-            value: settingsStore.showBTTVBadges,
-            onChanged: (newValue) => settingsStore.showBTTVBadges = newValue,
-          ),
-          SettingsListSwitch(
-            title: 'Show FFZ emotes',
-            value: settingsStore.showFFZEmotes,
-            onChanged: (newValue) => settingsStore.showFFZEmotes = newValue,
-          ),
-          SettingsListSwitch(
-            title: 'Show FFZ badges',
-            value: settingsStore.showFFZBadges,
-            onChanged: (newValue) => settingsStore.showFFZBadges = newValue,
-          ),
-          const SectionHeader('Recent messages'),
-          SettingsListSwitch(
-            title: 'Show historical recent messages',
-            subtitle: Text.rich(
-              TextSpan(
-                text:
-                    'Loads historical recent messages in chat through a third-party API service at ',
-                children: [
-                  TextSpan(
-                    text: 'https://recent-messages.robotty.de/',
-                    style: TextStyle(
-                      color: context.colorScheme.primary,
-                      decoration: TextDecoration.underline,
-                      decorationColor: context.colorScheme.primary,
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () => launchUrl(
-                        Uri.parse('https://recent-messages.robotty.de/'),
-                        mode: settingsStore.launchUrlExternal
-                            ? LaunchMode.externalApplication
-                            : LaunchMode.inAppBrowserView,
-                      ),
-                  ),
-                ],
-              ),
-            ),
-            value: settingsStore.showRecentMessages,
             onChanged: (newValue) =>
-                settingsStore.showRecentMessages = newValue,
+                settingsStore.showTwitchEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Twitch badges',
+            value: settingsStore.showTwitchBadges,
+            onChanged: (newValue) =>
+                settingsStore.showTwitchBadges = newValue,
+          ),
+          SettingsListSwitch(
+            title: '7TV emotes',
+            value: settingsStore.show7TVEmotes,
+            onChanged: (newValue) =>
+                settingsStore.show7TVEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'BTTV emotes',
+            value: settingsStore.showBTTVEmotes,
+            onChanged: (newValue) =>
+                settingsStore.showBTTVEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'BTTV badges',
+            value: settingsStore.showBTTVBadges,
+            onChanged: (newValue) =>
+                settingsStore.showBTTVBadges = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'FFZ emotes',
+            value: settingsStore.showFFZEmotes,
+            onChanged: (newValue) =>
+                settingsStore.showFFZEmotes = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'FFZ badges',
+            value: settingsStore.showFFZBadges,
+            onChanged: (newValue) =>
+                settingsStore.showFFZBadges = newValue,
           ),
         ],
       ),

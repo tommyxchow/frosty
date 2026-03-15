@@ -176,7 +176,9 @@ class IRCMessage {
               size: badgeSize,
               color:
                   Theme.of(context).iconTheme.color?.withValues(alpha: 0.5) ??
-                  Colors.grey.withValues(alpha: 0.5),
+                  Theme.of(context).colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.5,
+                  ),
             ),
           ),
         ),
