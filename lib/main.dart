@@ -17,6 +17,7 @@ import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/apis/twitch_auth_interceptor.dart';
+import 'package:frosty/apis/twitch_gql_api.dart';
 import 'package:frosty/apis/unauthorized_interceptor.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/firebase_options.dart';
@@ -104,6 +105,7 @@ void main() async {
   final bttvApiService = BTTVApi(dioClient);
   final ffzApiService = FFZApi(dioClient);
   final sevenTVApiService = SevenTVApi(dioClient);
+  final twitchGqlApiService = TwitchGqlApi(dioClient);
 
   // Create global assets store (shared cache for global emotes/badges)
   final globalAssetsStore = GlobalAssetsStore(
@@ -137,6 +139,7 @@ void main() async {
         Provider<BTTVApi>.value(value: bttvApiService),
         Provider<FFZApi>.value(value: ffzApiService),
         Provider<SevenTVApi>.value(value: sevenTVApiService),
+        Provider<TwitchGqlApi>.value(value: twitchGqlApiService),
         Provider<GlobalAssetsStore>.value(value: globalAssetsStore),
       ],
       child: MyApp(firstRun: firstRun),

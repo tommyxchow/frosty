@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/stream.dart';
+import 'package:frosty/screens/channel/video/video_player_interface.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
@@ -20,7 +22,7 @@ part 'video_store.g.dart';
 
 class VideoStore = VideoStoreBase with _$VideoStore;
 
-abstract class VideoStoreBase with Store {
+abstract class VideoStoreBase with Store implements VideoPlayerInterface {
   final TwitchApi twitchApi;
 
   /// The userlogin of the current channel.
@@ -31,12 +33,16 @@ abstract class VideoStoreBase with Store {
 
   final AuthStore authStore;
 
+  @override
   final SettingsStore settingsStore;
 
   /// The [SimplePip] instance used for initiating PiP on Android.
   final pip = SimplePip();
 
+  static const _highLatencyThresholdSeconds = 30;
+
   var _firstTimeSettingQuality = true;
+  var _highLatencyCount = 0;
 
   /// Whether [initVideo] should run on the next [onPageFinished].
   ///
@@ -58,14 +64,49 @@ abstract class VideoStoreBase with Store {
             final receivedLatency = message.message;
             _latency = receivedLatency;
 
-            if (!settingsStore.autoSyncChatDelay) return;
-
             // Parse latency from abbreviated format: "5s" -> 5.0
             final numericPart = receivedLatency.replaceAll(
               RegExp(r'[^0-9.]'),
               '',
             );
             final latencyAsDouble = double.tryParse(numericPart);
+
+            // Auto-recover when latency climbs too high.
+            // Intentionally skips the chat delay sync — the stale value
+            // would desync chat further. Recovery will restore it.
+            if (latencyAsDouble != null &&
+                latencyAsDouble >= _highLatencyThresholdSeconds &&
+                !_paused &&
+                !_loading) {
+              _highLatencyCount++;
+              if (_highLatencyCount == 1) {
+                debugPrint(
+                  'VideoStore: high latency (${latencyAsDouble.round()}s), seeking to live edge',
+                );
+                try {
+                  videoWebViewController.runJavaScript('''
+                    (function() {
+                      const v = window._videoEl || document.querySelector("video");
+                      if (v && v.buffered.length > 0) {
+                        v.currentTime = v.buffered.end(v.buffered.length - 1);
+                      }
+                    })();
+                  ''');
+                } catch (e) {
+                  debugPrint(e.toString());
+                }
+              } else {
+                debugPrint(
+                  'VideoStore: latency still high (${latencyAsDouble.round()}s), refreshing',
+                );
+                _highLatencyCount = 0;
+                handleRefresh();
+              }
+              return;
+            }
+            _highLatencyCount = 0;
+
+            if (!settingsStore.autoSyncChatDelay) return;
 
             if (latencyAsDouble != null) {
               settingsStore.syncedChatDelay = latencyAsDouble;
@@ -86,7 +127,7 @@ abstract class VideoStoreBase with Store {
                 return;
               }
               final prefs = await SharedPreferences.getInstance();
-              final lastStreamQuality = prefs.getString('last_stream_quality');
+              final lastStreamQuality = prefs.getString(kLastStreamQualityKey);
               if (lastStreamQuality == null) return;
               setStreamQuality(lastStreamQuality);
             }
@@ -102,6 +143,7 @@ abstract class VideoStoreBase with Store {
         ..addJavaScriptChannel(
           'VideoPlaying',
           onMessageReceived: (message) {
+            _loading = false;
             _paused = false;
             if (Platform.isAndroid) pip.setIsPlaying(true);
           },
@@ -169,6 +211,9 @@ abstract class VideoStoreBase with Store {
   /// Disposes the latency settings reaction.
   ReactionDisposer? _disposeLatencySettingsReaction;
 
+  @readonly
+  var _loading = true;
+
   /// If the video is currently paused.
   ///
   /// Does not pause or play the video, only used for rendering state of the overlay.
@@ -195,6 +240,7 @@ abstract class VideoStoreBase with Store {
   int _streamQualityIndex = 0;
 
   // The current stream quality string
+  @override
   String get streamQuality =>
       _availableStreamQualities.elementAtOrNull(_streamQualityIndex) ?? 'Auto';
 
@@ -343,6 +389,7 @@ abstract class VideoStoreBase with Store {
     );
   }
 
+  @override
   @action
   Future<void> updateStreamQualities() async {
     try {
@@ -382,6 +429,7 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  @override
   @action
   Future<void> setStreamQuality(String newStreamQuality) async {
     final indexOfStreamQuality = _availableStreamQualities.indexOf(
@@ -842,6 +890,7 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Called whenever the video/overlay is tapped.
+  @override
   @action
   void handleVideoTap() {
     if (_isInPipMode) {
@@ -918,6 +967,7 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Handles app resume event for immediate stream info refresh in chat-only mode.
+  @override
   @action
   void handleAppResume() {
     // Only refresh immediately in chat-only mode
@@ -930,6 +980,7 @@ abstract class VideoStoreBase with Store {
   ///
   /// If the stream is offline, fetches channel information to show offline details.
   /// Set [forceUpdate] to true to bypass the rate limiting check.
+  @override
   @action
   Future<void> updateStreamInfo({bool forceUpdate = false}) async {
     if (_streamInfoRequest != null) {
@@ -967,6 +1018,7 @@ abstract class VideoStoreBase with Store {
       _offlineChannelInfo = null;
     } catch (e) {
       _overlayTimer?.cancel();
+      _loading = false;
       _streamInfo = null;
       _paused = true;
 
@@ -987,6 +1039,7 @@ abstract class VideoStoreBase with Store {
   /// Handles the toggle overlay options.
   ///
   /// The toggle overlay option allows switching between the custom and Twitch's overlay by long-pressing the overlay.
+  @override
   @action
   void handleToggleOverlay() {
     if (settingsStore.toggleableOverlay) {
@@ -1004,14 +1057,20 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Refreshes the stream webview and updates the stream info.
+  @override
   @action
   Future<void> handleRefresh() async {
     HapticFeedback.lightImpact();
+    _loading = true;
     _paused = true;
     _firstTimeSettingQuality = true;
+    _highLatencyCount = 0;
     _isInPipMode = false;
     _latency = null;
     _availableStreamQualities = [];
+
+    _overlayTimer?.cancel();
+    _scheduleOverlayHide();
 
     // Signal that initVideo() should run on the next onPageFinished
     _needsInit = true;
@@ -1028,6 +1087,7 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Play or pause the video depending on the current state of [_paused].
+  @override
   void handlePausePlay() {
     try {
       if (_paused) {
@@ -1048,6 +1108,7 @@ abstract class VideoStoreBase with Store {
   ///
   /// On Android, this will utilize the native Android PiP API.
   /// On iOS, this will utilize the web picture-in-picture API.
+  @override
   void requestPictureInPicture() {
     try {
       if (Platform.isAndroid) {
@@ -1067,6 +1128,7 @@ abstract class VideoStoreBase with Store {
   /// If not in PiP mode, enters PiP mode.
   /// If already in PiP mode on iOS, exits PiP mode.
   /// On Android, always enters PiP mode (no programmatic exit or state tracking).
+  @override
   @action
   void togglePictureInPicture() {
     try {
@@ -1088,6 +1150,7 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  @override
   @action
   void dispose() {
     // Disable auto PiP when leaving so that we don't enter PiP on other screens.

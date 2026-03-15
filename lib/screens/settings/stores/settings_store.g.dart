@@ -23,7 +23,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..showVideo = json['showVideo'] as bool? ?? true
   ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
   ..useTextureRendering = json['useTextureRendering'] as bool? ?? true
-  ..keepScreenAwake = json['keepScreenAwake'] as bool? ?? true
+  ..useNativePlayer = json['useNativePlayer'] as bool? ?? false
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
   ..showLatency = json['showLatency'] as bool? ?? false
@@ -41,12 +41,23 @@ SettingsStore _$SettingsStoreFromJson(
         unknownValue: TimestampType.disabled,
       ) ??
       TimestampType.disabled
-  ..autoSyncChatDelay = json['autoSyncChatDelay'] as bool? ?? false
-  ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
   ..highlightFirstTimeChatter =
       json['highlightFirstTimeChatter'] as bool? ?? true
   ..showUserNotices = json['showUserNotices'] as bool? ?? true
+  ..showTwitchEmotes = json['showTwitchEmotes'] as bool? ?? true
+  ..showTwitchBadges = json['showTwitchBadges'] as bool? ?? true
+  ..show7TVEmotes = json['show7TVEmotes'] as bool? ?? true
+  ..showBTTVEmotes = json['showBTTVEmotes'] as bool? ?? true
+  ..showBTTVBadges = json['showBTTVBadges'] as bool? ?? true
+  ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
+  ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
   ..emoteMenuButtonOnLeft = json['emoteMenuButtonOnLeft'] as bool? ?? false
+  ..persistChatTabs = json['persistChatTabs'] as bool? ?? true
+  ..secondaryTabs =
+      (json['secondaryTabs'] as List<dynamic>?)
+          ?.map((e) => PersistedChatTab.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      []
   ..landscapeChatLeftSide = json['landscapeChatLeftSide'] as bool? ?? false
   ..landscapeForceVerticalChat =
       json['landscapeForceVerticalChat'] as bool? ?? false
@@ -59,21 +70,11 @@ SettingsStore _$SettingsStoreFromJson(
   ..chatWidth = (json['chatWidth'] as num?)?.toDouble() ?? 0.2
   ..fullScreenChatOverlayOpacity =
       (json['fullScreenChatOverlayOpacity'] as num?)?.toDouble() ?? 0.5
+  ..keepScreenAwake = json['keepScreenAwake'] as bool? ?? true
   ..autocomplete = json['autocomplete'] as bool? ?? true
-  ..showTwitchEmotes = json['showTwitchEmotes'] as bool? ?? true
-  ..showTwitchBadges = json['showTwitchBadges'] as bool? ?? true
-  ..show7TVEmotes = json['show7TVEmotes'] as bool? ?? true
-  ..showBTTVEmotes = json['showBTTVEmotes'] as bool? ?? true
-  ..showBTTVBadges = json['showBTTVBadges'] as bool? ?? true
-  ..showFFZEmotes = json['showFFZEmotes'] as bool? ?? true
-  ..showFFZBadges = json['showFFZBadges'] as bool? ?? true
   ..showRecentMessages = json['showRecentMessages'] as bool? ?? false
-  ..persistChatTabs = json['persistChatTabs'] as bool? ?? true
-  ..secondaryTabs =
-      (json['secondaryTabs'] as List<dynamic>?)
-          ?.map((e) => PersistedChatTab.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      []
+  ..autoSyncChatDelay = json['autoSyncChatDelay'] as bool? ?? false
+  ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
   ..mutedWords =
       (json['mutedWords'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -101,7 +102,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showVideo': instance.showVideo,
   'defaultToHighestQuality': instance.defaultToHighestQuality,
   'useTextureRendering': instance.useTextureRendering,
-  'keepScreenAwake': instance.keepScreenAwake,
+  'useNativePlayer': instance.useNativePlayer,
   'showOverlay': instance.showOverlay,
   'toggleableOverlay': instance.toggleableOverlay,
   'showLatency': instance.showLatency,
@@ -113,17 +114,8 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showDeletedMessages': instance.showDeletedMessages,
   'showChatMessageDividers': instance.showChatMessageDividers,
   'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
-  'autoSyncChatDelay': instance.autoSyncChatDelay,
-  'chatDelay': instance.chatDelay,
   'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
   'showUserNotices': instance.showUserNotices,
-  'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
-  'landscapeChatLeftSide': instance.landscapeChatLeftSide,
-  'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
-  'landscapeCutout': _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
-  'chatWidth': instance.chatWidth,
-  'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
-  'autocomplete': instance.autocomplete,
   'showTwitchEmotes': instance.showTwitchEmotes,
   'showTwitchBadges': instance.showTwitchBadges,
   'show7TVEmotes': instance.show7TVEmotes,
@@ -131,9 +123,19 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showBTTVBadges': instance.showBTTVBadges,
   'showFFZEmotes': instance.showFFZEmotes,
   'showFFZBadges': instance.showFFZBadges,
-  'showRecentMessages': instance.showRecentMessages,
+  'emoteMenuButtonOnLeft': instance.emoteMenuButtonOnLeft,
   'persistChatTabs': instance.persistChatTabs,
   'secondaryTabs': instance.secondaryTabs,
+  'landscapeChatLeftSide': instance.landscapeChatLeftSide,
+  'landscapeForceVerticalChat': instance.landscapeForceVerticalChat,
+  'landscapeCutout': _$LandscapeCutoutTypeEnumMap[instance.landscapeCutout]!,
+  'chatWidth': instance.chatWidth,
+  'fullScreenChatOverlayOpacity': instance.fullScreenChatOverlayOpacity,
+  'keepScreenAwake': instance.keepScreenAwake,
+  'autocomplete': instance.autocomplete,
+  'showRecentMessages': instance.showRecentMessages,
+  'autoSyncChatDelay': instance.autoSyncChatDelay,
+  'chatDelay': instance.chatDelay,
   'mutedWords': instance.mutedWords,
   'matchWholeWord': instance.matchWholeWord,
   'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
@@ -325,21 +327,21 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$keepScreenAwakeAtom = Atom(
-    name: '_SettingsStoreBase.keepScreenAwake',
+  late final _$useNativePlayerAtom = Atom(
+    name: '_SettingsStoreBase.useNativePlayer',
     context: context,
   );
 
   @override
-  bool get keepScreenAwake {
-    _$keepScreenAwakeAtom.reportRead();
-    return super.keepScreenAwake;
+  bool get useNativePlayer {
+    _$useNativePlayerAtom.reportRead();
+    return super.useNativePlayer;
   }
 
   @override
-  set keepScreenAwake(bool value) {
-    _$keepScreenAwakeAtom.reportWrite(value, super.keepScreenAwake, () {
-      super.keepScreenAwake = value;
+  set useNativePlayer(bool value) {
+    _$useNativePlayerAtom.reportWrite(value, super.useNativePlayer, () {
+      super.useNativePlayer = value;
     });
   }
 
@@ -545,60 +547,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$autoSyncChatDelayAtom = Atom(
-    name: '_SettingsStoreBase.autoSyncChatDelay',
-    context: context,
-  );
-
-  @override
-  bool get autoSyncChatDelay {
-    _$autoSyncChatDelayAtom.reportRead();
-    return super.autoSyncChatDelay;
-  }
-
-  @override
-  set autoSyncChatDelay(bool value) {
-    _$autoSyncChatDelayAtom.reportWrite(value, super.autoSyncChatDelay, () {
-      super.autoSyncChatDelay = value;
-    });
-  }
-
-  late final _$chatDelayAtom = Atom(
-    name: '_SettingsStoreBase.chatDelay',
-    context: context,
-  );
-
-  @override
-  double get chatDelay {
-    _$chatDelayAtom.reportRead();
-    return super.chatDelay;
-  }
-
-  @override
-  set chatDelay(double value) {
-    _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
-      super.chatDelay = value;
-    });
-  }
-
-  late final _$syncedChatDelayAtom = Atom(
-    name: '_SettingsStoreBase.syncedChatDelay',
-    context: context,
-  );
-
-  @override
-  double get syncedChatDelay {
-    _$syncedChatDelayAtom.reportRead();
-    return super.syncedChatDelay;
-  }
-
-  @override
-  set syncedChatDelay(double value) {
-    _$syncedChatDelayAtom.reportWrite(value, super.syncedChatDelay, () {
-      super.syncedChatDelay = value;
-    });
-  }
-
   late final _$highlightFirstTimeChatterAtom = Atom(
     name: '_SettingsStoreBase.highlightFirstTimeChatter',
     context: context,
@@ -636,148 +584,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set showUserNotices(bool value) {
     _$showUserNoticesAtom.reportWrite(value, super.showUserNotices, () {
       super.showUserNotices = value;
-    });
-  }
-
-  late final _$emoteMenuButtonOnLeftAtom = Atom(
-    name: '_SettingsStoreBase.emoteMenuButtonOnLeft',
-    context: context,
-  );
-
-  @override
-  bool get emoteMenuButtonOnLeft {
-    _$emoteMenuButtonOnLeftAtom.reportRead();
-    return super.emoteMenuButtonOnLeft;
-  }
-
-  @override
-  set emoteMenuButtonOnLeft(bool value) {
-    _$emoteMenuButtonOnLeftAtom.reportWrite(
-      value,
-      super.emoteMenuButtonOnLeft,
-      () {
-        super.emoteMenuButtonOnLeft = value;
-      },
-    );
-  }
-
-  late final _$landscapeChatLeftSideAtom = Atom(
-    name: '_SettingsStoreBase.landscapeChatLeftSide',
-    context: context,
-  );
-
-  @override
-  bool get landscapeChatLeftSide {
-    _$landscapeChatLeftSideAtom.reportRead();
-    return super.landscapeChatLeftSide;
-  }
-
-  @override
-  set landscapeChatLeftSide(bool value) {
-    _$landscapeChatLeftSideAtom.reportWrite(
-      value,
-      super.landscapeChatLeftSide,
-      () {
-        super.landscapeChatLeftSide = value;
-      },
-    );
-  }
-
-  late final _$landscapeForceVerticalChatAtom = Atom(
-    name: '_SettingsStoreBase.landscapeForceVerticalChat',
-    context: context,
-  );
-
-  @override
-  bool get landscapeForceVerticalChat {
-    _$landscapeForceVerticalChatAtom.reportRead();
-    return super.landscapeForceVerticalChat;
-  }
-
-  @override
-  set landscapeForceVerticalChat(bool value) {
-    _$landscapeForceVerticalChatAtom.reportWrite(
-      value,
-      super.landscapeForceVerticalChat,
-      () {
-        super.landscapeForceVerticalChat = value;
-      },
-    );
-  }
-
-  late final _$landscapeCutoutAtom = Atom(
-    name: '_SettingsStoreBase.landscapeCutout',
-    context: context,
-  );
-
-  @override
-  LandscapeCutoutType get landscapeCutout {
-    _$landscapeCutoutAtom.reportRead();
-    return super.landscapeCutout;
-  }
-
-  @override
-  set landscapeCutout(LandscapeCutoutType value) {
-    _$landscapeCutoutAtom.reportWrite(value, super.landscapeCutout, () {
-      super.landscapeCutout = value;
-    });
-  }
-
-  late final _$chatWidthAtom = Atom(
-    name: '_SettingsStoreBase.chatWidth',
-    context: context,
-  );
-
-  @override
-  double get chatWidth {
-    _$chatWidthAtom.reportRead();
-    return super.chatWidth;
-  }
-
-  @override
-  set chatWidth(double value) {
-    _$chatWidthAtom.reportWrite(value, super.chatWidth, () {
-      super.chatWidth = value;
-    });
-  }
-
-  late final _$fullScreenChatOverlayOpacityAtom = Atom(
-    name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
-    context: context,
-  );
-
-  @override
-  double get fullScreenChatOverlayOpacity {
-    _$fullScreenChatOverlayOpacityAtom.reportRead();
-    return super.fullScreenChatOverlayOpacity;
-  }
-
-  @override
-  set fullScreenChatOverlayOpacity(double value) {
-    _$fullScreenChatOverlayOpacityAtom.reportWrite(
-      value,
-      super.fullScreenChatOverlayOpacity,
-      () {
-        super.fullScreenChatOverlayOpacity = value;
-      },
-    );
-  }
-
-  late final _$autocompleteAtom = Atom(
-    name: '_SettingsStoreBase.autocomplete',
-    context: context,
-  );
-
-  @override
-  bool get autocomplete {
-    _$autocompleteAtom.reportRead();
-    return super.autocomplete;
-  }
-
-  @override
-  set autocomplete(bool value) {
-    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
-      super.autocomplete = value;
     });
   }
 
@@ -907,22 +713,26 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$showRecentMessagesAtom = Atom(
-    name: '_SettingsStoreBase.showRecentMessages',
+  late final _$emoteMenuButtonOnLeftAtom = Atom(
+    name: '_SettingsStoreBase.emoteMenuButtonOnLeft',
     context: context,
   );
 
   @override
-  bool get showRecentMessages {
-    _$showRecentMessagesAtom.reportRead();
-    return super.showRecentMessages;
+  bool get emoteMenuButtonOnLeft {
+    _$emoteMenuButtonOnLeftAtom.reportRead();
+    return super.emoteMenuButtonOnLeft;
   }
 
   @override
-  set showRecentMessages(bool value) {
-    _$showRecentMessagesAtom.reportWrite(value, super.showRecentMessages, () {
-      super.showRecentMessages = value;
-    });
+  set emoteMenuButtonOnLeft(bool value) {
+    _$emoteMenuButtonOnLeftAtom.reportWrite(
+      value,
+      super.emoteMenuButtonOnLeft,
+      () {
+        super.emoteMenuButtonOnLeft = value;
+      },
+    );
   }
 
   late final _$persistChatTabsAtom = Atom(
@@ -958,6 +768,216 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set secondaryTabs(List<PersistedChatTab> value) {
     _$secondaryTabsAtom.reportWrite(value, super.secondaryTabs, () {
       super.secondaryTabs = value;
+    });
+  }
+
+  late final _$landscapeChatLeftSideAtom = Atom(
+    name: '_SettingsStoreBase.landscapeChatLeftSide',
+    context: context,
+  );
+
+  @override
+  bool get landscapeChatLeftSide {
+    _$landscapeChatLeftSideAtom.reportRead();
+    return super.landscapeChatLeftSide;
+  }
+
+  @override
+  set landscapeChatLeftSide(bool value) {
+    _$landscapeChatLeftSideAtom.reportWrite(
+      value,
+      super.landscapeChatLeftSide,
+      () {
+        super.landscapeChatLeftSide = value;
+      },
+    );
+  }
+
+  late final _$landscapeForceVerticalChatAtom = Atom(
+    name: '_SettingsStoreBase.landscapeForceVerticalChat',
+    context: context,
+  );
+
+  @override
+  bool get landscapeForceVerticalChat {
+    _$landscapeForceVerticalChatAtom.reportRead();
+    return super.landscapeForceVerticalChat;
+  }
+
+  @override
+  set landscapeForceVerticalChat(bool value) {
+    _$landscapeForceVerticalChatAtom.reportWrite(
+      value,
+      super.landscapeForceVerticalChat,
+      () {
+        super.landscapeForceVerticalChat = value;
+      },
+    );
+  }
+
+  late final _$landscapeCutoutAtom = Atom(
+    name: '_SettingsStoreBase.landscapeCutout',
+    context: context,
+  );
+
+  @override
+  LandscapeCutoutType get landscapeCutout {
+    _$landscapeCutoutAtom.reportRead();
+    return super.landscapeCutout;
+  }
+
+  @override
+  set landscapeCutout(LandscapeCutoutType value) {
+    _$landscapeCutoutAtom.reportWrite(value, super.landscapeCutout, () {
+      super.landscapeCutout = value;
+    });
+  }
+
+  late final _$chatWidthAtom = Atom(
+    name: '_SettingsStoreBase.chatWidth',
+    context: context,
+  );
+
+  @override
+  double get chatWidth {
+    _$chatWidthAtom.reportRead();
+    return super.chatWidth;
+  }
+
+  @override
+  set chatWidth(double value) {
+    _$chatWidthAtom.reportWrite(value, super.chatWidth, () {
+      super.chatWidth = value;
+    });
+  }
+
+  late final _$fullScreenChatOverlayOpacityAtom = Atom(
+    name: '_SettingsStoreBase.fullScreenChatOverlayOpacity',
+    context: context,
+  );
+
+  @override
+  double get fullScreenChatOverlayOpacity {
+    _$fullScreenChatOverlayOpacityAtom.reportRead();
+    return super.fullScreenChatOverlayOpacity;
+  }
+
+  @override
+  set fullScreenChatOverlayOpacity(double value) {
+    _$fullScreenChatOverlayOpacityAtom.reportWrite(
+      value,
+      super.fullScreenChatOverlayOpacity,
+      () {
+        super.fullScreenChatOverlayOpacity = value;
+      },
+    );
+  }
+
+  late final _$keepScreenAwakeAtom = Atom(
+    name: '_SettingsStoreBase.keepScreenAwake',
+    context: context,
+  );
+
+  @override
+  bool get keepScreenAwake {
+    _$keepScreenAwakeAtom.reportRead();
+    return super.keepScreenAwake;
+  }
+
+  @override
+  set keepScreenAwake(bool value) {
+    _$keepScreenAwakeAtom.reportWrite(value, super.keepScreenAwake, () {
+      super.keepScreenAwake = value;
+    });
+  }
+
+  late final _$autocompleteAtom = Atom(
+    name: '_SettingsStoreBase.autocomplete',
+    context: context,
+  );
+
+  @override
+  bool get autocomplete {
+    _$autocompleteAtom.reportRead();
+    return super.autocomplete;
+  }
+
+  @override
+  set autocomplete(bool value) {
+    _$autocompleteAtom.reportWrite(value, super.autocomplete, () {
+      super.autocomplete = value;
+    });
+  }
+
+  late final _$showRecentMessagesAtom = Atom(
+    name: '_SettingsStoreBase.showRecentMessages',
+    context: context,
+  );
+
+  @override
+  bool get showRecentMessages {
+    _$showRecentMessagesAtom.reportRead();
+    return super.showRecentMessages;
+  }
+
+  @override
+  set showRecentMessages(bool value) {
+    _$showRecentMessagesAtom.reportWrite(value, super.showRecentMessages, () {
+      super.showRecentMessages = value;
+    });
+  }
+
+  late final _$autoSyncChatDelayAtom = Atom(
+    name: '_SettingsStoreBase.autoSyncChatDelay',
+    context: context,
+  );
+
+  @override
+  bool get autoSyncChatDelay {
+    _$autoSyncChatDelayAtom.reportRead();
+    return super.autoSyncChatDelay;
+  }
+
+  @override
+  set autoSyncChatDelay(bool value) {
+    _$autoSyncChatDelayAtom.reportWrite(value, super.autoSyncChatDelay, () {
+      super.autoSyncChatDelay = value;
+    });
+  }
+
+  late final _$chatDelayAtom = Atom(
+    name: '_SettingsStoreBase.chatDelay',
+    context: context,
+  );
+
+  @override
+  double get chatDelay {
+    _$chatDelayAtom.reportRead();
+    return super.chatDelay;
+  }
+
+  @override
+  set chatDelay(double value) {
+    _$chatDelayAtom.reportWrite(value, super.chatDelay, () {
+      super.chatDelay = value;
+    });
+  }
+
+  late final _$syncedChatDelayAtom = Atom(
+    name: '_SettingsStoreBase.syncedChatDelay',
+    context: context,
+  );
+
+  @override
+  double get syncedChatDelay {
+    _$syncedChatDelayAtom.reportRead();
+    return super.syncedChatDelay;
+  }
+
+  @override
+  set syncedChatDelay(double value) {
+    _$syncedChatDelayAtom.reportWrite(value, super.syncedChatDelay, () {
+      super.syncedChatDelay = value;
     });
   }
 
@@ -1165,7 +1185,7 @@ launchUrlExternal: ${launchUrlExternal},
 showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
 useTextureRendering: ${useTextureRendering},
-keepScreenAwake: ${keepScreenAwake},
+useNativePlayer: ${useNativePlayer},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 showLatency: ${showLatency},
@@ -1177,18 +1197,8 @@ fontSize: ${fontSize},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
-autoSyncChatDelay: ${autoSyncChatDelay},
-chatDelay: ${chatDelay},
-syncedChatDelay: ${syncedChatDelay},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
-emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
-landscapeChatLeftSide: ${landscapeChatLeftSide},
-landscapeForceVerticalChat: ${landscapeForceVerticalChat},
-landscapeCutout: ${landscapeCutout},
-chatWidth: ${chatWidth},
-fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
-autocomplete: ${autocomplete},
 showTwitchEmotes: ${showTwitchEmotes},
 showTwitchBadges: ${showTwitchBadges},
 show7TVEmotes: ${show7TVEmotes},
@@ -1196,9 +1206,20 @@ showBTTVEmotes: ${showBTTVEmotes},
 showBTTVBadges: ${showBTTVBadges},
 showFFZEmotes: ${showFFZEmotes},
 showFFZBadges: ${showFFZBadges},
-showRecentMessages: ${showRecentMessages},
+emoteMenuButtonOnLeft: ${emoteMenuButtonOnLeft},
 persistChatTabs: ${persistChatTabs},
 secondaryTabs: ${secondaryTabs},
+landscapeChatLeftSide: ${landscapeChatLeftSide},
+landscapeForceVerticalChat: ${landscapeForceVerticalChat},
+landscapeCutout: ${landscapeCutout},
+chatWidth: ${chatWidth},
+fullScreenChatOverlayOpacity: ${fullScreenChatOverlayOpacity},
+keepScreenAwake: ${keepScreenAwake},
+autocomplete: ${autocomplete},
+showRecentMessages: ${showRecentMessages},
+autoSyncChatDelay: ${autoSyncChatDelay},
+chatDelay: ${chatDelay},
+syncedChatDelay: ${syncedChatDelay},
 mutedWords: ${mutedWords},
 matchWholeWord: ${matchWholeWord},
 shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},

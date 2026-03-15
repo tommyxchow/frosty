@@ -9,6 +9,7 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
+import 'package:frosty/services/cookie_extractor.dart';
 import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -26,6 +27,9 @@ abstract class AuthBase with Store {
 
   /// The shared_preferences key for the user token.
   static const _userTokenKey = 'user_token';
+
+  /// The secure storage key for the GQL web cookie token.
+  static const _gqlTokenKey = 'gql_token';
 
   /// The Twitch API service for making requests.
   final TwitchApi twitchApi;
@@ -48,6 +52,10 @@ abstract class AuthBase with Store {
   /// The user token used to authenticate with the Twitch API.
   @readonly
   String? _token;
+
+  /// Web cookie token extracted from the login WebView for GQL ad-free playback.
+  @readonly
+  String? _gqlToken;
 
   /// Whether the user is logged in or not.
   @readonly
@@ -83,6 +91,7 @@ abstract class AuthBase with Store {
     // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
     // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
     if (request.url == 'https://www.twitch.tv/?no-reload=true') {
+      _extractGqlToken();
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
         navigatorKey.currentState?.push(
@@ -211,12 +220,27 @@ abstract class AuthBase with Store {
 
   AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
 
+  Future<void> _extractGqlToken() async {
+    try {
+      final token = await CookieExtractor.extractTwitchAuthToken();
+      if (token != null) {
+        runInAction(() {
+          _gqlToken = token;
+        });
+        await _storage.write(key: _gqlTokenKey, value: token);
+      }
+    } catch (e) {
+      debugPrint('GQL token extraction failed: $e');
+    }
+  }
+
   /// Initialize by retrieving a token if it does not already exist.
   @action
   Future<void> init() async {
     try {
       // Read and set the currently stored user token, if any.
       _token = await _storage.read(key: _userTokenKey);
+      _gqlToken = await _storage.read(key: _gqlTokenKey);
 
       // If the token does not exist, get the default token.
       // Otherwise, log in.
@@ -293,9 +317,11 @@ abstract class AuthBase with Store {
   Future<void> logout() async {
     try {
       _stopReconnectLoop();
-      // Delete the existing user token.
+      // Delete the existing user token and GQL token.
       await _storage.delete(key: _userTokenKey);
+      await _storage.delete(key: _gqlTokenKey);
       _token = null;
+      _gqlToken = null;
 
       // Clear the user info.
       user.dispose();

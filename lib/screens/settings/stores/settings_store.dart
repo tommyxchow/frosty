@@ -65,9 +65,8 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowVideo = true;
   static const defaultDefaultToHighestQuality = false;
   static const defaultUseTextureRendering = true;
-  static const defaultKeepScreenAwake = true;
+  static const defaultUseNativePlayer = false;
 
-  // Overlay defaults
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
   static const defaultShowLatency = false;
@@ -85,9 +84,9 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var useTextureRendering = defaultUseTextureRendering;
 
-  @JsonKey(defaultValue: defaultKeepScreenAwake)
+  @JsonKey(defaultValue: defaultUseNativePlayer)
   @observable
-  var keepScreenAwake = defaultKeepScreenAwake;
+  var useNativePlayer = defaultUseNativePlayer;
 
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
@@ -107,7 +106,7 @@ abstract class _SettingsStoreBase with Store {
     showVideo = defaultShowVideo;
     defaultToHighestQuality = defaultDefaultToHighestQuality;
     useTextureRendering = defaultUseTextureRendering;
-    keepScreenAwake = defaultKeepScreenAwake;
+    useNativePlayer = defaultUseNativePlayer;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
@@ -115,44 +114,25 @@ abstract class _SettingsStoreBase with Store {
   }
 
   // * Chat Settings
-  // Message sizing defaults
+
+  // -- Messages --
+  // Sizing defaults
   static const defaultBadgeScale = 1.0;
   static const defaultEmoteScale = 1.0;
   static const defaultMessageScale = 1.0;
   static const defaultMessageSpacing = 8.0;
   static const defaultFontSize = 12.0;
 
-  // Message appearance defaults
+  // Appearance defaults
   static const defaultShowDeletedMessages = false;
   static const defaultShowChatMessageDividers = false;
   static const defaultTimestampType = TimestampType.disabled;
-
-  // Delay defaults
-  static const defaultAutoSyncChatDelay = false;
-  static const defaultChatDelay = 0.0;
 
   // Alert defaults
   static const defaultHighlightFirstTimeChatter = true;
   static const defaultShowUserNotices = true;
 
-  // Layout defaults
-  static const defaultEmoteMenuButtonOnLeft = false;
-
-  // Landscape mode defaults
-  static const defaultLandscapeChatLeftSide = false;
-  static const defaultLandscapeForceVerticalChat = false;
-  static const defaultLandscapeCutout = LandscapeCutoutType.none;
-  static const defaultChatWidth = 0.2;
-  static const defaultFullScreenChatOverlayOpacity = 0.5;
-
-  // mute words defaults
-  static const defaultMutedWords = <String>[];
-  static const defaultMatchWholeWord = true;
-
-  // Autocomplete defaults
-  static const defaultAutocomplete = true;
-
-  // Emotes and badges defaults
+  // -- Emotes & Badges --
   static const defaultShowTwitchEmotes = true;
   static const defaultShowTwitchBadges = true;
   static const defaultShow7TVEmotes = true;
@@ -161,14 +141,26 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowFFZEmotes = true;
   static const defaultShowFFZBadges = true;
 
-  // Recent messages defaults
-  static const defaultShowRecentMessages = false;
-
-  // Chat tabs defaults
+  // -- Layout --
+  static const defaultEmoteMenuButtonOnLeft = false;
   static const defaultPersistChatTabs = true;
   static const defaultSecondaryTabs = <PersistedChatTab>[];
+  static const defaultLandscapeChatLeftSide = false;
+  static const defaultLandscapeForceVerticalChat = false;
+  static const defaultLandscapeCutout = LandscapeCutoutType.none;
+  static const defaultChatWidth = 0.2;
+  static const defaultFullScreenChatOverlayOpacity = 0.5;
 
-  // Message sizing options
+  // -- Behavior --
+  static const defaultKeepScreenAwake = true;
+  static const defaultAutocomplete = true;
+  static const defaultShowRecentMessages = false;
+  static const defaultAutoSyncChatDelay = false;
+  static const defaultChatDelay = 0.0;
+  static const defaultMutedWords = <String>[];
+  static const defaultMatchWholeWord = true;
+
+  // Messages options
   @JsonKey(defaultValue: defaultBadgeScale)
   @observable
   var badgeScale = defaultBadgeScale;
@@ -189,7 +181,6 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var fontSize = defaultFontSize;
 
-  // Message appearance options
   @JsonKey(defaultValue: defaultShowDeletedMessages)
   @observable
   var showDeletedMessages = defaultShowDeletedMessages;
@@ -205,24 +196,6 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var timestampType = defaultTimestampType;
 
-  // Delay options
-  @JsonKey(defaultValue: defaultAutoSyncChatDelay)
-  @observable
-  var autoSyncChatDelay = defaultAutoSyncChatDelay;
-
-  @JsonKey(defaultValue: defaultChatDelay)
-  @observable
-  var chatDelay = defaultChatDelay;
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @observable
-  var syncedChatDelay = defaultChatDelay;
-
-  @computed
-  double get effectiveChatDelay =>
-      autoSyncChatDelay ? syncedChatDelay : chatDelay;
-
-  // Alert options
   @JsonKey(defaultValue: defaultHighlightFirstTimeChatter)
   @observable
   var highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
@@ -231,38 +204,7 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showUserNotices = defaultShowUserNotices;
 
-  // Layout options
-  @JsonKey(defaultValue: defaultEmoteMenuButtonOnLeft)
-  @observable
-  var emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
-
-  // Landscape mode options
-  @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
-  @observable
-  var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
-
-  @JsonKey(defaultValue: defaultLandscapeForceVerticalChat)
-  @observable
-  var landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;
-
-  @JsonKey(defaultValue: defaultLandscapeCutout)
-  @observable
-  var landscapeCutout = defaultLandscapeCutout;
-
-  @JsonKey(defaultValue: defaultChatWidth)
-  @observable
-  var chatWidth = defaultChatWidth;
-
-  @JsonKey(defaultValue: defaultFullScreenChatOverlayOpacity)
-  @observable
-  var fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
-
-  // Autocomplete options
-  @JsonKey(defaultValue: defaultAutocomplete)
-  @observable
-  var autocomplete = defaultAutocomplete;
-
-  // Emotes and badges
+  // Emotes & Badges options
   @JsonKey(defaultValue: defaultShowTwitchEmotes)
   @observable
   var showTwitchEmotes = defaultShowTwitchEmotes;
@@ -291,12 +233,11 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var showFFZBadges = defaultShowFFZBadges;
 
-  // Recent messages
-  @JsonKey(defaultValue: defaultShowRecentMessages)
+  // Layout options
+  @JsonKey(defaultValue: defaultEmoteMenuButtonOnLeft)
   @observable
-  var showRecentMessages = defaultShowRecentMessages;
+  var emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
 
-  // Chat tabs
   @JsonKey(defaultValue: defaultPersistChatTabs)
   @observable
   var persistChatTabs = defaultPersistChatTabs;
@@ -304,6 +245,55 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultSecondaryTabs)
   @observable
   var secondaryTabs = defaultSecondaryTabs;
+
+  @JsonKey(defaultValue: defaultLandscapeChatLeftSide)
+  @observable
+  var landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+
+  @JsonKey(defaultValue: defaultLandscapeForceVerticalChat)
+  @observable
+  var landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;
+
+  @JsonKey(defaultValue: defaultLandscapeCutout)
+  @observable
+  var landscapeCutout = defaultLandscapeCutout;
+
+  @JsonKey(defaultValue: defaultChatWidth)
+  @observable
+  var chatWidth = defaultChatWidth;
+
+  @JsonKey(defaultValue: defaultFullScreenChatOverlayOpacity)
+  @observable
+  var fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
+
+  // Behavior options
+  @JsonKey(defaultValue: defaultKeepScreenAwake)
+  @observable
+  var keepScreenAwake = defaultKeepScreenAwake;
+
+  @JsonKey(defaultValue: defaultAutocomplete)
+  @observable
+  var autocomplete = defaultAutocomplete;
+
+  @JsonKey(defaultValue: defaultShowRecentMessages)
+  @observable
+  var showRecentMessages = defaultShowRecentMessages;
+
+  @JsonKey(defaultValue: defaultAutoSyncChatDelay)
+  @observable
+  var autoSyncChatDelay = defaultAutoSyncChatDelay;
+
+  @JsonKey(defaultValue: defaultChatDelay)
+  @observable
+  var chatDelay = defaultChatDelay;
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @observable
+  var syncedChatDelay = defaultChatDelay;
+
+  @computed
+  double get effectiveChatDelay =>
+      autoSyncChatDelay ? syncedChatDelay : chatDelay;
 
   @JsonKey(defaultValue: defaultMutedWords)
   @observable
@@ -315,36 +305,19 @@ abstract class _SettingsStoreBase with Store {
 
   @action
   void resetChatSettings() {
+    // Messages
     badgeScale = defaultBadgeScale;
     emoteScale = defaultEmoteScale;
     messageScale = defaultMessageScale;
     messageSpacing = defaultMessageSpacing;
     fontSize = defaultFontSize;
-
     showDeletedMessages = defaultShowDeletedMessages;
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
-
-    autoSyncChatDelay = defaultAutoSyncChatDelay;
-    chatDelay = defaultChatDelay;
-    syncedChatDelay = defaultChatDelay;
-
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
     showUserNotices = defaultShowUserNotices;
 
-    emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
-
-    landscapeChatLeftSide = defaultLandscapeChatLeftSide;
-    landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;
-    landscapeCutout = defaultLandscapeCutout;
-    chatWidth = defaultChatWidth;
-    fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
-
-    mutedWords = defaultMutedWords;
-    matchWholeWord = defaultMatchWholeWord;
-
-    autocomplete = defaultAutocomplete;
-
+    // Emotes & Badges
     showTwitchEmotes = defaultShowTwitchEmotes;
     showTwitchBadges = defaultShowTwitchBadges;
     show7TVEmotes = defaultShow7TVEmotes;
@@ -353,10 +326,25 @@ abstract class _SettingsStoreBase with Store {
     showFFZEmotes = defaultShowFFZEmotes;
     showFFZBadges = defaultShowFFZBadges;
 
-    showRecentMessages = defaultShowRecentMessages;
-
+    // Layout
+    emoteMenuButtonOnLeft = defaultEmoteMenuButtonOnLeft;
     persistChatTabs = defaultPersistChatTabs;
     secondaryTabs = defaultSecondaryTabs;
+    landscapeChatLeftSide = defaultLandscapeChatLeftSide;
+    landscapeForceVerticalChat = defaultLandscapeForceVerticalChat;
+    landscapeCutout = defaultLandscapeCutout;
+    chatWidth = defaultChatWidth;
+    fullScreenChatOverlayOpacity = defaultFullScreenChatOverlayOpacity;
+
+    // Behavior
+    keepScreenAwake = defaultKeepScreenAwake;
+    autocomplete = defaultAutocomplete;
+    showRecentMessages = defaultShowRecentMessages;
+    autoSyncChatDelay = defaultAutoSyncChatDelay;
+    chatDelay = defaultChatDelay;
+    syncedChatDelay = defaultChatDelay;
+    mutedWords = defaultMutedWords;
+    matchWholeWord = defaultMatchWholeWord;
   }
 
   // * Other settings

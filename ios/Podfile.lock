@@ -3,6 +3,8 @@ PODS:
     - Flutter
   - app_links (7.0.0):
     - Flutter
+  - better_native_video_player (0.4.11):
+    - Flutter
   - device_info_plus (0.0.1):
     - Flutter
   - Firebase/CoreOnly (12.9.0):
@@ -192,6 +194,7 @@ PODS:
 DEPENDENCIES:
   - advanced_in_app_review (from `.symlinks/plugins/advanced_in_app_review/ios`)
   - app_links (from `.symlinks/plugins/app_links/ios`)
+  - better_native_video_player (from `.symlinks/plugins/better_native_video_player/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -237,6 +240,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/advanced_in_app_review/ios"
   app_links:
     :path: ".symlinks/plugins/app_links/ios"
+  better_native_video_player:
+    :path: ".symlinks/plugins/better_native_video_player/ios"
   device_info_plus:
     :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_analytics:
@@ -273,6 +278,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   advanced_in_app_review: fe8fd50b8670cb3dbe67e4c26ca643f7aea8dbb8
   app_links: 6d01271b3907b0ee7325c5297c75d697c4226c4d
+  better_native_video_player: 88a6b9bf169428352c05b6ebec085c5263603282
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Firebase: 065f2bb395062046623036d8e6dc857bc2521d56
   firebase_analytics: b5c909bdc321fab0f9ddf8712f5cef79057e09fa
