@@ -51,7 +51,7 @@ dependencies:
     collection: ^1.16.0
     flutter_cache_manager: ^3.3.0
     device_info_plus: ^12.3.0
-    wakelock_plus: ^1.1.2
+    wakelock_plus: ^1.5.1
     simple_icons: ^14.6.1
     simple_pip_mode:
         git:
