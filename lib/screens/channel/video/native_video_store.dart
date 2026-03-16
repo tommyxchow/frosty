@@ -530,6 +530,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   @override
   @action
   Future<void> handleRefresh() async {
+    if (_isInPipMode) return;
     HapticFeedback.lightImpact();
     // Reset recovery cap on user-initiated refresh (error was shown).
     // Stall recovery calls this with _error == null, preserving the cap.
@@ -687,6 +688,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   @action
   void handleAppResume() {
     if (_isInPipMode) return;
+    _highLatencyCount = 0;
     updateStreamInfo(forceUpdate: true);
     if (!_userPaused && !_initializing && _controller != null) {
       _controller!.play();
