@@ -315,7 +315,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
           }
         case PlayerActivityState.buffering:
         case PlayerActivityState.loading:
-          if (!_isQualitySwitching) {
+          if (!_isQualitySwitching && !_hasPlayedOnce) {
             _loading = true;
           }
           // Clear _initializing on the first buffering event so the stall
@@ -692,6 +692,18 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     updateStreamInfo(forceUpdate: true);
     if (!_userPaused && !_initializing && _controller != null) {
       _controller!.play();
+    }
+  }
+
+  @override
+  @action
+  void handleAndroidPipChanged(bool isInPip) {
+    if (isInPip && !_isInPipMode) {
+      _isInPipMode = true;
+      _overlayTimer?.cancel();
+      _overlayVisible = true;
+    } else if (!isInPip && _isInPipMode) {
+      _isInPipMode = false;
     }
   }
 

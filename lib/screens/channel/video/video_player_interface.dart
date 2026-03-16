@@ -27,5 +27,6 @@ abstract class VideoPlayerInterface {
   Future<void> setStreamQuality(String quality);
   Future<void> updateStreamInfo({bool forceUpdate});
   void handleAppResume();
+  void handleAndroidPipChanged(bool isInPip);
   void dispose();
 }

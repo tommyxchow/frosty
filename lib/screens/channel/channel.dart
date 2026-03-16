@@ -753,6 +753,8 @@ class _VideoChatState extends State<VideoChat>
       return PipWidget(
         pipLayout: PipActionsLayout.mediaOnlyPause,
         onPipAction: (_) => _videoStore.handlePausePlay(),
+        onPipEntered: () => _videoStore.handleAndroidPipChanged(true),
+        onPipExited: () => _videoStore.handleAndroidPipChanged(false),
         pipChild: player,
         child: videoChat,
       );

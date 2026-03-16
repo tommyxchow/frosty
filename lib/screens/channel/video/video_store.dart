@@ -976,6 +976,11 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     }
   }
 
+  @override
+  void handleAndroidPipChanged(bool isInPip) {
+    // Webview player handles PiP independently via JavaScript channels.
+  }
+
   /// Updates the stream info from the Twitch API.
   ///
   /// If the stream is offline, fetches channel information to show offline details.

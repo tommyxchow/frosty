@@ -383,6 +383,18 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
   }
 
   @override
+  void handleAndroidPipChanged(bool isInPip) {
+    final _$actionInfo = _$NativeVideoStoreBaseActionController.startAction(
+      name: 'NativeVideoStoreBase.handleAndroidPipChanged',
+    );
+    try {
+      return super.handleAndroidPipChanged(isInPip);
+    } finally {
+      _$NativeVideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void dispose() {
     final _$actionInfo = _$NativeVideoStoreBaseActionController.startAction(
       name: 'NativeVideoStoreBase.dispose',
