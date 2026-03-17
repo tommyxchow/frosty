@@ -118,6 +118,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     required this.authStore,
     required this.settingsStore,
   }) {
+    if (settingsStore.autoSyncChatDelay) {
+      settingsStore.syncedChatDelay = 0.0;
+    }
     _controller = _createController();
     _scheduleOverlayHide();
     updateStreamInfo();
@@ -709,11 +712,17 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   @action
   void handleAndroidPipChanged(bool isInPip) {
     if (isInPip && !_isInPipMode) {
+      _overlayWasVisibleBeforePip = _overlayVisible;
       _isInPipMode = true;
       _overlayTimer?.cancel();
       _overlayVisible = true;
     } else if (!isInPip && _isInPipMode) {
       _isInPipMode = false;
+      if (_overlayWasVisibleBeforePip) {
+        _scheduleOverlayHide();
+      } else {
+        _overlayVisible = false;
+      }
     }
   }
 
