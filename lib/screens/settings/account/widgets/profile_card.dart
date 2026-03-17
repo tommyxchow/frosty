@@ -48,9 +48,10 @@ class ProfileCard extends StatelessWidget {
             ),
             title: GestureDetector(
               onTap: () {
+                final navigator = Navigator.of(context);
                 showDialog(
                   context: context,
-                  builder: (context) => FrostyDialog(
+                  builder: (dialogContext) => FrostyDialog(
                     title: 'Web session',
                     message: hasToken
                         ? 'Your Twitch web session is linked. When using the native player, ads will be avoided on channels where you have a subscription or Twitch Turbo.'
@@ -58,15 +59,14 @@ class ProfileCard extends StatelessWidget {
                     actions: [
                       if (!hasToken)
                         TextButton(
-                          onPressed: Navigator.of(context).pop,
+                          onPressed: Navigator.of(dialogContext).pop,
                           child: const Text('Cancel'),
                         ),
                       if (!hasToken)
                         FilledButton(
                           onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
+                            Navigator.of(dialogContext).pop();
+                            navigator.push(
                               MaterialPageRoute(
                                 builder: (context) => LoginWebView(),
                               ),
@@ -76,7 +76,7 @@ class ProfileCard extends StatelessWidget {
                         ),
                       if (hasToken)
                         TextButton(
-                          onPressed: Navigator.of(context).pop,
+                          onPressed: Navigator.of(dialogContext).pop,
                           child: const Text('OK'),
                         ),
                     ],
