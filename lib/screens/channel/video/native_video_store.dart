@@ -58,6 +58,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _totalRefreshAttempts = 0;
   var _highLatencyCount = 0;
   var _isQualitySwitching = false;
+  var _initGeneration = 0;
   static const _maxRefreshAttempts = 3;
   static const _highLatencyThresholdSeconds = 30;
   static final _bareResolutionRe = RegExp(r'^(\d+)p$');
@@ -152,6 +153,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   Future<void> _initPlayer() async {
     if (_initInFlight) return;
     _initInFlight = true;
+    final generation = _initGeneration;
     try {
       // Use web cookie token (works with web Client-ID) for ad-free playback.
       final authToken = authStore.gqlToken;
@@ -170,7 +172,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         }
       }
 
-      if (_disposed) {
+      if (_disposed || generation != _initGeneration) {
         _initInFlight = false;
         return;
       }
@@ -192,7 +194,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       });
 
       await _controller!.initialize();
-      if (_disposed) {
+      if (_disposed || generation != _initGeneration) {
         _initInFlight = false;
         return;
       }
@@ -277,12 +279,12 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         _error = null;
       });
     } catch (e) {
-      if (_disposed) return;
+      if (_disposed || generation != _initGeneration) return;
       _initializing = false;
       _initInFlight = false;
       // Wait for stream info so we can distinguish "offline" from "broken".
       await updateStreamInfo(forceUpdate: true);
-      if (_disposed) return;
+      if (_disposed || generation != _initGeneration) return;
       runInAction(() {
         _loading = false;
         // Only show the error if the stream is actually live — an offline
@@ -376,6 +378,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       // During PiP, only attempt light recovery (seek to live edge).
       // Heavy recovery (handleRefresh) disposes the controller, killing PiP.
       if (_isInPipMode) {
+        if (_stallRecoveryAttempt > _maxRefreshAttempts) return;
         debugPrint('NativeVideoStore: stall in PiP, seeking to live edge');
         _controller?.seekToLiveEdge();
         _controller?.play();
@@ -452,9 +455,12 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     }
     _highLatencyCount = 0;
 
-    runInAction(() {
-      _latency = '${rounded}s';
-    });
+    final newLatency = '${rounded}s';
+    if (newLatency != _latency) {
+      runInAction(() {
+        _latency = newLatency;
+      });
+    }
 
     if (!settingsStore.autoSyncChatDelay) return;
 
@@ -470,7 +476,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _overlayTimer?.cancel();
 
     if (_isInPipMode) {
-      _overlayVisible = true;
+      runInAction(() => _overlayVisible = true);
       return;
     }
 
@@ -556,14 +562,15 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _error = null;
     _initializing = true;
     _initInFlight = false;
+    _initGeneration++;
 
+    _pipSub?.cancel();
+    _qualitiesSub?.cancel();
     _overlayTimer?.cancel();
     _scheduleOverlayHide();
 
     _latencyTimer?.cancel();
     _stallRecoveryTimer?.cancel();
-    _pipSub?.cancel();
-    _qualitiesSub?.cancel();
     _controller?.removeActivityListener(_handleActivityEvent);
     _controller?.dispose();
     _controller = _createController();
@@ -660,17 +667,20 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   Future<void> _updateStreamInfoInternal() async {
     try {
       final info = await twitchApi.getStream(userLogin: userLogin);
+      if (_disposed) return;
       runInAction(() {
         _streamInfo = info;
         _offlineChannelInfo = null;
       });
     } catch (e) {
+      if (_disposed) return;
       Channel? channel;
       try {
         channel = await twitchApi.getChannel(userId: userId);
       } catch (e) {
         debugPrint('NativeVideoStore: channel info fallback failed: $e');
       }
+      if (_disposed) return;
 
       runInAction(() {
         _overlayTimer?.cancel();
