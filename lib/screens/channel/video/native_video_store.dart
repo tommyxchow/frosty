@@ -214,6 +214,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
             _overlayVisible = true;
           } else if (!isPip && _isInPipMode) {
             _isInPipMode = false;
+            _lastPipWasAutomatic = false;
             if (_overlayWasVisibleBeforePip) {
               _scheduleOverlayHide();
             } else {
