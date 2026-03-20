@@ -673,7 +673,17 @@ class IRCMessage {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
-    _addTimestamp(span, style, timestamp);
+    // Always show timestamps on historical messages, falling back to the
+    // device's locale preference when the user has timestamps disabled.
+    final isHistorical = tags['historical'] == '1';
+    final effectiveTimestamp =
+        (timestamp == TimestampType.disabled && isHistorical)
+            ? (MediaQuery.alwaysUse24HourFormatOf(context)
+                ? TimestampType.twentyFour
+                : TimestampType.twelve)
+            : timestamp;
+
+    _addTimestamp(span, style, effectiveTimestamp);
     _addHistoricalAndChannelBadges(
       context,
       span,
@@ -682,7 +692,6 @@ class IRCMessage {
       currentChannelId,
     );
 
-    final isHistorical = tags['historical'] == '1';
     _addUserBadges(
       context,
       span,
