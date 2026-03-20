@@ -171,7 +171,7 @@ class _HomeState extends State<Home> {
                       ),
                       selectedIcon: Icon(
                         Icons.favorite_rounded,
-                        color: theme.colorScheme.onSurface,
+                        color: theme.colorScheme.primary,
                       ),
                       label: 'Following',
                       tooltip: 'Following',
@@ -184,7 +184,7 @@ class _HomeState extends State<Home> {
                     ),
                     selectedIcon: Icon(
                       Icons.arrow_upward_rounded,
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.primary,
                     ),
                     label: 'Top',
                     tooltip: 'Top',
@@ -197,7 +197,7 @@ class _HomeState extends State<Home> {
                     ),
                     selectedIcon: Icon(
                       Icons.search_rounded,
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.primary,
                     ),
                     label: 'Search',
                     tooltip: 'Search',
