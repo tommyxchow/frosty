@@ -663,6 +663,7 @@ class IRCMessage {
     bool showMessage = true,
     Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
+    bool forceTimestamp = false,
     String? currentChannelId,
   }) {
     final emoteToObject = assetsStore.emoteToObject;
@@ -677,7 +678,7 @@ class IRCMessage {
     // device's locale preference when the user has timestamps disabled.
     final isHistorical = tags['historical'] == '1';
     final effectiveTimestamp =
-        (timestamp == TimestampType.disabled && isHistorical)
+        (timestamp == TimestampType.disabled && (isHistorical || forceTimestamp))
             ? (MediaQuery.alwaysUse24HourFormatOf(context)
                 ? TimestampType.twentyFour
                 : TimestampType.twelve)

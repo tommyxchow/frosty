@@ -17,6 +17,7 @@ class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
   final ChatStore chatStore;
   final bool isModal;
+  final bool forceTimestamp;
   final bool showReplyHeader;
   final bool isInReplyThread;
 
@@ -39,6 +40,7 @@ class ChatMessage extends StatelessWidget {
     required this.ircMessage,
     required this.chatStore,
     this.isModal = false,
+    this.forceTimestamp = false,
     this.showReplyHeader = true,
     this.isInReplyThread = false,
     this.overrideChannelIdToUserTwitch,
@@ -126,6 +128,7 @@ class ChatMessage extends StatelessWidget {
                   badgeScale: chatStore.settings.badgeScale,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
+                  forceTimestamp: forceTimestamp,
                   channelIdToUserTwitch: overrideChannelIdToUserTwitch ??
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId:
@@ -234,6 +237,7 @@ class ChatMessage extends StatelessWidget {
                   badgeScale: chatStore.settings.badgeScale,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
+                  forceTimestamp: forceTimestamp,
                   channelIdToUserTwitch: overrideChannelIdToUserTwitch ??
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId:
@@ -389,6 +393,7 @@ class ChatMessage extends StatelessWidget {
                         },
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
+                  forceTimestamp: forceTimestamp,
                         channelIdToUserTwitch:
                             overrideChannelIdToUserTwitch ??
                                 chatStore.assetsStore.channelIdToUserTwitch,
@@ -518,6 +523,7 @@ class ChatMessage extends StatelessWidget {
                           badgeScale: chatStore.settings.badgeScale,
                           launchExternal: chatStore.settings.launchUrlExternal,
                           timestamp: chatStore.settings.timestampType,
+                  forceTimestamp: forceTimestamp,
                           channelIdToUserTwitch:
                               overrideChannelIdToUserTwitch ??
                                   chatStore.assetsStore.channelIdToUserTwitch,

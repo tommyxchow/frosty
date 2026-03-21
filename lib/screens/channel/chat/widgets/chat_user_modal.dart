@@ -115,6 +115,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                           ircMessage: userMessages[index],
                           chatStore: widget.chatStore,
                           isModal: true,
+                          forceTimestamp: true,
                         ),
                       ),
                     ),
