@@ -252,6 +252,9 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
   @readonly
   var _isInPipMode = false;
 
+  @override
+  bool get isAudioOnlyMode => false;
+
   /// The video URL to use for the webview.
   String get videoUrl =>
       'https://player.twitch.tv/?channel=$userLogin&muted=false&parent=frosty';

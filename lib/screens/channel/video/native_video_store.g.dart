@@ -241,6 +241,26 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
     });
   }
 
+  late final _$_isAudioOnlyModeAtom = Atom(
+    name: 'NativeVideoStoreBase._isAudioOnlyMode',
+    context: context,
+  );
+
+  bool get isAudioOnlyMode {
+    _$_isAudioOnlyModeAtom.reportRead();
+    return super._isAudioOnlyMode;
+  }
+
+  @override
+  bool get _isAudioOnlyMode => isAudioOnlyMode;
+
+  @override
+  set _isAudioOnlyMode(bool value) {
+    _$_isAudioOnlyModeAtom.reportWrite(value, super._isAudioOnlyMode, () {
+      super._isAudioOnlyMode = value;
+    });
+  }
+
   late final _$_errorAtom = Atom(
     name: 'NativeVideoStoreBase._error',
     context: context,

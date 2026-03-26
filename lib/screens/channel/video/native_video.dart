@@ -71,6 +71,32 @@ class NativeVideo extends StatelessWidget {
                     size: 32,
                   ),
                 ),
+              if (nativeVideoStore.isAudioOnlyMode && !isOffline)
+                const ColoredBox(
+                  color: Colors.black,
+                  child: SizedBox.expand(
+                    child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.headphones_rounded,
+                          color: Colors.white24,
+                          size: 32,
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Audio Only',
+                          style: TextStyle(
+                            color: Colors.white24,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ),
+                ),
             ],
           ),
         );

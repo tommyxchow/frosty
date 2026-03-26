@@ -53,7 +53,6 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _firstTimeSettingQuality = true;
   int? _pendingQualityIndex;
   var _disposed = false;
-  var _isAudioOnlyMode = false;
   var _initializing = true;
   var _initInFlight = false;
   var _totalRefreshAttempts = 0;
@@ -104,6 +103,10 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
 
   @readonly
   var _isInPipMode = false;
+
+  @override
+  @readonly
+  var _isAudioOnlyMode = false;
 
   @readonly
   String? _error;

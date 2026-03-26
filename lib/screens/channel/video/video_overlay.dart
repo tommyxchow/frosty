@@ -90,7 +90,7 @@ class VideoOverlay extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SectionHeader(
-                'Stream quality',
+                'Quality',
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
                 isFirst: true,
               ),

@@ -11,6 +11,7 @@ abstract class VideoPlayerInterface {
   bool get paused;
   bool get overlayVisible;
   bool get isInPipMode;
+  bool get isAudioOnlyMode;
   StreamTwitch? get streamInfo;
   Channel? get offlineChannelInfo;
   List<String> get availableStreamQualities;
