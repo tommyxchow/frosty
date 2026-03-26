@@ -53,6 +53,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _firstTimeSettingQuality = true;
   int? _pendingQualityIndex;
   var _disposed = false;
+  var _isAudioOnlyMode = false;
   var _initializing = true;
   var _initInFlight = false;
   var _totalRefreshAttempts = 0;
@@ -558,6 +559,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _isQualitySwitching = false;
     _isInPipMode = false;
     _lastPipWasAutomatic = false;
+    _isAudioOnlyMode = false;
     _manualPipRequested = false;
     _overlayWasVisibleBeforePip = true;
     _latency = null;
@@ -636,6 +638,25 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       final qualityIndex = index - 1;
       if (qualityIndex >= 0 && qualityIndex < _qualityObjects.length) {
         await _controller!.setQuality(_qualityObjects[qualityIndex]);
+      }
+    }
+
+    // Toggle background PiP based on audio-only mode.
+    // Only call when the mode actually changes to avoid unnecessary
+    // method channel round-trips on every quality switch.
+    if (Platform.isIOS) {
+      final quality = index == 0
+          ? null
+          : _qualityObjects.elementAtOrNull(index - 1);
+      final isAudioOnly =
+          quality != null && quality.width == 0 && quality.height == 0;
+      if (isAudioOnly != _isAudioOnlyMode) {
+        _isAudioOnlyMode = isAudioOnly;
+        if (isAudioOnly) {
+          _controller!.disableAutomaticInlinePip();
+        } else {
+          _controller!.enableAutomaticInlinePip();
+        }
       }
     }
   }
