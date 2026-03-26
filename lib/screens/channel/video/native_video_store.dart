@@ -644,18 +644,24 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     // Toggle background PiP based on audio-only mode.
     // Only call when the mode actually changes to avoid unnecessary
     // method channel round-trips on every quality switch.
-    if (Platform.isIOS) {
-      final quality = index == 0
-          ? null
-          : _qualityObjects.elementAtOrNull(index - 1);
-      final isAudioOnly =
-          quality != null && quality.width == 0 && quality.height == 0;
-      if (isAudioOnly != _isAudioOnlyMode) {
-        _isAudioOnlyMode = isAudioOnly;
+    final quality = index == 0
+        ? null
+        : _qualityObjects.elementAtOrNull(index - 1);
+    final isAudioOnly =
+        quality != null && quality.width == 0 && quality.height == 0;
+    if (isAudioOnly != _isAudioOnlyMode) {
+      _isAudioOnlyMode = isAudioOnly;
+      if (Platform.isIOS) {
         if (isAudioOnly) {
           _controller!.disableAutomaticInlinePip();
         } else {
           _controller!.enableAutomaticInlinePip();
+        }
+      } else if (Platform.isAndroid) {
+        if (isAudioOnly) {
+          _pip.setAutoPipMode(autoEnter: false);
+        } else if (settingsStore.showVideo) {
+          _pip.setAutoPipMode();
         }
       }
     }
