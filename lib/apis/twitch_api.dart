@@ -189,6 +189,23 @@ class TwitchApi extends BaseApiClient {
     return StreamsTwitch.fromJson(data);
   }
 
+  /// Returns a bool indicating if the given [userId] follows the [broadcasterId].
+  Future<bool> checkUserFollowsChannel({
+    required String userId,
+    required String broadcasterId,
+  }) async {
+    final data = await get<JsonMap>(
+      '/channels/followed',
+      queryParameters: {
+        'user_id': userId,
+        'broadcaster_id': broadcasterId,
+      },
+    );
+
+    final channelsData = data['data'] as JsonList;
+    return channelsData.isNotEmpty;
+  }
+
   /// Returns a [FollowedChannels] object containing all followed channels (including offline ones) for the given user ID.
   Future<FollowedChannels> getFollowedChannels({
     required String userId,
