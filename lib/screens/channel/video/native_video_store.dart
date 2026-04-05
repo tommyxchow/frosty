@@ -41,6 +41,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   Timer? _latencyTimer;
   Timer? _stallRecoveryTimer;
   var _stallRecoveryAttempt = 0;
+  var _isStalled = false;
+  Timer? _initRetryTimer;
+  DateTime? _lastRefreshTime;
   DateTime? _lastStreamInfoUpdate;
   Future<void>? _streamInfoRequest;
   bool _overlayWasVisibleBeforePip = true;
@@ -55,6 +58,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _disposed = false;
   var _initializing = true;
   var _initInFlight = false;
+  var _controllerInitialized = false;
   var _totalRefreshAttempts = 0;
   var _highLatencyCount = 0;
   var _isQualitySwitching = false;
@@ -162,30 +166,6 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _initInFlight = true;
     final generation = _initGeneration;
     try {
-      // Use web cookie token (works with web Client-ID) for ad-free playback.
-      final authToken = authStore.gqlToken;
-      late final PlaybackAccessToken token;
-      try {
-        token = await twitchGqlApi.getPlaybackAccessToken(
-          login: userLogin,
-          authToken: authToken,
-        );
-      } catch (e) {
-        if (authToken != null) {
-          debugPrint('NativeVideoStore: auth token failed, retrying without: $e');
-          token = await twitchGqlApi.getPlaybackAccessToken(login: userLogin);
-        } else {
-          rethrow;
-        }
-      }
-
-      if (_disposed || generation != _initGeneration) {
-        _initInFlight = false;
-        return;
-      }
-
-      _hlsUrl = twitchGqlApi.buildHlsUrl(login: userLogin, token: token);
-
       // Fetch profile image URL for Now Playing artwork (fire-and-forget)
       twitchApi.getUser(id: userId).then((user) {
         _profileImageUrl = user.profileImageUrl;
@@ -277,34 +257,109 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         });
       });
 
-      await _controller!.loadUrl(url: _hlsUrl!);
-      await _controller!.configureForLivePlayback();
-
-      _startLatencyPolling();
-
+      _controllerInitialized = true;
+    } catch (e) {
+      if (_disposed || generation != _initGeneration) return;
       _initInFlight = false;
+      await _handleLoadError(e, generation);
+      return;
+    }
+    _initInFlight = false;
+    await _runLoadStream(generation);
+  }
+
+  /// Wraps `_loadStream` with shared success/error handling. On success,
+  /// clears `_error`; on failure, delegates to `_handleLoadError` for retry
+  /// scheduling or error display. Used by both first-time init and refresh.
+  Future<void> _runLoadStream(int generation) async {
+    try {
+      await _loadStream(generation);
+      if (_disposed || generation != _initGeneration) return;
       runInAction(() {
         _error = null;
       });
     } catch (e) {
       if (_disposed || generation != _initGeneration) return;
-      _initializing = false;
-      _initInFlight = false;
-      // Wait for stream info so we can distinguish "offline" from "broken".
-      await updateStreamInfo(forceUpdate: true);
-      if (_disposed || generation != _initGeneration) return;
-      runInAction(() {
-        _loading = false;
-        // Only show the error if the stream is actually live — an offline
-        // channel is expected to fail here and the overlay handles it.
-        if (_streamInfo != null) {
-          _error =
-              'Native player failed to load. Try the standard player in Settings.';
-        }
-      });
-      debugPrint('NativeVideoStore init error: $e');
+      await _handleLoadError(e, generation);
     }
   }
+
+  /// Fetches a fresh playback token, builds the HLS URL, and loads it into
+  /// the (already-initialized) controller. Used by both first-time init and
+  /// user-initiated refresh (light refresh reuses the same AVPlayer via
+  /// replaceCurrentItem internally, per Apple's HLS recovery guidance).
+  Future<void> _loadStream(int generation) async {
+    // Use web cookie token (works with web Client-ID) for ad-free playback.
+    final authToken = authStore.gqlToken;
+    late final PlaybackAccessToken token;
+    try {
+      token = await twitchGqlApi.getPlaybackAccessToken(
+        login: userLogin,
+        authToken: authToken,
+      );
+    } catch (e) {
+      if (authToken != null) {
+        debugPrint('NativeVideoStore: auth token failed, retrying without: $e');
+        token = await twitchGqlApi.getPlaybackAccessToken(login: userLogin);
+      } else {
+        rethrow;
+      }
+    }
+
+    if (_disposed || generation != _initGeneration) return;
+    _hlsUrl = twitchGqlApi.buildHlsUrl(login: userLogin, token: token);
+
+    await _controller!.loadUrl(url: _hlsUrl!);
+    if (_disposed || generation != _initGeneration) return;
+    await _controller!.configureForLivePlayback();
+    _startLatencyPolling();
+  }
+
+  /// Shared error handler for both `_initPlayer` and `_refreshStream`.
+  /// Checks stream liveness, auto-retries if CDN is still serving stale
+  /// manifests, or surfaces the error with the overlay visible.
+  Future<void> _handleLoadError(dynamic e, int generation) async {
+    _initializing = false;
+    // Wait for stream info so we can distinguish "offline" from "broken".
+    await updateStreamInfo(forceUpdate: true);
+    if (_disposed || generation != _initGeneration) return;
+    debugPrint('NativeVideoStore load error: $e');
+
+    // Auto-retry if the stream is live — the CDN may still be serving
+    // stale manifests right after a stream crash.
+    if (_streamInfo != null && _totalRefreshAttempts < _maxRefreshAttempts) {
+      _totalRefreshAttempts++;
+      debugPrint(
+        'NativeVideoStore: auto-retrying load '
+        '(attempt $_totalRefreshAttempts/$_maxRefreshAttempts)',
+      );
+      _initRetryTimer?.cancel();
+      _initRetryTimer = Timer(const Duration(seconds: 3), () {
+        if (!_disposed && generation == _initGeneration) handleRefresh();
+      });
+      return;
+    }
+
+    runInAction(() {
+      _loading = false;
+      _paused = true;
+      // Only show the error if the stream is actually live — an offline
+      // channel is expected to fail here and the overlay handles it.
+      if (_streamInfo != null) {
+        _error =
+            'Native player failed to load. Try the standard player in Settings.';
+        _overlayVisible = true;
+        _overlayTimer?.cancel();
+      }
+    });
+  }
+
+  /// Light refresh — reloads the stream URL on the existing controller.
+  /// Skips platform view recreation, audio session churn, and subscription
+  /// teardown. Per Apple's WWDC 2017 guidance, this is the preferred
+  /// pattern: new AVPlayerItem via `replaceCurrentItem` on existing AVPlayer.
+  @action
+  Future<void> _refreshStream() => _runLoadStream(_initGeneration);
 
   void _handleActivityEvent(PlayerActivityEvent event) {
     runInAction(() {
@@ -312,6 +367,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         case PlayerActivityState.playing:
           _loading = false;
           _paused = false;
+          _isStalled = false;
           _hasPlayedOnce = true;
           _initializing = false;
           _isQualitySwitching = false;
@@ -328,6 +384,13 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
           if (!_isQualitySwitching && !_hasPlayedOnce) {
             _loading = true;
           }
+          // Track mid-stream stalls separately from initial loading.
+          // With automaticallyWaitsToMinimizeStalling = false, AVPlayer
+          // silently drops rate to 0 when the buffer empties (e.g. stream
+          // crash). The stall timer needs this flag to engage recovery.
+          if (_hasPlayedOnce && !_isQualitySwitching) {
+            _isStalled = true;
+          }
           // Clear _initializing on the first buffering event so the stall
           // recovery timer is not permanently blocked during init stalls.
           // The player has started loading content — if it gets stuck here,
@@ -338,6 +401,8 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
           if (!_userPaused && !_initializing) _startStallRecoveryTimer();
         case PlayerActivityState.error:
           _loading = false;
+          _paused = true;
+          _isStalled = false;
           _initializing = false;
           _isQualitySwitching = false;
           _stallRecoveryTimer?.cancel();
@@ -351,6 +416,8 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
             runInAction(() {
               if (_streamInfo != null) {
                 _error = errorMessage;
+                _overlayVisible = true;
+                _overlayTimer?.cancel();
               }
             });
           });
@@ -361,6 +428,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
           if (!_isInPipMode) {
             _paused = true;
           }
+          _isStalled = false;
           _isQualitySwitching = false;
           _stallRecoveryTimer?.cancel();
         default:
@@ -372,7 +440,9 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   void _startStallRecoveryTimer() {
     _stallRecoveryTimer?.cancel();
     _stallRecoveryTimer = Timer(const Duration(seconds: 8), () async {
-      if (_disposed || !_loading || _userPaused || _initializing) return;
+      if (_disposed || (!_loading && !_isStalled) || _userPaused || _initializing) {
+        return;
+      }
 
       // Before attempting recovery, check if the stream is still live.
       // When a stream ends the HLS server stops serving segments, causing
@@ -407,9 +477,20 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
           _loading = false;
           _error =
               'Stream stalled. Try refreshing or switch to the standard player in Settings.';
+          _overlayVisible = true;
+          _overlayTimer?.cancel();
         });
       } else {
         // Heavy recovery: new HLS token + full player restart.
+        // Cooldown prevents a tight refresh loop when the stream is
+        // recovering (CDN may serve stale manifests for several seconds).
+        if (_lastRefreshTime != null &&
+            DateTime.now().difference(_lastRefreshTime!) <
+                const Duration(seconds: 15)) {
+          debugPrint('NativeVideoStore: refresh cooldown, re-arming timer');
+          _startStallRecoveryTimer();
+          return;
+        }
         _totalRefreshAttempts++;
         debugPrint(
           'NativeVideoStore: stall persists, refreshing player '
@@ -544,15 +625,16 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   @override
   @action
   Future<void> handleRefresh() async {
-    if (_isInPipMode) return;
     HapticFeedback.lightImpact();
-    // Reset recovery cap on user-initiated refresh (error was shown).
-    // Stall recovery calls this with _error == null, preserving the cap.
+    // Reset recovery cap and cooldown on user-initiated refresh (error was
+    // shown). Stall recovery calls this with _error == null, preserving the cap.
     if (_error != null) {
       _totalRefreshAttempts = 0;
     }
+    _lastRefreshTime = DateTime.now();
     _loading = true;
     _paused = true;
+    _isStalled = false;
     _hasPlayedOnce = false;
     _userPaused = false;
     _stallRecoveryAttempt = 0;
@@ -560,31 +642,41 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _firstTimeSettingQuality = true;
     _pendingQualityIndex = null;
     _isQualitySwitching = false;
-    _isInPipMode = false;
-    _lastPipWasAutomatic = false;
     _isAudioOnlyMode = false;
-    _manualPipRequested = false;
-    _overlayWasVisibleBeforePip = true;
     _latency = null;
     _availableStreamQualities = [];
     _qualityObjects = [];
     _error = null;
     _initializing = true;
-    _initInFlight = false;
     _initGeneration++;
 
-    _pipSub?.cancel();
-    _qualitiesSub?.cancel();
     _overlayTimer?.cancel();
     _scheduleOverlayHide();
-
     _latencyTimer?.cancel();
     _stallRecoveryTimer?.cancel();
-    _controller?.removeActivityListener(_handleActivityEvent);
-    _controller?.dispose();
-    _controller = _createController();
+    _initRetryTimer?.cancel();
 
-    _initPlayer();
+    if (_controllerInitialized) {
+      // Light refresh: reload stream on existing controller. PiP state is
+      // intentionally preserved — the controller is reused, so its observable
+      // PiP flags must stay in sync with the native player.
+      _refreshStream();
+    } else {
+      // Hard refresh: controller isn't ready (init in progress or failed).
+      // Tear down and rebuild from scratch.
+      _isInPipMode = false;
+      _lastPipWasAutomatic = false;
+      _manualPipRequested = false;
+      _overlayWasVisibleBeforePip = true;
+      _controllerInitialized = false;
+      _initInFlight = false;
+      _pipSub?.cancel();
+      _qualitiesSub?.cancel();
+      _controller?.removeActivityListener(_handleActivityEvent);
+      _controller?.dispose();
+      _controller = _createController();
+      _initPlayer();
+    }
     updateStreamInfo();
   }
 
@@ -771,6 +863,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _overlayTimer?.cancel();
     _latencyTimer?.cancel();
     _stallRecoveryTimer?.cancel();
+    _initRetryTimer?.cancel();
     _pipSub?.cancel();
     _qualitiesSub?.cancel();
     _disposeAndroidAutoPipReaction?.call();
