@@ -108,7 +108,6 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   @readonly
   var _isInPipMode = false;
 
-  @override
   @readonly
   var _isAudioOnlyMode = false;
 
