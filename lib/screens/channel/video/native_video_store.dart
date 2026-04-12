@@ -69,6 +69,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
 
   final _pip = SimplePip();
   ReactionDisposer? _disposeAndroidAutoPipReaction;
+  ReactionDisposer? _disposeVideoModeReaction;
 
   StreamSubscription<bool>? _pipSub;
   StreamSubscription<List<NativeVideoPlayerQuality>>? _qualitiesSub;
@@ -133,6 +134,23 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     updateStreamInfo();
     _initPlayer();
 
+    // Pause and release resources in chat-only mode so the AVPlayer
+    // isn't decoding/buffering while the video UI is hidden.
+    _disposeVideoModeReaction = reaction(
+      (_) => settingsStore.showVideo,
+      (showVideo) {
+        if (!showVideo) {
+          _controller?.pause();
+          _userPaused = true;
+          _latencyTimer?.cancel();
+          _stallRecoveryTimer?.cancel();
+          _initRetryTimer?.cancel();
+        } else {
+          handleRefresh();
+        }
+      },
+    );
+
     if (Platform.isAndroid) {
       _disposeAndroidAutoPipReaction = autorun((_) async {
         if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
@@ -181,7 +199,8 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
 
       await _controller!.initialize();
       if (_disposed || generation != _initGeneration) {
-        _initInFlight = false;
+        // Don't reset _initInFlight here — a newer generation's _initPlayer
+        // may already own the flag. Only the current generation should touch it.
         return;
       }
 
@@ -305,11 +324,15 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       }
     }
 
-    if (_disposed || generation != _initGeneration) return;
+    if (_disposed || generation != _initGeneration || !settingsStore.showVideo) {
+      return;
+    }
     _hlsUrl = twitchGqlApi.buildHlsUrl(login: userLogin, token: token);
 
     await _controller!.loadUrl(url: _hlsUrl!);
-    if (_disposed || generation != _initGeneration) return;
+    if (_disposed || generation != _initGeneration || !settingsStore.showVideo) {
+      return;
+    }
     await _controller!.configureForLivePlayback();
     _startLatencyPolling();
   }
@@ -451,17 +474,6 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       if (_disposed || _streamInfo == null) return;
 
       _stallRecoveryAttempt++;
-
-      // During PiP, only attempt light recovery (seek to live edge).
-      // Heavy recovery (handleRefresh) disposes the controller, killing PiP.
-      if (_isInPipMode) {
-        if (_stallRecoveryAttempt > _maxRefreshAttempts) return;
-        debugPrint('NativeVideoStore: stall in PiP, seeking to live edge');
-        _controller?.seekToLiveEdge();
-        _controller?.play();
-        _startStallRecoveryTimer();
-        return;
-      }
 
       if (_stallRecoveryAttempt <= 1) {
         // Light recovery: seek to live edge and resume.
@@ -642,6 +654,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _pendingQualityIndex = null;
     _isQualitySwitching = false;
     _isAudioOnlyMode = false;
+    _streamQualityIndex = 0;
     _latency = null;
     _availableStreamQualities = [];
     _qualityObjects = [];
@@ -866,6 +879,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _pipSub?.cancel();
     _qualitiesSub?.cancel();
     _disposeAndroidAutoPipReaction?.call();
+    _disposeVideoModeReaction?.call();
 
     _controller?.removeActivityListener(_handleActivityEvent);
     _controller?.dispose();
