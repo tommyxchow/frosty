@@ -89,9 +89,11 @@ abstract class ChatStoreBase with Store {
     return false;
   }
 
-  int get _chatDelaySeconds => settings.effectiveChatDelay.toInt();
+  Duration get _chatDelay => Duration(
+        milliseconds: (settings.effectiveChatDelay * 1000).round(),
+      );
 
-  bool get _hasActiveChatDelay => settings.showVideo && _chatDelaySeconds > 0;
+  bool get _hasActiveChatDelay => settings.showVideo && _chatDelay > Duration.zero;
 
   final TwitchApi twitchApi;
 
@@ -449,7 +451,7 @@ abstract class ChatStoreBase with Store {
   ) {
     queue.add(
       _DelayedCallback(
-        releaseAt: DateTime.now().add(Duration(seconds: _chatDelaySeconds)),
+        releaseAt: DateTime.now().add(_chatDelay),
         callback: callback,
       ),
     );
@@ -1124,7 +1126,7 @@ abstract class ChatStoreBase with Store {
       messageBuffer.clear();
     }
 
-    var remainingSeconds = _chatDelaySeconds;
+    var remainingSeconds = _chatDelay.inSeconds;
 
     // Create and store reference to the countdown message
     _countdownMessage = IRCMessage.createNotice(
