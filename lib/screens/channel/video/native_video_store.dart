@@ -516,7 +516,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _latencyTimer?.cancel();
     _pollLatency();
     _latencyTimer = Timer.periodic(
-      const Duration(seconds: 10),
+      const Duration(seconds: 30),
       (_) => _pollLatency(),
     );
   }
@@ -563,6 +563,10 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     }
 
     if (!settingsStore.autoSyncChatDelay) return;
+
+    // Without this guard, a stall/pause lets the live edge race ahead while
+    // the player's position stays frozen, and syncedChatDelay grows unbounded.
+    if (_paused || _loading || _userPaused || _isStalled) return;
 
     // Only update when unset or drifted by >2s to avoid restarting
     // the chat countdown on minor fluctuations.
@@ -828,6 +832,11 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         _latency = null;
         _streamInfo = null;
         _offlineChannelInfo = channel;
+        // Only flush chat delay on confirmed-offline (channel != null).
+        // Transient network errors leave chat state untouched.
+        if (channel != null && settingsStore.autoSyncChatDelay) {
+          settingsStore.syncedChatDelay = 0;
+        }
       });
     }
   }

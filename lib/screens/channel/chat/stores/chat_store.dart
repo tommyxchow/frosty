@@ -15,6 +15,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:mobx/mobx.dart';
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'chat_store.g.dart';
@@ -551,19 +552,17 @@ abstract class ChatStoreBase with Store {
           continue;
         }
 
-        // Filter messages containing any muted words.
+        // Filter messages containing any muted words. Must use `continue`
+        // (not `return`) — a single IRC frame can batch many messages, and
+        // returning would drop the rest of the frame with the matched one.
         if (parsedIRCMessage.message != null) {
-          final List<String> mutedWords = settings.mutedWords;
-
-          // check if the message contains any of the muted words
-          for (final word in mutedWords) {
-            if (parsedIRCMessage.message!
-                .toLowerCase()
-                .split(settings.matchWholeWord ? ' ' : '')
-                .contains(word.toLowerCase())) {
-              return;
-            }
-          }
+          final msg = parsedIRCMessage.message!.toLowerCase();
+          final words = settings.matchWholeWord ? msg.split(' ') : null;
+          final muted = settings.mutedWords.any((word) {
+            final lw = word.toLowerCase();
+            return words != null ? words.contains(lw) : msg.contains(lw);
+          });
+          if (muted) continue;
         }
 
         switch (parsedIRCMessage.command) {
@@ -827,8 +826,9 @@ abstract class ChatStoreBase with Store {
 
     _sevenTVChannel?.sink.close(1000);
     _clearPendingDelayedCallbacks(clearChat: false);
-    _sevenTVChannel = WebSocketChannel.connect(
+    _sevenTVChannel = IOWebSocketChannel.connect(
       Uri.parse('wss://events.7tv.io/v3'),
+      pingInterval: const Duration(seconds: 15),
     );
 
     void listener(dynamic data) {
@@ -915,8 +915,11 @@ abstract class ChatStoreBase with Store {
     _clearPendingDelayedCallbacks(clearSevenTV: false);
 
     _channel?.sink.close(1000);
-    _channel = WebSocketChannel.connect(
+    // 15s ping interval catches zombie connections (silent network changes,
+    // OS suspends) within the user's existing chat-delay tolerance window.
+    _channel = IOWebSocketChannel.connect(
       Uri.parse('wss://irc-ws.chat.twitch.tv:443'),
+      pingInterval: const Duration(seconds: 15),
     );
 
     // Only show chat delay countdown on initial connection or video toggle, not on reconnects
@@ -955,6 +958,13 @@ abstract class ChatStoreBase with Store {
         // Cancel chat delay countdown when disconnecting
         _cancelChatDelayCountdown();
         _chatDelaySyncCompleted = false;
+
+        // Reset send state — any in-flight message is unrecoverable across
+        // a disconnect, so don't leave the user blocked waiting for an ack
+        // that will never arrive.
+        _sendingTimeoutTimer?.cancel();
+        _isWaitingForAck = false;
+        toSend = null;
 
         if (_shouldDisconnect) {
           _sevenTVChannel?.sink.close(1000);
