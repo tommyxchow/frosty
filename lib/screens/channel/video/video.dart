@@ -32,10 +32,14 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   Future<void> didChangeAppLifecycleState(
     AppLifecycleState lifecycleState,
   ) async {
-    if (Platform.isAndroid &&
-        !await SimplePip.isAutoPipAvailable &&
-        lifecycleState == AppLifecycleState.inactive &&
-        widget.videoStore.settingsStore.showVideo) {
+    if (!widget.videoStore.settingsStore.showVideo) return;
+
+    // On Android, manually enter Picture-in-Picture if auto isn't available.
+    // On iOS, auto Picture-in-Picture is handled by the video element's
+    // autopictureinpicture attribute set in initVideo().
+    if (lifecycleState == AppLifecycleState.inactive &&
+        Platform.isAndroid &&
+        !await SimplePip.isAutoPipAvailable) {
       widget.videoStore.requestPictureInPicture();
     }
   }

@@ -71,6 +71,7 @@ dependencies:
     app_links: ^7.0.0
     extended_text_field: ^16.0.2
     native_device_orientation: ^2.1.0
+    audio_session: ^0.1.21
 
 dev_dependencies:
     flutter_test:

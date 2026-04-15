@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
@@ -236,6 +237,9 @@ abstract class VideoStoreBase with Store {
       (videoWebViewController.platform as AndroidWebViewController)
           .setMediaPlaybackRequiresUserGesture(false);
     }
+
+    // Configure audio session for background playback on home/lock screen.
+    _configureAudioSession();
 
     // Initialize the [_overlayTimer] to auto-hide the overlay after a delay (default 5 seconds).
     _scheduleOverlayHide();
@@ -782,6 +786,11 @@ abstract class VideoStoreBase with Store {
             // Cache for reuse in play/pause/PiP calls
             window._videoEl = videoElement;
 
+            // Enable auto Picture-in-Picture so iOS automatically enters it
+            // when the app goes to the background, keeping audio alive.
+            videoElement.disablePictureInPicture = false;
+            videoElement.setAttribute('autopictureinpicture', '');
+
             // Prevent duplicate event listener registration
             if (!videoElement._listenersAdded) {
               videoElement._listenersAdded = true;
@@ -1088,7 +1097,16 @@ abstract class VideoStoreBase with Store {
     }
   }
 
-  @action
+  Future<void> _configureAudioSession() async {
+    final session = await AudioSession.instance;
+    await session.configure(
+      const AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playback,
+        avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      ),
+    );
+  }
+
   void dispose() {
     // Disable auto PiP when leaving so that we don't enter PiP on other screens.
     if (Platform.isAndroid) {
