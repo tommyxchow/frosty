@@ -158,13 +158,22 @@ abstract class NativeVideoStoreBase
     );
 
     if (Platform.isAndroid) {
-      _disposeAndroidAutoPipReaction = autorun((_) async {
-        if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
-          _pip.setAutoPipMode();
-        } else {
-          _pip.setAutoPipMode(autoEnter: false);
-        }
-      });
+      // Explicit reaction on showVideo only (vs autorun, which re-runs on any
+      // observable the closure happens to read). Caches the auto-PiP
+      // availability check — it doesn't change within a session.
+      bool? autoPipAvailable;
+      _disposeAndroidAutoPipReaction = reaction(
+        (_) => settingsStore.showVideo,
+        (showVideo) async {
+          autoPipAvailable ??= await SimplePip.isAutoPipAvailable;
+          if (showVideo && autoPipAvailable!) {
+            _pip.setAutoPipMode();
+          } else {
+            _pip.setAutoPipMode(autoEnter: false);
+          }
+        },
+        fireImmediately: true,
+      );
     }
   }
 
