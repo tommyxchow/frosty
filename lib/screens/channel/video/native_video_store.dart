@@ -79,6 +79,11 @@ abstract class NativeVideoStoreBase
   ReactionDisposer? _disposeAndroidAutoPipReaction;
   ReactionDisposer? _disposeVideoModeReaction;
 
+  /// Cached SimplePip.isAutoPipAvailable result. Populated by the Android
+  /// auto-PiP reaction on first run; reused by dispose to avoid a redundant
+  /// platform-channel call.
+  bool? _autoPipAvailable;
+
   StreamSubscription<bool>? _pipSub;
   StreamSubscription<List<NativeVideoPlayerQuality>>? _qualitiesSub;
 
@@ -161,12 +166,11 @@ abstract class NativeVideoStoreBase
       // Explicit reaction on showVideo only (vs autorun, which re-runs on any
       // observable the closure happens to read). Caches the auto-PiP
       // availability check — it doesn't change within a session.
-      bool? autoPipAvailable;
       _disposeAndroidAutoPipReaction = reaction(
         (_) => settingsStore.showVideo,
         (showVideo) async {
-          autoPipAvailable ??= await SimplePip.isAutoPipAvailable;
-          if (showVideo && autoPipAvailable!) {
+          _autoPipAvailable ??= await SimplePip.isAutoPipAvailable;
+          if (showVideo && _autoPipAvailable!) {
             _pip.setAutoPipMode();
           } else {
             _pip.setAutoPipMode(autoEnter: false);
@@ -741,7 +745,9 @@ abstract class NativeVideoStoreBase
   @override
   void requestPictureInPicture() {
     if (Platform.isAndroid) {
-      _pip.enterPipMode(autoEnter: true);
+      // autoEnter for future background transitions is managed by the showVideo
+      // reaction (setAutoPipMode) — don't also pass it here.
+      _pip.enterPipMode();
     } else {
       // Skip manual PiP if the last session was auto-triggered (swipe gesture).
       // Entering manual PiP right after auto-PiP causes gray window artifacts
@@ -756,11 +762,13 @@ abstract class NativeVideoStoreBase
   @override
   @action
   void togglePictureInPicture() {
-    if (Platform.isIOS && _isInPipMode) {
-      _controller?.exitPictureInPicture();
-    } else {
-      requestPictureInPicture();
+    if (_isInPipMode) {
+      // iOS has a programmatic exit; Android does not — the user must close
+      // the PiP window themselves, so the toggle is a no-op there.
+      if (Platform.isIOS) _controller?.exitPictureInPicture();
+      return;
     }
+    requestPictureInPicture();
   }
 
   @override
@@ -878,10 +886,8 @@ abstract class NativeVideoStoreBase
   void dispose() {
     _disposed = true;
 
-    if (Platform.isAndroid) {
-      SimplePip.isAutoPipAvailable.then((isAutoPipAvailable) {
-        if (isAutoPipAvailable) _pip.setAutoPipMode(autoEnter: false);
-      });
+    if (Platform.isAndroid && _autoPipAvailable == true) {
+      _pip.setAutoPipMode(autoEnter: false);
     }
 
     _overlayTimer?.cancel();

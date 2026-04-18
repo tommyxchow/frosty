@@ -132,7 +132,9 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragStart(DragStartDetails details) {
-    if (_videoStore.isInPipMode || _videoStore.paused) return;
+    if (_videoStore.isInPipMode || _videoStore.paused || _videoStore.loading) {
+      return;
+    }
 
     _animationController.stop();
     _pipDragDistance.value = 0;
@@ -143,7 +145,10 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragUpdate(DragUpdateDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+    if (!_isPipDragging ||
+        _videoStore.isInPipMode ||
+        _videoStore.paused ||
+        _videoStore.loading) {
       return;
     }
 
@@ -163,7 +168,10 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragEnd(DragEndDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+    if (!_isPipDragging ||
+        _videoStore.isInPipMode ||
+        _videoStore.paused ||
+        _videoStore.loading) {
       return;
     }
 
