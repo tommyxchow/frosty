@@ -4,6 +4,8 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 
 /// Abstraction over the video player store so both [VideoStore] (WebView)
 /// and [NativeVideoStore] can drive the same overlay and channel UI.
+///
+/// Native-only capabilities live on [NativeVideoPlayerInterface].
 abstract class VideoPlayerInterface {
   SettingsStore get settingsStore;
 
@@ -11,7 +13,6 @@ abstract class VideoPlayerInterface {
   bool get paused;
   bool get overlayVisible;
   bool get isInPipMode;
-  bool get isAudioOnlyMode;
   StreamTwitch? get streamInfo;
   Channel? get offlineChannelInfo;
   List<String> get availableStreamQualities;
@@ -28,6 +29,5 @@ abstract class VideoPlayerInterface {
   Future<void> setStreamQuality(String quality);
   Future<void> updateStreamInfo({bool forceUpdate});
   void handleAppResume();
-  void handleAndroidPipChanged(bool isInPip);
   void dispose();
 }

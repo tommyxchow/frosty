@@ -355,6 +355,18 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
   );
 
   @override
+  Future<void> _reloadCurrentController() {
+    final _$actionInfo = _$NativeVideoStoreBaseActionController.startAction(
+      name: 'NativeVideoStoreBase._reloadCurrentController',
+    );
+    try {
+      return super._reloadCurrentController();
+    } finally {
+      _$NativeVideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void handleVideoTap() {
     final _$actionInfo = _$NativeVideoStoreBaseActionController.startAction(
       name: 'NativeVideoStoreBase.handleVideoTap',

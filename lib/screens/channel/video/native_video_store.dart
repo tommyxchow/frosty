@@ -10,7 +10,10 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/playback_access_token.dart';
 import 'package:frosty/models/stream.dart';
-import 'package:frosty/screens/channel/video/video_player_interface.dart';
+import 'package:frosty/screens/channel/video/chat_latency_sync.dart';
+import 'package:frosty/screens/channel/video/native_video_player_interface.dart';
+import 'package:frosty/screens/channel/video/stream_info_poller.dart';
+import 'package:frosty/screens/channel/video/video_timing_constants.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
@@ -21,7 +24,9 @@ part 'native_video_store.g.dart';
 
 class NativeVideoStore = NativeVideoStoreBase with _$NativeVideoStore;
 
-abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
+abstract class NativeVideoStoreBase
+    with Store
+    implements NativeVideoPlayerInterface {
   static int _nextId = 0;
 
   final String userLogin;
@@ -44,8 +49,6 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _isStalled = false;
   Timer? _initRetryTimer;
   DateTime? _lastRefreshTime;
-  DateTime? _lastStreamInfoUpdate;
-  Future<void>? _streamInfoRequest;
   bool _overlayWasVisibleBeforePip = true;
   var _userPaused = false;
 
@@ -63,11 +66,16 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   var _highLatencyCount = 0;
   var _isQualitySwitching = false;
   var _initGeneration = 0;
-  static const _maxRefreshAttempts = 3;
-  static const _highLatencyThresholdSeconds = 30;
   static final _bareResolutionRe = RegExp(r'^(\d+)p$');
 
   final _pip = SimplePip();
+  late final ChatLatencySync _chatLatencySync =
+      ChatLatencySync(settingsStore: settingsStore);
+  late final StreamInfoPoller _streamInfoPoller = StreamInfoPoller(
+    twitchApi: twitchApi,
+    userLogin: userLogin,
+    userId: userId,
+  );
   ReactionDisposer? _disposeAndroidAutoPipReaction;
   ReactionDisposer? _disposeVideoModeReaction;
 
@@ -126,9 +134,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     required this.authStore,
     required this.settingsStore,
   }) {
-    if (settingsStore.autoSyncChatDelay) {
-      settingsStore.syncedChatDelay = 0.0;
-    }
+    _chatLatencySync.reset();
     _controller = _createController();
     _scheduleOverlayHide();
     updateStreamInfo();
@@ -173,7 +179,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
         artworkUrl: _profileImageUrl,
       ),
     );
-    controller.addActivityListener(_handleActivityEvent);
+    controller.addActivityListener(_onPlayerActivity);
     return controller;
   }
 
@@ -337,7 +343,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _startLatencyPolling();
   }
 
-  /// Shared error handler for both `_initPlayer` and `_refreshStream`.
+  /// Shared error handler for both `_initPlayer` and `_reloadCurrentController`.
   /// Checks stream liveness, auto-retries if CDN is still serving stale
   /// manifests, or surfaces the error with the overlay visible.
   Future<void> _handleLoadError(dynamic e, int generation) async {
@@ -349,14 +355,14 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
 
     // Auto-retry if the stream is live — the CDN may still be serving
     // stale manifests right after a stream crash.
-    if (_streamInfo != null && _totalRefreshAttempts < _maxRefreshAttempts) {
+    if (_streamInfo != null && _totalRefreshAttempts < VideoTimingConstants.maxRefreshAttempts) {
       _totalRefreshAttempts++;
       debugPrint(
         'NativeVideoStore: auto-retrying load '
-        '(attempt $_totalRefreshAttempts/$_maxRefreshAttempts)',
+        '(attempt $_totalRefreshAttempts/${VideoTimingConstants.maxRefreshAttempts})',
       );
       _initRetryTimer?.cancel();
-      _initRetryTimer = Timer(const Duration(seconds: 3), () {
+      _initRetryTimer = Timer(VideoTimingConstants.initRetryDelay, () {
         if (!_disposed && generation == _initGeneration) handleRefresh();
       });
       return;
@@ -381,147 +387,179 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   /// teardown. Per Apple's WWDC 2017 guidance, this is the preferred
   /// pattern: new AVPlayerItem via `replaceCurrentItem` on existing AVPlayer.
   @action
-  Future<void> _refreshStream() => _runLoadStream(_initGeneration);
+  Future<void> _reloadCurrentController() => _runLoadStream(_initGeneration);
 
-  void _handleActivityEvent(PlayerActivityEvent event) {
+  void _onPlayerActivity(PlayerActivityEvent event) {
     runInAction(() {
       switch (event.state) {
         case PlayerActivityState.playing:
-          _loading = false;
-          _paused = false;
-          _isStalled = false;
-          _hasPlayedOnce = true;
-          _initializing = false;
-          _isQualitySwitching = false;
-          _stallRecoveryTimer?.cancel();
-          _stallRecoveryAttempt = 0;
-          _totalRefreshAttempts = 0;
-          if (_pendingQualityIndex != null) {
-            final index = _pendingQualityIndex!;
-            _pendingQualityIndex = null;
-            _setStreamQualityIndex(index);
-          }
+          _onPlaying();
         case PlayerActivityState.buffering:
         case PlayerActivityState.loading:
-          if (!_isQualitySwitching && !_hasPlayedOnce) {
-            _loading = true;
-          }
-          // Track mid-stream stalls separately from initial loading.
-          // With automaticallyWaitsToMinimizeStalling = false, AVPlayer
-          // silently drops rate to 0 when the buffer empties (e.g. stream
-          // crash). The stall timer needs this flag to engage recovery.
-          if (_hasPlayedOnce && !_isQualitySwitching) {
-            _isStalled = true;
-          }
-          // Clear _initializing on the first buffering event so the stall
-          // recovery timer is not permanently blocked during init stalls.
-          // The player has started loading content — if it gets stuck here,
-          // the watchdog needs to be able to act.
-          if (_initializing && event.state == PlayerActivityState.buffering) {
-            _initializing = false;
-          }
-          if (!_userPaused && !_initializing) _startStallRecoveryTimer();
+          _onBufferingOrLoading(event.state);
         case PlayerActivityState.error:
-          _loading = false;
-          _paused = true;
-          _isStalled = false;
-          _initializing = false;
-          _isQualitySwitching = false;
-          _stallRecoveryTimer?.cancel();
-          // Check if the stream is actually live before showing the error —
-          // an offline channel is expected to 404 and the overlay handles it.
-          final errorMessage =
-              event.data?['message'] as String? ??
-              'Playback error. Try refreshing or switch to the standard player in Settings.';
-          updateStreamInfo(forceUpdate: true).then((_) {
-            if (_disposed) return;
-            runInAction(() {
-              if (_streamInfo != null) {
-                _error = errorMessage;
-                _overlayVisible = true;
-                _overlayTimer?.cancel();
-              }
-            });
-          });
+          _onPlayerError(event.data);
         case PlayerActivityState.paused:
         case PlayerActivityState.stopped:
         case PlayerActivityState.completed:
         case PlayerActivityState.idle:
-          if (!_isInPipMode) {
-            _paused = true;
-          }
-          _isStalled = false;
-          _isQualitySwitching = false;
-          _stallRecoveryTimer?.cancel();
+          _onPaused();
         default:
           break;
       }
     });
   }
 
-  void _startStallRecoveryTimer() {
+  void _onPlaying() {
+    _loading = false;
+    _paused = false;
+    _isStalled = false;
+    _hasPlayedOnce = true;
+    _initializing = false;
+    _isQualitySwitching = false;
     _stallRecoveryTimer?.cancel();
-    _stallRecoveryTimer = Timer(const Duration(seconds: 8), () async {
-      if (_disposed || (!_loading && !_isStalled) || _userPaused || _initializing) {
-        return;
-      }
+    _stallRecoveryAttempt = 0;
+    _totalRefreshAttempts = 0;
+    if (_pendingQualityIndex != null) {
+      final index = _pendingQualityIndex!;
+      _pendingQualityIndex = null;
+      _setStreamQualityIndex(index);
+    }
+  }
 
-      // Before attempting recovery, check if the stream is still live.
-      // When a stream ends the HLS server stops serving segments, causing
-      // the player to stall indefinitely. Recovering is pointless if the
-      // stream is offline — just let the overlay show the offline state.
-      await updateStreamInfo(forceUpdate: true);
-      if (_disposed || _streamInfo == null) return;
+  void _onBufferingOrLoading(PlayerActivityState state) {
+    if (!_isQualitySwitching && !_hasPlayedOnce) {
+      _loading = true;
+    }
+    // Track mid-stream stalls separately from initial loading. With
+    // automaticallyWaitsToMinimizeStalling = false, AVPlayer silently drops
+    // rate to 0 when the buffer empties. The stall timer needs this flag
+    // to engage recovery on those stalls.
+    if (_hasPlayedOnce && !_isQualitySwitching) {
+      _isStalled = true;
+    }
+    // Clear _initializing on the first buffering event so the stall
+    // recovery timer isn't permanently blocked during init stalls.
+    if (_initializing && state == PlayerActivityState.buffering) {
+      _initializing = false;
+    }
+    if (!_userPaused && !_initializing) _startStallRecoveryTimer();
+  }
 
-      _stallRecoveryAttempt++;
-
-      if (_stallRecoveryAttempt <= 1) {
-        // Light recovery: seek to live edge and resume.
-        debugPrint('NativeVideoStore: stall detected, seeking to live edge');
-        _controller?.seekToLiveEdge();
-        _controller?.play();
-        _startStallRecoveryTimer();
-      } else if (_totalRefreshAttempts >= _maxRefreshAttempts) {
-        // Exhausted all recovery attempts — show error instead of looping.
-        debugPrint('NativeVideoStore: max recovery attempts reached');
-        runInAction(() {
-          _loading = false;
-          _error =
-              'Stream stalled. Try refreshing or switch to the standard player in Settings.';
+  void _onPlayerError(Map<String, dynamic>? eventData) {
+    _loading = false;
+    _paused = true;
+    _isStalled = false;
+    _initializing = false;
+    _isQualitySwitching = false;
+    _stallRecoveryTimer?.cancel();
+    final errorMessage =
+        eventData?['message'] as String? ??
+        'Playback error. Try refreshing or switch to the standard player in Settings.';
+    // Check stream liveness before showing the error — an offline channel
+    // is expected to 404 and the overlay handles it.
+    updateStreamInfo(forceUpdate: true).then((_) {
+      if (_disposed) return;
+      runInAction(() {
+        if (_streamInfo != null) {
+          _error = errorMessage;
           _overlayVisible = true;
           _overlayTimer?.cancel();
-        });
-      } else {
-        // Heavy recovery: new HLS token + full player restart.
-        // Cooldown prevents a tight refresh loop when the stream is
-        // recovering (CDN may serve stale manifests for several seconds).
-        if (_lastRefreshTime != null &&
-            DateTime.now().difference(_lastRefreshTime!) <
-                const Duration(seconds: 15)) {
-          debugPrint('NativeVideoStore: refresh cooldown, re-arming timer');
-          _startStallRecoveryTimer();
-          return;
         }
-        _totalRefreshAttempts++;
-        debugPrint(
-          'NativeVideoStore: stall persists, refreshing player '
-          '(attempt $_totalRefreshAttempts/$_maxRefreshAttempts)',
-        );
-        handleRefresh();
-      }
+      });
     });
+  }
+
+  void _onPaused() {
+    if (!_isInPipMode) {
+      _paused = true;
+    }
+    _isStalled = false;
+    _isQualitySwitching = false;
+    _stallRecoveryTimer?.cancel();
+  }
+
+  void _startStallRecoveryTimer() {
+    _stallRecoveryTimer?.cancel();
+    _stallRecoveryTimer = Timer(
+      VideoTimingConstants.stallDetectionDelay,
+      _runStallRecovery,
+    );
+  }
+
+  Future<void> _runStallRecovery() async {
+    if (_disposed ||
+        (!_loading && !_isStalled) ||
+        _userPaused ||
+        _initializing) {
+      return;
+    }
+
+    // When a stream ends the HLS server stops serving segments, causing
+    // the player to stall indefinitely. Skip recovery if the stream is
+    // offline — the overlay handles that state.
+    await updateStreamInfo(forceUpdate: true);
+    if (_disposed || _streamInfo == null) return;
+
+    _stallRecoveryAttempt++;
+
+    if (_stallRecoveryAttempt <= 1) {
+      _recoverBySeekingToLiveEdge();
+    } else if (_totalRefreshAttempts >=
+        VideoTimingConstants.maxRefreshAttempts) {
+      _showStallError();
+    } else if (_isWithinRefreshCooldown()) {
+      // CDN may still be serving stale manifests. Re-arm and try again.
+      debugPrint('NativeVideoStore: refresh cooldown, re-arming timer');
+      _startStallRecoveryTimer();
+    } else {
+      _recoverByFullRefresh();
+    }
+  }
+
+  void _recoverBySeekingToLiveEdge() {
+    debugPrint('NativeVideoStore: stall detected, seeking to live edge');
+    _controller?.seekToLiveEdge();
+    _controller?.play();
+    _startStallRecoveryTimer();
+  }
+
+  void _showStallError() {
+    debugPrint('NativeVideoStore: max recovery attempts reached');
+    runInAction(() {
+      _loading = false;
+      _error =
+          'Stream stalled. Try refreshing or switch to the standard player in Settings.';
+      _overlayVisible = true;
+      _overlayTimer?.cancel();
+    });
+  }
+
+  bool _isWithinRefreshCooldown() {
+    if (_lastRefreshTime == null) return false;
+    return DateTime.now().difference(_lastRefreshTime!) <
+        VideoTimingConstants.refreshCooldown;
+  }
+
+  void _recoverByFullRefresh() {
+    _totalRefreshAttempts++;
+    debugPrint(
+      'NativeVideoStore: stall persists, refreshing player '
+      '(attempt $_totalRefreshAttempts/${VideoTimingConstants.maxRefreshAttempts})',
+    );
+    handleRefresh();
   }
 
   void _startLatencyPolling() {
     _latencyTimer?.cancel();
-    _pollLatency();
+    _updateLatency();
     _latencyTimer = Timer.periodic(
-      const Duration(seconds: 30),
-      (_) => _pollLatency(),
+      VideoTimingConstants.latencyPollingInterval,
+      (_) => _updateLatency(),
     );
   }
 
-  Future<void> _pollLatency() async {
+  Future<void> _updateLatency() async {
     final seconds = await _controller?.getLatencyToLive();
     if (_disposed || seconds == null) return;
     final rounded = seconds.round();
@@ -531,7 +569,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     // 30s+ means the player fell behind and needs intervention.
     // Intentionally skips the latency display update and chat delay
     // sync — both are stale at this point and will refresh after recovery.
-    if (rounded >= _highLatencyThresholdSeconds &&
+    if (rounded >= VideoTimingConstants.highLatencyThresholdSeconds &&
         !_paused &&
         !_loading &&
         !_userPaused) {
@@ -562,21 +600,16 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       });
     }
 
-    if (!settingsStore.autoSyncChatDelay) return;
-
-    // Without this guard, a stall/pause lets the live edge race ahead while
-    // the player's position stays frozen, and syncedChatDelay grows unbounded.
+    // Skip chat sync when the player isn't actively progressing against
+    // the live edge — a stall/pause leaves the live edge racing ahead and
+    // would inflate syncedChatDelay unbounded.
     if (_paused || _loading || _userPaused || _isStalled) return;
-
-    // Only update when unset or drifted by >2s to avoid restarting
-    // the chat countdown on minor fluctuations.
-    final current = settingsStore.syncedChatDelay;
-    if (current == 0 || (seconds - current).abs() > 2) {
-      settingsStore.syncedChatDelay = seconds;
-    }
+    _chatLatencySync.report(seconds);
   }
 
-  void _scheduleOverlayHide([Duration delay = const Duration(seconds: 5)]) {
+  void _scheduleOverlayHide([
+    Duration delay = VideoTimingConstants.overlayAutoHide,
+  ]) {
     _overlayTimer?.cancel();
 
     if (_isInPipMode) {
@@ -632,7 +665,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
 
       if (settingsStore.showOverlay) {
         _overlayVisible = true;
-        _scheduleOverlayHide(const Duration(seconds: 3));
+        _scheduleOverlayHide(VideoTimingConstants.overlayQuickHide);
       }
     }
   }
@@ -676,7 +709,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       // Light refresh: reload stream on existing controller. PiP state is
       // intentionally preserved — the controller is reused, so its observable
       // PiP flags must stay in sync with the native player.
-      _refreshStream();
+      _reloadCurrentController();
     } else {
       // Hard refresh: controller isn't ready (init in progress or failed).
       // Tear down and rebuild from scratch.
@@ -688,7 +721,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
       _initInFlight = false;
       _pipSub?.cancel();
       _qualitiesSub?.cancel();
-      _controller?.removeActivityListener(_handleActivityEvent);
+      _controller?.removeActivityListener(_onPlayerActivity);
       _controller?.dispose();
       _controller = _createController();
       _initPlayer();
@@ -781,64 +814,25 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
   @override
   @action
   Future<void> updateStreamInfo({bool forceUpdate = false}) async {
-    if (_streamInfoRequest != null) {
-      await _streamInfoRequest;
-      return;
-    }
-
-    final now = DateTime.now();
-    if (!forceUpdate && _lastStreamInfoUpdate != null) {
-      final timeSince = now.difference(_lastStreamInfoUpdate!);
-      if (timeSince.inSeconds < 5) return;
-    }
-
-    _lastStreamInfoUpdate = now;
-
-    final request = _updateStreamInfoInternal();
-    _streamInfoRequest = request;
-
-    try {
-      await request;
-    } finally {
-      if (identical(_streamInfoRequest, request)) {
-        _streamInfoRequest = null;
-      }
-    }
-  }
-
-  Future<void> _updateStreamInfoInternal() async {
-    try {
-      final info = await twitchApi.getStream(userLogin: userLogin);
-      if (_disposed) return;
-      runInAction(() {
-        _streamInfo = info;
+    final result = await _streamInfoPoller.fetch(forceUpdate: forceUpdate);
+    if (_disposed || result == null) return;
+    runInAction(() {
+      if (result.stream != null) {
+        _streamInfo = result.stream;
         _offlineChannelInfo = null;
-      });
-    } catch (e) {
-      if (_disposed) return;
-      Channel? channel;
-      try {
-        channel = await twitchApi.getChannel(userId: userId);
-      } catch (e) {
-        debugPrint('NativeVideoStore: channel info fallback failed: $e');
+        return;
       }
-      if (_disposed) return;
-
-      runInAction(() {
-        _overlayTimer?.cancel();
-        _latencyTimer?.cancel();
-        _stallRecoveryTimer?.cancel();
-        _loading = false;
-        _latency = null;
-        _streamInfo = null;
-        _offlineChannelInfo = channel;
-        // Only flush chat delay on confirmed-offline (channel != null).
-        // Transient network errors leave chat state untouched.
-        if (channel != null && settingsStore.autoSyncChatDelay) {
-          settingsStore.syncedChatDelay = 0;
-        }
-      });
-    }
+      _overlayTimer?.cancel();
+      _latencyTimer?.cancel();
+      _stallRecoveryTimer?.cancel();
+      _loading = false;
+      _latency = null;
+      _streamInfo = null;
+      _offlineChannelInfo = result.offlineChannel;
+      // Only flush chat delay on confirmed-offline (offlineChannel != null).
+      // Transient network errors leave chat state untouched.
+      if (result.offlineChannel != null) _chatLatencySync.reset();
+    });
   }
 
   @override
@@ -890,7 +884,7 @@ abstract class NativeVideoStoreBase with Store implements VideoPlayerInterface {
     _disposeAndroidAutoPipReaction?.call();
     _disposeVideoModeReaction?.call();
 
-    _controller?.removeActivityListener(_handleActivityEvent);
+    _controller?.removeActivityListener(_onPlayerActivity);
     _controller?.dispose();
     _controller = null;
   }
