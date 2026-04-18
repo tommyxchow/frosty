@@ -128,6 +128,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowChatMessageDividers = false;
   static const defaultTimestampType = TimestampType.disabled;
   static const defaultShowHistoricalTimestamps = false;
+  static const defaultFocusCurrentChannel = false;
 
   // Alert defaults
   static const defaultHighlightFirstTimeChatter = true;
@@ -200,6 +201,10 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultShowHistoricalTimestamps)
   @observable
   var showHistoricalTimestamps = defaultShowHistoricalTimestamps;
+
+  @JsonKey(defaultValue: defaultFocusCurrentChannel)
+  @observable
+  var focusCurrentChannel = defaultFocusCurrentChannel;
 
   @JsonKey(defaultValue: defaultHighlightFirstTimeChatter)
   @observable
@@ -320,6 +325,7 @@ abstract class _SettingsStoreBase with Store {
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
     showHistoricalTimestamps = defaultShowHistoricalTimestamps;
+    focusCurrentChannel = defaultFocusCurrentChannel;
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
     showUserNotices = defaultShowUserNotices;
 

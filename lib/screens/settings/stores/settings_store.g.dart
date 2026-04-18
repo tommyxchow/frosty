@@ -43,6 +43,7 @@ SettingsStore _$SettingsStoreFromJson(
       TimestampType.disabled
   ..showHistoricalTimestamps =
       json['showHistoricalTimestamps'] as bool? ?? false
+  ..focusCurrentChannel = json['focusCurrentChannel'] as bool? ?? false
   ..highlightFirstTimeChatter =
       json['highlightFirstTimeChatter'] as bool? ?? true
   ..showUserNotices = json['showUserNotices'] as bool? ?? true
@@ -117,6 +118,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showChatMessageDividers': instance.showChatMessageDividers,
   'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
   'showHistoricalTimestamps': instance.showHistoricalTimestamps,
+  'focusCurrentChannel': instance.focusCurrentChannel,
   'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
   'showUserNotices': instance.showUserNotices,
   'showTwitchEmotes': instance.showTwitchEmotes,
@@ -570,6 +572,24 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
         super.showHistoricalTimestamps = value;
       },
     );
+  }
+
+  late final _$focusCurrentChannelAtom = Atom(
+    name: '_SettingsStoreBase.focusCurrentChannel',
+    context: context,
+  );
+
+  @override
+  bool get focusCurrentChannel {
+    _$focusCurrentChannelAtom.reportRead();
+    return super.focusCurrentChannel;
+  }
+
+  @override
+  set focusCurrentChannel(bool value) {
+    _$focusCurrentChannelAtom.reportWrite(value, super.focusCurrentChannel, () {
+      super.focusCurrentChannel = value;
+    });
   }
 
   late final _$highlightFirstTimeChatterAtom = Atom(
@@ -1223,6 +1243,7 @@ showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
 showHistoricalTimestamps: ${showHistoricalTimestamps},
+focusCurrentChannel: ${focusCurrentChannel},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
 showTwitchEmotes: ${showTwitchEmotes},

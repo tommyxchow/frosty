@@ -171,7 +171,9 @@ class ChatTabs extends StatelessWidget {
                             right: 12,
                             top: 0,
                             bottom: 0,
-                            child: Center(child: _buildMergeToggle(context)),
+                            child: Center(
+                              child: _buildMoreActionsMenu(context),
+                            ),
                           ),
                       ],
                     ),
@@ -184,22 +186,47 @@ class ChatTabs extends StatelessWidget {
     );
   }
 
-  Widget _buildMergeToggle(BuildContext context) {
-    final isMerged = chatTabsStore.mergedMode;
-    return IconButton.filledTonal(
-      icon: const Icon(Icons.call_merge, size: 18),
-      tooltip: isMerged ? 'Split chats' : 'Merge loaded chats',
-      visualDensity: VisualDensity.compact,
-      isSelected: isMerged,
-      style: IconButton.styleFrom(
-        minimumSize: const Size(42, 42),
-        backgroundColor: isMerged
-            ? null
-            : Theme.of(context).colorScheme.surfaceContainerHighest,
-      ),
-      onPressed: () {
-        HapticFeedback.selectionClick();
-        chatTabsStore.toggleMergedMode();
+  Widget _buildMoreActionsMenu(BuildContext context) {
+    final settings = chatTabsStore.activeChatStore.settings;
+
+    return MenuAnchor(
+      menuChildren: [
+        Observer(
+          builder: (_) => CheckboxMenuButton(
+            value: chatTabsStore.mergedMode,
+            onChanged: (_) {
+              HapticFeedback.selectionClick();
+              chatTabsStore.toggleMergedMode();
+            },
+            child: const Text('Merge chats'),
+          ),
+        ),
+        Observer(
+          builder: (_) => CheckboxMenuButton(
+            value: settings.focusCurrentChannel,
+            onChanged: (newValue) {
+              HapticFeedback.selectionClick();
+              settings.focusCurrentChannel = newValue ?? false;
+            },
+            child: const Text('Focus current channel'),
+          ),
+        ),
+      ],
+      builder: (context, controller, child) {
+        return IconButton.filledTonal(
+          icon: const Icon(Icons.more_vert, size: 18),
+          tooltip: 'Chat options',
+          visualDensity: VisualDensity.compact,
+          style: IconButton.styleFrom(
+            minimumSize: const Size(42, 42),
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+          ),
+          onPressed: () {
+            HapticFeedback.selectionClick();
+            controller.isOpen ? controller.close() : controller.open();
+          },
+        );
       },
     );
   }

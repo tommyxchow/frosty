@@ -609,6 +609,19 @@ class ChatMessage extends StatelessWidget {
                 child: dividedMessage,
               );
 
+        final sourceChannelId =
+            ircMessage.tags['source-room-id'] ?? ircMessage.tags['room-id'];
+        final currentChannelId =
+            overrideCurrentChannelId ?? chatStore.channelId;
+        final shouldFade =
+            chatStore.settings.focusCurrentChannel &&
+            sourceChannelId != null &&
+            sourceChannelId != currentChannelId;
+
+        final fadedMessage = shouldFade
+            ? Opacity(opacity: 0.4, child: coloredMessage)
+            : coloredMessage;
+
         final finalMessage = InkWell(
           onTap: () {
             FocusScope.of(context).unfocus();
@@ -617,7 +630,7 @@ class ChatMessage extends StatelessWidget {
             }
           },
           onLongPress: () => onLongPressMessage(context, defaultTextStyle),
-          child: coloredMessage,
+          child: fadedMessage,
         );
 
         return finalMessage;

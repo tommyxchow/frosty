@@ -221,6 +221,16 @@ class ChatSettings extends StatelessWidget {
             onChanged: (newValue) =>
                 settingsStore.showHistoricalTimestamps = newValue,
           ),
+          SettingsListSwitch(
+            title: 'Focus current channel',
+            subtitle: const Text(
+              'Fades messages from other channels in shared chat and '
+              'merged views, so the current channel stands out.',
+            ),
+            value: settingsStore.focusCurrentChannel,
+            onChanged: (newValue) =>
+                settingsStore.focusCurrentChannel = newValue,
+          ),
           const SectionHeader('Delay'),
           SettingsListSwitch(
             title: 'Auto-sync chat delay',
