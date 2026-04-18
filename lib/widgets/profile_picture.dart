@@ -3,11 +3,24 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
 import 'package:provider/provider.dart';
 
+const _grayscaleMatrix = <double>[
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0.2126, 0.7152, 0.0722, 0, 0,
+  0, 0, 0, 1, 0,
+];
+
 class ProfilePicture extends StatefulWidget {
   final String userLogin;
   final double radius;
+  final bool isGrayscale;
 
-  const ProfilePicture({super.key, required this.userLogin, this.radius = 20});
+  const ProfilePicture({
+    super.key,
+    required this.userLogin,
+    this.radius = 20,
+    this.isGrayscale = false,
+  });
 
   @override
   State<ProfilePicture> createState() => _ProfilePictureState();
@@ -59,7 +72,7 @@ class _ProfilePictureState extends State<ProfilePicture> {
     final diameter = widget.radius * 2;
     final placeholderColor = Theme.of(context).colorScheme.surfaceContainer;
 
-    return ClipOval(
+    final avatar = ClipOval(
       child: FutureBuilder<String>(
         future: _getProfileImageUrl(),
         builder: (context, snapshot) {
@@ -78,6 +91,13 @@ class _ProfilePictureState extends State<ProfilePicture> {
                 );
         },
       ),
+    );
+
+    if (!widget.isGrayscale) return avatar;
+
+    return ColorFiltered(
+      colorFilter: const ColorFilter.matrix(_grayscaleMatrix),
+      child: avatar,
     );
   }
 }

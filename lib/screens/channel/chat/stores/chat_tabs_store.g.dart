@@ -182,6 +182,18 @@ mixin _$ChatTabsStore on ChatTabsStoreBase, Store {
     );
   }
 
+  late final _$_refreshLiveStatusesAsyncAction = AsyncAction(
+    'ChatTabsStoreBase._refreshLiveStatuses',
+    context: context,
+  );
+
+  @override
+  Future<void> _refreshLiveStatuses() {
+    return _$_refreshLiveStatusesAsyncAction.run(
+      () => super._refreshLiveStatuses(),
+    );
+  }
+
   late final _$ChatTabsStoreBaseActionController = ActionController(
     name: 'ChatTabsStoreBase',
     context: context,
