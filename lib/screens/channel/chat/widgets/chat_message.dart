@@ -129,7 +129,10 @@ class ChatMessage extends StatelessWidget {
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                   forceTimestamp: forceTimestamp,
-                  channelIdToUserTwitch: overrideChannelIdToUserTwitch ??
+                  showHistoricalTimestamps:
+                      chatStore.settings.showHistoricalTimestamps,
+                  channelIdToUserTwitch:
+                      overrideChannelIdToUserTwitch ??
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId:
                       overrideCurrentChannelId ?? chatStore.channelId,
@@ -238,7 +241,10 @@ class ChatMessage extends StatelessWidget {
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
                   forceTimestamp: forceTimestamp,
-                  channelIdToUserTwitch: overrideChannelIdToUserTwitch ??
+                  showHistoricalTimestamps:
+                      chatStore.settings.showHistoricalTimestamps,
+                  channelIdToUserTwitch:
+                      overrideChannelIdToUserTwitch ??
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId:
                       overrideCurrentChannelId ?? chatStore.channelId,
@@ -393,10 +399,12 @@ class ChatMessage extends StatelessWidget {
                         },
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
-                  forceTimestamp: forceTimestamp,
+                        forceTimestamp: forceTimestamp,
+                        showHistoricalTimestamps:
+                            chatStore.settings.showHistoricalTimestamps,
                         channelIdToUserTwitch:
                             overrideChannelIdToUserTwitch ??
-                                chatStore.assetsStore.channelIdToUserTwitch,
+                            chatStore.assetsStore.channelIdToUserTwitch,
                         currentChannelId:
                             overrideCurrentChannelId ?? chatStore.channelId,
                       ),
@@ -523,10 +531,12 @@ class ChatMessage extends StatelessWidget {
                           badgeScale: chatStore.settings.badgeScale,
                           launchExternal: chatStore.settings.launchUrlExternal,
                           timestamp: chatStore.settings.timestampType,
-                  forceTimestamp: forceTimestamp,
+                          forceTimestamp: forceTimestamp,
+                          showHistoricalTimestamps:
+                              chatStore.settings.showHistoricalTimestamps,
                           channelIdToUserTwitch:
                               overrideChannelIdToUserTwitch ??
-                                  chatStore.assetsStore.channelIdToUserTwitch,
+                              chatStore.assetsStore.channelIdToUserTwitch,
                           currentChannelId:
                               overrideCurrentChannelId ?? chatStore.channelId,
                         ),

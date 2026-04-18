@@ -211,6 +211,16 @@ class ChatSettings extends StatelessWidget {
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
+          SettingsListSwitch(
+            title: 'Show timestamps on historical messages',
+            subtitle: const Text(
+              'Always show timestamps on messages loaded from chat history, '
+              'even when timestamps are disabled above.',
+            ),
+            value: settingsStore.showHistoricalTimestamps,
+            onChanged: (newValue) =>
+                settingsStore.showHistoricalTimestamps = newValue,
+          ),
           const SectionHeader('Delay'),
           SettingsListSwitch(
             title: 'Auto-sync chat delay',

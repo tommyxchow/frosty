@@ -41,6 +41,8 @@ SettingsStore _$SettingsStoreFromJson(
         unknownValue: TimestampType.disabled,
       ) ??
       TimestampType.disabled
+  ..showHistoricalTimestamps =
+      json['showHistoricalTimestamps'] as bool? ?? false
   ..highlightFirstTimeChatter =
       json['highlightFirstTimeChatter'] as bool? ?? true
   ..showUserNotices = json['showUserNotices'] as bool? ?? true
@@ -114,6 +116,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showDeletedMessages': instance.showDeletedMessages,
   'showChatMessageDividers': instance.showChatMessageDividers,
   'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
+  'showHistoricalTimestamps': instance.showHistoricalTimestamps,
   'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
   'showUserNotices': instance.showUserNotices,
   'showTwitchEmotes': instance.showTwitchEmotes,
@@ -545,6 +548,28 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
       super.timestampType = value;
     });
+  }
+
+  late final _$showHistoricalTimestampsAtom = Atom(
+    name: '_SettingsStoreBase.showHistoricalTimestamps',
+    context: context,
+  );
+
+  @override
+  bool get showHistoricalTimestamps {
+    _$showHistoricalTimestampsAtom.reportRead();
+    return super.showHistoricalTimestamps;
+  }
+
+  @override
+  set showHistoricalTimestamps(bool value) {
+    _$showHistoricalTimestampsAtom.reportWrite(
+      value,
+      super.showHistoricalTimestamps,
+      () {
+        super.showHistoricalTimestamps = value;
+      },
+    );
   }
 
   late final _$highlightFirstTimeChatterAtom = Atom(
@@ -1197,6 +1222,7 @@ fontSize: ${fontSize},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
+showHistoricalTimestamps: ${showHistoricalTimestamps},
 highlightFirstTimeChatter: ${highlightFirstTimeChatter},
 showUserNotices: ${showUserNotices},
 showTwitchEmotes: ${showTwitchEmotes},

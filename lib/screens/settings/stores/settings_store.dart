@@ -127,6 +127,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowDeletedMessages = false;
   static const defaultShowChatMessageDividers = false;
   static const defaultTimestampType = TimestampType.disabled;
+  static const defaultShowHistoricalTimestamps = false;
 
   // Alert defaults
   static const defaultHighlightFirstTimeChatter = true;
@@ -195,6 +196,10 @@ abstract class _SettingsStoreBase with Store {
   )
   @observable
   var timestampType = defaultTimestampType;
+
+  @JsonKey(defaultValue: defaultShowHistoricalTimestamps)
+  @observable
+  var showHistoricalTimestamps = defaultShowHistoricalTimestamps;
 
   @JsonKey(defaultValue: defaultHighlightFirstTimeChatter)
   @observable
@@ -314,6 +319,7 @@ abstract class _SettingsStoreBase with Store {
     showDeletedMessages = defaultShowDeletedMessages;
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
+    showHistoricalTimestamps = defaultShowHistoricalTimestamps;
     highlightFirstTimeChatter = defaultHighlightFirstTimeChatter;
     showUserNotices = defaultShowUserNotices;
 
