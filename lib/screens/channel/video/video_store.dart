@@ -298,13 +298,7 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
         await updateStreamQualities();
       } else {
         _showDefaultOverlay();
-        try {
-          videoWebViewController.runJavaScript(
-            'window._latencyTracker?.stop()',
-          );
-        } catch (e) {
-          debugPrint(e.toString());
-        }
+        _stopLatencyTracker();
       }
     });
 
@@ -322,6 +316,9 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
         _stopJsCleanupTimer();
         // Ensure overlay timer is active for clean UI
         _scheduleOverlayHide();
+        // The tracker's 60s cycle opens the Twitch settings menu via DOM
+        // queries — keep that off when the player isn't even visible.
+        _stopLatencyTracker();
       }
     });
 
@@ -353,8 +350,9 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
       (_) => (settingsStore.showLatency, settingsStore.autoSyncChatDelay),
       (values) async {
         final (showLatency, autoSync) = values;
-        // Only act if overlay is enabled (latency tracker only works with custom overlay)
-        if (!settingsStore.showOverlay) return;
+        // Tracker only runs against the live player iframe — skip in
+        // chat-only mode and when the custom overlay is off.
+        if (!settingsStore.showVideo || !settingsStore.showOverlay) return;
 
         if (showLatency || autoSync) {
           // Start tracker if either setting is now enabled
@@ -376,13 +374,7 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
           }
         } else {
           // Stop tracker if both settings are now disabled
-          try {
-            videoWebViewController.runJavaScript(
-              'window._latencyTracker?.stop()',
-            );
-          } catch (e) {
-            debugPrint(e.toString());
-          }
+          _stopLatencyTracker();
         }
       },
     );
@@ -541,6 +533,16 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     try {
       await videoWebViewController.runJavaScript(_kLatencyTrackerJs);
       _updateLatencyTrackerVisibility(_overlayVisible);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Tells the in-webview latency tracker to stop its polling cycle.
+  /// Safe to call when the tracker hasn't been injected yet.
+  void _stopLatencyTracker() {
+    try {
+      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -779,11 +781,7 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     // Signal that initVideo() should run on the next onPageFinished
     _needsInit = true;
 
-    try {
-      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
-    } catch (e) {
-      // Ignore - may not exist yet
-    }
+    _stopLatencyTracker();
 
     await videoWebViewController.loadRequest(Uri.parse(videoUrl));
 
@@ -876,11 +874,7 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     // Explicitly stop latency tracker as defense-in-depth.
     // The Video widget also loads about:blank during disposal which clears
     // all JavaScript state, but this provides an extra safety layer.
-    try {
-      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
-    } catch (e) {
-      // Ignore - page may already be unloading
-    }
+    _stopLatencyTracker();
   }
 }
 

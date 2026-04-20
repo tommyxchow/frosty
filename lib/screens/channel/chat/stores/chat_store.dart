@@ -134,6 +134,12 @@ abstract class ChatStoreBase with Store {
 
   static const _maxRetries = 5;
 
+  /// Ping interval for both the IRC and 7TV WebSocket sockets. Catches
+  /// zombie connections (silent network changes, OS suspends) without
+  /// waking the radio every 15s. Twitch's own recommended keepalive tops
+  /// out at 600s; community libs (e.g. dank-twitch-irc) sit around 30s.
+  static const _pingInterval = Duration(seconds: 60);
+
   // The retry counter for exponential backoff.
   var _retries = 0;
 
@@ -678,6 +684,13 @@ abstract class ChatStoreBase with Store {
               );
             }
             continue;
+          case Command.reconnect:
+            // Twitch is about to close the socket for maintenance — close
+            // it ourselves so the existing onDone path reconnects with no
+            // backoff (first retry is immediate) instead of waiting for the
+            // server to drop us mid-message.
+            _channel?.sink.close(1000);
+            continue;
           case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');
             continue;
@@ -828,7 +841,7 @@ abstract class ChatStoreBase with Store {
     _clearPendingDelayedCallbacks(clearChat: false);
     _sevenTVChannel = IOWebSocketChannel.connect(
       Uri.parse('wss://events.7tv.io/v3'),
-      pingInterval: const Duration(seconds: 15),
+      pingInterval: _pingInterval,
     );
 
     void listener(dynamic data) {
@@ -915,11 +928,9 @@ abstract class ChatStoreBase with Store {
     _clearPendingDelayedCallbacks(clearSevenTV: false);
 
     _channel?.sink.close(1000);
-    // 15s ping interval catches zombie connections (silent network changes,
-    // OS suspends) within the user's existing chat-delay tolerance window.
     _channel = IOWebSocketChannel.connect(
       Uri.parse('wss://irc-ws.chat.twitch.tv:443'),
-      pingInterval: const Duration(seconds: 15),
+      pingInterval: _pingInterval,
     );
 
     // Only show chat delay countdown on initial connection or video toggle, not on reconnects

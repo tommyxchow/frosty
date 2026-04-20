@@ -439,6 +439,30 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
   }
 
   @override
+  void _resetPlayerStateForChatOnly() {
+    final _$actionInfo = _$NativeVideoStoreBaseActionController.startAction(
+      name: 'NativeVideoStoreBase._resetPlayerStateForChatOnly',
+    );
+    try {
+      return super._resetPlayerStateForChatOnly();
+    } finally {
+      _$NativeVideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _initFreshController() {
+    final _$actionInfo = _$NativeVideoStoreBaseActionController.startAction(
+      name: 'NativeVideoStoreBase._initFreshController',
+    );
+    try {
+      return super._initFreshController();
+    } finally {
+      _$NativeVideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 streamQuality: ${streamQuality}

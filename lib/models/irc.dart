@@ -1163,6 +1163,11 @@ class IRCMessage {
       case 'GLOBALUSERSTATE':
         messageCommand = Command.globalUserState;
         break;
+      case 'RECONNECT':
+        // Server-initiated graceful reconnect notice. Twitch sends this
+        // before maintenance so clients can re-establish ahead of the close.
+        messageCommand = Command.reconnect;
+        break;
       default:
         debugPrint('Unknown command: $splitMessage[1]');
         messageCommand = Command.none;
@@ -1301,6 +1306,7 @@ enum Command {
   roomState,
   userState,
   globalUserState,
+  reconnect,
   none,
 }
 

@@ -329,9 +329,10 @@ abstract class ChatTabsStoreBase with Store {
       _restoreSecondaryTabs(primaryChannelId: primaryChannelId);
     }
 
-    // Kick off live-status polling for the avatar grayscale + popover header.
-    _ensureLiveStatusTimer();
-    _refreshLiveStatuses();
+    // Live-status data only powers the tab-chip avatar grayscale and the
+    // long-press popover, neither of which renders with a single tab —
+    // so skip the radio wake until a second tab is added.
+    _syncLiveStatusTimer();
 
     // Set up merged scroll listener once (reused across toggle cycles)
     mergedScrollController.addListener(() {
@@ -555,8 +556,7 @@ abstract class ChatTabsStoreBase with Store {
       _fetchTabChannelProfile(_tabs[newIndex]);
     }
 
-    // Pick up live status for the new tab without waiting for the next tick.
-    _refreshLiveStatuses();
+    _syncLiveStatusTimer();
 
     // Sync to settings for persistence
     _syncSecondaryTabsToSettings();
@@ -622,8 +622,7 @@ abstract class ChatTabsStoreBase with Store {
     // Remove the tab
     _tabs.removeAt(index);
 
-    // Drop any stale live-status entry tied to the removed tab.
-    _refreshLiveStatuses();
+    _syncLiveStatusTimer();
 
     // Disable merged mode if only 1 tab remains
     if (_tabs.length <= 1 && mergedMode) {
@@ -768,11 +767,23 @@ abstract class ChatTabsStoreBase with Store {
     }
   }
 
-  void _ensureLiveStatusTimer() {
-    _liveStatusTimer ??= Timer.periodic(
-      _liveStatusPeriod,
-      (_) => _refreshLiveStatuses(),
-    );
+  /// Starts the live-status timer (and an immediate fetch) when there are
+  /// multiple tabs, stops it when down to one. The data only feeds the tab
+  /// chip + popover, so polling at one tab is pure radio wake. Always
+  /// refreshes when multi-tab so add/remove drops stale entries.
+  void _syncLiveStatusTimer() {
+    if (_tabs.length > 1) {
+      _refreshLiveStatuses();
+      _liveStatusTimer ??= Timer.periodic(
+        _liveStatusPeriod,
+        (_) => _refreshLiveStatuses(),
+      );
+    } else {
+      _liveStatusTimer?.cancel();
+      _liveStatusTimer = null;
+      _liveStreams.clear();
+      _liveStatusFetched = false;
+    }
   }
 
   /// Disposes all ChatStores and cleans up resources.

@@ -11,6 +11,10 @@ import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/frosty_page_view.dart';
 import 'package:frosty/widgets/frosty_scrollbar.dart';
 
+/// ~2x default to keep richer message widgets (emotes, badges, replies) built
+/// ahead of fast scroll-back without holding the entire history.
+const _chatCacheExtent = 500.0;
+
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
   final EdgeInsetsGeometry? listPadding;
@@ -145,6 +149,7 @@ class Chat extends StatelessWidget {
         ),
       ),
       addAutomaticKeepAlives: false,
+      cacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: chatStore.renderMessages.length,
       itemBuilder: (context, index) => ChatMessage(
@@ -172,6 +177,7 @@ class Chat extends StatelessWidget {
         ),
       ),
       addAutomaticKeepAlives: false,
+      cacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: mergedMessages.length,
       itemBuilder: (context, index) {

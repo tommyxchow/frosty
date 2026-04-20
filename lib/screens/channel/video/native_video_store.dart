@@ -140,24 +140,30 @@ abstract class NativeVideoStoreBase
     required this.settingsStore,
   }) {
     _chatLatencySync.reset();
-    _controller = _createController();
     _scheduleOverlayHide();
     updateStreamInfo();
-    _initPlayer();
 
-    // Pause and release resources in chat-only mode so the AVPlayer
-    // isn't decoding/buffering while the video UI is hidden.
+    // Skip eager init in chat-only mode — `play()` is what activates the
+    // iOS audio session, so without it nothing is allocated.
+    if (settingsStore.showVideo) {
+      _controller = _createController();
+      _initPlayer();
+    } else {
+      _loading = false;
+      _initializing = false;
+    }
+
+    // `pause()` alone leaves the audio session, PiP controller, and URL
+    // session alive on iOS, which blocks low-power sleep states. Full
+    // dispose is the only path that deactivates the audio session.
     _disposeVideoModeReaction = reaction(
       (_) => settingsStore.showVideo,
       (showVideo) {
         if (!showVideo) {
-          _controller?.pause();
-          _userPaused = true;
-          _latencyTimer?.cancel();
-          _stallRecoveryTimer?.cancel();
-          _initRetryTimer?.cancel();
-        } else {
-          handleRefresh();
+          _disposeController();
+          _resetPlayerStateForChatOnly();
+        } else if (_controller == null) {
+          _initFreshController();
         }
       },
     );
@@ -891,16 +897,76 @@ abstract class NativeVideoStoreBase
     }
 
     _overlayTimer?.cancel();
+    _disposeAndroidAutoPipReaction?.call();
+    _disposeVideoModeReaction?.call();
+    _disposeController();
+  }
+
+  /// Tears down the native player and all of its observers. Releases the
+  /// `AVPlayer`, deactivates the audio session (when this is the last player
+  /// alive), and stops the PiP controller. Safe to call when no controller
+  /// has been created.
+  void _disposeController() {
     _latencyTimer?.cancel();
     _stallRecoveryTimer?.cancel();
     _initRetryTimer?.cancel();
     _pipSub?.cancel();
+    _pipSub = null;
     _qualitiesSub?.cancel();
-    _disposeAndroidAutoPipReaction?.call();
-    _disposeVideoModeReaction?.call();
-
+    _qualitiesSub = null;
     _controller?.removeActivityListener(_onPlayerActivity);
     _controller?.dispose();
     _controller = null;
+    _controllerInitialized = false;
+    _initInFlight = false;
+    _initGeneration++;
+  }
+
+  /// Resets the observable fields that have the same target value across
+  /// "torn down for chat-only" and "fresh controller about to load". Caller
+  /// sets the few fields that differ (`_loading`, `_initializing`).
+  void _resetPlayerStateCommon() {
+    _hasPlayedOnce = false;
+    _userPaused = false;
+    _paused = true;
+    _isStalled = false;
+    _isQualitySwitching = false;
+    _isAudioOnlyMode = false;
+    _stallRecoveryAttempt = 0;
+    _highLatencyCount = 0;
+    _firstTimeSettingQuality = true;
+    _pendingQualityIndex = null;
+    _streamQualityIndex = 0;
+    _availableStreamQualities = [];
+    _qualityObjects = [];
+    _latency = null;
+    _error = null;
+    _isInPipMode = false;
+    _lastPipWasAutomatic = false;
+    _manualPipRequested = false;
+    _overlayWasVisibleBeforePip = true;
+  }
+
+  /// Resets observable display state after [_disposeController] so the UI
+  /// reflects "no active player". Called only when entering chat-only mode;
+  /// final disposal skips this since the store is being torn down.
+  @action
+  void _resetPlayerStateForChatOnly() {
+    _resetPlayerStateCommon();
+    _loading = false;
+    _initializing = false;
+    _hlsUrl = null;
+    _chatLatencySync.reset();
+  }
+
+  /// Builds a brand new controller and kicks off `_initPlayer`. Used when
+  /// the user toggles back to video mode after a chat-only stretch.
+  @action
+  void _initFreshController() {
+    _resetPlayerStateCommon();
+    _loading = true;
+    _initializing = true;
+    _controller = _createController();
+    _initPlayer();
   }
 }
