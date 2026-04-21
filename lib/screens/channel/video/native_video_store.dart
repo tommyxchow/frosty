@@ -495,6 +495,10 @@ abstract class NativeVideoStoreBase
         statusCode >= 400 &&
         statusCode < 500 &&
         !_isWithinRecoveryCap()) {
+      debugPrint(
+        'NativeVideoStore: $statusCode on HLS fetch, refreshing with fresh '
+        'token (attempt ${_totalRefreshAttempts + 1}/${VideoTimingConstants.maxRefreshAttempts})',
+      );
       _totalRefreshAttempts++;
       handleRefresh();
       return;
