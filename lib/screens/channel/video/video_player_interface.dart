@@ -9,6 +9,10 @@ import 'package:frosty/screens/settings/stores/settings_store.dart';
 abstract class VideoPlayerInterface {
   SettingsStore get settingsStore;
 
+  /// Channel this store is driving — used as a key for per-channel
+  /// persistence (e.g. last-selected quality).
+  String get userLogin;
+
   bool get loading;
   bool get paused;
   bool get overlayVisible;

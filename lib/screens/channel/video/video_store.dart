@@ -29,6 +29,7 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
   final TwitchApi twitchApi;
 
   /// The userlogin of the current channel.
+  @override
   final String userLogin;
 
   /// The user ID of the current channel.
@@ -133,7 +134,8 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
                 return;
               }
               final prefs = await SharedPreferences.getInstance();
-              final lastStreamQuality = prefs.getString(kLastStreamQualityKey);
+              final lastStreamQuality =
+                  prefs.getString(lastStreamQualityKey(userLogin));
               if (lastStreamQuality == null) return;
               setStreamQuality(lastStreamQuality);
             }

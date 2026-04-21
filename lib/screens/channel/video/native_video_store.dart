@@ -29,6 +29,7 @@ abstract class NativeVideoStoreBase
     implements NativeVideoPlayerInterface {
   static int _nextId = 0;
 
+  @override
   final String userLogin;
   final String userId;
   final String displayName;
@@ -64,6 +65,12 @@ abstract class NativeVideoStoreBase
   var _controllerInitialized = false;
   var _totalRefreshAttempts = 0;
   var _highLatencyCount = 0;
+
+  /// Timestamp of the most recent transition into `_onPlaying`. A subsequent
+  /// stall that arrives inside [VideoTimingConstants.shortPlayWindow] counts
+  /// as a bounce; repeated bounces surface a tailored CDN-trouble error.
+  DateTime? _lastPlayingStart;
+  int _shortPlayBounceCount = 0;
   var _isQualitySwitching = false;
   var _initGeneration = 0;
   static final _bareResolutionRe = RegExp(r'^(\d+)p$');
@@ -287,7 +294,8 @@ abstract class NativeVideoStoreBase
             } else {
               SharedPreferences.getInstance().then((prefs) {
                 if (_disposed || _pendingQualityIndex != null) return;
-                final lastQuality = prefs.getString(kLastStreamQualityKey);
+                final lastQuality =
+                    prefs.getString(lastStreamQualityKey(userLogin));
                 if (lastQuality != null) {
                   final index = _availableStreamQualities.indexOf(lastQuality);
                   if (index != -1) _pendingQualityIndex = index;
@@ -439,6 +447,7 @@ abstract class NativeVideoStoreBase
     _stallRecoveryTimer?.cancel();
     _stallRecoveryAttempt = 0;
     _totalRefreshAttempts = 0;
+    _lastPlayingStart = DateTime.now();
     if (_pendingQualityIndex != null) {
       final index = _pendingQualityIndex!;
       _pendingQualityIndex = null;
@@ -456,6 +465,7 @@ abstract class NativeVideoStoreBase
     // to engage recovery on those stalls.
     if (_hasPlayedOnce && !_isQualitySwitching) {
       _isStalled = true;
+      _recordShortPlayBounceIfNeeded();
     }
     // Clear _initializing on the first buffering event so the stall
     // recovery timer isn't permanently blocked during init stalls.
@@ -475,6 +485,22 @@ abstract class NativeVideoStoreBase
     final errorMessage =
         eventData?['message'] as String? ??
         'Playback error. Try refreshing or switch to the standard player in Settings.';
+    final statusCode = eventData?['statusCode'] as int?;
+
+    // 4xx on the HLS fetch means the current playback session is gone — a
+    // fresh GQL token + new query params can land on a different CDN edge
+    // with a working manifest. Skip the user-facing error and retry
+    // immediately, bypassing the refresh cooldown.
+    if (statusCode != null &&
+        statusCode >= 400 &&
+        statusCode < 500 &&
+        !_isWithinRecoveryCap()) {
+      _totalRefreshAttempts++;
+      _lastRefreshTime = null;
+      handleRefresh();
+      return;
+    }
+
     // Check stream liveness before showing the error — an offline channel
     // is expected to 404 and the overlay handles it.
     updateStreamInfo(forceUpdate: true).then((_) {
@@ -488,6 +514,9 @@ abstract class NativeVideoStoreBase
       });
     });
   }
+
+  bool _isWithinRecoveryCap() =>
+      _totalRefreshAttempts >= VideoTimingConstants.maxRefreshAttempts;
 
   void _onPaused() {
     if (!_isInPipMode) {
@@ -527,9 +556,9 @@ abstract class NativeVideoStoreBase
     } else if (_totalRefreshAttempts >=
         VideoTimingConstants.maxRefreshAttempts) {
       _showStallError();
-    } else if (_isWithinRefreshCooldown()) {
-      // CDN may still be serving stale manifests. Re-arm and try again.
-      debugPrint('NativeVideoStore: refresh cooldown, re-arming timer');
+    } else if (_backoffDelayRemaining() > Duration.zero) {
+      // Still within the exponential backoff window — re-arm and try again.
+      debugPrint('NativeVideoStore: refresh backoff pending, re-arming timer');
       _startStallRecoveryTimer();
     } else {
       _recoverByFullRefresh();
@@ -545,19 +574,44 @@ abstract class NativeVideoStoreBase
 
   void _showStallError() {
     debugPrint('NativeVideoStore: max recovery attempts reached');
+    final bouncing = _shortPlayBounceCount >=
+        VideoTimingConstants.shortPlayLoopThreshold;
     runInAction(() {
       _loading = false;
-      _error =
-          'Stream stalled. Try refreshing or switch to the standard player in Settings.';
+      _error = bouncing
+          ? 'Twitch is having trouble with this channel right now. Try again in a moment, or switch to the standard player in Settings.'
+          : 'Stream stalled. Try refreshing or switch to the standard player in Settings.';
       _overlayVisible = true;
       _overlayTimer?.cancel();
     });
   }
 
-  bool _isWithinRefreshCooldown() {
-    if (_lastRefreshTime == null) return false;
-    return DateTime.now().difference(_lastRefreshTime!) <
-        VideoTimingConstants.refreshCooldown;
+  /// If a stall arrives within [shortPlayWindow] of the last `_onPlaying`,
+  /// count it as a bounce. Three bounces in a row flips the stall-error
+  /// message to the CDN-trouble variant.
+  void _recordShortPlayBounceIfNeeded() {
+    final start = _lastPlayingStart;
+    if (start == null) return;
+    final elapsed = DateTime.now().difference(start);
+    if (elapsed <= VideoTimingConstants.shortPlayWindow) {
+      _shortPlayBounceCount++;
+    } else {
+      _shortPlayBounceCount = 0;
+    }
+    _lastPlayingStart = null;
+  }
+
+  /// How long to wait before the next stall-recovery full refresh, based on
+  /// how many have already fired. Returns zero once enough time has elapsed
+  /// since the last refresh, or when no refresh has happened yet.
+  Duration _backoffDelayRemaining() {
+    if (_lastRefreshTime == null) return Duration.zero;
+    final idx = _totalRefreshAttempts
+        .clamp(0, VideoTimingConstants.refreshBackoff.length - 1);
+    final required = VideoTimingConstants.refreshBackoff[idx];
+    final elapsed = DateTime.now().difference(_lastRefreshTime!);
+    final remaining = required - elapsed;
+    return remaining > Duration.zero ? remaining : Duration.zero;
   }
 
   void _recoverByFullRefresh() {
@@ -693,10 +747,12 @@ abstract class NativeVideoStoreBase
   @action
   Future<void> handleRefresh() async {
     HapticFeedback.lightImpact();
-    // Reset recovery cap and cooldown on user-initiated refresh (error was
-    // shown). Stall recovery calls this with _error == null, preserving the cap.
+    // Reset recovery cap, cooldown, and bounce counter on user-initiated
+    // refresh (error was shown). Stall recovery calls this with
+    // _error == null, preserving the cap.
     if (_error != null) {
       _totalRefreshAttempts = 0;
+      _shortPlayBounceCount = 0;
     }
     _lastRefreshTime = DateTime.now();
     _loading = true;

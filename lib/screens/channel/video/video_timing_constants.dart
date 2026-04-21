@@ -9,6 +9,21 @@ class VideoTimingConstants {
   static const initRetryDelay = Duration(seconds: 3);
   static const int maxRefreshAttempts = 3;
 
+  /// Delay between stall-recovery full refreshes, indexed by attempt number
+  /// (0 = first attempt). Attempts beyond the list length fall through to
+  /// the error path via [maxRefreshAttempts].
+  static const refreshBackoff = <Duration>[
+    Duration.zero,
+    Duration(seconds: 3),
+    Duration(seconds: 8),
+  ];
+
+  /// A "play" event arriving within this window after a previous one is
+  /// treated as a failed-recovery bounce rather than a fresh successful start.
+  static const shortPlayWindow = Duration(seconds: 3);
+  /// Number of short-play bounces required before surfacing a tailored error.
+  static const int shortPlayLoopThreshold = 3;
+
   // Latency / chat sync
   static const latencyPollingInterval = Duration(seconds: 30);
   static const int highLatencyThresholdSeconds = 30;

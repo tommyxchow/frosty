@@ -6,8 +6,14 @@ const clientId = String.fromEnvironment('CLIENT_ID');
 /// Twitch GQL client ID (web player, used for playback access tokens).
 const twitchGqlClientId = 'kimne78kx3ncx6brgo4mv6wki5h1ko';
 
-/// SharedPreferences key for the last-selected stream quality.
-const kLastStreamQualityKey = 'last_stream_quality';
+/// SharedPreferences key for the per-channel last-selected stream quality.
+/// A saved variant that doesn't exist on the target channel (e.g. 1080p on a
+/// source-only channel) falls back to Auto via the quality-list lookup.
+String lastStreamQualityKey(String userLogin) =>
+    'last_stream_quality_$userLogin';
+
+/// Legacy global key. Cleared on startup during SharedPreferences init.
+const kLegacyLastStreamQualityKey = 'last_stream_quality';
 
 /// Twitch API client secret.
 const secret = String.fromEnvironment('SECRET');

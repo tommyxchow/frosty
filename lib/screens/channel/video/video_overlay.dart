@@ -110,7 +110,7 @@ class VideoOverlay extends StatelessWidget {
                               videoStore.setStreamQuality(quality);
                               SharedPreferences.getInstance().then(
                                 (prefs) => prefs.setString(
-                                  kLastStreamQualityKey,
+                                  lastStreamQualityKey(videoStore.userLogin),
                                   quality,
                                 ),
                               );
