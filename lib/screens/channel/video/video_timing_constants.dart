@@ -5,7 +5,6 @@ class VideoTimingConstants {
 
   // Stall recovery
   static const stallDetectionDelay = Duration(seconds: 8);
-  static const refreshCooldown = Duration(seconds: 15);
   static const initRetryDelay = Duration(seconds: 3);
   static const int maxRefreshAttempts = 3;
 

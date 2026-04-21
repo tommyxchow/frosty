@@ -490,13 +490,12 @@ abstract class NativeVideoStoreBase
     // 4xx on the HLS fetch means the current playback session is gone — a
     // fresh GQL token + new query params can land on a different CDN edge
     // with a working manifest. Skip the user-facing error and retry
-    // immediately, bypassing the refresh cooldown.
+    // immediately (handleRefresh updates _lastRefreshTime itself).
     if (statusCode != null &&
         statusCode >= 400 &&
         statusCode < 500 &&
         !_isWithinRecoveryCap()) {
       _totalRefreshAttempts++;
-      _lastRefreshTime = null;
       handleRefresh();
       return;
     }
