@@ -102,7 +102,7 @@ packages:
     description:
       path: "."
       ref: frosty-patches
-      resolved-ref: "8eb71aa662d4958d3569df5166aa5f831c87fd07"
+      resolved-ref: "6fc9a2764c9faf5cb29d784b402eeb466fa559e0"
       url: "https://github.com/tommyxchow/flutter-native-video-player.git"
     source: git
     version: "0.4.11"
