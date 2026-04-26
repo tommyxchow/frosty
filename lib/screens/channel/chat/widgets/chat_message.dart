@@ -619,7 +619,7 @@ class ChatMessage extends StatelessWidget {
             sourceChannelId != currentChannelId;
 
         final fadedMessage = shouldFade
-            ? Opacity(opacity: 0.4, child: coloredMessage)
+            ? Opacity(opacity: 0.55, child: coloredMessage)
             : coloredMessage;
 
         final finalMessage = InkWell(
