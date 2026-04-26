@@ -6,7 +6,6 @@ import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/models/irc.dart';
-import 'package:frosty/models/stream.dart';
 import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
@@ -279,27 +278,6 @@ abstract class ChatTabsStoreBase with Store {
   /// Public getter for the tabs list.
   List<ChatTabInfo> get tabs => _tabs;
 
-  /// Live stream info keyed by channel userId. Entries only exist for
-  /// currently-live channels; offline channels have no entry.
-  final _liveStreams = ObservableMap<String, StreamTwitch>();
-
-  /// True once the first live-status fetch has completed. Until then we
-  /// treat all channels as live to avoid a grayscale flash on startup.
-  bool _liveStatusFetched = false;
-
-  Timer? _liveStatusTimer;
-  static const _liveStatusPeriod = Duration(seconds: 90);
-
-  /// Whether [channelId] is currently live according to the latest fetch.
-  bool isTabLive(String channelId) {
-    if (!_liveStatusFetched) return true;
-    return _liveStreams.containsKey(channelId);
-  }
-
-  /// Returns live stream info for [channelId], or null if offline / unknown.
-  /// Used by the long-press popover to render title / game / viewer count.
-  StreamTwitch? getStreamInfo(String channelId) => _liveStreams[channelId];
-
   ChatTabsStoreBase({
     required this.twitchApi,
     required this.bttvApi,
@@ -328,11 +306,6 @@ abstract class ChatTabsStoreBase with Store {
     if (settingsStore.persistChatTabs) {
       _restoreSecondaryTabs(primaryChannelId: primaryChannelId);
     }
-
-    // Live-status data only powers the tab-chip avatar grayscale and the
-    // long-press popover, neither of which renders with a single tab —
-    // so skip the radio wake until a second tab is added.
-    _syncLiveStatusTimer();
 
     // Set up merged scroll listener once (reused across toggle cycles)
     mergedScrollController.addListener(() {
@@ -556,8 +529,6 @@ abstract class ChatTabsStoreBase with Store {
       _fetchTabChannelProfile(_tabs[newIndex]);
     }
 
-    _syncLiveStatusTimer();
-
     // Sync to settings for persistence
     _syncSecondaryTabsToSettings();
 
@@ -621,8 +592,6 @@ abstract class ChatTabsStoreBase with Store {
 
     // Remove the tab
     _tabs.removeAt(index);
-
-    _syncLiveStatusTimer();
 
     // Disable merged mode if only 1 tab remains
     if (_tabs.length <= 1 && mergedMode) {
@@ -746,52 +715,10 @@ abstract class ChatTabsStoreBase with Store {
     }
   }
 
-  /// Refreshes the live-status map for all current tabs in one bulk fetch.
-  /// Channels not in the response are treated as offline (removed from map).
-  @action
-  Future<void> _refreshLiveStatuses() async {
-    final ids = _tabs.map((t) => t.channelId).toList(growable: false);
-    if (ids.isEmpty) return;
-    try {
-      final result = await twitchApi.getStreamsByIds(userIds: ids);
-      final next = <String, StreamTwitch>{
-        for (final s in result.data) s.userId: s,
-      };
-      _liveStreams
-        ..clear()
-        ..addAll(next);
-      _liveStatusFetched = true;
-    } catch (e) {
-      // Transient errors: keep existing state, don't flicker. Log only.
-      debugPrint('Failed to refresh tab live statuses: $e');
-    }
-  }
-
-  /// Starts the live-status timer (and an immediate fetch) when there are
-  /// multiple tabs, stops it when down to one. The data only feeds the tab
-  /// chip + popover, so polling at one tab is pure radio wake. Always
-  /// refreshes when multi-tab so add/remove drops stale entries.
-  void _syncLiveStatusTimer() {
-    if (_tabs.length > 1) {
-      _refreshLiveStatuses();
-      _liveStatusTimer ??= Timer.periodic(
-        _liveStatusPeriod,
-        (_) => _refreshLiveStatuses(),
-      );
-    } else {
-      _liveStatusTimer?.cancel();
-      _liveStatusTimer = null;
-      _liveStreams.clear();
-      _liveStatusFetched = false;
-    }
-  }
-
   /// Disposes all ChatStores and cleans up resources.
   void dispose() {
     _mergedRenderTimer?.cancel();
     _mergedRenderTimer = null;
-    _liveStatusTimer?.cancel();
-    _liveStatusTimer = null;
     for (final tab in _tabs) {
       tab.chatStore?.dispose();
     }

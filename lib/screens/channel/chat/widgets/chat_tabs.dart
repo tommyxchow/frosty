@@ -3,38 +3,22 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/add_chat_dialog.dart';
 import 'package:frosty/utils.dart';
-import 'package:frosty/widgets/frosty_cached_network_image.dart';
 import 'package:frosty/widgets/profile_picture.dart';
-import 'package:intl/intl.dart' show NumberFormat;
-
-const _chipAnimationDuration = Duration(milliseconds: 200);
-const _avatarRadius = 12.0;
-const _activeChipRadius = 16.0;
 
 /// Widget that displays multiple chat tabs with a tab bar.
 /// Wraps the existing Chat widget and manages tab switching.
-class ChatTabs extends StatefulWidget {
+class ChatTabs extends StatelessWidget {
   final ChatTabsStore chatTabsStore;
   final EdgeInsetsGeometry? listPadding;
 
   const ChatTabs({super.key, required this.chatTabsStore, this.listPadding});
 
-  @override
-  State<ChatTabs> createState() => _ChatTabsState();
-}
-
-class _ChatTabsState extends State<ChatTabs> {
-  bool _isReordering = false;
-
-  ChatTabsStore get _store => widget.chatTabsStore;
-
-  Future<void> _handleAddChat() async {
-    if (!_store.canAddTab) {
+  Future<void> _handleAddChat(BuildContext context) async {
+    if (!chatTabsStore.canAddTab) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Maximum 10 chats open'),
@@ -44,17 +28,16 @@ class _ChatTabsState extends State<ChatTabs> {
       return;
     }
 
-    final result = await AddChatSheet.show(context, _store.twitchApi);
+    final result = await AddChatSheet.show(context, chatTabsStore.twitchApi);
 
     if (result != null) {
-      final added = _store.addTab(
+      final added = chatTabsStore.addTab(
         channelId: result.channelId,
         channelLogin: result.channelLogin,
         displayName: result.displayName,
       );
 
-      if (!added && mounted) {
-        // If not added, it means the channel already exists (switched to it)
+      if (!added && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Channel already open, switched to it'),
@@ -69,21 +52,15 @@ class _ChatTabsState extends State<ChatTabs> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        final tabs = _store.tabs;
-        final activeIndex = _store.activeTabIndex;
-        final showTabBar = _store.showTabBar;
+        final tabs = chatTabsStore.tabs;
+        final activeIndex = chatTabsStore.activeTabIndex;
+        final showTabBar = chatTabsStore.showTabBar;
         final showMerge = tabs.where((t) => t.isActivated).length >= 2;
 
-        // Calculate extra top padding for tab bar when visible
         final tabBarHeight = showTabBar ? 48.0 : 0.0;
-
-        // Get the top inset from listPadding (e.g., for AppBar in chat-only mode)
-        final topInset =
-            widget.listPadding?.resolve(TextDirection.ltr).top ?? 0;
-
-        // Adjust list padding to account for tab bar
-        final adjustedPadding = widget.listPadding != null
-            ? widget.listPadding!.add(EdgeInsets.only(top: tabBarHeight))
+        final topInset = listPadding?.resolve(TextDirection.ltr).top ?? 0;
+        final adjustedPadding = listPadding != null
+            ? listPadding!.add(EdgeInsets.only(top: tabBarHeight))
             : EdgeInsets.only(top: tabBarHeight);
 
         return PopScope(
@@ -91,39 +68,31 @@ class _ChatTabsState extends State<ChatTabs> {
           onPopInvokedWithResult: (didPop, _) {
             if (didPop) return;
 
-            // On Android back gesture, close overlays first before navigating back
-            final activeStore = _store.activeChatStore;
-
-            // Priority 1: Close emote menu
+            // Android back gesture: dismiss overlays before navigating away.
+            final activeStore = chatTabsStore.activeChatStore;
             if (activeStore.assetsStore.showEmoteMenu) {
               activeStore.assetsStore.showEmoteMenu = false;
               return;
             }
-
-            // Priority 2: Unfocus keyboard
             if (activeStore.textFieldFocusNode.hasFocus) {
               activeStore.unfocusInput();
               return;
             }
-
-            // Priority 3: Navigate back
             Navigator.of(context).pop();
           },
           child: Stack(
             children: [
-              // Chat content: merged view or IndexedStack
               Positioned.fill(
-                child: _store.mergedMode
+                child: chatTabsStore.mergedMode
                     ? Chat(
-                        chatStore: _store.activeChatStore,
-                        chatTabsStore: _store,
+                        chatStore: chatTabsStore.activeChatStore,
+                        chatTabsStore: chatTabsStore,
                         listPadding: adjustedPadding,
-                        onAddChat: _handleAddChat,
+                        onAddChat: () => _handleAddChat(context),
                       )
                     : IndexedStack(
                         index: activeIndex,
                         children: tabs.map((tabInfo) {
-                          // Show placeholder for non-activated tabs
                           if (tabInfo.chatStore == null) {
                             return const SizedBox.shrink();
                           }
@@ -131,12 +100,11 @@ class _ChatTabsState extends State<ChatTabs> {
                             key: ValueKey(tabInfo.channelId),
                             chatStore: tabInfo.chatStore!,
                             listPadding: adjustedPadding,
-                            onAddChat: _handleAddChat,
+                            onAddChat: () => _handleAddChat(context),
                           );
                         }).toList(),
                       ),
               ),
-              // Tab bar (only visible when more than 1 tab)
               if (showTabBar)
                 Positioned(
                   top: topInset,
@@ -146,8 +114,8 @@ class _ChatTabsState extends State<ChatTabs> {
                     height: 48,
                     child: Stack(
                       children: [
-                        // When merge button is visible, clips at its center
-                        // so chips slide under its left half then disappear.
+                        // Right-clip past the merge button so chips slide
+                        // under its left half then disappear.
                         Positioned(
                           left: 0,
                           top: 0,
@@ -160,13 +128,9 @@ class _ChatTabsState extends State<ChatTabs> {
                               left: 12,
                               right: showMerge ? 32 : 12,
                             ),
-                            onReorderStart: (_) =>
-                                setState(() => _isReordering = true),
-                            onReorderEnd: (_) =>
-                                setState(() => _isReordering = false),
                             onReorderItem: (oldIndex, newIndex) {
                               HapticFeedback.lightImpact();
-                              _store.reorderTab(oldIndex, newIndex);
+                              chatTabsStore.reorderTab(oldIndex, newIndex);
                             },
                             proxyDecorator: (child, index, animation) {
                               return Material(
@@ -175,7 +139,7 @@ class _ChatTabsState extends State<ChatTabs> {
                               );
                             },
                             itemBuilder: (context, index) {
-                              final tabInfo = _store.tabs[index];
+                              final tabInfo = chatTabsStore.tabs[index];
                               return Padding(
                                 key: ValueKey(tabInfo.channelId),
                                 padding: EdgeInsets.only(
@@ -207,16 +171,16 @@ class _ChatTabsState extends State<ChatTabs> {
   }
 
   Widget _buildMoreActionsMenu(BuildContext context) {
-    final settings = _store.activeChatStore.settings;
+    final settings = chatTabsStore.activeChatStore.settings;
 
-    return MenuAnchor(
-      menuChildren: [
+    return _AnchoredPopupMenu(
+      itemsBuilder: (close) => [
         Observer(
           builder: (_) => CheckboxMenuButton(
-            value: _store.mergedMode,
+            value: chatTabsStore.mergedMode,
             onChanged: (_) {
               HapticFeedback.selectionClick();
-              _store.toggleMergedMode();
+              chatTabsStore.toggleMergedMode();
             },
             child: const Text('Merge chats'),
           ),
@@ -232,7 +196,7 @@ class _ChatTabsState extends State<ChatTabs> {
           ),
         ),
       ],
-      builder: (context, controller, child) {
+      anchorBuilder: (context, toggle) {
         return IconButton.filledTonal(
           icon: const Icon(Icons.more_vert, size: 18),
           tooltip: 'Chat options',
@@ -244,7 +208,7 @@ class _ChatTabsState extends State<ChatTabs> {
           ),
           onPressed: () {
             HapticFeedback.selectionClick();
-            controller.isOpen ? controller.close() : controller.open();
+            toggle();
           },
         );
       },
@@ -252,8 +216,8 @@ class _ChatTabsState extends State<ChatTabs> {
   }
 
   Widget _buildTab(BuildContext context, int index) {
-    final tabInfo = _store.tabs[index];
-    final isActive = index == _store.activeTabIndex;
+    final tabInfo = chatTabsStore.tabs[index];
+    final isActive = index == chatTabsStore.activeTabIndex;
     final isSecondary = !tabInfo.isPrimary;
     final displayName = getReadableName(
       tabInfo.displayName,
@@ -262,282 +226,199 @@ class _ChatTabsState extends State<ChatTabs> {
 
     return Observer(
       builder: (context) {
+        final theme = Theme.of(context);
         final isActivated = tabInfo.isActivated;
-        final isLive = _store.isTabLive(tabInfo.channelId);
-        final hasUnread = _store.hasUnreadMessages(index);
-        final streamInfo = _store.getStreamInfo(tabInfo.channelId);
+        final hasUnread = chatTabsStore.hasUnreadMessages(index);
+        final dimmed = !isActivated;
 
-        // Primary + offline → empty popover (no header value, no actions);
-        // skip opening entirely.
-        final canOpenPopover = isSecondary || isLive;
-
-        return MenuAnchor(
-          menuChildren: _buildPopoverChildren(
-            context: context,
-            index: index,
-            isPrimary: tabInfo.isPrimary,
-            isActivated: isActivated,
-            isLive: isLive,
-            displayName: displayName,
-            streamInfo: streamInfo,
-          ),
-          builder: (context, controller, child) {
-            void openPopover() {
-              if (!canOpenPopover) return;
-              HapticFeedback.lightImpact();
-              controller.open();
-            }
-
-            return Semantics(
-              button: true,
-              selected: isActive,
-              label: [
-                displayName,
-                if (!isLive) 'offline',
-                if (hasUnread) 'unread messages',
-                if (!isActivated) 'disconnected',
-              ].join(', '),
-              excludeSemantics: true,
-              child: _ChipShell(
-                isActive: isActive,
-                animationDuration:
-                    _isReordering ? Duration.zero : _chipAnimationDuration,
-                onTap: () {
-                  if (isActive) return;
-                  HapticFeedback.selectionClick();
-                  _store.setActiveTab(index);
-                },
-                onLongPress: openPopover,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Opacity(
-                      opacity: isActivated ? 1.0 : 0.5,
-                      child: Badge(
-                        smallSize: 8,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primary,
-                        isLabelVisible: hasUnread,
-                        child: ProfilePicture(
-                          userLogin: tabInfo.channelLogin,
-                          radius: _avatarRadius,
-                          isGrayscale: !isLive,
-                        ),
-                      ),
-                    ),
-                    if (isActive) ...[
-                      const SizedBox(width: 6),
-                      Text(
-                        displayName,
-                        style: isActivated
-                            ? null
-                            : TextStyle(
-                                color: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.color
-                                    ?.withValues(alpha: 0.5),
-                              ),
-                      ),
-                      if (isSecondary) ...[
-                        const SizedBox(width: 4),
-                        InkResponse(
-                          radius: 14,
-                          onTap: openPopover,
-                          child: Icon(
-                            Icons.close_rounded,
-                            size: 16,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ],
+        InputChip buildChip({VoidCallback? onDeleted}) => InputChip(
+              avatar: Badge(
+                smallSize: 8,
+                backgroundColor: theme.colorScheme.primary,
+                isLabelVisible: hasUnread,
+                child: Opacity(
+                  opacity: dimmed ? 0.5 : 1.0,
+                  child: ProfilePicture(
+                    userLogin: tabInfo.channelLogin,
+                    radius: 12,
+                  ),
                 ),
               ),
+              label: Text(
+                displayName,
+                style: dimmed
+                    ? TextStyle(
+                        color: theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.5),
+                      )
+                    : null,
+              ),
+              selected: isActive,
+              showCheckmark: false,
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onPressed: () {
+                if (isActive) return;
+                HapticFeedback.selectionClick();
+                chatTabsStore.setActiveTab(index);
+              },
+              onDeleted: onDeleted,
+              deleteButtonTooltipMessage:
+                  onDeleted != null ? 'Tab options' : null,
             );
-          },
+
+        if (!isSecondary) return buildChip();
+
+        return _AnchoredPopupMenu(
+          itemsBuilder: (close) => [
+            if (isActivated)
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.power_off_rounded, size: 18),
+                child: const Text('Disconnect'),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  close();
+                  chatTabsStore.deactivateTab(index);
+                },
+              ),
+            MenuItemButton(
+              leadingIcon: Icon(
+                Icons.delete_outline_rounded,
+                size: 18,
+                color: theme.colorScheme.error,
+              ),
+              child: Text(
+                'Remove',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                close();
+                chatTabsStore.removeTab(index);
+              },
+            ),
+          ],
+          anchorBuilder: (context, toggle) =>
+              buildChip(onDeleted: toggle),
         );
       },
     );
   }
-
-  List<Widget> _buildPopoverChildren({
-    required BuildContext context,
-    required int index,
-    required bool isPrimary,
-    required bool isActivated,
-    required bool isLive,
-    required String displayName,
-    required StreamTwitch? streamInfo,
-  }) {
-    final isSecondary = !isPrimary;
-    final hasActions = isSecondary;
-
-    return [
-      _PopoverHeader(
-        displayName: displayName,
-        streamInfo: isLive ? streamInfo : null,
-      ),
-      if (hasActions) const Divider(height: 1),
-      if (isSecondary && isActivated)
-        MenuItemButton(
-          leadingIcon: const Icon(Icons.power_off_rounded, size: 18),
-          child: const Text('Disconnect'),
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            _store.deactivateTab(index);
-          },
-        ),
-      if (isSecondary)
-        MenuItemButton(
-          leadingIcon: Icon(
-            Icons.delete_outline_rounded,
-            size: 18,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          child: Text(
-            'Remove',
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            _store.removeTab(index);
-          },
-        ),
-    ];
-  }
 }
 
-/// Animated container shell for a chat tab chip — pill background when active,
-/// transparent when not. Drives the avatar↔pill morph via [AnimatedSize].
-class _ChipShell extends StatelessWidget {
-  final bool isActive;
-  final Duration animationDuration;
-  final VoidCallback onTap;
-  final VoidCallback onLongPress;
-  final Widget child;
+/// Lightweight popup menu anchored to a child widget. The menu's top-right
+/// aligns to the anchor's bottom-right via [CompositedTransformFollower] and
+/// fades + scales in from that corner. [MenuAnchor] doesn't expose an entry
+/// animation hook in this Flutter version, so we drive one ourselves.
+class _AnchoredPopupMenu extends StatefulWidget {
+  final Widget Function(BuildContext context, VoidCallback toggle)
+      anchorBuilder;
+  final List<Widget> Function(VoidCallback close) itemsBuilder;
 
-  const _ChipShell({
-    required this.isActive,
-    required this.animationDuration,
-    required this.onTap,
-    required this.onLongPress,
-    required this.child,
+  const _AnchoredPopupMenu({
+    required this.anchorBuilder,
+    required this.itemsBuilder,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      color: isActive ? theme.colorScheme.surfaceContainerHigh : Colors.transparent,
-      borderRadius: BorderRadius.circular(_activeChipRadius),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(_activeChipRadius),
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: AnimatedSize(
-          duration: animationDuration,
-          curve: Curves.easeOut,
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: isActive ? 8 : 4,
-              vertical: 4,
-            ),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
+  State<_AnchoredPopupMenu> createState() => _AnchoredPopupMenuState();
 }
 
-/// Header widget for the long-press popover. Renders stream details when
-/// [streamInfo] is non-null, otherwise an "Offline" label.
-class _PopoverHeader extends StatelessWidget {
-  final String displayName;
-  final StreamTwitch? streamInfo;
+class _AnchoredPopupMenuState extends State<_AnchoredPopupMenu>
+    with SingleTickerProviderStateMixin {
+  final _link = LayerLink();
+  final _portalCtrl = OverlayPortalController();
+  late final _anim = AnimationController(
+    duration: const Duration(milliseconds: 150),
+    reverseDuration: const Duration(milliseconds: 100),
+    vsync: this,
+  )..addStatusListener((status) {
+      if (status == AnimationStatus.dismissed && _portalCtrl.isShowing) {
+        _portalCtrl.hide();
+      }
+    });
+  late final _curve =
+      CurvedAnimation(parent: _anim, curve: Curves.easeOut);
+  late final _scale = Tween<double>(begin: 0.92, end: 1.0).animate(_curve);
 
-  const _PopoverHeader({required this.displayName, this.streamInfo});
+  @override
+  void dispose() {
+    _curve.dispose();
+    _anim.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    if (_portalCtrl.isShowing) {
+      _anim.reverse();
+    } else {
+      _portalCtrl.show();
+      _anim.forward();
+    }
+  }
+
+  void _close() {
+    if (_portalCtrl.isShowing) _anim.reverse();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final info = streamInfo;
-
-    if (info == null) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Text(
-          'Offline',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      );
-    }
-
-    final headerName = getReadableName(info.userName, info.userLogin);
-    final viewers = '${NumberFormat().format(info.viewerCount)} viewers';
-    final title = info.title.trim();
-    final game = info.gameName.trim();
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 280),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: FrostyCachedNetworkImage(
-                  imageUrl: info.thumbnailUrl.replaceFirst(
-                    '-{width}x{height}',
-                    '-240x135',
-                  ),
-                  placeholder: (context, url) => ColoredBox(
-                    color: theme.colorScheme.surfaceContainer,
+    return CompositedTransformTarget(
+      link: _link,
+      child: OverlayPortal(
+        controller: _portalCtrl,
+        overlayChildBuilder: (overlayContext) {
+          final theme = Theme.of(overlayContext);
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _close,
+                ),
+              ),
+              CompositedTransformFollower(
+                link: _link,
+                targetAnchor: Alignment.bottomRight,
+                followerAnchor: Alignment.topRight,
+                offset: const Offset(0, 4),
+                showWhenUnlinked: false,
+                child: FadeTransition(
+                  opacity: _anim,
+                  child: ScaleTransition(
+                    scale: _scale,
+                    alignment: Alignment.topRight,
+                    child: Material(
+                      color: theme.colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: theme.colorScheme.outlineVariant
+                              .withValues(alpha: 0.5),
+                          width: 0.5,
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: IntrinsicWidth(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: widget.itemsBuilder(_close),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '$headerName  ·  $viewers',
-              style: theme.textTheme.titleSmall,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            if (title.isNotEmpty) ...[
-              const SizedBox(height: 2),
-              Text(
-                title,
-                style: theme.textTheme.bodySmall,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
             ],
-            if (game.isNotEmpty) ...[
-              const SizedBox(height: 2),
-              Text(
-                game,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ],
-        ),
+          );
+        },
+        child: widget.anchorBuilder(context, _toggle),
       ),
     );
   }

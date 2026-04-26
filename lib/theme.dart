@@ -144,7 +144,7 @@ class FrostyThemes {
       menuTheme: MenuThemeData(
         style: MenuStyle(
           padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(vertical: 4),
+            EdgeInsets.symmetric(vertical: 2),
           ),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
@@ -157,6 +157,9 @@ class FrostyThemes {
       menuButtonTheme: MenuButtonThemeData(
         style: MenuItemButton.styleFrom(
           visualDensity: VisualDensity.compact,
+          minimumSize: const Size(0, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ),
       dialogTheme: DialogThemeData(
