@@ -182,7 +182,6 @@ abstract class ChatStoreBase with Store {
     revealedMessageIds.add(id);
   }
 
-  // ← ADD THIS BLOCK
   final highlightedUsers = ObservableSet<String>();
 
   @action
@@ -195,7 +194,6 @@ abstract class ChatStoreBase with Store {
   }
 
   bool isHighlighted(String username) => highlightedUsers.contains(username);
-  // ← END ADD
 
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
