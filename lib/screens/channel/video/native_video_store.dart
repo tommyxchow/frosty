@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:better_native_video_player/better_native_video_player.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
@@ -309,10 +310,10 @@ abstract class NativeVideoStoreBase
       });
 
       _controllerInitialized = true;
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (_disposed || generation != _initGeneration) return;
       _initInFlight = false;
-      await _handleLoadError(e, generation);
+      await _handleLoadError(e, stackTrace, generation);
       return;
     }
     _initInFlight = false;
@@ -329,9 +330,9 @@ abstract class NativeVideoStoreBase
       runInAction(() {
         _error = null;
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
       if (_disposed || generation != _initGeneration) return;
-      await _handleLoadError(e, generation);
+      await _handleLoadError(e, stackTrace, generation);
     }
   }
 
@@ -373,16 +374,32 @@ abstract class NativeVideoStoreBase
   /// Shared error handler for both `_initPlayer` and `_reloadCurrentController`.
   /// Checks stream liveness, auto-retries if CDN is still serving stale
   /// manifests, or surfaces the error with the overlay visible.
-  Future<void> _handleLoadError(dynamic e, int generation) async {
+  Future<void> _handleLoadError(
+    Object e,
+    StackTrace stackTrace,
+    int generation,
+  ) async {
     _initializing = false;
     // Wait for stream info so we can distinguish "offline" from "broken".
     await updateStreamInfo(forceUpdate: true);
     if (_disposed || generation != _initGeneration) return;
     debugPrint('NativeVideoStore load error: $e');
+    if (_streamInfo != null) {
+      _recordNativePlaybackError(
+        e,
+        stackTrace,
+        'Native video load failed',
+        information: [
+          'channel=$userLogin',
+          'attempt=$_totalRefreshAttempts',
+        ],
+      );
+    }
 
     // Auto-retry if the stream is live — the CDN may still be serving
     // stale manifests right after a stream crash.
-    if (_streamInfo != null && _totalRefreshAttempts < VideoTimingConstants.maxRefreshAttempts) {
+    if (_streamInfo != null &&
+        _totalRefreshAttempts < VideoTimingConstants.maxRefreshAttempts) {
       _totalRefreshAttempts++;
       debugPrint(
         'NativeVideoStore: auto-retrying load '
@@ -390,7 +407,9 @@ abstract class NativeVideoStoreBase
       );
       _initRetryTimer?.cancel();
       _initRetryTimer = Timer(VideoTimingConstants.initRetryDelay, () {
-        if (!_disposed && generation == _initGeneration) handleRefresh();
+        if (!_disposed && generation == _initGeneration) {
+          _handleRefresh(userInitiated: false);
+        }
       });
       return;
     }
@@ -485,7 +504,13 @@ abstract class NativeVideoStoreBase
     final errorMessage =
         eventData?['message'] as String? ??
         'Playback error. Try refreshing or switch to the standard player in Settings.';
+    final errorCode = eventData?['code'] as String?;
     final statusCode = eventData?['statusCode'] as int?;
+
+    if (errorCode == 'mediaServicesWereReset') {
+      _handleMediaServicesReset(errorMessage);
+      return;
+    }
 
     // 4xx on the HLS fetch means the current playback session is gone — a
     // fresh GQL token + new query params can land on a different CDN edge
@@ -500,7 +525,7 @@ abstract class NativeVideoStoreBase
         'token (attempt ${_totalRefreshAttempts + 1}/${VideoTimingConstants.maxRefreshAttempts})',
       );
       _totalRefreshAttempts++;
-      handleRefresh();
+      _handleRefresh(userInitiated: false);
       return;
     }
 
@@ -510,12 +535,65 @@ abstract class NativeVideoStoreBase
       if (_disposed) return;
       runInAction(() {
         if (_streamInfo != null) {
+          _recordNativePlaybackError(
+            StateError(errorMessage),
+            StackTrace.current,
+            'Native video player error',
+            information: [
+              'channel=$userLogin',
+              if (errorCode != null) 'code=$errorCode',
+              if (statusCode != null) 'statusCode=$statusCode',
+            ],
+          );
           _error = errorMessage;
           _overlayVisible = true;
           _overlayTimer?.cancel();
         }
       });
     });
+  }
+
+  void _recordNativePlaybackError(
+    Object error,
+    StackTrace stackTrace,
+    String reason, {
+    List<Object> information = const [],
+  }) {
+    try {
+      FirebaseCrashlytics.instance.recordError(
+        error,
+        stackTrace,
+        reason: reason,
+        information: information,
+      );
+    } catch (_) {
+      // Firebase may not be initialized (e.g., in tests).
+    }
+  }
+
+  void _handleMediaServicesReset(String errorMessage) {
+    if (_isWithinRecoveryCap()) {
+      runInAction(() {
+        _disposeController();
+        _loading = false;
+        _paused = true;
+        _isStalled = false;
+        _initializing = false;
+        _isQualitySwitching = false;
+        _error = errorMessage;
+        _overlayVisible = true;
+        _overlayTimer?.cancel();
+      });
+      return;
+    }
+
+    _totalRefreshAttempts++;
+    debugPrint(
+      'NativeVideoStore: media services reset, rebuilding player '
+      '(attempt $_totalRefreshAttempts/${VideoTimingConstants.maxRefreshAttempts})',
+    );
+    _disposeController();
+    unawaited(_handleRefresh(userInitiated: false));
   }
 
   bool _isWithinRecoveryCap() =>
@@ -623,7 +701,7 @@ abstract class NativeVideoStoreBase
       'NativeVideoStore: stall persists, refreshing player '
       '(attempt $_totalRefreshAttempts/${VideoTimingConstants.maxRefreshAttempts})',
     );
-    handleRefresh();
+    _handleRefresh(userInitiated: false);
   }
 
   void _startLatencyPolling() {
@@ -663,7 +741,7 @@ abstract class NativeVideoStoreBase
           'NativeVideoStore: latency still high (${rounded}s), refreshing',
         );
         _highLatencyCount = 0;
-        handleRefresh();
+        _handleRefresh(userInitiated: false);
       }
       return;
     }
@@ -748,47 +826,48 @@ abstract class NativeVideoStoreBase
 
   @override
   @action
-  Future<void> handleRefresh() async {
-    HapticFeedback.lightImpact();
-    // Reset recovery cap, cooldown, and bounce counter on user-initiated
-    // refresh (error was shown). Stall recovery calls this with
-    // _error == null, preserving the cap.
-    if (_error != null) {
-      _totalRefreshAttempts = 0;
-      _shortPlayBounceCount = 0;
-    }
-    _lastRefreshTime = DateTime.now();
-    _loading = true;
-    _paused = true;
-    _isStalled = false;
-    _hasPlayedOnce = false;
-    _userPaused = false;
-    _stallRecoveryAttempt = 0;
-    _highLatencyCount = 0;
-    _firstTimeSettingQuality = true;
-    _pendingQualityIndex = null;
-    _isQualitySwitching = false;
-    _isAudioOnlyMode = false;
-    _streamQualityIndex = 0;
-    _latency = null;
-    _availableStreamQualities = [];
-    _qualityObjects = [];
-    _error = null;
-    _initializing = true;
-    _initGeneration++;
+  Future<void> handleRefresh() => _handleRefresh(userInitiated: true);
 
-    _overlayTimer?.cancel();
-    _scheduleOverlayHide();
-    _latencyTimer?.cancel();
-    _stallRecoveryTimer?.cancel();
-    _initRetryTimer?.cancel();
+  Future<void> _handleRefresh({required bool userInitiated}) {
+    if (userInitiated) HapticFeedback.lightImpact();
 
-    if (_controllerInitialized) {
-      // Light refresh: reload stream on existing controller. PiP state is
-      // intentionally preserved — the controller is reused, so its observable
-      // PiP flags must stay in sync with the native player.
-      _reloadCurrentController();
-    } else {
+    final wasControllerInitialized = _controllerInitialized;
+    runInAction(() {
+      // Reset recovery cap, cooldown, and bounce counter on user-initiated
+      // refresh (error was shown). Stall recovery calls this with
+      // _error == null, preserving the cap.
+      if (userInitiated && _error != null) {
+        _totalRefreshAttempts = 0;
+        _shortPlayBounceCount = 0;
+      }
+      _lastRefreshTime = DateTime.now();
+      _loading = true;
+      _paused = true;
+      _isStalled = false;
+      _hasPlayedOnce = false;
+      _userPaused = false;
+      _stallRecoveryAttempt = 0;
+      _highLatencyCount = 0;
+      _firstTimeSettingQuality = true;
+      _pendingQualityIndex = null;
+      _isQualitySwitching = false;
+      _isAudioOnlyMode = false;
+      _streamQualityIndex = 0;
+      _latency = null;
+      _availableStreamQualities = [];
+      _qualityObjects = [];
+      _error = null;
+      _initializing = true;
+      _initGeneration++;
+
+      _overlayTimer?.cancel();
+      _scheduleOverlayHide();
+      _latencyTimer?.cancel();
+      _stallRecoveryTimer?.cancel();
+      _initRetryTimer?.cancel();
+
+      if (wasControllerInitialized) return;
+
       // Hard refresh: controller isn't ready (init in progress or failed).
       // Tear down and rebuild from scratch.
       _isInPipMode = false;
@@ -802,9 +881,18 @@ abstract class NativeVideoStoreBase
       _controller?.removeActivityListener(_onPlayerActivity);
       _controller?.dispose();
       _controller = _createController();
-      _initPlayer();
+    });
+
+    if (wasControllerInitialized) {
+      // Light refresh: reload stream on existing controller. PiP state is
+      // intentionally preserved — the controller is reused, so its observable
+      // PiP flags must stay in sync with the native player.
+      unawaited(_reloadCurrentController());
+    } else {
+      unawaited(_initPlayer());
     }
-    updateStreamInfo();
+    unawaited(updateStreamInfo());
+    return Future<void>.value();
   }
 
   @override

@@ -8,7 +8,13 @@ import UIKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
-    CookieExtractorPlugin.register(with: self.registrar(forPlugin: "CookieExtractorPlugin")!)
+    guard let cookieExtractorRegistrar = self.registrar(
+      forPlugin: "CookieExtractorPlugin"
+    ) else {
+      assertionFailure("Failed to create CookieExtractorPlugin registrar")
+      return false
+    }
+    CookieExtractorPlugin.register(with: cookieExtractorRegistrar)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

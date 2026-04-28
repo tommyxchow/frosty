@@ -291,16 +291,6 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
     return _$_initPlayerAsyncAction.run(() => super._initPlayer());
   }
 
-  late final _$handleRefreshAsyncAction = AsyncAction(
-    'NativeVideoStoreBase.handleRefresh',
-    context: context,
-  );
-
-  @override
-  Future<void> handleRefresh() {
-    return _$handleRefreshAsyncAction.run(() => super.handleRefresh());
-  }
-
   late final _$updateStreamQualitiesAsyncAction = AsyncAction(
     'NativeVideoStoreBase.updateStreamQualities',
     context: context,
@@ -385,6 +375,18 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
     );
     try {
       return super.handleToggleOverlay();
+    } finally {
+      _$NativeVideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  Future<void> handleRefresh() {
+    final _$actionInfo = _$NativeVideoStoreBaseActionController.startAction(
+      name: 'NativeVideoStoreBase.handleRefresh',
+    );
+    try {
+      return super.handleRefresh();
     } finally {
       _$NativeVideoStoreBaseActionController.endAction(_$actionInfo);
     }
