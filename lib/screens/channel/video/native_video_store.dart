@@ -50,6 +50,7 @@ abstract class NativeVideoStoreBase
   var _stallRecoveryAttempt = 0;
   var _isStalled = false;
   Timer? _initRetryTimer;
+  Timer? _healthyPlaybackTimer;
   DateTime? _lastRefreshTime;
   bool _overlayWasVisibleBeforePip = true;
   var _userPaused = false;
@@ -291,7 +292,7 @@ abstract class NativeVideoStoreBase
           if (_firstTimeSettingQuality && qualities.isNotEmpty) {
             _firstTimeSettingQuality = false;
             if (settingsStore.defaultToHighestQuality) {
-              _pendingQualityIndex = 1;
+              _queueOrApplyInitialQualityIndex(1);
             } else {
               SharedPreferences.getInstance().then((prefs) {
                 if (_disposed || _pendingQualityIndex != null) return;
@@ -299,7 +300,12 @@ abstract class NativeVideoStoreBase
                     prefs.getString(lastStreamQualityKey(userLogin));
                 if (lastQuality != null) {
                   final index = _availableStreamQualities.indexOf(lastQuality);
-                  if (index != -1) _pendingQualityIndex = index;
+                  if (index != -1) {
+                    runInAction(() {
+                      if (_disposed || _pendingQualityIndex != null) return;
+                      _queueOrApplyInitialQualityIndex(index);
+                    });
+                  }
                 }
               }).catchError((e) {
                 debugPrint('NativeVideoStore: failed to read last quality: $e');
@@ -465,8 +471,8 @@ abstract class NativeVideoStoreBase
     _isQualitySwitching = false;
     _stallRecoveryTimer?.cancel();
     _stallRecoveryAttempt = 0;
-    _totalRefreshAttempts = 0;
     _lastPlayingStart = DateTime.now();
+    _scheduleHealthyPlaybackRecoveryReset(_lastPlayingStart!);
     if (_pendingQualityIndex != null) {
       final index = _pendingQualityIndex!;
       _pendingQualityIndex = null;
@@ -600,6 +606,7 @@ abstract class NativeVideoStoreBase
       _totalRefreshAttempts >= VideoTimingConstants.maxRefreshAttempts;
 
   void _onPaused() {
+    _healthyPlaybackTimer?.cancel();
     if (!_isInPipMode) {
       _paused = true;
     }
@@ -671,6 +678,7 @@ abstract class NativeVideoStoreBase
   /// count it as a bounce. Three bounces in a row flips the stall-error
   /// message to the CDN-trouble variant.
   void _recordShortPlayBounceIfNeeded() {
+    _healthyPlaybackTimer?.cancel();
     final start = _lastPlayingStart;
     if (start == null) return;
     final elapsed = DateTime.now().difference(start);
@@ -680,6 +688,22 @@ abstract class NativeVideoStoreBase
       _shortPlayBounceCount = 0;
     }
     _lastPlayingStart = null;
+  }
+
+  void _scheduleHealthyPlaybackRecoveryReset(DateTime playingStartedAt) {
+    _healthyPlaybackTimer?.cancel();
+    _healthyPlaybackTimer = Timer(VideoTimingConstants.shortPlayWindow, () {
+      if (_disposed ||
+          _isStalled ||
+          _lastPlayingStart != playingStartedAt) {
+        return;
+      }
+      runInAction(() {
+        _totalRefreshAttempts = 0;
+        _shortPlayBounceCount = 0;
+        _lastPlayingStart = null;
+      });
+    });
   }
 
   /// How long to wait before the next stall-recovery full refresh, based on
@@ -865,6 +889,7 @@ abstract class NativeVideoStoreBase
       _latencyTimer?.cancel();
       _stallRecoveryTimer?.cancel();
       _initRetryTimer?.cancel();
+      _healthyPlaybackTimer?.cancel();
 
       if (wasControllerInitialized) return;
 
@@ -981,6 +1006,14 @@ abstract class NativeVideoStoreBase
     }
   }
 
+  void _queueOrApplyInitialQualityIndex(int index) {
+    if (_hasPlayedOnce) {
+      unawaited(_setStreamQualityIndex(index));
+    } else {
+      _pendingQualityIndex = index;
+    }
+  }
+
   @override
   @action
   Future<void> updateStreamInfo({bool forceUpdate = false}) async {
@@ -995,6 +1028,7 @@ abstract class NativeVideoStoreBase
       _overlayTimer?.cancel();
       _latencyTimer?.cancel();
       _stallRecoveryTimer?.cancel();
+      _healthyPlaybackTimer?.cancel();
       _loading = false;
       _latency = null;
       _streamInfo = null;
@@ -1057,6 +1091,7 @@ abstract class NativeVideoStoreBase
     _latencyTimer?.cancel();
     _stallRecoveryTimer?.cancel();
     _initRetryTimer?.cancel();
+    _healthyPlaybackTimer?.cancel();
     _pipSub?.cancel();
     _pipSub = null;
     _qualitiesSub?.cancel();

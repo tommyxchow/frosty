@@ -80,6 +80,9 @@ abstract class ChatStoreBase with Store {
   /// Returns true if any message in the data contains a bypass command.
   bool _shouldBypassDelay(String data) {
     for (final message in data.trimRight().split('\r\n')) {
+      if (message == ':tmi.twitch.tv RECONNECT') {
+        return true;
+      }
       if (message.startsWith('@')) {
         final parts = message.split(' ');
         if (parts.length >= 3 && _delayBypassCommands.contains(parts[2])) {
@@ -527,6 +530,11 @@ abstract class ChatStoreBase with Store {
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
       // debugPrint('$message\n');
+      if (message == ':tmi.twitch.tv RECONNECT') {
+        _channel?.sink.close(1000);
+        continue;
+      }
+
       if (message.startsWith('@')) {
         // Parse defensively: a single malformed message must never abort the
         // loop, or one bad frame would drop every other message batched with
@@ -565,7 +573,8 @@ abstract class ChatStoreBase with Store {
           final msg = parsedIRCMessage.message!.toLowerCase();
           final words = settings.matchWholeWord ? msg.split(' ') : null;
           final muted = settings.mutedWords.any((word) {
-            final lw = word.toLowerCase();
+            final lw = word.trim().toLowerCase();
+            if (lw.isEmpty) return false;
             return words != null ? words.contains(lw) : msg.contains(lw);
           });
           if (muted) continue;
