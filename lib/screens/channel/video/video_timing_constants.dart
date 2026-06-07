@@ -19,7 +19,7 @@ class VideoTimingConstants {
 
   /// A "play" event arriving within this window after a previous one is
   /// treated as a failed-recovery bounce rather than a fresh successful start.
-  static const shortPlayWindow = Duration(seconds: 3);
+  static const shortPlayWindow = Duration(seconds: 10);
   /// Number of short-play bounces required before surfacing a tailored error.
   static const int shortPlayLoopThreshold = 3;
 

@@ -757,7 +757,7 @@ abstract class NativeVideoStoreBase
     await updateStreamInfo(forceUpdate: true);
     if (_disposed) return;
 
-    if (wasOffline && _streamInfo != null && settingsStore.showVideo) {
+    if (wasOffline && _streamInfo != null && settingsStore.showVideo && !_userPaused) {
       debugPrint(
         'NativeVideoStore: stream detected back online, auto-refreshing',
       );
@@ -1060,6 +1060,9 @@ abstract class NativeVideoStoreBase
       if (result.stream != null) {
         _streamInfo = result.stream;
         _offlineChannelInfo = null;
+        return;
+      }
+      if (result.offlineChannel == null) {
         return;
       }
       _overlayTimer?.cancel();
