@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
@@ -13,7 +14,7 @@ import 'package:frosty/widgets/frosty_scrollbar.dart';
 
 /// ~2x default to keep richer message widgets (emotes, badges, replies) built
 /// ahead of fast scroll-back without holding the entire history.
-const _chatCacheExtent = 500.0;
+const _chatCacheExtent = ScrollCacheExtent.pixels(500.0);
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -149,7 +150,7 @@ class Chat extends StatelessWidget {
         ),
       ),
       addAutomaticKeepAlives: false,
-      cacheExtent: _chatCacheExtent,
+      scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: chatStore.renderMessages.length,
       itemBuilder: (context, index) => ChatMessage(
@@ -177,7 +178,7 @@ class Chat extends StatelessWidget {
         ),
       ),
       addAutomaticKeepAlives: false,
-      cacheExtent: _chatCacheExtent,
+      scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: mergedMessages.length,
       itemBuilder: (context, index) {
