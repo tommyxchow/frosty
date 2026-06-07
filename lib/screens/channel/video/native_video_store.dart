@@ -480,6 +480,7 @@ abstract class NativeVideoStoreBase
       _pendingQualityIndex = null;
       _setStreamQualityIndex(index);
     }
+    _updateLatency();
   }
 
   void _onBufferingOrLoading(PlayerActivityState state) {

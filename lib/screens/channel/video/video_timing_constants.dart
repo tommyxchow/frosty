@@ -24,7 +24,7 @@ class VideoTimingConstants {
   static const int shortPlayLoopThreshold = 3;
 
   // Latency / chat sync
-  static const latencyPollingInterval = Duration(seconds: 30);
+  static const latencyPollingInterval = Duration(seconds: 3);
   static const int highLatencyThresholdSeconds = 30;
   static const int chatSyncDriftToleranceSeconds = 2;
 
