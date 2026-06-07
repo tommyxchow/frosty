@@ -229,7 +229,7 @@ class ChatTabs extends StatelessWidget {
         final theme = Theme.of(context);
         final isActivated = tabInfo.isActivated;
         final hasUnread = chatTabsStore.hasUnreadMessages(index);
-        final dimmed = !isActivated;
+        final dimmed = !isActivated || !(tabInfo.chatStore?.isConnected ?? false);
 
         InputChip buildChip({VoidCallback? onDeleted}) => InputChip(
               avatar: Badge(
