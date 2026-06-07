@@ -35,6 +35,7 @@ class VideoTimingConstants {
   // Stream info
   static const streamInfoDebounce = Duration(seconds: 5);
   static const webviewStreamInfoInterval = Duration(minutes: 1);
+  static const nativeStreamInfoInterval = Duration(seconds: 30);
 
   // WebView housekeeping
   static const jsCleanupInterval = Duration(minutes: 10);

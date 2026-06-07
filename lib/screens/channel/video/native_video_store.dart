@@ -47,6 +47,7 @@ abstract class NativeVideoStoreBase
   Timer? _overlayTimer;
   Timer? _latencyTimer;
   Timer? _stallRecoveryTimer;
+  Timer? _streamInfoTimer;
   var _stallRecoveryAttempt = 0;
   var _isStalled = false;
   Timer? _initRetryTimer;
@@ -151,6 +152,7 @@ abstract class NativeVideoStoreBase
     _chatLatencySync.reset();
     _scheduleOverlayHide();
     updateStreamInfo();
+    _startStreamInfoTimer();
 
     // Skip eager init in chat-only mode — `play()` is what activates the
     // iOS audio session, so without it nothing is allocated.
@@ -613,6 +615,14 @@ abstract class NativeVideoStoreBase
     _isStalled = false;
     _isQualitySwitching = false;
     _stallRecoveryTimer?.cancel();
+
+    // If the player auto-paused during startup/buffering before playing once,
+    // and the user didn't explicitly pause it, force resume and trigger recovery.
+    if (!_userPaused && !_hasPlayedOnce && !_initializing && _error == null) {
+      debugPrint('NativeVideoStore: auto-paused before first play, triggering play');
+      _controller?.play();
+      _startStallRecoveryTimer();
+    }
   }
 
   void _startStallRecoveryTimer() {
@@ -726,6 +736,33 @@ abstract class NativeVideoStoreBase
       '(attempt $_totalRefreshAttempts/${VideoTimingConstants.maxRefreshAttempts})',
     );
     _handleRefresh(userInitiated: false);
+  }
+
+  void _startStreamInfoTimer() {
+    _streamInfoTimer?.cancel();
+    _streamInfoTimer = Timer.periodic(
+      VideoTimingConstants.nativeStreamInfoInterval,
+      (_) => _pollStreamInfoAndRecoverIfNeeded(),
+    );
+  }
+
+  void _stopStreamInfoTimer() {
+    _streamInfoTimer?.cancel();
+    _streamInfoTimer = null;
+  }
+
+  Future<void> _pollStreamInfoAndRecoverIfNeeded() async {
+    if (_disposed) return;
+    final wasOffline = _streamInfo == null;
+    await updateStreamInfo(forceUpdate: true);
+    if (_disposed) return;
+
+    if (wasOffline && _streamInfo != null && settingsStore.showVideo) {
+      debugPrint(
+        'NativeVideoStore: stream detected back online, auto-refreshing',
+      );
+      _handleRefresh(userInitiated: false);
+    }
   }
 
   void _startLatencyPolling() {
@@ -1078,6 +1115,7 @@ abstract class NativeVideoStoreBase
     }
 
     _overlayTimer?.cancel();
+    _stopStreamInfoTimer();
     _disposeAndroidAutoPipReaction?.call();
     _disposeVideoModeReaction?.call();
     _disposeController();
