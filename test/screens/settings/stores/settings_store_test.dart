@@ -14,6 +14,9 @@ void main() {
       expect(store.showVideo, isTrue);
       expect(store.defaultToHighestQuality, isFalse);
       expect(store.useTextureRendering, isTrue);
+      expect(store.streamProxyMode, StreamProxyMode.off);
+      expect(store.streamProxyUrls, isEmpty);
+      expect(store.streamProxyWhitelistedChannels, isEmpty);
       expect(store.showOverlay, isTrue);
       expect(store.toggleableOverlay, isFalse);
       expect(store.showLatency, isFalse);
@@ -67,6 +70,12 @@ void main() {
       store.chatDelay = 5.0;
       store.syncedChatDelay = 8.0;
       store.showVideo = false;
+      store.streamProxyMode = StreamProxyMode.ttvLolPro;
+      store.streamProxyUrls = [
+        'proxy.example.com:3128',
+        'https://user:pass@proxy.example.com:443',
+      ];
+      store.streamProxyWhitelistedChannels = ['streamer_name123'];
       store.timestampType = TimestampType.twelve;
       store.landscapeCutout = LandscapeCutoutType.both;
       store.mutedWords = ['spam', 'bad'];
@@ -83,6 +92,12 @@ void main() {
       expect(restored.syncedChatDelay, 0.0);
       expect(json.containsKey('syncedChatDelay'), isFalse);
       expect(restored.showVideo, isFalse);
+      expect(restored.streamProxyMode, StreamProxyMode.ttvLolPro);
+      expect(restored.streamProxyUrls, [
+        'proxy.example.com:3128',
+        'https://user:pass@proxy.example.com:443',
+      ]);
+      expect(restored.streamProxyWhitelistedChannels, ['streamer_name123']);
       expect(restored.timestampType, TimestampType.twelve);
       expect(restored.landscapeCutout, LandscapeCutoutType.both);
       expect(restored.mutedWords, ['spam', 'bad']);
@@ -99,6 +114,13 @@ void main() {
         'timestampType': 'nonexistent_timestamp',
       });
       expect(store.timestampType, TimestampType.disabled);
+    });
+
+    test('unknown StreamProxyMode enum value falls back to off', () {
+      final store = SettingsStore.fromJson({
+        'streamProxyMode': 'nonexistent_proxy_mode',
+      });
+      expect(store.streamProxyMode, StreamProxyMode.off);
     });
   });
 
@@ -127,6 +149,9 @@ void main() {
       store.showVideo = false;
       store.defaultToHighestQuality = true;
       store.useTextureRendering = false;
+      store.streamProxyMode = StreamProxyMode.ttvLolPro;
+      store.streamProxyUrls = ['proxy.example.com:3128'];
+      store.streamProxyWhitelistedChannels = ['streamer_name123'];
       store.showOverlay = false;
       store.toggleableOverlay = true;
       store.showLatency = true;
@@ -136,6 +161,9 @@ void main() {
       expect(store.showVideo, isTrue);
       expect(store.defaultToHighestQuality, isFalse);
       expect(store.useTextureRendering, isTrue);
+      expect(store.streamProxyMode, StreamProxyMode.off);
+      expect(store.streamProxyUrls, isEmpty);
+      expect(store.streamProxyWhitelistedChannels, isEmpty);
       expect(store.showOverlay, isTrue);
       expect(store.toggleableOverlay, isFalse);
       expect(store.showLatency, isFalse);
@@ -291,6 +319,12 @@ void main() {
       expect(timestampNames[0], 'Disabled');
       expect(timestampNames[1], '12-hour');
       expect(timestampNames[2], '24-hour');
+    });
+
+    test('streamProxyModeNames matches StreamProxyMode order', () {
+      expect(streamProxyModeNames.length, StreamProxyMode.values.length);
+      expect(streamProxyModeNames[0], 'Off');
+      expect(streamProxyModeNames[1], 'On');
     });
   });
 }

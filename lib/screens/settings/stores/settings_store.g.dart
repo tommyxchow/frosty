@@ -24,6 +24,23 @@ SettingsStore _$SettingsStoreFromJson(
   ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
   ..useTextureRendering = json['useTextureRendering'] as bool? ?? true
   ..keepScreenAwake = json['keepScreenAwake'] as bool? ?? true
+  ..streamProxyMode =
+      $enumDecodeNullable(
+        _$StreamProxyModeEnumMap,
+        json['streamProxyMode'],
+        unknownValue: StreamProxyMode.off,
+      ) ??
+      StreamProxyMode.off
+  ..streamProxyUrls =
+      (json['streamProxyUrls'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      []
+  ..streamProxyWhitelistedChannels =
+      (json['streamProxyWhitelistedChannels'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      []
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
   ..showLatency = json['showLatency'] as bool? ?? false
@@ -102,6 +119,9 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'defaultToHighestQuality': instance.defaultToHighestQuality,
   'useTextureRendering': instance.useTextureRendering,
   'keepScreenAwake': instance.keepScreenAwake,
+  'streamProxyMode': _$StreamProxyModeEnumMap[instance.streamProxyMode]!,
+  'streamProxyUrls': instance.streamProxyUrls,
+  'streamProxyWhitelistedChannels': instance.streamProxyWhitelistedChannels,
   'showOverlay': instance.showOverlay,
   'toggleableOverlay': instance.toggleableOverlay,
   'showLatency': instance.showLatency,
@@ -146,6 +166,11 @@ const _$ThemeTypeEnumMap = {
   ThemeType.system: 'system',
   ThemeType.light: 'light',
   ThemeType.dark: 'dark',
+};
+
+const _$StreamProxyModeEnumMap = {
+  StreamProxyMode.off: 'off',
+  StreamProxyMode.ttvLolPro: 'ttvLolPro',
 };
 
 const _$TimestampTypeEnumMap = {
@@ -341,6 +366,64 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     _$keepScreenAwakeAtom.reportWrite(value, super.keepScreenAwake, () {
       super.keepScreenAwake = value;
     });
+  }
+
+  late final _$streamProxyModeAtom = Atom(
+    name: '_SettingsStoreBase.streamProxyMode',
+    context: context,
+  );
+
+  @override
+  StreamProxyMode get streamProxyMode {
+    _$streamProxyModeAtom.reportRead();
+    return super.streamProxyMode;
+  }
+
+  @override
+  set streamProxyMode(StreamProxyMode value) {
+    _$streamProxyModeAtom.reportWrite(value, super.streamProxyMode, () {
+      super.streamProxyMode = value;
+    });
+  }
+
+  late final _$streamProxyUrlsAtom = Atom(
+    name: '_SettingsStoreBase.streamProxyUrls',
+    context: context,
+  );
+
+  @override
+  List<String> get streamProxyUrls {
+    _$streamProxyUrlsAtom.reportRead();
+    return super.streamProxyUrls;
+  }
+
+  @override
+  set streamProxyUrls(List<String> value) {
+    _$streamProxyUrlsAtom.reportWrite(value, super.streamProxyUrls, () {
+      super.streamProxyUrls = value;
+    });
+  }
+
+  late final _$streamProxyWhitelistedChannelsAtom = Atom(
+    name: '_SettingsStoreBase.streamProxyWhitelistedChannels',
+    context: context,
+  );
+
+  @override
+  List<String> get streamProxyWhitelistedChannels {
+    _$streamProxyWhitelistedChannelsAtom.reportRead();
+    return super.streamProxyWhitelistedChannels;
+  }
+
+  @override
+  set streamProxyWhitelistedChannels(List<String> value) {
+    _$streamProxyWhitelistedChannelsAtom.reportWrite(
+      value,
+      super.streamProxyWhitelistedChannels,
+      () {
+        super.streamProxyWhitelistedChannels = value;
+      },
+    );
   }
 
   late final _$showOverlayAtom = Atom(
@@ -1166,6 +1249,9 @@ showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
 useTextureRendering: ${useTextureRendering},
 keepScreenAwake: ${keepScreenAwake},
+streamProxyMode: ${streamProxyMode},
+streamProxyUrls: ${streamProxyUrls},
+streamProxyWhitelistedChannels: ${streamProxyWhitelistedChannels},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 showLatency: ${showLatency},

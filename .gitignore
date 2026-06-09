@@ -69,3 +69,6 @@ random/
 
 # ai
 .claude/settings.local.json
+
+# FVM Version Cache
+.fvm/

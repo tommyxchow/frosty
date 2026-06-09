@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -21,9 +22,7 @@ class _VideoState extends State<Video> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     if (widget.videoStore.settingsStore.showVideo) {
-      widget.videoStore.videoWebViewController.loadRequest(
-        Uri.parse(widget.videoStore.videoUrl),
-      );
+      unawaited(widget.videoStore.initializeVideoPlayer());
     }
     WidgetsBinding.instance.addObserver(this);
   }

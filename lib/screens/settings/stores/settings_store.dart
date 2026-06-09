@@ -66,6 +66,9 @@ abstract class _SettingsStoreBase with Store {
   static const defaultDefaultToHighestQuality = false;
   static const defaultUseTextureRendering = true;
   static const defaultKeepScreenAwake = true;
+  static const defaultStreamProxyMode = StreamProxyMode.off;
+  static const defaultStreamProxyUrls = <String>[];
+  static const defaultStreamProxyWhitelistedChannels = <String>[];
 
   // Overlay defaults
   static const defaultShowOverlay = true;
@@ -89,6 +92,22 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var keepScreenAwake = defaultKeepScreenAwake;
 
+  @JsonKey(
+    defaultValue: defaultStreamProxyMode,
+    unknownEnumValue: StreamProxyMode.off,
+  )
+  @observable
+  var streamProxyMode = defaultStreamProxyMode;
+
+  @JsonKey(defaultValue: defaultStreamProxyUrls)
+  @observable
+  List<String> streamProxyUrls = defaultStreamProxyUrls;
+
+  @JsonKey(defaultValue: defaultStreamProxyWhitelistedChannels)
+  @observable
+  List<String> streamProxyWhitelistedChannels =
+      defaultStreamProxyWhitelistedChannels;
+
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
   @observable
@@ -108,6 +127,9 @@ abstract class _SettingsStoreBase with Store {
     defaultToHighestQuality = defaultDefaultToHighestQuality;
     useTextureRendering = defaultUseTextureRendering;
     keepScreenAwake = defaultKeepScreenAwake;
+    streamProxyMode = defaultStreamProxyMode;
+    streamProxyUrls = defaultStreamProxyUrls;
+    streamProxyWhitelistedChannels = defaultStreamProxyWhitelistedChannels;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;
@@ -416,3 +438,7 @@ enum TimestampType { disabled, twelve, twentyFour }
 const landscapeCutoutNames = ['None', 'Left', 'Right', 'Both'];
 
 enum LandscapeCutoutType { none, left, right, both }
+
+const streamProxyModeNames = ['Off', 'On'];
+
+enum StreamProxyMode { off, ttvLolPro }

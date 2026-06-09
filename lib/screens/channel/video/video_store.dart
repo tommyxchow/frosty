@@ -9,6 +9,8 @@ import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/stream.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/services/stream_proxy_bridge.dart';
+import 'package:frosty/services/stream_proxy_config.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
@@ -46,6 +48,14 @@ abstract class VideoStoreBase with Store {
 
   /// The video web view params used for enabling auto play.
   late final PlatformWebViewControllerCreationParams _videoWebViewParams;
+
+  late final NavigationDelegate _navigationDelegate = NavigationDelegate(
+    onPageFinished: _handlePageFinished,
+  );
+
+  final StreamProxyBridge _streamProxyBridge = StreamProxyBridge();
+
+  var _streamProxyAttached = false;
 
   /// The webview controller used for injecting JavaScript to control the webview and video player.
   late final WebViewController videoWebViewController =
@@ -128,17 +138,7 @@ abstract class VideoStoreBase with Store {
             }
           },
         )
-        ..setNavigationDelegate(
-          NavigationDelegate(
-            onPageFinished: (url) async {
-              if (url != videoUrl) return;
-              if (!_needsInit) return;
-              _needsInit = false;
-              await initVideo();
-              _acceptContentWarning();
-            },
-          ),
-        );
+        ..setNavigationDelegate(_navigationDelegate);
 
   /// The timer that handles hiding the overlay automatically
   Timer? _overlayTimer;
@@ -168,6 +168,9 @@ abstract class VideoStoreBase with Store {
 
   /// Disposes the latency settings reaction.
   ReactionDisposer? _disposeLatencySettingsReaction;
+
+  /// Disposes the stream proxy settings reaction.
+  ReactionDisposer? _disposeStreamProxyReaction;
 
   /// If the video is currently paused.
   ///
@@ -297,6 +300,15 @@ abstract class VideoStoreBase with Store {
           pip.setAutoPipMode(autoEnter: false);
         }
       });
+
+      _disposeStreamProxyReaction = reaction(
+        (_) => (
+          settingsStore.streamProxyMode,
+          settingsStore.streamProxyUrls.join('\n'),
+          settingsStore.streamProxyWhitelistedChannels.join('\n'),
+        ),
+        (_) => unawaited(_syncStreamProxyBridge(refresh: true)),
+      );
     }
 
     updateStreamInfo();
@@ -320,10 +332,7 @@ abstract class VideoStoreBase with Store {
           // value (e.g. from showLatency tracking), apply it immediately instead
           // of waiting for the next tracker cycle (up to 60s).
           if (autoSync && _latency != null) {
-            final numericPart = _latency!.replaceAll(
-              RegExp(r'[^0-9.]'),
-              '',
-            );
+            final numericPart = _latency!.replaceAll(RegExp(r'[^0-9.]'), '');
             final latencyAsDouble = double.tryParse(numericPart);
             if (latencyAsDouble != null) {
               settingsStore.syncedChatDelay = latencyAsDouble;
@@ -341,6 +350,66 @@ abstract class VideoStoreBase with Store {
         }
       },
     );
+  }
+
+  bool get _shouldUseStreamProxy =>
+      Platform.isAndroid &&
+      settingsStore.streamProxyMode == StreamProxyMode.ttvLolPro;
+
+  StreamProxyConfig get _streamProxyConfig => StreamProxyConfig.fromSettings(
+    settingsStore: settingsStore,
+    currentChannelLogin: userLogin,
+  );
+
+  Future<void> initializeVideoPlayer() async {
+    if (!settingsStore.showVideo) return;
+
+    await _syncStreamProxyBridge(refresh: false);
+    await videoWebViewController.loadRequest(Uri.parse(videoUrl));
+  }
+
+  Future<void> _handlePageFinished(String url) async {
+    if (url != videoUrl) return;
+    if (!_needsInit) return;
+
+    _needsInit = false;
+    await initVideo();
+    _acceptContentWarning();
+  }
+
+  Future<void> _syncStreamProxyBridge({required bool refresh}) async {
+    if (!Platform.isAndroid) return;
+
+    final platformController = videoWebViewController.platform;
+    if (platformController is! AndroidWebViewController) return;
+
+    if (!_shouldUseStreamProxy) {
+      if (_streamProxyAttached) {
+        await _streamProxyBridge.detach(platformController);
+        _streamProxyAttached = false;
+        await videoWebViewController.setNavigationDelegate(_navigationDelegate);
+      }
+
+      if (refresh && settingsStore.showVideo) {
+        await handleRefresh(haptic: false);
+      }
+      return;
+    }
+
+    if (_streamProxyAttached) {
+      await _streamProxyBridge.updateConfig(_streamProxyConfig);
+    } else {
+      await _streamProxyBridge.attach(
+        controller: platformController,
+        config: _streamProxyConfig,
+        onPageFinished: (url) => unawaited(_handlePageFinished(url)),
+      );
+      _streamProxyAttached = true;
+    }
+
+    if (refresh && settingsStore.showVideo) {
+      await handleRefresh(haptic: false);
+    }
   }
 
   @action
@@ -1005,8 +1074,10 @@ abstract class VideoStoreBase with Store {
 
   /// Refreshes the stream webview and updates the stream info.
   @action
-  Future<void> handleRefresh() async {
-    HapticFeedback.lightImpact();
+  Future<void> handleRefresh({bool haptic = true}) async {
+    if (haptic) {
+      HapticFeedback.lightImpact();
+    }
     _paused = true;
     _firstTimeSettingQuality = true;
     _isInPipMode = false;
@@ -1022,6 +1093,7 @@ abstract class VideoStoreBase with Store {
       // Ignore - may not exist yet
     }
 
+    await _syncStreamProxyBridge(refresh: false);
     await videoWebViewController.loadRequest(Uri.parse(videoUrl));
 
     updateStreamInfo();
@@ -1105,6 +1177,15 @@ abstract class VideoStoreBase with Store {
     _disposeVideoModeReaction();
     _disposeAndroidAutoPipReaction?.call();
     _disposeLatencySettingsReaction?.call();
+    _disposeStreamProxyReaction?.call();
+
+    final platformController = videoWebViewController.platform;
+    if (_streamProxyAttached &&
+        Platform.isAndroid &&
+        platformController is AndroidWebViewController) {
+      unawaited(_streamProxyBridge.detach(platformController));
+    }
+    _streamProxyBridge.dispose();
 
     // Explicitly stop latency tracker as defense-in-depth.
     // The Video widget also loads about:blank during disposal which clears

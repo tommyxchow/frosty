@@ -615,15 +615,13 @@ abstract class ChatTabsStoreBase with Store {
 
   /// Reorders a tab from oldIndex to newIndex.
   /// The primary tab (index 0) cannot be moved, and no tab can be placed before it.
+  /// The caller must pass an insertion index already adjusted for Flutter's
+  /// ReorderableListView remove-then-insert behavior.
   @action
   void reorderTab(int oldIndex, int newIndex) {
     // Primary tab (index 0) cannot be moved, and nothing can move before it
     if (oldIndex == 0 || newIndex == 0) return;
 
-    // ReorderableListView passes newIndex as if item was already removed
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex == newIndex) return;
 
     final tab = _tabs.removeAt(oldIndex);

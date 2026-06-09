@@ -237,8 +237,10 @@ mixin _$VideoStore on VideoStoreBase, Store {
   );
 
   @override
-  Future<void> handleRefresh() {
-    return _$handleRefreshAsyncAction.run(() => super.handleRefresh());
+  Future<void> handleRefresh({bool haptic = true}) {
+    return _$handleRefreshAsyncAction.run(
+      () => super.handleRefresh(haptic: haptic),
+    );
   }
 
   late final _$VideoStoreBaseActionController = ActionController(

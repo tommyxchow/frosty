@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/screens/settings/widgets/settings_list_select.dart';
 import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
+import 'package:frosty/screens/settings/widgets/settings_string_list_editor.dart';
+import 'package:frosty/services/stream_proxy_config.dart';
 import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/settings_page_layout.dart';
@@ -49,6 +52,54 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.keepScreenAwake,
             onChanged: (newValue) => settingsStore.keepScreenAwake = newValue,
           ),
+          if (Platform.isAndroid) ...[
+            SettingsListSelect(
+              title: 'Stream proxy mode',
+              selectedOption:
+                  streamProxyModeNames[settingsStore.streamProxyMode.index],
+              options: streamProxyModeNames,
+              onChanged: (selectedOption) {
+                final selectedIndex = streamProxyModeNames.indexOf(
+                  selectedOption,
+                );
+                if (selectedIndex == -1) return;
+
+                settingsStore.streamProxyMode =
+                    StreamProxyMode.values[selectedIndex];
+              },
+            ),
+            if (settingsStore.streamProxyMode == StreamProxyMode.ttvLolPro) ...[
+              SettingsStringListEditor(
+                title: 'Proxy URLs',
+                subtitle: 'Used for eligible livestream playback requests.',
+                emptyMessage: 'No proxy URLs',
+                hintText: 'proxy.example.com:3128',
+                values: settingsStore.streamProxyUrls,
+                validator: validateStreamProxyUrl,
+                onChanged: (values) {
+                  settingsStore.streamProxyUrls = values
+                      .map((value) => value.trim())
+                      .where((value) => value.isNotEmpty)
+                      .toList();
+                },
+              ),
+              SettingsStringListEditor(
+                title: 'Whitelisted channels',
+                subtitle: 'Channels that should always load direct.',
+                emptyMessage: 'No whitelisted channels',
+                hintText: 'streamer_name123',
+                values: settingsStore.streamProxyWhitelistedChannels,
+                validator: validateStreamProxyChannelLogin,
+                normalizeValue: (value) => value.trim().toLowerCase(),
+                onChanged: (values) {
+                  settingsStore.streamProxyWhitelistedChannels = values
+                      .map((value) => value.trim().toLowerCase())
+                      .where((value) => value.isNotEmpty)
+                      .toList();
+                },
+              ),
+            ],
+          ],
           const SectionHeader('Overlay'),
           SettingsListSwitch(
             title: 'Use custom video overlay',
