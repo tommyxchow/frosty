@@ -10,7 +10,7 @@
     </queries>
 
     <application
-        android:label="Frosty"
+        android:label="Glacier"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"

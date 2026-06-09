@@ -12,9 +12,9 @@ class OnboardingIntro extends StatelessWidget {
       future: PackageInfo.fromPlatform(),
       builder: (context, snapshot) {
         return OnboardingScaffold(
-          header: 'Frosty',
+          header: 'Glacier',
           subtitle:
-              'A mobile Twitch client with 7TV, BetterTTV (BTTV), and FrankerFaceZ (FFZ) support.',
+              'An Android-only fork of Frosty, a mobile Twitch app with support for 7TV, BetterTTV, and FrankerFaceZ emotes.',
           showLogo: true,
           disclaimer: snapshot.hasData
               ? 'v${snapshot.data?.version} (${snapshot.data?.buildNumber})'

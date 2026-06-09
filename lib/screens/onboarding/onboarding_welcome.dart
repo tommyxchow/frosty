@@ -9,7 +9,7 @@ class OnboardingWelcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const text = [
-      'Check out the GitHub repo at the top-right of the settings page to explore Frosty\'s source code, report bugs, make feature requests, and more.',
+      'Check out the GitHub repo at the top-right of the settings page to explore Glacier\'s source code, report bugs, make feature requests, and more.',
       'Links to the full changelog and FAQ are in the settings page under "Other".',
       'Download updates from the GitHub releases page.',
     ];
