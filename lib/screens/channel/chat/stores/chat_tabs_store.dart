@@ -622,6 +622,8 @@ abstract class ChatTabsStoreBase with Store {
     // Primary tab (index 0) cannot be moved, and nothing can move before it
     if (oldIndex == 0 || newIndex == 0) return;
 
+    // onReorderItem already adjusts newIndex for the removed item, so no
+    // manual off-by-one correction is needed here.
     if (oldIndex == newIndex) return;
 
     final tab = _tabs.removeAt(oldIndex);

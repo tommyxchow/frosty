@@ -9,6 +9,19 @@ const basicPrivmsg =
     'tmi-sent-ts=1234567890123;turbo=0;user-id=67890;user-type= '
     ':testuser!testuser@testuser.tmi.twitch.tv PRIVMSG #channel :Hello World';
 
+/// Exercises the full IRCv3 tag escape set plus a value that itself contains
+/// '='. Uses a raw string so the backslashes are literal wire bytes.
+const messageWithEscapedTagChars =
+    r'@a-space=one\stwo;a-semi=left\:right;a-slash=a\\b;a-equals=k=v;'
+    r'a-double=x\\sy;display-name=EscapeAll;mod=0 '
+    r':escapeall!escapeall@escapeall.tmi.twitch.tv PRIVMSG #channel :hi';
+
+/// A message whose prefix is not the usual `nick!user@host` form (no '!').
+/// The parser should fall back to the login tag instead of throwing.
+const messageNoBangPrefix =
+    '@login=fallbackuser;mod=0;id=nobang-1 '
+    ':some.server.example PRIVMSG #channel :server style';
+
 /// A chat message with emotes in the tags
 /// Note: emote positions are 0-indexed byte positions in the message
 /// "Kappa LUL" - Kappa is at 0-4, LUL is at 6-8
@@ -137,6 +150,16 @@ const historicalMessage =
     'historical=1;id=hist-123;mod=0;room-id=12345;subscriber=0;'
     'tmi-sent-ts=1234567890123;turbo=0;user-id=12121;user-type= '
     ':histuser!histuser@histuser.tmi.twitch.tv PRIVMSG #channel :Historical message';
+
+/// A historical message as serialized by the recent-messages API, which emits
+/// empty tags as bare keys (e.g. `emotes`, `flags`) instead of the `key=` form
+/// that live Twitch IRC uses.
+const historicalMessageBareTags =
+    '@badges=raging-wolf-helm/1;emotes;first-msg=0;tmi-sent-ts=1234567890123;'
+    'flags;mod=0;returning-chatter=0;rm-received-ts=1234567890456;color=#1E90FF;'
+    'id=hist-bare-123;room-id=12345;historical=1;user-type;turbo=0;subscriber=0;'
+    'badge-info;display-name=BareUser;user-id=18181 '
+    ':bareuser!bareuser@bareuser.tmi.twitch.tv PRIVMSG #channel :Bare tag message';
 
 /// A message from a shared chat session (source room different from current)
 const sharedChatMessage =

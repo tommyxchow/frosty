@@ -959,22 +959,25 @@ class IRCMessage {
     // Obtain the index to break off the tags.
     final tagAndIrcMessageDivider = whole.indexOf(' ');
 
-    // Get the tags substring and escape characters.
-    // IRC messages escape spaces with \s.
-    final tags = whole
-        .substring(1, tagAndIrcMessageDivider)
-        .replaceAll('\\s', ' ');
-
-    // Next, parse and map the tags.
+    // Parse the IRCv3 tags into a map. The tags section is everything between
+    // the leading '@' and the first space. We split on the *raw* string: a
+    // literal ';' is always a separator because escaped semicolons inside a
+    // value are encoded as `\:` (unescaped per-value below).
     final mappedTags = <String, String>{};
+    final rawTags = whole.substring(1, tagAndIrcMessageDivider);
 
-    // Loop through each tag and store their key value pairs into the map.
-    for (final tag in tags.split(';')) {
-      // Skip if the tag has no value.
-      if (tag.endsWith('=')) continue;
+    for (final tag in rawTags.split(';')) {
+      // Split on the first '=' only; IRCv3 tag values may contain '='.
+      final equalsIndex = tag.indexOf('=');
 
-      final tagSplit = tag.split('=');
-      mappedTags[tagSplit[0]] = tagSplit[1];
+      // Skip valueless tags. Per the IRCv3 spec a missing value (bare `key`)
+      // and an empty value (`key=`) are equivalent; live Twitch sends the
+      // latter, the recent-messages API the former.
+      if (equalsIndex == -1 || equalsIndex == tag.length - 1) continue;
+
+      mappedTags[tag.substring(0, equalsIndex)] = _unescapeTagValue(
+        tag.substring(equalsIndex + 1),
+      );
     }
 
     // Now we'll parse the message itself.
@@ -990,9 +993,19 @@ class IRCMessage {
 
     // If the username exists, set it.
     // tmi.twitch.tv means the message was sent by Twitch rather than a user, so will be irrelevant.
-    final String? user = splitMessage[0] == _twitchIrcServer
-        ? mappedTags['login']
-        : splitMessage[0].substring(0, splitMessage[0].indexOf('!'));
+    final prefix = splitMessage[0];
+    final String? user;
+    if (prefix == _twitchIrcServer) {
+      user = mappedTags['login'];
+    } else {
+      // Normal prefixes are `nick!user@host`. Fall back to the login tag (or
+      // null) if the expected `!` is absent so an unexpected prefix shape can
+      // never throw a RangeError and take down the whole message.
+      final bangIndex = prefix.indexOf('!');
+      user = bangIndex == -1
+          ? mappedTags['login']
+          : prefix.substring(0, bangIndex);
+    }
 
     // If there is an associated message, set it.
     String? message;
@@ -1151,6 +1164,50 @@ class IRCMessage {
       action: action,
       mention: mention,
     );
+  }
+
+  /// Unescapes an IRCv3 message-tag value.
+  ///
+  /// The spec defines these sequences: `\:` to `;`, `\s` to space, `\\` to `\`,
+  /// `\r` to CR, `\n` to LF. Any other `\x` collapses to `x`, and a lone trailing
+  /// backslash is dropped. Done in a single pass so sequences can't be
+  /// double-unescaped (e.g. `\\s` correctly yields `\s`, not a space).
+  static String _unescapeTagValue(String value) {
+    // Fast path: the vast majority of tag values contain no escape sequences.
+    if (!value.contains('\\')) return value;
+
+    final buffer = StringBuffer();
+    for (var i = 0; i < value.length; i++) {
+      if (value[i] != '\\') {
+        buffer.write(value[i]);
+        continue;
+      }
+
+      // A trailing backslash with nothing after it is dropped.
+      if (i + 1 == value.length) break;
+
+      switch (value[i + 1]) {
+        case ':':
+          buffer.write(';');
+          break;
+        case 's':
+          buffer.write(' ');
+          break;
+        case '\\':
+          buffer.write('\\');
+          break;
+        case 'r':
+          buffer.write('\r');
+          break;
+        case 'n':
+          buffer.write('\n');
+          break;
+        default:
+          buffer.write(value[i + 1]);
+      }
+      i++; // Skip the escaped character we just consumed.
+    }
+    return buffer.toString();
   }
 
   factory IRCMessage.createNotice({

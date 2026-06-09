@@ -29,7 +29,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.9'
+          flutter-version: '3.44.1'
           channel: stable
           cache: true
 
@@ -45,5 +45,7 @@ jobs:
       - name: Test
         run: flutter test
 
-      - name: Build debug APK
-        run: flutter build apk --debug --dart-define=CLIENT_ID=dummy --dart-define=SECRET=dummy
+      - name: Build release APK
+        run: flutter build apk --release --dart-define=CLIENT_ID=dummy --dart-define=SECRET=dummy
+        env:
+          ALLOW_DEBUG_SIGNED_RELEASE: '1'
