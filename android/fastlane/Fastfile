@@ -17,11 +17,14 @@ default_platform(:android)
 
 platform :android do
   desc "Deploy a new version to the Google Play"
-  lane :deploy do
+  lane :deploy do |options|
     # Upload to the play store ussing the provided credentials and AAB from flutter build.
+    # With dry_run:true (release dry-run workflow), validate_only authenticates and
+    # validates the AAB against Google Play without committing the release.
     upload_to_play_store(
       json_key_data: Base64.decode64(ENV["PLAY_STORE_CREDENTIALS"]),
-      aab: "../build/app/outputs/bundle/release/app-release.aab"
+      aab: "../build/app/outputs/bundle/release/app-release.aab",
+      validate_only: options[:dry_run] || false
     )
   end
 end

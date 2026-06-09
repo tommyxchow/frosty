@@ -8,6 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      # Match the JDK the release workflows build with, so the release-mode APK
+      # check below faithfully catches what would break a real release.
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.44.1
@@ -16,3 +22,10 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      # Release-mode compile check (no signing secrets needed — Android falls back
+      # to debug signing via ALLOW_DEBUG_SIGNED_RELEASE). Catches release-only
+      # breakage that debug builds and tests miss (AOT compile, icon tree-shaking,
+      # plugin/Gradle release incompatibility).
+      - run: flutter build apk --release
+        env:
+          ALLOW_DEBUG_SIGNED_RELEASE: '1'

@@ -17,7 +17,9 @@ default_platform(:ios)
 
 platform :ios do
   desc 'Push a new release build to the App Store'
-  lane :release do
+  lane :release do |options|
+    dry_run = options[:dry_run] || false
+
     # Setup for CI. Uses a keychain to prevent the CI from hanging due to password prompts.
     setup_ci
 
@@ -29,8 +31,9 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # Manage code signing (with match).
-    sync_code_signing
+    # Manage code signing (with match). readonly on a dry run so we only verify the
+    # existing cert/profile resolve and never regenerate or mutate the certificates repo.
+    sync_code_signing(readonly: dry_run)
 
     # Automatic signing is used during development, but fastlane needs to use manual signing.
     update_code_signing_settings(
@@ -44,6 +47,11 @@ platform :ios do
       scheme: 'Runner',
       output_directory: '../build/ios/archive'
     )
+
+    # On a dry run, stop here: the signed archive above exercises every step that
+    # actually fails (ASC key, match certs/profiles, signing, release build). The
+    # App Store upload itself is the only remaining unverified step.
+    next if dry_run
 
     # Upload the app to the App Store.
     upload_to_app_store(

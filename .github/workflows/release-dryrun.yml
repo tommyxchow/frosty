@@ -1,0 +1,118 @@
+# Dry-runs the full store release pipeline without publishing, to catch
+# credential, signing, dependency, and store-validation breakage before an
+# actual release. Mirrors store-release.yml but stops short of publishing:
+# Android validates the AAB against Google Play (validate_only); iOS builds a
+# fully signed archive via match (readonly) and skips the App Store upload.
+name: Release dry-run
+on:
+  # Run on demand before cutting a release.
+  workflow_dispatch:
+  # Weekly heartbeat so cert expiry, secret rotation, and dependency drift
+  # surface on their own between releases.
+  schedule:
+    - cron: '0 9 * * 1' # Mondays 09:00 UTC
+# Setup environment variables for use in all jobs.
+env:
+  # Gemfile path used for caching dependencies.
+  BUNDLE_GEMFILE: ${{ github.workspace }}/android/Gemfile
+  CLIENT_ID: ${{ secrets.CLIENT_ID }}
+  SECRET: ${{ secrets.SECRET }}
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+jobs:
+  android:
+    name: Dry-run Android release
+    runs-on: ubuntu-latest
+    environment: release-android
+    env:
+      UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      KEY_FILE_PATH: android/key.properties
+      PLAY_STORE_CREDENTIALS: ${{ secrets.PLAY_STORE_CREDENTIALS }}
+
+    steps:
+      - name: Checkout Frosty repo
+        uses: actions/checkout@v6
+
+      # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
+      - name: Set up Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+          bundler-cache: true
+
+      # Setup Java so that we can build the appbundle.
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Setup and cache Flutter to install packages and build.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.1
+          cache: true
+
+      # Decode and create the upload-keystore.jks file, used for signing the app.
+      - name: Decode and create upload-keystore.jks
+        run: echo $UPLOAD_KEYSTORE | base64 --decode > $GITHUB_WORKSPACE/android/upload-keystore.jks
+
+      # Create the key.properties file, used for signing the app.
+      - name: Create key.properties
+        run: |
+          echo storePassword=$STORE_PASSWORD >> $KEY_FILE_PATH
+          echo keyPassword=$KEY_PASSWORD >> $KEY_FILE_PATH
+          echo keyAlias=upload >> $KEY_FILE_PATH
+          echo storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks >> $KEY_FILE_PATH
+
+      # Build the Android app bundle (AAB) and pass the environment variables.
+      - name: Build the Android AAB
+        run: flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
+
+      # Validate the AAB and credentials against Google Play without publishing.
+      - name: Validate release with fastlane (no publish)
+        run: cd android && bundle exec fastlane deploy dry_run:true
+  ios:
+    name: Dry-run iOS release
+    runs-on: macos-latest
+    environment: release-ios
+    env:
+      APP_STORE_KEY_ID: ${{ secrets.APP_STORE_KEY_ID }}
+      APP_STORE_ISSUER_ID: ${{ secrets.APP_STORE_ISSUER_ID }}
+      APP_STORE_CREDENTIALS: ${{ secrets.APP_STORE_CREDENTIALS }}
+      MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+    steps:
+      - name: Checkout Frosty repo
+        uses: actions/checkout@v6
+
+        # Always pick the newest production Xcode on the runner
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      # Install Ruby and install/cache dependencies with bundler in order to use fastlane.
+      - name: Set up Ruby and Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+          bundler-cache: true
+
+      # Setup and cache Flutter to install packages and build.
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.1
+          cache: true
+
+      # Setup the iOS project with environment variables without signing (building and signing will happen in fastlane).
+      - name: Config the iOS build
+        run: flutter build ios --no-codesign --config-only --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
+
+      # Authenticate ASC API key, resolve signing via match (readonly), and build a
+      # fully signed archive without uploading to the App Store.
+      - name: Sign and build with fastlane (no publish)
+        run: cd ios && bundle exec fastlane release dry_run:true

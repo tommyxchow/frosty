@@ -3,14 +3,20 @@ on:
   push:
     branches: [main]
 jobs:
-  test:
-    name: Check and test on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+  # Linux runner: analyze + test once (both are OS-independent) and compile a
+  # release APK to catch release-only breakage. Debug-signed via the build.gradle
+  # fallback (ALLOW_DEBUG_SIGNED_RELEASE) — no signing secrets needed.
+  android:
+    name: Analyze, test, and build Android
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      # Match the JDK the release workflows build with, so this compile check
+      # faithfully catches what would break a real release.
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.44.1
@@ -19,3 +25,19 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      - run: flutter build apk --release
+        env:
+          ALLOW_DEBUG_SIGNED_RELEASE: '1'
+  # macOS runner: release-compile iOS (no codesign, no secrets) — the only thing
+  # that must run on macOS. analyze/test already covered on the Linux job.
+  ios:
+    name: Build iOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.1
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign
