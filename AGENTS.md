@@ -50,4 +50,6 @@ dart run build_runner build --delete-conflicting-outputs             # Same, but
 
 ## Commits
 
-Lowercase, no prefixes (e.g., `fix landscape bottom padding in chat bottom bar`). Keep commits tightly scoped.
+Conventional commits: `type(scope): description` — lowercase, no trailing period, tightly scoped (e.g., `fix(chat): correct landscape bottom padding in bottom bar`). Append `!` before the `:` for breaking changes (e.g., `feat(api)!: drop legacy auth flow`).
+
+Common types: `feat`, `fix`, `chore`, `refactor`, `docs`, `test`, `perf`, `style`. Scope is the affected area (e.g., `chat`, `video`, `api`).

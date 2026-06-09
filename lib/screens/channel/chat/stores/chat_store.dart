@@ -518,10 +518,19 @@ abstract class ChatStoreBase with Store {
     for (final message in data.trimRight().split('\r\n')) {
       // debugPrint('$message\n');
       if (message.startsWith('@')) {
-        final parsedIRCMessage = IRCMessage.fromString(
-          message,
-          userLogin: auth.user.details?.login,
-        );
+        // Parse defensively: a single malformed message must never abort the
+        // loop, or one bad frame would drop every other message batched with
+        // it (e.g. an entire recent-messages backlog). Skip and keep going.
+        final IRCMessage parsedIRCMessage;
+        try {
+          parsedIRCMessage = IRCMessage.fromString(
+            message,
+            userLogin: auth.user.details?.login,
+          );
+        } catch (e) {
+          debugPrint('Failed to parse IRC message: $e');
+          continue;
+        }
 
         if (parsedIRCMessage.user != null) {
           chatDetailsStore.chatUsers.add(parsedIRCMessage.user!);
@@ -601,6 +610,16 @@ abstract class ChatStoreBase with Store {
                 showFFZEmotes: settings.showFFZEmotes,
                 showFFZBadges: settings.showFFZBadges,
               );
+            } else if (wasShared &&
+                !_isInSharedChatMode &&
+                assetsStore.hasLoadedSharedChatAssets) {
+              // On leaving shared chat, drop the participants' merged emotes and
+              // badges and restore just this channel's assets; otherwise the
+              // other streamer's emote set and badges linger (#522). Guarded on
+              // having actually loaded shared assets so a flapping tag can't
+              // trigger redundant refetches.
+              assetsStore.resetSharedChatAssets();
+              getAssets();
             }
             messageBuffer.add(parsedIRCMessage);
             break;

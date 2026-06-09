@@ -47,7 +47,16 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            // Use the real upload key when key.properties is present (release
+            // workflows create it from secrets). Allow debug signing only when a CI
+            // compile-only check explicitly opts in via ALLOW_DEBUG_SIGNED_RELEASE;
+            // otherwise fail loudly so a real release can never be silently
+            // debug-signed if the keystore step is ever missing.
+            signingConfig = when {
+                keystorePropertiesFile.exists() -> signingConfigs.getByName("release")
+                System.getenv("ALLOW_DEBUG_SIGNED_RELEASE") != null -> signingConfigs.getByName("debug")
+                else -> error("key.properties missing - set ALLOW_DEBUG_SIGNED_RELEASE=1 for compile-only builds")
+            }
         }
     }
 }
