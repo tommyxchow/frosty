@@ -52,7 +52,7 @@ dependencies:
     flutter_cache_manager: ^3.3.0
     device_info_plus: ^12.3.0
     wakelock_plus: ^1.1.2
-    simple_icons: ^14.6.1
+    simple_icons: ^16.23.0
     simple_pip_mode:
         git:
             url: https://github.com/tommyxchow/simple_pip_mode_flutter
@@ -69,7 +69,12 @@ dependencies:
     path_provider: ^2.1.5
     dio: ^5.9.0
     app_links: ^7.0.0
-    extended_text_field: ^16.0.2
+    # Fork pinned for Flutter 3.44 compatibility — upstream 16.0.2 is the latest
+    # pub release and references ExtendSelectionByPageIntent, removed in 3.44.
+    extended_text_field:
+        git:
+            url: https://github.com/tommyxchow/extended_text_field.git
+            ref: 76305e9b115f0b41dc0d23e7a4f651df454fea89
     native_device_orientation: ^2.1.0
 
 dev_dependencies:
