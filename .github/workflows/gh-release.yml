@@ -49,20 +49,28 @@ jobs:
           cache: true
 
       - name: Validate release version
+        id: release_info
         shell: bash
         run: |
-          if ! [[ "$RELEASE_TAG" =~ ^glacier-v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Release tag must look like glacier-v5.0.5, got $RELEASE_TAG"
+          if ! [[ "$RELEASE_TAG" =~ ^glacier-v[0-9]+\.[0-9]+\.[0-9]+(\+[0-9]+)?$ ]]; then
+            echo "::error::Release tag must look like glacier-v5.0.5 or glacier-v5.0.5+1, got $RELEASE_TAG"
             exit 1
           fi
 
-          VERSION="${RELEASE_TAG#glacier-v}"
+          VERSION_WITH_PREFIX="${RELEASE_TAG#glacier-}"
+          APP_VERSION="${VERSION_WITH_PREFIX#v}"
+          BASE_VERSION="${APP_VERSION%%+*}"
           PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          APK_NAME="glacier-android-${VERSION_WITH_PREFIX}.apk"
 
-          if [ "$PUBSPEC_VERSION" != "$VERSION" ]; then
+          if [ "$PUBSPEC_VERSION" != "$BASE_VERSION" ]; then
             echo "::error::Tag $RELEASE_TAG does not match pubspec.yaml version $PUBSPEC_VERSION"
             exit 1
           fi
+
+          echo "version=$VERSION_WITH_PREFIX" >> "$GITHUB_OUTPUT"
+          echo "base_version=$BASE_VERSION" >> "$GITHUB_OUTPUT"
+          echo "apk_name=$APK_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Verify required secrets
         shell: bash
@@ -84,12 +92,7 @@ jobs:
       - name: Create key.properties
         shell: bash
         run: |
-          cat > android/key.properties <<EOF_KEY_PROPERTIES
-          storePassword=$STORE_PASSWORD
-          keyPassword=$KEY_PASSWORD
-          keyAlias=upload
-          storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks
-          EOF_KEY_PROPERTIES
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=upload\nstoreFile=%s\n' "$STORE_PASSWORD" "$KEY_PASSWORD" "$GITHUB_WORKSPACE/android/upload-keystore.jks" > android/key.properties
 
       - name: Install dependencies
         run: flutter pub get
@@ -98,14 +101,14 @@ jobs:
         shell: bash
         run: |
           flutter build apk --release --dart-define=CLIENT_ID="$CLIENT_ID" --dart-define=SECRET="$SECRET"
-          mv build/app/outputs/flutter-apk/app-release.apk "glacier-android-${RELEASE_TAG}.apk"
+          mv build/app/outputs/flutter-apk/app-release.apk "${{ steps.release_info.outputs.apk_name }}"
 
       - name: Extract release notes
         id: release_notes
         shell: bash
         run: |
           VERSION="$RELEASE_TAG"
-          RELEASE_NOTES_VERSION="v${RELEASE_TAG#glacier-v}"
+          RELEASE_NOTES_VERSION="v${{ steps.release_info.outputs.base_version }}"
           RELEASE_NOTES_FILE="assets/release-notes.md"
 
           NOTES=$(awk -v version="$RELEASE_NOTES_VERSION" '
@@ -142,6 +145,7 @@ jobs:
         with:
           draft: true
           tag_name: ${{ env.RELEASE_TAG }}
+          name: Glacier ${{ steps.release_info.outputs.version }}
           generate_release_notes: ${{ steps.release_notes.outputs.found != 'true' }}
           body: ${{ steps.release_notes.outputs.found == 'true' && steps.release_notes.outputs.body || '' }}
-          files: glacier-android-${{ env.RELEASE_TAG }}.apk
+          files: ${{ steps.release_info.outputs.apk_name }}
