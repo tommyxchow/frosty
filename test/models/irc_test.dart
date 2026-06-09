@@ -27,6 +27,27 @@ void main() {
         expect(msg.message, 'test message');
       });
 
+      test('unescapes the full IRCv3 tag escape set', () {
+        final msg = IRCMessage.fromString(messageWithEscapedTagChars);
+
+        expect(msg.tags['a-space'], 'one two');
+        expect(msg.tags['a-semi'], 'left;right');
+        expect(msg.tags['a-slash'], r'a\b');
+        // Only the first '=' splits key/value; later '=' stays in the value.
+        expect(msg.tags['a-equals'], 'k=v');
+        // `\\` consumes both backslashes; the following 's' is a literal letter,
+        // not a `\s` space escape (single-pass unescaping).
+        expect(msg.tags['a-double'], r'x\sy');
+      });
+
+      test('falls back to login tag when prefix has no "!"', () {
+        // An unexpected prefix shape must not throw and drop the message.
+        final msg = IRCMessage.fromString(messageNoBangPrefix);
+
+        expect(msg.user, 'fallbackuser');
+        expect(msg.message, 'server style');
+      });
+
       test('handles message with no color tag', () {
         final msg = IRCMessage.fromString(messageNoColor);
 
@@ -221,6 +242,20 @@ void main() {
         final msg = IRCMessage.fromString(historicalMessage);
 
         expect(msg.tags['historical'], '1');
+      });
+
+      test('parses historical message with bare (valueless) tags', () {
+        // The recent-messages API serializes empty tags as bare keys (e.g.
+        // `emotes`, `flags`) instead of `key=`. This previously threw a
+        // RangeError, silently dropping all recent messages.
+        final msg = IRCMessage.fromString(historicalMessageBareTags);
+
+        expect(msg.tags['historical'], '1');
+        expect(msg.tags['display-name'], 'BareUser');
+        expect(msg.message, 'Bare tag message');
+        // Bare tags should be absent from the map, not crash parsing.
+        expect(msg.tags.containsKey('emotes'), isFalse);
+        expect(msg.tags.containsKey('flags'), isFalse);
       });
 
       test('parses shared chat message with source room', () {

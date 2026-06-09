@@ -519,10 +519,19 @@ abstract class ChatStoreBase with Store {
     for (final message in data.trimRight().split('\r\n')) {
       // debugPrint('$message\n');
       if (message.startsWith('@')) {
-        final parsedIRCMessage = IRCMessage.fromString(
-          message,
-          userLogin: auth.user.details?.login,
-        );
+        // Parse defensively: a single malformed message must never abort the
+        // loop, or one bad frame would drop every other message batched with
+        // it (e.g. an entire recent-messages backlog). Skip and keep going.
+        final IRCMessage parsedIRCMessage;
+        try {
+          parsedIRCMessage = IRCMessage.fromString(
+            message,
+            userLogin: auth.user.details?.login,
+          );
+        } catch (e) {
+          debugPrint('Failed to parse IRC message: $e');
+          continue;
+        }
 
         if (parsedIRCMessage.user != null) {
           chatDetailsStore.chatUsers.add(parsedIRCMessage.user!);
