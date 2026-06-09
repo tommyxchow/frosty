@@ -290,6 +290,18 @@ abstract class ChatAssetsStoreBase with Store {
     await Future.wait(futures);
   }
 
+  /// Whether any shared chat participant assets have been merged in.
+  bool get hasLoadedSharedChatAssets => _loadedSharedChannelIds.isNotEmpty;
+
+  /// Clears tracking of merged shared chat participant assets so that leaving
+  /// and later re-entering a shared chat session re-fetches cleanly. The caller
+  /// must re-fetch this channel's own assets afterwards (which replaces the
+  /// merged emote/badge maps). Must run within a MobX action.
+  void resetSharedChatAssets() {
+    _loadedSharedChannelIds.clear();
+    sharedSevenTvSetIds.clear();
+  }
+
   /// Load and cache shared chat participants for a broadcaster.
   /// Returns the list of new participant broadcaster IDs (deduped).
   @action

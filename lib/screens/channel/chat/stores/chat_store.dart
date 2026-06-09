@@ -611,6 +611,16 @@ abstract class ChatStoreBase with Store {
                 showFFZEmotes: settings.showFFZEmotes,
                 showFFZBadges: settings.showFFZBadges,
               );
+            } else if (wasShared &&
+                !_isInSharedChatMode &&
+                assetsStore.hasLoadedSharedChatAssets) {
+              // On leaving shared chat, drop the participants' merged emotes and
+              // badges and restore just this channel's assets — otherwise the
+              // other streamer's emote set and badges linger (#522). Guarded on
+              // having actually loaded shared assets so a flapping tag can't
+              // trigger redundant refetches.
+              assetsStore.resetSharedChatAssets();
+              getAssets();
             }
             messageBuffer.add(parsedIRCMessage);
             break;
