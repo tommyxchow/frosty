@@ -1,5 +1,6 @@
-# Drafts a GitHub release with the APK attached.
+# Drafts a GitHub release with the signed release APK attached.
 name: Draft GitHub release
+
 on:
   workflow_dispatch:
     inputs:
@@ -9,83 +10,104 @@ on:
   push:
     tags:
       - glacier-v*.*.*
+
 permissions:
   contents: write
+
 jobs:
   android:
     name: Draft release and attach APK
     runs-on: ubuntu-latest
     environment: release-android
+
     env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      SECRET: ${{ secrets.SECRET }}
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      KEY_FILE_PATH: android/key.properties
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      SECRET: ${{ secrets.SECRET }}
-      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
-      
-      # Setup Java so that we can build the APK.
+          submodules: recursive
+
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
-      
-      # Setup and cache Flutter to install packages and build.
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.38.9'
+          channel: stable
           cache: true
 
-      # Keep release tags aligned with Flutter's Android versionName.
       - name: Validate release version
+        shell: bash
         run: |
           if ! [[ "$RELEASE_TAG" =~ ^glacier-v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::Release tag must look like glacier-v5.0.5, got $RELEASE_TAG"
             exit 1
           fi
+
           VERSION="${RELEASE_TAG#glacier-v}"
           PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+
           if [ "$PUBSPEC_VERSION" != "$VERSION" ]; then
             echo "::error::Tag $RELEASE_TAG does not match pubspec.yaml version $PUBSPEC_VERSION"
             exit 1
           fi
-      
-      # Decode and create the upload-keystore.jks file, used for signing the app.
-      - name: Decode and create upload-keystore.jks
-        run: echo $UPLOAD_KEYSTORE | base64 --decode > $GITHUB_WORKSPACE/android/upload-keystore.jks
-      
-      # Create the key.properties file, used for signing the app.
-      - name: Create key.properties
-        run: |
-          echo storePassword=$STORE_PASSWORD >> $KEY_FILE_PATH
-          echo keyPassword=$KEY_PASSWORD >> $KEY_FILE_PATH
-          echo keyAlias=upload >> $KEY_FILE_PATH
-          echo storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks >> $KEY_FILE_PATH
-      
-      # Build the APK with the environment variables and move/rename it.
-      - name: Build for Android
-        run: |
-          flutter build apk --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
-          mv build/app/outputs/flutter-apk/app-release.apk frosty-android-${RELEASE_TAG}.apk
 
-      # Extract release notes from assets/release-notes.md for the current version.
+      - name: Verify required secrets
+        shell: bash
+        run: |
+          missing=0
+          for name in CLIENT_ID SECRET UPLOAD_KEYSTORE STORE_PASSWORD KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name secret is not set"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Decode upload keystore
+        shell: bash
+        run: |
+          printf '%s' "$UPLOAD_KEYSTORE" | base64 --decode > android/upload-keystore.jks
+
+      - name: Create key.properties
+        shell: bash
+        run: |
+          cat > android/key.properties <<EOF_KEY_PROPERTIES
+          storePassword=$STORE_PASSWORD
+          keyPassword=$KEY_PASSWORD
+          keyAlias=upload
+          storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks
+          EOF_KEY_PROPERTIES
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        shell: bash
+        run: |
+          flutter build apk --release --dart-define=CLIENT_ID="$CLIENT_ID" --dart-define=SECRET="$SECRET"
+          mv build/app/outputs/flutter-apk/app-release.apk "glacier-android-${RELEASE_TAG}.apk"
+
       - name: Extract release notes
         id: release_notes
+        shell: bash
         run: |
           VERSION="$RELEASE_TAG"
           RELEASE_NOTES_VERSION="v${RELEASE_TAG#glacier-v}"
           RELEASE_NOTES_FILE="assets/release-notes.md"
 
-          # Extract the section for this version using awk
-          # Starts at "## vX.X.X", skips date line, stops at next "---" or "## v" header
           NOTES=$(awk -v version="$RELEASE_NOTES_VERSION" '
             BEGIN { found=0; output="" }
             $0 ~ "^## " version "$" { found=1; next }
@@ -96,35 +118,30 @@ jobs:
             END { print output }
           ' "$RELEASE_NOTES_FILE")
 
-          # Clean up "on GitHub" suffix (redundant since we're on GitHub)
           NOTES=$(echo "$NOTES" | sed 's/ on GitHub)/)/')
-
-          # Trim leading/trailing whitespace
           NOTES=$(echo "$NOTES" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
           if [ -n "$NOTES" ]; then
-            # Get the previous tag for the Full Changelog link
             PREV_TAG=$(git describe --tags --match 'glacier-v*' --abbrev=0 "$VERSION^" 2>/dev/null || echo "")
 
-            echo "found=true" >> $GITHUB_OUTPUT
-            echo "body<<EOF" >> $GITHUB_OUTPUT
-            echo "$NOTES" >> $GITHUB_OUTPUT
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "body<<EOF_RELEASE_NOTES" >> "$GITHUB_OUTPUT"
+            echo "$NOTES" >> "$GITHUB_OUTPUT"
             if [ -n "$PREV_TAG" ]; then
-              echo "" >> $GITHUB_OUTPUT
-              echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}" >> $GITHUB_OUTPUT
+              echo "" >> "$GITHUB_OUTPUT"
+              echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${VERSION}" >> "$GITHUB_OUTPUT"
             fi
-            echo "EOF" >> $GITHUB_OUTPUT
+            echo "EOF_RELEASE_NOTES" >> "$GITHUB_OUTPUT"
           else
-            echo "found=false" >> $GITHUB_OUTPUT
+            echo "found=false" >> "$GITHUB_OUTPUT"
             echo "::warning::No release notes found for $VERSION in $RELEASE_NOTES_FILE"
           fi
 
-      # Create a draft release on GitHub.
-      - name: Release
+      - name: Create draft release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
           tag_name: ${{ env.RELEASE_TAG }}
           generate_release_notes: ${{ steps.release_notes.outputs.found != 'true' }}
           body: ${{ steps.release_notes.outputs.found == 'true' && steps.release_notes.outputs.body || '' }}
-          files: frosty-android-${{ env.RELEASE_TAG }}.apk
+          files: glacier-android-${{ env.RELEASE_TAG }}.apk
