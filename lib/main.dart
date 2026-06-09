@@ -1,13 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:advanced_in_app_review/advanced_in_app_review.dart';
 import 'package:app_links/app_links.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_performance/firebase_performance.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,7 +13,6 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/apis/twitch_auth_interceptor.dart';
 import 'package:frosty/apis/unauthorized_interceptor.dart';
 import 'package:frosty/cache_manager.dart';
-import 'package:frosty/firebase_options.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
@@ -27,7 +20,6 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/stores/global_assets_store.dart';
 import 'package:frosty/theme.dart';
-import 'package:frosty/utils.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
@@ -38,17 +30,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   CustomCacheManager.removeOrphanedCacheFiles();
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Pass all uncaught "fatal" errors from the framework to Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -70,27 +51,12 @@ void main() async {
     );
   }
 
-  await initUtils();
-
   // With the shared preferences instance, obtain the existing user settings if it exists.
   // If default settings don't exist, use an empty JSON string to use the default values.
   final userSettings = prefs.getString('settings') ?? '{}';
 
   // Initialize a settings store from the settings JSON string.
   final settingsStore = SettingsStore.fromJson(jsonDecode(userSettings));
-
-  // Disable Firebase collection in debug builds to avoid polluting production data.
-  // In release builds, respect the user's preference.
-  if (kDebugMode) {
-    FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
-    FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
-    FirebasePerformance.instance.setPerformanceCollectionEnabled(false);
-  } else {
-    final shareEnabled = settingsStore.shareCrashLogsAndAnalytics;
-    FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(shareEnabled);
-    FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(shareEnabled);
-    FirebasePerformance.instance.setPerformanceCollectionEnabled(shareEnabled);
-  }
 
   // Create a MobX reaction that will save the settings on disk every time they are changed.
   autorun((_) => prefs.setString('settings', jsonEncode(settingsStore)));
@@ -123,10 +89,6 @@ void main() async {
   dioClient.interceptors.add(UnauthorizedInterceptor(authStore));
 
   await authStore.init();
-  FirebaseCrashlytics.instance.setCustomKey('is_logged_in', authStore.isLoggedIn);
-  if (authStore.isLoggedIn && authStore.user.details != null) {
-    FirebaseCrashlytics.instance.setUserIdentifier(authStore.user.details!.id);
-  }
 
   runApp(
     MultiProvider(
@@ -164,13 +126,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
-    AdvancedInAppReview()
-        .setMinDaysBeforeRemind(7)
-        .setMinDaysAfterInstall(1)
-        .setMinLaunchTimes(5)
-        .setMinSecondsBeforeShowDialog(3)
-        .monitor();
-
     _initDeepLinks();
   }
 
@@ -192,11 +147,6 @@ class _MyAppState extends State<MyApp> {
               : settingsStore.themeType == ThemeType.light
               ? ThemeMode.light
               : ThemeMode.dark,
-          navigatorObservers: [
-            FirebaseAnalyticsObserver(
-              analytics: FirebaseAnalytics.instance,
-            ),
-          ],
           home: widget.firstRun ? const OnboardingIntro() : const Home(),
           navigatorKey: navigatorKey,
         );

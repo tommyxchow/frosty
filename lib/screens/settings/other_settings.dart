@@ -1,13 +1,8 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/cache_manager.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/screens/settings/widgets/release_notes.dart';
-import 'package:frosty/screens/settings/widgets/settings_list_switch.dart';
 import 'package:frosty/widgets/alert_message.dart';
 import 'package:frosty/widgets/frosty_dialog.dart';
 
@@ -63,12 +58,12 @@ class _OtherSettingsState extends State<OtherSettings> {
         ListTile(
           leading: const Icon(Icons.notes_rounded),
           title: const Text('Release notes'),
-          onTap: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(
-            settings: const RouteSettings(name: ReleaseNotes.routeName),
-            builder: (context) => const ReleaseNotes(),
-          )),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              settings: const RouteSettings(name: ReleaseNotes.routeName),
+              builder: (context) => const ReleaseNotes(),
+            ),
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded),
@@ -95,28 +90,6 @@ class _OtherSettingsState extends State<OtherSettings> {
           leading: const Icon(Icons.restore_rounded),
           title: const Text('Reset settings'),
           onTap: () => _showConfirmDialog(context),
-        ),
-        Observer(
-          builder: (_) => SettingsListSwitch(
-            title: 'Share crash logs and analytics',
-            subtitle: const Text(
-              'Help improve Frosty by sending anonymous crash logs and analytics through Firebase.',
-            ),
-            value: widget.settingsStore.shareCrashLogsAndAnalytics,
-            onChanged: (newValue) {
-              widget.settingsStore.shareCrashLogsAndAnalytics = newValue;
-
-              FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-                newValue,
-              );
-              FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(
-                newValue,
-              );
-              FirebasePerformance.instance.setPerformanceCollectionEnabled(
-                newValue,
-              );
-            },
-          ),
         ),
       ],
     );

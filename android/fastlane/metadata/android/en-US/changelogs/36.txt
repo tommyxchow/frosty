@@ -1,6 +1,0 @@
-Improvements
-• Migrated to Firebase for crash logs and analytics
-• Migrated to new Twitch API badges endpoint
-
-Bug Fixes
-• Fixed chatters not showing due to legacy Twitch API shutdown (chatters are now based on recent messages)

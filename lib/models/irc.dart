@@ -1073,7 +1073,7 @@ class IRCMessage {
       message = message
           .split(' ')
           // Also remove any "INVALID/UNDEFINED" Unicode characters.
-          // Rendering this character on iOS shows a question mark inside a square.
+          // Rendering this character can show a question mark inside a square.
           // This character is used by some clients to bypass restrictions on repeating message.
           .map((word) => word.replaceAll(_invalidUnicodeChar, '').trim())
           .where((element) => element != '')
@@ -1159,9 +1159,7 @@ class IRCMessage {
     String? actionLabel,
   }) => IRCMessage(
     raw: '',
-    tags: {
-      'tmi-sent-ts': '${DateTime.now().millisecondsSinceEpoch}',
-    },
+    tags: {'tmi-sent-ts': '${DateTime.now().millisecondsSinceEpoch}'},
     command: Command.notice,
     message: message,
     actionCallback: actionCallback,

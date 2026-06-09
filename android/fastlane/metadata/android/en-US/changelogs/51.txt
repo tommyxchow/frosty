@@ -1,9 +1,0 @@
-New Features
-• Added an option to un-darken historical recent messages in chat
-
-Improvements
-• Moved exact matches of searched categories to the top (by @Shingyx on GitHub)
-
-Bug Fixes
-• Fixed extraneous notices when toggling chat-only mode
-• Fixed cookie banner blocking login and added backup workaround instructions in the login screen toolbar (instructions by @UmmonTeal on GitHub)

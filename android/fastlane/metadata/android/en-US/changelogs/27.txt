@@ -1,4 +1,0 @@
-Version 2.1.1
-
-Bug Fixes
-• Fixed old data restoring on reinstall

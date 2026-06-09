@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:frosty/apis/base_api_client.dart';
@@ -105,9 +103,7 @@ abstract class AuthBase with Store {
       // Google blocks OAuth in embedded WebViews (error 403: disallowed_useragent)
       // by detecting WebView markers. These standard browser UAs work around that.
       ..setUserAgent(
-        Platform.isIOS
-            ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1'
-            : 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Mobile Safari/537.36',
+        'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Mobile Safari/537.36',
       );
 
     return webViewController
@@ -250,8 +246,6 @@ abstract class AuthBase with Store {
           _stopReconnectLoop();
         }
       }
-
-      FirebaseCrashlytics.instance.setCustomKey('is_logged_in', _isLoggedIn);
       _error = null;
     } catch (e) {
       debugPrint(e.toString());
@@ -279,8 +273,6 @@ abstract class AuthBase with Store {
       // Set the login status to logged in.
       if (user.details != null) {
         _isLoggedIn = true;
-        FirebaseCrashlytics.instance.setCustomKey('is_logged_in', true);
-        FirebaseCrashlytics.instance.setUserIdentifier(user.details!.id);
         _stopReconnectLoop();
       }
     } catch (e) {
@@ -311,8 +303,6 @@ abstract class AuthBase with Store {
 
       // Set the login status to logged out.
       _isLoggedIn = false;
-      FirebaseCrashlytics.instance.setCustomKey('is_logged_in', false);
-      FirebaseCrashlytics.instance.setUserIdentifier('');
 
       debugPrint('Successfully logged out');
     } catch (e) {
@@ -327,7 +317,7 @@ abstract class AuthBase with Store {
       try {
         _reconnectAttempts++;
         if (_reconnectAttempts > _maxReconnectAttempts) {
-          FirebaseCrashlytics.instance.log(
+          debugPrint(
             'Auth reconnection exhausted after $_maxReconnectAttempts attempts',
           );
           await logout();

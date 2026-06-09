@@ -1,2 +1,0 @@
-Bug Fixes
-• Fixed emote/mention autocomplete not updating

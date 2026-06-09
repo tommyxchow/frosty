@@ -1,3 +1,0 @@
-Bug Fixes
-• Fixed own display name not showing in sent chat messages
-• Fixed rare case where 7TV emotes don't show in chat

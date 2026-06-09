@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -9,7 +7,6 @@ import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
-import 'package:frosty/utils.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/live_indicator.dart';
@@ -178,23 +175,14 @@ class VideoOverlay extends StatelessWidget {
                   useSensor: true,
                 );
 
-            // Map native orientation to Flutter's DeviceOrientation
-            // iOS: native landscapeLeft = notch left, needs swap to Flutter's landscapeRight
-            // Android: direct mapping works correctly
-            final needsSwap = Platform.isIOS;
-
             if (physicalOrientation == NativeDeviceOrientation.landscapeLeft) {
               SystemChrome.setPreferredOrientations([
-                needsSwap
-                    ? DeviceOrientation.landscapeRight
-                    : DeviceOrientation.landscapeLeft,
+                DeviceOrientation.landscapeLeft,
               ]);
             } else if (physicalOrientation ==
                 NativeDeviceOrientation.landscapeRight) {
               SystemChrome.setPreferredOrientations([
-                needsSwap
-                    ? DeviceOrientation.landscapeLeft
-                    : DeviceOrientation.landscapeRight,
+                DeviceOrientation.landscapeRight,
               ]);
             } else {
               // Not tilted to landscape yet, allow both
@@ -281,9 +269,7 @@ class VideoOverlay extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         refreshButton,
-                        // On iPad, hide the rotate button on the overlay
-                        // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
-                        if (!isIPad()) rotateButton,
+                        rotateButton,
                         if (context.isLandscape) fullScreenButton,
                       ],
                     ),
@@ -344,7 +330,7 @@ class VideoOverlay extends StatelessWidget {
                     if (videoStore.settingsStore.fullScreen &&
                         context.isLandscape)
                       chatOverlayButton,
-                    if (!Platform.isIOS || isIPad()) videoSettingsButton,
+                    videoSettingsButton,
                   ],
                 ),
                 Center(
@@ -481,34 +467,20 @@ class VideoOverlay extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Builder(
-                        builder: (_) {
-                          // On iOS, show toggle behavior. On Android, always show enter PiP.
-                          final isIOS = Platform.isIOS;
-                          final showExitState = isIOS && videoStore.isInPipMode;
-
-                          return Tooltip(
-                            message: showExitState
-                                ? 'Exit picture-in-picture'
-                                : 'Enter picture-in-picture',
-                            preferBelow: false,
-                            child: IconButton(
-                              icon: Icon(
-                                showExitState
-                                    ? Icons.picture_in_picture_alt_outlined
-                                    : Icons.picture_in_picture_alt_rounded,
-                                color: surfaceColor,
-                                shadows: kOverlayShadow,
-                              ),
-                              onPressed: videoStore.togglePictureInPicture,
-                            ),
-                          );
-                        },
+                      Tooltip(
+                        message: 'Enter picture-in-picture',
+                        preferBelow: false,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.picture_in_picture_alt_rounded,
+                            color: surfaceColor,
+                            shadows: kOverlayShadow,
+                          ),
+                          onPressed: videoStore.togglePictureInPicture,
+                        ),
                       ),
                       refreshButton,
-                      // On iPad, hide the rotate button on the overlay
-                      // Flutter doesn't allow programmatic rotation on iPad unless multitasking is disabled.
-                      if (!isIPad()) rotateButton,
+                      rotateButton,
                       if (context.isLandscape) fullScreenButton,
                     ],
                   ),

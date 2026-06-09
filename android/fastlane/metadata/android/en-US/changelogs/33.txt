@@ -1,5 +1,0 @@
-Version 3.0.0
-
-This update contains major redesigns, usability improvements, automatic picture-in-picture (PiP), bug fixes, and more!
-
-See the full release notes on GitHub: https://github.com/tommyxchow/frosty/releases

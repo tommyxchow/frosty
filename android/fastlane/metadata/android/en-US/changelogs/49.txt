@@ -1,4 +1,0 @@
-Bug Fixes
-• Fixed stream quality options not showing (by @Shingyx on GitHub)
-• Fixed stream latency not showing (by @Shingyx on GitHub)
-• Fixed stream latency icon color on light mode

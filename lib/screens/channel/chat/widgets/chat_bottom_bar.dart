@@ -1,4 +1,3 @@
-import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -9,7 +8,6 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/blurred_container.dart';
-import 'package:frosty/widgets/chat_input/emote_text_span_builder.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
 
 class ChatBottomBar extends StatelessWidget {
@@ -264,21 +262,12 @@ class ChatBottomBar extends StatelessWidget {
                                     );
                                   }
                                 : null,
-                            child: ExtendedTextField(
+                            child: TextField(
                               textInputAction: TextInputAction.send,
                               focusNode: chatStore.textFieldFocusNode,
                               minLines: 1,
                               maxLines: 3,
                               enabled: isEnabled,
-                              specialTextSpanBuilder: EmoteTextSpanBuilder(
-                                emoteToObject:
-                                    chatStore.assetsStore.emoteToObject,
-                                userEmoteToObject:
-                                    chatStore.assetsStore.userEmoteToObject,
-                                emoteSize:
-                                    chatStore.settings.emoteScale *
-                                    defaultEmoteSize,
-                              ),
                               decoration: InputDecoration(
                                 prefixIcon:
                                     chatStore.settings.emoteMenuButtonOnLeft

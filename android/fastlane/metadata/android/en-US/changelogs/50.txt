@@ -1,1 +1,0 @@
-This update contains a variety of new features including a quick toggle to enter or exit chat-only mode, the ability to zoom stream thumbnails and emotes or badges, an option to show historical recent messages in chat, and other improvements and bug fixes.

@@ -97,8 +97,6 @@ SettingsStore _$SettingsStoreFromJson(
           .toList() ??
       []
   ..matchWholeWord = json['matchWholeWord'] as bool? ?? true
-  ..shareCrashLogsAndAnalytics =
-      json['shareCrashLogsAndAnalytics'] as bool? ?? true
   ..fullScreen = json['fullScreen'] as bool? ?? false
   ..fullScreenChatOverlay = json['fullScreenChatOverlay'] as bool? ?? false
   ..pinnedChannelIds =
@@ -156,7 +154,6 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'secondaryTabs': instance.secondaryTabs,
   'mutedWords': instance.mutedWords,
   'matchWholeWord': instance.matchWholeWord,
-  'shareCrashLogsAndAnalytics': instance.shareCrashLogsAndAnalytics,
   'fullScreen': instance.fullScreen,
   'fullScreenChatOverlay': instance.fullScreenChatOverlay,
   'pinnedChannelIds': instance.pinnedChannelIds,
@@ -1080,28 +1077,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     });
   }
 
-  late final _$shareCrashLogsAndAnalyticsAtom = Atom(
-    name: '_SettingsStoreBase.shareCrashLogsAndAnalytics',
-    context: context,
-  );
-
-  @override
-  bool get shareCrashLogsAndAnalytics {
-    _$shareCrashLogsAndAnalyticsAtom.reportRead();
-    return super.shareCrashLogsAndAnalytics;
-  }
-
-  @override
-  set shareCrashLogsAndAnalytics(bool value) {
-    _$shareCrashLogsAndAnalyticsAtom.reportWrite(
-      value,
-      super.shareCrashLogsAndAnalytics,
-      () {
-        super.shareCrashLogsAndAnalytics = value;
-      },
-    );
-  }
-
   late final _$fullScreenAtom = Atom(
     name: '_SettingsStoreBase.fullScreen',
     context: context,
@@ -1202,18 +1177,6 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   }
 
   @override
-  void resetOtherSettings() {
-    final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
-      name: '_SettingsStoreBase.resetOtherSettings',
-    );
-    try {
-      return super.resetOtherSettings();
-    } finally {
-      _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void resetGlobalConfigs() {
     final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
       name: '_SettingsStoreBase.resetGlobalConfigs',
@@ -1287,7 +1250,6 @@ persistChatTabs: ${persistChatTabs},
 secondaryTabs: ${secondaryTabs},
 mutedWords: ${mutedWords},
 matchWholeWord: ${matchWholeWord},
-shareCrashLogsAndAnalytics: ${shareCrashLogsAndAnalytics},
 fullScreen: ${fullScreen},
 fullScreenChatOverlay: ${fullScreenChatOverlay},
 pinnedChannelIds: ${pinnedChannelIds},

@@ -11,7 +11,7 @@ class OnboardingWelcome extends StatelessWidget {
     const text = [
       'Check out the GitHub repo at the top-right of the settings page to explore Frosty\'s source code, report bugs, make feature requests, and more.',
       'Links to the full changelog and FAQ are in the settings page under "Other".',
-      'Don\'t forget to leave a rating and/or review on the app store!',
+      'Download updates from the GitHub releases page.',
     ];
 
     return OnboardingScaffold(

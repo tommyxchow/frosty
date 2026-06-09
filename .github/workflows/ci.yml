@@ -2,15 +2,18 @@ name: CI
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 jobs:
-  test:
-    name: Check and test on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+  android:
+    name: Analyze, test, and build Android
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
       - uses: subosito/flutter-action@v2
         with:
           cache: true
@@ -18,3 +21,4 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      - run: flutter build apk --debug --dart-define CLIENT_ID=dummy --dart-define SECRET=dummy

@@ -53,7 +53,6 @@ void main() {
       expect(store.secondaryTabs, isEmpty);
       expect(store.mutedWords, isEmpty);
       expect(store.matchWholeWord, isTrue);
-      expect(store.shareCrashLogsAndAnalytics, isTrue);
       expect(store.fullScreen, isFalse);
       expect(store.fullScreenChatOverlay, isFalse);
       expect(store.pinnedChannelIds, isEmpty);
@@ -203,16 +202,6 @@ void main() {
       expect(store.showFFZBadges, isTrue);
     });
 
-    test('resetOtherSettings restores other defaults', () {
-      final store = SettingsStore.fromJson({});
-
-      store.shareCrashLogsAndAnalytics = false;
-
-      store.resetOtherSettings();
-
-      expect(store.shareCrashLogsAndAnalytics, isTrue);
-    });
-
     test('resetGlobalConfigs restores global config defaults', () {
       final store = SettingsStore.fromJson({});
 
@@ -234,7 +223,6 @@ void main() {
       store.themeType = ThemeType.light;
       store.showVideo = false;
       store.fontSize = 20.0;
-      store.shareCrashLogsAndAnalytics = false;
       store.fullScreen = true;
 
       store.resetAllSettings();
@@ -242,7 +230,6 @@ void main() {
       expect(store.themeType, ThemeType.system);
       expect(store.showVideo, isTrue);
       expect(store.fontSize, 12.0);
-      expect(store.shareCrashLogsAndAnalytics, isTrue);
       expect(store.fullScreen, isFalse);
     });
 

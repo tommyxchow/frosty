@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 /// Shared shadow for overlay controls and text on top of video content.
@@ -84,13 +82,21 @@ class FrostyColors extends ThemeExtension<FrostyColors> {
   FrostyColors lerp(FrostyColors? other, double t) {
     if (other is! FrostyColors) return this;
     return FrostyColors(
-      highlightedMessage: Color.lerp(highlightedMessage, other.highlightedMessage, t)!,
+      highlightedMessage: Color.lerp(
+        highlightedMessage,
+        other.highlightedMessage,
+        t,
+      )!,
       emoteOnly: Color.lerp(emoteOnly, other.emoteOnly, t)!,
       followersOnly: Color.lerp(followersOnly, other.followersOnly, t)!,
       slowMode: Color.lerp(slowMode, other.slowMode, t)!,
       subOnly: Color.lerp(subOnly, other.subOnly, t)!,
       uniqueMode: Color.lerp(uniqueMode, other.uniqueMode, t)!,
-      overlayOnSurface: Color.lerp(overlayOnSurface, other.overlayOnSurface, t)!,
+      overlayOnSurface: Color.lerp(
+        overlayOnSurface,
+        other.overlayOnSurface,
+        t,
+      )!,
     );
   }
 }
@@ -129,7 +135,6 @@ class FrostyThemes {
       ],
       colorScheme: colorScheme,
       fontFamily: 'Inter',
-      splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
       scaffoldBackgroundColor: backgroundColor,
       bottomSheetTheme: BottomSheetThemeData(
         showDragHandle: true,
@@ -150,9 +155,7 @@ class FrostyThemes {
         ),
       ),
       menuButtonTheme: MenuButtonThemeData(
-        style: MenuItemButton.styleFrom(
-          visualDensity: VisualDensity.compact,
-        ),
+        style: MenuItemButton.styleFrom(visualDensity: VisualDensity.compact),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: backgroundColor,

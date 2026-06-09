@@ -1,5 +1,0 @@
-Version 2.2.0
-
-This update contains new features including a "Reconnect to chat" button, a "Paste" button when copying messages, and other improvements and bug fixes.
-
-See the full release notes on GitHub (since they can't fit here): https://github.com/tommyxchow/frosty/releases

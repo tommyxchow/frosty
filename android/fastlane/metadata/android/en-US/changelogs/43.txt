@@ -1,3 +1,0 @@
-Bug Fixes
-• Fixed 7TV emotes not using custom names
-• Fixed 7TV zero-width emotes not working

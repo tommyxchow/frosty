@@ -381,18 +381,6 @@ abstract class _SettingsStoreBase with Store {
     secondaryTabs = defaultSecondaryTabs;
   }
 
-  // * Other settings
-  static const defaultShareCrashLogsAndAnalytics = true;
-
-  @JsonKey(defaultValue: defaultShareCrashLogsAndAnalytics)
-  @observable
-  var shareCrashLogsAndAnalytics = defaultShareCrashLogsAndAnalytics;
-
-  @action
-  void resetOtherSettings() {
-    shareCrashLogsAndAnalytics = defaultShareCrashLogsAndAnalytics;
-  }
-
   // * Global configs
   static const defaultFullScreen = false;
   static const defaultFullScreenChatOverlay = false;
@@ -422,7 +410,6 @@ abstract class _SettingsStoreBase with Store {
     resetGeneralSettings();
     resetVideoSettings();
     resetChatSettings();
-    resetOtherSettings();
     resetGlobalConfigs();
   }
 }

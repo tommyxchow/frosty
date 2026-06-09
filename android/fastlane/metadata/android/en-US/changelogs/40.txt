@@ -1,2 +1,0 @@
-Bug Fixes
-• Fixed audio playing in chat-only mode

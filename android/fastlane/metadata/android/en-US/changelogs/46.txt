@@ -1,3 +1,0 @@
-This update contains support for stream quality options (by @Artiu on GitHub), support for live 7TV emote set updates in chat, updated designs for chat message alerts and highlights, and more improvements and bug fixes.
-
-See the full release notes on GitHub: https://github.com/tommyxchow/frosty/releases

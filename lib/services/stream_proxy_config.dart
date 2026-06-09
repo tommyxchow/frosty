@@ -54,6 +54,16 @@ String? validateStreamProxyUrl(String value) {
   }
 
   final normalized = trimmed.contains('://') ? trimmed : 'http://$trimmed';
+  final explicitPort = _extractExplicitPort(normalized);
+  if (explicitPort == null) {
+    return 'Enter a proxy port';
+  }
+
+  final port = int.tryParse(explicitPort);
+  if (port == null) {
+    return 'Enter a numeric proxy port';
+  }
+
   final Uri uri;
   try {
     uri = Uri.parse(normalized);
@@ -69,15 +79,48 @@ String? validateStreamProxyUrl(String value) {
     return 'Enter a proxy host';
   }
 
-  try {
-    if (!uri.hasPort || uri.port <= 0 || uri.port > 65535) {
-      return 'Enter a proxy port';
-    }
-  } catch (_) {
-    return 'Enter a numeric proxy port';
+  if (port <= 0 || port > 65535) {
+    return 'Enter a proxy port';
   }
 
   return null;
+}
+
+String? _extractExplicitPort(String normalizedUrl) {
+  final schemeSeparatorIndex = normalizedUrl.indexOf('://');
+  if (schemeSeparatorIndex == -1) {
+    return null;
+  }
+
+  final authorityStart = schemeSeparatorIndex + 3;
+  final authorityEnd = normalizedUrl.indexOf(
+    RegExp(r'[/#?]'),
+    authorityStart,
+  );
+  final authority = normalizedUrl.substring(
+    authorityStart,
+    authorityEnd == -1 ? normalizedUrl.length : authorityEnd,
+  );
+  final hostAndPort = authority.substring(authority.lastIndexOf('@') + 1);
+
+  if (hostAndPort.startsWith('[')) {
+    final closingBracketIndex = hostAndPort.indexOf(']');
+    if (closingBracketIndex == -1 ||
+        closingBracketIndex + 1 >= hostAndPort.length ||
+        hostAndPort[closingBracketIndex + 1] != ':') {
+      return null;
+    }
+
+    return hostAndPort.substring(closingBracketIndex + 2);
+  }
+
+  final portSeparatorIndex = hostAndPort.lastIndexOf(':');
+  if (portSeparatorIndex == -1 ||
+      hostAndPort.indexOf(':') != portSeparatorIndex) {
+    return null;
+  }
+
+  return hostAndPort.substring(portSeparatorIndex + 1);
 }
 
 String? validateStreamProxyChannelLogin(String value) {

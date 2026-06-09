@@ -64,7 +64,7 @@ class Settings extends StatelessWidget {
             child: IconButton(
               tooltip: 'View source on GitHub',
               onPressed: () => launchUrl(
-                Uri.parse('https://github.com/tommyxchow/frosty'),
+                Uri.parse('https://github.com/namecallfilter/glacier'),
                 mode: settingsStore.launchUrlExternal
                     ? LaunchMode.externalApplication
                     : LaunchMode.inAppBrowserView,
@@ -180,7 +180,7 @@ class Settings extends StatelessWidget {
                                 GestureDetector(
                                   onTap: () => launchUrl(
                                     Uri.parse(
-                                      'https://github.com/tommyxchow/frosty/releases/tag/v$version',
+                                      'https://github.com/namecallfilter/glacier/releases/tag/v$version',
                                     ),
                                     mode: settingsStore.launchUrlExternal
                                         ? LaunchMode.externalApplication

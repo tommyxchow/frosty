@@ -12,17 +12,6 @@ updates:
         patterns:
           - "*"
 
-  # Keep Ruby gems (fastlane) up to date
-  - package-ecosystem: "bundler"
-    directory: "/android"
-    schedule:
-      interval: "monthly"
-
-  - package-ecosystem: "bundler"
-    directory: "/ios"
-    schedule:
-      interval: "monthly"
-
   # Keep Dart/Flutter packages up to date
   - package-ecosystem: "pub"
     directory: "/"

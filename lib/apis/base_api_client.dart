@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 /// Common type aliases to reduce repetition
 typedef JsonMap = Map<String, dynamic>;
@@ -161,34 +160,21 @@ abstract class BaseApiClient {
     final exception = switch (error.type) {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout =>
-        TimeoutException(_getTimeoutMessage(error.type)),
+      DioExceptionType.receiveTimeout => TimeoutException(
+        _getTimeoutMessage(error.type),
+      ),
       DioExceptionType.connectionError => NetworkException(
         'No internet connection. Please check your network.',
       ),
       DioExceptionType.badResponse => _handleHttpError(error),
       DioExceptionType.cancel => ApiException('Request was cancelled'),
-      DioExceptionType.badCertificate =>
-        ApiException('Security certificate error'),
-      DioExceptionType.unknown =>
-        ApiException(error.message ?? 'An unexpected error occurred'),
+      DioExceptionType.badCertificate => ApiException(
+        'Security certificate error',
+      ),
+      DioExceptionType.unknown => ApiException(
+        error.message ?? 'An unexpected error occurred',
+      ),
     };
-
-    // Record server errors and unexpected failures to Crashlytics.
-    // Skip timeouts, network errors (normal offline conditions), 401s, and cancellations.
-    if (exception is ServerException ||
-        error.type == DioExceptionType.unknown ||
-        error.type == DioExceptionType.badCertificate) {
-      try {
-        FirebaseCrashlytics.instance.recordError(
-          exception,
-          error.stackTrace,
-          reason: '${error.requestOptions.method} ${error.requestOptions.uri}',
-        );
-      } catch (_) {
-        // Firebase may not be initialized (e.g., in tests).
-      }
-    }
 
     return exception;
   }

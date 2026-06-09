@@ -1,3 +1,0 @@
-This major update contains Material 3/You redesigns, UI/UX improvements, reply threads, bug fixes, and more!
-
-See the full release notes on GitHub: https://github.com/tommyxchow/frosty/releases

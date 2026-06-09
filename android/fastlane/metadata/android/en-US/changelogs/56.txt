@@ -1,6 +1,0 @@
-New Features
-- Added new "Use enhanced rendering" option in video settings
-
-Bug Fixes
-- Fixed incorrect badge order and spacing for FFZ bots
-- Fixed missing emotes on channels that don't have 7TV enabled

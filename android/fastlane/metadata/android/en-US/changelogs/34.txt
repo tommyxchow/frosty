@@ -1,5 +1,0 @@
-Version 3.0.1
-
-Bug Fixes
-• Fixed badges/emotes in chat transitioning from old image
-• Fixed emote menu header not updating properly

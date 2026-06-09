@@ -1,5 +1,5 @@
 name: frosty
-description: A Twitch client for iOS and Android.
+description: An Android Twitch client.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -12,9 +12,6 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # build by specifying --build-name and --build-number, respectively.
 # In Android, build-name is used as versionName while build-number used as versionCode.
 # Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
 version: 5.0.5+68
@@ -33,9 +30,6 @@ dependencies:
         sdk: flutter
     json_annotation: ^4.6.0
 
-    # The following adds the Cupertino Icons font to your application.
-    # Use with the CupertinoIcons class for iOS style icons.
-    cupertino_icons: ^1.0.2
     web_socket_channel: ^3.0.0
     flutter_secure_storage: ^9.2.2
     intl: ^0.20.1
@@ -50,26 +44,18 @@ dependencies:
     package_info_plus: ^9.0.0
     collection: ^1.16.0
     flutter_cache_manager: ^3.3.0
-    device_info_plus: ^12.3.0
     wakelock_plus: ^1.1.2
-    simple_icons: ^14.6.1
+    simple_icons: ^16.23.0
     simple_pip_mode:
         git:
             url: https://github.com/tommyxchow/simple_pip_mode_flutter
-    firebase_core: ^4.1.0
-    firebase_crashlytics: ^5.0.1
-    firebase_performance: ^0.11.0+1
-    firebase_analytics: ^12.0.1
-    advanced_in_app_review: ^1.1.3
     webview_flutter_android: ^4.0.2
-    webview_flutter_wkwebview: ^3.4.3
     photo_view: ^0.15.0
     flutter_markdown_plus: ^1.0.7
     flutter_colorpicker: ^1.1.0
     path_provider: ^2.1.5
     dio: ^5.9.0
     app_links: ^7.0.0
-    extended_text_field: ^16.0.2
     native_device_orientation: ^2.1.0
 
 dev_dependencies:
@@ -180,8 +166,8 @@ flutter_native_splash:
     # png file and should be sized for 4x pixel density.
     image: assets/icons/logo.png
 
-    # This property allows you to specify an image used as branding in the splash screen. It must be
-    # a png file. Currently, it is only supported for Android and iOS.
+    # This property allows you to specify an image used as branding in the splash screen.
+    # It must be a png file.
     # branding: assets/dart.png
 
     # Specify your branding image for dark mode.
@@ -190,8 +176,7 @@ flutter_native_splash:
     # To position the branding image at the bottom of the screen you can use bottom, bottomRight,
     # and bottomLeft. The default values is bottom if not specified or specified something else.
     #
-    # Make sure this content mode value should not be similar to android_gravity value and ios_content_mode
-    # value.
+    # Make sure this content mode value is not similar to android_gravity.
     # branding_mode: bottom
 
     # The color_dark, background_image_dark, and image_dark are parameters that set the background
@@ -203,48 +188,20 @@ flutter_native_splash:
     #background_image_dark: "assets/dark-background.png"
     #image_dark: assets/splash-invert.png
 
-    # The android, ios and web parameters can be used to disable generating a splash screen on a given
-    # platform.
+    # The android parameter can be used to disable generating a splash screen.
     #android: false
-    #ios: false
-    #web: false
 
-    # The position of the splash image can be set with android_gravity, ios_content_mode, and
-    # web_image_mode parameters.  All default to center.
+    # The position of the splash image can be set with android_gravity.
     #
     # android_gravity can be one of the following Android Gravity (see
     # https://developer.android.com/reference/android/view/Gravity): bottom, center,
     # center_horizontal, center_vertical, clip_horizontal, clip_vertical, end, fill, fill_horizontal,
     # fill_vertical, left, right, start, or top.
     #android_gravity: center
-    #
-    # ios_content_mode can be one of the following iOS UIView.ContentMode (see
-    # https://developer.apple.com/documentation/uikit/uiview/contentmode): scaleToFill,
-    # scaleAspectFit, scaleAspectFill, center, top, bottom, left, right, topLeft, topRight,
-    # bottomLeft, or bottomRight.
-    #ios_content_mode: center
-    #
-    # web_image_mode can be one of the following modes: center, contain, stretch, and cover.
-    #web_image_mode: center
 
-    # To hide the notification bar, use the fullscreen parameter.  Has no affect in web since web
-    # has no notification bar.  Defaults to false.
-    # NOTE: Unlike Android, iOS will not automatically show the notification bar when the app loads.
-    #       To show the notification bar, add the following code to your Flutter app:
-    #       WidgetsFlutterBinding.ensureInitialized();
-    #       SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom, SystemUiOverlay.top]);
+    # To hide the notification bar, use the fullscreen parameter. Defaults to false.
     #fullscreen: true
-
-    # If you have changed the name(s) of your info.plist file(s), you can specify the filename(s)
-    # with the info_plist_files parameter.  Remove only the # characters in the three lines below,
-    # do not remove any spaces:
-    #info_plist_files:
-    #  - 'ios/Runner/Info-Debug.plist'
-    #  - 'ios/Runner/Info-Release.plist'
 
 flutter_launcher_icons:
     image_path_android: "assets/icons/icon_android.png"
-    image_path_ios: "assets/icons/icon_ios.png"
     android: true
-    ios: true
-    remove_alpha_ios: true

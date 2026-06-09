@@ -2,9 +2,15 @@
 name: Draft GitHub release
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, such as glacier-v5.0.5
+        required: true
   push:
     tags:
-      - v*.*.*
+      - glacier-v*.*.*
+permissions:
+  contents: write
 jobs:
   android:
     name: Draft release and attach APK
@@ -17,9 +23,13 @@ jobs:
       KEY_FILE_PATH: android/key.properties
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SECRET: ${{ secrets.SECRET }}
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
     steps:
-      - name: Checkout Frosty repo
+      - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
       
       # Setup Java so that we can build the APK.
       - name: Set up Java
@@ -33,6 +43,20 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           cache: true
+
+      # Keep release tags aligned with Flutter's Android versionName.
+      - name: Validate release version
+        run: |
+          if ! [[ "$RELEASE_TAG" =~ ^glacier-v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Release tag must look like glacier-v5.0.5, got $RELEASE_TAG"
+            exit 1
+          fi
+          VERSION="${RELEASE_TAG#glacier-v}"
+          PUBSPEC_VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d+ -f1)
+          if [ "$PUBSPEC_VERSION" != "$VERSION" ]; then
+            echo "::error::Tag $RELEASE_TAG does not match pubspec.yaml version $PUBSPEC_VERSION"
+            exit 1
+          fi
       
       # Decode and create the upload-keystore.jks file, used for signing the app.
       - name: Decode and create upload-keystore.jks
@@ -50,18 +74,19 @@ jobs:
       - name: Build for Android
         run: |
           flutter build apk --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
-          mv build/app/outputs/flutter-apk/app-release.apk frosty-${{ github.ref_name }}.apk
+          mv build/app/outputs/flutter-apk/app-release.apk frosty-android-${RELEASE_TAG}.apk
 
       # Extract release notes from assets/release-notes.md for the current version.
       - name: Extract release notes
         id: release_notes
         run: |
-          VERSION="${{ github.ref_name }}"
+          VERSION="$RELEASE_TAG"
+          RELEASE_NOTES_VERSION="v${RELEASE_TAG#glacier-v}"
           RELEASE_NOTES_FILE="assets/release-notes.md"
 
           # Extract the section for this version using awk
           # Starts at "## vX.X.X", skips date line, stops at next "---" or "## v" header
-          NOTES=$(awk -v version="$VERSION" '
+          NOTES=$(awk -v version="$RELEASE_NOTES_VERSION" '
             BEGIN { found=0; output="" }
             $0 ~ "^## " version "$" { found=1; next }
             found && /^[A-Z][a-z]+ [0-9]+, [0-9]+$/ { next }
@@ -79,7 +104,7 @@ jobs:
 
           if [ -n "$NOTES" ]; then
             # Get the previous tag for the Full Changelog link
-            PREV_TAG=$(git describe --tags --abbrev=0 "$VERSION^" 2>/dev/null || echo "")
+            PREV_TAG=$(git describe --tags --match 'glacier-v*' --abbrev=0 "$VERSION^" 2>/dev/null || echo "")
 
             echo "found=true" >> $GITHUB_OUTPUT
             echo "body<<EOF" >> $GITHUB_OUTPUT
@@ -99,6 +124,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           draft: true
+          tag_name: ${{ env.RELEASE_TAG }}
           generate_release_notes: ${{ steps.release_notes.outputs.found != 'true' }}
           body: ${{ steps.release_notes.outputs.found == 'true' && steps.release_notes.outputs.body || '' }}
-          files: frosty-${{ github.ref_name }}.apk
+          files: frosty-android-${{ env.RELEASE_TAG }}.apk

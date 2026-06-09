@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:frosty/apis/firebase_performance_interceptor.dart';
 
 /// Centralized Dio client configuration with interceptors and error handling
 class DioClient {
@@ -55,9 +54,6 @@ class DioClient {
         ),
       );
     }
-
-    // Trace HTTP requests as Firebase Performance metrics
-    dio.interceptors.add(FirebasePerformanceInterceptor());
 
     // Add any additional interceptors provided
     if (additionalInterceptors != null) {

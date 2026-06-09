@@ -1,8 +1,0 @@
-New Features
-- Added initial support for shared chat sessions
-
-Improvements
-- Changed historical recent message indicator to chat message badge icon
-
-Bug Fixes
-- Fixed video causing random crashes on some devices

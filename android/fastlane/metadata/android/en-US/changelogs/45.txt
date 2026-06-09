@@ -1,5 +1,0 @@
-New Features
-• Added support for replying to specific messages in chat (by @Artiu on GitHub)
-
-Bug Fixes
-• Fixed recent emotes not clearing

@@ -1,5 +1,0 @@
-Version 2.3.0
-
-This update contains various chat enhancements and improvements in layouts and styles.
-
-See the full release notes on GitHub: https://github.com/tommyxchow/frosty/releases

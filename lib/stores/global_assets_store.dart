@@ -1,4 +1,3 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/ffz_api.dart';
@@ -169,11 +168,6 @@ abstract class GlobalAssetsStoreBase with Store {
   }) async {
     void onAssetError(dynamic error, StackTrace stack) {
       debugPrint('GlobalAssetsStore error: $error');
-      FirebaseCrashlytics.instance.recordError(
-        error,
-        stack,
-        reason: 'Global asset fetch failed',
-      );
     }
 
     await Future.wait([

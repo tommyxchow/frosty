@@ -1,8 +1,0 @@
-Version 2.4.0
-
-New Features
-• Added an option to force vertical chat in landscape mode
-
-Improvements
-• Removed zero-width emote option in favor of enabling it by default
-• Removed pip button option in favor of enabling it by default

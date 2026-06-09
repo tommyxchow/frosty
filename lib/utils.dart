@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:frosty/constants.dart';
 
@@ -102,21 +100,4 @@ String getReadableName(String displayName, String username) {
 
   // Otherwise (non-English characters, possibly with numbers), add username
   return '$displayName ($username)';
-}
-
-var _isIPad = false;
-
-bool isIPad() {
-  return _isIPad;
-}
-
-Future<void> initUtils() async {
-  // Determine whether the device is an iPad or not.
-  if (Platform.isIOS) {
-    final deviceInfo = DeviceInfoPlugin();
-    final info = await deviceInfo.iosInfo;
-    if (info.model.toLowerCase().contains('ipad')) {
-      _isIPad = true;
-    }
-  }
 }

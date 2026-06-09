@@ -16,7 +16,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 part 'video_store.g.dart';
 
@@ -46,8 +45,9 @@ abstract class VideoStoreBase with Store {
   /// conditions when `loadRequest` fires before the previous page fully loads.
   var _needsInit = true;
 
-  /// The video web view params used for enabling auto play.
-  late final PlatformWebViewControllerCreationParams _videoWebViewParams;
+  /// The video web view params used for the Android web view.
+  final PlatformWebViewControllerCreationParams _videoWebViewParams =
+      const PlatformWebViewControllerCreationParams();
 
   late final NavigationDelegate _navigationDelegate = NavigationDelegate(
     onPageFinished: _handlePageFinished,
@@ -204,8 +204,7 @@ abstract class VideoStoreBase with Store {
   @readonly
   String? _latency;
 
-  /// Whether the app is currently in picture-in-picture mode (iOS only).
-  /// On Android, this state is not tracked since there's no programmatic exit.
+  /// Whether the app is currently in picture-in-picture mode.
   @readonly
   var _isInPipMode = false;
 
@@ -224,16 +223,6 @@ abstract class VideoStoreBase with Store {
     if (settingsStore.autoSyncChatDelay) {
       settingsStore.syncedChatDelay = 0.0;
     }
-    // Initialize the video webview params for iOS to enable video autoplay.
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      _videoWebViewParams = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-      );
-    } else {
-      _videoWebViewParams = const PlatformWebViewControllerCreationParams();
-    }
-
     // Initialize the video webview params for Android to enable video autoplay.
     if (videoWebViewController.platform is AndroidWebViewController) {
       (videoWebViewController.platform as AndroidWebViewController)
@@ -871,7 +860,7 @@ abstract class VideoStoreBase with Store {
                 }
               });
 
-              // Add PiP event listeners for iOS
+              // Add PiP event listeners for web video state changes.
               videoElement.addEventListener("enterpictureinpicture", () => {
                 PipEntered.postMessage("pip entered");
               });
@@ -1118,16 +1107,11 @@ abstract class VideoStoreBase with Store {
 
   /// Initiate picture in picture if available.
   ///
-  /// On Android, this will utilize the native Android PiP API.
-  /// On iOS, this will utilize the web picture-in-picture API.
+  /// Uses the native Android PiP API.
   void requestPictureInPicture() {
     try {
       if (Platform.isAndroid) {
         pip.enterPipMode(autoEnter: true);
-      } else if (Platform.isIOS) {
-        videoWebViewController.runJavaScript(
-          '(window._videoEl || document.getElementsByTagName("video")[0])?.requestPictureInPicture();',
-        );
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -1137,24 +1121,11 @@ abstract class VideoStoreBase with Store {
   /// Toggle picture-in-picture mode.
   ///
   /// If not in PiP mode, enters PiP mode.
-  /// If already in PiP mode on iOS, exits PiP mode.
   /// On Android, always enters PiP mode (no programmatic exit or state tracking).
   @action
   void togglePictureInPicture() {
     try {
-      if (Platform.isIOS && _isInPipMode) {
-        // Exit PiP mode on iOS
-        videoWebViewController.runJavaScript('''
-          (function() {
-            if (document.pictureInPictureElement) {
-              document.exitPictureInPicture();
-            }
-          })();
-          ''');
-      } else {
-        // Enter PiP mode (both iOS and Android)
-        requestPictureInPicture();
-      }
+      requestPictureInPicture();
     } catch (e) {
       debugPrint(e.toString());
     }

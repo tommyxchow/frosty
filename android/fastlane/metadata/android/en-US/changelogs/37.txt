@@ -1,2 +1,0 @@
-Bug Fixes
-• Fixed chatters not sorted alphabetically

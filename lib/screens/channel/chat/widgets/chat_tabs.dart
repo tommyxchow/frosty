@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -56,8 +54,7 @@ class ChatTabs extends StatelessWidget {
         final tabs = chatTabsStore.tabs;
         final activeIndex = chatTabsStore.activeTabIndex;
         final showTabBar = chatTabsStore.showTabBar;
-        final showMerge =
-            tabs.where((t) => t.isActivated).length >= 2;
+        final showMerge = tabs.where((t) => t.isActivated).length >= 2;
 
         // Calculate extra top padding for tab bar when visible
         final tabBarHeight = showTabBar ? 48.0 : 0.0;
@@ -71,7 +68,7 @@ class ChatTabs extends StatelessWidget {
             : EdgeInsets.only(top: tabBarHeight);
 
         return PopScope(
-          canPop: Platform.isIOS,
+          canPop: false,
           onPopInvokedWithResult: (didPop, _) {
             if (didPop) return;
 
@@ -268,8 +265,7 @@ class ChatTabs extends StatelessWidget {
       ],
       builder: (context, controller, child) {
         return InputChip(
-          avatar:
-              isActivated ? avatar : Opacity(opacity: 0.5, child: avatar),
+          avatar: isActivated ? avatar : Opacity(opacity: 0.5, child: avatar),
           label: Text(
             displayName,
             style: isActivated

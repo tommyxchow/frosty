@@ -25,7 +25,6 @@ migrate_working_dir/
 
 # Flutter/Dart/Pub related
 **/doc/api/
-**/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -48,27 +47,8 @@ app.*.map.json
 # Folder containing random testing files
 random/
 
-# fastlane specific
-**/fastlane/report.xml
-
-# deliver temporary files
-**/fastlane/Preview.html
-
-# snapshot generated screenshots
-**/fastlane/screenshots
-**/fastlane/metadata/android/en-US/images
-
-# scan temporary files
-**/fastlane/test_output
-
-# potentially sensitive review information
-**/fastlane/metadata/review_information
-
 # secrets
 .env
-
-# ai
-.claude/settings.local.json
 
 # FVM Version Cache
 .fvm/

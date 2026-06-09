@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -171,8 +169,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             SettingsListSlider(
               title: 'Message delay',
               trailing: '${settingsStore.chatDelay.toInt()} seconds',
-              subtitle:
-                  'Adds a delay before each message is rendered in chat. ${Platform.isIOS ? '15 seconds is recommended for iOS.' : ''}',
+              subtitle: 'Adds a delay before each message is rendered in chat.',
               value: settingsStore.chatDelay,
               max: 30.0,
               divisions: 30,

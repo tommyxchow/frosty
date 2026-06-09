@@ -7,7 +7,6 @@ January 9, 2026
 - Fixed lag/frame drops in overlay chat mode.
 - Fixed draggable divider still interactable in fullscreen mode.
 - Fixed landscape bottom padding in chat bottom bar.
-- [iOS] Fixed user agent breaking login.
 
 ---
 
@@ -24,7 +23,6 @@ January 8, 2026
 ### Bug Fixes
 
 - Fixed Google login not working.
-- [iOS] Fixed bottom safe area in landscape mode.
 
 ---
 
@@ -110,4 +108,4 @@ January 1, 2026
 - Fixed chat reconnection issues when a chat delay was active.
 - Fixed duplicate message cases and various UI stability issues.
 
-#### See all release notes at [https://github.com/tommyxchow/frosty/releases](https://github.com/tommyxchow/frosty/releases)
+#### See all release notes at [https://github.com/namecallfilter/glacier/releases](https://github.com/namecallfilter/glacier/releases)
