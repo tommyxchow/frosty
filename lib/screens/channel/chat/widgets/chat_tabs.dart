@@ -144,7 +144,7 @@ class ChatTabs extends StatelessWidget {
                               left: 12,
                               right: showMerge ? 32 : 12,
                             ),
-                            onReorder: (oldIndex, newIndex) {
+                            onReorderItem: (oldIndex, newIndex) {
                               HapticFeedback.lightImpact();
                               chatTabsStore.reorderTab(oldIndex, newIndex);
                             },
