@@ -47,7 +47,7 @@ pnpm nuke         # Delete .next, .open-next, node_modules, and pnpm-lock.yaml
 
 ## Cache Components
 
-Enabled ([docs](https://nextjs.org/docs/app/getting-started/cache-components)) — everything is dynamic (SSR) by default. Opt into caching with `"use cache"` + `cacheLife()`, wrap async work in `<Suspense>` for PPR. Old `revalidate`/`dynamic`/`fetchCache` exports are replaced. Use `cacheTag()` + `revalidateTag()`/`updateTag()` for on-demand invalidation. Durable runtime cache requires R2 incremental cache (see `open-next.config.ts`) — without it, cache is in-memory only per Worker instance.
+Not yet enabled — `cacheComponents` is not set in `next.config.ts` and no `"use cache"` directives are in use. Everything is dynamic (SSR) by default. To opt in: add `cacheComponents: true` to `next.config.ts`, use `"use cache"` + `cacheLife()` on server components/functions, and wrap async work in `<Suspense>` for PPR. Durable runtime cache requires R2 incremental cache (see `open-next.config.ts`) — without it, cache is in-memory only per Worker instance.
 
 ## Cloudflare Workers
 
