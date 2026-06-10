@@ -67,6 +67,7 @@ class ChatMessage extends StatelessWidget {
         username: ircMessage.user!,
         userId: ircMessage.tags['user-id']!,
         displayName: ircMessage.tags['display-name']!,
+        onActivateSourceTab: onActivateSourceTab,
       ),
     );
   }
@@ -86,6 +87,7 @@ class ChatMessage extends StatelessWidget {
             username: user.login,
             userId: user.id,
             displayName: user.displayName,
+            onActivateSourceTab: onActivateSourceTab,
           ),
         );
       }

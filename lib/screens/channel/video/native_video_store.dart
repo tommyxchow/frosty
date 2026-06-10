@@ -187,7 +187,8 @@ abstract class NativeVideoStoreBase
         (_) => settingsStore.showVideo,
         (showVideo) async {
           _autoPipAvailable ??= await SimplePip.isAutoPipAvailable;
-          if (showVideo && _autoPipAvailable!) {
+          if (_disposed || !_autoPipAvailable!) return;
+          if (showVideo) {
             _pip.setAutoPipMode();
           } else {
             _pip.setAutoPipMode(autoEnter: false);
@@ -610,9 +611,7 @@ abstract class NativeVideoStoreBase
 
   void _onPaused() {
     _healthyPlaybackTimer?.cancel();
-    if (!_isInPipMode) {
-      _paused = true;
-    }
+    _paused = true;
     _isStalled = false;
     _isQualitySwitching = false;
     _stallRecoveryTimer?.cancel();
@@ -1034,7 +1033,7 @@ abstract class NativeVideoStoreBase
         } else {
           _controller!.enableAutomaticInlinePip();
         }
-      } else if (Platform.isAndroid) {
+      } else if (Platform.isAndroid && _autoPipAvailable == true) {
         if (isAudioOnly) {
           _pip.setAutoPipMode(autoEnter: false);
         } else if (settingsStore.showVideo) {

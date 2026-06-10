@@ -519,10 +519,9 @@ abstract class ChatTabsStoreBase with Store {
       ),
     );
 
-    // Switch to the new tab (this will activate it)
+    // Switch to the new tab, snapshotting the outgoing tab's lastSeenMessageId.
     final newIndex = _tabs.length - 1;
-    activateTab(newIndex);
-    activeTabIndex = newIndex;
+    setActiveTab(newIndex);
 
     // If in merged mode, fetch the new tab's channel profile
     if (mergedMode) {

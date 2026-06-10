@@ -15,7 +15,8 @@ class CookieExtractorPlugin: NSObject, FlutterPlugin {
         if call.method == "extractTwitchAuthToken" {
             WKWebsiteDataStore.default().httpCookieStore.getAllCookies { cookies in
                 let authCookie = cookies.first {
-                    $0.name == "auth-token" && $0.domain.contains("twitch.tv")
+                    $0.name == "auth-token" &&
+                        ($0.domain == "twitch.tv" || $0.domain.hasSuffix(".twitch.tv"))
                 }
                 result(authCookie?.value)
             }

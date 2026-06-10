@@ -14,6 +14,7 @@ class ChatUserModal extends StatefulWidget {
   final String username;
   final String displayName;
   final String userId;
+  final VoidCallback? onActivateSourceTab;
 
   const ChatUserModal({
     super.key,
@@ -21,6 +22,7 @@ class ChatUserModal extends StatefulWidget {
     required this.username,
     required this.displayName,
     required this.userId,
+    this.onActivateSourceTab,
   });
 
   @override
@@ -61,6 +63,7 @@ class _ChatUserModalState extends State<ChatUserModal> {
                   IconButton(
                     tooltip: 'Reply',
                     onPressed: () {
+                      widget.onActivateSourceTab?.call();
                       widget.chatStore.textController.text =
                           '@${widget.username} ';
                       Navigator.pop(context);
