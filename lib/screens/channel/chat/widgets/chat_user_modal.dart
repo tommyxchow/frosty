@@ -77,6 +77,8 @@ class _ChatUserModalState extends State<ChatUserModal> {
                       name: name,
                       userLogin: widget.username,
                       userId: widget.userId,
+                      isHighlighted: widget.chatStore.highlightedUsers.contains(widget.username),
+                      onHighlightToggle: () => widget.chatStore.toggleHighlight(widget.username),
                     ),
                   ),
                   icon: Icon(Icons.adaptive.more_rounded),

@@ -13,6 +13,9 @@ class UserActionsModal extends StatelessWidget {
   final String userId;
   final bool showPinOption;
   final bool? isPinned;
+  // ← ADD THESE TWO
+  final bool isHighlighted;
+  final VoidCallback? onHighlightToggle;
 
   const UserActionsModal({
     super.key,
@@ -22,6 +25,9 @@ class UserActionsModal extends StatelessWidget {
     required this.userId,
     this.showPinOption = false,
     this.isPinned,
+    // ← ADD THESE TWO
+    this.isHighlighted = false,
+    this.onHighlightToggle,
   });
 
   @override
@@ -50,6 +56,26 @@ class UserActionsModal extends StatelessWidget {
               Navigator.pop(context);
             },
           ),
+
+        // ← ADD THIS BLOCK
+        if (onHighlightToggle != null)
+          ListTile(
+            leading: Icon(
+              isHighlighted ? Icons.highlight_off : Icons.highlight,
+              color: isHighlighted
+                  ? Theme.of(context).colorScheme.error
+                  : Theme.of(context).colorScheme.primary,
+            ),
+            title: Text(
+              isHighlighted ? 'Remove highlight for $name' : 'Highlight $name',
+            ),
+            onTap: () {
+              onHighlightToggle!();
+              Navigator.pop(context);
+            },
+          ),
+        // ← END ADD
+
         if (authStore.isLoggedIn)
           ListTile(
             leading: const Icon(Icons.block_rounded),
@@ -99,7 +125,6 @@ class UserActionsModal extends StatelessWidget {
                   ),
                   body: Stack(
                     children: [
-                      // WebView content
                       Positioned.fill(
                         child: Padding(
                           padding: EdgeInsets.only(
@@ -127,7 +152,6 @@ class UserActionsModal extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Blurred app bar overlay
                       Positioned(
                         top: 0,
                         left: 0,

@@ -57,7 +57,7 @@ abstract class AuthBase with Store {
   @computed
   Map<String, String> get headersTwitch => {
     'Authorization': 'Bearer $_token',
-    'Client-Id': clientId,
+    'Client-ID': clientId,
   };
 
   /// Error flag that will be non-null and contain an error message if login failed.
