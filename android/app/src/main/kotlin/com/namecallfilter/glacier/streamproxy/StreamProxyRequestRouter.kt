@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
 class StreamProxyRequestRouter {
     private val videoWeaverChannels = ConcurrentHashMap<String, String>()
     private val proxiedVideoWeaverUrls = ConcurrentHashMap.newKeySet<String>()
+    private val usherManifestUrls = ConcurrentHashMap<String, String>()
     private val usherChannelRegex = Regex("/hls/(.+)\\.m3u8", RegexOption.IGNORE_CASE)
     private val videoWeaverUrlRegex = Regex(
         "^https?://(?:[a-z0-9-]+\\.playlist\\.(?:live-video|ttvnw)\\.net|video-weaver\\.[a-z0-9-]+\\.hls\\.ttvnw\\.net)/v1/playlist/.+\\.m3u8(?:$|[?#])",
@@ -101,6 +102,7 @@ class StreamProxyRequestRouter {
     fun rememberUsherManifest(channel: String?, manifestUrl: String, manifestBody: String) {
         val normalizedChannel = channel?.lowercase(Locale.US) ?: return
         val baseUri = runCatching { URI(manifestUrl) }.getOrNull() ?: return
+        usherManifestUrls[normalizedChannel] = manifestUrl
 
         manifestBody
             .lineSequence()
@@ -113,6 +115,21 @@ class StreamProxyRequestRouter {
             .forEach { videoWeaverUrl ->
                 videoWeaverChannels[videoWeaverUrl] = normalizedChannel
             }
+    }
+
+    fun rememberUsherRequest(url: String) {
+        val channel = extractUsherChannel(url) ?: return
+        usherManifestUrls[channel] = url
+    }
+
+    fun latestUsherManifestUrl(channel: String?): String? {
+        val normalizedChannel = channel
+            ?.trim()
+            ?.lowercase(Locale.US)
+            ?.takeIf(String::isNotEmpty)
+            ?: return null
+
+        return usherManifestUrls[normalizedChannel]
     }
 
     private fun routeUsher(

@@ -69,17 +69,9 @@ abstract class VideoStoreBase with Store {
             _latency = receivedLatency;
 
             if (!settingsStore.autoSyncChatDelay) return;
+            if (StreamProxyBridge.castState.value.isCasting) return;
 
-            // Parse latency from abbreviated format: "5s" -> 5.0
-            final numericPart = receivedLatency.replaceAll(
-              RegExp(r'[^0-9.]'),
-              '',
-            );
-            final latencyAsDouble = double.tryParse(numericPart);
-
-            if (latencyAsDouble != null) {
-              settingsStore.syncedChatDelay = latencyAsDouble;
-            }
+            _syncChatDelayFromLatencyText(receivedLatency);
           },
         )
         ..addJavaScriptChannel(
@@ -97,9 +89,13 @@ abstract class VideoStoreBase with Store {
               }
               final prefs = await SharedPreferences.getInstance();
               final lastStreamQuality = prefs.getString('last_stream_quality');
-              if (lastStreamQuality == null) return;
-              setStreamQuality(lastStreamQuality);
+              if (lastStreamQuality == null) {
+                await _updateCastContext();
+                return;
+              }
+              await setStreamQuality(lastStreamQuality);
             }
+            await _updateCastContext();
           },
         )
         ..addJavaScriptChannel(
@@ -201,6 +197,13 @@ abstract class VideoStoreBase with Store {
   String get streamQuality =>
       _availableStreamQualities.elementAtOrNull(_streamQualityIndex) ?? 'Auto';
 
+  String get _castQuality {
+    final quality = streamQuality;
+    if (quality != 'Auto') return quality;
+
+    return settingsStore.defaultToHighestQuality ? 'highest' : 'auto';
+  }
+
   @readonly
   String? _latency;
 
@@ -298,6 +301,8 @@ abstract class VideoStoreBase with Store {
         ),
         (_) => unawaited(_syncStreamProxyBridge(refresh: true)),
       );
+
+      StreamProxyBridge.castState.addListener(_handleCastStateChanged);
     }
 
     updateStreamInfo();
@@ -320,12 +325,10 @@ abstract class VideoStoreBase with Store {
           // If autoSync was just enabled and we already have a cached latency
           // value (e.g. from showLatency tracking), apply it immediately instead
           // of waiting for the next tracker cycle (up to 60s).
-          if (autoSync && _latency != null) {
-            final numericPart = _latency!.replaceAll(RegExp(r'[^0-9.]'), '');
-            final latencyAsDouble = double.tryParse(numericPart);
-            if (latencyAsDouble != null) {
-              settingsStore.syncedChatDelay = latencyAsDouble;
-            }
+          if (autoSync &&
+              (_latency != null ||
+                  StreamProxyBridge.castState.value.latency != null)) {
+            _syncChatDelayFromCurrentSource();
           }
         } else {
           // Stop tracker if both settings are now disabled
@@ -341,14 +344,68 @@ abstract class VideoStoreBase with Store {
     );
   }
 
-  bool get _shouldUseStreamProxy =>
-      Platform.isAndroid &&
-      settingsStore.streamProxyMode == StreamProxyMode.ttvLolPro;
-
   StreamProxyConfig get _streamProxyConfig => StreamProxyConfig.fromSettings(
     settingsStore: settingsStore,
     currentChannelLogin: userLogin,
   );
+
+  bool get isCasting => StreamProxyBridge.castState.value.isCasting;
+
+  void _handleCastStateChanged() {
+    final castState = StreamProxyBridge.castState.value;
+
+    if (castState.isCasting) {
+      unawaited(_pauseLocalPlaybackForCast());
+      _syncChatDelayFromCurrentSource();
+      return;
+    }
+
+    if (settingsStore.autoSyncChatDelay && _latency != null) {
+      _syncChatDelayFromLatencyText(_latency!);
+    }
+  }
+
+  Future<void> _pauseLocalPlaybackForCast() async {
+    try {
+      await videoWebViewController.runJavaScript(
+        '(window._videoEl || document.getElementsByTagName("video")[0])?.pause();',
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      _paused = true;
+      if (Platform.isAndroid) pip.setIsPlaying(false);
+    }
+  }
+
+  void _syncChatDelayFromCurrentSource() {
+    if (!settingsStore.autoSyncChatDelay) return;
+
+    final castState = StreamProxyBridge.castState.value;
+    final castLatency = castState.latency;
+    if (castState.isCasting) {
+      if (castLatency != null) {
+        settingsStore.syncedChatDelay = (castLatency.inMilliseconds / 1000)
+            .ceilToDouble();
+      }
+      return;
+    }
+
+    final latency = _latency;
+    if (latency != null) {
+      _syncChatDelayFromLatencyText(latency);
+    }
+  }
+
+  void _syncChatDelayFromLatencyText(String latency) {
+    // Parse abbreviated Twitch latency format: "5s" -> 5.0.
+    final numericPart = latency.replaceAll(RegExp(r'[^0-9.]'), '');
+    final latencyAsDouble = double.tryParse(numericPart);
+
+    if (latencyAsDouble != null) {
+      settingsStore.syncedChatDelay = latencyAsDouble;
+    }
+  }
 
   Future<void> initializeVideoPlayer() async {
     if (!settingsStore.showVideo) return;
@@ -372,19 +429,6 @@ abstract class VideoStoreBase with Store {
     final platformController = videoWebViewController.platform;
     if (platformController is! AndroidWebViewController) return;
 
-    if (!_shouldUseStreamProxy) {
-      if (_streamProxyAttached) {
-        await _streamProxyBridge.detach(platformController);
-        _streamProxyAttached = false;
-        await videoWebViewController.setNavigationDelegate(_navigationDelegate);
-      }
-
-      if (refresh && settingsStore.showVideo) {
-        await handleRefresh(haptic: false);
-      }
-      return;
-    }
-
     if (_streamProxyAttached) {
       await _streamProxyBridge.updateConfig(_streamProxyConfig);
     } else {
@@ -396,9 +440,22 @@ abstract class VideoStoreBase with Store {
       _streamProxyAttached = true;
     }
 
+    await _updateCastContext();
+
     if (refresh && settingsStore.showVideo) {
       await handleRefresh(haptic: false);
     }
+  }
+
+  Future<void> _updateCastContext() async {
+    if (!Platform.isAndroid || !_streamProxyAttached) return;
+
+    await _streamProxyBridge.updateCastContext(
+      config: _streamProxyConfig,
+      title: _streamInfo?.userName ?? userLogin,
+      subtitle: _streamInfo?.title,
+      quality: _castQuality,
+    );
   }
 
   @action
@@ -437,6 +494,8 @@ abstract class VideoStoreBase with Store {
     ''');
     } catch (e) {
       debugPrint(e.toString());
+    } finally {
+      await _updateCastContext();
     }
   }
 
@@ -475,6 +534,7 @@ abstract class VideoStoreBase with Store {
         });
       ''');
       _streamQualityIndex = newStreamQualityIndex;
+      await _updateCastContext();
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -1039,6 +1099,8 @@ abstract class VideoStoreBase with Store {
       if (!settingsStore.showVideo) {
         _scheduleOverlayHide();
       }
+    } finally {
+      await _updateCastContext();
     }
   }
 
@@ -1064,6 +1126,8 @@ abstract class VideoStoreBase with Store {
   /// Refreshes the stream webview and updates the stream info.
   @action
   Future<void> handleRefresh({bool haptic = true}) async {
+    if (isCasting) return;
+
     if (haptic) {
       HapticFeedback.lightImpact();
     }
@@ -1090,6 +1154,8 @@ abstract class VideoStoreBase with Store {
 
   /// Play or pause the video depending on the current state of [_paused].
   void handlePausePlay() {
+    if (isCasting) return;
+
     try {
       if (_paused) {
         videoWebViewController.runJavaScript(
@@ -1109,6 +1175,8 @@ abstract class VideoStoreBase with Store {
   ///
   /// Uses the native Android PiP API.
   void requestPictureInPicture() {
+    if (isCasting) return;
+
     try {
       if (Platform.isAndroid) {
         pip.enterPipMode(autoEnter: true);
@@ -1149,6 +1217,9 @@ abstract class VideoStoreBase with Store {
     _disposeAndroidAutoPipReaction?.call();
     _disposeLatencySettingsReaction?.call();
     _disposeStreamProxyReaction?.call();
+    if (Platform.isAndroid) {
+      StreamProxyBridge.castState.removeListener(_handleCastStateChanged);
+    }
 
     final platformController = videoWebViewController.platform;
     if (_streamProxyAttached &&

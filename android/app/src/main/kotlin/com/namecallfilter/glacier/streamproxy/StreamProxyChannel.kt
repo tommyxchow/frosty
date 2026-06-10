@@ -1,25 +1,36 @@
 package com.namecallfilter.glacier.streamproxy
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.webkit.WebViewClient
+import com.namecallfilter.glacier.cast.CastStreamContext
+import com.namecallfilter.glacier.cast.GlacierCastController
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.webviewflutter.WebViewFlutterAndroidExternalApi
-import java.util.concurrent.ConcurrentHashMap
 
 object StreamProxyChannel {
     private const val CHANNEL_NAME = "frosty/stream_proxy"
 
-    fun register(flutterEngine: FlutterEngine) {
+    fun register(
+        flutterEngine: FlutterEngine,
+        context: Context,
+    ) {
         val mainHandler = Handler(Looper.getMainLooper())
         val methodChannel = MethodChannel(
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL_NAME,
         )
-        val routers = ConcurrentHashMap<Long, StreamProxyRequestRouter>()
-        val clients = ConcurrentHashMap<Long, StreamProxyWebViewClient>()
+        val castController = GlacierCastController(
+            context = context,
+            onStateChanged = { state ->
+                mainHandler.post {
+                    methodChannel.invokeMethod("castStateChanged", state)
+                }
+            },
+        )
 
         methodChannel.setMethodCallHandler { call, result ->
             try {
@@ -40,28 +51,33 @@ object StreamProxyChannel {
                             null,
                         )
                         val config = config(call)
-                        val router = routers.getOrPut(webViewIdentifier) {
-                            StreamProxyRequestRouter()
-                        }
-                        val client = clients[webViewIdentifier]?.also {
-                            it.updateConfig(config)
-                        } ?: StreamProxyWebViewClient(
-                            initialConfig = config,
-                            router = router,
-                            onPageFinished = { url ->
-                                mainHandler.post {
-                                    methodChannel.invokeMethod(
-                                        "pageFinished",
-                                        mapOf(
-                                            "webViewIdentifier" to webViewIdentifier,
-                                            "url" to url,
-                                        ),
-                                    )
-                                }
-                            },
-                        ).also {
-                            clients[webViewIdentifier] = it
-                        }
+                        val router = StreamProxySessionRegistry.getOrCreateRouter(
+                            webViewIdentifier,
+                        )
+                        val client = StreamProxySessionRegistry.clientFor(webViewIdentifier)
+                            ?.also { client ->
+                                client.updateConfig(config)
+                            }
+                            ?: StreamProxyWebViewClient(
+                                initialConfig = config,
+                                router = router,
+                                onPageFinished = { url ->
+                                    mainHandler.post {
+                                        methodChannel.invokeMethod(
+                                            "pageFinished",
+                                            mapOf(
+                                                "webViewIdentifier" to webViewIdentifier,
+                                                "url" to url,
+                                            ),
+                                        )
+                                    }
+                                },
+                            ).also { client ->
+                                StreamProxySessionRegistry.putClient(
+                                    webViewIdentifier,
+                                    client,
+                                )
+                            }
 
                         webView.webViewClient = client
                         client.attachToWebView(webView)
@@ -71,18 +87,49 @@ object StreamProxyChannel {
                         val config = config(call)
                         val webViewIdentifier = webViewIdentifier(call)
                         if (webViewIdentifier != null) {
-                            clients[webViewIdentifier]?.updateConfig(config)
+                            StreamProxySessionRegistry
+                                .clientFor(webViewIdentifier)
+                                ?.updateConfig(config)
                         } else {
-                            clients.values.forEach { it.updateConfig(config) }
+                            StreamProxySessionRegistry.updateAllClients(config)
+                        }
+                        result.success(null)
+                    }
+                    "updateCastContext" -> {
+                        val config = config(call)
+                        val webViewIdentifier = webViewIdentifier(call)
+                            ?: return@setMethodCallHandler result.success(null)
+                        castController.updateContext(
+                            CastStreamContext(
+                                webViewIdentifier = webViewIdentifier,
+                                channelLogin = config.currentChannelLogin,
+                                title = stringArgument(call, "title")
+                                    ?: config.currentChannelLogin,
+                                subtitle = stringArgument(call, "subtitle"),
+                                quality = stringArgument(call, "quality"),
+                                config = config,
+                            ),
+                        )
+                        result.success(null)
+                    }
+                    "showCastDialog" -> {
+                        mainHandler.post {
+                            castController.showCastDialog()
+                        }
+                        result.success(null)
+                    }
+                    "stopCasting" -> {
+                        mainHandler.post {
+                            castController.stopCasting()
                         }
                         result.success(null)
                     }
                     "detach" -> {
                         val webViewIdentifier = webViewIdentifier(call)
                             ?: return@setMethodCallHandler result.success(null)
-                        clients.remove(webViewIdentifier)
+                        StreamProxySessionRegistry.removeClient(webViewIdentifier)
                             ?.detachFromWebView()
-                        routers.remove(webViewIdentifier)
+                        StreamProxySessionRegistry.removeRouter(webViewIdentifier)
 
                         WebViewFlutterAndroidExternalApi.getWebView(
                             flutterEngine,
@@ -116,5 +163,12 @@ object StreamProxyChannel {
     private fun config(call: MethodCall): StreamProxyConfig {
         val arguments = call.arguments as? Map<*, *>
         return StreamProxyConfig.fromMap(arguments?.get("config") as? Map<*, *>)
+    }
+
+    private fun stringArgument(call: MethodCall, key: String): String? {
+        val arguments = call.arguments as? Map<*, *> ?: return null
+        return (arguments[key] as? String)
+            ?.trim()
+            ?.takeIf(String::isNotEmpty)
     }
 }

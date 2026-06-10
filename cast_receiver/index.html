@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Glacier Cast Receiver</title>
+    <style>
+      html,
+      body,
+      cast-media-player {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <cast-media-player></cast-media-player>
+    <script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+    <script>
+      (() => {
+        const MESSAGE_NAMESPACE = 'urn:x-cast:com.namecallfilter.glacier.cast';
+        const TARGET_LATENCY_SECONDS = 3;
+        const MAX_LATENCY_SECONDS = 6;
+        const STATUS_INTERVAL_MS = 1000;
+        const CHASE_INTERVAL_MS = 750;
+
+        const context = cast.framework.CastReceiverContext.getInstance();
+        const playerManager = context.getPlayerManager();
+        const playbackConfig = new cast.framework.PlaybackConfig();
+
+        playbackConfig.autoResumeNumberOfSegments = 1;
+        playbackConfig.enableSmoothLiveRefresh = false;
+        playbackConfig.segmentRequestRetryLimit = 1;
+        playbackConfig.shakaConfig = {
+          streaming: {
+            lowLatencyMode: true,
+            bufferingGoal: 3,
+            rebufferingGoal: 0.5,
+            bufferBehind: 6,
+            updateIntervalSeconds: 0.5,
+            startAtSegmentBoundary: false,
+            liveSync: {
+              enabled: true,
+              targetLatency: TARGET_LATENCY_SECONDS,
+              targetLatencyTolerance: 1,
+              maxPlaybackRate: 1.1,
+              minPlaybackRate: 0.95,
+            },
+            retryParameters: {
+              maxAttempts: 2,
+              baseDelay: 250,
+              backoffFactor: 1.4,
+              fuzzFactor: 0.2,
+            },
+          },
+          manifest: {
+            hls: {
+              ignoreTextStreamFailures: true,
+            },
+          },
+        };
+
+        if (typeof playerManager.setPlaybackConfig === 'function') {
+          playerManager.setPlaybackConfig(playbackConfig);
+        }
+
+        playerManager.setMessageInterceptor(
+          cast.framework.messages.MessageType.LOAD,
+          (loadRequestData) => {
+            const media = loadRequestData.media;
+            if (media) {
+              media.entity = media.entity || media.contentId;
+              media.contentUrl = media.contentUrl || media.contentId;
+              media.streamType = cast.framework.messages.StreamType.LIVE;
+              media.contentType =
+                media.contentType || 'application/x-mpegURL';
+            }
+            loadRequestData.autoplay = true;
+            return loadRequestData;
+          },
+        );
+
+        const finiteNumber = (value) =>
+          typeof value === 'number' && Number.isFinite(value);
+
+        const liveStatus = () => {
+          const range = playerManager.getLiveSeekableRange();
+          if (!range || !finiteNumber(range.end)) return null;
+
+          const currentTime = playerManager.getCurrentTimeSec();
+          if (!finiteNumber(currentTime)) return null;
+
+          return {
+            currentTime,
+            rangeStart: finiteNumber(range.start) ? range.start : null,
+            rangeEnd: range.end,
+            latency: Math.max(0, range.end - currentTime),
+          };
+        };
+
+        const sendStatus = () => {
+          const status = liveStatus();
+          const message = {
+            type: 'status',
+            latencyMs: status == null ? null : Math.round(status.latency * 1000),
+            playerState: playerManager.getPlayerState(),
+            currentTimeSec: status == null ? null : status.currentTime,
+            rangeStartSec: status == null ? null : status.rangeStart,
+            rangeEndSec: status == null ? null : status.rangeEnd,
+            targetLatencySec: TARGET_LATENCY_SECONDS,
+          };
+
+          for (const sender of context.getSenders()) {
+            context.sendCustomMessage(MESSAGE_NAMESPACE, sender.id, message);
+          }
+        };
+
+        const chaseLiveEdge = () => {
+          const status = liveStatus();
+          if (!status || status.latency <= MAX_LATENCY_SECONDS) {
+            return;
+          }
+
+          const start = status.rangeStart == null ? 0 : status.rangeStart;
+          const targetTime = Math.max(
+            start,
+            status.rangeEnd - TARGET_LATENCY_SECONDS,
+          );
+
+          playerManager.seek({
+            currentTime: targetTime,
+            resumeState: cast.framework.messages.ResumeState.PLAYBACK_START,
+          });
+        };
+
+        setInterval(sendStatus, STATUS_INTERVAL_MS);
+        setInterval(chaseLiveEdge, CHASE_INTERVAL_MS);
+
+        context.start({
+          disableIdleTimeout: true,
+          playbackConfig,
+          statusText: 'Glacier',
+        });
+      })();
+    </script>
+  </body>
+</html>

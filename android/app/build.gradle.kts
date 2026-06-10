@@ -14,6 +14,40 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+val envProperties = Properties()
+val envPropertiesFile = rootProject.file("../.env")
+if (envPropertiesFile.exists()) {
+    envPropertiesFile.inputStream().use { envInput ->
+        envInput
+            .bufferedReader()
+            .lineSequence()
+            .map(String::trim)
+            .filter { line -> line.isNotEmpty() && !line.startsWith("#") }
+            .forEach { line ->
+                val separatorIndex = line.indexOf("=")
+                if (separatorIndex > 0) {
+                    val key = line.substring(0, separatorIndex).trim()
+                    val value = line.substring(separatorIndex + 1)
+                        .trim()
+                        .trim('"')
+                        .trim('\'')
+                    envProperties.setProperty(key, value)
+                }
+            }
+    }
+}
+
+fun resolveConfigValue(name: String): String {
+    return providers.gradleProperty(name).orNull
+        ?: System.getenv(name)
+        ?: envProperties.getProperty(name)
+        ?: ""
+}
+
+fun String.asAndroidStringResource(): String {
+    return "\"${replace("\\", "\\\\").replace("\"", "\\\"")}\""
+}
+
 android {
     namespace = "com.namecallfilter.glacier"
     compileSdk = flutter.compileSdkVersion
@@ -34,6 +68,11 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        resValue(
+            "string",
+            "cast_receiver_app_id",
+            resolveConfigValue("CAST_RECEIVER_APP_ID").asAndroidStringResource(),
+        )
     }
 
     signingConfigs {
@@ -46,6 +85,10 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
         release {
             // Use the real upload key when key.properties is present (release
             // workflows create it from secrets). Allow debug signing only when a CI
@@ -67,5 +110,6 @@ flutter {
 
 dependencies {
     implementation("androidx.webkit:webkit:1.15.0")
+    implementation("com.google.android.gms:play-services-cast-framework:22.3.1")
     testImplementation("junit:junit:4.13.2")
 }
