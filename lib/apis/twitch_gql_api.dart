@@ -64,7 +64,21 @@ class TwitchGqlApi extends BaseApiClient {
         '&supported_codecs=av1,h265,h264'
         '&reassignments_supported=true'
         '&platform=web'
+        '&player_backend=mediaplayer'
+        '&play_session_id=${_randomSessionId()}'
         '&playlist_include_framerate=true'
         '&p=$random';
+  }
+
+  /// 32-char hex play-session id, matching the web client and streamlink. Sent
+  /// to Usher to identify the playback session; Usher tolerates its absence
+  /// today but has historically tightened required params.
+  String _randomSessionId() {
+    final random = Random();
+    final buffer = StringBuffer();
+    for (var i = 0; i < 32; i++) {
+      buffer.write(random.nextInt(16).toRadixString(16));
+    }
+    return buffer.toString();
   }
 }
