@@ -20,6 +20,7 @@ Future<T?> showModalBottomSheetWithProperFocus<T>({
   String? barrierLabel,
   AnimationController? transitionAnimationController,
   Offset? anchorPoint,
+  bool? showDragHandle,
 }) {
   // Clear focus and its history so it can't be auto-restored
   FocusScope.of(context).unfocus();
@@ -40,6 +41,7 @@ Future<T?> showModalBottomSheetWithProperFocus<T>({
     barrierLabel: barrierLabel,
     transitionAnimationController: transitionAnimationController,
     anchorPoint: anchorPoint,
+    showDragHandle: showDragHandle,
   ).whenComplete(() {
     // Additional safety: clear any focus that might have been restored
     if (context.mounted) {

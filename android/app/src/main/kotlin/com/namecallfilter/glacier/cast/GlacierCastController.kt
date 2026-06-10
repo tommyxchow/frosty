@@ -1,20 +1,16 @@
 package com.namecallfilter.glacier.cast
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log
-import android.view.ContextThemeWrapper
-import android.view.Gravity
-import android.widget.FrameLayout
-import androidx.mediarouter.app.MediaRouteButton
+import androidx.mediarouter.media.MediaRouteSelector
+import androidx.mediarouter.media.MediaRouter
+import com.google.android.gms.cast.CastMediaControlIntent
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaLoadRequestData
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.SessionManagerListener
-import com.google.android.gms.cast.framework.CastButtonFactory
-import com.namecallfilter.glacier.R
 import com.namecallfilter.glacier.streamproxy.CastRelayServer
 import com.namecallfilter.glacier.streamproxy.StreamProxyConfig
 import com.namecallfilter.glacier.streamproxy.StreamProxySessionRegistry
@@ -22,13 +18,22 @@ import com.namecallfilter.glacier.streamproxy.StreamProxySessionRegistry
 class GlacierCastController(
     context: Context,
     private val onStateChanged: (Map<String, Any?>) -> Unit = {},
+    private val onRoutesChanged: (Map<String, Any?>) -> Unit = {},
 ) {
-    private val activity = context as? Activity
     private val applicationContext = context.applicationContext
+    private val receiverApplicationId =
+        GlacierCastReceiverConfig.receiverApplicationId(applicationContext)
     private val receiverApplicationIdDescription =
         GlacierCastReceiverConfig.maskedReceiverApplicationId(applicationContext)
     private val relayServer = CastRelayServer(::log)
     private val sessionListener = CastSessionListener()
+    private val mediaRouter: MediaRouter by lazy {
+        MediaRouter.getInstance(applicationContext)
+    }
+    private val routeSelector = MediaRouteSelector.Builder()
+        .addControlCategory(CastMediaControlIntent.categoryForCast(receiverApplicationId))
+        .build()
+    private val routeCallback = CastRouteCallback()
 
     @Volatile
     private var castContext: CastContext? = null
@@ -43,7 +48,13 @@ class GlacierCastController(
     private var receiverLatencyMs: Long? = null
 
     @Volatile
-    private var routeButton: MediaRouteButton? = null
+    private var routeDiscoveryActive = false
+
+    @Volatile
+    private var connectingRouteId: String? = null
+
+    @Volatile
+    private var connectingRouteName: String? = null
 
     init {
         runCatching {
@@ -76,85 +87,90 @@ class GlacierCastController(
         }
     }
 
-    fun showCastDialog() {
+    fun startRouteDiscovery() {
+        routeDiscoveryActive = true
+        runCatching {
+            mediaRouter.addCallback(
+                routeSelector,
+                routeCallback,
+                MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY or
+                    MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN,
+            )
+            emitRoutes()
+        }.onFailure { error ->
+            emitRoutes(error = "Unable to search for Cast devices.")
+            Log.d(
+                LOG_TAG,
+                "cast_routes action=start_failed reason=${error.javaClass.simpleName} " +
+                    "message=${error.message}",
+                error,
+            )
+        }
+    }
+
+    fun stopRouteDiscovery() {
+        if (!routeDiscoveryActive) return
+
+        routeDiscoveryActive = false
+        runCatching {
+            mediaRouter.removeCallback(routeCallback)
+            emitRoutes()
+        }.onFailure { error ->
+            Log.d(
+                LOG_TAG,
+                "cast_routes action=stop_failed reason=${error.javaClass.simpleName} " +
+                    "message=${error.message}",
+                error,
+            )
+        }
+    }
+
+    fun selectRoute(routeId: String) {
         val session = currentSession()
         if (session?.isConnected == true) {
             emitState(session)
+            emitRoutes()
+            return
+        }
+
+        val route = castRoutes().firstOrNull { route -> route.id == routeId }
+        if (route == null) {
+            connectingRouteId = null
+            connectingRouteName = null
+            emitRoutes(error = "Cast device is no longer available.")
             return
         }
 
         prepareLoad()
+        connectingRouteId = route.id
+        connectingRouteName = route.name.toString()
+        emitRoutes()
 
-        val button = routeButton ?: ensureRouteButton()
-        if (button == null) {
-            Log.d(LOG_TAG, "cast_button action=show_failed reason=route_button_unavailable")
-            return
-        }
-
-        button.post {
-            runCatching {
-                button.performClick()
-            }.onFailure { error ->
-                Log.d(
-                    LOG_TAG,
-                    "cast_button action=show_failed reason=${error.javaClass.simpleName} " +
-                        "message=${error.message}",
-                    error,
-                )
-            }
+        runCatching {
+            route.select()
+        }.onFailure { error ->
+            pendingLoad = false
+            connectingRouteId = null
+            connectingRouteName = null
+            emitRoutes(error = "Unable to connect to Cast device.")
+            Log.d(
+                LOG_TAG,
+                "cast_routes action=select_failed reason=${error.javaClass.simpleName} " +
+                    "message=${error.message}",
+                error,
+            )
         }
     }
 
     fun stopCasting() {
         pendingLoad = false
         receiverLatencyMs = null
+        connectingRouteId = null
+        connectingRouteName = null
         castContext?.sessionManager?.endCurrentSession(true)
         relayServer.close()
         emitDisconnected()
-    }
-
-    private fun ensureRouteButton(): MediaRouteButton? {
-        routeButton?.let { button ->
-            if (button.isAttachedToWindow) return button
-        }
-
-        val activity = activity ?: return null
-        return try {
-            val buttonContext = ContextThemeWrapper(
-                activity,
-                R.style.GlacierCastRouteButtonTheme,
-            )
-            val button = object : MediaRouteButton(buttonContext) {
-                override fun performClick(): Boolean {
-                    prepareLoad()
-                    return super.performClick()
-                }
-            }
-            button.alpha = 0f
-            @Suppress("DEPRECATION")
-            button.setAlwaysVisible(true)
-
-            CastButtonFactory.setUpMediaRouteButton(activity, button)
-            activity.addContentView(
-                button,
-                FrameLayout.LayoutParams(
-                    1,
-                    1,
-                    Gravity.TOP or Gravity.START,
-                ),
-            )
-            routeButton = button
-            Log.d(LOG_TAG, "cast_button action=attached")
-            button
-        } catch (error: Exception) {
-            Log.d(
-                LOG_TAG,
-                "cast_button action=setup_failed reason=${error.javaClass.simpleName} " +
-                    "message=${error.message}",
-                error,
-            )
-            null
-        }
+        emitRoutes()
     }
 
     private fun loadCurrent() {
@@ -277,6 +293,33 @@ class GlacierCastController(
         )
     }
 
+    private fun emitRoutes(error: String? = null) {
+        val isCasting = currentSession()?.isConnected == true
+        onRoutesChanged(
+            mapOf(
+                "isSearching" to routeDiscoveryActive,
+                "isConnecting" to (!isCasting && connectingRouteId != null),
+                "connectingRouteName" to connectingRouteName,
+                "routes" to castRoutes().map { route ->
+                    mapOf(
+                        "id" to route.id,
+                        "name" to route.name.toString(),
+                        "description" to route.description?.toString(),
+                    )
+                },
+                "error" to error,
+            ),
+        )
+    }
+
+    private fun castRoutes(): List<MediaRouter.RouteInfo> {
+        return mediaRouter.routes.filter { route ->
+            route.isEnabled &&
+                !route.isDefault &&
+                route.matchesSelector(routeSelector)
+        }
+    }
+
     private fun emitDisconnected() {
         onStateChanged(
             mapOf(
@@ -294,12 +337,17 @@ class GlacierCastController(
     }
 
     private inner class CastSessionListener : SessionManagerListener<CastSession> {
-        override fun onSessionStarting(session: CastSession) = Unit
+        override fun onSessionStarting(session: CastSession) {
+            emitRoutes()
+        }
 
         override fun onSessionStarted(session: CastSession, sessionId: String) {
             receiverLatencyMs = null
+            connectingRouteId = null
+            connectingRouteName = null
             attachReceiverChannel(session)
             emitState(session)
+            emitRoutes()
             if (pendingLoad) {
                 loadCurrent()
             }
@@ -308,7 +356,10 @@ class GlacierCastController(
         override fun onSessionStartFailed(session: CastSession, error: Int) {
             pendingLoad = false
             receiverLatencyMs = null
+            connectingRouteId = null
+            connectingRouteName = null
             emitDisconnected()
+            emitRoutes(error = "Unable to connect to Cast device.")
             Log.d(
                 LOG_TAG,
                 "cast action=session_start_failed error=$error " +
@@ -324,8 +375,11 @@ class GlacierCastController(
         override fun onSessionEnded(session: CastSession, error: Int) {
             pendingLoad = false
             receiverLatencyMs = null
+            connectingRouteId = null
+            connectingRouteName = null
             relayServer.close()
             emitDisconnected()
+            emitRoutes()
             Log.d(
                 LOG_TAG,
                 "cast action=session_ended error=$error " +
@@ -337,8 +391,11 @@ class GlacierCastController(
         override fun onSessionResuming(session: CastSession, sessionId: String) = Unit
 
         override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) {
+            connectingRouteId = null
+            connectingRouteName = null
             attachReceiverChannel(session)
             emitState(session)
+            emitRoutes()
             if (pendingLoad) {
                 loadCurrent()
             }
@@ -346,7 +403,10 @@ class GlacierCastController(
 
         override fun onSessionResumeFailed(session: CastSession, error: Int) {
             receiverLatencyMs = null
+            connectingRouteId = null
+            connectingRouteName = null
             emitDisconnected()
+            emitRoutes(error = "Unable to reconnect to Cast device.")
             Log.d(
                 LOG_TAG,
                 "cast action=session_resume_failed error=$error " +
@@ -358,6 +418,46 @@ class GlacierCastController(
         override fun onSessionSuspended(session: CastSession, reason: Int) {
             emitState(session)
             log("cast action=session_suspended reason=$reason")
+        }
+    }
+
+    private inner class CastRouteCallback : MediaRouter.Callback() {
+        override fun onRouteAdded(router: MediaRouter, route: MediaRouter.RouteInfo) {
+            emitRoutes()
+        }
+
+        override fun onRouteChanged(router: MediaRouter, route: MediaRouter.RouteInfo) {
+            emitRoutes()
+        }
+
+        override fun onRouteRemoved(router: MediaRouter, route: MediaRouter.RouteInfo) {
+            if (route.id == connectingRouteId) {
+                connectingRouteId = null
+                connectingRouteName = null
+            }
+            emitRoutes()
+        }
+
+        override fun onRouteSelected(
+            router: MediaRouter,
+            route: MediaRouter.RouteInfo,
+            reason: Int,
+        ) {
+            connectingRouteId = route.id
+            connectingRouteName = route.name.toString()
+            emitRoutes()
+        }
+
+        override fun onRouteUnselected(
+            router: MediaRouter,
+            route: MediaRouter.RouteInfo,
+            reason: Int,
+        ) {
+            if (route.id == connectingRouteId) {
+                connectingRouteId = null
+                connectingRouteName = null
+            }
+            emitRoutes()
         }
     }
 

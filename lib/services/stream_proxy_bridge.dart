@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:frosty/services/cast_route_picker_state.dart';
 import 'package:frosty/services/cast_state.dart';
 import 'package:frosty/services/stream_proxy_config.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
@@ -10,6 +11,9 @@ class StreamProxyBridge {
   static const _channel = MethodChannel('frosty/stream_proxy');
   static final castState = ValueNotifier<CastState>(
     const CastState.disconnected(),
+  );
+  static final castRoutePickerState = ValueNotifier<CastRoutePickerState>(
+    const CastRoutePickerState.idle(),
   );
   static StreamProxyBridge? _activeBridge;
   static var _methodCallHandlerAttached = false;
@@ -90,9 +94,31 @@ class StreamProxyBridge {
     await _invokeStatic(method, arguments);
   }
 
-  static Future<void> showCastDialog() async {
+  static Future<void> startCastRouteDiscovery() async {
     if (!Platform.isAndroid) return;
-    await _invokeStatic('showCastDialog', const {});
+    castRoutePickerState.value = castRoutePickerState.value.copyWith(
+      isSearching: true,
+      clearError: true,
+    );
+    await _invokeStatic('startCastRouteDiscovery', const {});
+  }
+
+  static Future<void> stopCastRouteDiscovery() async {
+    if (!Platform.isAndroid) return;
+    castRoutePickerState.value = castRoutePickerState.value.copyWith(
+      isSearching: false,
+    );
+    await _invokeStatic('stopCastRouteDiscovery', const {});
+  }
+
+  static Future<void> selectCastRoute(CastRoute route) async {
+    if (!Platform.isAndroid) return;
+    castRoutePickerState.value = castRoutePickerState.value.copyWith(
+      isConnecting: true,
+      connectingRouteName: route.name,
+      clearError: true,
+    );
+    await _invokeStatic('selectCastRoute', {'routeId': route.id});
   }
 
   static Future<void> stopCasting() async {
@@ -131,6 +157,10 @@ class StreamProxyBridge {
         return;
       case 'castStateChanged':
         castState.value = CastState.fromMethodChannelPayload(call.arguments);
+        return;
+      case 'castRoutesChanged':
+        castRoutePickerState.value =
+            CastRoutePickerState.fromMethodChannelPayload(call.arguments);
         return;
       default:
         debugPrint('Unknown stream proxy bridge method: ${call.method}');

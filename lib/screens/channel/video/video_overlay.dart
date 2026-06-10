@@ -348,23 +348,16 @@ class VideoOverlay extends StatelessWidget {
                     valueListenable: StreamProxyBridge.castState,
                     builder: (context, castState, _) {
                       if (castState.isCasting) {
-                        return Tooltip(
-                          message: castState.receiverName == null
-                              ? 'Casting'
-                              : 'Casting to ${castState.receiverName}',
-                          preferBelow: false,
-                          child: Icon(
-                            Icons.cast_connected_rounded,
-                            size: 56,
-                            color: surfaceColor,
-                            shadows: [
-                              Shadow(
-                                offset: const Offset(0, 3),
-                                blurRadius: 8,
-                                color: Colors.black.withValues(alpha: 0.6),
-                              ),
-                            ],
-                          ),
+                        return CastStatusButton(
+                          castState: castState,
+                          color: surfaceColor,
+                          shadows: [
+                            Shadow(
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                              color: Colors.black.withValues(alpha: 0.6),
+                            ),
+                          ],
                         );
                       }
 

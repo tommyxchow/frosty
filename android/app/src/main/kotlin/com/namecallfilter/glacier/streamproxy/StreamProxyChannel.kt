@@ -30,6 +30,11 @@ object StreamProxyChannel {
                     methodChannel.invokeMethod("castStateChanged", state)
                 }
             },
+            onRoutesChanged = { state ->
+                mainHandler.post {
+                    methodChannel.invokeMethod("castRoutesChanged", state)
+                }
+            },
         )
 
         methodChannel.setMethodCallHandler { call, result ->
@@ -112,9 +117,27 @@ object StreamProxyChannel {
                         )
                         result.success(null)
                     }
-                    "showCastDialog" -> {
+                    "startCastRouteDiscovery" -> {
                         mainHandler.post {
-                            castController.showCastDialog()
+                            castController.startRouteDiscovery()
+                        }
+                        result.success(null)
+                    }
+                    "stopCastRouteDiscovery" -> {
+                        mainHandler.post {
+                            castController.stopRouteDiscovery()
+                        }
+                        result.success(null)
+                    }
+                    "selectCastRoute" -> {
+                        val routeId = stringArgument(call, "routeId")
+                            ?: return@setMethodCallHandler result.error(
+                                "missing_route_id",
+                                "Missing routeId",
+                                null,
+                            )
+                        mainHandler.post {
+                            castController.selectRoute(routeId)
                         }
                         result.success(null)
                     }
