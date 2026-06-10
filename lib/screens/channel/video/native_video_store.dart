@@ -5,6 +5,7 @@ import 'package:better_native_video_player/better_native_video_player.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/apis/twitch_gql_api.dart';
 import 'package:frosty/constants.dart';
@@ -361,6 +362,11 @@ abstract class NativeVideoStoreBase
     } catch (e) {
       if (authToken != null) {
         debugPrint('NativeVideoStore: auth token failed, retrying without: $e');
+        if (e is UnauthorizedException) {
+          // Twitch rejected the web session token — unlink it so the UI
+          // reflects the true state and future loads skip this request.
+          authStore.invalidateGqlToken();
+        }
         token = await twitchGqlApi.getPlaybackAccessToken(login: userLogin);
       } else {
         rethrow;

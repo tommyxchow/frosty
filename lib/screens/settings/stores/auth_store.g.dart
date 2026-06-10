@@ -92,6 +92,18 @@ mixin _$AuthStore on AuthBase, Store {
     });
   }
 
+  late final _$invalidateGqlTokenAsyncAction = AsyncAction(
+    'AuthBase.invalidateGqlToken',
+    context: context,
+  );
+
+  @override
+  Future<void> invalidateGqlToken() {
+    return _$invalidateGqlTokenAsyncAction.run(
+      () => super.invalidateGqlToken(),
+    );
+  }
+
   late final _$initAsyncAction = AsyncAction('AuthBase.init', context: context);
 
   @override

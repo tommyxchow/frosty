@@ -234,6 +234,15 @@ abstract class AuthBase with Store {
     }
   }
 
+  /// Clears the stored web session token after Twitch rejects it, so the
+  /// profile card reflects the unlinked state and future stream loads skip
+  /// the doomed authenticated request.
+  @action
+  Future<void> invalidateGqlToken() async {
+    _gqlToken = null;
+    await _storage.delete(key: _gqlTokenKey);
+  }
+
   /// Initialize by retrieving a token if it does not already exist.
   @action
   Future<void> init() async {
@@ -272,6 +281,10 @@ abstract class AuthBase with Store {
         if (user.details != null) {
           _isLoggedIn = true;
           _stopReconnectLoop();
+
+          // Recover a missed web session link — the WebView cookie store may
+          // still hold a valid auth-token from a previous login.
+          if (_gqlToken == null) _extractGqlToken();
         }
       }
 
