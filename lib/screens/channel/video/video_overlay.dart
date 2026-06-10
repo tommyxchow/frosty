@@ -348,28 +348,28 @@ class VideoOverlay extends StatelessWidget {
                   ],
                 ),
                 Center(
-                  child: Tooltip(
-                    message: videoStore.paused ? 'Play' : 'Pause',
-                    preferBelow: false,
-                    child: IconButton(
-                      iconSize: 56,
-                      icon: Icon(
-                        videoStore.paused
-                            ? Icons.play_arrow_rounded
-                            : Icons.pause_rounded,
-                        color: surfaceColor,
-                        shadows: [
-                          Shadow(
-                            offset: const Offset(0, 3),
-                            blurRadius: 8,
-                            color: Colors.black.withValues(alpha: 0.6),
-                          ),
-                        ],
+                    child: Tooltip(
+                      message: videoStore.paused ? 'Play' : 'Pause',
+                      preferBelow: false,
+                      child: IconButton(
+                        iconSize: 56,
+                        icon: Icon(
+                          videoStore.paused
+                              ? Icons.play_arrow_rounded
+                              : Icons.pause_rounded,
+                          color: surfaceColor,
+                          shadows: [
+                            Shadow(
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                              color: Colors.black.withValues(alpha: 0.6),
+                            ),
+                          ],
+                        ),
+                        onPressed: videoStore.handlePausePlay,
                       ),
-                      onPressed: videoStore.handlePausePlay,
                     ),
                   ),
-                ),
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Row(
