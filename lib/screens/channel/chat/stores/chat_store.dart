@@ -76,11 +76,19 @@ abstract class ChatStoreBase with Store {
   /// Height of the reply bar (Container + Divider).
   static const _replyBarHeight = 41.0;
 
+  /// Server-initiated graceful reconnect notice. Twitch sends this untagged
+  /// before maintenance so clients can re-establish ahead of the close.
+  static const _serverReconnectNotice = ':tmi.twitch.tv RECONNECT';
+
+  /// Muted words pre-normalized (trimmed, lowercased, empties dropped) by a
+  /// reaction on the setting — avoids re-normalizing on every message.
+  var _normalizedMutedWords = <String>[];
+
   /// Checks if IRC data contains a command that should bypass the chat delay.
   /// Returns true if any message in the data contains a bypass command.
   bool _shouldBypassDelay(String data) {
     for (final message in data.trimRight().split('\r\n')) {
-      if (message == ':tmi.twitch.tv RECONNECT') {
+      if (message == _serverReconnectNotice) {
         return true;
       }
       if (message.startsWith('@')) {
@@ -349,6 +357,21 @@ abstract class ChatStoreBase with Store {
       reaction((_) => auth.isLoggedIn, (_) => _channel?.sink.close(1000)),
     );
 
+    // Normalize muted words once per settings change instead of per message
+    // — the filter runs in the IRC hot path (50+ msgs/s in busy channels).
+    reactions.add(
+      reaction(
+        (_) => settings.mutedWords.toList(),
+        (List<String> words) {
+          _normalizedMutedWords = words
+              .map((word) => word.trim().toLowerCase())
+              .where((word) => word.isNotEmpty)
+              .toList();
+        },
+        fireImmediately: true,
+      ),
+    );
+
     reactions.add(
       reaction(
         (_) => [
@@ -530,7 +553,11 @@ abstract class ChatStoreBase with Store {
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
       // debugPrint('$message\n');
-      if (message == ':tmi.twitch.tv RECONNECT') {
+      if (message == _serverReconnectNotice) {
+        // Twitch is about to close the socket for maintenance — close it
+        // ourselves so the existing onDone path reconnects with no backoff
+        // (first retry is immediate) instead of waiting for the server to
+        // drop us mid-message.
         _channel?.sink.close(1000);
         continue;
       }
@@ -569,14 +596,14 @@ abstract class ChatStoreBase with Store {
         // Filter messages containing any muted words. Must use `continue`
         // (not `return`) — a single IRC frame can batch many messages, and
         // returning would drop the rest of the frame with the matched one.
-        if (parsedIRCMessage.message != null) {
+        if (parsedIRCMessage.message != null &&
+            _normalizedMutedWords.isNotEmpty) {
           final msg = parsedIRCMessage.message!.toLowerCase();
           final words = settings.matchWholeWord ? msg.split(' ') : null;
-          final muted = settings.mutedWords.any((word) {
-            final lw = word.trim().toLowerCase();
-            if (lw.isEmpty) return false;
-            return words != null ? words.contains(lw) : msg.contains(lw);
-          });
+          final muted = _normalizedMutedWords.any(
+            (word) =>
+                words != null ? words.contains(word) : msg.contains(word),
+          );
           if (muted) continue;
         }
 
@@ -692,13 +719,6 @@ abstract class ChatStoreBase with Store {
                 },
               );
             }
-            continue;
-          case Command.reconnect:
-            // Twitch is about to close the socket for maintenance — close
-            // it ourselves so the existing onDone path reconnects with no
-            // backoff (first retry is immediate) instead of waiting for the
-            // server to drop us mid-message.
-            _channel?.sink.close(1000);
             continue;
           case Command.none:
             debugPrint('Unknown command: ${parsedIRCMessage.command}');

@@ -56,30 +56,30 @@ class ProfileCard extends StatelessWidget {
                     message: hasToken
                         ? 'Your Twitch web session is linked. When using the native player, ads will be avoided on channels where you have a subscription or Twitch Turbo.'
                         : 'Your Twitch web session is not linked. Log in again to avoid ads when using the native player on channels where you have a subscription or Twitch Turbo.',
-                    actions: [
-                      if (!hasToken)
-                        TextButton(
-                          onPressed: Navigator.of(dialogContext).pop,
-                          child: const Text('Cancel'),
-                        ),
-                      if (!hasToken)
-                        FilledButton(
-                          onPressed: () {
-                            Navigator.of(dialogContext).pop();
-                            navigator.push(
-                              MaterialPageRoute(
-                                builder: (context) => LoginWebView(),
-                              ),
-                            );
-                          },
-                          child: const Text('Log in'),
-                        ),
-                      if (hasToken)
-                        TextButton(
-                          onPressed: Navigator.of(dialogContext).pop,
-                          child: const Text('OK'),
-                        ),
-                    ],
+                    actions: hasToken
+                        ? [
+                            TextButton(
+                              onPressed: Navigator.of(dialogContext).pop,
+                              child: const Text('OK'),
+                            ),
+                          ]
+                        : [
+                            TextButton(
+                              onPressed: Navigator.of(dialogContext).pop,
+                              child: const Text('Cancel'),
+                            ),
+                            FilledButton(
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop();
+                                navigator.push(
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginWebView(),
+                                  ),
+                                );
+                              },
+                              child: const Text('Log in'),
+                            ),
+                          ],
                   ),
                 );
               },

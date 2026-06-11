@@ -378,16 +378,22 @@ class _VideoChatState extends State<VideoChat>
                   ? Duration.zero
                   : const Duration(milliseconds: 300),
               curve: Curves.easeOut,
-              child: const IgnorePointer(
-                child: ColoredBox(
-                  color: Colors.black,
-                  child: Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        color: Colors.white38,
-                        strokeWidth: 2,
+              // TickerMode stops the spinner's repeating animation while
+              // hidden — opacity 0 skips painting but would otherwise keep
+              // scheduling frames for the whole video session.
+              child: IgnorePointer(
+                child: TickerMode(
+                  enabled: _videoStore.loading,
+                  child: const ColoredBox(
+                    color: Colors.black,
+                    child: Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white38,
+                          strokeWidth: 2,
+                        ),
                       ),
                     ),
                   ),

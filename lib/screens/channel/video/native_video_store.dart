@@ -145,8 +145,6 @@ abstract class NativeVideoStoreBase
   @readonly
   String? _error;
 
-  String? _hlsUrl;
-
   NativeVideoStoreBase({
     required this.userLogin,
     required this.userId,
@@ -221,25 +219,36 @@ abstract class NativeVideoStoreBase
     return controller;
   }
 
+  /// Pushes the channel's Now Playing metadata (lock screen / control center)
+  /// to the native player using the cached profile image.
+  void _applyNowPlayingMediaInfo() {
+    if (_disposed || _controller == null) return;
+    _controller!.setMediaInfo(NativeVideoPlayerMediaInfo(
+      title: displayName,
+      subtitle: _streamInfo?.title ?? 'Twitch',
+      artworkUrl: _profileImageUrl,
+    ));
+  }
+
   @action
   Future<void> _initPlayer() async {
     if (_initInFlight) return;
     _initInFlight = true;
     final generation = _initGeneration;
     try {
-      // Fetch profile image URL for Now Playing artwork (fire-and-forget)
-      twitchApi.getUser(id: userId).then((user) {
-        _profileImageUrl = user.profileImageUrl;
-        if (!_disposed && _controller != null) {
-          _controller!.setMediaInfo(NativeVideoPlayerMediaInfo(
-            title: displayName,
-            subtitle: _streamInfo?.title ?? 'Twitch',
-            artworkUrl: _profileImageUrl,
-          ));
-        }
-      }).catchError((e) {
-        debugPrint('NativeVideoStore: profile image fetch failed: $e');
-      });
+      // Fetch profile image URL for Now Playing artwork (fire-and-forget).
+      // _initPlayer re-runs on every hard refresh and chat-only toggle, so
+      // skip the Helix call once the URL is cached.
+      if (_profileImageUrl != null) {
+        _applyNowPlayingMediaInfo();
+      } else {
+        twitchApi.getUser(id: userId).then((user) {
+          _profileImageUrl = user.profileImageUrl;
+          _applyNowPlayingMediaInfo();
+        }).catchError((e) {
+          debugPrint('NativeVideoStore: profile image fetch failed: $e');
+        });
+      }
 
       await _controller!.initialize();
       if (_disposed || generation != _initGeneration) {
@@ -250,23 +259,16 @@ abstract class NativeVideoStoreBase
 
       _pipSub = _controller!.isPipEnabledStream.listen((isPip) {
         runInAction(() {
+          // iOS-only bookkeeping: track whether PiP was triggered by gesture
+          // (auto) or button (manual). Must run before _setPipActive mutates
+          // _isInPipMode.
           if (isPip && !_isInPipMode) {
-            // Detect whether PiP was triggered by gesture (auto) or button (manual).
             _lastPipWasAutomatic = !_manualPipRequested;
             _manualPipRequested = false;
-            _overlayWasVisibleBeforePip = _overlayVisible;
-            _isInPipMode = true;
-            _overlayTimer?.cancel();
-            _overlayVisible = true;
           } else if (!isPip && _isInPipMode) {
-            _isInPipMode = false;
             _lastPipWasAutomatic = false;
-            if (_overlayWasVisibleBeforePip) {
-              _scheduleOverlayHide();
-            } else {
-              _overlayVisible = false;
-            }
           }
+          _setPipActive(isPip);
         });
       });
 
@@ -308,14 +310,10 @@ abstract class NativeVideoStoreBase
                 if (_disposed || _pendingQualityIndex != null) return;
                 final lastQuality =
                     prefs.getString(lastStreamQualityKey(userLogin));
-                if (lastQuality != null) {
-                  final index = _availableStreamQualities.indexOf(lastQuality);
-                  if (index != -1) {
-                    runInAction(() {
-                      if (_disposed || _pendingQualityIndex != null) return;
-                      _queueOrApplyInitialQualityIndex(index);
-                    });
-                  }
+                if (lastQuality == null) return;
+                final index = _availableStreamQualities.indexOf(lastQuality);
+                if (index != -1) {
+                  runInAction(() => _queueOrApplyInitialQualityIndex(index));
                 }
               }).catchError((e) {
                 debugPrint('NativeVideoStore: failed to read last quality: $e');
@@ -382,9 +380,9 @@ abstract class NativeVideoStoreBase
     if (_disposed || generation != _initGeneration || !settingsStore.showVideo) {
       return;
     }
-    _hlsUrl = twitchGqlApi.buildHlsUrl(login: userLogin, token: token);
+    final hlsUrl = twitchGqlApi.buildHlsUrl(login: userLogin, token: token);
 
-    await _controller!.loadUrl(url: _hlsUrl!);
+    await _controller!.loadUrl(url: hlsUrl);
     if (_disposed || generation != _initGeneration || !settingsStore.showVideo) {
       return;
     }
@@ -441,10 +439,9 @@ abstract class NativeVideoStoreBase
       // Only show the error if the stream is actually live — an offline
       // channel is expected to fail here and the overlay handles it.
       if (_streamInfo != null) {
-        _error =
-            'Native player failed to load. Try the standard player in Settings.';
-        _overlayVisible = true;
-        _overlayTimer?.cancel();
+        _showErrorOverlay(
+          'Native player failed to load. Try the standard player in Settings.',
+        );
       }
     });
   }
@@ -541,7 +538,7 @@ abstract class NativeVideoStoreBase
     if (statusCode != null &&
         statusCode >= 400 &&
         statusCode < 500 &&
-        !_isWithinRecoveryCap()) {
+        !_refreshCapReached()) {
       if (_userPaused) {
         // Don't yank a user-paused stream back to life — the refresh would
         // reload with autoplay. Defer until they resume.
@@ -574,12 +571,18 @@ abstract class NativeVideoStoreBase
               if (statusCode != null) 'statusCode=$statusCode',
             ],
           );
-          _error = errorMessage;
-          _overlayVisible = true;
-          _overlayTimer?.cancel();
+          _showErrorOverlay(errorMessage);
         }
       });
     });
+  }
+
+  /// Surfaces [message] on the video overlay and pins it (cancels auto-hide).
+  /// Must be called inside an action context.
+  void _showErrorOverlay(String message) {
+    _error = message;
+    _overlayVisible = true;
+    _overlayTimer?.cancel();
   }
 
   void _recordNativePlaybackError(
@@ -601,7 +604,7 @@ abstract class NativeVideoStoreBase
   }
 
   void _handleMediaServicesReset(String errorMessage) {
-    if (_isWithinRecoveryCap()) {
+    if (_refreshCapReached()) {
       runInAction(() {
         _disposeController();
         _loading = false;
@@ -609,9 +612,7 @@ abstract class NativeVideoStoreBase
         _isStalled = false;
         _initializing = false;
         _isQualitySwitching = false;
-        _error = errorMessage;
-        _overlayVisible = true;
-        _overlayTimer?.cancel();
+        _showErrorOverlay(errorMessage);
       });
       return;
     }
@@ -633,7 +634,7 @@ abstract class NativeVideoStoreBase
     unawaited(_handleRefresh(userInitiated: false));
   }
 
-  bool _isWithinRecoveryCap() =>
+  bool _refreshCapReached() =>
       _totalRefreshAttempts >= VideoTimingConstants.maxRefreshAttempts;
 
   void _onPaused() {
@@ -678,8 +679,7 @@ abstract class NativeVideoStoreBase
 
     if (_stallRecoveryAttempt <= 1) {
       _recoverBySeekingToLiveEdge();
-    } else if (_totalRefreshAttempts >=
-        VideoTimingConstants.maxRefreshAttempts) {
+    } else if (_refreshCapReached()) {
       _showStallError();
     } else if (_backoffDelayRemaining() > Duration.zero) {
       // Still within the exponential backoff window — re-arm and try again.
@@ -703,11 +703,11 @@ abstract class NativeVideoStoreBase
         VideoTimingConstants.shortPlayLoopThreshold;
     runInAction(() {
       _loading = false;
-      _error = bouncing
-          ? 'Twitch is having trouble with this channel right now. Try again in a moment, or switch to the standard player in Settings.'
-          : 'Stream stalled. Try refreshing or switch to the standard player in Settings.';
-      _overlayVisible = true;
-      _overlayTimer?.cancel();
+      _showErrorOverlay(
+        bouncing
+            ? 'Twitch is having trouble with this channel right now. Try again in a moment, or switch to the standard player in Settings.'
+            : 'Stream stalled. Try refreshing or switch to the standard player in Settings.',
+      );
     });
   }
 
@@ -833,7 +833,7 @@ abstract class NativeVideoStoreBase
         );
         _controller?.seekToLiveEdge();
         _controller?.play();
-      } else if (!_isWithinRecoveryCap() &&
+      } else if (!_refreshCapReached() &&
           _backoffDelayRemaining() == Duration.zero) {
         debugPrint(
           'NativeVideoStore: latency still high (${rounded}s), refreshing '
@@ -936,6 +936,15 @@ abstract class NativeVideoStoreBase
   Future<void> handleRefresh() => _handleRefresh(userInitiated: true);
 
   Future<void> _handleRefresh({required bool userInitiated}) {
+    // Auto-recovery must never resume a stream the user paused — park the
+    // refresh until they tap play (handlePausePlay consumes the flag). The
+    // error paths set the flag themselves to preserve attempt counters;
+    // this guard covers every other producer (e.g. the init-retry timer).
+    if (!userInitiated && _userPaused) {
+      _pendingRefreshOnResume = true;
+      return Future<void>.value();
+    }
+
     if (userInitiated) HapticFeedback.lightImpact();
 
     final wasControllerInitialized = _controllerInitialized;
@@ -948,25 +957,16 @@ abstract class NativeVideoStoreBase
         _shortPlayBounceCount = 0;
       }
       _lastRefreshTime = DateTime.now();
+      // PiP state is preserved here: the light path reuses the controller
+      // (flags must stay in sync with the native player) and the hard path
+      // resets it via _disposeController below. _highLatencyCount survives
+      // so the latency-recovery cap can stop a persistent loop; it resets
+      // on the next healthy reading.
+      _resetPlayerStateCommon(
+        preservePipState: true,
+        preserveHighLatencyCount: true,
+      );
       _loading = true;
-      _paused = true;
-      _isStalled = false;
-      _hasPlayedOnce = false;
-      _userPaused = false;
-      _pendingRefreshOnResume = false;
-      _stallRecoveryAttempt = 0;
-      // _highLatencyCount intentionally survives refreshes so the
-      // latency-recovery cap can stop a persistent loop; it resets on the
-      // next healthy latency reading.
-      _firstTimeSettingQuality = true;
-      _pendingQualityIndex = null;
-      _isQualitySwitching = false;
-      _isAudioOnlyMode = false;
-      _streamQualityIndex = 0;
-      _latency = null;
-      _availableStreamQualities = [];
-      _qualityObjects = [];
-      _error = null;
       _initializing = true;
       _initGeneration++;
 
@@ -985,12 +985,7 @@ abstract class NativeVideoStoreBase
       _lastPipWasAutomatic = false;
       _manualPipRequested = false;
       _overlayWasVisibleBeforePip = true;
-      _controllerInitialized = false;
-      _initInFlight = false;
-      _pipSub?.cancel();
-      _qualitiesSub?.cancel();
-      _controller?.removeActivityListener(_onPlayerActivity);
-      _controller?.dispose();
+      _disposeController();
       _controller = _createController();
     });
 
@@ -1138,9 +1133,9 @@ abstract class NativeVideoStoreBase
       _latency = null;
       _streamInfo = null;
       _offlineChannelInfo = result.offlineChannel;
-      // Only flush chat delay on confirmed-offline (offlineChannel != null).
-      // Transient network errors leave chat state untouched.
-      if (result.offlineChannel != null) _chatLatencySync.reset();
+      // Confirmed offline (transient errors returned above) — flush the
+      // chat delay since there's no video to sync against.
+      _chatLatencySync.reset();
     });
   }
 
@@ -1157,7 +1152,11 @@ abstract class NativeVideoStoreBase
 
   @override
   @action
-  void handleAndroidPipChanged(bool isInPip) {
+  void handleAndroidPipChanged(bool isInPip) => _setPipActive(isInPip);
+
+  /// Shared PiP enter/exit overlay state machine, driven by the Android
+  /// activity callback and the iOS controller's PiP stream.
+  void _setPipActive(bool isInPip) {
     if (isInPip && !_isInPipMode) {
       _overlayWasVisibleBeforePip = _overlayVisible;
       _isInPipMode = true;
@@ -1214,7 +1213,10 @@ abstract class NativeVideoStoreBase
   /// Resets the observable fields that have the same target value across
   /// "torn down for chat-only" and "fresh controller about to load". Caller
   /// sets the few fields that differ (`_loading`, `_initializing`).
-  void _resetPlayerStateCommon() {
+  void _resetPlayerStateCommon({
+    bool preservePipState = false,
+    bool preserveHighLatencyCount = false,
+  }) {
     _hasPlayedOnce = false;
     _userPaused = false;
     _pendingRefreshOnResume = false;
@@ -1223,7 +1225,7 @@ abstract class NativeVideoStoreBase
     _isQualitySwitching = false;
     _isAudioOnlyMode = false;
     _stallRecoveryAttempt = 0;
-    _highLatencyCount = 0;
+    if (!preserveHighLatencyCount) _highLatencyCount = 0;
     _firstTimeSettingQuality = true;
     _pendingQualityIndex = null;
     _streamQualityIndex = 0;
@@ -1231,10 +1233,12 @@ abstract class NativeVideoStoreBase
     _qualityObjects = [];
     _latency = null;
     _error = null;
-    _isInPipMode = false;
-    _lastPipWasAutomatic = false;
-    _manualPipRequested = false;
-    _overlayWasVisibleBeforePip = true;
+    if (!preservePipState) {
+      _isInPipMode = false;
+      _lastPipWasAutomatic = false;
+      _manualPipRequested = false;
+      _overlayWasVisibleBeforePip = true;
+    }
   }
 
   /// Resets observable display state after [_disposeController] so the UI
@@ -1245,7 +1249,6 @@ abstract class NativeVideoStoreBase
     _resetPlayerStateCommon();
     _loading = false;
     _initializing = false;
-    _hlsUrl = null;
     _chatLatencySync.reset();
   }
 

@@ -4,6 +4,14 @@ class VideoTimingConstants {
   VideoTimingConstants._();
 
   // Stall recovery
+  //
+  // Cross-layer ordering contract: iOS's native notification-stall recovery
+  // fires at ~1s, this Dart timer at 8s, and the Android native watchdog
+  // (VideoPlayerObserver.kt STALL_WATCHDOG_MS) at 12s. Correctness depends
+  // on 1s < stallDetectionDelay < 12s — Dart's attempt-1 seek must pre-empt
+  // the Android watchdog's heavier stop()/prepare() recovery, and iOS has
+  // no native watchdog so the Dart timer is the only recoverer for silent
+  // rate-drops there. Don't tune past either neighbor.
   static const stallDetectionDelay = Duration(seconds: 8);
   static const initRetryDelay = Duration(seconds: 3);
   static const int maxRefreshAttempts = 3;
