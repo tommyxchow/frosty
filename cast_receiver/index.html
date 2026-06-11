@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Glacier Cast Receiver</title>
+	<style>
+		html,
+		body,
+		cast-media-player {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			overflow: hidden;
+			background: #000;
+		}
+	</style>
+</head>
+
+<body>
+	<cast-media-player></cast-media-player>
+
+	<script src="https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+	<script>
+		(() => {
+			const MESSAGE_NAMESPACE = 'urn:x-cast:com.namecallfilter.glacier.cast';
+
+			const TARGET_LATENCY_SECONDS = 2.0;
+			const MAX_LATENCY_SECONDS = 5.0;
+
+			const STATUS_INTERVAL_MS = 1000;
+			const LATENCY_CHECK_INTERVAL_MS = 500;
+			const STARTUP_LIVE_SEEK_THRESHOLD_SECONDS = TARGET_LATENCY_SECONDS + 0.5;
+			const MAX_LATENCY_SEEK_COOLDOWN_MS = 8000;
+
+			const context = cast.framework.CastReceiverContext.getInstance();
+			const playerManager = context.getPlayerManager();
+
+			const playbackConfig = new cast.framework.PlaybackConfig();
+
+			playbackConfig.autoResumeNumberOfSegments = 0;
+			playbackConfig.enableSmoothLiveRefresh = false;
+			playbackConfig.segmentRequestRetryLimit = 1;
+
+			playbackConfig.shakaConfig = {
+				streaming: {
+					lowLatencyMode: true,
+
+					bufferingGoal: 3,
+					rebufferingGoal: 0.75,
+					bufferBehind: 6,
+
+					updateIntervalSeconds: 0.5,
+
+					segmentPrefetchLimit: 2,
+					inaccurateManifestTolerance: 0,
+					startAtSegmentBoundary: false,
+
+					liveSync: {
+						enabled: true,
+						targetLatency: TARGET_LATENCY_SECONDS,
+						targetLatencyTolerance: 0.25,
+
+						maxPlaybackRate: 1.1,
+						minPlaybackRate: 0.98,
+
+						panicMode: false,
+						panicThreshold: MAX_LATENCY_SECONDS,
+
+						dynamicTargetLatency: {
+							enabled: true,
+							minLatency: TARGET_LATENCY_SECONDS,
+							maxLatency: MAX_LATENCY_SECONDS,
+							rebufferIncrement: 0.5,
+							stabilityThreshold: 8,
+							maxAttempts: 3,
+						},
+					},
+
+					retryParameters: {
+						maxAttempts: 2,
+						baseDelay: 100,
+						backoffFactor: 1.2,
+						fuzzFactor: 0.1,
+					},
+				},
+
+				manifest: {
+					defaultPresentationDelay: TARGET_LATENCY_SECONDS,
+
+					updatePeriod: 0.2,
+
+					retryParameters: {
+						maxAttempts: 2,
+						baseDelay: 100,
+						backoffFactor: 1.2,
+						fuzzFactor: 0.1,
+					},
+
+					hls: {
+						ignoreTextStreamFailures: true,
+					},
+				},
+			};
+
+			if (typeof playerManager.setPlaybackConfig === 'function') {
+				playerManager.setPlaybackConfig(playbackConfig);
+			}
+
+			const finiteNumber = (value) =>
+				typeof value === 'number' && Number.isFinite(value);
+
+			let pendingStartupLiveSeek = false;
+			let lastMaxLatencySeekAtMs = 0;
+
+			const currentPlaybackRate = () => {
+				if (typeof playerManager.getPlaybackRate === 'function') {
+					const managerRate = playerManager.getPlaybackRate();
+					if (finiteNumber(managerRate) && managerRate > 0) {
+						return managerRate;
+					}
+				}
+
+				const mediaElement = document.querySelector('video, audio');
+				if (mediaElement && finiteNumber(mediaElement.playbackRate)) {
+					return mediaElement.playbackRate;
+				}
+
+				return 1.0;
+			};
+
+			const liveStatus = () => {
+				const range = playerManager.getLiveSeekableRange();
+				if (!range || !finiteNumber(range.end)) return null;
+
+				const currentTime = playerManager.getCurrentTimeSec();
+				if (!finiteNumber(currentTime)) return null;
+
+				return {
+					currentTime,
+					rangeStart: finiteNumber(range.start) ? range.start : null,
+					rangeEnd: range.end,
+					latency: Math.max(0, range.end - currentTime),
+				};
+			};
+
+			const sendCustomMessageToAll = (message) => {
+				for (const sender of context.getSenders()) {
+					context.sendCustomMessage(MESSAGE_NAMESPACE, sender.id, message);
+				}
+			};
+
+			const sendStatus = (extra = {}) => {
+				const status = liveStatus();
+
+				sendCustomMessageToAll({
+					type: 'status',
+					latencyMs: status == null ? null : Math.round(status.latency * 1000),
+					playerState: playerManager.getPlayerState(),
+					currentTimeSec: status == null ? null : status.currentTime,
+					rangeStartSec: status == null ? null : status.rangeStart,
+					rangeEndSec: status == null ? null : status.rangeEnd,
+					targetLatencySec: TARGET_LATENCY_SECONDS,
+					maxLatencySec: MAX_LATENCY_SECONDS,
+					playbackRate: currentPlaybackRate(),
+					latencyReference: 'receiverLiveSeekableRange',
+					...extra,
+				});
+			};
+
+			const seekToLiveLatency = (latencySeconds) => {
+				const status = liveStatus();
+				if (!status) return false;
+
+				const start = status.rangeStart == null ? 0 : status.rangeStart;
+				const targetTime = Math.max(
+					start,
+					status.rangeEnd - latencySeconds,
+				);
+
+				playerManager.seek({
+					currentTime: targetTime,
+					resumeState: cast.framework.messages.ResumeState.PLAYBACK_START,
+				});
+
+				return true;
+			};
+
+			const seekToTargetLive = () => seekToLiveLatency(TARGET_LATENCY_SECONDS);
+
+			const jumpToLive = () => {
+				const ok = seekToTargetLive();
+				sendStatus({correction: ok ? 'manualJumpToLive' : 'manualJumpFailed'});
+				return ok;
+			};
+
+			const tryStartupLiveSeek = () => {
+				if (!pendingStartupLiveSeek) return false;
+
+				pendingStartupLiveSeek = false;
+
+				const status = liveStatus();
+				if (!status) {
+					sendStatus({correction: 'startupJumpUnavailable'});
+					return false;
+				}
+
+				if (status.latency <= STARTUP_LIVE_SEEK_THRESHOLD_SECONDS) return false;
+
+				const ok = seekToTargetLive();
+				sendStatus({
+					correction: ok ? 'startupJumpToLive' : 'startupJumpFailed',
+					latencyBeforeCorrectionMs: Math.round(status.latency * 1000),
+				});
+
+				return ok;
+			};
+
+			const enforceMaxLatencySeek = (status) => {
+				if (status.latency <= MAX_LATENCY_SECONDS) return;
+				if (Date.now() - lastMaxLatencySeekAtMs < MAX_LATENCY_SEEK_COOLDOWN_MS) return;
+
+				lastMaxLatencySeekAtMs = Date.now();
+				const ok = seekToTargetLive();
+
+				sendStatus({
+					correction: ok ? 'maxLatencyJumpToLive' : 'maxLatencyJumpFailed',
+					latencyBeforeCorrectionMs: Math.round(status.latency * 1000),
+				});
+			};
+
+			const enforceMaxLatency = () => {
+				const state = playerManager.getPlayerState();
+				const active = state === 'PLAYING' || state === 'BUFFERING';
+
+				if (!active) return;
+
+				if (tryStartupLiveSeek()) return;
+
+				const status = liveStatus();
+				if (!status) return;
+
+				enforceMaxLatencySeek(status);
+			};
+
+			playerManager.setMessageInterceptor(
+				cast.framework.messages.MessageType.LOAD,
+				(loadRequestData) => {
+					const media = loadRequestData.media;
+
+					pendingStartupLiveSeek = true;
+					lastMaxLatencySeekAtMs = 0;
+
+					if (media) {
+						media.entity = media.entity || media.contentId;
+						media.contentUrl = media.contentUrl || media.contentId;
+						media.streamType = cast.framework.messages.StreamType.LIVE;
+						media.contentType = media.contentType || 'application/x-mpegURL';
+					}
+
+					loadRequestData.autoplay = true;
+					return loadRequestData;
+				},
+			);
+
+			context.addCustomMessageListener(MESSAGE_NAMESPACE, (event) => {
+				let message = event.data;
+
+				if (typeof message === 'string') {
+					try {
+						message = JSON.parse(message);
+					} catch (_) {
+						return;
+					}
+				}
+
+				if (!message || typeof message !== 'object') return;
+
+				if (message.type === 'jumpToLive') {
+					const ok = jumpToLive();
+
+					context.sendCustomMessage(MESSAGE_NAMESPACE, event.senderId, {
+						type: 'jumpToLiveResult',
+						ok,
+					});
+				}
+			});
+
+			setInterval(sendStatus, STATUS_INTERVAL_MS);
+			setInterval(enforceMaxLatency, LATENCY_CHECK_INTERVAL_MS);
+
+			const receiverOptions = new cast.framework.CastReceiverOptions();
+			receiverOptions.disableIdleTimeout = true;
+			receiverOptions.playbackConfig = playbackConfig;
+			receiverOptions.statusText = 'Glacier';
+
+			receiverOptions.useShakaForHls = true;
+
+			context.start(receiverOptions);
+		})();
+	</script>
+
+</body>
+
+</html>

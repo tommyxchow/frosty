@@ -3,9 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/screens/channel/video/cast_button.dart';
 import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
+import 'package:frosty/services/cast_state.dart';
+import 'package:frosty/services/stream_proxy_bridge.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
@@ -123,16 +126,21 @@ class VideoOverlay extends StatelessWidget {
       },
     );
 
-    final refreshButton = Tooltip(
-      message: 'Refresh',
-      preferBelow: false,
-      child: IconButton(
-        icon: Icon(
-          Icons.refresh_rounded,
-          color: surfaceColor,
-          shadows: kOverlayShadow,
+    final refreshButton = ValueListenableBuilder<CastState>(
+      valueListenable: StreamProxyBridge.castState,
+      builder: (context, castState, _) => Tooltip(
+        message: castState.isCasting ? 'Casting' : 'Refresh',
+        preferBelow: false,
+        child: IconButton(
+          icon: Icon(
+            Icons.refresh_rounded,
+            color: castState.isCasting
+                ? surfaceColor.withValues(alpha: 0.4)
+                : surfaceColor,
+            shadows: kOverlayShadow,
+          ),
+          onPressed: castState.isCasting ? null : videoStore.handleRefresh,
         ),
-        onPressed: videoStore.handleRefresh,
       ),
     );
 
@@ -261,6 +269,7 @@ class VideoOverlay extends StatelessWidget {
                       if (videoStore.settingsStore.fullScreen &&
                           context.isLandscape)
                         chatOverlayButton,
+                      CastButton(color: surfaceColor, shadows: kOverlayShadow),
                     ],
                   ),
                   Align(
@@ -330,30 +339,50 @@ class VideoOverlay extends StatelessWidget {
                     if (videoStore.settingsStore.fullScreen &&
                         context.isLandscape)
                       chatOverlayButton,
+                    CastButton(color: surfaceColor, shadows: kOverlayShadow),
                     videoSettingsButton,
                   ],
                 ),
                 Center(
-                  child: Tooltip(
-                    message: videoStore.paused ? 'Play' : 'Pause',
-                    preferBelow: false,
-                    child: IconButton(
-                      iconSize: 56,
-                      icon: Icon(
-                        videoStore.paused
-                            ? Icons.play_arrow_rounded
-                            : Icons.pause_rounded,
-                        color: surfaceColor,
-                        shadows: [
-                          Shadow(
-                            offset: const Offset(0, 3),
-                            blurRadius: 8,
-                            color: Colors.black.withValues(alpha: 0.6),
+                  child: ValueListenableBuilder<CastState>(
+                    valueListenable: StreamProxyBridge.castState,
+                    builder: (context, castState, _) {
+                      if (castState.isCasting) {
+                        return CastStatusButton(
+                          castState: castState,
+                          color: surfaceColor,
+                          shadows: [
+                            Shadow(
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                              color: Colors.black.withValues(alpha: 0.6),
+                            ),
+                          ],
+                        );
+                      }
+
+                      return Tooltip(
+                        message: videoStore.paused ? 'Play' : 'Pause',
+                        preferBelow: false,
+                        child: IconButton(
+                          iconSize: 56,
+                          icon: Icon(
+                            videoStore.paused
+                                ? Icons.play_arrow_rounded
+                                : Icons.pause_rounded,
+                            color: surfaceColor,
+                            shadows: [
+                              Shadow(
+                                offset: const Offset(0, 3),
+                                blurRadius: 8,
+                                color: Colors.black.withValues(alpha: 0.6),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      onPressed: videoStore.handlePausePlay,
-                    ),
+                          onPressed: videoStore.handlePausePlay,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Align(
@@ -447,18 +476,30 @@ class VideoOverlay extends StatelessWidget {
                                         color: surfaceColor,
                                         shadows: kOverlayShadow,
                                       ),
-                                      Observer(
-                                        builder: (context) => Text(
-                                          videoStore.latency ?? '—',
-                                          style: TextStyle(
-                                            color: surfaceColor,
-                                            fontWeight: FontWeight.w500,
-                                            fontFeatures: const [
-                                              FontFeature.tabularFigures(),
-                                            ],
-                                            shadows: kOverlayShadow,
-                                          ),
-                                        ),
+                                      ValueListenableBuilder<CastState>(
+                                        valueListenable:
+                                            StreamProxyBridge.castState,
+                                        builder: (context, castState, _) {
+                                          final castLatency =
+                                              castState.latencySeconds;
+
+                                          return Observer(
+                                            builder: (context) => Text(
+                                              castState.isCasting &&
+                                                      castLatency != null
+                                                  ? '${castLatency}s'
+                                                  : videoStore.latency ?? '—',
+                                              style: TextStyle(
+                                                color: surfaceColor,
+                                                fontWeight: FontWeight.w500,
+                                                fontFeatures: const [
+                                                  FontFeature.tabularFigures(),
+                                                ],
+                                                shadows: kOverlayShadow,
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
@@ -467,17 +508,26 @@ class VideoOverlay extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Tooltip(
-                        message: 'Enter picture-in-picture',
-                        preferBelow: false,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.picture_in_picture_alt_rounded,
-                            color: surfaceColor,
-                            shadows: kOverlayShadow,
-                          ),
-                          onPressed: videoStore.togglePictureInPicture,
-                        ),
+                      ValueListenableBuilder<CastState>(
+                        valueListenable: StreamProxyBridge.castState,
+                        builder: (context, castState, _) {
+                          if (castState.isCasting) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return Tooltip(
+                            message: 'Enter picture-in-picture',
+                            preferBelow: false,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.picture_in_picture_alt_rounded,
+                                color: surfaceColor,
+                                shadows: kOverlayShadow,
+                              ),
+                              onPressed: videoStore.togglePictureInPicture,
+                            ),
+                          );
+                        },
                       ),
                       refreshButton,
                       rotateButton,

@@ -6,6 +6,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_tabs.dart';
+import 'package:frosty/screens/channel/video/cast_aware_pointer_blocker.dart';
 import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
@@ -297,7 +298,9 @@ class _VideoChatState extends State<VideoChat>
 
     final player = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
-      child: Video(key: _videoKey, videoStore: _videoStore),
+      child: CastAwarePointerBlocker(
+        child: Video(key: _videoKey, videoStore: _videoStore),
+      ),
     );
 
     final overlay = GestureDetector(

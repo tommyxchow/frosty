@@ -65,6 +65,7 @@ class StreamProxyWebViewClient(
         if (request == null) return null
 
         val currentConfig = config
+        router.rememberUsherRequest(request.url.toString())
         val decision = router.route(
             url = request.url.toString(),
             method = request.method,
@@ -73,17 +74,19 @@ class StreamProxyWebViewClient(
         )
 
         if (decision.action != StreamProxyAction.PROXY) {
-            logDecision(decision)
+            if (currentConfig.enabled) {
+                logDecision(decision)
+            }
             return null
         }
 
         return try {
             val response = fetcher.fetch(
-                request = request,
+                request = request.toStreamProxyRequest(),
                 decision = decision,
                 config = currentConfig,
                 router = router,
-            )
+            )?.toWebResourceResponse()
 
             if (response == null) {
                 log(
@@ -164,4 +167,23 @@ class StreamProxyWebViewClient(
     companion object {
         private const val LOG_TAG = "FrostyStreamProxy"
     }
+}
+
+private fun WebResourceRequest.toStreamProxyRequest(): StreamProxyRequest {
+    return StreamProxyRequest(
+        url = url.toString(),
+        method = method,
+        headers = requestHeaders ?: emptyMap(),
+    )
+}
+
+private fun StreamProxyResponse.toWebResourceResponse(): WebResourceResponse {
+    return WebResourceResponse(
+        mimeType,
+        encoding,
+        statusCode,
+        reasonPhrase,
+        headers,
+        body,
+    )
 }
