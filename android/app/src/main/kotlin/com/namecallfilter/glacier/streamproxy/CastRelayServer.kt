@@ -85,7 +85,8 @@ class CastRelayServer(
                 InetAddress.getByName("0.0.0.0"),
             )
             serverSocket = socket
-            baseUrl = "http://${lanAddress()}:${socket.localPort}"
+            val relayAddress = lanAddress()
+            baseUrl = "http://$relayAddress:${socket.localPort}"
 
             Thread {
                 acceptLoop(socket)
@@ -95,7 +96,7 @@ class CastRelayServer(
                 start()
             }
 
-            log("cast_relay action=started url=$baseUrl")
+            log("cast_relay action=started url=$baseUrl address=$relayAddress")
         }
     }
 
@@ -227,6 +228,7 @@ class CastRelayServer(
                 selectedQuality = rewritten.selectedQuality
                 mimeType = "application/vnd.apple.mpegurl"
                 headers["Content-Type"] = "$mimeType; charset=utf-8"
+                CastRelayPlaylistHeaders.applyNoCache(headers)
             } else if (mimeType != null && headers.keys.none {
                     it.equals("Content-Type", ignoreCase = true)
                 }
@@ -416,20 +418,22 @@ class CastRelayServer(
             Collections.list(NetworkInterface.getNetworkInterfaces())
         }.getOrDefault(emptyList())
 
-        val address = interfaces
-            .asSequence()
-            .filter { it.isUp && !it.isLoopback }
+        val candidates = interfaces
+            .filter { networkInterface -> networkInterface.isUp && !networkInterface.isLoopback }
             .flatMap { networkInterface ->
-                Collections.list(networkInterface.inetAddresses).asSequence()
+                Collections.list(networkInterface.inetAddresses)
+                    .filterIsInstance<Inet4Address>()
+                    .map { address ->
+                        CastRelayLanAddressSelector.Candidate(
+                            interfaceName = networkInterface.name.orEmpty(),
+                            displayName = networkInterface.displayName.orEmpty(),
+                            address = address,
+                        )
+                    }
             }
-            .filterIsInstance<Inet4Address>()
-            .firstOrNull { address ->
-                !address.isLoopbackAddress &&
-                    !address.isLinkLocalAddress &&
-                    !address.isAnyLocalAddress
-            }
+        val selected = CastRelayLanAddressSelector.select(candidates)
 
-        return address?.hostAddress ?: "127.0.0.1"
+        return selected?.address?.hostAddress ?: "127.0.0.1"
     }
 
     private data class HttpRequest(
@@ -459,4 +463,67 @@ class CastRelayServer(
             "upgrade",
         )
     }
+}
+
+internal object CastRelayLanAddressSelector {
+    data class Candidate(
+        val interfaceName: String,
+        val displayName: String,
+        val address: Inet4Address,
+    )
+
+    fun select(candidates: List<Candidate>): Candidate? {
+        return candidates
+            .filter { candidate ->
+                val address = candidate.address
+                !address.isLoopbackAddress &&
+                    !address.isLinkLocalAddress &&
+                    !address.isAnyLocalAddress
+            }
+            .maxWithOrNull(
+                compareBy<Candidate> { interfaceScore(it) }
+                    .thenBy { addressScore(it.address) },
+            )
+    }
+
+    private fun interfaceScore(candidate: Candidate): Int {
+        val name = "${candidate.interfaceName} ${candidate.displayName}"
+            .lowercase(Locale.US)
+
+        return when {
+            preferredInterfaceTokens.any { name.contains(it) } -> 3
+            avoidedInterfaceTokens.any { name.contains(it) } -> 0
+            else -> 1
+        }
+    }
+
+    private fun addressScore(address: Inet4Address): Int {
+        return when {
+            address.isSiteLocalAddress -> 2
+            else -> 0
+        }
+    }
+
+    private val preferredInterfaceTokens = listOf(
+        "wlan",
+        "wifi",
+        "wi-fi",
+        "eth",
+        "ap",
+        "bridge",
+        "br-",
+    )
+
+    private val avoidedInterfaceTokens = listOf(
+        "rmnet",
+        "cell",
+        "mobile",
+        "pdp",
+        "ccmni",
+        "wwan",
+        "tun",
+        "tap",
+        "vpn",
+        "clat",
+    )
 }

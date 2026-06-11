@@ -269,7 +269,12 @@ class GlacierCastController(
                 "current_sec=${status.currentTimeSec ?: -1.0} " +
                 "range_start_sec=${status.rangeStartSec ?: -1.0} " +
                 "range_end_sec=${status.rangeEndSec ?: -1.0} " +
-                "target_sec=${status.targetLatencySec ?: -1.0}",
+                "target_sec=${status.targetLatencySec ?: -1.0} " +
+                "max_sec=${status.maxLatencySec ?: -1.0} " +
+                "playback_rate=${status.playbackRate ?: -1.0} " +
+                "requested_rate=${status.requestedPlaybackRate ?: -1.0} " +
+                "correction=${status.correction ?: ""} " +
+                "latency_before_correction_ms=${status.latencyBeforeCorrectionMs ?: -1}",
         )
     }
 

@@ -89,6 +89,32 @@ class HlsPlaylistRewriterTest {
     }
 
     @Test
+    fun rewritePlaylistRewritesLowLatencyHlsPartUrisThroughRelay() {
+        val playlist = """
+            #EXTM3U
+            #EXT-X-PART-INF:PART-TARGET=0.33334
+            #EXT-X-PART:DURATION=0.33334,URI="parts/segment-1.part0.m4s"
+            #EXT-X-PART:DURATION=0.33334,URI="https://video-weaver.example.hls.ttvnw.net/v1/parts/segment-1.part1.m4s"
+            #EXT-X-PRELOAD-HINT:TYPE=PART,URI="parts/segment-2.part0.m4s"
+        """.trimIndent()
+
+        val result = HlsPlaylistRewriter.rewritePlaylist(
+            body = playlist,
+            baseUrl = "https://video-weaver.example.hls.ttvnw.net/v1/playlist/live.m3u8",
+            selectedQuality = null,
+            rewriteUrl = { originalUrl ->
+                "http://phone/relay/${originalUrl.substringAfterLast("/")}"
+            },
+        )
+
+        assertTrue(result.body.contains("#EXT-X-PART:DURATION=0.33334,URI=\"http://phone/relay/segment-1.part0.m4s\""))
+        assertTrue(result.body.contains("#EXT-X-PART:DURATION=0.33334,URI=\"http://phone/relay/segment-1.part1.m4s\""))
+        assertTrue(result.body.contains("#EXT-X-PRELOAD-HINT:TYPE=PART,URI=\"http://phone/relay/segment-2.part0.m4s\""))
+        assertFalse(result.body.contains("URI=\"parts/segment-1.part0.m4s\""))
+        assertFalse(result.body.contains("URI=\"parts/segment-2.part0.m4s\""))
+    }
+
+    @Test
     fun rewritePlaylistSelectsHighestVariantWhenRequested() {
         val playlist = """
             #EXTM3U
