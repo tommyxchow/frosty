@@ -24,6 +24,7 @@ jobs:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       SECRET: ${{ secrets.SECRET }}
+      CAST_RECEIVER_APP_ID: ${{ secrets.CAST_RECEIVER_APP_ID }}
       UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -76,7 +77,7 @@ jobs:
         shell: bash
         run: |
           missing=0
-          for name in CLIENT_ID SECRET UPLOAD_KEYSTORE STORE_PASSWORD KEY_PASSWORD; do
+          for name in CLIENT_ID SECRET CAST_RECEIVER_APP_ID UPLOAD_KEYSTORE STORE_PASSWORD KEY_PASSWORD; do
             if [ -z "${!name}" ]; then
               echo "::error::$name secret is not set"
               missing=1
@@ -100,7 +101,7 @@ jobs:
       - name: Build release APK
         shell: bash
         run: |
-          flutter build apk --release --dart-define=CLIENT_ID="$CLIENT_ID" --dart-define=SECRET="$SECRET"
+          flutter build apk --release --dart-define=CLIENT_ID="$CLIENT_ID" --dart-define=SECRET="$SECRET" --dart-define=CAST_RECEIVER_APP_ID="$CAST_RECEIVER_APP_ID"
           mv build/app/outputs/flutter-apk/app-release.apk "${{ steps.release_info.outputs.apk_name }}"
 
       - name: Extract release notes

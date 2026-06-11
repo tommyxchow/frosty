@@ -58,6 +58,38 @@ class CastRelayUpstreamHeadersTest {
         assertTrue(headers["User-Agent"].orEmpty().contains("Mozilla/5.0"))
     }
 
+    @Test
+    fun forcesFreshPlaylistRequestsWithoutDroppingMediaRangeBehavior() {
+        val playlistHeaders = CastRelayUpstreamHeaders.build(
+            requestHeaders = mapOf(
+                "Accept" to "application/vnd.apple.mpegurl",
+                "Range" to "bytes=0-99",
+                "If-Match" to "\"old-match\"",
+                "If-None-Match" to "\"old-none-match\"",
+                "If-Modified-Since" to "Wed, 21 Oct 2015 07:28:00 GMT",
+                "If-Unmodified-Since" to "Wed, 21 Oct 2015 07:28:00 GMT",
+            ),
+            config = disabledConfig(),
+            isPlaylistRequest = true,
+        )
+
+        assertFalse(playlistHeaders.containsKey("Range"))
+        assertFalse(playlistHeaders.containsKey("If-Match"))
+        assertFalse(playlistHeaders.containsKey("If-None-Match"))
+        assertFalse(playlistHeaders.containsKey("If-Modified-Since"))
+        assertFalse(playlistHeaders.containsKey("If-Unmodified-Since"))
+        assertEquals("no-cache, no-store, max-age=0", playlistHeaders["Cache-Control"])
+        assertEquals("no-cache", playlistHeaders["Pragma"])
+
+        val mediaHeaders = CastRelayUpstreamHeaders.build(
+            requestHeaders = mapOf("Range" to "bytes=0-99"),
+            config = disabledConfig(),
+            isPlaylistRequest = false,
+        )
+
+        assertEquals("bytes=0-99", mediaHeaders["Range"])
+    }
+
     private fun disabledConfig() = StreamProxyConfig(
         mode = StreamProxyMode.OFF,
         currentChannelLogin = "streamer",

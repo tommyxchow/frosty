@@ -26,18 +26,13 @@
 		(() => {
 			const MESSAGE_NAMESPACE = 'urn:x-cast:com.namecallfilter.glacier.cast';
 
-			const TARGET_LATENCY_SECONDS = 1.0;
+			const TARGET_LATENCY_SECONDS = 2.0;
 			const MAX_LATENCY_SECONDS = 5.0;
 
 			const STATUS_INTERVAL_MS = 1000;
 			const LATENCY_CHECK_INTERVAL_MS = 500;
-			const STARTUP_LIVE_SEEK_ATTEMPTS = 12;
-			const STARTUP_LIVE_SEEK_THRESHOLD_SECONDS = TARGET_LATENCY_SECONDS + 0.25;
-			const MAX_CATCHUP_PLAYBACK_RATE = 1.1;
-			const MIN_CATCHUP_PLAYBACK_RATE = 1.012;
-			const CATCHUP_RATE_PER_SECOND_BEHIND = 0.025;
-			const PLAYBACK_RATE_RESET_TOLERANCE_SECONDS = 0.2;
-			const PLAYBACK_RATE_CHANGE_EPSILON = 0.002;
+			const STARTUP_LIVE_SEEK_THRESHOLD_SECONDS = TARGET_LATENCY_SECONDS + 0.5;
+			const MAX_LATENCY_SEEK_COOLDOWN_MS = 8000;
 
 			const context = cast.framework.CastReceiverContext.getInstance();
 			const playerManager = context.getPlayerManager();
@@ -52,11 +47,11 @@
 				streaming: {
 					lowLatencyMode: true,
 
-					bufferingGoal: 1.5,
-					rebufferingGoal: 0.25,
-					bufferBehind: 3,
+					bufferingGoal: 3,
+					rebufferingGoal: 0.75,
+					bufferBehind: 6,
 
-					updateIntervalSeconds: 0.1,
+					updateIntervalSeconds: 0.5,
 
 					segmentPrefetchLimit: 2,
 					inaccurateManifestTolerance: 0,
@@ -67,8 +62,8 @@
 						targetLatency: TARGET_LATENCY_SECONDS,
 						targetLatencyTolerance: 0.25,
 
-						maxPlaybackRate: 1,
-						minPlaybackRate: 1,
+						maxPlaybackRate: 1.1,
+						minPlaybackRate: 0.98,
 
 						panicMode: false,
 						panicThreshold: MAX_LATENCY_SECONDS,
@@ -116,13 +111,8 @@
 			const finiteNumber = (value) =>
 				typeof value === 'number' && Number.isFinite(value);
 
-			const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-
-			const roundedPlaybackRate = (value) => Math.round(value * 1000) / 1000;
-
-			let requestedPlaybackRate = 1.0;
 			let pendingStartupLiveSeek = false;
-			let startupLiveSeekAttempts = 0;
+			let lastMaxLatencySeekAtMs = 0;
 
 			const currentPlaybackRate = () => {
 				if (typeof playerManager.getPlaybackRate === 'function') {
@@ -137,47 +127,7 @@
 					return mediaElement.playbackRate;
 				}
 
-				return requestedPlaybackRate;
-			};
-
-			const setPlaybackRate = (playbackRate) => {
-				const nextRate = roundedPlaybackRate(playbackRate);
-				const currentRate = currentPlaybackRate();
-				if (
-					Math.abs(currentRate - nextRate) < PLAYBACK_RATE_CHANGE_EPSILON &&
-					Math.abs(requestedPlaybackRate - nextRate) < PLAYBACK_RATE_CHANGE_EPSILON
-				) {
-					return true;
-				}
-
-				requestedPlaybackRate = nextRate;
-
-				try {
-					const request =
-						new cast.framework.messages.SetPlaybackRateRequestData();
-					request.type = cast.framework.messages.MessageType.SET_PLAYBACK_RATE;
-					request.playbackRate = nextRate;
-					playerManager.sendLocalMediaRequest(request);
-					return true;
-				} catch (_) {
-					return false;
-				}
-			};
-
-			const catchupPlaybackRate = (latencySeconds) => {
-				const secondsBehindTarget = latencySeconds - TARGET_LATENCY_SECONDS;
-				if (secondsBehindTarget <= PLAYBACK_RATE_RESET_TOLERANCE_SECONDS) {
-					return 1.0;
-				}
-
-				const scaledIncrease = secondsBehindTarget * CATCHUP_RATE_PER_SECOND_BEHIND;
-				return roundedPlaybackRate(
-					1.0 + clamp(
-						scaledIncrease,
-						MIN_CATCHUP_PLAYBACK_RATE - 1.0,
-						MAX_CATCHUP_PLAYBACK_RATE - 1.0,
-					),
-				);
+				return 1.0;
 			};
 
 			const liveStatus = () => {
@@ -214,20 +164,19 @@
 					targetLatencySec: TARGET_LATENCY_SECONDS,
 					maxLatencySec: MAX_LATENCY_SECONDS,
 					playbackRate: currentPlaybackRate(),
-					requestedPlaybackRate,
 					latencyReference: 'receiverLiveSeekableRange',
 					...extra,
 				});
 			};
 
-			const seekToTargetLive = () => {
+			const seekToLiveLatency = (latencySeconds) => {
 				const status = liveStatus();
 				if (!status) return false;
 
 				const start = status.rangeStart == null ? 0 : status.rangeStart;
 				const targetTime = Math.max(
 					start,
-					status.rangeEnd - TARGET_LATENCY_SECONDS,
+					status.rangeEnd - latencySeconds,
 				);
 
 				playerManager.seek({
@@ -238,6 +187,8 @@
 				return true;
 			};
 
+			const seekToTargetLive = () => seekToLiveLatency(TARGET_LATENCY_SECONDS);
+
 			const jumpToLive = () => {
 				const ok = seekToTargetLive();
 				sendStatus({correction: ok ? 'manualJumpToLive' : 'manualJumpFailed'});
@@ -247,26 +198,17 @@
 			const tryStartupLiveSeek = () => {
 				if (!pendingStartupLiveSeek) return false;
 
-				startupLiveSeekAttempts += 1;
+				pendingStartupLiveSeek = false;
 
 				const status = liveStatus();
 				if (!status) {
-					if (startupLiveSeekAttempts >= STARTUP_LIVE_SEEK_ATTEMPTS) {
-						pendingStartupLiveSeek = false;
-						sendStatus({correction: 'startupJumpUnavailable'});
-					}
-
+					sendStatus({correction: 'startupJumpUnavailable'});
 					return false;
 				}
 
-				if (status.latency <= STARTUP_LIVE_SEEK_THRESHOLD_SECONDS) {
-					pendingStartupLiveSeek = false;
-					return false;
-				}
+				if (status.latency <= STARTUP_LIVE_SEEK_THRESHOLD_SECONDS) return false;
 
 				const ok = seekToTargetLive();
-				pendingStartupLiveSeek =
-					!ok && startupLiveSeekAttempts < STARTUP_LIVE_SEEK_ATTEMPTS;
 				sendStatus({
 					correction: ok ? 'startupJumpToLive' : 'startupJumpFailed',
 					latencyBeforeCorrectionMs: Math.round(status.latency * 1000),
@@ -275,37 +217,31 @@
 				return ok;
 			};
 
+			const enforceMaxLatencySeek = (status) => {
+				if (status.latency <= MAX_LATENCY_SECONDS) return;
+				if (Date.now() - lastMaxLatencySeekAtMs < MAX_LATENCY_SEEK_COOLDOWN_MS) return;
+
+				lastMaxLatencySeekAtMs = Date.now();
+				const ok = seekToTargetLive();
+
+				sendStatus({
+					correction: ok ? 'maxLatencyJumpToLive' : 'maxLatencyJumpFailed',
+					latencyBeforeCorrectionMs: Math.round(status.latency * 1000),
+				});
+			};
+
 			const enforceMaxLatency = () => {
 				const state = playerManager.getPlayerState();
-				const active =
-					state === 'PLAYING' || (pendingStartupLiveSeek && state === 'BUFFERING');
+				const active = state === 'PLAYING' || state === 'BUFFERING';
 
 				if (!active) return;
 
 				if (tryStartupLiveSeek()) return;
 
-				if (state !== 'PLAYING') return;
-
 				const status = liveStatus();
 				if (!status) return;
 
-				const nextPlaybackRate = catchupPlaybackRate(status.latency);
-				const changed = setPlaybackRate(nextPlaybackRate);
-				const correction =
-					nextPlaybackRate > 1.0
-						? 'playbackRateCatchup'
-						: 'playbackRateNormal';
-
-				if (
-					status.latency > MAX_LATENCY_SECONDS ||
-					Math.abs(currentPlaybackRate() - nextPlaybackRate) >=
-					PLAYBACK_RATE_CHANGE_EPSILON
-				) {
-					sendStatus({
-						correction: changed ? correction : 'playbackRateChangeFailed',
-						latencyBeforeCorrectionMs: Math.round(status.latency * 1000),
-					});
-				}
+				enforceMaxLatencySeek(status);
 			};
 
 			playerManager.setMessageInterceptor(
@@ -313,9 +249,8 @@
 				(loadRequestData) => {
 					const media = loadRequestData.media;
 
-					requestedPlaybackRate = 1.0;
 					pendingStartupLiveSeek = true;
-					startupLiveSeekAttempts = 0;
+					lastMaxLatencySeekAtMs = 0;
 
 					if (media) {
 						media.entity = media.entity || media.contentId;

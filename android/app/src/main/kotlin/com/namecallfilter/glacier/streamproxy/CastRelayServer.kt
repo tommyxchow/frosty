@@ -1,6 +1,7 @@
 package com.namecallfilter.glacier.streamproxy
 
 import java.io.Closeable
+import java.io.InputStream
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -169,9 +170,15 @@ class CastRelayServer(
         }
 
         val currentConfig = config
+        val upstreamUrl = upstreamUrlFor(
+            sourceUrl = target.sourceUrl,
+            relayTarget = request.target,
+        )
+        val playlistRequest = isPlaylistUrl(target.sourceUrl)
         val requestHeaders = CastRelayUpstreamHeaders.build(
             requestHeaders = request.headers,
             config = currentConfig,
+            isPlaylistRequest = playlistRequest,
         )
         val upstreamMethod = if (request.method.equals("HEAD", ignoreCase = true)) {
             "HEAD"
@@ -179,7 +186,7 @@ class CastRelayServer(
             "GET"
         }
         val upstreamRequest = StreamProxyRequest(
-            url = target.sourceUrl,
+            url = upstreamUrl,
             method = upstreamMethod,
             headers = requestHeaders,
         )
@@ -205,55 +212,79 @@ class CastRelayServer(
 
         response.use { upstream ->
             val headOnly = request.method.equals("HEAD", ignoreCase = true)
-            var body = if (headOnly) {
-                ByteArray(0)
-            } else {
-                upstream.body.readBytes()
-            }
             val headers = responseHeaders(upstream)
             var mimeType = upstream.mimeType
             var selectedQuality: String? = null
+            val playlistResponse = isPlaylistResponse(upstreamUrl, upstream)
 
-            if (!headOnly && isPlaylistResponse(target.sourceUrl, upstream)) {
-                val playlist = decodeBody(body, upstream.encoding)
-                val rewritten = HlsPlaylistRewriter.rewritePlaylist(
-                    body = playlist,
-                    baseUrl = target.sourceUrl,
-                    selectedQuality = target.selectedQuality,
-                    rewriteUrl = { nestedSourceUrl ->
-                        relayUrlFor(nestedSourceUrl)
-                    },
-                )
-                body = rewritten.body.toByteArray(StandardCharsets.UTF_8)
-                selectedQuality = rewritten.selectedQuality
+            if (playlistResponse) {
+                var body = if (headOnly) {
+                    ByteArray(0)
+                } else {
+                    val playlist = decodeBody(upstream.body.readBytes(), upstream.encoding)
+                    val rewritten = HlsPlaylistRewriter.rewritePlaylist(
+                        body = playlist,
+                        baseUrl = upstreamUrl,
+                        selectedQuality = target.selectedQuality,
+                        rewriteUrl = { nestedSourceUrl ->
+                            relayUrlFor(nestedSourceUrl)
+                        },
+                    )
+                    selectedQuality = rewritten.selectedQuality
+                    rewritten.body.toByteArray(StandardCharsets.UTF_8)
+                }
                 mimeType = "application/vnd.apple.mpegurl"
                 headers["Content-Type"] = "$mimeType; charset=utf-8"
                 CastRelayPlaylistHeaders.applyNoCache(headers)
-            } else if (mimeType != null && headers.keys.none {
+                headers.putAll(corsHeaders())
+                headers["Content-Length"] = body.size.toString()
+
+                log(
+                    "cast_relay action=response method=${request.method} " +
+                        "path=$path status=${upstream.statusCode} " +
+                        "source=${sourceDescription(upstreamUrl)} " +
+                        "bytes=${body.size} mime=${mimeType.orEmpty()} " +
+                        "playlist=true selected_quality=${selectedQuality.orEmpty()}",
+                )
+
+                sendResponse(
+                    socket = socket,
+                    statusCode = upstream.statusCode,
+                    reasonPhrase = upstream.reasonPhrase,
+                    headers = headers,
+                    body = body,
+                    headOnly = headOnly,
+                )
+                return@use
+            }
+
+            if (mimeType != null && headers.keys.none {
                     it.equals("Content-Type", ignoreCase = true)
                 }
             ) {
                 headers["Content-Type"] = mimeType
             }
-
+            upstreamHeader(upstream.headers, "Content-Length")
+                ?.takeIf(String::isNotBlank)
+                ?.let { contentLength ->
+                    headers["Content-Length"] = contentLength
+                }
             headers.putAll(corsHeaders())
-            headers["Content-Length"] = body.size.toString()
-            log(
-                "cast_relay action=response method=${request.method} " +
-                    "path=$path status=${upstream.statusCode} " +
-                    "source=${sourceDescription(target.sourceUrl)} " +
-                    "bytes=${body.size} mime=${mimeType.orEmpty()} " +
-                    "playlist=${isPlaylistResponse(target.sourceUrl, upstream)} " +
-                    "selected_quality=${selectedQuality.orEmpty()}",
-            )
 
-            sendResponse(
+            val bytes = sendStreamingResponse(
                 socket = socket,
                 statusCode = upstream.statusCode,
                 reasonPhrase = upstream.reasonPhrase,
                 headers = headers,
-                body = body,
+                body = upstream.body,
                 headOnly = headOnly,
+            )
+            log(
+                "cast_relay action=response method=${request.method} " +
+                    "path=$path status=${upstream.statusCode} " +
+                    "source=${sourceDescription(upstreamUrl)} " +
+                    "bytes=$bytes mime=${mimeType.orEmpty()} " +
+                    "playlist=false selected_quality=",
             )
         }
     }
@@ -314,6 +345,38 @@ class CastRelayServer(
         body: ByteArray,
         headOnly: Boolean,
     ) {
+        val output = sendResponseHeaders(socket, statusCode, reasonPhrase, headers)
+        if (!headOnly) {
+            output.write(body)
+        }
+        output.flush()
+    }
+
+    private fun sendStreamingResponse(
+        socket: Socket,
+        statusCode: Int,
+        reasonPhrase: String,
+        headers: Map<String, String>,
+        body: InputStream,
+        headOnly: Boolean,
+    ): Long {
+        val output = sendResponseHeaders(socket, statusCode, reasonPhrase, headers)
+        if (headOnly) {
+            output.flush()
+            return 0L
+        }
+
+        val bytes = body.copyTo(output, STREAM_BUFFER_SIZE)
+        output.flush()
+        return bytes
+    }
+
+    private fun sendResponseHeaders(
+        socket: Socket,
+        statusCode: Int,
+        reasonPhrase: String,
+        headers: Map<String, String>,
+    ): java.io.OutputStream {
         val output = socket.getOutputStream()
         val headerText = buildString {
             append("HTTP/1.1 ")
@@ -332,10 +395,8 @@ class CastRelayServer(
         }
 
         output.write(headerText.toByteArray(StandardCharsets.ISO_8859_1))
-        if (!headOnly) {
-            output.write(body)
-        }
         output.flush()
+        return output
     }
 
     private fun corsHeaders(): Map<String, String> {
@@ -370,6 +431,45 @@ class CastRelayServer(
         return mimeType.contains("mpegurl", ignoreCase = true) ||
             mimeType.contains("m3u8", ignoreCase = true) ||
             URI(sourceUrl).path?.endsWith(".m3u8", ignoreCase = true) == true
+    }
+
+    private fun isPlaylistUrl(sourceUrl: String): Boolean {
+        return runCatching {
+            URI(sourceUrl).path?.endsWith(".m3u8", ignoreCase = true) == true
+        }.getOrDefault(false)
+    }
+
+    private fun upstreamUrlFor(sourceUrl: String, relayTarget: String): String {
+        val relayQuery = relayTarget
+            .substringAfter("?", missingDelimiterValue = "")
+            .takeIf(String::isNotEmpty)
+            ?: return sourceUrl
+
+        val fragmentIndex = sourceUrl.indexOf("#")
+        val sourceWithoutFragment = if (fragmentIndex >= 0) {
+            sourceUrl.substring(0, fragmentIndex)
+        } else {
+            sourceUrl
+        }
+        val fragment = if (fragmentIndex >= 0) {
+            sourceUrl.substring(fragmentIndex)
+        } else {
+            ""
+        }
+        val separator = when {
+            sourceWithoutFragment.endsWith("?") ||
+                sourceWithoutFragment.endsWith("&") -> ""
+            sourceWithoutFragment.contains("?") -> "&"
+            else -> "?"
+        }
+
+        return "$sourceWithoutFragment$separator$relayQuery$fragment"
+    }
+
+    private fun upstreamHeader(headers: Map<String, String>, name: String): String? {
+        return headers.entries
+            .firstOrNull { (key, _) -> key.equals(name, ignoreCase = true) }
+            ?.value
     }
 
     private fun decodeBody(bytes: ByteArray, encoding: String?): String {
@@ -449,6 +549,7 @@ class CastRelayServer(
 
     private companion object {
         private const val SERVER_BACKLOG = 32
+        private const val STREAM_BUFFER_SIZE = 64 * 1024
 
         private val hopByHopHeaders = setOf(
             "connection",

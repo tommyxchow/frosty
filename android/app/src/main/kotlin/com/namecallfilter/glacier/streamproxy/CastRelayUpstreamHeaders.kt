@@ -6,6 +6,7 @@ object CastRelayUpstreamHeaders {
     fun build(
         requestHeaders: Map<String, String>,
         config: StreamProxyConfig,
+        isPlaylistRequest: Boolean = false,
     ): Map<String, String> {
         val headers = linkedMapOf<String, String>()
         val requestHeaderLookup = requestHeaders.entries.associateBy {
@@ -19,10 +20,22 @@ object CastRelayUpstreamHeaders {
         headers["User-Agent"] = DEFAULT_USER_AGENT
 
         passthroughHeaderNames.forEach { headerName ->
+            if (
+                isPlaylistRequest &&
+                playlistFreshnessRequestHeaderNames.contains(headerName.lowercase(Locale.US))
+            ) {
+                return@forEach
+            }
+
             requestHeaderLookup[headerName.lowercase(Locale.US)]
                 ?.value
                 ?.takeIf(String::isNotBlank)
                 ?.let { value -> headers[headerName] = value }
+        }
+
+        if (isPlaylistRequest) {
+            headers["Cache-Control"] = "no-cache, no-store, max-age=0"
+            headers["Pragma"] = "no-cache"
         }
 
         return headers
@@ -56,5 +69,13 @@ object CastRelayUpstreamHeaders {
         "If-None-Match",
         "If-Modified-Since",
         "If-Unmodified-Since",
+    )
+
+    private val playlistFreshnessRequestHeaderNames = setOf(
+        "range",
+        "if-match",
+        "if-none-match",
+        "if-modified-since",
+        "if-unmodified-since",
     )
 }
