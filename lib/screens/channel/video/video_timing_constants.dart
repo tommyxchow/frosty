@@ -28,6 +28,23 @@ class VideoTimingConstants {
   static const int highLatencyThresholdSeconds = 30;
   static const int chatSyncDriftToleranceSeconds = 2;
 
+  /// Maximum consecutive high-latency interventions (seek/refresh) before
+  /// giving up on latency-driven recovery. Persistent high readings usually
+  /// mean device clock skew or a device that can't keep up — looping
+  /// recoveries forever makes playback worse, not better.
+  static const int maxHighLatencyRecoveries = 3;
+
+  /// How long a quality switch may suppress stall classification before the
+  /// flag expires. A resolution-only switch never interrupts playback, so no
+  /// play/pause event arrives to clear it — without this backstop the flag
+  /// sticks for the whole session and disables stall recovery.
+  static const qualitySwitchGrace = Duration(seconds: 5);
+
+  /// Delay before re-checking /streams when the first check reports offline.
+  /// Helix transiently drops live streams from results; a single failed
+  /// check isn't enough to tear down healthy playback.
+  static const offlineConfirmationDelay = Duration(seconds: 2);
+
   // Overlay
   static const overlayAutoHide = Duration(seconds: 5);
   static const overlayQuickHide = Duration(seconds: 3);

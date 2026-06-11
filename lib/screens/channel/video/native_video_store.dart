@@ -76,6 +76,12 @@ abstract class NativeVideoStoreBase
   DateTime? _lastPlayingStart;
   int _shortPlayBounceCount = 0;
   var _isQualitySwitching = false;
+  Timer? _qualitySwitchGraceTimer;
+
+  /// Set when an automatic refresh was suppressed because the user had
+  /// paused (e.g. the playback session expired mid-pause). Consumed by
+  /// [handlePausePlay] to refresh instead of playing a dead session.
+  var _pendingRefreshOnResume = false;
   var _initGeneration = 0;
   static final _bareResolutionRe = RegExp(r'^(\d+)p$');
 
@@ -536,6 +542,12 @@ abstract class NativeVideoStoreBase
         statusCode >= 400 &&
         statusCode < 500 &&
         !_isWithinRecoveryCap()) {
+      if (_userPaused) {
+        // Don't yank a user-paused stream back to life — the refresh would
+        // reload with autoplay. Defer until they resume.
+        _pendingRefreshOnResume = true;
+        return;
+      }
       debugPrint(
         'NativeVideoStore: $statusCode on HLS fetch, refreshing with fresh '
         'token (attempt ${_totalRefreshAttempts + 1}/${VideoTimingConstants.maxRefreshAttempts})',
@@ -547,8 +559,9 @@ abstract class NativeVideoStoreBase
 
     // Check stream liveness before showing the error — an offline channel
     // is expected to 404 and the overlay handles it.
+    final generation = _initGeneration;
     updateStreamInfo(forceUpdate: true).then((_) {
-      if (_disposed) return;
+      if (_disposed || generation != _initGeneration) return;
       runInAction(() {
         if (_streamInfo != null) {
           _recordNativePlaybackError(
@@ -600,6 +613,14 @@ abstract class NativeVideoStoreBase
         _overlayVisible = true;
         _overlayTimer?.cancel();
       });
+      return;
+    }
+
+    if (_userPaused) {
+      // The player is orphaned either way, but don't auto-resume a stream
+      // the user paused — rebuild when they tap play.
+      _disposeController();
+      _pendingRefreshOnResume = true;
       return;
     }
 
@@ -795,6 +816,15 @@ abstract class NativeVideoStoreBase
         !_loading &&
         !_userPaused) {
       _highLatencyCount++;
+      // Still high after several interventions — the reading can't be
+      // trusted (device clock skew) or the device genuinely can't keep up.
+      // Either way, looping seeks/refreshes forever makes playback worse.
+      // The counter survives refreshes and only resets on a healthy
+      // reading, so a persistent condition stops recovery permanently.
+      if (_highLatencyCount >
+          VideoTimingConstants.maxHighLatencyRecoveries) {
+        return;
+      }
       if (_isInPipMode || _highLatencyCount == 1) {
         // During PiP, only seek to live edge — handleRefresh() disposes
         // the controller which kills PiP.
@@ -803,13 +833,16 @@ abstract class NativeVideoStoreBase
         );
         _controller?.seekToLiveEdge();
         _controller?.play();
-      } else {
+      } else if (!_isWithinRecoveryCap() &&
+          _backoffDelayRemaining() == Duration.zero) {
         debugPrint(
-          'NativeVideoStore: latency still high (${rounded}s), refreshing',
+          'NativeVideoStore: latency still high (${rounded}s), refreshing '
+          '(attempt ${_totalRefreshAttempts + 1}/${VideoTimingConstants.maxRefreshAttempts})',
         );
-        _highLatencyCount = 0;
+        _totalRefreshAttempts++;
         _handleRefresh(userInitiated: false);
       }
+      // Within the refresh cap/backoff window — wait for the next poll.
       return;
     }
     _highLatencyCount = 0;
@@ -867,6 +900,13 @@ abstract class NativeVideoStoreBase
 
   @override
   void handlePausePlay() {
+    if (_pendingRefreshOnResume) {
+      // The playback session died while user-paused (token expiry, media
+      // services reset) — playing the dead session would no-op or error.
+      _pendingRefreshOnResume = false;
+      _handleRefresh(userInitiated: false);
+      return;
+    }
     if (_controller == null) return;
     if (_paused) {
       _userPaused = false;
@@ -913,8 +953,11 @@ abstract class NativeVideoStoreBase
       _isStalled = false;
       _hasPlayedOnce = false;
       _userPaused = false;
+      _pendingRefreshOnResume = false;
       _stallRecoveryAttempt = 0;
-      _highLatencyCount = 0;
+      // _highLatencyCount intentionally survives refreshes so the
+      // latency-recovery cap can stop a persistent loop; it resets on the
+      // next healthy latency reading.
       _firstTimeSettingQuality = true;
       _pendingQualityIndex = null;
       _isQualitySwitching = false;
@@ -1009,19 +1052,35 @@ abstract class NativeVideoStoreBase
   @action
   Future<void> _setStreamQualityIndex(int index) async {
     _streamQualityIndex = index;
-    if (_controller == null) return;
+    final controller = _controller;
+    if (controller == null) return;
 
     _isQualitySwitching = true;
+    // A resolution-only switch never interrupts playback, so no play/pause
+    // event arrives to clear the flag — expire it after a grace window or
+    // it sticks for the session and disables stall classification.
+    _qualitySwitchGraceTimer?.cancel();
+    _qualitySwitchGraceTimer = Timer(
+      VideoTimingConstants.qualitySwitchGrace,
+      () {
+        if (_disposed) return;
+        runInAction(() => _isQualitySwitching = false);
+      },
+    );
 
     if (index == 0) {
       // 'Auto' — reset to adaptive quality
-      await _controller!.setQuality(NativeVideoPlayerQuality.auto());
+      await controller.setQuality(NativeVideoPlayerQuality.auto());
     } else {
       final qualityIndex = index - 1;
       if (qualityIndex >= 0 && qualityIndex < _qualityObjects.length) {
-        await _controller!.setQuality(_qualityObjects[qualityIndex]);
+        await controller.setQuality(_qualityObjects[qualityIndex]);
       }
     }
+
+    // The controller can be disposed or replaced during the platform call
+    // (user backs out, chat-only toggle, media services reset).
+    if (_disposed || !identical(controller, _controller)) return;
 
     // Toggle background PiP based on audio-only mode.
     // Only call when the mode actually changes to avoid unnecessary
@@ -1035,9 +1094,9 @@ abstract class NativeVideoStoreBase
       _isAudioOnlyMode = isAudioOnly;
       if (Platform.isIOS) {
         if (isAudioOnly) {
-          _controller!.disableAutomaticInlinePip();
+          controller.disableAutomaticInlinePip();
         } else {
-          _controller!.enableAutomaticInlinePip();
+          controller.enableAutomaticInlinePip();
         }
       } else if (Platform.isAndroid && _autoPipAvailable == true) {
         if (isAudioOnly) {
@@ -1139,6 +1198,7 @@ abstract class NativeVideoStoreBase
     _stallRecoveryTimer?.cancel();
     _initRetryTimer?.cancel();
     _healthyPlaybackTimer?.cancel();
+    _qualitySwitchGraceTimer?.cancel();
     _pipSub?.cancel();
     _pipSub = null;
     _qualitiesSub?.cancel();
@@ -1157,6 +1217,7 @@ abstract class NativeVideoStoreBase
   void _resetPlayerStateCommon() {
     _hasPlayedOnce = false;
     _userPaused = false;
+    _pendingRefreshOnResume = false;
     _paused = true;
     _isStalled = false;
     _isQualitySwitching = false;

@@ -63,11 +63,23 @@ class StreamInfoPoller {
       final info = await twitchApi.getStream(userLogin: userLogin);
       return StreamInfoResult(stream: info);
     } catch (_) {
+      // Helix can transiently drop a live stream from /streams (or 500 on
+      // one endpoint while others succeed). A false "confirmed offline"
+      // tears down latency polling and chat delay on healthy playback, so
+      // require a second failed check before falling back to /channels.
       try {
-        final channel = await twitchApi.getChannel(userId: userId);
-        return StreamInfoResult(offlineChannel: channel);
+        await Future<void>.delayed(
+          VideoTimingConstants.offlineConfirmationDelay,
+        );
+        final info = await twitchApi.getStream(userLogin: userLogin);
+        return StreamInfoResult(stream: info);
       } catch (_) {
-        return const StreamInfoResult();
+        try {
+          final channel = await twitchApi.getChannel(userId: userId);
+          return StreamInfoResult(offlineChannel: channel);
+        } catch (_) {
+          return const StreamInfoResult();
+        }
       }
     }
   }
