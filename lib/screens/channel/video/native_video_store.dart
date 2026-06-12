@@ -703,14 +703,12 @@ abstract class NativeVideoStoreBase
       return;
     }
 
-    // Ad-pod transitions cause brief discontinuities that look like stalls.
-    // Defer (not skip) recovery so a genuine stall surviving the ad break
-    // still gets handled once the break ends.
-    if (_isAdBreakActive) {
-      debugPrint('NativeVideoStore: stall during ad break, deferring recovery');
-      _startStallRecoveryTimer();
-      return;
-    }
+    // Note: recovery deliberately does NOT defer during ad breaks. Ad-pod
+    // transition glitches resolve well inside the 8s stall window, attempt-1
+    // recovery (seek to edge + play) is harmless mid-pod, and the native
+    // ad-break flag can freeze at true when paused (the time observer that
+    // re-evaluates it stops firing) — gating recovery on it deadlocks the
+    // player into a permanent pause.
 
     // When a stream ends the HLS server stops serving segments, causing
     // the player to stall indefinitely. Skip recovery if the stream is
