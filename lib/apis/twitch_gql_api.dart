@@ -56,7 +56,10 @@ class TwitchGqlApi extends BaseApiClient {
       'platform': 'web',
     };
 
-    final persistedBody = {
+    Future<JsonMap> query(Map<String, Object> body) =>
+        post<JsonMap>('/gql', data: body, headers: headers);
+
+    final response = await query({
       'operationName': 'PlaybackAccessToken',
       'extensions': {
         'persistedQuery': {
@@ -67,13 +70,7 @@ class TwitchGqlApi extends BaseApiClient {
         },
       },
       'variables': variables,
-    };
-
-    final response = await post<JsonMap>(
-      '/gql',
-      data: persistedBody,
-      headers: headers,
-    );
+    });
 
     // PersistedQueryNotFound (or similar) comes back as a 200 with an
     // errors array — retry once with the inline template before failing.
@@ -82,18 +79,14 @@ class TwitchGqlApi extends BaseApiClient {
         'TwitchGqlApi: persisted query failed (${response['errors']}), '
         'falling back to inline template',
       );
-      final templateBody = {
-        'operationName': 'PlaybackAccessToken_Template',
-        'query':
-            'query PlaybackAccessToken_Template(\$login: String!, \$isLive: Boolean!, \$vodID: ID!, \$isVod: Boolean!, \$playerType: String!) { streamPlaybackAccessToken(channelName: \$login, params: {platform: "web", playerBackend: "mediaplayer", playerType: \$playerType}) @include(if: \$isLive) { value signature __typename } videoPlaybackAccessToken(id: \$vodID, params: {platform: "web", playerBackend: "mediaplayer", playerType: \$playerType}) @include(if: \$isVod) { value signature __typename } }',
-        'variables': variables,
-      };
-      final fallback = await post<JsonMap>(
-        '/gql',
-        data: templateBody,
-        headers: headers,
+      return PlaybackAccessToken.fromGqlResponse(
+        await query({
+          'operationName': 'PlaybackAccessToken_Template',
+          'query':
+              'query PlaybackAccessToken_Template(\$login: String!, \$isLive: Boolean!, \$vodID: ID!, \$isVod: Boolean!, \$playerType: String!) { streamPlaybackAccessToken(channelName: \$login, params: {platform: "web", playerBackend: "mediaplayer", playerType: \$playerType}) @include(if: \$isLive) { value signature __typename } videoPlaybackAccessToken(id: \$vodID, params: {platform: "web", playerBackend: "mediaplayer", playerType: \$playerType}) @include(if: \$isVod) { value signature __typename } }',
+          'variables': variables,
+        }),
       );
-      return PlaybackAccessToken.fromGqlResponse(fallback);
     }
 
     return PlaybackAccessToken.fromGqlResponse(response);
