@@ -111,10 +111,6 @@ abstract class NativeVideoStoreBase
   /// suspended rather than burning refresh attempts on ad-induced noise.
   var _isAdBreakActive = false;
 
-  /// True while playback runs at [VideoTimingConstants.catchUpPlaybackRate]
-  /// to glide back toward the live edge. Not observable — no UI reflects it.
-  var _isCatchingUp = false;
-
   @readonly
   var _loading = true;
 
@@ -275,9 +271,6 @@ abstract class NativeVideoStoreBase
 
       _adBreakSub = _controller!.adBreakStream.listen((isActive) {
         _isAdBreakActive = isActive;
-        // Latency polling is suspended during the pod, so an engaged
-        // catch-up would otherwise stay at 1.05x for the whole break.
-        if (isActive) _stopCatchUp();
         debugPrint(
           'NativeVideoStore: ad break ${isActive ? 'started' : 'ended'}',
         );
@@ -862,9 +855,6 @@ abstract class NativeVideoStoreBase
         !_loading &&
         !_userPaused) {
       _highLatencyCount++;
-      // Seek/refresh intervention takes over from here — 1.05x right after
-      // a seek to the live edge (2s headroom) would invite an instant stall.
-      _stopCatchUp();
       // Still high after several interventions — the reading can't be
       // trusted (device clock skew) or the device genuinely can't keep up.
       // Either way, looping seeks/refreshes forever makes playback worse.
@@ -903,50 +893,11 @@ abstract class NativeVideoStoreBase
       });
     }
 
-    _maybeAdjustCatchUp(seconds);
-
     // Skip chat sync when the player isn't actively progressing against
     // the live edge — a stall/pause leaves the live edge racing ahead and
     // would inflate syncedChatDelay unbounded.
     if (_paused || _loading || _userPaused || _isStalled) return;
     _chatLatencySync.report(seconds);
-  }
-
-  /// Gently speeds playback when latency drifts above target so the player
-  /// glides back toward the live edge. Never seeks or pauses — speed is the
-  /// only thing touched, and only on iOS: ExoPlayer already rate-adjusts
-  /// natively via its LiveConfiguration, so engaging here would fight it.
-  void _maybeAdjustCatchUp(double latencySeconds) {
-    if (!Platform.isIOS) return;
-    if (_paused || _loading || _userPaused || _isStalled) {
-      _stopCatchUp();
-      return;
-    }
-    if (!_isCatchingUp &&
-        latencySeconds >= VideoTimingConstants.catchUpEngageLatencySeconds) {
-      _isCatchingUp = true;
-      debugPrint(
-        'NativeVideoStore: latency ${latencySeconds.toStringAsFixed(1)}s, '
-        'catching up at ${VideoTimingConstants.catchUpPlaybackRate}x',
-      );
-      _controller?.setSpeed(VideoTimingConstants.catchUpPlaybackRate);
-    } else if (_isCatchingUp &&
-        latencySeconds <=
-            VideoTimingConstants.catchUpDisengageLatencySeconds) {
-      debugPrint(
-        'NativeVideoStore: caught up to '
-        '${latencySeconds.toStringAsFixed(1)}s, back to 1x',
-      );
-      _stopCatchUp();
-    }
-  }
-
-  /// Returns playback to 1x if a catch-up is engaged. Safe to call when the
-  /// controller is already gone — a recreated controller starts at 1x.
-  void _stopCatchUp() {
-    if (!_isCatchingUp) return;
-    _isCatchingUp = false;
-    _controller?.setSpeed(1.0);
   }
 
   void _scheduleOverlayHide([
@@ -1313,9 +1264,6 @@ abstract class NativeVideoStoreBase
     _paused = true;
     _isStalled = false;
     _isAdBreakActive = false;
-    // Flag only — the controller this reset accompanies is recreated and
-    // starts at 1x, so there's no speed to restore.
-    _isCatchingUp = false;
     _restrictedStreamQualities = [];
     _isQualitySwitching = false;
     _isAudioOnlyMode = false;
