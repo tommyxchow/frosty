@@ -20,6 +20,12 @@ abstract class VideoPlayerInterface {
   StreamTwitch? get streamInfo;
   Channel? get offlineChannelInfo;
   List<String> get availableStreamQualities;
+
+  /// Qualities that exist for this stream but require a subscription.
+  /// Only the native player can know this (parsed from the playback token);
+  /// the WebView player always reports none.
+  List<String> get restrictedStreamQualities;
+
   String get streamQuality;
   String? get latency;
 

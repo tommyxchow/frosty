@@ -103,6 +103,13 @@ abstract class NativeVideoStoreBase
 
   StreamSubscription<bool>? _pipSub;
   StreamSubscription<List<NativeVideoPlayerQuality>>? _qualitiesSub;
+  StreamSubscription<bool>? _adBreakSub;
+
+  /// True while a server-stitched ad break is playing (native player detects
+  /// twitch-stitched-ad dateranges). Latency readings and play/buffer
+  /// transitions are unreliable during ads, so recovery and chat sync are
+  /// suspended rather than burning refresh attempts on ad-induced noise.
+  var _isAdBreakActive = false;
 
   @readonly
   var _loading = true;
@@ -124,6 +131,11 @@ abstract class NativeVideoStoreBase
 
   @readonly
   var _availableStreamQualities = <String>[];
+
+  /// Qualities that exist for this stream but require a subscription
+  /// (parsed from the playback token's restricted_bitrates).
+  @readonly
+  var _restrictedStreamQualities = <String>[];
 
   @readonly
   var _streamQualityIndex = 0;
@@ -257,6 +269,13 @@ abstract class NativeVideoStoreBase
         return;
       }
 
+      _adBreakSub = _controller!.adBreakStream.listen((isActive) {
+        _isAdBreakActive = isActive;
+        debugPrint(
+          'NativeVideoStore: ad break ${isActive ? 'started' : 'ended'}',
+        );
+      });
+
       _pipSub = _controller!.isPipEnabledStream.listen((isPip) {
         runInAction(() {
           // iOS-only bookkeeping: track whether PiP was triggered by gesture
@@ -380,9 +399,15 @@ abstract class NativeVideoStoreBase
     if (_disposed || generation != _initGeneration || !settingsStore.showVideo) {
       return;
     }
+    runInAction(
+      () => _restrictedStreamQualities = token.restrictedQualities,
+    );
     final hlsUrl = twitchGqlApi.buildHlsUrl(login: userLogin, token: token);
 
-    await _controller!.loadUrl(url: hlsUrl);
+    await _controller!.loadUrl(
+      url: hlsUrl,
+      headers: TwitchGqlApi.playbackHttpHeaders,
+    );
     if (_disposed || generation != _initGeneration || !settingsStore.showVideo) {
       return;
     }
@@ -503,7 +528,9 @@ abstract class NativeVideoStoreBase
     // to engage recovery on those stalls.
     if (_hasPlayedOnce && !_isQualitySwitching) {
       _isStalled = true;
-      _recordShortPlayBounceIfNeeded();
+      // Ad-pod entry/exit produces short play/buffer bounces that would
+      // otherwise count toward the CDN-trouble error heuristic.
+      if (!_isAdBreakActive) _recordShortPlayBounceIfNeeded();
     }
     // Clear _initializing on the first buffering event so the stall
     // recovery timer isn't permanently blocked during init stalls.
@@ -669,6 +696,15 @@ abstract class NativeVideoStoreBase
       return;
     }
 
+    // Ad-pod transitions cause brief discontinuities that look like stalls.
+    // Defer (not skip) recovery so a genuine stall surviving the ad break
+    // still gets handled once the break ends.
+    if (_isAdBreakActive) {
+      debugPrint('NativeVideoStore: stall during ad break, deferring recovery');
+      _startStallRecoveryTimer();
+      return;
+    }
+
     // When a stream ends the HLS server stops serving segments, causing
     // the player to stall indefinitely. Skip recovery if the stream is
     // offline — the overlay handles that state.
@@ -802,6 +838,11 @@ abstract class NativeVideoStoreBase
   }
 
   Future<void> _updateLatency() async {
+    // Program-date-time readings jump around during stitched ad breaks —
+    // skip the poll entirely (display, recovery, and chat sync all resume
+    // on the next tick after the break ends).
+    if (_isAdBreakActive) return;
+
     final seconds = await _controller?.getLatencyToLive();
     if (_disposed || seconds == null) return;
     final rounded = seconds.round();
@@ -1202,6 +1243,8 @@ abstract class NativeVideoStoreBase
     _pipSub = null;
     _qualitiesSub?.cancel();
     _qualitiesSub = null;
+    _adBreakSub?.cancel();
+    _adBreakSub = null;
     _controller?.removeActivityListener(_onPlayerActivity);
     _controller?.dispose();
     _controller = null;
@@ -1222,6 +1265,8 @@ abstract class NativeVideoStoreBase
     _pendingRefreshOnResume = false;
     _paused = true;
     _isStalled = false;
+    _isAdBreakActive = false;
+    _restrictedStreamQualities = [];
     _isQualitySwitching = false;
     _isAudioOnlyMode = false;
     _stallRecoveryAttempt = 0;

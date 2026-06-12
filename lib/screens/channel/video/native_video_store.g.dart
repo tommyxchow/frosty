@@ -181,6 +181,30 @@ mixin _$NativeVideoStore on NativeVideoStoreBase, Store {
     );
   }
 
+  late final _$_restrictedStreamQualitiesAtom = Atom(
+    name: 'NativeVideoStoreBase._restrictedStreamQualities',
+    context: context,
+  );
+
+  List<String> get restrictedStreamQualities {
+    _$_restrictedStreamQualitiesAtom.reportRead();
+    return super._restrictedStreamQualities;
+  }
+
+  @override
+  List<String> get _restrictedStreamQualities => restrictedStreamQualities;
+
+  @override
+  set _restrictedStreamQualities(List<String> value) {
+    _$_restrictedStreamQualitiesAtom.reportWrite(
+      value,
+      super._restrictedStreamQualities,
+      () {
+        super._restrictedStreamQualities = value;
+      },
+    );
+  }
+
   late final _$_streamQualityIndexAtom = Atom(
     name: 'NativeVideoStoreBase._streamQualityIndex',
     context: context,

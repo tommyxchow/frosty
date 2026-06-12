@@ -99,26 +99,35 @@ class VideoOverlay extends StatelessWidget {
                   builder: (context) => ListView(
                     shrinkWrap: true,
                     primary: false,
-                    children: videoStore.availableStreamQualities
-                        .map(
-                          (quality) => ListTile(
-                            trailing: videoStore.streamQuality == quality
-                                ? const Icon(Icons.check_rounded)
-                                : null,
-                            title: Text(quality),
-                            onTap: () {
-                              videoStore.setStreamQuality(quality);
-                              SharedPreferences.getInstance().then(
-                                (prefs) => prefs.setString(
-                                  lastStreamQualityKey(videoStore.userLogin),
-                                  quality,
-                                ),
-                              );
-                              Navigator.pop(context);
-                            },
-                          ),
-                        )
-                        .toList(),
+                    children: [
+                      ...videoStore.availableStreamQualities.map(
+                        (quality) => ListTile(
+                          trailing: videoStore.streamQuality == quality
+                              ? const Icon(Icons.check_rounded)
+                              : null,
+                          title: Text(quality),
+                          onTap: () {
+                            videoStore.setStreamQuality(quality);
+                            SharedPreferences.getInstance().then(
+                              (prefs) => prefs.setString(
+                                lastStreamQualityKey(videoStore.userLogin),
+                                quality,
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      // Qualities the broadcaster offers only to subscribers
+                      // (from the playback token's restricted_bitrates).
+                      ...videoStore.restrictedStreamQualities.map(
+                        (quality) => ListTile(
+                          enabled: false,
+                          title: Text(quality),
+                          subtitle: const Text('Subscribers only'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

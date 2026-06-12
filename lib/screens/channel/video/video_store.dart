@@ -237,6 +237,11 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
   @readonly
   List<String> _availableStreamQualities = [];
 
+  // The WebView player has no access to the playback token, so sub-only
+  // qualities can't be detected here.
+  @override
+  List<String> get restrictedStreamQualities => const [];
+
   // The current stream quality index
   @readonly
   int _streamQualityIndex = 0;
