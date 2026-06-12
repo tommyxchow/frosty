@@ -259,7 +259,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Locate upload-symbols whether Firebase is integrated via CocoaPods or Swift Package Manager.\nBIN=\"$PODS_ROOT/FirebaseCrashlytics/upload-symbols\"\n[ -f \"$BIN\" ] || BIN=\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\"\n\"$BIN\" --flutter-project \"$PROJECT_DIR/firebase_app_id_file.json\"\n";
+			shellScript = "# Symbol upload only matters for builds that ship; Debug dSYMs are absent or empty and fail the tool.\nif [ \"$CONFIGURATION\" = \"Debug\" ]; then\n  echo \"Skipping Crashlytics symbol upload for Debug build\"\n  exit 0\nfi\n# Locate upload-symbols whether Firebase is integrated via CocoaPods or Swift Package Manager.\nBIN=\"$PODS_ROOT/FirebaseCrashlytics/upload-symbols\"\n[ -f \"$BIN\" ] || BIN=\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/upload-symbols\"\n\"$BIN\" --flutter-project \"$PROJECT_DIR/firebase_app_id_file.json\"\n";
 		};
 		34CC65D58A1948B306772884 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
