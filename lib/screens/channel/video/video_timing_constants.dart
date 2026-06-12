@@ -42,6 +42,17 @@ class VideoTimingConstants {
   /// recoveries forever makes playback worse, not better.
   static const int maxHighLatencyRecoveries = 3;
 
+  /// Latency drift catch-up (iOS only — ExoPlayer does this natively via
+  /// LiveConfiguration's min/maxPlaybackSpeed). Engage above 8s, glide at
+  /// 1.05x, release at 6s: ~1s of correction per 20s of playback — slow
+  /// enough to be inaudible and to never outrun the buffer. The 2s gap
+  /// between engage and release is hysteresis so a noisy reading can't
+  /// flap the speed. Gross drift (≥[highLatencyThresholdSeconds]) is owned
+  /// by seek/refresh recovery, which runs before catch-up is considered.
+  static const int catchUpEngageLatencySeconds = 8;
+  static const int catchUpDisengageLatencySeconds = 6;
+  static const double catchUpPlaybackRate = 1.05;
+
   /// How long a quality switch may suppress stall classification before the
   /// flag expires. A resolution-only switch never interrupts playback, so no
   /// play/pause event arrives to clear it — without this backstop the flag
