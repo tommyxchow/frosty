@@ -97,7 +97,7 @@ jobs:
 
       # Create a draft release on GitHub.
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           draft: true
           generate_release_notes: ${{ steps.release_notes.outputs.found != 'true' }}

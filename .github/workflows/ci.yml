@@ -35,6 +35,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
+      # Match release workflows and avoid GitHub's lagging default Xcode.
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.44.1
