@@ -5,8 +5,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/models/channel.dart';
 import 'package:frosty/models/stream.dart';
+import 'package:frosty/screens/channel/video/chat_latency_sync.dart';
+import 'package:frosty/screens/channel/video/stream_info_poller.dart';
+import 'package:frosty/screens/channel/video/video_player_interface.dart';
+import 'package:frosty/screens/channel/video/video_timing_constants.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:mobx/mobx.dart';
@@ -20,10 +25,11 @@ part 'video_store.g.dart';
 
 class VideoStore = VideoStoreBase with _$VideoStore;
 
-abstract class VideoStoreBase with Store {
+abstract class VideoStoreBase with Store implements VideoPlayerInterface {
   final TwitchApi twitchApi;
 
   /// The userlogin of the current channel.
+  @override
   final String userLogin;
 
   /// The user ID of the current channel.
@@ -31,12 +37,21 @@ abstract class VideoStoreBase with Store {
 
   final AuthStore authStore;
 
+  @override
   final SettingsStore settingsStore;
 
   /// The [SimplePip] instance used for initiating PiP on Android.
   final pip = SimplePip();
+  late final ChatLatencySync _chatLatencySync =
+      ChatLatencySync(settingsStore: settingsStore);
+  late final StreamInfoPoller _streamInfoPoller = StreamInfoPoller(
+    twitchApi: twitchApi,
+    userLogin: userLogin,
+    userId: userId,
+  );
 
   var _firstTimeSettingQuality = true;
+  var _highLatencyCount = 0;
 
   /// Whether [initVideo] should run on the next [onPageFinished].
   ///
@@ -58,8 +73,6 @@ abstract class VideoStoreBase with Store {
             final receivedLatency = message.message;
             _latency = receivedLatency;
 
-            if (!settingsStore.autoSyncChatDelay) return;
-
             // Parse latency from abbreviated format: "5s" -> 5.0
             final numericPart = receivedLatency.replaceAll(
               RegExp(r'[^0-9.]'),
@@ -67,8 +80,43 @@ abstract class VideoStoreBase with Store {
             );
             final latencyAsDouble = double.tryParse(numericPart);
 
+            // Auto-recover when latency climbs too high.
+            // Intentionally skips the chat delay sync — the stale value
+            // would desync chat further. Recovery will restore it.
+            if (latencyAsDouble != null &&
+                latencyAsDouble >= VideoTimingConstants.highLatencyThresholdSeconds &&
+                !_paused &&
+                !_loading) {
+              _highLatencyCount++;
+              if (_highLatencyCount == 1) {
+                debugPrint(
+                  'VideoStore: high latency (${latencyAsDouble.round()}s), seeking to live edge',
+                );
+                try {
+                  videoWebViewController.runJavaScript('''
+                    (function() {
+                      const v = window._videoEl || document.querySelector("video");
+                      if (v && v.buffered.length > 0) {
+                        v.currentTime = v.buffered.end(v.buffered.length - 1);
+                      }
+                    })();
+                  ''');
+                } catch (e) {
+                  debugPrint(e.toString());
+                }
+              } else {
+                debugPrint(
+                  'VideoStore: latency still high (${latencyAsDouble.round()}s), refreshing',
+                );
+                _highLatencyCount = 0;
+                handleRefresh();
+              }
+              return;
+            }
+            _highLatencyCount = 0;
+
             if (latencyAsDouble != null) {
-              settingsStore.syncedChatDelay = latencyAsDouble;
+              _chatLatencySync.report(latencyAsDouble);
             }
           },
         )
@@ -86,7 +134,8 @@ abstract class VideoStoreBase with Store {
                 return;
               }
               final prefs = await SharedPreferences.getInstance();
-              final lastStreamQuality = prefs.getString('last_stream_quality');
+              final lastStreamQuality =
+                  prefs.getString(lastStreamQualityKey(userLogin));
               if (lastStreamQuality == null) return;
               setStreamQuality(lastStreamQuality);
             }
@@ -102,6 +151,7 @@ abstract class VideoStoreBase with Store {
         ..addJavaScriptChannel(
           'VideoPlaying',
           onMessageReceived: (message) {
+            _loading = false;
             _paused = false;
             if (Platform.isAndroid) pip.setIsPlaying(true);
           },
@@ -152,12 +202,6 @@ abstract class VideoStoreBase with Store {
   /// Timer for periodic JavaScript state cleanup to prevent memory accumulation.
   Timer? _jsCleanupTimer;
 
-  /// Tracks the last time stream info was updated to prevent double refresh
-  DateTime? _lastStreamInfoUpdate;
-
-  /// Tracks an in-flight stream info request so refreshes can be deduplicated.
-  Future<void>? _streamInfoRequest;
-
   /// Disposes the overlay reactions.
   late final ReactionDisposer _disposeOverlayReaction;
 
@@ -168,6 +212,9 @@ abstract class VideoStoreBase with Store {
 
   /// Disposes the latency settings reaction.
   ReactionDisposer? _disposeLatencySettingsReaction;
+
+  @readonly
+  var _loading = true;
 
   /// If the video is currently paused.
   ///
@@ -190,11 +237,17 @@ abstract class VideoStoreBase with Store {
   @readonly
   List<String> _availableStreamQualities = [];
 
+  // The WebView player has no access to the playback token, so sub-only
+  // qualities can't be detected here.
+  @override
+  List<String> get restrictedStreamQualities => const [];
+
   // The current stream quality index
   @readonly
   int _streamQualityIndex = 0;
 
   // The current stream quality string
+  @override
   String get streamQuality =>
       _availableStreamQualities.elementAtOrNull(_streamQualityIndex) ?? 'Auto';
 
@@ -217,10 +270,9 @@ abstract class VideoStoreBase with Store {
     required this.authStore,
     required this.settingsStore,
   }) {
-    // Reset chat delay to 0 if auto sync is already enabled to prevent starting with old values
-    if (settingsStore.autoSyncChatDelay) {
-      settingsStore.syncedChatDelay = 0.0;
-    }
+    // Reset chat delay to 0 to prevent starting with a stale value from
+    // a previous channel.
+    _chatLatencySync.reset();
     // Initialize the video webview params for iOS to enable video autoplay.
     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
       _videoWebViewParams = WebKitWebViewControllerCreationParams(
@@ -253,13 +305,7 @@ abstract class VideoStoreBase with Store {
         await updateStreamQualities();
       } else {
         _showDefaultOverlay();
-        try {
-          videoWebViewController.runJavaScript(
-            'window._latencyTracker?.stop()',
-          );
-        } catch (e) {
-          debugPrint(e.toString());
-        }
+        _stopLatencyTracker();
       }
     });
 
@@ -277,6 +323,9 @@ abstract class VideoStoreBase with Store {
         _stopJsCleanupTimer();
         // Ensure overlay timer is active for clean UI
         _scheduleOverlayHide();
+        // The tracker's 60s cycle opens the Twitch settings menu via DOM
+        // queries — keep that off when the player isn't even visible.
+        _stopLatencyTracker();
       }
     });
 
@@ -308,8 +357,9 @@ abstract class VideoStoreBase with Store {
       (_) => (settingsStore.showLatency, settingsStore.autoSyncChatDelay),
       (values) async {
         final (showLatency, autoSync) = values;
-        // Only act if overlay is enabled (latency tracker only works with custom overlay)
-        if (!settingsStore.showOverlay) return;
+        // Tracker only runs against the live player iframe — skip in
+        // chat-only mode and when the custom overlay is off.
+        if (!settingsStore.showVideo || !settingsStore.showOverlay) return;
 
         if (showLatency || autoSync) {
           // Start tracker if either setting is now enabled
@@ -326,23 +376,18 @@ abstract class VideoStoreBase with Store {
             );
             final latencyAsDouble = double.tryParse(numericPart);
             if (latencyAsDouble != null) {
-              settingsStore.syncedChatDelay = latencyAsDouble;
+              _chatLatencySync.report(latencyAsDouble);
             }
           }
         } else {
           // Stop tracker if both settings are now disabled
-          try {
-            videoWebViewController.runJavaScript(
-              'window._latencyTracker?.stop()',
-            );
-          } catch (e) {
-            debugPrint(e.toString());
-          }
+          _stopLatencyTracker();
         }
       },
     );
   }
 
+  @override
   @action
   Future<void> updateStreamQualities() async {
     try {
@@ -382,6 +427,7 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  @override
   @action
   Future<void> setStreamQuality(String newStreamQuality) async {
     final indexOfStreamQuality = _availableStreamQualities.indexOf(
@@ -492,155 +538,18 @@ abstract class VideoStoreBase with Store {
   /// - Skips cycles entirely when overlay hidden (saves CPU)
   Future<void> _listenOnLatencyChanges() async {
     try {
-      await videoWebViewController.runJavaScript(r'''
-        window._latencyTracker ??= {
-          CYCLE_INTERVAL: 60000,
-          STATS_ACTIVE_TIME: 1500,
-          INITIAL_RETRY_INTERVAL: 3000,
-          MAX_INITIAL_RETRIES: 4,
-
-          cycleCount: 0,
-          hasInitialLatency: false,
-          timeoutId: null,
-          isRunning: false,
-          overlayVisible: true,
-          isCycling: false,
-
-          init() {
-            if (this.isRunning) return;
-            this.isRunning = true;
-            if (!this.isCycling && !this.timeoutId) {
-              this._cycle();
-            }
-          },
-
-          stop() {
-            this.isRunning = false;
-            if (this.timeoutId) {
-              clearTimeout(this.timeoutId);
-              this.timeoutId = null;
-            }
-          },
-
-          setOverlayVisible(visible) {
-            this.overlayVisible = visible;
-            // Resume immediately when overlay becomes visible
-            if (visible && this.isRunning && !this.isCycling && !this.timeoutId) {
-              this._cycle();
-            }
-          },
-
-          async _cycle() {
-            if (this.isCycling) return;
-            this.isCycling = true;
-
-            try {
-              // Clear timeout ID synchronously at entry to prevent race conditions
-              // (e.g., setOverlayVisible calling _cycle while timeout is firing)
-              const currentTimeoutId = this.timeoutId;
-              this.timeoutId = null;
-              if (currentTimeoutId) {
-                clearTimeout(currentTimeoutId);
-              }
-
-              if (!this.isRunning) return;
-
-              // Skip cycle entirely if overlay not visible - major CPU savings
-              if (!this.overlayVisible) {
-                this.timeoutId = setTimeout(() => this._cycle(), 5000);
-                return;
-              }
-
-              // Defer if another operation (e.g., quality selection) is using the settings menu
-              if (window._promiseQueueLength > 0) {
-                this.timeoutId = setTimeout(() => this._cycle(), 2000);
-                return;
-              }
-
-              this.cycleCount++;
-              const cycleStart = Date.now();
-
-              await this._setStatsEnabled(true);
-
-              // Wait longer on first cycle for stats to populate
-              const waitTime = this.cycleCount === 1 ? 3000 : this.STATS_ACTIVE_TIME;
-              await new Promise(resolve => setTimeout(resolve, waitTime));
-
-              this._readLatency();
-              await this._setStatsEnabled(false);
-
-              if (!this.isRunning) return;
-
-              const totalActiveTime = Date.now() - cycleStart;
-
-              // Calculate next interval
-              let nextInterval;
-              if (!this.hasInitialLatency && this.cycleCount < this.MAX_INITIAL_RETRIES) {
-                nextInterval = this.INITIAL_RETRY_INTERVAL;
-              } else {
-                nextInterval = this.CYCLE_INTERVAL - totalActiveTime;
-              }
-
-              // Schedule next cycle
-              this.timeoutId = setTimeout(() => this._cycle(), Math.max(nextInterval, 1000));
-            } finally {
-              this.isCycling = false;
-            }
-          },
-
-          async _setStatsEnabled(enable) {
-            try {
-              await _queuePromise(async () => {
-                const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
-                if (!settingsBtn) return;
-                settingsBtn.click();
-
-                const advancedItem = await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]');
-                if (!advancedItem) {
-                  settingsBtn.click();
-                  return;
-                }
-                advancedItem.click();
-
-                const statsCheckbox = await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input');
-                if (statsCheckbox && statsCheckbox.checked !== enable) {
-                  statsCheckbox.click();
-                }
-
-                settingsBtn.click();
-              });
-            } catch (error) {
-              // Silently fail - stats panel may not be available
-            }
-          },
-
-          _readLatency() {
-            try {
-              const latencyElement = document.querySelector('[aria-label="Latency To Broadcaster"]');
-              if (latencyElement && latencyElement.textContent) {
-                let latencyText = latencyElement.textContent.trim();
-
-                // Convert to whole number with abbreviated unit: "4.69 sec." -> "5s"
-                const match = latencyText.match(/([0-9.]+)\s*sec/i);
-                if (match) {
-                  const rounded = Math.round(parseFloat(match[1]));
-                  latencyText = rounded + 's';
-                  this.hasInitialLatency = true;
-                }
-
-                if (window.Latency) {
-                  Latency.postMessage(latencyText);
-                }
-              }
-            } catch (error) {
-              // Silently fail
-            }
-          }
-        };
-
-        window._latencyTracker.init();
-      ''');
+      await videoWebViewController.runJavaScript(_kLatencyTrackerJs);
       _updateLatencyTrackerVisibility(_overlayVisible);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Tells the in-webview latency tracker to stop its polling cycle.
+  /// Safe to call when the tracker hasn't been injected yet.
+  void _stopLatencyTracker() {
+    try {
+      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
     } catch (e) {
       debugPrint(e.toString());
     }
@@ -708,140 +617,24 @@ abstract class VideoStoreBase with Store {
   /// Initializes the video webview.
   @action
   Future<void> initVideo() async {
-    if (await videoWebViewController.currentUrl() == videoUrl) {
-      // Declare `window` level utility methods and add event listeners to notify the JavaScript channels when the video plays and pauses.
-      try {
-        await videoWebViewController.runJavaScript('''
-          // Promise queue with length limit and generation tracking
-          // Generation tracking prevents counter from going negative when queue resets
-          window._PROMISE_QUEUE = Promise.resolve();
-          window._promiseQueueLength = 0;
-          window._promiseQueueGen = 0;
-
-          window._queuePromise = (method) => {
-            window._promiseQueueLength++;
-
-            // Reset queue if it gets too long (prevents memory accumulation)
-            if (window._promiseQueueLength > 30) {
-              window._PROMISE_QUEUE = Promise.resolve();
-              window._promiseQueueLength = 1;
-              window._promiseQueueGen++;
-            }
-
-            const myGen = window._promiseQueueGen;
-
-            window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(async () => {
-              try {
-                await method();
-              } catch (e) {
-                console.warn('Queue promise error:', e);
-              } finally {
-                // Only decrement if still same generation (not reset)
-                if (myGen === window._promiseQueueGen) {
-                  window._promiseQueueLength--;
-                }
-              }
-            });
-
-            return window._PROMISE_QUEUE;
-          };
-          window._asyncQuerySelector = (selector, timeout = 10000) => new Promise((resolve) => {
-            let element = document.querySelector(selector);
-            if (element) {
-              return resolve(element);
-            }
-
-            let timeoutId;
-            const observer = new MutationObserver(() => {
-              element = document.querySelector(selector);
-              if (element) {
-                observer.disconnect();
-                clearTimeout(timeoutId);
-                resolve(element);
-              }
-            });
-            // Must use subtree to detect nested elements in the player
-            observer.observe(document.body, { childList: true, subtree: true });
-
-            // Always set timeout with default of 10 seconds
-            timeoutId = setTimeout(() => {
-              observer.disconnect();
-              resolve(undefined);
-            }, timeout);
-          });
-
-          _queuePromise(async () => {
-            const videoElement = await _asyncQuerySelector("video");
-
-            // Null check in case element was not found within timeout
-            if (!videoElement) {
-              console.warn("Video element not found within timeout");
-              return;
-            }
-
-            // Cache for reuse in play/pause/PiP calls
-            window._videoEl = videoElement;
-
-            // Prevent duplicate event listener registration
-            if (!videoElement._listenersAdded) {
-              videoElement._listenersAdded = true;
-
-              videoElement.addEventListener("pause", () => {
-                VideoPause.postMessage("video paused");
-                if (videoElement.textTracks && videoElement.textTracks.length > 0) {
-                  videoElement.textTracks[0].mode = "hidden";
-                }
-              });
-              videoElement.addEventListener("playing", () => {
-                VideoPlaying.postMessage("video playing");
-                // Ensure video is unmuted and captions are hidden
-                videoElement.muted = false;
-                videoElement.volume = 1.0;
-                if (videoElement.textTracks && videoElement.textTracks.length > 0) {
-                  videoElement.textTracks[0].mode = "hidden";
-                }
-              });
-
-              // Add PiP event listeners for iOS
-              videoElement.addEventListener("enterpictureinpicture", () => {
-                PipEntered.postMessage("pip entered");
-              });
-              videoElement.addEventListener("leavepictureinpicture", () => {
-                PipExited.postMessage("pip exited");
-              });
-            }
-
-            if (!videoElement.paused) {
-              VideoPlaying.postMessage("video playing");
-              // Ensure video is unmuted and captions are hidden
-              videoElement.muted = false;
-              videoElement.volume = 1.0;
-              if (videoElement.textTracks && videoElement.textTracks.length > 0) {
-                videoElement.textTracks[0].mode = "hidden";
-              }
-            }
-
-            // Explicitly attempt autoplay in case the player loaded paused
-            try { await videoElement.play(); } catch (e) {}
-          });
-        ''');
-        if (settingsStore.showOverlay) {
-          await _hideDefaultOverlay();
-          // Start latency tracking if either:
-          // - showLatency is enabled (user wants to see it on overlay), OR
-          // - autoSyncChatDelay is enabled (needs latency data for syncing)
-          if (settingsStore.showLatency || settingsStore.autoSyncChatDelay) {
-            await _listenOnLatencyChanges();
-          }
-          await updateStreamQualities();
-        }
-      } catch (e) {
-        debugPrint(e.toString());
+    if (await videoWebViewController.currentUrl() != videoUrl) return;
+    try {
+      await videoWebViewController.runJavaScript(_kInitVideoJs);
+      if (!settingsStore.showOverlay) return;
+      await _hideDefaultOverlay();
+      // Start latency tracking if either showLatency (user-visible) or
+      // autoSyncChatDelay (needs latency to sync chat) is enabled.
+      if (settingsStore.showLatency || settingsStore.autoSyncChatDelay) {
+        await _listenOnLatencyChanges();
       }
+      await updateStreamQualities();
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 
   /// Called whenever the video/overlay is tapped.
+  @override
   @action
   void handleVideoTap() {
     if (_isInPipMode) {
@@ -870,7 +663,7 @@ abstract class VideoStoreBase with Store {
     // Only start if not already active
     if (_streamInfoTimer?.isActive != true) {
       _streamInfoTimer = Timer.periodic(
-        const Duration(seconds: 60),
+        VideoTimingConstants.webviewStreamInfoInterval,
         (_) => updateStreamInfo(),
       );
     }
@@ -888,7 +681,7 @@ abstract class VideoStoreBase with Store {
     if (_jsCleanupTimer?.isActive == true) return;
 
     _jsCleanupTimer = Timer.periodic(
-      const Duration(minutes: 10),
+      VideoTimingConstants.jsCleanupInterval,
       (_) => _performJsSoftReset(),
     );
   }
@@ -898,7 +691,9 @@ abstract class VideoStoreBase with Store {
     _jsCleanupTimer = null;
   }
 
-  void _scheduleOverlayHide([Duration delay = const Duration(seconds: 5)]) {
+  void _scheduleOverlayHide([
+    Duration delay = VideoTimingConstants.overlayAutoHide,
+  ]) {
     _overlayTimer?.cancel();
 
     if (_isInPipMode) {
@@ -918,6 +713,7 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Handles app resume event for immediate stream info refresh in chat-only mode.
+  @override
   @action
   void handleAppResume() {
     // Only refresh immediately in chat-only mode
@@ -930,63 +726,33 @@ abstract class VideoStoreBase with Store {
   ///
   /// If the stream is offline, fetches channel information to show offline details.
   /// Set [forceUpdate] to true to bypass the rate limiting check.
+  @override
   @action
   Future<void> updateStreamInfo({bool forceUpdate = false}) async {
-    if (_streamInfoRequest != null) {
-      await _streamInfoRequest;
-      return;
-    }
-
-    // Rate limiting: prevent too frequent updates unless forced
-    final now = DateTime.now();
-    if (!forceUpdate && _lastStreamInfoUpdate != null) {
-      final timeSinceLastUpdate = now.difference(_lastStreamInfoUpdate!);
-      if (timeSinceLastUpdate.inSeconds < 5) {
-        return; // Skip update if less than 5 seconds since last update
+    final result = await _streamInfoPoller.fetch(forceUpdate: forceUpdate);
+    if (result == null) return;
+    runInAction(() {
+      if (result.stream != null) {
+        _streamInfo = result.stream;
+        _offlineChannelInfo = null;
+        return;
       }
-    }
-
-    _lastStreamInfoUpdate = now;
-
-    final request = _updateStreamInfoInternal();
-    _streamInfoRequest = request;
-
-    try {
-      await request;
-    } finally {
-      if (identical(_streamInfoRequest, request)) {
-        _streamInfoRequest = null;
-      }
-    }
-  }
-
-  Future<void> _updateStreamInfoInternal() async {
-    try {
-      _streamInfo = await twitchApi.getStream(userLogin: userLogin);
-      // Clear offline info when stream is live
-      _offlineChannelInfo = null;
-    } catch (e) {
       _overlayTimer?.cancel();
+      _loading = false;
       _streamInfo = null;
       _paused = true;
-
-      // Try to fetch offline channel information
-      try {
-        _offlineChannelInfo = await twitchApi.getChannel(userId: userId);
-      } catch (channelError) {
-        _offlineChannelInfo = null;
-      }
-
+      _offlineChannelInfo = result.offlineChannel;
       // Restart overlay timer in chat-only mode even on error
       if (!settingsStore.showVideo) {
         _scheduleOverlayHide();
       }
-    }
+    });
   }
 
   /// Handles the toggle overlay options.
   ///
   /// The toggle overlay option allows switching between the custom and Twitch's overlay by long-pressing the overlay.
+  @override
   @action
   void handleToggleOverlay() {
     if (settingsStore.toggleableOverlay) {
@@ -996,7 +762,7 @@ abstract class VideoStoreBase with Store {
 
       if (settingsStore.showOverlay) {
         _overlayVisible = true;
-        _scheduleOverlayHide(const Duration(seconds: 3));
+        _scheduleOverlayHide(VideoTimingConstants.overlayQuickHide);
       }
     }
 
@@ -1004,23 +770,25 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Refreshes the stream webview and updates the stream info.
+  @override
   @action
   Future<void> handleRefresh() async {
     HapticFeedback.lightImpact();
+    _loading = true;
     _paused = true;
     _firstTimeSettingQuality = true;
+    _highLatencyCount = 0;
     _isInPipMode = false;
     _latency = null;
     _availableStreamQualities = [];
 
+    _overlayTimer?.cancel();
+    _scheduleOverlayHide();
+
     // Signal that initVideo() should run on the next onPageFinished
     _needsInit = true;
 
-    try {
-      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
-    } catch (e) {
-      // Ignore - may not exist yet
-    }
+    _stopLatencyTracker();
 
     await videoWebViewController.loadRequest(Uri.parse(videoUrl));
 
@@ -1028,6 +796,7 @@ abstract class VideoStoreBase with Store {
   }
 
   /// Play or pause the video depending on the current state of [_paused].
+  @override
   void handlePausePlay() {
     try {
       if (_paused) {
@@ -1048,6 +817,7 @@ abstract class VideoStoreBase with Store {
   ///
   /// On Android, this will utilize the native Android PiP API.
   /// On iOS, this will utilize the web picture-in-picture API.
+  @override
   void requestPictureInPicture() {
     try {
       if (Platform.isAndroid) {
@@ -1067,6 +837,7 @@ abstract class VideoStoreBase with Store {
   /// If not in PiP mode, enters PiP mode.
   /// If already in PiP mode on iOS, exits PiP mode.
   /// On Android, always enters PiP mode (no programmatic exit or state tracking).
+  @override
   @action
   void togglePictureInPicture() {
     try {
@@ -1088,6 +859,7 @@ abstract class VideoStoreBase with Store {
     }
   }
 
+  @override
   @action
   void dispose() {
     // Disable auto PiP when leaving so that we don't enter PiP on other screens.
@@ -1109,10 +881,282 @@ abstract class VideoStoreBase with Store {
     // Explicitly stop latency tracker as defense-in-depth.
     // The Video widget also loads about:blank during disposal which clears
     // all JavaScript state, but this provides an extra safety layer.
-    try {
-      videoWebViewController.runJavaScript('window._latencyTracker?.stop()');
-    } catch (e) {
-      // Ignore - page may already be unloading
-    }
+    _stopLatencyTracker();
   }
 }
+
+// ---------------------------------------------------------------------------
+// JS templates evaluated inside the Twitch player WebView.
+// These are at the end of the file so the Dart code above stays readable.
+// ---------------------------------------------------------------------------
+
+/// Bootstraps the Twitch player iframe: promise queue, async query selector,
+/// and play/pause/PiP event listeners that post back through Flutter's
+/// JavaScriptChannels. Run once per page load from [VideoStoreBase.initVideo].
+const _kInitVideoJs = r'''
+  // Promise queue with length limit and generation tracking
+  // Generation tracking prevents counter from going negative when queue resets
+  window._PROMISE_QUEUE = Promise.resolve();
+  window._promiseQueueLength = 0;
+  window._promiseQueueGen = 0;
+
+  window._queuePromise = (method) => {
+    window._promiseQueueLength++;
+
+    // Reset queue if it gets too long (prevents memory accumulation)
+    if (window._promiseQueueLength > 30) {
+      window._PROMISE_QUEUE = Promise.resolve();
+      window._promiseQueueLength = 1;
+      window._promiseQueueGen++;
+    }
+
+    const myGen = window._promiseQueueGen;
+
+    window._PROMISE_QUEUE = window._PROMISE_QUEUE.then(async () => {
+      try {
+        await method();
+      } catch (e) {
+        console.warn('Queue promise error:', e);
+      } finally {
+        // Only decrement if still same generation (not reset)
+        if (myGen === window._promiseQueueGen) {
+          window._promiseQueueLength--;
+        }
+      }
+    });
+
+    return window._PROMISE_QUEUE;
+  };
+  window._asyncQuerySelector = (selector, timeout = 10000) => new Promise((resolve) => {
+    let element = document.querySelector(selector);
+    if (element) {
+      return resolve(element);
+    }
+
+    let timeoutId;
+    const observer = new MutationObserver(() => {
+      element = document.querySelector(selector);
+      if (element) {
+        observer.disconnect();
+        clearTimeout(timeoutId);
+        resolve(element);
+      }
+    });
+    // Must use subtree to detect nested elements in the player
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Always set timeout with default of 10 seconds
+    timeoutId = setTimeout(() => {
+      observer.disconnect();
+      resolve(undefined);
+    }, timeout);
+  });
+
+  _queuePromise(async () => {
+    const videoElement = await _asyncQuerySelector("video");
+
+    // Null check in case element was not found within timeout
+    if (!videoElement) {
+      console.warn("Video element not found within timeout");
+      return;
+    }
+
+    // Cache for reuse in play/pause/PiP calls
+    window._videoEl = videoElement;
+
+    // Prevent duplicate event listener registration
+    if (!videoElement._listenersAdded) {
+      videoElement._listenersAdded = true;
+
+      videoElement.addEventListener("pause", () => {
+        VideoPause.postMessage("video paused");
+        if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+          videoElement.textTracks[0].mode = "hidden";
+        }
+      });
+      videoElement.addEventListener("playing", () => {
+        VideoPlaying.postMessage("video playing");
+        // Ensure video is unmuted and captions are hidden
+        videoElement.muted = false;
+        videoElement.volume = 1.0;
+        if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+          videoElement.textTracks[0].mode = "hidden";
+        }
+      });
+
+      // Add PiP event listeners for iOS
+      videoElement.addEventListener("enterpictureinpicture", () => {
+        PipEntered.postMessage("pip entered");
+      });
+      videoElement.addEventListener("leavepictureinpicture", () => {
+        PipExited.postMessage("pip exited");
+      });
+    }
+
+    if (!videoElement.paused) {
+      VideoPlaying.postMessage("video playing");
+      // Ensure video is unmuted and captions are hidden
+      videoElement.muted = false;
+      videoElement.volume = 1.0;
+      if (videoElement.textTracks && videoElement.textTracks.length > 0) {
+        videoElement.textTracks[0].mode = "hidden";
+      }
+    }
+
+    // Explicitly attempt autoplay in case the player loaded paused
+    try { await videoElement.play(); } catch (e) {}
+  });
+''';
+
+/// Periodic latency-tracker state machine running inside the Twitch player
+/// WebView. Opens the stats panel, reads "Latency To Broadcaster", posts the
+/// value through the `Latency` JavaScriptChannel, and closes the panel.
+/// Pauses its cycle when the overlay is hidden (saves CPU).
+const _kLatencyTrackerJs = r'''
+  window._latencyTracker ??= {
+    CYCLE_INTERVAL: 60000,
+    STATS_ACTIVE_TIME: 1500,
+    INITIAL_RETRY_INTERVAL: 3000,
+    MAX_INITIAL_RETRIES: 4,
+
+    cycleCount: 0,
+    hasInitialLatency: false,
+    timeoutId: null,
+    isRunning: false,
+    overlayVisible: true,
+    isCycling: false,
+
+    init() {
+      if (this.isRunning) return;
+      this.isRunning = true;
+      if (!this.isCycling && !this.timeoutId) {
+        this._cycle();
+      }
+    },
+
+    stop() {
+      this.isRunning = false;
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
+      }
+    },
+
+    setOverlayVisible(visible) {
+      this.overlayVisible = visible;
+      // Resume immediately when overlay becomes visible
+      if (visible && this.isRunning && !this.isCycling && !this.timeoutId) {
+        this._cycle();
+      }
+    },
+
+    async _cycle() {
+      if (this.isCycling) return;
+      this.isCycling = true;
+
+      try {
+        // Clear timeout ID synchronously at entry to prevent race conditions
+        // (e.g., setOverlayVisible calling _cycle while timeout is firing)
+        const currentTimeoutId = this.timeoutId;
+        this.timeoutId = null;
+        if (currentTimeoutId) {
+          clearTimeout(currentTimeoutId);
+        }
+
+        if (!this.isRunning) return;
+
+        // Skip cycle entirely if overlay not visible - major CPU savings
+        if (!this.overlayVisible) {
+          this.timeoutId = setTimeout(() => this._cycle(), 5000);
+          return;
+        }
+
+        // Defer if another operation (e.g., quality selection) is using the settings menu
+        if (window._promiseQueueLength > 0) {
+          this.timeoutId = setTimeout(() => this._cycle(), 2000);
+          return;
+        }
+
+        this.cycleCount++;
+        const cycleStart = Date.now();
+
+        await this._setStatsEnabled(true);
+
+        // Wait longer on first cycle for stats to populate
+        const waitTime = this.cycleCount === 1 ? 3000 : this.STATS_ACTIVE_TIME;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+
+        this._readLatency();
+        await this._setStatsEnabled(false);
+
+        if (!this.isRunning) return;
+
+        const totalActiveTime = Date.now() - cycleStart;
+
+        // Calculate next interval
+        let nextInterval;
+        if (!this.hasInitialLatency && this.cycleCount < this.MAX_INITIAL_RETRIES) {
+          nextInterval = this.INITIAL_RETRY_INTERVAL;
+        } else {
+          nextInterval = this.CYCLE_INTERVAL - totalActiveTime;
+        }
+
+        // Schedule next cycle
+        this.timeoutId = setTimeout(() => this._cycle(), Math.max(nextInterval, 1000));
+      } finally {
+        this.isCycling = false;
+      }
+    },
+
+    async _setStatsEnabled(enable) {
+      try {
+        await _queuePromise(async () => {
+          const settingsBtn = await _asyncQuerySelector('[data-a-target="player-settings-button"]');
+          if (!settingsBtn) return;
+          settingsBtn.click();
+
+          const advancedItem = await _asyncQuerySelector('[data-a-target="player-settings-menu-item-advanced"]');
+          if (!advancedItem) {
+            settingsBtn.click();
+            return;
+          }
+          advancedItem.click();
+
+          const statsCheckbox = await _asyncQuerySelector('[data-a-target="player-settings-submenu-advanced-video-stats"] input');
+          if (statsCheckbox && statsCheckbox.checked !== enable) {
+            statsCheckbox.click();
+          }
+
+          settingsBtn.click();
+        });
+      } catch (error) {
+        // Silently fail - stats panel may not be available
+      }
+    },
+
+    _readLatency() {
+      try {
+        const latencyElement = document.querySelector('[aria-label="Latency To Broadcaster"]');
+        if (latencyElement && latencyElement.textContent) {
+          let latencyText = latencyElement.textContent.trim();
+
+          // Convert to whole number with abbreviated unit: "4.69 sec." -> "5s"
+          const match = latencyText.match(/([0-9.]+)\s*sec/i);
+          if (match) {
+            const rounded = Math.round(parseFloat(match[1]));
+            latencyText = rounded + 's';
+            this.hasInitialLatency = true;
+          }
+
+          if (window.Latency) {
+            Latency.postMessage(latencyText);
+          }
+        }
+      } catch (error) {
+        // Silently fail
+      }
+    }
+  };
+
+  window._latencyTracker.init();
+''';

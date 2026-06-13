@@ -176,7 +176,9 @@ class IRCMessage {
               size: badgeSize,
               color:
                   Theme.of(context).iconTheme.color?.withValues(alpha: 0.5) ??
-                  Colors.grey.withValues(alpha: 0.5),
+                  Theme.of(context).colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.5,
+                  ),
             ),
           ),
         ),
@@ -661,6 +663,8 @@ class IRCMessage {
     bool showMessage = true,
     Map<String, UserTwitch>? channelIdToUserTwitch,
     TimestampType timestamp = TimestampType.disabled,
+    bool forceTimestamp = false,
+    bool showHistoricalTimestamps = false,
     String? currentChannelId,
   }) {
     final emoteToObject = assetsStore.emoteToObject;
@@ -671,7 +675,19 @@ class IRCMessage {
     // The span list that will be used to render the chat message
     final span = <InlineSpan>[];
 
-    _addTimestamp(span, style, timestamp);
+    // When the user has timestamps disabled globally, fall back to the device's
+    // locale preference for historical messages (opt-in via setting) and for
+    // forced contexts like previews.
+    final isHistorical = tags['historical'] == '1';
+    final effectiveTimestamp =
+        (timestamp == TimestampType.disabled &&
+                ((isHistorical && showHistoricalTimestamps) || forceTimestamp))
+            ? (MediaQuery.alwaysUse24HourFormatOf(context)
+                ? TimestampType.twentyFour
+                : TimestampType.twelve)
+            : timestamp;
+
+    _addTimestamp(span, style, effectiveTimestamp);
     _addHistoricalAndChannelBadges(
       context,
       span,
@@ -680,7 +696,6 @@ class IRCMessage {
       currentChannelId,
     );
 
-    final isHistorical = tags['historical'] == '1';
     _addUserBadges(
       context,
       span,

@@ -29,11 +29,6 @@
   //     "bucket_name": "<BUCKET_NAME>",
   //   },
   // ],
-  "images": {
-    // Enable image optimization
-    // see https://opennext.js.org/cloudflare/howtos/image
-    "binding": "IMAGES",
-  },
   "minify": true,
   "keep_names": false,
   "upload_source_maps": true,

@@ -1,5 +1,19 @@
 # AGENTS.md
 
+---
+
+# Author Preferences
+
+## Infrastructure Checklist
+
+When creating new infrastructure (routes, API handlers, providers), use exploration findings as a **checklist** — systematically verify each convention is followed before writing code.
+
+---
+
+# Project
+
+Next.js 16 landing page for [Frosty](https://frostyapp.io) using the App Router with React 19. Deployed on **Cloudflare Workers** via `@opennextjs/cloudflare`.
+
 ## Commands
 
 ```bash
@@ -17,25 +31,25 @@ pnpm clean        # Delete .next, .open-next, and node_modules
 pnpm nuke         # Delete .next, .open-next, node_modules, and pnpm-lock.yaml
 ```
 
-## Architecture
-
-Next.js 16 landing page for [Frosty](https://frostyapp.io) using the App Router with React 19. Deployed on **Cloudflare Workers** via `@opennextjs/cloudflare`.
-
-### Key Configuration
-
-- **React Compiler**: Enabled in `next.config.ts` for automatic memoization
-- **Typed Routes**: Enabled for type-safe navigation (use `Route` type from `next/navigation`)
-- **Path Alias**: `@/*` maps to `./src/*`
-- **Strict TypeScript**: `noUncheckedIndexedAccess`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `noImplicitOverride`, `verbatimModuleSyntax`
-
-### Source Structure
+## Source Structure
 
 - `src/app/` - App Router pages and layouts
 - `src/components/` - React components (`ui/` subdirectory for shadcn `base-vega` style — add with `pnpm dlx shadcn@latest add <component>`)
 - `src/lib/` - Utilities (`cn()` for className merging, `constants.ts` for external links)
 - `src/assets/` - Static images (screenshots)
 
-### Cloudflare Workers
+## Key Configuration
+
+- **React Compiler**: Enabled in `next.config.ts` for automatic memoization
+- **Typed Routes**: Enabled for type-safe navigation (use `Route` type from `next/navigation`)
+- **Path Alias**: `@/*` maps to `./src/*`
+- **Strict TypeScript**: `noUncheckedIndexedAccess`, `noImplicitReturns`, `noFallthroughCasesInSwitch`, `noImplicitOverride`, `verbatimModuleSyntax`
+
+## Cache Components
+
+Not yet enabled — `cacheComponents` is not set in `next.config.ts` and no `"use cache"` directives are in use. Everything is dynamic (SSR) by default. To opt in: add `cacheComponents: true` to `next.config.ts`, use `"use cache"` + `cacheLife()` on server components/functions, and wrap async work in `<Suspense>` for PPR. Durable runtime cache requires R2 incremental cache (see `open-next.config.ts`) — without it, cache is in-memory only per Worker instance.
+
+## Cloudflare Workers
 
 - `wrangler.jsonc` - Cloudflare Workers configuration (bindings, R2, KV, etc.)
 - `open-next.config.ts` - OpenNext adapter config (ISR requires uncommenting R2 incremental cache)
@@ -67,9 +81,12 @@ Notable strict rules enforced:
 - `react-you-might-not-need-an-effect` - Avoid unnecessary useEffect
 - Unused variables must be prefixed with `_`
 
-## Commits
+## Gotchas
 
-Lowercase, no prefixes (e.g., `remove marquee emote background from hero section`). Keep commits tightly scoped.
+- **shadcn uses @base-ui/react**: Not Radix UI — component primitives differ from older shadcn examples. `button.tsx` is a `'use client'` module with no `asChild` prop. Check `src/components/ui/` before building custom UI.
+- **`useSearchParams()` needs Suspense**: Always wrap components using `useSearchParams()` in a `<Suspense>` boundary — required for production builds.
+- **Never remove `tw-animate-css`**: Required by shadcn/ui components for animations. Check shadcn dependencies before removing any package.
+- **No `pnpm` prefix inside package.json scripts**: The package manager is already the script runner. Use bare commands (e.g., `next build`, not `pnpm next build`).
 
 ## Dev Tooling
 

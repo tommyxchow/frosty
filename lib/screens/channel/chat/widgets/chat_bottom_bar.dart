@@ -11,6 +11,7 @@ import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/chat_input/emote_text_span_builder.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
+import 'package:frosty/widgets/measure_size.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -393,6 +394,13 @@ class ChatBottomBar extends StatelessWidget {
         final needsBottomPadding =
             !chatStore.assetsStore.showEmoteMenu && !isHorizontalLandscape;
 
+        // Measured once here; the list pads itself by this height so the bar
+        // never overlaps messages. Shared by both container branches below.
+        final measuredBar = MeasureSize(
+          onChange: (size) => chatStore.setBottomBarHeight(size.height),
+          child: bottomBarContent,
+        );
+
         return isFullscreenOverlay
             ? Padding(
                 padding: EdgeInsets.only(
@@ -400,7 +408,7 @@ class ChatBottomBar extends StatelessWidget {
                       ? MediaQuery.of(context).padding.bottom
                       : 0,
                 ),
-                child: bottomBarContent,
+                child: measuredBar,
               )
             : BlurredContainer(
                 gradientDirection: GradientDirection.down,
@@ -409,7 +417,7 @@ class ChatBottomBar extends StatelessWidget {
                       ? MediaQuery.of(context).padding.bottom
                       : 0,
                 ),
-                child: bottomBarContent,
+                child: measuredBar,
               );
       },
     );

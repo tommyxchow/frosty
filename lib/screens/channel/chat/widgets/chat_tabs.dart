@@ -38,7 +38,6 @@ class ChatTabs extends StatelessWidget {
       );
 
       if (!added && context.mounted) {
-        // If not added, it means the channel already exists (switched to it)
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Channel already open, switched to it'),
@@ -56,16 +55,10 @@ class ChatTabs extends StatelessWidget {
         final tabs = chatTabsStore.tabs;
         final activeIndex = chatTabsStore.activeTabIndex;
         final showTabBar = chatTabsStore.showTabBar;
-        final showMerge =
-            tabs.where((t) => t.isActivated).length >= 2;
+        final showMerge = tabs.where((t) => t.isActivated).length >= 2;
 
-        // Calculate extra top padding for tab bar when visible
         final tabBarHeight = showTabBar ? 48.0 : 0.0;
-
-        // Get the top inset from listPadding (e.g., for AppBar in chat-only mode)
         final topInset = listPadding?.resolve(TextDirection.ltr).top ?? 0;
-
-        // Adjust list padding to account for tab bar
         final adjustedPadding = listPadding != null
             ? listPadding!.add(EdgeInsets.only(top: tabBarHeight))
             : EdgeInsets.only(top: tabBarHeight);
@@ -75,27 +68,20 @@ class ChatTabs extends StatelessWidget {
           onPopInvokedWithResult: (didPop, _) {
             if (didPop) return;
 
-            // On Android back gesture, close overlays first before navigating back
+            // Android back gesture: dismiss overlays before navigating away.
             final activeStore = chatTabsStore.activeChatStore;
-
-            // Priority 1: Close emote menu
             if (activeStore.assetsStore.showEmoteMenu) {
               activeStore.assetsStore.showEmoteMenu = false;
               return;
             }
-
-            // Priority 2: Unfocus keyboard
             if (activeStore.textFieldFocusNode.hasFocus) {
               activeStore.unfocusInput();
               return;
             }
-
-            // Priority 3: Navigate back
             Navigator.of(context).pop();
           },
           child: Stack(
             children: [
-              // Chat content: merged view or IndexedStack
               Positioned.fill(
                 child: chatTabsStore.mergedMode
                     ? Chat(
@@ -107,7 +93,6 @@ class ChatTabs extends StatelessWidget {
                     : IndexedStack(
                         index: activeIndex,
                         children: tabs.map((tabInfo) {
-                          // Show placeholder for non-activated tabs
                           if (tabInfo.chatStore == null) {
                             return const SizedBox.shrink();
                           }
@@ -120,7 +105,6 @@ class ChatTabs extends StatelessWidget {
                         }).toList(),
                       ),
               ),
-              // Tab bar (only visible when more than 1 tab)
               if (showTabBar)
                 Positioned(
                   top: topInset,
@@ -130,8 +114,8 @@ class ChatTabs extends StatelessWidget {
                     height: 48,
                     child: Stack(
                       children: [
-                        // When merge button is visible, clips at its center
-                        // so chips slide under its left half then disappear.
+                        // Right-clip past the merge button so chips slide
+                        // under its left half then disappear.
                         Positioned(
                           left: 0,
                           top: 0,
@@ -161,7 +145,7 @@ class ChatTabs extends StatelessWidget {
                                 padding: EdgeInsets.only(
                                   right: index < tabs.length - 1 ? 4 : 0,
                                 ),
-                                child: _buildTab(context, index),
+                                child: Center(child: _buildTab(context, index)),
                               );
                             },
                           ),
@@ -171,7 +155,9 @@ class ChatTabs extends StatelessWidget {
                             right: 12,
                             top: 0,
                             bottom: 0,
-                            child: Center(child: _buildMergeToggle(context)),
+                            child: Center(
+                              child: _buildMoreActionsMenu(context),
+                            ),
                           ),
                       ],
                     ),
@@ -184,22 +170,47 @@ class ChatTabs extends StatelessWidget {
     );
   }
 
-  Widget _buildMergeToggle(BuildContext context) {
-    final isMerged = chatTabsStore.mergedMode;
-    return IconButton.filledTonal(
-      icon: const Icon(Icons.call_merge, size: 18),
-      tooltip: isMerged ? 'Split chats' : 'Merge loaded chats',
-      visualDensity: VisualDensity.compact,
-      isSelected: isMerged,
-      style: IconButton.styleFrom(
-        minimumSize: const Size(42, 42),
-        backgroundColor: isMerged
-            ? null
-            : Theme.of(context).colorScheme.surfaceContainerHighest,
-      ),
-      onPressed: () {
-        HapticFeedback.selectionClick();
-        chatTabsStore.toggleMergedMode();
+  Widget _buildMoreActionsMenu(BuildContext context) {
+    final settings = chatTabsStore.activeChatStore.settings;
+
+    return _AnchoredPopupMenu(
+      itemsBuilder: (close) => [
+        Observer(
+          builder: (_) => CheckboxMenuButton(
+            value: chatTabsStore.mergedMode,
+            onChanged: (_) {
+              HapticFeedback.selectionClick();
+              chatTabsStore.toggleMergedMode();
+            },
+            child: const Text('Merge chats'),
+          ),
+        ),
+        Observer(
+          builder: (_) => CheckboxMenuButton(
+            value: settings.focusCurrentChannel,
+            onChanged: (newValue) {
+              HapticFeedback.selectionClick();
+              settings.focusCurrentChannel = newValue ?? false;
+            },
+            child: const Text('Focus current channel'),
+          ),
+        ),
+      ],
+      anchorBuilder: (context, toggle) {
+        return IconButton.filledTonal(
+          icon: const Icon(Icons.more_vert, size: 18),
+          tooltip: 'Chat options',
+          visualDensity: VisualDensity.compact,
+          style: IconButton.styleFrom(
+            minimumSize: const Size(42, 42),
+            backgroundColor:
+                Theme.of(context).colorScheme.surfaceContainerHighest,
+          ),
+          onPressed: () {
+            HapticFeedback.selectionClick();
+            toggle();
+          },
+        );
       },
     );
   }
@@ -207,86 +218,208 @@ class ChatTabs extends StatelessWidget {
   Widget _buildTab(BuildContext context, int index) {
     final tabInfo = chatTabsStore.tabs[index];
     final isActive = index == chatTabsStore.activeTabIndex;
-    final isActivated = tabInfo.isActivated;
+    final isSecondary = !tabInfo.isPrimary;
     final displayName = getReadableName(
       tabInfo.displayName,
       tabInfo.channelLogin,
     );
 
-    final avatar = ProfilePicture(userLogin: tabInfo.channelLogin, radius: 12);
+    return Observer(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final isActivated = tabInfo.isActivated;
+        final hasUnread = chatTabsStore.hasUnreadMessages(index);
+        final dimmed = !isActivated || !(tabInfo.chatStore?.isConnected ?? false);
 
-    if (tabInfo.isPrimary) {
-      return InputChip(
-        avatar: avatar,
-        label: Text(displayName),
-        selected: isActive,
-        showCheckmark: false,
-        visualDensity: VisualDensity.compact,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        onPressed: () {
-          if (!isActive) {
-            HapticFeedback.selectionClick();
-            chatTabsStore.setActiveTab(index);
-          }
-        },
-      );
-    }
-
-    return MenuAnchor(
-      menuChildren: [
-        if (isActivated)
-          MenuItemButton(
-            leadingIcon: const Icon(Icons.power_off_rounded, size: 18),
-            child: const Text('Disconnect'),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              chatTabsStore.deactivateTab(index);
-            },
-          ),
-        MenuItemButton(
-          leadingIcon: Icon(
-            Icons.delete_outline_rounded,
-            size: 18,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          child: Text(
-            'Remove',
-            style: TextStyle(color: Theme.of(context).colorScheme.error),
-          ),
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            chatTabsStore.removeTab(index);
-          },
-        ),
-      ],
-      builder: (context, controller, child) {
-        return InputChip(
-          avatar:
-              isActivated ? avatar : Opacity(opacity: 0.5, child: avatar),
-          label: Text(
-            displayName,
-            style: isActivated
-                ? null
-                : TextStyle(
-                    color: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.color?.withValues(alpha: 0.5),
+        InputChip buildChip({VoidCallback? onDeleted}) => InputChip(
+              avatar: Badge(
+                smallSize: 8,
+                backgroundColor: theme.colorScheme.primary,
+                isLabelVisible: hasUnread,
+                child: Opacity(
+                  opacity: dimmed ? 0.5 : 1.0,
+                  child: ProfilePicture(
+                    userLogin: tabInfo.channelLogin,
+                    radius: 12,
                   ),
-          ),
-          selected: isActive,
-          showCheckmark: false,
-          visualDensity: VisualDensity.compact,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onPressed: () {
-            if (!isActive) {
-              HapticFeedback.selectionClick();
-              chatTabsStore.setActiveTab(index);
-            }
-          },
-          onDeleted: () => controller.open(),
-          deleteButtonTooltipMessage: 'Tab options',
+                ),
+              ),
+              label: Text(
+                displayName,
+                style: dimmed
+                    ? TextStyle(
+                        color: theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.5),
+                      )
+                    : null,
+              ),
+              selected: isActive,
+              showCheckmark: false,
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onPressed: () {
+                if (isActive) return;
+                HapticFeedback.selectionClick();
+                chatTabsStore.setActiveTab(index);
+              },
+              onDeleted: onDeleted,
+              deleteButtonTooltipMessage:
+                  onDeleted != null ? 'Tab options' : null,
+            );
+
+        if (!isSecondary) return buildChip();
+
+        return _AnchoredPopupMenu(
+          itemsBuilder: (close) => [
+            if (isActivated)
+              MenuItemButton(
+                leadingIcon: const Icon(Icons.power_off_rounded, size: 18),
+                child: const Text('Disconnect'),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  close();
+                  chatTabsStore.deactivateTab(index);
+                },
+              ),
+            MenuItemButton(
+              leadingIcon: Icon(
+                Icons.delete_outline_rounded,
+                size: 18,
+                color: theme.colorScheme.error,
+              ),
+              child: Text(
+                'Remove',
+                style: TextStyle(color: theme.colorScheme.error),
+              ),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                close();
+                chatTabsStore.removeTab(index);
+              },
+            ),
+          ],
+          anchorBuilder: (context, toggle) =>
+              buildChip(onDeleted: toggle),
         );
       },
+    );
+  }
+}
+
+/// Lightweight popup menu anchored to a child widget. The menu's top-right
+/// aligns to the anchor's bottom-right via [CompositedTransformFollower] and
+/// fades + scales in from that corner. [MenuAnchor] doesn't expose an entry
+/// animation hook in this Flutter version, so we drive one ourselves.
+class _AnchoredPopupMenu extends StatefulWidget {
+  final Widget Function(BuildContext context, VoidCallback toggle)
+      anchorBuilder;
+  final List<Widget> Function(VoidCallback close) itemsBuilder;
+
+  const _AnchoredPopupMenu({
+    required this.anchorBuilder,
+    required this.itemsBuilder,
+  });
+
+  @override
+  State<_AnchoredPopupMenu> createState() => _AnchoredPopupMenuState();
+}
+
+class _AnchoredPopupMenuState extends State<_AnchoredPopupMenu>
+    with SingleTickerProviderStateMixin {
+  final _link = LayerLink();
+  final _portalCtrl = OverlayPortalController();
+  late final _anim = AnimationController(
+    duration: const Duration(milliseconds: 150),
+    reverseDuration: const Duration(milliseconds: 100),
+    vsync: this,
+  )..addStatusListener((status) {
+      if (status == AnimationStatus.dismissed && _portalCtrl.isShowing) {
+        _portalCtrl.hide();
+      }
+    });
+  late final _curve =
+      CurvedAnimation(parent: _anim, curve: Curves.easeOut);
+  late final _scale = Tween<double>(begin: 0.92, end: 1.0).animate(_curve);
+
+  @override
+  void dispose() {
+    _curve.dispose();
+    _anim.dispose();
+    super.dispose();
+  }
+
+  void _toggle() {
+    if (_portalCtrl.isShowing) {
+      _anim.reverse();
+    } else {
+      _portalCtrl.show();
+      _anim.forward();
+    }
+  }
+
+  void _close() {
+    if (_portalCtrl.isShowing) _anim.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CompositedTransformTarget(
+      link: _link,
+      child: OverlayPortal(
+        controller: _portalCtrl,
+        overlayChildBuilder: (overlayContext) {
+          final theme = Theme.of(overlayContext);
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _close,
+                ),
+              ),
+              CompositedTransformFollower(
+                link: _link,
+                targetAnchor: Alignment.bottomRight,
+                followerAnchor: Alignment.topRight,
+                offset: const Offset(0, 4),
+                showWhenUnlinked: false,
+                child: FadeTransition(
+                  opacity: _anim,
+                  child: ScaleTransition(
+                    scale: _scale,
+                    alignment: Alignment.topRight,
+                    child: Material(
+                      color: theme.colorScheme.surface,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                        side: BorderSide(
+                          color: theme.colorScheme.outlineVariant
+                              .withValues(alpha: 0.5),
+                          width: 0.5,
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: IntrinsicWidth(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: widget.itemsBuilder(_close),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+        child: widget.anchorBuilder(context, _toggle),
+      ),
     );
   }
 }

@@ -39,7 +39,7 @@ class _SettingsPageLayoutState extends State<SettingsPageLayout> {
 
     // Responsive values based on orientation
     final listPadding = EdgeInsets.only(
-      top: isPortrait ? 116 : 92,
+      top: isPortrait ? 124 : 100,
       bottom: widget.hasBottomPadding ? context.safePaddingBottom + 8 : 0,
     );
 

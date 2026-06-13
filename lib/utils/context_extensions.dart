@@ -3,6 +3,7 @@ import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/ffz_api.dart';
 import 'package:frosty/apis/seventv_api.dart';
 import 'package:frosty/apis/twitch_api.dart';
+import 'package:frosty/apis/twitch_gql_api.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/stores/global_assets_store.dart';
@@ -13,17 +14,17 @@ import 'package:provider/provider.dart';
 class OrientationUtils {
   /// Gets the current orientation from the given context
   static Orientation getCurrentOrientation(BuildContext context) {
-    return MediaQuery.of(context).orientation;
+    return MediaQuery.orientationOf(context);
   }
 
   /// Returns true if the current orientation is portrait
   static bool isPortrait(BuildContext context) {
-    return MediaQuery.of(context).orientation == Orientation.portrait;
+    return MediaQuery.orientationOf(context) == Orientation.portrait;
   }
 
   /// Returns true if the current orientation is landscape
   static bool isLandscape(BuildContext context) {
-    return MediaQuery.of(context).orientation == Orientation.landscape;
+    return MediaQuery.orientationOf(context) == Orientation.landscape;
   }
 }
 
@@ -55,21 +56,24 @@ extension ContextExtensions on BuildContext {
   // ===== SCREEN & LAYOUT =====
 
   /// Gets the screen width
-  double get screenWidth => MediaQuery.of(this).size.width;
+  double get screenWidth => MediaQuery.sizeOf(this).width;
 
   /// Gets the screen height
-  double get screenHeight => MediaQuery.of(this).size.height;
+  double get screenHeight => MediaQuery.sizeOf(this).height;
 
   /// Gets the safe area padding top (commonly used)
-  double get safePaddingTop => MediaQuery.of(this).padding.top;
+  double get safePaddingTop => MediaQuery.paddingOf(this).top;
 
   /// Gets the safe area padding bottom (commonly used)
-  double get safePaddingBottom => MediaQuery.of(this).padding.bottom;
+  double get safePaddingBottom => MediaQuery.paddingOf(this).bottom;
 
   // ===== PROVIDER ACCESS =====
 
   /// Gets TwitchApi from provider
   TwitchApi get twitchApi => read<TwitchApi>();
+
+  /// Gets TwitchGqlApi from provider
+  TwitchGqlApi get twitchGqlApi => read<TwitchGqlApi>();
 
   /// Gets AuthStore from provider
   AuthStore get authStore => read<AuthStore>();

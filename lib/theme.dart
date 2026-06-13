@@ -39,23 +39,23 @@ class FrostyColors extends ThemeExtension<FrostyColors> {
     required this.overlayOnSurface,
   });
 
-  static const light = FrostyColors(
-    highlightedMessage: Color(0xff9146ff),
-    emoteOnly: Color(0xFFFFB74D),
-    followersOnly: Color(0xFFF44336),
-    slowMode: Color(0xFF2196F3),
-    subOnly: Color(0xFF4CAF50),
-    uniqueMode: Color(0xFFAB47BC),
+  static FrostyColors light({required ColorScheme colorScheme}) => FrostyColors(
+    highlightedMessage: colorScheme.primary,
+    emoteOnly: const Color(0xFFFFB74D),
+    followersOnly: const Color(0xFFF44336),
+    slowMode: const Color(0xFF2196F3),
+    subOnly: const Color(0xFF4CAF50),
+    uniqueMode: const Color(0xFFAB47BC),
     overlayOnSurface: Colors.white,
   );
 
-  static const dark = FrostyColors(
-    highlightedMessage: Color(0xff9146ff),
-    emoteOnly: Color(0xFFFFCC80),
-    followersOnly: Color(0xFFE57373),
-    slowMode: Color(0xFF64B5F6),
-    subOnly: Color(0xFF81C784),
-    uniqueMode: Color(0xFFBA68C8),
+  static FrostyColors dark({required ColorScheme colorScheme}) => FrostyColors(
+    highlightedMessage: colorScheme.primary,
+    emoteOnly: const Color(0xFFFFCC80),
+    followersOnly: const Color(0xFFE57373),
+    slowMode: const Color(0xFF64B5F6),
+    subOnly: const Color(0xFF81C784),
+    uniqueMode: const Color(0xFFBA68C8),
     overlayOnSurface: Colors.white,
   );
 
@@ -124,12 +124,17 @@ class FrostyThemes {
     return ThemeData(
       extensions: [
         colorScheme.brightness == Brightness.dark
-            ? FrostyColors.dark
-            : FrostyColors.light,
+            ? FrostyColors.dark(colorScheme: colorScheme)
+            : FrostyColors.light(colorScheme: colorScheme),
       ],
       colorScheme: colorScheme,
       fontFamily: 'Inter',
       splashFactory: Platform.isIOS ? NoSplash.splashFactory : null,
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: colorScheme.primary,
+        selectionColor: colorScheme.primary.withValues(alpha: 0.3),
+        selectionHandleColor: colorScheme.primary,
+      ),
       scaffoldBackgroundColor: backgroundColor,
       bottomSheetTheme: BottomSheetThemeData(
         showDragHandle: true,
@@ -139,7 +144,7 @@ class FrostyThemes {
       menuTheme: MenuThemeData(
         style: MenuStyle(
           padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(vertical: 4),
+            EdgeInsets.symmetric(vertical: 2),
           ),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
@@ -152,6 +157,9 @@ class FrostyThemes {
       menuButtonTheme: MenuButtonThemeData(
         style: MenuItemButton.styleFrom(
           visualDensity: VisualDensity.compact,
+          minimumSize: const Size(0, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ),
       dialogTheme: DialogThemeData(
@@ -194,6 +202,23 @@ class FrostyThemes {
             color: colorScheme.primary.withValues(alpha: 0.8),
             width: 1.5,
           ),
+        ),
+      ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          letterSpacing: -0.011,
+          height: 1.5,
+        ),
+        subtitleTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+          fontSize: 13,
+          height: 1.4,
+        ),
+        leadingAndTrailingTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(

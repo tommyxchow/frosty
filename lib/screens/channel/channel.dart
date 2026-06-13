@@ -6,9 +6,13 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_tabs.dart';
+import 'package:frosty/screens/channel/video/native_video.dart';
+import 'package:frosty/screens/channel/video/native_video_player_interface.dart';
+import 'package:frosty/screens/channel/video/native_video_store.dart';
 import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
 import 'package:frosty/screens/channel/video/video_overlay.dart';
+import 'package:frosty/screens/channel/video/video_player_interface.dart';
 import 'package:frosty/screens/channel/video/video_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
@@ -43,11 +47,10 @@ class _VideoChatState extends State<VideoChat>
   final _videoKey = GlobalKey();
   final _chatKey = GlobalKey();
 
-  // PiP drag state - essential only
-  double _pipDragDistance = 0;
+  // PiP drag state — ValueNotifier avoids full widget rebuilds during drag.
+  final _pipDragDistance = ValueNotifier<double>(0);
   bool _isPipDragging = false;
-  bool _isInPipTriggerZone =
-      false; // Track when in trigger zone for haptic feedback
+  bool _isInPipTriggerZone = false;
 
   // Divider drag state for synchronizing animation
   bool _isDividerDragging = false;
@@ -75,13 +78,24 @@ class _VideoChatState extends State<VideoChat>
     primaryDisplayName: widget.userName,
   );
 
-  late final VideoStore _videoStore = VideoStore(
-    userLogin: widget.userLogin,
-    userId: widget.userId,
-    twitchApi: context.twitchApi,
-    authStore: context.authStore,
-    settingsStore: context.settingsStore,
-  );
+  late final VideoPlayerInterface _videoStore =
+      context.settingsStore.useNativePlayer
+          ? NativeVideoStore(
+              userLogin: widget.userLogin,
+              userId: widget.userId,
+              displayName: widget.userName,
+              twitchApi: context.twitchApi,
+              twitchGqlApi: context.twitchGqlApi,
+              authStore: context.authStore,
+              settingsStore: context.settingsStore,
+            )
+          : VideoStore(
+              userLogin: widget.userLogin,
+              userId: widget.userId,
+              twitchApi: context.twitchApi,
+              authStore: context.authStore,
+              settingsStore: context.settingsStore,
+            );
 
   @override
   void initState() {
@@ -98,12 +112,10 @@ class _VideoChatState extends State<VideoChat>
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
 
-    // Attach listener to the controller (not the derived animation) so it
-    // survives _springBackAnimation being reassigned in _animateSpringBack.
+    // Drive the ValueNotifier from the spring-back animation so the
+    // AnimatedBuilder rebuilds without a full setState.
     _animationController.addListener(() {
-      setState(() {
-        _pipDragDistance = _springBackAnimation.value;
-      });
+      _pipDragDistance.value = _springBackAnimation.value;
     });
 
     // Register as observer for app lifecycle events
@@ -120,58 +132,58 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragStart(DragStartDetails details) {
-    // Disable drag gesture when already in PiP mode or video is not playing
-    if (_videoStore.isInPipMode || _videoStore.paused) return;
+    if (_videoStore.isInPipMode || _videoStore.paused || _videoStore.loading) {
+      return;
+    }
 
-    _animationController.stop(); // Stop any ongoing animation
+    _animationController.stop();
+    _pipDragDistance.value = 0;
+    _isInPipTriggerZone = false;
     setState(() {
       _isPipDragging = true;
-      _pipDragDistance = 0;
-      _isInPipTriggerZone = false;
     });
   }
 
   void _handlePipDragUpdate(DragUpdateDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+    if (!_isPipDragging ||
+        _videoStore.isInPipMode ||
+        _videoStore.paused ||
+        _videoStore.loading) {
       return;
     }
 
-    setState(() {
-      _pipDragDistance += details.delta.dy;
-      _pipDragDistance = _pipDragDistance.clamp(0, _pipMaxDragDistance);
+    // Update the ValueNotifier directly — only the ListenableBuilder rebuilds,
+    // not the entire channel scaffold.
+    _pipDragDistance.value =
+        (_pipDragDistance.value + details.delta.dy).clamp(0, _pipMaxDragDistance);
 
-      // Check if we've entered or exited the trigger zone for haptic feedback
-      final wasInTriggerZone = _isInPipTriggerZone;
-      _isInPipTriggerZone = _pipDragDistance >= _pipTriggerDistance;
+    final wasInTriggerZone = _isInPipTriggerZone;
+    _isInPipTriggerZone = _pipDragDistance.value >= _pipTriggerDistance;
 
-      // Provide haptic feedback when entering the trigger zone
-      if (!wasInTriggerZone && _isInPipTriggerZone) {
-        HapticFeedback.mediumImpact(); // Entering trigger zone
-      }
-      // Provide subtle haptic feedback when exiting the trigger zone
-      else if (wasInTriggerZone && !_isInPipTriggerZone) {
-        HapticFeedback.lightImpact(); // Exiting trigger zone
-      }
-    });
+    if (!wasInTriggerZone && _isInPipTriggerZone) {
+      HapticFeedback.mediumImpact();
+    } else if (wasInTriggerZone && !_isInPipTriggerZone) {
+      HapticFeedback.lightImpact();
+    }
   }
 
   void _handlePipDragEnd(DragEndDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+    if (!_isPipDragging ||
+        _videoStore.isInPipMode ||
+        _videoStore.paused ||
+        _videoStore.loading) {
       return;
     }
 
     final velocity = details.velocity.pixelsPerSecond.dy;
     final shouldTriggerPip =
-        _pipDragDistance >= _pipTriggerDistance ||
-        velocity > 600; // Simple velocity threshold
+        _pipDragDistance.value >= _pipTriggerDistance || velocity > 600;
 
     if (shouldTriggerPip) {
-      // Simple haptic feedback on success
       HapticFeedback.mediumImpact();
       _videoStore.requestPictureInPicture();
       _resetDragState();
     } else {
-      // Animate back to original position
       _animateSpringBack();
     }
   }
@@ -182,16 +194,16 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _resetDragState() {
+    _pipDragDistance.value = 0;
+    _isInPipTriggerZone = false;
     setState(() {
       _isPipDragging = false;
-      _pipDragDistance = 0;
-      _isInPipTriggerZone = false;
     });
   }
 
   void _animateSpringBack() {
-    _springBackAnimation = Tween<double>(begin: _pipDragDistance, end: 0)
-        .animate(
+    _springBackAnimation =
+        Tween<double>(begin: _pipDragDistance.value, end: 0).animate(
           CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
         );
 
@@ -229,13 +241,13 @@ class _VideoChatState extends State<VideoChat>
         ? AspectRatio(aspectRatio: aspectRatio, child: child)
         : child;
 
-    return AnimatedBuilder(
-      animation: _animationController,
+    // Listen to the ValueNotifier (drag) and AnimationController (spring-back)
+    // so only this subtree rebuilds during the gesture — not the full scaffold.
+    return ListenableBuilder(
+      listenable: _pipDragDistance,
       child: wrappedChild,
       builder: (context, animatedChild) {
-        final currentDragDistance = _isPipDragging
-            ? _pipDragDistance
-            : _springBackAnimation.value;
+        final currentDragDistance = _pipDragDistance.value;
 
         final scaleFactor =
             1.0 - (currentDragDistance / _pipMaxDragDistance * 0.1);
@@ -256,11 +268,13 @@ class _VideoChatState extends State<VideoChat>
                 if (!_videoStore.isInPipMode)
                   Positioned.fill(
                     child: IgnorePointer(
-                      ignoring: !(_isPipDragging && _pipDragDistance > 0),
+                      ignoring:
+                          !(_isPipDragging && currentDragDistance > 0),
                       child: AnimatedOpacity(
-                        opacity: (_isPipDragging && _pipDragDistance > 0)
-                            ? 1.0
-                            : 0.0,
+                        opacity:
+                            (_isPipDragging && currentDragDistance > 0)
+                                ? 1.0
+                                : 0.0,
                         duration: const Duration(milliseconds: 150),
                         curve: Curves.easeOut,
                         child: Container(
@@ -297,7 +311,12 @@ class _VideoChatState extends State<VideoChat>
 
     final player = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
-      child: Video(key: _videoKey, videoStore: _videoStore),
+      child: _videoStore is NativeVideoStore
+          ? NativeVideo(nativeVideoStore: _videoStore)
+          : Video(
+              key: _videoKey,
+              videoStore: _videoStore as VideoStore,
+            ),
     );
 
     final overlay = GestureDetector(
@@ -324,7 +343,9 @@ class _VideoChatState extends State<VideoChat>
             settingsStore: settingsStore,
           );
 
-          if (_videoStore.paused || _videoStore.streamInfo == null) {
+          if (_videoStore.paused ||
+              _videoStore.streamInfo == null ||
+              _videoStore.loading) {
             return videoOverlay;
           }
 
@@ -344,15 +365,49 @@ class _VideoChatState extends State<VideoChat>
       ),
     );
 
-    final video = Observer(
-      builder: (context) {
-        return Stack(
-          children: [
-            player,
-            if (_videoStore.settingsStore.showOverlay) overlay,
-          ],
-        );
-      },
+    final video = Stack(
+      children: [
+        player,
+        Positioned.fill(
+          child: Observer(
+            builder: (_) => AnimatedOpacity(
+              opacity: _videoStore.loading ? 1.0 : 0.0,
+              // Appear instantly to cover native player placeholders during
+              // recovery; fade out smoothly when playback resumes.
+              duration: _videoStore.loading
+                  ? Duration.zero
+                  : const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              // TickerMode stops the spinner's repeating animation while
+              // hidden — opacity 0 skips painting but would otherwise keep
+              // scheduling frames for the whole video session.
+              child: IgnorePointer(
+                child: TickerMode(
+                  enabled: _videoStore.loading,
+                  child: const ColoredBox(
+                    color: Colors.black,
+                    child: Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white38,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Observer(
+          builder: (_) => _videoStore.settingsStore.showOverlay
+              ? overlay
+              : const SizedBox.shrink(),
+        ),
+      ],
     );
 
     final chat = Observer(
@@ -683,7 +738,7 @@ class _VideoChatState extends State<VideoChat>
                         if (settingsStore.showVideo) ...[
                           AspectRatio(
                             aspectRatio: 16 / 9,
-                            child: Container(), // Placeholder for video space
+                            child: SizedBox(),
                           ),
                         ],
                         Expanded(child: chat),
@@ -710,9 +765,18 @@ class _VideoChatState extends State<VideoChat>
 
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
+      void notifyPip(bool isInPip) {
+        final store = _videoStore;
+        if (store is NativeVideoPlayerInterface) {
+          store.handleAndroidPipChanged(isInPip);
+        }
+      }
+
       return PipWidget(
         pipLayout: PipActionsLayout.mediaOnlyPause,
         onPipAction: (_) => _videoStore.handlePausePlay(),
+        onPipEntered: () => notifyPip(true),
+        onPipExited: () => notifyPip(false),
         pipChild: player,
         child: videoChat,
       );
@@ -731,6 +795,7 @@ class _VideoChatState extends State<VideoChat>
     _videoStore.dispose();
 
     _animationController.dispose();
+    _pipDragDistance.dispose();
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,

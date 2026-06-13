@@ -35,6 +35,26 @@ mixin _$AuthStore on AuthBase, Store {
     });
   }
 
+  late final _$_gqlTokenAtom = Atom(
+    name: 'AuthBase._gqlToken',
+    context: context,
+  );
+
+  String? get gqlToken {
+    _$_gqlTokenAtom.reportRead();
+    return super._gqlToken;
+  }
+
+  @override
+  String? get _gqlToken => gqlToken;
+
+  @override
+  set _gqlToken(String? value) {
+    _$_gqlTokenAtom.reportWrite(value, super._gqlToken, () {
+      super._gqlToken = value;
+    });
+  }
+
   late final _$_isLoggedInAtom = Atom(
     name: 'AuthBase._isLoggedIn',
     context: context,
@@ -70,6 +90,18 @@ mixin _$AuthStore on AuthBase, Store {
     _$_errorAtom.reportWrite(value, super._error, () {
       super._error = value;
     });
+  }
+
+  late final _$invalidateGqlTokenAsyncAction = AsyncAction(
+    'AuthBase.invalidateGqlToken',
+    context: context,
+  );
+
+  @override
+  Future<void> invalidateGqlToken() {
+    return _$invalidateGqlTokenAsyncAction.run(
+      () => super.invalidateGqlToken(),
+    );
   }
 
   late final _$initAsyncAction = AsyncAction('AuthBase.init', context: context);

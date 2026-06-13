@@ -45,3 +45,4 @@ next-env.d.ts
 
 # ai
 .claude/settings.local.json
+.playwright-mcp

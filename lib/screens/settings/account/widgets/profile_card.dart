@@ -5,6 +5,7 @@ import 'package:frosty/screens/onboarding/login_webview.dart';
 import 'package:frosty/screens/settings/account/account_options.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
+import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:frosty/widgets/profile_picture.dart';
 
 class ProfileCard extends StatelessWidget {
@@ -39,12 +40,69 @@ class ProfileCard extends StatelessWidget {
           );
         }
         if (authStore.isLoggedIn && authStore.user.details != null) {
+          final hasToken = authStore.gqlToken != null;
           return ListTile(
             leading: ProfilePicture(
               userLogin: authStore.user.details!.login,
               radius: 12,
             ),
-            title: Text(authStore.user.details!.displayName),
+            title: GestureDetector(
+              onTap: () {
+                final navigator = Navigator.of(context);
+                showDialog(
+                  context: context,
+                  builder: (dialogContext) => FrostyDialog(
+                    title: 'Web session',
+                    message: hasToken
+                        ? 'Your Twitch web session is linked. When using the native player, ads will be avoided on channels where you have a subscription or Twitch Turbo.'
+                        : 'Your Twitch web session is not linked. Log in again to avoid ads when using the native player on channels where you have a subscription or Twitch Turbo.',
+                    actions: hasToken
+                        ? [
+                            TextButton(
+                              onPressed: Navigator.of(dialogContext).pop,
+                              child: const Text('OK'),
+                            ),
+                          ]
+                        : [
+                            TextButton(
+                              onPressed: Navigator.of(dialogContext).pop,
+                              child: const Text('Cancel'),
+                            ),
+                            FilledButton(
+                              onPressed: () {
+                                Navigator.of(dialogContext).pop();
+                                navigator.push(
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginWebView(),
+                                  ),
+                                );
+                              },
+                              child: const Text('Log in'),
+                            ),
+                          ],
+                  ),
+                );
+              },
+              child: Text.rich(
+                TextSpan(
+                  text: authStore.user.details!.displayName,
+                  children: [
+                    const WidgetSpan(child: SizedBox(width: 6)),
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Icon(
+                        hasToken
+                            ? Icons.check_circle_outline_rounded
+                            : Icons.info_outline_rounded,
+                        size: 16,
+                        color: hasToken ? Colors.green : Colors.amber,
+                      ),
+                    ),
+                  ],
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => _showAccountOptionsModalBottomSheet(context),
           );

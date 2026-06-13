@@ -15,6 +15,7 @@ import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
 import 'package:mobx/mobx.dart';
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 part 'chat_store.g.dart';
@@ -66,32 +67,41 @@ abstract class ChatStoreBase with Store {
     'msg_bad_characters',
   };
 
-  /// Base height of the bottom bar (input field area).
+  /// Fallback height used to pad the message list for one frame, until the
+  /// real bottom bar reports its measured height via [setBottomBarHeight].
   static const _baseBottomBarHeight = 68.0;
 
-  /// Height of the autocomplete bar (SizedBox + Divider).
-  static const _autocompleteHeight = 51.0;
+  /// Server-initiated graceful reconnect notice. Twitch sends this untagged
+  /// before maintenance so clients can re-establish ahead of the close.
+  static const _serverReconnectNotice = ':tmi.twitch.tv RECONNECT';
 
-  /// Height of the reply bar (Container + Divider).
-  static const _replyBarHeight = 41.0;
+  /// Muted words pre-normalized (trimmed, lowercased, empties dropped) by a
+  /// reaction on the setting — avoids re-normalizing on every message.
+  var _normalizedMutedWords = <String>[];
 
-  /// Checks if IRC data contains a command that should bypass the chat delay.
-  /// Returns true if any message in the data contains a bypass command.
-  bool _shouldBypassDelay(String data) {
-    for (final message in data.trimRight().split('\r\n')) {
-      if (message.startsWith('@')) {
-        final parts = message.split(' ');
-        if (parts.length >= 3 && _delayBypassCommands.contains(parts[2])) {
-          return true;
-        }
-      }
-    }
-    return false;
+  /// Whether a single IRC [line] should bypass the chat delay and be handled
+  /// immediately. Displayable chat content (PRIVMSG/USERNOTICE and the
+  /// moderation CLEARCHAT/CLEARMSG) is delayed, so it stays in sync with the
+  /// delayed video. Everything else is handled at once: control/state messages
+  /// (USERSTATE/ROOMSTATE/GLOBALUSERSTATE), NOTICE (so a send rejection surfaces
+  /// immediately instead of one chat-delay later), the reconnect notice, and
+  /// any untagged server line (PING keepalives, CAP, JOIN, the welcome banner)
+  /// — delaying those would stall the send-ack, drop the PONG, or never start
+  /// the buffer drain.
+  bool _lineShouldBypassDelay(String line) {
+    if (line.isEmpty || line == _serverReconnectNotice) return true;
+    // Displayable chat content is always IRCv3-tagged; an untagged line is
+    // never delayed.
+    if (!line.startsWith('@')) return true;
+    final parts = line.split(' ');
+    return parts.length >= 3 && _delayBypassCommands.contains(parts[2]);
   }
 
-  int get _chatDelaySeconds => settings.effectiveChatDelay.toInt();
+  Duration get _chatDelay => Duration(
+        milliseconds: (settings.effectiveChatDelay * 1000).round(),
+      );
 
-  bool get _hasActiveChatDelay => settings.showVideo && _chatDelaySeconds > 0;
+  bool get _hasActiveChatDelay => settings.showVideo && _chatDelay > Duration.zero;
 
   final TwitchApi twitchApi;
 
@@ -131,6 +141,12 @@ abstract class ChatStoreBase with Store {
 
   static const _maxRetries = 5;
 
+  /// Ping interval for both the IRC and 7TV WebSocket sockets. Catches
+  /// zombie connections (silent network changes, OS suspends) without
+  /// waking the radio every 15s. Twitch's own recommended keepalive tops
+  /// out at 600s; community libs (e.g. dank-twitch-irc) sit around 30s.
+  static const _pingInterval = Duration(seconds: 60);
+
   // The retry counter for exponential backoff.
   var _retries = 0;
 
@@ -157,6 +173,12 @@ abstract class ChatStoreBase with Store {
 
   /// Requested message to be sent by the user. Will only be sent on receipt of a USERNOTICE command.
   IRCMessage? toSend;
+
+  /// Raw text of the most recent outgoing message, retained until the send is
+  /// confirmed. Lets the USERSTATE handler build the local echo even when the
+  /// message was sent before this session's first USERSTATE arrived (so
+  /// [toSend] couldn't be built up front).
+  String? _pendingSentMessageText;
 
   /// The list of reaction disposer functions that will be used later when disposing.
   final reactions = <ReactionDisposer>[];
@@ -300,25 +322,26 @@ abstract class ChatStoreBase with Store {
         .toList();
   }
 
-  /// Current bottom bar height based on visible overlays.
-  /// Used to dynamically adjust chat message list padding.
+  /// Measured height of the rendered bottom bar (input plus any reply or
+  /// autocomplete overlays). The bar reports this via [setBottomBarHeight] so
+  /// the message list's bottom padding tracks the bar's *true* height —
+  /// including multi-line input growth and OS text scaling, which fixed
+  /// per-overlay constants silently undercount.
+  final _measuredBottomBarHeight = Observable<double?>(null);
+
+  /// Current bottom bar height, used to dynamically pad the message list so the
+  /// bar never overlaps messages. Falls back to the single-line base height
+  /// until the real bar reports its first measurement.
   @computed
-  double get bottomBarHeight {
-    var height = _baseBottomBarHeight;
+  double get bottomBarHeight =>
+      _measuredBottomBarHeight.value ?? _baseBottomBarHeight;
 
-    // Add reply bar height when replying to a message.
-    if (replyingToMessage != null) {
-      height += _replyBarHeight;
-    }
-
-    // Add autocomplete bar height when showing matches.
-    if (settings.autocomplete &&
-        ((_showEmoteAutocomplete && matchingEmotes.isNotEmpty) ||
-            (_showMentionAutocomplete && matchingChatters.isNotEmpty))) {
-      height += _autocompleteHeight;
-    }
-
-    return height;
+  /// Reports the bar's real rendered height. Sub-pixel changes are ignored to
+  /// avoid needless message-list relayouts.
+  void setBottomBarHeight(double height) {
+    final current = _measuredBottomBarHeight.value;
+    if (current != null && (current - height).abs() < 0.5) return;
+    runInAction(() => _measuredBottomBarHeight.value = height);
   }
 
   ChatStoreBase({
@@ -335,6 +358,21 @@ abstract class ChatStoreBase with Store {
     // Closing the channel will trigger a reconnect with the new credentials.
     reactions.add(
       reaction((_) => auth.isLoggedIn, (_) => _channel?.sink.close(1000)),
+    );
+
+    // Normalize muted words once per settings change instead of per message
+    // — the filter runs in the IRC hot path (50+ msgs/s in busy channels).
+    reactions.add(
+      reaction(
+        (_) => settings.mutedWords.toList(),
+        (List<String> words) {
+          _normalizedMutedWords = words
+              .map((word) => word.trim().toLowerCase())
+              .where((word) => word.isNotEmpty)
+              .toList();
+        },
+        fireImmediately: true,
+      ),
     );
 
     reactions.add(
@@ -449,7 +487,7 @@ abstract class ChatStoreBase with Store {
   ) {
     queue.add(
       _DelayedCallback(
-        releaseAt: DateTime.now().add(Duration(seconds: _chatDelaySeconds)),
+        releaseAt: DateTime.now().add(_chatDelay),
         callback: callback,
       ),
     );
@@ -518,6 +556,15 @@ abstract class ChatStoreBase with Store {
     // To account for this, split by CRLF, then loop and process each message.
     for (final message in data.trimRight().split('\r\n')) {
       // debugPrint('$message\n');
+      if (message == _serverReconnectNotice) {
+        // Twitch is about to close the socket for maintenance — close it
+        // ourselves so the existing onDone path reconnects with no backoff
+        // (first retry is immediate) instead of waiting for the server to
+        // drop us mid-message.
+        _channel?.sink.close(1000);
+        continue;
+      }
+
       if (message.startsWith('@')) {
         // Parse defensively: a single malformed message must never abort the
         // loop, or one bad frame would drop every other message batched with
@@ -549,19 +596,18 @@ abstract class ChatStoreBase with Store {
           continue;
         }
 
-        // Filter messages containing any muted words.
-        if (parsedIRCMessage.message != null) {
-          final List<String> mutedWords = settings.mutedWords;
-
-          // check if the message contains any of the muted words
-          for (final word in mutedWords) {
-            if (parsedIRCMessage.message!
-                .toLowerCase()
-                .split(settings.matchWholeWord ? ' ' : '')
-                .contains(word.toLowerCase())) {
-              return;
-            }
-          }
+        // Filter messages containing any muted words. Must use `continue`
+        // (not `return`) — a single IRC frame can batch many messages, and
+        // returning would drop the rest of the frame with the matched one.
+        if (parsedIRCMessage.message != null &&
+            _normalizedMutedWords.isNotEmpty) {
+          final msg = parsedIRCMessage.message!.toLowerCase();
+          final words = settings.matchWholeWord ? msg.split(' ') : null;
+          final muted = _normalizedMutedWords.any(
+            (word) =>
+                words != null ? words.contains(word) : msg.contains(word),
+          );
+          if (muted) continue;
         }
 
         switch (parsedIRCMessage.command) {
@@ -577,6 +623,9 @@ abstract class ChatStoreBase with Store {
                 _sendingTimeoutTimer?.cancel();
                 _isWaitingForAck = false;
                 toSend = null;
+                // Drop the retained text so a later USERSTATE can't render the
+                // rejected message as a deferred echo.
+                _pendingSentMessageText = null;
 
                 // Show notification with Twitch's rejection message
                 if (parsedIRCMessage.message != null) {
@@ -645,23 +694,13 @@ abstract class ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
 
-            // USERSTATE arrival confirms message was sent, even without id tag
-            if (toSend != null) {
-              final messageId = parsedIRCMessage.tags['id'];
-              if (messageId != null) {
-                toSend!.tags['id'] = messageId;
-              } else {
-                // Fallback ID for edge cases where Twitch doesn't provide one
-                toSend!.tags['id'] =
-                    'local-${DateTime.now().millisecondsSinceEpoch}';
-              }
-              messageBuffer.add(toSend!);
-              toSend = null;
-              // Reset sending state and clear text/reply after successful confirmation
-              _sendingTimeoutTimer?.cancel();
-              _isWaitingForAck = false;
-              textController.clear();
-              replyingToMessage = null;
+            // A USERSTATE following our PRIVMSG confirms the send. Finalize
+            // regardless of whether a local echo was pre-built — gating this on
+            // `toSend` left the player stuck "sending" (and firing a false
+            // "may not have been sent") whenever the message went out before
+            // this session's first USERSTATE populated `_userState`.
+            if (_isWaitingForAck) {
+              _finalizeSend(parsedIRCMessage.tags['id']);
             }
             break;
           case Command.globalUserState:
@@ -825,8 +864,9 @@ abstract class ChatStoreBase with Store {
 
     _sevenTVChannel?.sink.close(1000);
     _clearPendingDelayedCallbacks(clearChat: false);
-    _sevenTVChannel = WebSocketChannel.connect(
+    _sevenTVChannel = IOWebSocketChannel.connect(
       Uri.parse('wss://events.7tv.io/v3'),
+      pingInterval: _pingInterval,
     );
 
     void listener(dynamic data) {
@@ -913,8 +953,9 @@ abstract class ChatStoreBase with Store {
     _clearPendingDelayedCallbacks(clearSevenTV: false);
 
     _channel?.sink.close(1000);
-    _channel = WebSocketChannel.connect(
+    _channel = IOWebSocketChannel.connect(
       Uri.parse('wss://irc-ws.chat.twitch.tv:443'),
+      pingInterval: _pingInterval,
     );
 
     // Only show chat delay countdown on initial connection or video toggle, not on reconnects
@@ -927,13 +968,27 @@ abstract class ChatStoreBase with Store {
       (data) {
         final dataStr = data.toString();
 
-        // Process immediately if delay is disabled or command should bypass delay
-        if (!_hasActiveChatDelay || _shouldBypassDelay(dataStr)) {
+        // No active delay: process the whole frame immediately.
+        if (!_hasActiveChatDelay) {
           _handleIRCData(dataStr);
-        } else {
-          _enqueueDelayedCallback(_pendingChatCallbacks, () {
-            _handleIRCData(dataStr);
-          });
+          return;
+        }
+
+        // Dispatch each line individually so a bypass-eligible control message
+        // isn't dragged behind the delay by chat lines batched in the same
+        // frame — and, conversely, so a delayed chat line can't hold up a
+        // PING/USERSTATE that shares the frame.
+        for (final line in dataStr.split('\r\n')) {
+          final trimmed = line.trimRight();
+          if (trimmed.isEmpty) continue;
+          if (_lineShouldBypassDelay(trimmed)) {
+            _handleIRCData(trimmed);
+          } else {
+            _enqueueDelayedCallback(
+              _pendingChatCallbacks,
+              () => _handleIRCData(trimmed),
+            );
+          }
         }
       },
       onError: (error) {
@@ -953,6 +1008,14 @@ abstract class ChatStoreBase with Store {
         // Cancel chat delay countdown when disconnecting
         _cancelChatDelayCountdown();
         _chatDelaySyncCompleted = false;
+
+        // Reset send state — any in-flight message is unrecoverable across
+        // a disconnect, so don't leave the user blocked waiting for an ack
+        // that will never arrive.
+        _sendingTimeoutTimer?.cancel();
+        _isWaitingForAck = false;
+        toSend = null;
+        _pendingSentMessageText = null;
 
         if (_shouldDisconnect) {
           _sevenTVChannel?.sink.close(1000);
@@ -1124,7 +1187,7 @@ abstract class ChatStoreBase with Store {
       messageBuffer.clear();
     }
 
-    var remainingSeconds = _chatDelaySeconds;
+    var remainingSeconds = _chatDelay.inSeconds;
 
     // Create and store reference to the countdown message
     _countdownMessage = IRCMessage.createNotice(
@@ -1209,53 +1272,92 @@ abstract class ChatStoreBase with Store {
     // Text field and reply state cleared on USERSTATE confirmation (not optimistically)
     // to preserve message text if Twitch rejects it (e.g., slow mode)
 
-    // Start timeout timer in case server doesn't respond (network failure)
-    // Must be outside userStateString conditional to always have a safety net
+    // Fallback in case the confirming USERSTATE never arrives. Twitch can omit
+    // or drop the USERSTATE that acknowledges a send — intermittently, and more
+    // often under a long chat delay — even though the message was delivered.
+    // A missing ack is therefore NOT evidence of failure, so rather than cry
+    // wolf with a "may not have been sent" error (which pushes the user to
+    // resend and double-post), optimistically finalize the send: render the
+    // local echo and clear the pending state. Genuine rejections almost always
+    // arrive first — the rejection NOTICE bypasses the chat delay, so it lands
+    // well within this window and clears the pending send before the timeout. A
+    // rejection arriving after the timeout has finalized is treated as sent (the
+    // echo stays), an accepted edge given how early NOTICEs arrive. Scaled by
+    // the chat delay so a legitimately delayed USERSTATE is given time to land.
     _sendingTimeoutTimer?.cancel();
-    _sendingTimeoutTimer = Timer(const Duration(seconds: 10), () {
-      // Guard against execution after disposal
-      if (_shouldDisconnect) return;
-
-      if (_isWaitingForAck) {
-        _isWaitingForAck = false;
-        toSend = null;
-        HapticFeedback.heavyImpact();
-        updateNotification('Message may not have been sent. Please try again.');
-      }
+    _sendingTimeoutTimer = Timer(const Duration(seconds: 10) + _chatDelay, () {
+      if (_shouldDisconnect || !_isWaitingForAck) return;
+      runInAction(() => _finalizeSend(null));
     });
 
-    // Obtain the logged-in user's appearance in chat with USERSTATE and create the full message to render.
-    var userStateString = _userState.raw;
-    if (userStateString != null) {
-      if (message.length > 3 && message.substring(0, 3) == '/me') {
-        userStateString +=
-            ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
-      } else {
-        userStateString +=
-            ' :${replyingToMessage?.tags['display-name'] != null ? '@${replyingToMessage!.tags['display-name']} ' : ''}${message.trim()}';
-      }
+    // Build the optimistic local echo from the current USERSTATE. If the
+    // message is sent before this session's first USERSTATE arrives,
+    // _buildLocalEcho returns null and the echo is built later, when the
+    // confirming USERSTATE lands (see the Command.userState handler). The raw
+    // text is retained so that deferred build is possible.
+    _pendingSentMessageText = message;
+    toSend = _buildLocalEcho(message);
+  }
 
-      final userChatMessage = IRCMessage.fromString(userStateString);
-      userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
-      if (auth.isLoggedIn && auth.user.details != null) {
-        userChatMessage.tags['user-id'] = auth.user.details!.id;
-      }
-
-      if (replyingToMessage != null && replyingToMessage!.tags['id'] != null) {
-        userChatMessage.tags['reply-parent-msg-id'] =
-            replyingToMessage!.tags['id']!;
-        userChatMessage.tags['reply-parent-display-name'] =
-            replyingToMessage!.tags['display-name'] ?? '';
-        userChatMessage.tags['reply-parent-msg-body'] =
-            replyingToMessage!.message ?? '';
-      }
-
-      // Ensure a timestamp so merged-mode sorting works correctly.
-      userChatMessage.tags['tmi-sent-ts'] ??=
-          '${DateTime.now().millisecondsSinceEpoch}';
-
-      toSend = userChatMessage;
+  /// Renders the pending outgoing message's local echo (building it lazily if
+  /// it couldn't be built at send time) and clears all send-pending state.
+  /// Shared by the USERSTATE confirmation and the optimistic timeout fallback.
+  /// [serverMessageId] is the `id` tag from the confirming USERSTATE, or null
+  /// when finalizing optimistically without one.
+  void _finalizeSend(String? serverMessageId) {
+    toSend ??= _pendingSentMessageText != null
+        ? _buildLocalEcho(_pendingSentMessageText!)
+        : null;
+    if (toSend != null) {
+      // Prefer the server id; fall back to any id already set, then a local one.
+      toSend!.tags['id'] = serverMessageId ??
+          toSend!.tags['id'] ??
+          'local-${DateTime.now().millisecondsSinceEpoch}';
+      messageBuffer.add(toSend!);
+      toSend = null;
     }
+    _pendingSentMessageText = null;
+    _sendingTimeoutTimer?.cancel();
+    _isWaitingForAck = false;
+    textController.clear();
+    replyingToMessage = null;
+  }
+
+  /// Builds the optimistic local echo of an outgoing [message] from the current
+  /// USERSTATE, or null if no USERSTATE has been received yet this session
+  /// (the echo can't be rendered without the user's badges/color/display-name).
+  IRCMessage? _buildLocalEcho(String message) {
+    var userStateString = _userState.raw;
+    if (userStateString == null) return null;
+
+    if (message == '/me' || message.startsWith('/me ')) {
+      userStateString +=
+          ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
+    } else {
+      userStateString +=
+          ' :${replyingToMessage?.tags['display-name'] != null ? '@${replyingToMessage!.tags['display-name']} ' : ''}${message.trim()}';
+    }
+
+    final userChatMessage = IRCMessage.fromString(userStateString);
+    userChatMessage.localEmotes?.addAll(assetsStore.userEmoteToObject);
+    if (auth.isLoggedIn && auth.user.details != null) {
+      userChatMessage.tags['user-id'] = auth.user.details!.id;
+    }
+
+    if (replyingToMessage != null && replyingToMessage!.tags['id'] != null) {
+      userChatMessage.tags['reply-parent-msg-id'] =
+          replyingToMessage!.tags['id']!;
+      userChatMessage.tags['reply-parent-display-name'] =
+          replyingToMessage!.tags['display-name'] ?? '';
+      userChatMessage.tags['reply-parent-msg-body'] =
+          replyingToMessage!.message ?? '';
+    }
+
+    // Ensure a timestamp so merged-mode sorting works correctly.
+    userChatMessage.tags['tmi-sent-ts'] ??=
+        '${DateTime.now().millisecondsSinceEpoch}';
+
+    return userChatMessage;
   }
 
   /// Adds the given [emote] to the chat textfield.

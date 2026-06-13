@@ -1,0 +1,43 @@
+import 'package:frosty/models/channel.dart';
+import 'package:frosty/models/stream.dart';
+import 'package:frosty/screens/settings/stores/settings_store.dart';
+
+/// Abstraction over the video player store so both [VideoStore] (WebView)
+/// and [NativeVideoStore] can drive the same overlay and channel UI.
+///
+/// Native-only capabilities live on [NativeVideoPlayerInterface].
+abstract class VideoPlayerInterface {
+  SettingsStore get settingsStore;
+
+  /// Channel this store is driving — used as a key for per-channel
+  /// persistence (e.g. last-selected quality).
+  String get userLogin;
+
+  bool get loading;
+  bool get paused;
+  bool get overlayVisible;
+  bool get isInPipMode;
+  StreamTwitch? get streamInfo;
+  Channel? get offlineChannelInfo;
+  List<String> get availableStreamQualities;
+
+  /// Qualities that exist for this stream but require a subscription.
+  /// Only the native player can know this (parsed from the playback token);
+  /// the WebView player always reports none.
+  List<String> get restrictedStreamQualities;
+
+  String get streamQuality;
+  String? get latency;
+
+  void handleVideoTap();
+  void handlePausePlay();
+  void handleToggleOverlay();
+  Future<void> handleRefresh();
+  void requestPictureInPicture();
+  void togglePictureInPicture();
+  Future<void> updateStreamQualities();
+  Future<void> setStreamQuality(String quality);
+  Future<void> updateStreamInfo({bool forceUpdate});
+  void handleAppResume();
+  void dispose();
+}

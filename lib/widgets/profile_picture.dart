@@ -7,7 +7,11 @@ class ProfilePicture extends StatefulWidget {
   final String userLogin;
   final double radius;
 
-  const ProfilePicture({super.key, required this.userLogin, this.radius = 20});
+  const ProfilePicture({
+    super.key,
+    required this.userLogin,
+    this.radius = 20,
+  });
 
   @override
   State<ProfilePicture> createState() => _ProfilePictureState();

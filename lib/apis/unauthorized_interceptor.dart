@@ -14,8 +14,9 @@ class UnauthorizedInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // Check if this is a 401 Unauthorized error
-    if (err.response?.statusCode == 401) {
+    // Check if this is a 401 Unauthorized error on a Twitch Helix/OAuth request
+    if (err.response?.statusCode == 401 &&
+        _isTwitchHelixOrOAuth(err.requestOptions.uri)) {
       // For token validation requests, let the error propagate so validateToken can handle it
       if (err.requestOptions.uri.path.endsWith('/validate')) {
         handler.next(err);
@@ -89,4 +90,10 @@ class UnauthorizedInterceptor extends Interceptor {
   }
 
   static bool _isDialogShowing = false;
+
+  bool _isTwitchHelixOrOAuth(Uri uri) {
+    final url = uri.toString();
+    return url.startsWith('https://api.twitch.tv/helix') ||
+        url.startsWith('https://id.twitch.tv/oauth2');
+  }
 }

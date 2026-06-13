@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/screens/channel/video/native_video_store.dart';
 import 'package:frosty/screens/channel/video/stream_info_bar.dart';
-import 'package:frosty/screens/channel/video/video_store.dart';
+import 'package:frosty/screens/channel/video/video_player_interface.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/theme.dart';
 import 'package:frosty/utils.dart';
@@ -21,7 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Creates a widget containing controls which enable interactions with an underlying [Video] widget.
 class VideoOverlay extends StatelessWidget {
-  final VideoStore videoStore;
+  final VideoPlayerInterface videoStore;
   final ChatStore chatStore;
   final SettingsStore settingsStore;
 
@@ -88,7 +90,7 @@ class VideoOverlay extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SectionHeader(
-                'Stream quality',
+                'Quality',
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
                 isFirst: true,
               ),
@@ -97,26 +99,35 @@ class VideoOverlay extends StatelessWidget {
                   builder: (context) => ListView(
                     shrinkWrap: true,
                     primary: false,
-                    children: videoStore.availableStreamQualities
-                        .map(
-                          (quality) => ListTile(
-                            trailing: videoStore.streamQuality == quality
-                                ? const Icon(Icons.check_rounded)
-                                : null,
-                            title: Text(quality),
-                            onTap: () {
-                              videoStore.setStreamQuality(quality);
-                              SharedPreferences.getInstance().then(
-                                (prefs) => prefs.setString(
-                                  'last_stream_quality',
-                                  quality,
-                                ),
-                              );
-                              Navigator.pop(context);
-                            },
-                          ),
-                        )
-                        .toList(),
+                    children: [
+                      ...videoStore.availableStreamQualities.map(
+                        (quality) => ListTile(
+                          trailing: videoStore.streamQuality == quality
+                              ? const Icon(Icons.check_rounded)
+                              : null,
+                          title: Text(quality),
+                          onTap: () {
+                            videoStore.setStreamQuality(quality);
+                            SharedPreferences.getInstance().then(
+                              (prefs) => prefs.setString(
+                                lastStreamQualityKey(videoStore.userLogin),
+                                quality,
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ),
+                      // Qualities the broadcaster offers only to subscribers
+                      // (from the playback token's restricted_bitrates).
+                      ...videoStore.restrictedStreamQualities.map(
+                        (quality) => ListTile(
+                          enabled: false,
+                          title: Text(quality),
+                          subtitle: const Text('Subscribers only'),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -259,7 +270,6 @@ class VideoOverlay extends StatelessWidget {
                                     displayName: chatStore.displayName,
                                     showUptime: false,
                                     showViewerCount: false,
-                                    showOfflineIndicator: false,
                                     textColor: surfaceColor,
                                     isOffline: true,
                                     isInSharedChatMode:
@@ -344,32 +354,36 @@ class VideoOverlay extends StatelessWidget {
                     if (videoStore.settingsStore.fullScreen &&
                         context.isLandscape)
                       chatOverlayButton,
-                    if (!Platform.isIOS || isIPad()) videoSettingsButton,
+                    if (!Platform.isIOS ||
+                        isIPad() ||
+                        videoStore is NativeVideoStore)
+                      videoSettingsButton,
                   ],
                 ),
-                Center(
-                  child: Tooltip(
-                    message: videoStore.paused ? 'Play' : 'Pause',
-                    preferBelow: false,
-                    child: IconButton(
-                      iconSize: 56,
-                      icon: Icon(
-                        videoStore.paused
-                            ? Icons.play_arrow_rounded
-                            : Icons.pause_rounded,
-                        color: surfaceColor,
-                        shadows: [
-                          Shadow(
-                            offset: const Offset(0, 3),
-                            blurRadius: 8,
-                            color: Colors.black.withValues(alpha: 0.6),
-                          ),
-                        ],
+                if (!videoStore.loading)
+                  Center(
+                    child: Tooltip(
+                      message: videoStore.paused ? 'Play' : 'Pause',
+                      preferBelow: false,
+                      child: IconButton(
+                        iconSize: 56,
+                        icon: Icon(
+                          videoStore.paused
+                              ? Icons.play_arrow_rounded
+                              : Icons.pause_rounded,
+                          color: surfaceColor,
+                          shadows: [
+                            Shadow(
+                              offset: const Offset(0, 3),
+                              blurRadius: 8,
+                              color: Colors.black.withValues(alpha: 0.6),
+                            ),
+                          ],
+                        ),
+                        onPressed: videoStore.handlePausePlay,
                       ),
-                      onPressed: videoStore.handlePausePlay,
                     ),
                   ),
-                ),
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Row(

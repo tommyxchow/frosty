@@ -1,12 +1,29 @@
 # AGENTS.md
 
-> **Monorepo note:** `web/` is a separate Next.js landing page with its own `AGENTS.md`. This file covers the Flutter app only.
+---
 
-## Workflow
+# Author Preferences
 
-- In plan mode, interview thoroughly — ask about UI/UX, tradeoffs, and edge cases before coding
-- When new code supersedes existing functionality, find and remove everything it makes redundant
-- Favor parallel tool calls and subagents when tasks are independent
+## Code Opinions
+
+- Package imports (`import 'package:frosty/...'`), not relative imports
+- Trailing commas always
+- Single quotes
+- Extract related/grouped logic (state, reactions, actions) into dedicated stores when it improves readability — keep widgets focused on rendering
+
+## Infrastructure Checklist
+
+When creating new infrastructure (screens, API clients, stores), use exploration findings as a **checklist** — systematically verify each convention is followed before writing code.
+
+## Never
+
+- Never edit `.g.dart` files directly — always regenerate with `dart run build_runner build`
+
+---
+
+# Project
+
+Flutter mobile app for browsing Twitch on iOS and Android. Uses MobX for state management with code generation.
 
 ## Commands
 
@@ -29,7 +46,7 @@ dart run build_runner build --delete-conflicting-outputs             # Same, but
 - `lib/widgets/` — Shared widgets
 - `lib/utils/` — Utility functions
 
-## Architecture (non-obvious bits)
+## Architecture
 
 - Feature stores live in `lib/screens/{feature}/stores/` — don't create new top-level store files (only `lib/stores/` holds global stores)
 - All API services extend `BaseApiClient` (`lib/apis/base_api_client.dart`) — don't create standalone API classes
@@ -39,9 +56,6 @@ dart run build_runner build --delete-conflicting-outputs             # Same, but
 
 - After changing MobX stores or `@JsonSerializable` models, regenerate with `dart run build_runner build`. Never edit `.g.dart` files directly. Commit `.g.dart` files to source control.
 - The secure storage cleanup in `main.dart` looks unnecessary but handles an Android/iOS edge case where secure storage persists after uninstall. Don't remove it.
-- Use package imports (`import 'package:frosty/...'`), not relative imports
-- Always include trailing commas
-- Use single quotes
 
 ## Testing
 
@@ -49,9 +63,3 @@ dart run build_runner build --delete-conflicting-outputs             # Same, but
 - HTTP mocking: `http_mock_adapter` (`DioAdapter`) — use full URLs in `onGet`/`onPost`
 - General mocking: `mocktail` (no codegen required)
 - Fixtures live in `test/fixtures/` (e.g., `irc_messages.dart`, `api_responses.dart`)
-
-## Commits
-
-Conventional commits: `type(scope): description` — lowercase, no trailing period, tightly scoped (e.g., `fix(chat): correct landscape bottom padding in bottom bar`). Append `!` before the `:` for breaking changes (e.g., `feat(api)!: drop legacy auth flow`).
-
-Common types: `feat`, `fix`, `chore`, `refactor`, `docs`, `test`, `perf`, `style`. Scope is the affected area (e.g., `chat`, `video`, `api`).
