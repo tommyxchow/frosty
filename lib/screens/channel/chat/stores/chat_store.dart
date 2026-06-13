@@ -80,10 +80,11 @@ abstract class ChatStoreBase with Store {
   var _normalizedMutedWords = <String>[];
 
   /// Whether a single IRC [line] should bypass the chat delay and be handled
-  /// immediately. Only displayable chat content (PRIVMSG/NOTICE/USERNOTICE and
-  /// the moderation CLEARCHAT/CLEARMSG) is delayed, so it stays in sync with
-  /// the delayed video. Everything else must be handled at once: control/state
-  /// messages (USERSTATE/ROOMSTATE/GLOBALUSERSTATE), the reconnect notice, and
+  /// immediately. Displayable chat content (PRIVMSG/USERNOTICE and the
+  /// moderation CLEARCHAT/CLEARMSG) is delayed, so it stays in sync with the
+  /// delayed video. Everything else is handled at once: control/state messages
+  /// (USERSTATE/ROOMSTATE/GLOBALUSERSTATE), NOTICE (so a send rejection surfaces
+  /// immediately instead of one chat-delay later), the reconnect notice, and
   /// any untagged server line (PING keepalives, CAP, JOIN, the welcome banner)
   /// — delaying those would stall the send-ack, drop the PONG, or never start
   /// the buffer drain.
@@ -1014,6 +1015,7 @@ abstract class ChatStoreBase with Store {
         _sendingTimeoutTimer?.cancel();
         _isWaitingForAck = false;
         toSend = null;
+        _pendingSentMessageText = null;
 
         if (_shouldDisconnect) {
           _sevenTVChannel?.sink.close(1000);
@@ -1276,9 +1278,12 @@ abstract class ChatStoreBase with Store {
     // A missing ack is therefore NOT evidence of failure, so rather than cry
     // wolf with a "may not have been sent" error (which pushes the user to
     // resend and double-post), optimistically finalize the send: render the
-    // local echo and clear the pending state. Genuine rejections still surface
-    // via the rejection NOTICE path. Scaled by the chat delay so a legitimately
-    // delayed USERSTATE is given time to land first.
+    // local echo and clear the pending state. Genuine rejections almost always
+    // arrive first — the rejection NOTICE bypasses the chat delay, so it lands
+    // well within this window and clears the pending send before the timeout. A
+    // rejection arriving after the timeout has finalized is treated as sent (the
+    // echo stays), an accepted edge given how early NOTICEs arrive. Scaled by
+    // the chat delay so a legitimately delayed USERSTATE is given time to land.
     _sendingTimeoutTimer?.cancel();
     _sendingTimeoutTimer = Timer(const Duration(seconds: 10) + _chatDelay, () {
       if (_shouldDisconnect || !_isWaitingForAck) return;
@@ -1325,7 +1330,7 @@ abstract class ChatStoreBase with Store {
     var userStateString = _userState.raw;
     if (userStateString == null) return null;
 
-    if (message.length > 3 && message.substring(0, 3) == '/me') {
+    if (message == '/me' || message.startsWith('/me ')) {
       userStateString +=
           ' :\x01ACTION ${message.replaceRange(0, 3, '').trim()}\x01';
     } else {
