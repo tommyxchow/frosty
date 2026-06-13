@@ -53,7 +53,7 @@ class ExpandableSectionHeader extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.8,
                       color: context.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.5,
+                        alpha: 0.6,
                       ),
                     ),
                   ),
@@ -64,7 +64,7 @@ class ExpandableSectionHeader extends StatelessWidget {
                   child: Icon(
                     Icons.keyboard_arrow_down,
                     color: context.colorScheme.onSurfaceVariant.withValues(
-                      alpha: 0.5,
+                      alpha: 0.6,
                     ),
                     size: 20,
                   ),
