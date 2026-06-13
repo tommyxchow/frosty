@@ -11,6 +11,7 @@ import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:frosty/widgets/blurred_container.dart';
 import 'package:frosty/widgets/chat_input/emote_text_span_builder.dart';
 import 'package:frosty/widgets/frosty_cached_network_image.dart';
+import 'package:frosty/widgets/measure_size.dart';
 
 class ChatBottomBar extends StatelessWidget {
   final ChatStore chatStore;
@@ -400,7 +401,11 @@ class ChatBottomBar extends StatelessWidget {
                       ? MediaQuery.of(context).padding.bottom
                       : 0,
                 ),
-                child: bottomBarContent,
+                child: MeasureSize(
+                  onChange: (size) =>
+                      chatStore.setBottomBarHeight(size.height),
+                  child: bottomBarContent,
+                ),
               )
             : BlurredContainer(
                 gradientDirection: GradientDirection.down,
@@ -409,7 +414,11 @@ class ChatBottomBar extends StatelessWidget {
                       ? MediaQuery.of(context).padding.bottom
                       : 0,
                 ),
-                child: bottomBarContent,
+                child: MeasureSize(
+                  onChange: (size) =>
+                      chatStore.setBottomBarHeight(size.height),
+                  child: bottomBarContent,
+                ),
               );
       },
     );
