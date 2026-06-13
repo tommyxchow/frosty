@@ -693,32 +693,13 @@ abstract class ChatStoreBase with Store {
           case Command.userState:
             _userState = _userState.fromIRCMessage(parsedIRCMessage);
 
-            // A USERSTATE following our PRIVMSG confirms the send. Clear the
-            // ack regardless of whether a local echo exists — gating this on
+            // A USERSTATE following our PRIVMSG confirms the send. Finalize
+            // regardless of whether a local echo was pre-built — gating this on
             // `toSend` left the player stuck "sending" (and firing a false
             // "may not have been sent") whenever the message went out before
             // this session's first USERSTATE populated `_userState`.
             if (_isWaitingForAck) {
-              // If the echo couldn't be built at send time (no USERSTATE yet),
-              // build it now that `_userState` is populated, so the user's own
-              // message still renders.
-              toSend ??= _pendingSentMessageText != null
-                  ? _buildLocalEcho(_pendingSentMessageText!)
-                  : null;
-              if (toSend != null) {
-                final messageId = parsedIRCMessage.tags['id'];
-                // Fallback ID for edge cases where Twitch doesn't provide one.
-                toSend!.tags['id'] =
-                    messageId ??
-                    'local-${DateTime.now().millisecondsSinceEpoch}';
-                messageBuffer.add(toSend!);
-                toSend = null;
-              }
-              _pendingSentMessageText = null;
-              _sendingTimeoutTimer?.cancel();
-              _isWaitingForAck = false;
-              textController.clear();
-              replyingToMessage = null;
+              _finalizeSend(parsedIRCMessage.tags['id']);
             }
             break;
           case Command.globalUserState:
@@ -1289,22 +1270,19 @@ abstract class ChatStoreBase with Store {
     // Text field and reply state cleared on USERSTATE confirmation (not optimistically)
     // to preserve message text if Twitch rejects it (e.g., slow mode)
 
-    // Start timeout timer in case server doesn't respond (network failure).
-    // Scaled by the chat delay: under an active delay the confirming USERSTATE
-    // can itself be queued, so a fixed 10s ceiling would fire before the ack
-    // ever arrives at higher delays. Must be outside the userStateString
-    // conditional to always have a safety net.
+    // Fallback in case the confirming USERSTATE never arrives. Twitch can omit
+    // or drop the USERSTATE that acknowledges a send — intermittently, and more
+    // often under a long chat delay — even though the message was delivered.
+    // A missing ack is therefore NOT evidence of failure, so rather than cry
+    // wolf with a "may not have been sent" error (which pushes the user to
+    // resend and double-post), optimistically finalize the send: render the
+    // local echo and clear the pending state. Genuine rejections still surface
+    // via the rejection NOTICE path. Scaled by the chat delay so a legitimately
+    // delayed USERSTATE is given time to land first.
     _sendingTimeoutTimer?.cancel();
     _sendingTimeoutTimer = Timer(const Duration(seconds: 10) + _chatDelay, () {
-      // Guard against execution after disposal
-      if (_shouldDisconnect) return;
-
-      if (_isWaitingForAck) {
-        _isWaitingForAck = false;
-        toSend = null;
-        HapticFeedback.heavyImpact();
-        updateNotification('Message may not have been sent. Please try again.');
-      }
+      if (_shouldDisconnect || !_isWaitingForAck) return;
+      runInAction(() => _finalizeSend(null));
     });
 
     // Build the optimistic local echo from the current USERSTATE. If the
@@ -1314,6 +1292,30 @@ abstract class ChatStoreBase with Store {
     // text is retained so that deferred build is possible.
     _pendingSentMessageText = message;
     toSend = _buildLocalEcho(message);
+  }
+
+  /// Renders the pending outgoing message's local echo (building it lazily if
+  /// it couldn't be built at send time) and clears all send-pending state.
+  /// Shared by the USERSTATE confirmation and the optimistic timeout fallback.
+  /// [serverMessageId] is the `id` tag from the confirming USERSTATE, or null
+  /// when finalizing optimistically without one.
+  void _finalizeSend(String? serverMessageId) {
+    toSend ??= _pendingSentMessageText != null
+        ? _buildLocalEcho(_pendingSentMessageText!)
+        : null;
+    if (toSend != null) {
+      // Prefer the server id; fall back to any id already set, then a local one.
+      toSend!.tags['id'] = serverMessageId ??
+          toSend!.tags['id'] ??
+          'local-${DateTime.now().millisecondsSinceEpoch}';
+      messageBuffer.add(toSend!);
+      toSend = null;
+    }
+    _pendingSentMessageText = null;
+    _sendingTimeoutTimer?.cancel();
+    _isWaitingForAck = false;
+    textController.clear();
+    replyingToMessage = null;
   }
 
   /// Builds the optimistic local echo of an outgoing [message] from the current
