@@ -228,7 +228,7 @@ class _ConnectedCastControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final receiverName = castState.receiverName ?? 'Cast device';
-    final latency = castState.latencySeconds;
+    final latency = castState.formattedLatency;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
@@ -241,7 +241,7 @@ class _ConnectedCastControls extends StatelessWidget {
             title: Text(receiverName),
             subtitle: latency == null
                 ? const Text('Casting')
-                : Text('Casting - ${latency}s latency'),
+                : Text('Casting - $latency latency'),
             trailing: TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();

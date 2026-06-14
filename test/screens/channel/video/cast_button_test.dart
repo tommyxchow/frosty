@@ -69,7 +69,7 @@ void main() {
 
     expect(find.text('CAST TO DEVICE'), findsOneWidget);
     expect(find.text('Jacoby\'s TV'), findsOneWidget);
-    expect(find.text('Casting - 7s latency'), findsOneWidget);
+    expect(find.text('Casting - 7.42s latency'), findsOneWidget);
     expect(find.text('Disconnect'), findsOneWidget);
   });
 

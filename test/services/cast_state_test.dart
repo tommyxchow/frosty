@@ -13,7 +13,8 @@ void main() {
       expect(state.isCasting, isTrue);
       expect(state.receiverName, 'Jacoby\'s TV');
       expect(state.latency, const Duration(milliseconds: 7420));
-      expect(state.latencySeconds, 7);
+      expect(state.latencySeconds, 7.42);
+      expect(state.formattedLatency, '7.42s');
     });
 
     test('treats missing and malformed payloads as disconnected', () {

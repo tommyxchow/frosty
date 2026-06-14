@@ -26,13 +26,16 @@
 		(() => {
 			const MESSAGE_NAMESPACE = 'urn:x-cast:com.namecallfilter.glacier.cast';
 
-			const TARGET_LATENCY_SECONDS = 2.0;
-			const MAX_LATENCY_SECONDS = 5.0;
+			const TARGET_LATENCY_SECONDS = 4.0;
+			const MAX_LATENCY_SECONDS = 8.0;
+			const EMERGENCY_LATENCY_SECONDS = 10.0;
 
 			const STATUS_INTERVAL_MS = 1000;
 			const LATENCY_CHECK_INTERVAL_MS = 500;
 			const STARTUP_LIVE_SEEK_THRESHOLD_SECONDS = TARGET_LATENCY_SECONDS + 0.5;
 			const MAX_LATENCY_SEEK_COOLDOWN_MS = 8000;
+			const MAX_LATENCY_RELOAD_COOLDOWN_MS = 15000;
+			const HIGH_LATENCY_RELOAD_TICKS = 3;
 
 			const context = cast.framework.CastReceiverContext.getInstance();
 			const playerManager = context.getPlayerManager();
@@ -65,7 +68,7 @@
 						maxPlaybackRate: 1.1,
 						minPlaybackRate: 0.98,
 
-						panicMode: false,
+						panicMode: true,
 						panicThreshold: MAX_LATENCY_SECONDS,
 
 						dynamicTargetLatency: {
@@ -113,6 +116,18 @@
 
 			let pendingStartupLiveSeek = false;
 			let lastMaxLatencySeekAtMs = 0;
+			let lastMaxLatencyReloadAtMs = 0;
+			let emergencyRecoveryActive = false;
+			let emergencyTicksAfterSeek = 0;
+			let lastLoadRequestData = null;
+
+			const logReceiverEvent = (action, fields = {}) => {
+				const details = Object.entries({action, ...fields})
+					.map(([key, value]) => `${key}=${value == null ? '' : value}`)
+					.join(' ');
+
+				console.log(`[GlacierCastReceiver] ${details}`);
+			};
 
 			const currentPlaybackRate = () => {
 				if (typeof playerManager.getPlaybackRate === 'function') {
@@ -195,6 +210,32 @@
 				return ok;
 			};
 
+			const reloadCurrentMedia = () => {
+				if (!lastLoadRequestData || typeof playerManager.load !== 'function') {
+					return false;
+				}
+
+				lastLoadRequestData.autoplay = true;
+				pendingStartupLiveSeek = true;
+
+				try {
+					const loadResult = playerManager.load(lastLoadRequestData);
+					if (loadResult && typeof loadResult.catch === 'function') {
+						loadResult.catch((error) => {
+							logReceiverEvent('reload_failed', {
+								reason: error && error.name ? error.name : 'unknown',
+							});
+						});
+					}
+					return true;
+				} catch (error) {
+					logReceiverEvent('reload_failed', {
+						reason: error && error.name ? error.name : 'unknown',
+					});
+					return false;
+				}
+			};
+
 			const tryStartupLiveSeek = () => {
 				if (!pendingStartupLiveSeek) return false;
 
@@ -209,6 +250,11 @@
 				if (status.latency <= STARTUP_LIVE_SEEK_THRESHOLD_SECONDS) return false;
 
 				const ok = seekToTargetLive();
+				if (ok && status.latency > EMERGENCY_LATENCY_SECONDS) {
+					lastMaxLatencySeekAtMs = Date.now();
+					emergencyRecoveryActive = true;
+					emergencyTicksAfterSeek = 0;
+				}
 				sendStatus({
 					correction: ok ? 'startupJumpToLive' : 'startupJumpFailed',
 					latencyBeforeCorrectionMs: Math.round(status.latency * 1000),
@@ -218,10 +264,71 @@
 			};
 
 			const enforceMaxLatencySeek = (status) => {
-				if (status.latency <= MAX_LATENCY_SECONDS) return;
-				if (Date.now() - lastMaxLatencySeekAtMs < MAX_LATENCY_SEEK_COOLDOWN_MS) return;
+				if (status.latency <= MAX_LATENCY_SECONDS) {
+					emergencyRecoveryActive = false;
+					emergencyTicksAfterSeek = 0;
+					return;
+				}
 
-				lastMaxLatencySeekAtMs = Date.now();
+				const now = Date.now();
+				const latencyBeforeCorrectionMs = Math.round(status.latency * 1000);
+				const emergency = status.latency > EMERGENCY_LATENCY_SECONDS;
+
+				logReceiverEvent('max_latency', {
+					state: playerManager.getPlayerState(),
+					latency_ms: latencyBeforeCorrectionMs,
+					max_latency_ms: Math.round(MAX_LATENCY_SECONDS * 1000),
+					target_latency_ms: Math.round(TARGET_LATENCY_SECONDS * 1000),
+					current_sec: status.currentTime,
+					range_start_sec: status.rangeStart,
+					range_end_sec: status.rangeEnd,
+					emergency,
+				});
+
+				if (emergency && emergencyRecoveryActive) {
+					emergencyTicksAfterSeek += 1;
+
+					if (emergencyTicksAfterSeek >= HIGH_LATENCY_RELOAD_TICKS) {
+						const reloadCooldownActive =
+							lastMaxLatencyReloadAtMs > 0 &&
+							now - lastMaxLatencyReloadAtMs < MAX_LATENCY_RELOAD_COOLDOWN_MS;
+
+						if (!reloadCooldownActive) {
+							lastMaxLatencyReloadAtMs = now;
+							emergencyRecoveryActive = false;
+							emergencyTicksAfterSeek = 0;
+							const ok = reloadCurrentMedia();
+
+							sendStatus({
+								correction: ok ? 'maxLatencyReload' : 'maxLatencyReloadFailed',
+								latencyBeforeCorrectionMs,
+							});
+							return;
+						}
+					}
+
+					sendStatus({
+						correction: 'maxLatencyObserved',
+						latencyBeforeCorrectionMs,
+					});
+					return;
+				}
+
+				const seekCooldownActive =
+					lastMaxLatencySeekAtMs > 0 &&
+					now - lastMaxLatencySeekAtMs < MAX_LATENCY_SEEK_COOLDOWN_MS;
+
+				if (!emergency && seekCooldownActive) {
+					sendStatus({
+						correction: 'maxLatencyObserved',
+						latencyBeforeCorrectionMs,
+					});
+					return;
+				}
+
+				lastMaxLatencySeekAtMs = now;
+				emergencyRecoveryActive = emergency;
+				emergencyTicksAfterSeek = 0;
 				const ok = seekToTargetLive();
 
 				sendStatus({
@@ -251,6 +358,9 @@
 
 					pendingStartupLiveSeek = true;
 					lastMaxLatencySeekAtMs = 0;
+					lastMaxLatencyReloadAtMs = 0;
+					emergencyRecoveryActive = false;
+					emergencyTicksAfterSeek = 0;
 
 					if (media) {
 						media.entity = media.entity || media.contentId;
@@ -260,6 +370,7 @@
 					}
 
 					loadRequestData.autoplay = true;
+					lastLoadRequestData = loadRequestData;
 					return loadRequestData;
 				},
 			);

@@ -56,6 +56,9 @@ class GlacierCastController(
     @Volatile
     private var connectingRouteName: String? = null
 
+    @Volatile
+    private var keepAliveActive = false
+
     init {
         runCatching {
             CastContext.getSharedInstance(applicationContext)
@@ -169,6 +172,7 @@ class GlacierCastController(
         connectingRouteName = null
         castContext?.sessionManager?.endCurrentSession(true)
         relayServer.close()
+        stopKeepAlive()
         emitDisconnected()
         emitRoutes()
     }
@@ -240,6 +244,29 @@ class GlacierCastController(
             router = router,
             config = context.config,
         )
+    }
+
+    private fun startKeepAlive() {
+        if (keepAliveActive) return
+
+        keepAliveActive = true
+        runCatching {
+            CastRelayKeepAliveService.start(applicationContext)
+        }.onFailure { error ->
+            keepAliveActive = false
+            log("cast_keep_alive action=start_failed reason=${error.javaClass.simpleName}")
+        }
+    }
+
+    private fun stopKeepAlive() {
+        if (!keepAliveActive) return
+
+        keepAliveActive = false
+        runCatching {
+            CastRelayKeepAliveService.stop(applicationContext)
+        }.onFailure { error ->
+            log("cast_keep_alive action=stop_failed reason=${error.javaClass.simpleName}")
+        }
     }
 
     private fun currentSession(): CastSession? {
@@ -350,6 +377,7 @@ class GlacierCastController(
             receiverLatencyMs = null
             connectingRouteId = null
             connectingRouteName = null
+            startKeepAlive()
             attachReceiverChannel(session)
             emitState(session)
             emitRoutes()
@@ -363,6 +391,7 @@ class GlacierCastController(
             receiverLatencyMs = null
             connectingRouteId = null
             connectingRouteName = null
+            stopKeepAlive()
             emitDisconnected()
             emitRoutes(error = "Unable to connect to Cast device.")
             Log.d(
@@ -383,6 +412,7 @@ class GlacierCastController(
             connectingRouteId = null
             connectingRouteName = null
             relayServer.close()
+            stopKeepAlive()
             emitDisconnected()
             emitRoutes()
             Log.d(
@@ -398,6 +428,7 @@ class GlacierCastController(
         override fun onSessionResumed(session: CastSession, wasSuspended: Boolean) {
             connectingRouteId = null
             connectingRouteName = null
+            startKeepAlive()
             attachReceiverChannel(session)
             emitState(session)
             emitRoutes()
@@ -410,6 +441,7 @@ class GlacierCastController(
             receiverLatencyMs = null
             connectingRouteId = null
             connectingRouteName = null
+            stopKeepAlive()
             emitDisconnected()
             emitRoutes(error = "Unable to reconnect to Cast device.")
             Log.d(

@@ -10,7 +10,15 @@ class CastState {
       receiverName = null,
       latency = null;
 
-  int? get latencySeconds => latency?.inSeconds;
+  double? get latencySeconds {
+    final currentLatency = latency;
+    return currentLatency == null ? null : currentLatency.inMilliseconds / 1000;
+  }
+
+  String? get formattedLatency {
+    final seconds = latencySeconds;
+    return seconds == null ? null : '${seconds.toStringAsFixed(2)}s';
+  }
 
   factory CastState.fromMethodChannelPayload(Object? payload) {
     if (payload is! Map) return const CastState.disconnected();

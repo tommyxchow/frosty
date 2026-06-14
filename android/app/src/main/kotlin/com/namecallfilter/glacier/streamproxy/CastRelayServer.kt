@@ -152,9 +152,15 @@ class CastRelayServer(
     }
 
     private fun handleRelayRequest(socket: Socket, request: HttpRequest) {
+        val requestStartedNs = System.nanoTime()
         val path = request.target.substringBefore("?")
         if (!path.startsWith("/relay/")) {
             sendError(socket, 404, "Not Found")
+            log(
+                "cast_relay action=response method=${request.method} " +
+                    "path=$path status=404 total_ms=${elapsedMs(requestStartedNs)} " +
+                    "bytes=9 playlist=false reason=invalid_path",
+            )
             return
         }
 
@@ -164,8 +170,12 @@ class CastRelayServer(
             .takeIf(String::isNotEmpty)
         val target = targets[id]
         if (target == null) {
-            log("cast_relay action=response path=$path status=404 reason=missing_target")
             sendError(socket, 404, "Not Found")
+            log(
+                "cast_relay action=response method=${request.method} " +
+                    "path=$path status=404 total_ms=${elapsedMs(requestStartedNs)} " +
+                    "bytes=9 playlist=false reason=missing_target",
+            )
             return
         }
 
@@ -203,10 +213,19 @@ class CastRelayServer(
             router = router,
             directWhenSkipped = true,
         )
+        val upstreamConnectedNs = System.nanoTime()
 
         if (response == null) {
-            log("cast_relay action=response path=$path status=502 reason=upstream_null")
             sendError(socket, 502, "Bad Gateway")
+            log(
+                "cast_relay action=response method=${request.method} " +
+                    "path=$path status=502 " +
+                    "source=${sourceDescription(upstreamUrl)} " +
+                    "upstream_connect_ms=${elapsedMs(requestStartedNs, upstreamConnectedNs)} " +
+                    "upstream_first_byte_ms=-1 " +
+                    "total_ms=${elapsedMs(requestStartedNs)} " +
+                    "bytes=11 playlist=$playlistRequest reason=upstream_null",
+            )
             return
         }
 
@@ -216,12 +235,17 @@ class CastRelayServer(
             var mimeType = upstream.mimeType
             var selectedQuality: String? = null
             val playlistResponse = isPlaylistResponse(upstreamUrl, upstream)
+            var firstByteNs: Long? = null
+            var playlistMetadata = PlaylistLiveEdgeMetadata()
 
             if (playlistResponse) {
-                var body = if (headOnly) {
+                val body = if (headOnly) {
                     ByteArray(0)
                 } else {
-                    val playlist = decodeBody(upstream.body.readBytes(), upstream.encoding)
+                    val timedBody = readBodyWithTiming(upstream.body)
+                    firstByteNs = timedBody.firstByteNs
+                    val playlist = decodeBody(timedBody.bytes, upstream.encoding)
+                    playlistMetadata = playlistLiveEdgeMetadata(playlist)
                     val rewritten = HlsPlaylistRewriter.rewritePlaylist(
                         body = playlist,
                         baseUrl = upstreamUrl,
@@ -231,6 +255,13 @@ class CastRelayServer(
                         },
                     )
                     selectedQuality = rewritten.selectedQuality
+                    log(
+                        "cast_relay action=playlist_edge " +
+                            "path=$path media_sequence=${playlistMetadata.mediaSequence.orEmpty()} " +
+                            "program_date_time=${sanitizeLogValue(playlistMetadata.programDateTime)} " +
+                            "target_duration=${playlistMetadata.targetDuration.orEmpty()} " +
+                            "last_segment_uri=${sanitizeLogValue(playlistMetadata.lastSegmentUri)}",
+                    )
                     rewritten.body.toByteArray(StandardCharsets.UTF_8)
                 }
                 mimeType = "application/vnd.apple.mpegurl"
@@ -239,14 +270,6 @@ class CastRelayServer(
                 headers.putAll(corsHeaders())
                 headers["Content-Length"] = body.size.toString()
 
-                log(
-                    "cast_relay action=response method=${request.method} " +
-                        "path=$path status=${upstream.statusCode} " +
-                        "source=${sourceDescription(upstreamUrl)} " +
-                        "bytes=${body.size} mime=${mimeType.orEmpty()} " +
-                        "playlist=true selected_quality=${selectedQuality.orEmpty()}",
-                )
-
                 sendResponse(
                     socket = socket,
                     statusCode = upstream.statusCode,
@@ -254,6 +277,20 @@ class CastRelayServer(
                     headers = headers,
                     body = body,
                     headOnly = headOnly,
+                )
+                log(
+                    "cast_relay action=response method=${request.method} " +
+                        "path=$path status=${upstream.statusCode} " +
+                        "source=${sourceDescription(upstreamUrl)} " +
+                        "upstream_connect_ms=${elapsedMs(requestStartedNs, upstreamConnectedNs)} " +
+                        "upstream_first_byte_ms=${elapsedMsOrMissing(requestStartedNs, firstByteNs)} " +
+                        "total_ms=${elapsedMs(requestStartedNs)} " +
+                        "bytes=${body.size} mime=${mimeType.orEmpty()} " +
+                        "playlist=true selected_quality=${selectedQuality.orEmpty()} " +
+                        "media_sequence=${playlistMetadata.mediaSequence.orEmpty()} " +
+                        "program_date_time=${sanitizeLogValue(playlistMetadata.programDateTime)} " +
+                        "target_duration=${playlistMetadata.targetDuration.orEmpty()} " +
+                        "last_segment_uri=${sanitizeLogValue(playlistMetadata.lastSegmentUri)}",
                 )
                 return@use
             }
@@ -271,7 +308,7 @@ class CastRelayServer(
                 }
             headers.putAll(corsHeaders())
 
-            val bytes = sendStreamingResponse(
+            val streamResult = sendStreamingResponse(
                 socket = socket,
                 statusCode = upstream.statusCode,
                 reasonPhrase = upstream.reasonPhrase,
@@ -283,7 +320,11 @@ class CastRelayServer(
                 "cast_relay action=response method=${request.method} " +
                     "path=$path status=${upstream.statusCode} " +
                     "source=${sourceDescription(upstreamUrl)} " +
-                    "bytes=$bytes mime=${mimeType.orEmpty()} " +
+                    "upstream_connect_ms=${elapsedMs(requestStartedNs, upstreamConnectedNs)} " +
+                    "upstream_first_byte_ms=" +
+                    "${elapsedMsOrMissing(requestStartedNs, streamResult.firstByteNs)} " +
+                    "total_ms=${elapsedMs(requestStartedNs)} " +
+                    "bytes=${streamResult.bytes} mime=${mimeType.orEmpty()} " +
                     "playlist=false selected_quality=",
             )
         }
@@ -359,16 +400,50 @@ class CastRelayServer(
         headers: Map<String, String>,
         body: InputStream,
         headOnly: Boolean,
-    ): Long {
+    ): StreamResult {
         val output = sendResponseHeaders(socket, statusCode, reasonPhrase, headers)
         if (headOnly) {
             output.flush()
-            return 0L
+            return StreamResult(bytes = 0L, firstByteNs = null)
         }
 
-        val bytes = body.copyTo(output, STREAM_BUFFER_SIZE)
+        val buffer = ByteArray(STREAM_BUFFER_SIZE)
+        var bytes = 0L
+        var firstByteNs: Long? = null
+
+        while (true) {
+            val count = body.read(buffer)
+            if (count == -1) break
+            if (count == 0) continue
+            if (firstByteNs == null) {
+                firstByteNs = System.nanoTime()
+            }
+            output.write(buffer, 0, count)
+            bytes += count
+        }
         output.flush()
-        return bytes
+        return StreamResult(bytes = bytes, firstByteNs = firstByteNs)
+    }
+
+    private fun readBodyWithTiming(input: InputStream): TimedBody {
+        val output = java.io.ByteArrayOutputStream()
+        val buffer = ByteArray(STREAM_BUFFER_SIZE)
+        var firstByteNs: Long? = null
+
+        while (true) {
+            val count = input.read(buffer)
+            if (count == -1) break
+            if (count == 0) continue
+            if (firstByteNs == null) {
+                firstByteNs = System.nanoTime()
+            }
+            output.write(buffer, 0, count)
+        }
+
+        return TimedBody(
+            bytes = output.toByteArray(),
+            firstByteNs = firstByteNs,
+        )
     }
 
     private fun sendResponseHeaders(
@@ -480,6 +555,55 @@ class CastRelayServer(
         }
     }
 
+    private fun playlistLiveEdgeMetadata(playlist: String): PlaylistLiveEdgeMetadata {
+        var mediaSequence: String? = null
+        var programDateTime: String? = null
+        var targetDuration: String? = null
+        var lastSegmentUri: String? = null
+
+        playlist.lineSequence()
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .forEach { line ->
+                when {
+                    line.startsWith("#EXT-X-MEDIA-SEQUENCE:", ignoreCase = true) -> {
+                        mediaSequence = line.substringAfter(":").trim()
+                    }
+                    line.startsWith("#EXT-X-PROGRAM-DATE-TIME:", ignoreCase = true) -> {
+                        programDateTime = line.substringAfter(":").trim()
+                    }
+                    line.startsWith("#EXT-X-TARGETDURATION:", ignoreCase = true) -> {
+                        targetDuration = line.substringAfter(":").trim()
+                    }
+                    !line.startsWith("#") -> {
+                        lastSegmentUri = line
+                    }
+                }
+            }
+
+        return PlaylistLiveEdgeMetadata(
+            mediaSequence = mediaSequence,
+            programDateTime = programDateTime,
+            targetDuration = targetDuration,
+            lastSegmentUri = lastSegmentUri,
+        )
+    }
+
+    private fun elapsedMs(startNs: Long, endNs: Long = System.nanoTime()): Long {
+        return (endNs - startNs).coerceAtLeast(0L) / 1_000_000L
+    }
+
+    private fun elapsedMsOrMissing(startNs: Long, endNs: Long?): Long {
+        return endNs?.let { elapsedMs(startNs, it) } ?: -1L
+    }
+
+    private fun sanitizeLogValue(value: String?): String {
+        return value
+            ?.replace(Regex("\\s+"), "_")
+            ?.take(MAX_LOG_VALUE_LENGTH)
+            .orEmpty()
+    }
+
     private fun stableTargetId(key: String): String {
         val digest = MessageDigest.getInstance("SHA-256")
             .digest(key.toByteArray(StandardCharsets.UTF_8))
@@ -547,9 +671,27 @@ class CastRelayServer(
         val selectedQuality: String?,
     )
 
+    private data class TimedBody(
+        val bytes: ByteArray,
+        val firstByteNs: Long?,
+    )
+
+    private data class StreamResult(
+        val bytes: Long,
+        val firstByteNs: Long?,
+    )
+
+    private data class PlaylistLiveEdgeMetadata(
+        val mediaSequence: String? = null,
+        val programDateTime: String? = null,
+        val targetDuration: String? = null,
+        val lastSegmentUri: String? = null,
+    )
+
     private companion object {
         private const val SERVER_BACKLOG = 32
         private const val STREAM_BUFFER_SIZE = 64 * 1024
+        private const val MAX_LOG_VALUE_LENGTH = 240
 
         private val hopByHopHeaders = setOf(
             "connection",

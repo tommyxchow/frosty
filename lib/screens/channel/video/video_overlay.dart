@@ -481,13 +481,13 @@ class VideoOverlay extends StatelessWidget {
                                             StreamProxyBridge.castState,
                                         builder: (context, castState, _) {
                                           final castLatency =
-                                              castState.latencySeconds;
+                                              castState.formattedLatency;
 
                                           return Observer(
                                             builder: (context) => Text(
                                               castState.isCasting &&
                                                       castLatency != null
-                                                  ? '${castLatency}s'
+                                                  ? castLatency
                                                   : videoStore.latency ?? '—',
                                               style: TextStyle(
                                                 color: surfaceColor,

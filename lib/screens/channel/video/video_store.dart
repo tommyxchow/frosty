@@ -738,11 +738,10 @@ abstract class VideoStoreBase with Store {
               if (latencyElement && latencyElement.textContent) {
                 let latencyText = latencyElement.textContent.trim();
 
-                // Convert to whole number with abbreviated unit: "4.69 sec." -> "5s"
+                // Convert to abbreviated unit: "4.69 sec." -> "4.69s"
                 const match = latencyText.match(/([0-9.]+)\s*sec/i);
                 if (match) {
-                  const rounded = Math.round(parseFloat(match[1]));
-                  latencyText = rounded + 's';
+                  latencyText = parseFloat(match[1]).toFixed(2) + 's';
                   this.hasInitialLatency = true;
                 }
 

@@ -169,6 +169,85 @@ class CastRelayServerTest {
     }
 
     @Test
+    fun logsRelayTimingForMediaResponses() {
+        val logs = mutableListOf<String>()
+
+        RawUpstreamServer { _, output ->
+            writeHttpResponse(
+                output = output,
+                contentType = "video/mp2t",
+                body = "segment",
+            )
+        }.use { upstream ->
+            CastRelayServer(log = logs::add).use { relay ->
+                val relayUrl = localRelayUrl(
+                    relay.relayUrlFor(upstream.url("/segment.ts")),
+                )
+
+                val response = get(relayUrl)
+
+                assertEquals("segment", response.body)
+                val responseLog = logs.firstOrNull { log ->
+                    log.contains("cast_relay action=response") &&
+                        log.contains("playlist=false")
+                } ?: error("Expected media response timing log in $logs")
+
+                assertTrue(responseLog.contains("upstream_connect_ms="))
+                assertTrue(responseLog.contains("upstream_first_byte_ms="))
+                assertTrue(responseLog.contains("total_ms="))
+                assertTrue(responseLog.contains("bytes=7"))
+                assertTrue(responseLog.contains("playlist=false"))
+            }
+        }
+    }
+
+    @Test
+    fun logsRelayTimingAndLiveEdgeMetadataForPlaylists() {
+        val logs = mutableListOf<String>()
+
+        RawUpstreamServer { _, output ->
+            writeHttpResponse(
+                output = output,
+                contentType = "application/vnd.apple.mpegurl",
+                body = """
+                    #EXTM3U
+                    #EXT-X-MEDIA-SEQUENCE:777
+                    #EXT-X-TARGETDURATION:2
+                    #EXT-X-PROGRAM-DATE-TIME:2026-06-12T10:00:00.000Z
+                    #EXTINF:2.000,
+                    segment-777.ts
+                    #EXT-X-PROGRAM-DATE-TIME:2026-06-12T10:00:02.000Z
+                    #EXTINF:2.000,
+                    segment-778.ts
+                """.trimIndent(),
+            )
+        }.use { upstream ->
+            CastRelayServer(log = logs::add).use { relay ->
+                val relayUrl = localRelayUrl(
+                    relay.relayUrlFor(upstream.url("/live/index.m3u8")),
+                )
+
+                val response = get(relayUrl)
+
+                assertTrue(response.body.contains("#EXTM3U"))
+                val responseLog = logs.firstOrNull { log ->
+                    log.contains("cast_relay action=response") &&
+                        log.contains("playlist=true")
+                } ?: error("Expected playlist response timing log in $logs")
+
+                assertTrue(responseLog.contains("upstream_connect_ms="))
+                assertTrue(responseLog.contains("upstream_first_byte_ms="))
+                assertTrue(responseLog.contains("total_ms="))
+                assertTrue(responseLog.contains("playlist=true"))
+                assertTrue(responseLog.contains("media_sequence=777"))
+                assertTrue(responseLog.contains("program_date_time=2026-06-12T10:00:02.000Z"))
+                assertTrue(responseLog.contains("target_duration=2"))
+                assertTrue(responseLog.contains("last_segment_uri=segment-778.ts"))
+            }
+        }
+    }
+
+    @Test
     fun rewritesPlaylistResponsesAndAppliesNoCacheHeaders() {
         RawUpstreamServer { _, output ->
             writeHttpResponse(
