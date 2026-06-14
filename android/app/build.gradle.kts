@@ -10,6 +10,7 @@ plugins {
 
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
+val allowDebugSignedRelease = System.getenv("ALLOW_DEBUG_SIGNED_RELEASE") != null
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
@@ -97,10 +98,18 @@ android {
             // debug-signed if the keystore step is ever missing.
             signingConfig = when {
                 keystorePropertiesFile.exists() -> signingConfigs.getByName("release")
-                System.getenv("ALLOW_DEBUG_SIGNED_RELEASE") != null -> signingConfigs.getByName("debug")
-                else -> error("key.properties missing - set ALLOW_DEBUG_SIGNED_RELEASE=1 for compile-only builds")
+                else -> signingConfigs.getByName("debug")
             }
         }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    val releaseTaskRequested = allTasks.any { task ->
+        task.path.startsWith(":app:") && task.name.contains("Release")
+    }
+    if (releaseTaskRequested && !keystorePropertiesFile.exists() && !allowDebugSignedRelease) {
+        throw GradleException("key.properties missing - set ALLOW_DEBUG_SIGNED_RELEASE=1 for compile-only builds")
     }
 }
 

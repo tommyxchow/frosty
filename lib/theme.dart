@@ -37,23 +37,23 @@ class FrostyColors extends ThemeExtension<FrostyColors> {
     required this.overlayOnSurface,
   });
 
-  static const light = FrostyColors(
-    highlightedMessage: Color(0xff9146ff),
-    emoteOnly: Color(0xFFFFB74D),
-    followersOnly: Color(0xFFF44336),
-    slowMode: Color(0xFF2196F3),
-    subOnly: Color(0xFF4CAF50),
-    uniqueMode: Color(0xFFAB47BC),
+  static FrostyColors light({required ColorScheme colorScheme}) => FrostyColors(
+    highlightedMessage: colorScheme.primary,
+    emoteOnly: const Color(0xFFFFB74D),
+    followersOnly: const Color(0xFFF44336),
+    slowMode: const Color(0xFF2196F3),
+    subOnly: const Color(0xFF4CAF50),
+    uniqueMode: const Color(0xFFAB47BC),
     overlayOnSurface: Colors.white,
   );
 
-  static const dark = FrostyColors(
-    highlightedMessage: Color(0xff9146ff),
-    emoteOnly: Color(0xFFFFCC80),
-    followersOnly: Color(0xFFE57373),
-    slowMode: Color(0xFF64B5F6),
-    subOnly: Color(0xFF81C784),
-    uniqueMode: Color(0xFFBA68C8),
+  static FrostyColors dark({required ColorScheme colorScheme}) => FrostyColors(
+    highlightedMessage: colorScheme.primary,
+    emoteOnly: const Color(0xFFFFCC80),
+    followersOnly: const Color(0xFFE57373),
+    slowMode: const Color(0xFF64B5F6),
+    subOnly: const Color(0xFF81C784),
+    uniqueMode: const Color(0xFFBA68C8),
     overlayOnSurface: Colors.white,
   );
 
@@ -130,11 +130,16 @@ class FrostyThemes {
     return ThemeData(
       extensions: [
         colorScheme.brightness == Brightness.dark
-            ? FrostyColors.dark
-            : FrostyColors.light,
+            ? FrostyColors.dark(colorScheme: colorScheme)
+            : FrostyColors.light(colorScheme: colorScheme),
       ],
       colorScheme: colorScheme,
       fontFamily: 'Inter',
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: colorScheme.primary,
+        selectionColor: colorScheme.primary.withValues(alpha: 0.3),
+        selectionHandleColor: colorScheme.primary,
+      ),
       scaffoldBackgroundColor: backgroundColor,
       bottomSheetTheme: BottomSheetThemeData(
         showDragHandle: true,
@@ -144,7 +149,7 @@ class FrostyThemes {
       menuTheme: MenuThemeData(
         style: MenuStyle(
           padding: const WidgetStatePropertyAll(
-            EdgeInsets.symmetric(vertical: 4),
+            EdgeInsets.symmetric(vertical: 2),
           ),
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(
@@ -155,7 +160,12 @@ class FrostyThemes {
         ),
       ),
       menuButtonTheme: MenuButtonThemeData(
-        style: MenuItemButton.styleFrom(visualDensity: VisualDensity.compact),
+        style: MenuItemButton.styleFrom(
+          visualDensity: VisualDensity.compact,
+          minimumSize: const Size(0, 40),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: backgroundColor,
@@ -197,6 +207,23 @@ class FrostyThemes {
             color: colorScheme.primary.withValues(alpha: 0.8),
             width: 1.5,
           ),
+        ),
+      ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          letterSpacing: 0,
+          height: 1.5,
+        ),
+        subtitleTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+          fontSize: 13,
+          height: 1.4,
+        ),
+        leadingAndTrailingTextStyle: TextStyle(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -241,46 +268,34 @@ class FrostyThemes {
         headlineSmall: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w600,
-          letterSpacing: -0.019,
+          letterSpacing: 0,
         ),
 
         // App bar title
         titleLarge: TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.w600,
-          letterSpacing: -0.019,
+          letterSpacing: 0,
         ),
 
         // Section titles
-        titleMedium: TextStyle(
-          fontWeight: FontWeight.w600,
-          letterSpacing: -0.011,
-        ),
+        titleMedium: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0),
 
         // Tab bar title
         titleSmall: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          letterSpacing: -0.011,
+          letterSpacing: 0,
         ),
 
         // Labels
-        labelLarge: TextStyle(
-          fontWeight: FontWeight.w500,
-          letterSpacing: -0.006,
-        ),
+        labelLarge: TextStyle(fontWeight: FontWeight.w500, letterSpacing: 0),
         labelMedium: TextStyle(fontWeight: FontWeight.w500, letterSpacing: 0),
-        labelSmall: TextStyle(
-          fontWeight: FontWeight.w500,
-          letterSpacing: 0.005,
-        ),
+        labelSmall: TextStyle(fontWeight: FontWeight.w500, letterSpacing: 0),
 
         // Body text
-        bodyLarge: TextStyle(
-          fontWeight: FontWeight.w500,
-          letterSpacing: -0.011,
-        ),
-        bodyMedium: TextStyle(letterSpacing: -0.006),
+        bodyLarge: TextStyle(fontWeight: FontWeight.w500, letterSpacing: 0),
+        bodyMedium: TextStyle(letterSpacing: 0),
         bodySmall: TextStyle(letterSpacing: 0),
       ),
     );

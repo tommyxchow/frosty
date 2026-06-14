@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
@@ -10,6 +11,10 @@ import 'package:frosty/utils.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/widgets/frosty_page_view.dart';
 import 'package:frosty/widgets/frosty_scrollbar.dart';
+
+/// ~2x default to keep richer message widgets (emotes, badges, replies) built
+/// ahead of fast scroll-back without holding the entire history.
+const _chatCacheExtent = ScrollCacheExtent.pixels(500.0);
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -140,16 +145,15 @@ class Chat extends StatelessWidget {
     return ListView.builder(
       reverse: true,
       padding: (listPadding ?? EdgeInsets.zero).add(
-        EdgeInsets.only(
-          bottom: chatStore.bottomBarHeight + bottomPadding,
-        ),
+        EdgeInsets.only(bottom: chatStore.bottomBarHeight + bottomPadding),
       ),
       addAutomaticKeepAlives: false,
+      scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: chatStore.renderMessages.length,
       itemBuilder: (context, index) => ChatMessage(
-        ircMessage: chatStore.renderMessages[
-            chatStore.renderMessages.length - 1 - index],
+        ircMessage: chatStore
+            .renderMessages[chatStore.renderMessages.length - 1 - index],
         chatStore: chatStore,
       ),
     );
@@ -160,23 +164,20 @@ class Chat extends StatelessWidget {
     double bottomPadding,
   ) {
     final mergedMessages = chatTabsStore!.mergedMessages;
-    final channelIdToUserTwitch =
-        chatTabsStore!.mergedChannelIdToUserTwitch;
+    final channelIdToUserTwitch = chatTabsStore!.mergedChannelIdToUserTwitch;
     final currentChannelId = chatTabsStore!.activeTab.channelId;
 
     return ListView.builder(
       reverse: true,
       padding: (listPadding ?? EdgeInsets.zero).add(
-        EdgeInsets.only(
-          bottom: chatStore.bottomBarHeight + bottomPadding,
-        ),
+        EdgeInsets.only(bottom: chatStore.bottomBarHeight + bottomPadding),
       ),
       addAutomaticKeepAlives: false,
+      scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: mergedMessages.length,
       itemBuilder: (context, index) {
-        final merged =
-            mergedMessages[mergedMessages.length - 1 - index];
+        final merged = mergedMessages[mergedMessages.length - 1 - index];
         return ChatMessage(
           ircMessage: merged.ircMessage,
           chatStore: merged.chatStore,
@@ -211,8 +212,7 @@ class Chat extends StatelessWidget {
             right: 4,
             bottom:
                 chatStore.bottomBarHeight +
-                (chatStore.assetsStore.showEmoteMenu ||
-                        isHorizontalLandscape
+                (chatStore.assetsStore.showEmoteMenu || isHorizontalLandscape
                     ? 0
                     : MediaQuery.of(context).padding.bottom),
           ),
@@ -236,17 +236,13 @@ class Chat extends StatelessWidget {
                     ? null
                     : ElevatedButton.icon(
                         onPressed: onResume,
-                        icon: const Icon(
-                          Icons.arrow_downward_rounded,
-                        ),
+                        icon: const Icon(Icons.arrow_downward_rounded),
                         label: Text(
                           bufferCount > 0
                               ? '$bufferCount new ${bufferCount == 1 ? 'message' : 'messages'}'
                               : 'Resume scroll',
                           style: const TextStyle(
-                            fontFeatures: [
-                              FontFeature.tabularFigures(),
-                            ],
+                            fontFeatures: [FontFeature.tabularFigures()],
                           ),
                         ),
                       ),
@@ -278,17 +274,13 @@ class Chat extends StatelessWidget {
                       child: FrostyPageView(
                         headers: [
                           'Recent',
-                          if (chatStore.settings.showTwitchEmotes)
-                            'Twitch',
+                          if (chatStore.settings.showTwitchEmotes) 'Twitch',
                           if (chatStore.settings.show7TVEmotes) '7TV',
                           if (chatStore.settings.showBTTVEmotes) 'BTTV',
                           if (chatStore.settings.showFFZEmotes) 'FFZ',
                         ],
                         tabActions: {
-                          if (chatStore
-                              .assetsStore
-                              .recentEmotes
-                              .isNotEmpty)
+                          if (chatStore.assetsStore.recentEmotes.isNotEmpty)
                             0: IconButton(
                               onPressed: () {
                                 chatStore.assetsStore.recentEmotes.clear();
@@ -296,9 +288,7 @@ class Chat extends StatelessWidget {
                                   'Recent emotes cleared',
                                 );
                               },
-                              icon: const Icon(
-                                Icons.delete_outline_rounded,
-                              ),
+                              icon: const Icon(Icons.delete_outline_rounded),
                               tooltip: 'Clear recent emotes',
                               iconSize: 20,
                             ),

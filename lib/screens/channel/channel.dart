@@ -122,7 +122,9 @@ class _VideoChatState extends State<VideoChat>
 
   void _handlePipDragStart(DragStartDetails details) {
     // Disable drag gesture when already in PiP mode or video is not playing
-    if (_videoStore.isInPipMode || _videoStore.paused) return;
+    if (_videoStore.isInPipMode || _videoStore.paused || _videoStore.loading) {
+      return;
+    }
 
     _animationController.stop(); // Stop any ongoing animation
     setState(() {
@@ -133,7 +135,10 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragUpdate(DragUpdateDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+    if (!_isPipDragging ||
+        _videoStore.isInPipMode ||
+        _videoStore.paused ||
+        _videoStore.loading) {
       return;
     }
 
@@ -157,7 +162,10 @@ class _VideoChatState extends State<VideoChat>
   }
 
   void _handlePipDragEnd(DragEndDetails details) {
-    if (!_isPipDragging || _videoStore.isInPipMode || _videoStore.paused) {
+    if (!_isPipDragging ||
+        _videoStore.isInPipMode ||
+        _videoStore.paused ||
+        _videoStore.loading) {
       return;
     }
 
@@ -327,7 +335,9 @@ class _VideoChatState extends State<VideoChat>
             settingsStore: settingsStore,
           );
 
-          if (_videoStore.paused || _videoStore.streamInfo == null) {
+          if (_videoStore.paused ||
+              _videoStore.streamInfo == null ||
+              _videoStore.loading) {
             return videoOverlay;
           }
 
@@ -347,15 +357,44 @@ class _VideoChatState extends State<VideoChat>
       ),
     );
 
-    final video = Observer(
-      builder: (context) {
-        return Stack(
-          children: [
-            player,
-            if (_videoStore.settingsStore.showOverlay) overlay,
-          ],
-        );
-      },
+    final video = Stack(
+      children: [
+        player,
+        Positioned.fill(
+          child: Observer(
+            builder: (_) => AnimatedOpacity(
+              opacity: _videoStore.loading ? 1.0 : 0.0,
+              duration: _videoStore.loading
+                  ? Duration.zero
+                  : const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+              child: IgnorePointer(
+                child: TickerMode(
+                  enabled: _videoStore.loading,
+                  child: const ColoredBox(
+                    color: Colors.black,
+                    child: Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white38,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Observer(
+          builder: (_) => _videoStore.settingsStore.showOverlay
+              ? overlay
+              : const SizedBox.shrink(),
+        ),
+      ],
     );
 
     final chat = Observer(

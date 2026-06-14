@@ -58,6 +58,9 @@ SettingsStore _$SettingsStoreFromJson(
         unknownValue: TimestampType.disabled,
       ) ??
       TimestampType.disabled
+  ..showHistoricalTimestamps =
+      json['showHistoricalTimestamps'] as bool? ?? false
+  ..focusCurrentChannel = json['focusCurrentChannel'] as bool? ?? false
   ..autoSyncChatDelay = json['autoSyncChatDelay'] as bool? ?? false
   ..chatDelay = (json['chatDelay'] as num?)?.toDouble() ?? 0.0
   ..highlightFirstTimeChatter =
@@ -131,6 +134,8 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'showDeletedMessages': instance.showDeletedMessages,
   'showChatMessageDividers': instance.showChatMessageDividers,
   'timestampType': _$TimestampTypeEnumMap[instance.timestampType]!,
+  'showHistoricalTimestamps': instance.showHistoricalTimestamps,
+  'focusCurrentChannel': instance.focusCurrentChannel,
   'autoSyncChatDelay': instance.autoSyncChatDelay,
   'chatDelay': instance.chatDelay,
   'highlightFirstTimeChatter': instance.highlightFirstTimeChatter,
@@ -622,6 +627,46 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set timestampType(TimestampType value) {
     _$timestampTypeAtom.reportWrite(value, super.timestampType, () {
       super.timestampType = value;
+    });
+  }
+
+  late final _$showHistoricalTimestampsAtom = Atom(
+    name: '_SettingsStoreBase.showHistoricalTimestamps',
+    context: context,
+  );
+
+  @override
+  bool get showHistoricalTimestamps {
+    _$showHistoricalTimestampsAtom.reportRead();
+    return super.showHistoricalTimestamps;
+  }
+
+  @override
+  set showHistoricalTimestamps(bool value) {
+    _$showHistoricalTimestampsAtom.reportWrite(
+      value,
+      super.showHistoricalTimestamps,
+      () {
+        super.showHistoricalTimestamps = value;
+      },
+    );
+  }
+
+  late final _$focusCurrentChannelAtom = Atom(
+    name: '_SettingsStoreBase.focusCurrentChannel',
+    context: context,
+  );
+
+  @override
+  bool get focusCurrentChannel {
+    _$focusCurrentChannelAtom.reportRead();
+    return super.focusCurrentChannel;
+  }
+
+  @override
+  set focusCurrentChannel(bool value) {
+    _$focusCurrentChannelAtom.reportWrite(value, super.focusCurrentChannel, () {
+      super.focusCurrentChannel = value;
     });
   }
 
@@ -1226,6 +1271,8 @@ fontSize: ${fontSize},
 showDeletedMessages: ${showDeletedMessages},
 showChatMessageDividers: ${showChatMessageDividers},
 timestampType: ${timestampType},
+showHistoricalTimestamps: ${showHistoricalTimestamps},
+focusCurrentChannel: ${focusCurrentChannel},
 autoSyncChatDelay: ${autoSyncChatDelay},
 chatDelay: ${chatDelay},
 syncedChatDelay: ${syncedChatDelay},

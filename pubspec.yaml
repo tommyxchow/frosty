@@ -14,7 +14,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 # Read more about Android versioning at https://developer.android.com/studio/publish/versioning
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 5.0.5+68
+version: 5.1.0+69
 
 environment:
   sdk: ^3.9.0
@@ -56,6 +56,12 @@ dependencies:
     path_provider: ^2.1.5
     dio: ^5.9.0
     app_links: ^7.0.0
+    # Fork pinned for Flutter 3.44 compatibility: upstream 16.0.2 references
+    # ExtendSelectionByPageIntent, removed in Flutter 3.44.
+    extended_text_field:
+        git:
+            url: https://github.com/tommyxchow/extended_text_field.git
+            ref: 76305e9b115f0b41dc0d23e7a4f651df454fea89
     native_device_orientation: ^2.1.0
 
 dev_dependencies:

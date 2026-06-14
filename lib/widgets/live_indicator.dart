@@ -138,57 +138,61 @@ class _LiveIndicatorState extends State<LiveIndicator>
       );
     }
 
-    return AnimatedBuilder(
-      animation: _pingController!,
-      builder: (context, child) {
-        final pingSize = widget.size * _pingScale!.value;
-        return SizedBox(
-          width: widget.size,
-          height: widget.size,
-          child: Stack(
-            alignment: Alignment.center,
-            clipBehavior: Clip.none,
-            children: [
-              // Ping ring rendered outside without affecting layout
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: OverflowBox(
-                    maxWidth: pingSize,
-                    maxHeight: pingSize,
-                    child: Center(
-                      child: Opacity(
-                        opacity: _pingOpacity!.value,
-                        child: Container(
-                          width: pingSize,
-                          height: pingSize,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: widget.color.withValues(
-                                alpha: _borderOpacity,
+    return SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // Ping ring in its own RepaintBoundary so its 60fps animation
+          // doesn't dirty the overlay's compositing layer (expensive with
+          // Impeller + PlatformView).
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: AnimatedBuilder(
+                animation: _pingController!,
+                builder: (context, child) {
+                  final pingSize = widget.size * _pingScale!.value;
+                  return IgnorePointer(
+                    child: OverflowBox(
+                      maxWidth: pingSize,
+                      maxHeight: pingSize,
+                      child: Center(
+                        child: Opacity(
+                          opacity: _pingOpacity!.value,
+                          child: Container(
+                            width: pingSize,
+                            height: pingSize,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: widget.color.withValues(
+                                  alpha: _borderOpacity,
+                                ),
+                                width: _borderWidth,
                               ),
-                              width: _borderWidth,
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
-              // Static center dot
-              Container(
-                width: widget.size,
-                height: widget.size,
-                decoration: BoxDecoration(
-                  color: widget.color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
+            ),
           ),
-        );
-      },
+          // Static center dot
+          Container(
+            width: widget.size,
+            height: widget.size,
+            decoration: BoxDecoration(
+              color: widget.color,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -13,26 +13,63 @@ import 'package:frosty/widgets/section_header.dart';
 import 'package:frosty/widgets/settings_page_layout.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class ChatSettings extends StatefulWidget {
+class ChatSettings extends StatelessWidget {
   final SettingsStore settingsStore;
 
   const ChatSettings({super.key, required this.settingsStore});
 
   @override
-  State<ChatSettings> createState() => _ChatSettingsState();
-}
-
-class _ChatSettingsState extends State<ChatSettings> {
-  var showPreview = false;
-
-  @override
   Widget build(BuildContext context) {
-    final settingsStore = widget.settingsStore;
-
     return Observer(
       builder: (context) => SettingsPageLayout(
         children: [
-          const SectionHeader('Message sizing', isFirst: true),
+          const SectionHeader('General', isFirst: true),
+          SettingsListSwitch(
+            title: 'Keep screen on',
+            subtitle: const Text(
+              'Prevents the screen from sleeping while a channel is open.',
+            ),
+            value: settingsStore.keepScreenAwake,
+            onChanged: (newValue) => settingsStore.keepScreenAwake = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Autocomplete',
+            subtitle: const Text(
+              'Shows matching emotes and mentions while typing.',
+            ),
+            value: settingsStore.autocomplete,
+            onChanged: (newValue) => settingsStore.autocomplete = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Load recent messages',
+            subtitle: Text.rich(
+              TextSpan(
+                text:
+                    'Loads historical recent messages in chat through a third-party API service at ',
+                children: [
+                  TextSpan(
+                    text: 'https://recent-messages.robotty.de/',
+                    style: TextStyle(
+                      color: context.colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                      decorationColor: context.colorScheme.primary,
+                    ),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => launchUrl(
+                        Uri.parse('https://recent-messages.robotty.de/'),
+                        mode: settingsStore.launchUrlExternal
+                            ? LaunchMode.externalApplication
+                            : LaunchMode.inAppBrowserView,
+                      ),
+                  ),
+                ],
+              ),
+            ),
+            value: settingsStore.showRecentMessages,
+            onChanged: (newValue) =>
+                settingsStore.showRecentMessages = newValue,
+          ),
+          const SectionHeader('Message sizing'),
           ExpansionTile(
             title: const Text('Preview'),
             children: [
@@ -153,21 +190,41 @@ class _ChatSettingsState extends State<ChatSettings> {
                 settingsStore.showChatMessageDividers = newValue,
           ),
           SettingsListSelect(
-            title: 'Message timestamps',
+            title: 'Timestamps',
             selectedOption: timestampNames[settingsStore.timestampType.index],
             options: timestampNames,
             onChanged: (newValue) => settingsStore.timestampType =
                 TimestampType.values[timestampNames.indexOf(newValue)],
           ),
-          const SectionHeader('Delay and latency'),
           SettingsListSwitch(
-            title: 'Sync message delay and stream latency',
+            title: 'Show timestamps on historical messages',
+            subtitle: const Text(
+              'Always show timestamps on messages loaded from chat history, '
+              'even when timestamps are disabled above.',
+            ),
+            value: settingsStore.showHistoricalTimestamps,
+            onChanged: (newValue) =>
+                settingsStore.showHistoricalTimestamps = newValue,
+          ),
+          SettingsListSwitch(
+            title: 'Focus current channel',
+            subtitle: const Text(
+              'Fades messages from other channels in shared chat and '
+              'merged views, so the current channel stands out.',
+            ),
+            value: settingsStore.focusCurrentChannel,
+            onChanged: (newValue) =>
+                settingsStore.focusCurrentChannel = newValue,
+          ),
+          const SectionHeader('Delay'),
+          SettingsListSwitch(
+            title: 'Auto-sync chat delay',
             value: settingsStore.autoSyncChatDelay,
             onChanged: (newValue) => settingsStore.autoSyncChatDelay = newValue,
           ),
           if (!settingsStore.autoSyncChatDelay)
             SettingsListSlider(
-              title: 'Message delay',
+              title: 'Chat delay',
               trailing: '${settingsStore.chatDelay.toInt()} seconds',
               subtitle: 'Adds a delay before each message is rendered in chat.',
               value: settingsStore.chatDelay,
@@ -177,7 +234,7 @@ class _ChatSettingsState extends State<ChatSettings> {
             ),
           const SectionHeader('Alerts'),
           SettingsListSwitch(
-            title: 'Highlight first time chatters',
+            title: 'Highlight first-time chatters',
             value: settingsStore.highlightFirstTimeChatter,
             onChanged: (newValue) =>
                 settingsStore.highlightFirstTimeChatter = newValue,
@@ -185,25 +242,25 @@ class _ChatSettingsState extends State<ChatSettings> {
           SettingsListSwitch(
             title: 'Show notices',
             subtitle: const Text(
-              'Shows notices such as subs and re-subs, announcements, and raids.',
+              'Shows notices such as subs, announcements, and raids.',
             ),
             value: settingsStore.showUserNotices,
             onChanged: (newValue) => settingsStore.showUserNotices = newValue,
           ),
           const SectionHeader('Layout'),
           SettingsListSwitch(
-            title: 'Move emote menu button left',
+            title: 'Emote menu on left',
             subtitle: const Text(
-              'Places the emote menu button on the left side to avoid accidental presses.',
+              'Places the emote menu button on the left side.',
             ),
             value: settingsStore.emoteMenuButtonOnLeft,
             onChanged: (newValue) =>
                 settingsStore.emoteMenuButtonOnLeft = newValue,
           ),
           SettingsListSwitch(
-            title: 'Persist chat tabs',
+            title: 'Remember chat tabs',
             subtitle: const Text(
-              'Secondary chat tabs are remembered when switching channels.',
+              'Secondary chat tabs are kept when switching channels.',
             ),
             value: settingsStore.persistChatTabs,
             onChanged: (newValue) {
@@ -213,26 +270,23 @@ class _ChatSettingsState extends State<ChatSettings> {
               }
             },
           ),
-          const SectionHeader('Landscape mode'),
+          const SectionHeader('Landscape'),
           SettingsListSwitch(
-            title: 'Move chat left',
+            title: 'Chat on left side',
             value: settingsStore.landscapeChatLeftSide,
             onChanged: (newValue) =>
                 settingsStore.landscapeChatLeftSide = newValue,
           ),
           SettingsListSwitch(
             title: 'Force vertical chat',
-            subtitle: const Text(
-              'Intended for tablets and other larger displays.',
-            ),
+            subtitle: const Text('Intended for tablets and larger displays.'),
             value: settingsStore.landscapeForceVerticalChat,
             onChanged: (newValue) =>
                 settingsStore.landscapeForceVerticalChat = newValue,
           ),
           SettingsListSelect(
-            title: 'Fill notch side',
-            subtitle:
-                'Overrides and fills the available space in devices with a display notch.',
+            title: 'Notch fill',
+            subtitle: 'Fills the display cutout area on the selected side.',
             selectedOption:
                 landscapeCutoutNames[settingsStore.landscapeCutout.index],
             options: landscapeCutoutNames,
@@ -242,17 +296,16 @@ class _ChatSettingsState extends State<ChatSettings> {
                 )],
           ),
           SettingsListSlider(
-            title: 'Chat overlay opacity',
+            title: 'Overlay chat opacity',
             trailing:
                 '${(settingsStore.fullScreenChatOverlayOpacity * 100).toStringAsFixed(0)}%',
-            subtitle:
-                'Sets the opacity (transparency) of the overlay chat in fullscreen mode.',
+            subtitle: 'Opacity of the chat overlay in fullscreen mode.',
             value: settingsStore.fullScreenChatOverlayOpacity,
             divisions: 10,
             onChanged: (newValue) =>
                 settingsStore.fullScreenChatOverlayOpacity = newValue,
           ),
-          const SectionHeader('Muted keywords'),
+          const SectionHeader('Filtering'),
           SettingsMutedWords(settingsStore: settingsStore),
           SettingsListSwitch(
             title: 'Match whole words',
@@ -262,80 +315,41 @@ class _ChatSettingsState extends State<ChatSettings> {
             value: settingsStore.matchWholeWord,
             onChanged: (newValue) => settingsStore.matchWholeWord = newValue,
           ),
-          const SectionHeader('Autocomplete'),
-          SettingsListSwitch(
-            title: 'Show autocomplete bar',
-            subtitle: const Text(
-              'Shows a bar containing matching emotes and mentions while typing.',
-            ),
-            value: settingsStore.autocomplete,
-            onChanged: (newValue) => settingsStore.autocomplete = newValue,
-          ),
           const SectionHeader('Emotes and badges'),
           SettingsListSwitch(
-            title: 'Show Twitch emotes',
+            title: 'Twitch emotes',
             value: settingsStore.showTwitchEmotes,
             onChanged: (newValue) => settingsStore.showTwitchEmotes = newValue,
           ),
           SettingsListSwitch(
-            title: 'Show Twitch badges',
+            title: 'Twitch badges',
             value: settingsStore.showTwitchBadges,
             onChanged: (newValue) => settingsStore.showTwitchBadges = newValue,
           ),
           SettingsListSwitch(
-            title: 'Show 7TV emotes',
+            title: '7TV emotes',
             value: settingsStore.show7TVEmotes,
             onChanged: (newValue) => settingsStore.show7TVEmotes = newValue,
           ),
           SettingsListSwitch(
-            title: 'Show BTTV emotes',
+            title: 'BTTV emotes',
             value: settingsStore.showBTTVEmotes,
             onChanged: (newValue) => settingsStore.showBTTVEmotes = newValue,
           ),
           SettingsListSwitch(
-            title: 'Show BTTV badges',
+            title: 'BTTV badges',
             value: settingsStore.showBTTVBadges,
             onChanged: (newValue) => settingsStore.showBTTVBadges = newValue,
           ),
           SettingsListSwitch(
-            title: 'Show FFZ emotes',
+            title: 'FFZ emotes',
             value: settingsStore.showFFZEmotes,
             onChanged: (newValue) => settingsStore.showFFZEmotes = newValue,
           ),
           SettingsListSwitch(
-            title: 'Show FFZ badges',
+            title: 'FFZ badges',
             value: settingsStore.showFFZBadges,
             onChanged: (newValue) => settingsStore.showFFZBadges = newValue,
-          ),
-          const SectionHeader('Recent messages'),
-          SettingsListSwitch(
-            title: 'Show historical recent messages',
-            subtitle: Text.rich(
-              TextSpan(
-                text:
-                    'Loads historical recent messages in chat through a third-party API service at ',
-                children: [
-                  TextSpan(
-                    text: 'https://recent-messages.robotty.de/',
-                    style: TextStyle(
-                      color: context.colorScheme.primary,
-                      decoration: TextDecoration.underline,
-                      decorationColor: context.colorScheme.primary,
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () => launchUrl(
-                        Uri.parse('https://recent-messages.robotty.de/'),
-                        mode: settingsStore.launchUrlExternal
-                            ? LaunchMode.externalApplication
-                            : LaunchMode.inAppBrowserView,
-                      ),
-                  ),
-                ],
-              ),
-            ),
-            value: settingsStore.showRecentMessages,
-            onChanged: (newValue) =>
-                settingsStore.showRecentMessages = newValue,
           ),
         ],
       ),

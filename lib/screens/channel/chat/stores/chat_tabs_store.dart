@@ -55,6 +55,10 @@ class ChatTabInfo {
   /// The ChatStore for this tab. Null until the tab is activated (lazy loading).
   ChatStore? chatStore;
 
+  /// The id of the most recent message visible the last time the user viewed
+  /// this tab. Used to compute unread state — null means "no baseline yet".
+  String? lastSeenMessageId;
+
   /// Whether this is the primary tab (first tab, cannot be removed).
   final bool isPrimary;
 
@@ -184,8 +188,9 @@ abstract class ChatTabsStoreBase with Store {
     int? tailCount,
   }) {
     final msgs = store.messages;
-    final start =
-        tailCount != null && msgs.length > tailCount ? msgs.length - tailCount : 0;
+    final start = tailCount != null && msgs.length > tailCount
+        ? msgs.length - tailCount
+        : 0;
     for (var i = start; i < msgs.length; i++) {
       final id = msgs[i].tags['id'];
       if (id != null && !seenIds.add(id)) continue;
@@ -221,7 +226,12 @@ abstract class ChatTabsStoreBase with Store {
     final seenIds = <String>{};
     for (final tab in _tabs) {
       if (tab.chatStore == null) continue;
-      _collectMessages(tab.chatStore!, recent, seenIds, tailCount: _mergedRenderLimit);
+      _collectMessages(
+        tab.chatStore!,
+        recent,
+        seenIds,
+        tailCount: _mergedRenderLimit,
+      );
     }
     recent.sort(_compareByTimestamp);
     if (recent.length > _mergedRenderLimit) {
@@ -256,7 +266,8 @@ abstract class ChatTabsStoreBase with Store {
     for (final tab in _tabs) {
       if (tab.chatStore != null) {
         total +=
-            tab.chatStore!.messages.length + tab.chatStore!.messageBuffer.length;
+            tab.chatStore!.messages.length +
+            tab.chatStore!.messageBuffer.length;
       }
     }
     return total;
@@ -515,10 +526,9 @@ abstract class ChatTabsStoreBase with Store {
       ),
     );
 
-    // Switch to the new tab (this will activate it)
+    // Switch to the new tab, snapshotting the outgoing tab's lastSeenMessageId.
     final newIndex = _tabs.length - 1;
-    activateTab(newIndex);
-    activeTabIndex = newIndex;
+    setActiveTab(newIndex);
 
     // If in merged mode, fetch the new tab's channel profile
     if (mergedMode) {
@@ -615,8 +625,6 @@ abstract class ChatTabsStoreBase with Store {
 
   /// Reorders a tab from oldIndex to newIndex.
   /// The primary tab (index 0) cannot be moved, and no tab can be placed before it.
-  /// The caller must pass an insertion index already adjusted for Flutter's
-  /// ReorderableListView remove-then-insert behavior.
   @action
   void reorderTab(int oldIndex, int newIndex) {
     // Primary tab (index 0) cannot be moved, and nothing can move before it
@@ -641,6 +649,30 @@ abstract class ChatTabsStoreBase with Store {
     _syncSecondaryTabsToSettings();
   }
 
+  /// Returns the last message id in [messages] that has a non-null tag id,
+  /// or null if no such message exists. Skips system messages without ids.
+  String? _latestMessageId(List<IRCMessage> messages) {
+    for (var i = messages.length - 1; i >= 0; i--) {
+      final id = messages[i].tags['id'];
+      if (id != null) return id;
+    }
+    return null;
+  }
+
+  /// True if [index] has unread messages since the user last viewed it.
+  /// Always false for the active tab and in merged mode.
+  bool hasUnreadMessages(int index) {
+    if (mergedMode) return false;
+    if (index == activeTabIndex) return false;
+    if (index < 0 || index >= _tabs.length) return false;
+    final tab = _tabs[index];
+    final store = tab.chatStore;
+    if (store == null) return false;
+    final latest = _latestMessageId(store.messages);
+    if (latest == null) return false;
+    return latest != tab.lastSeenMessageId;
+  }
+
   /// Sets the active tab to the given index.
   ///
   /// When [silent] is true, the current tab's draft text and reply state are
@@ -649,6 +681,18 @@ abstract class ChatTabsStoreBase with Store {
   @action
   void setActiveTab(int index, {bool silent = false}) {
     if (index >= 0 && index < _tabs.length) {
+      // Snapshot the outgoing tab's most recent message id so the unread
+      // dot for that tab clears, and only future messages count as unread.
+      if (index != activeTabIndex &&
+          activeTabIndex >= 0 &&
+          activeTabIndex < _tabs.length) {
+        final outgoing = _tabs[activeTabIndex];
+        final outStore = outgoing.chatStore;
+        if (outStore != null) {
+          outgoing.lastSeenMessageId = _latestMessageId(outStore.messages);
+        }
+      }
+
       // Clear text input and emote menu when switching tabs.
       // Skip in merged mode — tabs act as send-target selectors, not
       // view switches, so draft/reply state should be preserved.

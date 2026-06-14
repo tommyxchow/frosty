@@ -61,7 +61,7 @@ class ReplyThread extends StatelessWidget {
                       padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                       child: Text(
                         '$replyName: $replyBody',
-                        style: const TextStyle(fontWeight: FontWeight.w500),
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
                   Flexible(

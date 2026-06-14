@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/chat/details/chat_users_list.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/video/cast_button.dart';
@@ -88,7 +89,7 @@ class VideoOverlay extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SectionHeader(
-                'Stream quality',
+                'Quality',
                 padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
                 isFirst: true,
               ),
@@ -108,7 +109,7 @@ class VideoOverlay extends StatelessWidget {
                               videoStore.setStreamQuality(quality);
                               SharedPreferences.getInstance().then(
                                 (prefs) => prefs.setString(
-                                  'last_stream_quality',
+                                  lastStreamQualityKey(videoStore.userLogin),
                                   quality,
                                 ),
                               );
@@ -343,33 +344,14 @@ class VideoOverlay extends StatelessWidget {
                     videoSettingsButton,
                   ],
                 ),
-                Center(
-                  child: ValueListenableBuilder<CastState>(
-                    valueListenable: StreamProxyBridge.castState,
-                    builder: (context, castState, _) {
-                      if (castState.isCasting) {
-                        return CastStatusButton(
-                          castState: castState,
-                          color: surfaceColor,
-                          shadows: [
-                            Shadow(
-                              offset: const Offset(0, 3),
-                              blurRadius: 8,
-                              color: Colors.black.withValues(alpha: 0.6),
-                            ),
-                          ],
-                        );
-                      }
-
-                      return Tooltip(
-                        message: videoStore.paused ? 'Play' : 'Pause',
-                        preferBelow: false,
-                        child: IconButton(
-                          iconSize: 56,
-                          icon: Icon(
-                            videoStore.paused
-                                ? Icons.play_arrow_rounded
-                                : Icons.pause_rounded,
+                if (!videoStore.loading)
+                  Center(
+                    child: ValueListenableBuilder<CastState>(
+                      valueListenable: StreamProxyBridge.castState,
+                      builder: (context, castState, _) {
+                        if (castState.isCasting) {
+                          return CastStatusButton(
+                            castState: castState,
                             color: surfaceColor,
                             shadows: [
                               Shadow(
@@ -378,13 +360,33 @@ class VideoOverlay extends StatelessWidget {
                                 color: Colors.black.withValues(alpha: 0.6),
                               ),
                             ],
+                          );
+                        }
+
+                        return Tooltip(
+                          message: videoStore.paused ? 'Play' : 'Pause',
+                          preferBelow: false,
+                          child: IconButton(
+                            iconSize: 56,
+                            icon: Icon(
+                              videoStore.paused
+                                  ? Icons.play_arrow_rounded
+                                  : Icons.pause_rounded,
+                              color: surfaceColor,
+                              shadows: [
+                                Shadow(
+                                  offset: const Offset(0, 3),
+                                  blurRadius: 8,
+                                  color: Colors.black.withValues(alpha: 0.6),
+                                ),
+                              ],
+                            ),
+                            onPressed: videoStore.handlePausePlay,
                           ),
-                          onPressed: videoStore.handlePausePlay,
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: Row(

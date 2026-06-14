@@ -148,6 +148,8 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowDeletedMessages = false;
   static const defaultShowChatMessageDividers = false;
   static const defaultTimestampType = TimestampType.disabled;
+  static const defaultShowHistoricalTimestamps = false;
+  static const defaultFocusCurrentChannel = false;
 
   // Delay defaults
   static const defaultAutoSyncChatDelay = false;
@@ -226,6 +228,14 @@ abstract class _SettingsStoreBase with Store {
   )
   @observable
   var timestampType = defaultTimestampType;
+
+  @JsonKey(defaultValue: defaultShowHistoricalTimestamps)
+  @observable
+  var showHistoricalTimestamps = defaultShowHistoricalTimestamps;
+
+  @JsonKey(defaultValue: defaultFocusCurrentChannel)
+  @observable
+  var focusCurrentChannel = defaultFocusCurrentChannel;
 
   // Delay options
   @JsonKey(defaultValue: defaultAutoSyncChatDelay)
@@ -346,6 +356,8 @@ abstract class _SettingsStoreBase with Store {
     showDeletedMessages = defaultShowDeletedMessages;
     showChatMessageDividers = defaultShowChatMessageDividers;
     timestampType = defaultTimestampType;
+    showHistoricalTimestamps = defaultShowHistoricalTimestamps;
+    focusCurrentChannel = defaultFocusCurrentChannel;
 
     autoSyncChatDelay = defaultAutoSyncChatDelay;
     chatDelay = defaultChatDelay;

@@ -17,6 +17,7 @@ class ChatMessage extends StatelessWidget {
   final IRCMessage ircMessage;
   final ChatStore chatStore;
   final bool isModal;
+  final bool forceTimestamp;
   final bool showReplyHeader;
   final bool isInReplyThread;
 
@@ -39,6 +40,7 @@ class ChatMessage extends StatelessWidget {
     required this.ircMessage,
     required this.chatStore,
     this.isModal = false,
+    this.forceTimestamp = false,
     this.showReplyHeader = true,
     this.isInReplyThread = false,
     this.overrideChannelIdToUserTwitch,
@@ -65,6 +67,7 @@ class ChatMessage extends StatelessWidget {
         username: ircMessage.user!,
         userId: ircMessage.tags['user-id']!,
         displayName: ircMessage.tags['display-name']!,
+        onActivateSourceTab: onActivateSourceTab,
       ),
     );
   }
@@ -84,6 +87,7 @@ class ChatMessage extends StatelessWidget {
             username: user.login,
             userId: user.id,
             displayName: user.displayName,
+            onActivateSourceTab: onActivateSourceTab,
           ),
         );
       }
@@ -126,7 +130,11 @@ class ChatMessage extends StatelessWidget {
                   badgeScale: chatStore.settings.badgeScale,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
-                  channelIdToUserTwitch: overrideChannelIdToUserTwitch ??
+                  forceTimestamp: forceTimestamp,
+                  showHistoricalTimestamps:
+                      chatStore.settings.showHistoricalTimestamps,
+                  channelIdToUserTwitch:
+                      overrideChannelIdToUserTwitch ??
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId:
                       overrideCurrentChannelId ?? chatStore.channelId,
@@ -234,7 +242,11 @@ class ChatMessage extends StatelessWidget {
                   badgeScale: chatStore.settings.badgeScale,
                   launchExternal: chatStore.settings.launchUrlExternal,
                   timestamp: chatStore.settings.timestampType,
-                  channelIdToUserTwitch: overrideChannelIdToUserTwitch ??
+                  forceTimestamp: forceTimestamp,
+                  showHistoricalTimestamps:
+                      chatStore.settings.showHistoricalTimestamps,
+                  channelIdToUserTwitch:
+                      overrideChannelIdToUserTwitch ??
                       chatStore.assetsStore.channelIdToUserTwitch,
                   currentChannelId:
                       overrideCurrentChannelId ?? chatStore.channelId,
@@ -389,9 +401,12 @@ class ChatMessage extends StatelessWidget {
                         },
                         launchExternal: chatStore.settings.launchUrlExternal,
                         timestamp: chatStore.settings.timestampType,
+                        forceTimestamp: forceTimestamp,
+                        showHistoricalTimestamps:
+                            chatStore.settings.showHistoricalTimestamps,
                         channelIdToUserTwitch:
                             overrideChannelIdToUserTwitch ??
-                                chatStore.assetsStore.channelIdToUserTwitch,
+                            chatStore.assetsStore.channelIdToUserTwitch,
                         currentChannelId:
                             overrideCurrentChannelId ?? chatStore.channelId,
                       ),
@@ -482,10 +497,14 @@ class ChatMessage extends StatelessWidget {
                 messageHeaderIcon = Icon(
                   Icons.campaign_rounded,
                   size: messageHeaderIconSize,
+                  color: messageHeaderTextColor,
                 );
-                messageHeader = const Text(
+                messageHeader = Text(
                   'Announcement',
-                  style: TextStyle(fontWeight: messageHeaderFontWeight),
+                  style: TextStyle(
+                    fontWeight: messageHeaderFontWeight,
+                    color: messageHeaderTextColor,
+                  ),
                 );
               }
 
@@ -514,9 +533,12 @@ class ChatMessage extends StatelessWidget {
                           badgeScale: chatStore.settings.badgeScale,
                           launchExternal: chatStore.settings.launchUrlExternal,
                           timestamp: chatStore.settings.timestampType,
+                          forceTimestamp: forceTimestamp,
+                          showHistoricalTimestamps:
+                              chatStore.settings.showHistoricalTimestamps,
                           channelIdToUserTwitch:
                               overrideChannelIdToUserTwitch ??
-                                  chatStore.assetsStore.channelIdToUserTwitch,
+                              chatStore.assetsStore.channelIdToUserTwitch,
                           currentChannelId:
                               overrideCurrentChannelId ?? chatStore.channelId,
                         ),
@@ -589,6 +611,19 @@ class ChatMessage extends StatelessWidget {
                 child: dividedMessage,
               );
 
+        final sourceChannelId =
+            ircMessage.tags['source-room-id'] ?? ircMessage.tags['room-id'];
+        final currentChannelId =
+            overrideCurrentChannelId ?? chatStore.channelId;
+        final shouldFade =
+            chatStore.settings.focusCurrentChannel &&
+            sourceChannelId != null &&
+            sourceChannelId != currentChannelId;
+
+        final fadedMessage = shouldFade
+            ? Opacity(opacity: 0.55, child: coloredMessage)
+            : coloredMessage;
+
         final finalMessage = InkWell(
           onTap: () {
             FocusScope.of(context).unfocus();
@@ -597,7 +632,7 @@ class ChatMessage extends StatelessWidget {
             }
           },
           onLongPress: () => onLongPressMessage(context, defaultTextStyle),
-          child: coloredMessage,
+          child: fadedMessage,
         );
 
         return finalMessage;

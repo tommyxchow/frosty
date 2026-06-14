@@ -166,13 +166,13 @@ class _HomeState extends State<Home> {
                     NavigationDestination(
                       icon: Icon(
                         Icons.favorite_border_rounded,
-                        color: _homeStore.selectedIndex == 0
-                            ? theme.colorScheme.onSurface
-                            : theme.colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                       selectedIcon: Icon(
                         Icons.favorite_rounded,
-                        color: theme.colorScheme.onSurface,
+                        color: theme.colorScheme.primary,
                       ),
                       label: 'Following',
                       tooltip: 'Following',
@@ -180,15 +180,13 @@ class _HomeState extends State<Home> {
                   NavigationDestination(
                     icon: Icon(
                       Icons.arrow_upward_rounded,
-                      color:
-                          _homeStore.selectedIndex ==
-                              (_authStore.isLoggedIn ? 1 : 0)
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                     selectedIcon: Icon(
                       Icons.arrow_upward_rounded,
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.primary,
                     ),
                     label: 'Top',
                     tooltip: 'Top',
@@ -196,15 +194,13 @@ class _HomeState extends State<Home> {
                   NavigationDestination(
                     icon: Icon(
                       Icons.search_rounded,
-                      color:
-                          _homeStore.selectedIndex ==
-                              (_authStore.isLoggedIn ? 2 : 1)
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                     selectedIcon: Icon(
                       Icons.search_rounded,
-                      color: theme.colorScheme.onSurface,
+                      color: theme.colorScheme.primary,
                     ),
                     label: 'Search',
                     tooltip: 'Search',

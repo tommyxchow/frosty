@@ -1,3 +1,29 @@
+## v5.1.0
+
+June 13, 2026
+
+### Improvements
+
+- Added merged chat mode for multi-tab chat, with unread indicators and channel focus controls.
+- Added chat settings for keeping the screen on and showing timestamps on historical messages.
+- Improved chat input with inline emote rendering while typing.
+- Improved chat send reliability, especially when chat delay is enabled.
+- Improved WebView video stability around refreshes, stalls, high latency, fullscreen, and Picture-in-Picture.
+- Kept Glacier Android-only packaging, app identity, APK release flow, Cast support, and stream proxy support.
+
+### Bug Fixes
+
+- Fixed recent messages failing on valueless or escaped IRC tags.
+- Fixed shared chat badges and emotes lingering after leaving shared chat.
+- Fixed recent searches not saving from type-to-search.
+- Fixed auto-synced chat delay not applying when toggled on mid-session.
+- Fixed long chat inputs overlapping the message list.
+- Fixed a video refresh race that could leave a black screen with only the play button visible.
+- Fixed fullscreen button and system UI state getting out of sync.
+- Fixed Twitch/API auth requests that could hang instead of failing cleanly.
+
+---
+
 ## v5.0.5
 
 January 9, 2026

@@ -3,6 +3,14 @@ import 'package:flutter/material.dart';
 /// Twitch API client ID.
 const clientId = String.fromEnvironment('CLIENT_ID');
 
+/// SharedPreferences key for the per-channel last-selected stream quality.
+/// A saved variant that does not exist on another channel falls back to Auto.
+String lastStreamQualityKey(String userLogin) =>
+    'last_stream_quality_$userLogin';
+
+/// Legacy global quality key. Removed on startup during SharedPreferences init.
+const kLegacyLastStreamQualityKey = 'last_stream_quality';
+
 /// Twitch API client secret.
 const secret = String.fromEnvironment('SECRET');
 

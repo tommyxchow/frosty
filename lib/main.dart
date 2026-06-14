@@ -13,6 +13,7 @@ import 'package:frosty/apis/twitch_api.dart';
 import 'package:frosty/apis/twitch_auth_interceptor.dart';
 import 'package:frosty/apis/unauthorized_interceptor.dart';
 import 'package:frosty/cache_manager.dart';
+import 'package:frosty/constants.dart';
 import 'package:frosty/screens/channel/channel.dart';
 import 'package:frosty/screens/home/home.dart';
 import 'package:frosty/screens/onboarding/onboarding_intro.dart';
@@ -32,6 +33,7 @@ void main() async {
   CustomCacheManager.removeOrphanedCacheFiles();
 
   final prefs = await SharedPreferences.getInstance();
+  await prefs.remove(kLegacyLastStreamQualityKey);
 
   final firstRun = prefs.getBool('first_run') ?? true;
 

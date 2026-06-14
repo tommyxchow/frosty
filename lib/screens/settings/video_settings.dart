@@ -20,7 +20,7 @@ class VideoSettings extends StatelessWidget {
         children: [
           const SectionHeader('Player', isFirst: true),
           SettingsListSwitch(
-            title: 'Enable video',
+            title: 'Show video player',
             value: settingsStore.showVideo,
             onChanged: (newValue) => settingsStore.showVideo = newValue,
           ),
@@ -38,14 +38,6 @@ class VideoSettings extends StatelessWidget {
             value: settingsStore.useTextureRendering,
             onChanged: (newValue) =>
                 settingsStore.useTextureRendering = newValue,
-          ),
-          SettingsListSwitch(
-            title: 'Keep screen awake',
-            subtitle: const Text(
-              'Prevents the screen from sleeping while a channel is open.',
-            ),
-            value: settingsStore.keepScreenAwake,
-            onChanged: (newValue) => settingsStore.keepScreenAwake = newValue,
           ),
           SettingsListSelect(
             title: 'Stream proxy mode',
@@ -103,9 +95,9 @@ class VideoSettings extends StatelessWidget {
             onChanged: (newValue) => settingsStore.showOverlay = newValue,
           ),
           SettingsListSwitch(
-            title: 'Long-press player to toggle overlay',
+            title: 'Toggle overlay on long-press',
             subtitle: const Text(
-              'Allows switching between Twitch\'s overlay and the custom overlay.',
+              'Switch between Twitch\'s overlay and the custom overlay.',
             ),
             value: settingsStore.toggleableOverlay,
             onChanged: (newValue) => settingsStore.toggleableOverlay = newValue,
