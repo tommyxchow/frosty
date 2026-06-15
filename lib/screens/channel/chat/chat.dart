@@ -153,11 +153,19 @@ class Chat extends StatelessWidget {
       scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: chatStore.renderMessages.length,
-      itemBuilder: (context, index) => ChatMessage(
-        ircMessage: chatStore.renderMessages[
-            chatStore.renderMessages.length - 1 - index],
-        chatStore: chatStore,
-      ),
+      itemBuilder: (context, index) {
+        final ircMessage = chatStore.renderMessages[
+            chatStore.renderMessages.length - 1 - index];
+        // Key by message identity so the list reconciles by message rather
+        // than by slot. This keeps each message's element (and its gesture
+        // recognizers) bound to the same message when new messages arrive
+        // mid-interaction, fixing long-press landing on the wrong message.
+        return ChatMessage(
+          key: ObjectKey(ircMessage),
+          ircMessage: ircMessage,
+          chatStore: chatStore,
+        );
+      },
     );
   }
 
@@ -185,6 +193,7 @@ class Chat extends StatelessWidget {
         final merged =
             mergedMessages[mergedMessages.length - 1 - index];
         return ChatMessage(
+          key: ObjectKey(merged.ircMessage),
           ircMessage: merged.ircMessage,
           chatStore: merged.chatStore,
           inputChatStore: chatStore,

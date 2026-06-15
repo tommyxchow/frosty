@@ -699,30 +699,18 @@ class ChatMessage extends StatelessWidget {
             ? Opacity(opacity: 0.55, child: coloredMessage)
             : coloredMessage;
 
-        return GestureDetector(
-          // If a new message comes in while long pressing, prevent scrolling
-          // so that the long press doesn't miss and activate on the wrong message.
-          onLongPressStart: (_) {
-            chatStore.pauseAutoScrollForInteraction();
+        final finalMessage = InkWell(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            if (_effectiveInputStore.assetsStore.showEmoteMenu) {
+              _effectiveInputStore.assetsStore.showEmoteMenu = false;
+            }
           },
-          onLongPressEnd: (_) {
-            chatStore.resumeAutoScrollAfterInteraction();
-            onLongPressMessage(context, defaultTextStyle);
-          },
-          onLongPressCancel: () {
-            chatStore.resumeAutoScrollAfterInteraction();
-          },
-          // Use an InkWell here to get the ripple effect on tap
-          child: InkWell(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-              if (_effectiveInputStore.assetsStore.showEmoteMenu) {
-                _effectiveInputStore.assetsStore.showEmoteMenu = false;
-              }
-            },
-            child: fadedMessage,
-          ),
+          onLongPress: () => onLongPressMessage(context, defaultTextStyle),
+          child: fadedMessage,
         );
+
+        return finalMessage;
       },
     );
   }
