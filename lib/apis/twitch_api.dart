@@ -465,4 +465,83 @@ class TwitchApi extends BaseApiClient {
 
     return data['messages'] as JsonList;
   }
+
+  /// Returns a list of broadcaster IDs for channels the authenticated user moderates.
+  Future<List<String>> getModeratedChannels({required String id}) async {
+    try {
+      final data = await get<JsonMap>(
+        '/moderation/channels',
+        // Default page size is 20; request the max to avoid hiding mod
+        // actions for users who moderate many channels.
+        queryParameters: {'user_id': id, 'first': '100'},
+      );
+
+      final channels = data['data'] as JsonList;
+      return channels
+          .map((channel) => (channel as JsonMap)['broadcaster_id'] as String?)
+          .whereType<String>()
+          .toList();
+    } on ApiException catch (e) {
+      // Existing users may not have re-authenticated with the new scope yet.
+      // Treat this as non-fatal and hide moderation actions.
+      debugPrint('Failed to get moderated channels: $e');
+      return [];
+    }
+  }
+
+  /// Deletes a specific chat message.
+  Future<bool> deleteChatMessage({
+    required String broadcasterId,
+    required String moderatorId,
+    required String messageId,
+  }) async {
+    try {
+      await delete<dynamic>(
+        '/moderation/chat',
+        queryParameters: {
+          'broadcaster_id': broadcasterId,
+          'moderator_id': moderatorId,
+          'message_id': messageId,
+        },
+      );
+      return true;
+    } on ApiException {
+      return false;
+    }
+  }
+
+  /// Bans or times out a user from a channel.
+  ///
+  /// The optional `duration` in seconds will timeout the user. If omitted, the user is banned.
+  /// The optional `reason` will be displayed to the banned user and other moderators.
+  Future<bool> banUser({
+    required String broadcasterId,
+    required String moderatorId,
+    required String userIdToBan,
+    int? duration,
+    String? reason,
+  }) async {
+    final requestBody = {
+      'data': {
+        'user_id': userIdToBan,
+        if (duration != null) 'duration': duration,
+        if (reason != null) 'reason': reason,
+      },
+    };
+
+    try {
+      final response = await post<JsonMap>(
+        '/moderation/bans',
+        data: requestBody,
+        queryParameters: {
+          'broadcaster_id': broadcasterId,
+          'moderator_id': moderatorId,
+        },
+      );
+      final data = response['data'] as JsonList;
+      return data.isNotEmpty;
+    } on ApiException {
+      return false;
+    }
+  }
 }

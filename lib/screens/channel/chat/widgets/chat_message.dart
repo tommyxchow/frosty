@@ -9,6 +9,7 @@ import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -112,6 +113,9 @@ class ChatMessage extends StatelessWidget {
       return;
     }
 
+    final userStore = context.read<AuthStore>().user;
+    final isModerator = userStore.isModerator(chatStore.channelId);
+
     showModalBottomSheetWithProperFocus(
       context: context,
       isScrollControlled: true,
@@ -199,9 +203,80 @@ class ChatMessage extends StatelessWidget {
             leading: const Icon(Icons.reply),
             title: const Text('Reply to message'),
           ),
+          if (isModerator && ircMessage.tags['user-id'] != null && ircMessage.tags['id'] != null) ...[
+            const Divider(),
+            ListTile(
+              onTap: () {
+                deleteMessageAction(context);
+                Navigator.pop(context);
+              },
+              leading: const Icon(Icons.delete_outline),
+              title: const Text('Delete message'),
+            ),
+            ListTile(
+              onTap: () {
+                timeoutUserAction(context);
+                Navigator.pop(context);
+              },
+              leading: const Icon(Icons.timer_outlined),
+              title: const Text('Timeout for 10min'),
+            ),
+            ListTile(
+              onTap: () {
+                banUserAction(context);
+                Navigator.pop(context);
+              },
+              leading: const Icon(Icons.block),
+              title: const Text('Ban user'),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  Future<void> deleteMessageAction(BuildContext context) async {
+    final userStore = context.read<AuthStore>().user;
+    final success = await userStore.deleteMessage(
+      broadcasterId: chatStore.channelId,
+      messageId: ircMessage.tags['id']!,
+    );
+    if (success) {
+      chatStore.updateNotification('Message deleted');
+    } else {
+      chatStore.updateNotification('Failed to delete message');
+    }
+  }
+
+  Future<void> timeoutUserAction(BuildContext context) async {
+    final userStore = context.read<AuthStore>().user;
+    final success = await userStore.banOrTimeoutUser(
+      broadcasterId: chatStore.channelId,
+      userIdToBan: ircMessage.tags['user-id']!,
+      duration: 600, // 10 minutes
+    );
+    if (success) {
+      chatStore.updateNotification(
+        'User ${ircMessage.tags['display-name'] ?? ircMessage.user} timed out for 10 minutes.',
+      );
+    } else {
+      chatStore.updateNotification('Failed to timeout user');
+    }
+  }
+
+  Future<void> banUserAction(BuildContext context) async {
+    final userStore = context.read<AuthStore>().user;
+    final success = await userStore.banOrTimeoutUser(
+      broadcasterId: chatStore.channelId,
+      userIdToBan: ircMessage.tags['user-id']!,
+    );
+    if (success) {
+      chatStore.updateNotification(
+        'User ${ircMessage.tags['display-name'] ?? ircMessage.user} banned.',
+      );
+    } else {
+      chatStore.updateNotification('Failed to ban user');
+    }
   }
 
   @override
