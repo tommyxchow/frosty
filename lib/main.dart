@@ -1,16 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:advanced_in_app_review/advanced_in_app_review.dart';
 import 'package:app_links/app_links.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:frosty/apis/base_api_client.dart' show ApiException;
 import 'package:frosty/apis/bttv_api.dart';
 import 'package:frosty/apis/dio_client.dart';
 import 'package:frosty/apis/ffz_api.dart';
@@ -35,6 +39,25 @@ import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+/// Errors that are expected on a mobile client — transient network/I/O, plugin
+/// teardown races, and image fetch failures — and therefore shouldn't be
+/// reported to Crashlytics as fatal crashes (which would tank the crash-free
+/// metric and bucket unrelated errors together under the global handlers).
+///
+/// This is a last-resort net. The layers that own these errors already record
+/// them non-fatally with precise reasons (e.g. base_api_client, the IRC
+/// websocket handlers); this only catches what escapes that local handling.
+bool _isNonFatalError(Object error) {
+  return error is SocketException ||
+      error is HttpException ||
+      error is WebSocketChannelException ||
+      error is ApiException ||
+      error is MissingPluginException ||
+      error is NetworkImageLoadException ||
+      (error is DioException && error.type != DioExceptionType.badResponse);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,12 +66,33 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Pass all uncaught "fatal" errors from the framework to Crashlytics
-  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  // Route uncaught framework errors to Crashlytics. Non-crashing UI errors
+  // (layout overflows, image-load failures) and other expected transient
+  // failures are recorded as non-fatal so they don't inflate the crash count.
+  FlutterError.onError = (details) {
+    // Run the cheap type checks first; only fall back to the diagnostics string
+    // (RenderFlex overflow has no typed signal) when those miss.
+    final isNonFatal =
+        _isNonFatalError(details.exception) ||
+        details.exceptionAsString().contains('overflowed');
+    if (isNonFatal) {
+      FirebaseCrashlytics.instance.recordFlutterError(details);
+    } else {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
+  };
 
-  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  // Pass uncaught asynchronous errors to Crashlytics. Expected transient errors
+  // are recorded non-fatally; everything else stays fatal. The reason gives the
+  // grouping engine a real signal so distinct errors don't collapse into one
+  // catch-all issue under this handler frame.
   PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    FirebaseCrashlytics.instance.recordError(
+      error,
+      stack,
+      reason: error.runtimeType.toString(),
+      fatal: !_isNonFatalError(error),
+    );
     return true;
   };
 

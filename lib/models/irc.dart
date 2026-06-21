@@ -974,6 +974,12 @@ class IRCMessage {
     // Obtain the index to break off the tags.
     final tagAndIrcMessageDivider = whole.indexOf(' ');
 
+    // Without a separating space there are no tags to slice and no message body
+    // to parse — bail out rather than throw on the substring/index calls below.
+    if (tagAndIrcMessageDivider == -1) {
+      return IRCMessage(raw: whole, command: Command.none, tags: const {});
+    }
+
     // Parse the IRCv3 tags into a map. The tags section is everything between
     // the leading '@' and the first space. We split on the *raw* string: a
     // literal ';' is always a separator because escaped semicolons inside a
@@ -1005,6 +1011,14 @@ class IRCMessage {
     // Index 2 is #channel name that we are currently connected to
     // Index 3 and beyond is the :message (word by word) that is sent by the user or empty depending on the command
     final splitMessage = ircMessage.split(' ');
+
+    // A well-formed message is at least `<prefix> <COMMAND>`. A malformed or
+    // truncated line (e.g. from the recent-messages history API) can split into
+    // a single token, which would otherwise throw a RangeError on the
+    // splitMessage[0]/[1] accesses below.
+    if (splitMessage.length < 2) {
+      return IRCMessage(raw: whole, command: Command.none, tags: mappedTags);
+    }
 
     // If the username exists, set it.
     // tmi.twitch.tv means the message was sent by Twitch rather than a user, so will be irrelevant.

@@ -340,11 +340,10 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     // On Android, enable auto PiP mode (setAutoEnterEnabled) if the device supports it.
     if (Platform.isAndroid) {
       _disposeAndroidAutoPipReaction = autorun((_) async {
-        if (settingsStore.showVideo && await SimplePip.isAutoPipAvailable) {
-          pip.setAutoPipMode();
-        } else {
-          pip.setAutoPipMode(autoEnter: false);
-        }
+        // setAutoPipMode is only implemented on Android S+ — invoking it on
+        // older versions throws a PlatformException, so skip when unavailable.
+        if (!await SimplePip.isAutoPipAvailable) return;
+        pip.setAutoPipMode(autoEnter: settingsStore.showVideo);
       });
     }
 

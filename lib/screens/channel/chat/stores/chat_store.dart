@@ -651,7 +651,7 @@ abstract class ChatStoreBase with Store {
                 },
                 onBadgeError: (error) {
                   debugPrint(error.toString());
-                  return <ChatBadge>[];
+                  return <String, ChatBadge>{};
                 },
                 showTwitchEmotes: settings.showTwitchEmotes,
                 showTwitchBadges: settings.showTwitchBadges,
@@ -798,9 +798,12 @@ abstract class ChatStoreBase with Store {
       return <Emote>[];
     }
 
-    List<ChatBadge> onBadgeError(dynamic error) {
+    // Returns a Map, not a List: this is attached via `.catchError` to the
+    // `getBadgesChannel` future (a Future<Map<String, ChatBadge>>), so the
+    // handler must return that type or Dart throws at runtime.
+    Map<String, ChatBadge> onBadgeError(dynamic error) {
       debugPrint(error.toString());
-      return <ChatBadge>[];
+      return <String, ChatBadge>{};
     }
 
     final baseAssets = assetsStore.assetsFuture(

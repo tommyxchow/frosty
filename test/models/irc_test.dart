@@ -622,6 +622,24 @@ void main() {
       expect(msg.localEmotes, isNotNull);
       expect(msg.localEmotes!.containsKey('Kappa'), isTrue);
     });
+
+    test('returns Command.none for a truncated line without a command', () {
+      // A malformed/truncated line (e.g. from the recent-messages history API)
+      // whose message section is a single token used to throw a RangeError on
+      // splitMessage[1]. It must now parse safely as a none command.
+      final msg = IRCMessage.fromString('@historical=1 :justaprefix');
+
+      expect(msg.command, Command.none);
+      expect(msg.tags['historical'], '1');
+    });
+
+    test('returns Command.none for a line with no separating space', () {
+      // No space means there are no tags to slice and no body to parse; must
+      // not throw on the substring/split calls.
+      final msg = IRCMessage.fromString('@onlytags');
+
+      expect(msg.command, Command.none);
+    });
   });
 
   group('USERSTATE', () {

@@ -266,76 +266,84 @@ class Chat extends StatelessWidget {
   }
 
   Widget _buildEmoteMenu(BuildContext context) {
+    final menuHeight = context.screenHeight / (context.isPortrait ? 3 : 2);
     return AnimatedContainer(
       curve: Curves.ease,
       duration: const Duration(milliseconds: 200),
-      height: chatStore.assetsStore.showEmoteMenu
-          ? context.screenHeight / (context.isPortrait ? 3 : 2)
-          : 0,
+      height: chatStore.assetsStore.showEmoteMenu ? menuHeight : 0,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 100),
         switchInCurve: Curves.easeOut,
         switchOutCurve: Curves.easeIn,
         child: chatStore.assetsStore.showEmoteMenu
             ? ClipRect(
-                child: Column(
-                  children: [
-                    const Divider(),
-                    Expanded(
-                      child: FrostyPageView(
-                        headers: [
-                          'Recent',
-                          if (chatStore.settings.showTwitchEmotes)
-                            'Twitch',
-                          if (chatStore.settings.show7TVEmotes) '7TV',
-                          if (chatStore.settings.showBTTVEmotes) 'BTTV',
-                          if (chatStore.settings.showFFZEmotes) 'FFZ',
-                        ],
-                        tabActions: {
-                          if (chatStore
-                              .assetsStore
-                              .recentEmotes
-                              .isNotEmpty)
-                            0: IconButton(
-                              onPressed: () {
-                                chatStore.assetsStore.recentEmotes.clear();
-                                chatStore.updateNotification(
-                                  'Recent emotes cleared',
-                                );
-                              },
-                              icon: const Icon(
-                                Icons.delete_outline_rounded,
+                // Lay the content out at its full target height regardless of
+                // the animated container's current height, then clip — the
+                // Column would otherwise overflow (RenderFlex error) as the
+                // height tweens toward zero and can no longer fit the Divider.
+                child: OverflowBox(
+                  minHeight: 0,
+                  maxHeight: menuHeight,
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    children: [
+                      const Divider(),
+                      Expanded(
+                        child: FrostyPageView(
+                          headers: [
+                            'Recent',
+                            if (chatStore.settings.showTwitchEmotes)
+                              'Twitch',
+                            if (chatStore.settings.show7TVEmotes) '7TV',
+                            if (chatStore.settings.showBTTVEmotes) 'BTTV',
+                            if (chatStore.settings.showFFZEmotes) 'FFZ',
+                          ],
+                          tabActions: {
+                            if (chatStore
+                                .assetsStore
+                                .recentEmotes
+                                .isNotEmpty)
+                              0: IconButton(
+                                onPressed: () {
+                                  chatStore.assetsStore.recentEmotes.clear();
+                                  chatStore.updateNotification(
+                                    'Recent emotes cleared',
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.delete_outline_rounded,
+                                ),
+                                tooltip: 'Clear recent emotes',
+                                iconSize: 20,
                               ),
-                              tooltip: 'Clear recent emotes',
-                              iconSize: 20,
+                          },
+                          children: [
+                            RecentEmotesPanel(chatStore: chatStore),
+                            if (chatStore.settings.showTwitchEmotes)
+                              EmoteMenuPanel(
+                                chatStore: chatStore,
+                                twitchEmotes: chatStore
+                                    .assetsStore
+                                    .userEmoteSectionToEmotes,
+                              ),
+                            ...[
+                              if (chatStore.settings.show7TVEmotes)
+                                chatStore.assetsStore.sevenTVEmotes,
+                              if (chatStore.settings.showBTTVEmotes)
+                                chatStore.assetsStore.bttvEmotes,
+                              if (chatStore.settings.showFFZEmotes)
+                                chatStore.assetsStore.ffzEmotes,
+                            ].map(
+                              (emotes) => EmoteMenuPanel(
+                                chatStore: chatStore,
+                                emotes: emotes,
+                              ),
                             ),
-                        },
-                        children: [
-                          RecentEmotesPanel(chatStore: chatStore),
-                          if (chatStore.settings.showTwitchEmotes)
-                            EmoteMenuPanel(
-                              chatStore: chatStore,
-                              twitchEmotes: chatStore
-                                  .assetsStore
-                                  .userEmoteSectionToEmotes,
-                            ),
-                          ...[
-                            if (chatStore.settings.show7TVEmotes)
-                              chatStore.assetsStore.sevenTVEmotes,
-                            if (chatStore.settings.showBTTVEmotes)
-                              chatStore.assetsStore.bttvEmotes,
-                            if (chatStore.settings.showFFZEmotes)
-                              chatStore.assetsStore.ffzEmotes,
-                          ].map(
-                            (emotes) => EmoteMenuPanel(
-                              chatStore: chatStore,
-                              emotes: emotes,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               )
             : null,
