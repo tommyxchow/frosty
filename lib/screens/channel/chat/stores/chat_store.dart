@@ -10,6 +10,7 @@ import 'package:frosty/models/emotes.dart';
 import 'package:frosty/models/events.dart';
 import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
+import 'package:frosty/screens/channel/chat/stores/banned_user_tracker.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -254,6 +255,17 @@ abstract class ChatStoreBase with Store {
   @readonly
   var _autoScroll = true;
 
+  /// Tracks users banned/timed-out via CLEARCHAT so the moderation menu only
+  /// offers an unban action when it applies.
+  final _bannedUserTracker = BannedUserTracker();
+
+  /// Whether [userId] is currently banned or within an unexpired timeout
+  /// (as observed from CLEARCHAT in this session).
+  bool isUserBannedOrTimedOut(String userId) =>
+      _bannedUserTracker.isBannedOrTimedOut(userId, DateTime.now());
+
+  /// Forget a user's ban state after a successful unban so the action hides.
+  void clearUserBanState(String userId) => _bannedUserTracker.clear(userId);
   @readonly
   var _inputText = '';
 
@@ -674,11 +686,35 @@ abstract class ChatStoreBase with Store {
             messageBuffer.add(parsedIRCMessage);
             break;
           case Command.clearChat:
+            // Track the banned/timed-out user so the chat can offer an unban
+            // action only when applicable. target-user-id is absent for a
+            // whole-chat clear.
+            final clearedUserId = parsedIRCMessage.tags['target-user-id'];
+            if (clearedUserId != null) {
+              final banDuration = parsedIRCMessage.tags['ban-duration'];
+              final seconds = banDuration != null
+                  ? int.tryParse(banDuration)
+                  : null;
+              if (seconds != null) {
+                _bannedUserTracker.recordTimeout(
+                  clearedUserId,
+                  Duration(seconds: seconds),
+                  DateTime.now(),
+                );
+              } else {
+                _bannedUserTracker.recordBan(clearedUserId);
+              }
+            }
             IRCMessage.clearChat(
               messages: _messages,
               bufferedMessages: messageBuffer,
               ircMessage: parsedIRCMessage,
             );
+            // clearChat marks messages in place, which doesn't notify the
+            // observable list; reassign so renderMessages recomputes and the
+            // ban/timeout strike-through shows without waiting for the next
+            // message.
+            _messages = _messages.toList().asObservable();
             break;
           case Command.clearMessage:
             IRCMessage.clearMessage(
@@ -686,6 +722,9 @@ abstract class ChatStoreBase with Store {
               bufferedMessages: messageBuffer,
               ircMessage: parsedIRCMessage,
             );
+            // Same as clearChat: force a re-render so the deleted message
+            // updates immediately rather than on the next incoming message.
+            _messages = _messages.toList().asObservable();
             break;
           case Command.roomState:
             chatDetailsStore.roomState = chatDetailsStore.roomState

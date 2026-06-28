@@ -8,6 +8,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_user_modal.dart';
+import 'package:frosty/screens/channel/chat/widgets/moderation_actions.dart';
 import 'package:frosty/screens/channel/chat/widgets/reply_thread.dart';
 import 'package:frosty/utils/context_extensions.dart';
 import 'package:frosty/utils/modal_bottom_sheet.dart';
@@ -106,8 +107,14 @@ class ChatMessage extends StatelessWidget {
   void onLongPressMessage(BuildContext context, TextStyle defaultTextStyle) {
     HapticFeedback.lightImpact();
 
+    // Allow the full menu for live messages and for ones marked deleted/cleared
+    // by a moderation action — those keep their tags (user-id, id), so a
+    // moderator can still act on them (e.g. remove a timeout). Everything else
+    // (notices, system messages) just copies.
     if (ircMessage.command != Command.privateMessage &&
-        ircMessage.command != Command.userState) {
+        ircMessage.command != Command.userState &&
+        ircMessage.command != Command.clearChat &&
+        ircMessage.command != Command.clearMessage) {
       copyMessage();
       return;
     }
@@ -199,6 +206,14 @@ class ChatMessage extends StatelessWidget {
             leading: const Icon(Icons.reply),
             title: const Text('Reply to message'),
           ),
+          if (ircMessage.tags['user-id'] != null)
+            ModerationActions(
+              chatStore: chatStore,
+              targetUserId: ircMessage.tags['user-id']!,
+              targetName:
+                  ircMessage.tags['display-name'] ?? ircMessage.user ?? '',
+              messageId: ircMessage.tags['id'],
+            ),
         ],
       ),
     );
