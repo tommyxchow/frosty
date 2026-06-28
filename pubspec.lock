@@ -101,9 +101,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: frosty-patches
-      resolved-ref: "6460859318b7b44034fe44016cddff02d0bd4c0a"
-      url: "https://github.com/tommyxchow/flutter-native-video-player.git"
+      ref: background-playback
+      resolved-ref: "01f20e0a62fc79a839f5cc3eff052c2d2d602a59"
+      url: "https://github.com/francislavoie/flutter-native-video-player.git"
     source: git
     version: "0.4.11"
   boolean_selector:

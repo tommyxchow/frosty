@@ -24,6 +24,7 @@ SettingsStore _$SettingsStoreFromJson(
   ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
   ..useTextureRendering = json['useTextureRendering'] as bool? ?? true
   ..useNativePlayer = json['useNativePlayer'] as bool? ?? false
+  ..backgroundPlayback = json['backgroundPlayback'] as bool? ?? false
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
   ..showLatency = json['showLatency'] as bool? ?? false
@@ -106,6 +107,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'defaultToHighestQuality': instance.defaultToHighestQuality,
   'useTextureRendering': instance.useTextureRendering,
   'useNativePlayer': instance.useNativePlayer,
+  'backgroundPlayback': instance.backgroundPlayback,
   'showOverlay': instance.showOverlay,
   'toggleableOverlay': instance.toggleableOverlay,
   'showLatency': instance.showLatency,
@@ -347,6 +349,24 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
   set useNativePlayer(bool value) {
     _$useNativePlayerAtom.reportWrite(value, super.useNativePlayer, () {
       super.useNativePlayer = value;
+    });
+  }
+
+  late final _$backgroundPlaybackAtom = Atom(
+    name: '_SettingsStoreBase.backgroundPlayback',
+    context: context,
+  );
+
+  @override
+  bool get backgroundPlayback {
+    _$backgroundPlaybackAtom.reportRead();
+    return super.backgroundPlayback;
+  }
+
+  @override
+  set backgroundPlayback(bool value) {
+    _$backgroundPlaybackAtom.reportWrite(value, super.backgroundPlayback, () {
+      super.backgroundPlayback = value;
     });
   }
 
@@ -1231,6 +1251,7 @@ showVideo: ${showVideo},
 defaultToHighestQuality: ${defaultToHighestQuality},
 useTextureRendering: ${useTextureRendering},
 useNativePlayer: ${useNativePlayer},
+backgroundPlayback: ${backgroundPlayback},
 showOverlay: ${showOverlay},
 toggleableOverlay: ${toggleableOverlay},
 showLatency: ${showLatency},

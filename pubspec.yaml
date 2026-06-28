@@ -78,8 +78,12 @@ dependencies:
     native_device_orientation: ^2.1.0
     better_native_video_player:
         git:
-            url: https://github.com/tommyxchow/flutter-native-video-player.git
-            ref: frosty-patches
+            # TEMP: points at francislavoie's fork while developing the
+            # background-playback foreground service. Revert to
+            # tommyxchow/flutter-native-video-player @ frosty-patches once the
+            # change is merged upstream. Branch is based on the same pinned ref.
+            url: https://github.com/francislavoie/flutter-native-video-player.git
+            ref: background-playback
 
 dev_dependencies:
     flutter_test:
