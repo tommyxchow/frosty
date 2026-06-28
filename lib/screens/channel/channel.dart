@@ -312,7 +312,14 @@ class _VideoChatState extends State<VideoChat>
     final player = GestureDetector(
       onLongPress: _videoStore.handleToggleOverlay,
       child: _videoStore is NativeVideoStore
-          ? NativeVideo(nativeVideoStore: _videoStore)
+          ? NativeVideo(
+              // GlobalKey so the native platform view is *reparented* (not
+              // rebuilt) across the portrait↔landscape layout swap — without
+              // it, rotating destroys and recreates the player, forcing a
+              // reload. Mirrors the WebView Video below.
+              key: _videoKey,
+              nativeVideoStore: _videoStore,
+            )
           : Video(
               key: _videoKey,
               videoStore: _videoStore as VideoStore,
