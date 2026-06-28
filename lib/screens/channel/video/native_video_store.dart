@@ -95,6 +95,7 @@ abstract class NativeVideoStoreBase
   );
   ReactionDisposer? _disposeAndroidAutoPipReaction;
   ReactionDisposer? _disposeVideoModeReaction;
+  ReactionDisposer? _disposeBackgroundPlaybackReaction;
 
   /// Cached SimplePip.isAutoPipAvailable result. Populated by the Android
   /// auto-PiP reaction on first run; reused by dispose to avoid a redundant
@@ -210,6 +211,19 @@ abstract class NativeVideoStoreBase
           } else {
             _pip.setAutoPipMode(autoEnter: false);
           }
+        },
+        fireImmediately: true,
+      );
+
+      // Mirror the background-playback setting onto the plugin's foreground
+      // service. Driving it from a reaction (not just _onPlaying) means it
+      // fires the moment the toggle flips while the app is visible, which is
+      // what grants the service Android 17's while-in-use capability.
+      _disposeBackgroundPlaybackReaction = reaction(
+        (_) => settingsStore.backgroundPlayback,
+        (bool enabled) {
+          debugPrint('[BGAUDIO] setBackgroundPlaybackEnabled($enabled)');
+          _controller?.setBackgroundPlaybackEnabled(enabled);
         },
         fireImmediately: true,
       );
@@ -514,6 +528,12 @@ abstract class NativeVideoStoreBase
       final index = _pendingQualityIndex!;
       _pendingQualityIndex = null;
       _setStreamQualityIndex(index);
+    }
+    // Start the background-audio foreground service now that the MediaSession
+    // exists and we're playing in the foreground (Android 17 grants the
+    // service while-in-use capability only when started while visible).
+    if (Platform.isAndroid && settingsStore.backgroundPlayback) {
+      _controller?.setBackgroundPlaybackEnabled(true);
     }
     _updateLatency();
   }
@@ -1224,6 +1244,7 @@ abstract class NativeVideoStoreBase
     _stopStreamInfoTimer();
     _disposeAndroidAutoPipReaction?.call();
     _disposeVideoModeReaction?.call();
+    _disposeBackgroundPlaybackReaction?.call();
     _disposeController();
   }
 

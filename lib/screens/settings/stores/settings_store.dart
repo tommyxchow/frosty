@@ -66,6 +66,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultDefaultToHighestQuality = false;
   static const defaultUseTextureRendering = true;
   static const defaultUseNativePlayer = false;
+  static const defaultBackgroundPlayback = false;
 
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
@@ -88,6 +89,11 @@ abstract class _SettingsStoreBase with Store {
   @observable
   var useNativePlayer = defaultUseNativePlayer;
 
+  /// Keep audio playing when the screen is locked (native player only).
+  @JsonKey(defaultValue: defaultBackgroundPlayback)
+  @observable
+  var backgroundPlayback = defaultBackgroundPlayback;
+
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
   @observable
@@ -107,6 +113,7 @@ abstract class _SettingsStoreBase with Store {
     defaultToHighestQuality = defaultDefaultToHighestQuality;
     useTextureRendering = defaultUseTextureRendering;
     useNativePlayer = defaultUseNativePlayer;
+    backgroundPlayback = defaultBackgroundPlayback;
 
     showOverlay = defaultShowOverlay;
     toggleableOverlay = defaultToggleableOverlay;

@@ -34,6 +34,17 @@ class VideoSettings extends StatelessWidget {
               onChanged: (newValue) =>
                   settingsStore.useNativePlayer = newValue,
             ),
+          if (settingsStore.showVideo && settingsStore.useNativePlayer)
+            SettingsListSwitch(
+              title: 'Background audio when screen locked',
+              subtitle: const Text(
+                'Keep the stream playing as audio-only when the screen is off. '
+                'Native player only.',
+              ),
+              value: settingsStore.backgroundPlayback,
+              onChanged: (newValue) =>
+                  settingsStore.backgroundPlayback = newValue,
+            ),
           if (!Platform.isIOS || isIPad())
             SettingsListSwitch(
               title: 'Default to highest quality',
