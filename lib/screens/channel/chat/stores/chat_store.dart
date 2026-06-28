@@ -12,6 +12,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/banned_user_tracker.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_interaction_pause.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
@@ -98,11 +99,11 @@ abstract class ChatStoreBase with Store {
     return parts.length >= 3 && _delayBypassCommands.contains(parts[2]);
   }
 
-  Duration get _chatDelay => Duration(
-        milliseconds: (settings.effectiveChatDelay * 1000).round(),
-      );
+  Duration get _chatDelay =>
+      Duration(milliseconds: (settings.effectiveChatDelay * 1000).round());
 
-  bool get _hasActiveChatDelay => settings.showVideo && _chatDelay > Duration.zero;
+  bool get _hasActiveChatDelay =>
+      settings.showVideo && _chatDelay > Duration.zero;
 
   final TwitchApi twitchApi;
 
@@ -266,6 +267,21 @@ abstract class ChatStoreBase with Store {
 
   /// Forget a user's ban state after a successful unban so the action hides.
   void clearUserBanState(String userId) => _bannedUserTracker.clear(userId);
+
+  /// Freezes the rendered list while the user is touching it, so a long-press
+  /// target can't scroll out from under the finger and get its gesture
+  /// recognizer disposed mid-press. Plain field (not observable): it only gates
+  /// the periodic [addMessages] flush, which reads it each 200ms tick.
+  final _interactionPause = ChatInteractionPause();
+
+  /// Hooks for the message list to report touch start/move/end (see [Chat]).
+  void onMessageListPointerDown(int pointer, Offset position) =>
+      _interactionPause.pointerDown(pointer, position);
+  void onMessageListPointerMove(int pointer, Offset position) =>
+      _interactionPause.pointerMove(pointer, position);
+  void onMessageListPointerUp(int pointer) =>
+      _interactionPause.pointerUp(pointer);
+
   @readonly
   var _inputText = '';
 
@@ -375,16 +391,12 @@ abstract class ChatStoreBase with Store {
     // Normalize muted words once per settings change instead of per message
     // — the filter runs in the IRC hot path (50+ msgs/s in busy channels).
     reactions.add(
-      reaction(
-        (_) => settings.mutedWords.toList(),
-        (List<String> words) {
-          _normalizedMutedWords = words
-              .map((word) => word.trim().toLowerCase())
-              .where((word) => word.isNotEmpty)
-              .toList();
-        },
-        fireImmediately: true,
-      ),
+      reaction((_) => settings.mutedWords.toList(), (List<String> words) {
+        _normalizedMutedWords = words
+            .map((word) => word.trim().toLowerCase())
+            .where((word) => word.isNotEmpty)
+            .toList();
+      }, fireImmediately: true),
     );
 
     reactions.add(
@@ -616,8 +628,7 @@ abstract class ChatStoreBase with Store {
           final msg = parsedIRCMessage.message!.toLowerCase();
           final words = settings.matchWholeWord ? msg.split(' ') : null;
           final muted = _normalizedMutedWords.any(
-            (word) =>
-                words != null ? words.contains(word) : msg.contains(word),
+            (word) => words != null ? words.contains(word) : msg.contains(word),
           );
           if (muted) continue;
         }
@@ -1198,7 +1209,11 @@ abstract class ChatStoreBase with Store {
   void addMessages() {
     _flushDueDelayedCallbacks();
 
-    if (!_autoScroll || messageBuffer.isEmpty) return;
+    // Hold messages back while the user is touching the list so the pressed
+    // message stays put (and alive) for the duration of a long-press.
+    if (!_autoScroll || _interactionPause.isPaused || messageBuffer.isEmpty) {
+      return;
+    }
 
     _messages.addAll(messageBuffer);
     messageBuffer.clear();
@@ -1352,7 +1367,8 @@ abstract class ChatStoreBase with Store {
         : null;
     if (toSend != null) {
       // Prefer the server id; fall back to any id already set, then a local one.
-      toSend!.tags['id'] = serverMessageId ??
+      toSend!.tags['id'] =
+          serverMessageId ??
           toSend!.tags['id'] ??
           'local-${DateTime.now().millisecondsSinceEpoch}';
       messageBuffer.add(toSend!);
@@ -1505,6 +1521,8 @@ abstract class ChatStoreBase with Store {
   /// Closes and disposes all the channels and controllers used by the store.
   void dispose() {
     _shouldDisconnect = true;
+
+    _interactionPause.reset();
 
     _clearPendingDelayedCallbacks();
 

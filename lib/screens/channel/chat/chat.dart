@@ -86,25 +86,59 @@ class Chat extends StatelessWidget {
                                 ? chatTabsStore!.mergedScrollController
                                 : chatStore.scrollController;
 
-                            return FrostyScrollbar(
-                              controller: scrollController,
-                              padding: EdgeInsets.only(
-                                top: MediaQuery.of(context).padding.top,
-                                bottom:
-                                    chatStore.bottomBarHeight + bottomPadding,
-                              ),
-                              child: Observer(
-                                builder: (context) {
-                                  return _isMerged
-                                      ? _buildMergedList(
-                                          scrollController,
-                                          bottomPadding,
-                                        )
-                                      : _buildNormalList(
-                                          scrollController,
-                                          bottomPadding,
-                                        );
-                                },
+                            // Freeze the message list while a finger rests on a
+                            // message so a long-press target can't scroll out
+                            // from under it (which would dispose its recognizer
+                            // mid-press). The store resumes flowing as soon as
+                            // the pointer moves like a scroll, so scrolling is
+                            // never interrupted — only a stationary hold pauses.
+                            void onDown(PointerDownEvent e) => _isMerged
+                                ? chatTabsStore!.onMessageListPointerDown(
+                                    e.pointer,
+                                    e.position,
+                                  )
+                                : chatStore.onMessageListPointerDown(
+                                    e.pointer,
+                                    e.position,
+                                  );
+                            void onMove(PointerMoveEvent e) => _isMerged
+                                ? chatTabsStore!.onMessageListPointerMove(
+                                    e.pointer,
+                                    e.position,
+                                  )
+                                : chatStore.onMessageListPointerMove(
+                                    e.pointer,
+                                    e.position,
+                                  );
+                            void onUp(int pointer) => _isMerged
+                                ? chatTabsStore!.onMessageListPointerUp(pointer)
+                                : chatStore.onMessageListPointerUp(pointer);
+
+                            return Listener(
+                              onPointerDown: onDown,
+                              onPointerMove: onMove,
+                              onPointerUp: (e) => onUp(e.pointer),
+                              onPointerCancel: (e) => onUp(e.pointer),
+                              child: FrostyScrollbar(
+                                controller: scrollController,
+                                padding: EdgeInsets.only(
+                                  top: MediaQuery.of(context).padding.top,
+                                  bottom:
+                                      chatStore.bottomBarHeight + bottomPadding,
+                                ),
+                                child: Observer(
+                                  builder: (context) {
+                                    return _isMerged
+                                        ? _buildMergedList(
+                                            scrollController,
+                                            bottomPadding,
+                                          )
+                                        : _buildNormalList(
+                                            scrollController,
+                                            bottomPadding,
+                                          );
+                                  },
+                                ),
                               ),
                             );
                           },
@@ -145,19 +179,25 @@ class Chat extends StatelessWidget {
     return ListView.builder(
       reverse: true,
       padding: (listPadding ?? EdgeInsets.zero).add(
-        EdgeInsets.only(
-          bottom: chatStore.bottomBarHeight + bottomPadding,
-        ),
+        EdgeInsets.only(bottom: chatStore.bottomBarHeight + bottomPadding),
       ),
       addAutomaticKeepAlives: false,
       scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: chatStore.renderMessages.length,
-      itemBuilder: (context, index) => ChatMessage(
-        ircMessage: chatStore.renderMessages[
-            chatStore.renderMessages.length - 1 - index],
-        chatStore: chatStore,
-      ),
+      itemBuilder: (context, index) {
+        final ircMessage = chatStore
+            .renderMessages[chatStore.renderMessages.length - 1 - index];
+        // Key by message identity so the list reconciles by message rather
+        // than by slot. This keeps each message's element (and its gesture
+        // recognizers) bound to the same message when new messages arrive
+        // mid-interaction, fixing long-press landing on the wrong message.
+        return ChatMessage(
+          key: ObjectKey(ircMessage),
+          ircMessage: ircMessage,
+          chatStore: chatStore,
+        );
+      },
     );
   }
 
@@ -166,25 +206,22 @@ class Chat extends StatelessWidget {
     double bottomPadding,
   ) {
     final mergedMessages = chatTabsStore!.mergedMessages;
-    final channelIdToUserTwitch =
-        chatTabsStore!.mergedChannelIdToUserTwitch;
+    final channelIdToUserTwitch = chatTabsStore!.mergedChannelIdToUserTwitch;
     final currentChannelId = chatTabsStore!.activeTab.channelId;
 
     return ListView.builder(
       reverse: true,
       padding: (listPadding ?? EdgeInsets.zero).add(
-        EdgeInsets.only(
-          bottom: chatStore.bottomBarHeight + bottomPadding,
-        ),
+        EdgeInsets.only(bottom: chatStore.bottomBarHeight + bottomPadding),
       ),
       addAutomaticKeepAlives: false,
       scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: mergedMessages.length,
       itemBuilder: (context, index) {
-        final merged =
-            mergedMessages[mergedMessages.length - 1 - index];
+        final merged = mergedMessages[mergedMessages.length - 1 - index];
         return ChatMessage(
+          key: ObjectKey(merged.ircMessage),
           ircMessage: merged.ircMessage,
           chatStore: merged.chatStore,
           inputChatStore: chatStore,
@@ -218,8 +255,7 @@ class Chat extends StatelessWidget {
             right: 4,
             bottom:
                 chatStore.bottomBarHeight +
-                (chatStore.assetsStore.showEmoteMenu ||
-                        isHorizontalLandscape
+                (chatStore.assetsStore.showEmoteMenu || isHorizontalLandscape
                     ? 0
                     : MediaQuery.of(context).padding.bottom),
           ),
@@ -243,17 +279,13 @@ class Chat extends StatelessWidget {
                     ? null
                     : ElevatedButton.icon(
                         onPressed: onResume,
-                        icon: const Icon(
-                          Icons.arrow_downward_rounded,
-                        ),
+                        icon: const Icon(Icons.arrow_downward_rounded),
                         label: Text(
                           bufferCount > 0
                               ? '$bufferCount new ${bufferCount == 1 ? 'message' : 'messages'}'
                               : 'Resume scroll',
                           style: const TextStyle(
-                            fontFeatures: [
-                              FontFeature.tabularFigures(),
-                            ],
+                            fontFeatures: [FontFeature.tabularFigures()],
                           ),
                         ),
                       ),
@@ -292,17 +324,13 @@ class Chat extends StatelessWidget {
                         child: FrostyPageView(
                           headers: [
                             'Recent',
-                            if (chatStore.settings.showTwitchEmotes)
-                              'Twitch',
+                            if (chatStore.settings.showTwitchEmotes) 'Twitch',
                             if (chatStore.settings.show7TVEmotes) '7TV',
                             if (chatStore.settings.showBTTVEmotes) 'BTTV',
                             if (chatStore.settings.showFFZEmotes) 'FFZ',
                           ],
                           tabActions: {
-                            if (chatStore
-                                .assetsStore
-                                .recentEmotes
-                                .isNotEmpty)
+                            if (chatStore.assetsStore.recentEmotes.isNotEmpty)
                               0: IconButton(
                                 onPressed: () {
                                   chatStore.assetsStore.recentEmotes.clear();
@@ -310,9 +338,7 @@ class Chat extends StatelessWidget {
                                     'Recent emotes cleared',
                                   );
                                 },
-                                icon: const Icon(
-                                  Icons.delete_outline_rounded,
-                                ),
+                                icon: const Icon(Icons.delete_outline_rounded),
                                 tooltip: 'Clear recent emotes',
                                 iconSize: 20,
                               ),
