@@ -227,6 +227,14 @@ abstract class ChatStoreBase with Store {
   @observable
   var timeRemaining = const Duration();
 
+  /// A check if the user follows the current channel.
+  /// 
+  /// Architectural note: While it might seem convenient to pack this into [_userState] 
+  /// alongside subscriber and mod, [_userState] is strictly populated from 
+  /// IRC messages which do not include follower status. Therefore, it is managed separately here
+  @observable
+  bool isFollowing = false;
+
   /// A notification message to display above the chat.
   @readonly
   String? _notification;
@@ -951,6 +959,9 @@ abstract class ChatStoreBase with Store {
       (e) => debugPrint('Failed to fetch chat assets: $e'),
     );
 
+    // Check if the current user follows the channel
+    checkFollowStatus();
+
     // Cancel existing listener to prevent duplicate message processing
     _channelListener?.cancel();
     _clearPendingDelayedCallbacks(clearSevenTV: false);
@@ -1460,6 +1471,46 @@ abstract class ChatStoreBase with Store {
       }
     } catch (e) {
       debugPrint('Failed to fetch recent messages: $e');
+    }
+  }
+
+  /// checks the follow status of the user regarding the currently
+  /// watched channel
+  @action
+  Future<void> checkFollowStatus() async {
+    // Sanity Check 1: Is user logged in
+    final currentUserId = auth.user.details?.id;
+    
+    if (currentUserId == null || currentUserId.isEmpty) {
+      isFollowing = false;
+      return;
+    }
+
+    // Sanity Check 2: Is the user watching a valid channel
+    if (channelId.isEmpty) {
+      isFollowing = false;
+      return;
+    }
+
+    // API Call
+    try {
+      isFollowing = await twitchApi.checkUserFollowsChannel(
+        userId: currentUserId,
+        broadcasterId: channelId,
+      );
+    
+      debugPrint('Follow status for channel $channelId: $isFollowing');
+    } catch (e, stackTrace) {
+      debugPrint('❌ Follow Status Check failed: $e');
+      
+      // Log the failing check to FirebaseCrashlytics
+      FirebaseCrashlytics.instance.recordError(
+        e,
+        stackTrace,
+        reason: 'Failed to check follow status for channel $channelId',
+      );
+      
+      isFollowing = false;
     }
   }
 
