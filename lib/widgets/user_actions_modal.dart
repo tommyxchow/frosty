@@ -14,6 +14,10 @@ class UserActionsModal extends StatelessWidget {
   final bool showPinOption;
   final bool? isPinned;
 
+  /// Optional moderation actions (shown at the top) for chat contexts. Kept as
+  /// an injected widget so this generic modal stays chat-agnostic.
+  final Widget? moderationActions;
+
   const UserActionsModal({
     super.key,
     required this.authStore,
@@ -22,6 +26,7 @@ class UserActionsModal extends StatelessWidget {
     required this.userId,
     this.showPinOption = false,
     this.isPinned,
+    this.moderationActions,
   });
 
   @override
@@ -30,6 +35,7 @@ class UserActionsModal extends StatelessWidget {
       primary: false,
       shrinkWrap: true,
       children: [
+        ?moderationActions,
         if (showPinOption)
           ListTile(
             leading: const Icon(Icons.push_pin_outlined),
