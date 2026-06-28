@@ -9,6 +9,7 @@ import 'package:frosty/models/irc.dart';
 import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
+import 'package:frosty/screens/channel/chat/stores/chat_interaction_pause.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
@@ -151,6 +152,19 @@ abstract class ChatTabsStoreBase with Store {
   /// Timer that drives merged message rendering at a fixed cadence.
   Timer? _mergedRenderTimer;
 
+  /// Freezes the rendered merged list while the user is touching it, so a
+  /// long-press target can't scroll out from under the finger. Gates the
+  /// periodic [_refreshMergedMessages]; see [ChatInteractionPause].
+  final _interactionPause = ChatInteractionPause();
+
+  /// Hooks for the merged message list to report touch start/move/end (see [Chat]).
+  void onMessageListPointerDown(int pointer, Offset position) =>
+      _interactionPause.pointerDown(pointer, position);
+  void onMessageListPointerMove(int pointer, Offset position) =>
+      _interactionPause.pointerMove(pointer, position);
+  void onMessageListPointerUp(int pointer) =>
+      _interactionPause.pointerUp(pointer);
+
   /// Frozen snapshot of merged messages when user scrolls up.
   /// Prevents new messages from causing scroll jumps while reading.
   List<MergedMessage>? _mergedSnapshot;
@@ -188,8 +202,9 @@ abstract class ChatTabsStoreBase with Store {
     int? tailCount,
   }) {
     final msgs = store.messages;
-    final start =
-        tailCount != null && msgs.length > tailCount ? msgs.length - tailCount : 0;
+    final start = tailCount != null && msgs.length > tailCount
+        ? msgs.length - tailCount
+        : 0;
     for (var i = start; i < msgs.length; i++) {
       final id = msgs[i].tags['id'];
       if (id != null && !seenIds.add(id)) continue;
@@ -225,7 +240,12 @@ abstract class ChatTabsStoreBase with Store {
     final seenIds = <String>{};
     for (final tab in _tabs) {
       if (tab.chatStore == null) continue;
-      _collectMessages(tab.chatStore!, recent, seenIds, tailCount: _mergedRenderLimit);
+      _collectMessages(
+        tab.chatStore!,
+        recent,
+        seenIds,
+        tailCount: _mergedRenderLimit,
+      );
     }
     recent.sort(_compareByTimestamp);
     if (recent.length > _mergedRenderLimit) {
@@ -249,7 +269,9 @@ abstract class ChatTabsStoreBase with Store {
   /// Refreshes the rendered merged messages. Called by the render timer.
   @action
   void _refreshMergedMessages() {
-    if (!_mergedAutoScroll) return;
+    // Hold the rendered list still while the user is touching it so a
+    // long-press target stays put for the duration of the press.
+    if (!_mergedAutoScroll || _interactionPause.isPaused) return;
     _mergedRenderedMessages = _computeRecentMergedMessages();
   }
 
@@ -260,7 +282,8 @@ abstract class ChatTabsStoreBase with Store {
     for (final tab in _tabs) {
       if (tab.chatStore != null) {
         total +=
-            tab.chatStore!.messages.length + tab.chatStore!.messageBuffer.length;
+            tab.chatStore!.messages.length +
+            tab.chatStore!.messageBuffer.length;
       }
     }
     return total;
@@ -718,6 +741,7 @@ abstract class ChatTabsStoreBase with Store {
   void dispose() {
     _mergedRenderTimer?.cancel();
     _mergedRenderTimer = null;
+    _interactionPause.reset();
     for (final tab in _tabs) {
       tab.chatStore?.dispose();
     }
