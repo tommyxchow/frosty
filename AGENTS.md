@@ -34,6 +34,8 @@ dart run build_runner build                                         # Regenerate
 dart run build_runner build --delete-conflicting-outputs             # Same, but clears stale outputs
 ```
 
+Before pushing: `flutter analyze && flutter test`.
+
 ## Source Structure
 
 - `lib/apis/` — API services (all extend `BaseApiClient`)
@@ -54,10 +56,11 @@ dart run build_runner build --delete-conflicting-outputs             # Same, but
 
 - After changing MobX stores or `@JsonSerializable` models, regenerate with `dart run build_runner build`. Never edit `.g.dart` files directly. Commit `.g.dart` files to source control.
 - The secure storage cleanup in `main.dart` looks unnecessary but handles an Android/iOS edge case where secure storage persists after uninstall. Don't remove it.
+- Several deps in `pubspec.yaml` are git-pinned forks carrying compatibility patches (`extended_text_field`, `better_native_video_player`, `simple_pip_mode`). When upgrading dependencies, don't swap them back to pub.dev releases.
 
 ## Testing
 
 - `flutter test` runs all tests; `flutter test test/path/to/file.dart` for a single file
 - HTTP mocking: `http_mock_adapter` (`DioAdapter`) — use full URLs in `onGet`/`onPost`
 - General mocking: `mocktail` (no codegen required)
-- Fixtures live in `test/fixtures/` (e.g., `irc_messages.dart`, `api_responses.dart`)
+- Test layout mirrors `lib/` (`test/apis/`, `test/models/`, `test/screens/`); shared fixtures live in `test/fixtures/` (e.g., `irc_messages.dart`, `api_responses.dart`)
