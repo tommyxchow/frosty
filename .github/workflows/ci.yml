@@ -23,6 +23,18 @@ jobs:
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get
+      # Fail if committed generated files (*.g.dart) are stale — CI never runs
+      # build_runner otherwise, so forgetting to regenerate after editing a MobX
+      # store or @JsonSerializable model slips past analyze/test/build.
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - name: Verify generated files are up to date
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo '::error::Generated files are out of date. Run `dart run build_runner build --delete-conflicting-outputs` and commit the result.'
+            git status --porcelain
+            git diff
+            exit 1
+          fi
       - run: flutter analyze
       - run: flutter test
       - run: flutter build apk --release
