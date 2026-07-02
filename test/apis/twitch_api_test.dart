@@ -389,4 +389,137 @@ void main() {
       expect(emotes[2].type, EmoteType.twitchChannel);
     });
   });
+
+  group('banUser', () {
+    test('returns true on success', () async {
+      dioAdapter.onPost(
+        'https://api.twitch.tv/helix/moderation/bans',
+        (server) => server.reply(200, {
+          'data': [
+            {'user_id': '3'},
+          ],
+        }),
+        data: {
+          'data': {'user_id': '3'},
+        },
+        queryParameters: {'broadcaster_id': '1', 'moderator_id': '2'},
+      );
+
+      final result = await api.banUser(
+        broadcasterId: '1',
+        moderatorId: '2',
+        userIdToBan: '3',
+      );
+
+      expect(result, isTrue);
+    });
+
+    test('propagates the Twitch message when the target cannot be banned '
+        '(e.g. another moderator)', () async {
+      dioAdapter.onPost(
+        'https://api.twitch.tv/helix/moderation/bans',
+        (server) => server.reply(400, {
+          'message': 'The user specified in the user_id field is a moderator.',
+        }),
+        data: {
+          'data': {'user_id': '3'},
+        },
+        queryParameters: {'broadcaster_id': '1', 'moderator_id': '2'},
+      );
+
+      expect(
+        () => api.banUser(
+          broadcasterId: '1',
+          moderatorId: '2',
+          userIdToBan: '3',
+        ),
+        throwsA(
+          isA<ApiException>().having(
+            (e) => e.message,
+            'message',
+            'The user specified in the user_id field is a moderator.',
+          ),
+        ),
+      );
+    });
+  });
+
+  group('deleteChatMessage', () {
+    test('propagates the Twitch message when the message cannot be deleted '
+        "(e.g. another moderator's or the broadcaster's)", () async {
+      dioAdapter.onDelete(
+        'https://api.twitch.tv/helix/moderation/chat',
+        (server) => server.reply(400, {
+          'message': "You cannot delete the broadcaster's messages.",
+        }),
+        queryParameters: {
+          'broadcaster_id': '1',
+          'moderator_id': '2',
+          'message_id': 'm',
+        },
+      );
+
+      expect(
+        () => api.deleteChatMessage(
+          broadcasterId: '1',
+          moderatorId: '2',
+          messageId: 'm',
+        ),
+        throwsA(
+          isA<ApiException>().having(
+            (e) => e.message,
+            'message',
+            "You cannot delete the broadcaster's messages.",
+          ),
+        ),
+      );
+    });
+  });
+
+  group('unbanUser', () {
+    test('returns true on success (removes a ban or timeout)', () async {
+      dioAdapter.onDelete(
+        'https://api.twitch.tv/helix/moderation/bans',
+        (server) => server.reply(204, null),
+        queryParameters: {
+          'broadcaster_id': '1',
+          'moderator_id': '2',
+          'user_id': '3',
+        },
+      );
+
+      final result = await api.unbanUser(
+        broadcasterId: '1',
+        moderatorId: '2',
+        userId: '3',
+      );
+
+      expect(result, isTrue);
+    });
+
+    test('propagates the Twitch message when the user is not banned', () async {
+      dioAdapter.onDelete(
+        'https://api.twitch.tv/helix/moderation/bans',
+        (server) => server.reply(400, {
+          'message': 'The user in the user_id query parameter is not banned.',
+        }),
+        queryParameters: {
+          'broadcaster_id': '1',
+          'moderator_id': '2',
+          'user_id': '3',
+        },
+      );
+
+      expect(
+        () => api.unbanUser(broadcasterId: '1', moderatorId: '2', userId: '3'),
+        throwsA(
+          isA<ApiException>().having(
+            (e) => e.message,
+            'message',
+            'The user in the user_id query parameter is not banned.',
+          ),
+        ),
+      );
+    });
+  });
 }

@@ -171,7 +171,7 @@ abstract class AuthBase with Store {
             'redirect_uri': 'https://twitch.tv/login',
             'response_type': 'token',
             'scope':
-                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users user:manage:chat_color',
+                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users user:manage:chat_color user:read:moderated_channels moderator:manage:chat_messages moderator:manage:banned_users',
             'force_verify': 'true',
           },
         ),
