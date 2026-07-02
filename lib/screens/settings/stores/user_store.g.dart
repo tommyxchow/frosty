@@ -49,6 +49,26 @@ mixin _$UserStore on UserStoreBase, Store {
     });
   }
 
+  late final _$_moderatedChannelsAtom = Atom(
+    name: 'UserStoreBase._moderatedChannels',
+    context: context,
+  );
+
+  ObservableList<String> get moderatedChannels {
+    _$_moderatedChannelsAtom.reportRead();
+    return super._moderatedChannels;
+  }
+
+  @override
+  ObservableList<String> get _moderatedChannels => moderatedChannels;
+
+  @override
+  set _moderatedChannels(ObservableList<String> value) {
+    _$_moderatedChannelsAtom.reportWrite(value, super._moderatedChannels, () {
+      super._moderatedChannels = value;
+    });
+  }
+
   late final _$initAsyncAction = AsyncAction(
     'UserStoreBase.init',
     context: context,
@@ -90,6 +110,76 @@ mixin _$UserStore on UserStoreBase, Store {
   Future<void> refreshBlockedUsers() {
     return _$refreshBlockedUsersAsyncAction.run(
       () => super.refreshBlockedUsers(),
+    );
+  }
+
+  late final _$refreshModeratedChannelsAsyncAction = AsyncAction(
+    'UserStoreBase.refreshModeratedChannels',
+    context: context,
+  );
+
+  @override
+  Future<void> refreshModeratedChannels() {
+    return _$refreshModeratedChannelsAsyncAction.run(
+      () => super.refreshModeratedChannels(),
+    );
+  }
+
+  late final _$deleteMessageAsyncAction = AsyncAction(
+    'UserStoreBase.deleteMessage',
+    context: context,
+  );
+
+  @override
+  Future<bool> deleteMessage({
+    required String broadcasterId,
+    required String messageId,
+  }) {
+    return _$deleteMessageAsyncAction.run(
+      () => super.deleteMessage(
+        broadcasterId: broadcasterId,
+        messageId: messageId,
+      ),
+    );
+  }
+
+  late final _$banOrTimeoutUserAsyncAction = AsyncAction(
+    'UserStoreBase.banOrTimeoutUser',
+    context: context,
+  );
+
+  @override
+  Future<bool> banOrTimeoutUser({
+    required String broadcasterId,
+    required String userIdToBan,
+    int? duration,
+    String? reason,
+  }) {
+    return _$banOrTimeoutUserAsyncAction.run(
+      () => super.banOrTimeoutUser(
+        broadcasterId: broadcasterId,
+        userIdToBan: userIdToBan,
+        duration: duration,
+        reason: reason,
+      ),
+    );
+  }
+
+  late final _$unbanUserAsyncAction = AsyncAction(
+    'UserStoreBase.unbanUser',
+    context: context,
+  );
+
+  @override
+  Future<bool> unbanUser({
+    required String broadcasterId,
+    required String userIdToUnban,
+  }) {
+    return _$unbanUserAsyncAction.run(
+      () => super.unbanUser(
+        broadcasterId: broadcasterId,
+        userIdToUnban: userIdToUnban,
+      ),
     );
   }
 

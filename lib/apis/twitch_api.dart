@@ -466,21 +466,40 @@ class TwitchApi extends BaseApiClient {
     return data['messages'] as JsonList;
   }
 
-  /// Returns a list of broadcaster IDs for channels the authenticated user moderates.
-  Future<List<String>> getModeratedChannels({required String id}) async {
+  /// Returns a list of broadcaster IDs for channels the authenticated user
+  /// moderates, following pagination so moderators of more than one page of
+  /// channels aren't silently truncated at the first 100.
+  Future<List<String>> getModeratedChannels({
+    required String id,
+    String? cursor,
+  }) async {
     try {
+      // Default page size is 20; request the max to keep the request count low.
+      final queryParams = {'user_id': id, 'first': '100'};
+      if (cursor != null) queryParams['after'] = cursor;
+
       final data = await get<JsonMap>(
         '/moderation/channels',
-        // Default page size is 20; request the max to avoid hiding mod
-        // actions for users who moderate many channels.
-        queryParameters: {'user_id': id, 'first': '100'},
+        queryParameters: queryParams,
       );
 
       final channels = data['data'] as JsonList;
-      return channels
+      final result = channels
           .map((channel) => (channel as JsonMap)['broadcaster_id'] as String?)
           .whereType<String>()
           .toList();
+
+      final paginationCursor = data['pagination']['cursor'];
+      if (paginationCursor != null && channels.isNotEmpty) {
+        // Throttle between pages to stay under Twitch's rate limit, matching
+        // getUserBlockedList above.
+        await Future.delayed(const Duration(milliseconds: 150));
+        result.addAll(
+          await getModeratedChannels(id: id, cursor: paginationCursor),
+        );
+      }
+
+      return result;
     } on ApiException catch (e) {
       // Existing users may not have re-authenticated with the new scope yet.
       // Treat this as non-fatal and hide moderation actions.

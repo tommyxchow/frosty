@@ -467,6 +467,10 @@ abstract class ChatStoreBase with Store {
       connectToChat();
     }
 
+    // Refresh which channels the user moderates on entry so mod actions reflect
+    // status granted/revoked since login. Fire-and-forget, like blocked users.
+    if (auth.isLoggedIn) auth.user.refreshModeratedChannels();
+
     // Tell the scrollController to determine when auto-scroll should be enabled or disabled.
     scrollController.addListener(() {
       // If the scroll position is at the latest message (maximum possible), enable autoscroll.

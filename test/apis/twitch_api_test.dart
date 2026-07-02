@@ -290,6 +290,70 @@ void main() {
     });
   });
 
+  group('getModeratedChannels', () {
+    test('returns broadcaster IDs from a single page', () async {
+      dioAdapter.onGet(
+        'https://api.twitch.tv/helix/moderation/channels',
+        (server) => server.reply(200, {
+          'data': [
+            {'broadcaster_id': '111', 'broadcaster_login': 'a'},
+            {'broadcaster_id': '222', 'broadcaster_login': 'b'},
+          ],
+          'pagination': {'cursor': null},
+        }),
+        queryParameters: {'user_id': '12345', 'first': '100'},
+      );
+
+      final channels = await api.getModeratedChannels(id: '12345');
+
+      expect(channels, ['111', '222']);
+    });
+
+    test('follows the pagination cursor across pages', () async {
+      dioAdapter
+        ..onGet(
+          'https://api.twitch.tv/helix/moderation/channels',
+          (server) => server.reply(200, {
+            'data': [
+              {'broadcaster_id': '111'},
+            ],
+            'pagination': {'cursor': 'page2'},
+          }),
+          queryParameters: {'user_id': '12345', 'first': '100'},
+        )
+        ..onGet(
+          'https://api.twitch.tv/helix/moderation/channels',
+          (server) => server.reply(200, {
+            'data': [
+              {'broadcaster_id': '222'},
+            ],
+            'pagination': {'cursor': null},
+          }),
+          queryParameters: {
+            'user_id': '12345',
+            'first': '100',
+            'after': 'page2',
+          },
+        );
+
+      final channels = await api.getModeratedChannels(id: '12345');
+
+      expect(channels, ['111', '222']);
+    });
+
+    test('returns an empty list when the scope is missing', () async {
+      dioAdapter.onGet(
+        'https://api.twitch.tv/helix/moderation/channels',
+        (server) => server.reply(401, {'message': 'Missing scope'}),
+        queryParameters: {'user_id': '12345', 'first': '100'},
+      );
+
+      final channels = await api.getModeratedChannels(id: '12345');
+
+      expect(channels, isEmpty);
+    });
+  });
+
   group('getTopStreams', () {
     test('returns streams with pagination', () async {
       dioAdapter.onGet(

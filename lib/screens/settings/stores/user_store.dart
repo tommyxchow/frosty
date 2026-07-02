@@ -68,6 +68,16 @@ abstract class UserStoreBase with Store {
   Future<void> refreshBlockedUsers() async => _blockedUsers =
       (await twitchApi.getUserBlockedList(id: _details!.id)).asObservable();
 
+  /// Re-fetches which channels the user moderates. Mod status is otherwise only
+  /// loaded once at login, so call this when entering a channel to reflect mod
+  /// status granted or revoked since then.
+  @action
+  Future<void> refreshModeratedChannels() async {
+    if (_details?.id == null) return;
+    _moderatedChannels =
+        (await twitchApi.getModeratedChannels(id: _details!.id)).asObservable();
+  }
+
   bool isModerator(String channelId) {
     return _moderatedChannels.contains(channelId);
   }
