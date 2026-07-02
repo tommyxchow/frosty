@@ -21,6 +21,9 @@ version: 5.1.0+69
 
 environment:
   sdk: ^3.9.0
+  # Exact Flutter pin, enforced by `flutter pub get` locally and read by CI via
+  # `flutter-version-file: pubspec.yaml`. Single source of truth: bump here.
+  flutter: 3.44.2
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions

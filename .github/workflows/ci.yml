@@ -19,7 +19,7 @@ jobs:
           java-version: 21
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.44.1
+          flutter-version-file: pubspec.yaml
           cache: true
       - run: flutter doctor -v
       - run: flutter pub get
@@ -53,7 +53,7 @@ jobs:
           xcode-version: latest-stable
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.44.1
+          flutter-version-file: pubspec.yaml
           cache: true
       - run: flutter pub get
       - run: flutter build ios --release --no-codesign
