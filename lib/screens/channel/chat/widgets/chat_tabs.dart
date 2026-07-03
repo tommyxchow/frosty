@@ -49,6 +49,16 @@ class ChatTabs extends StatelessWidget {
     }
   }
 
+  /// Wraps a tab bar item (a tab chip or a shared-chat bubble) with its
+  /// trailing gap and centering, keyed for the reorderable list.
+  Widget _wrapItem({required Key key, required bool isLast, required Widget child}) {
+    return Padding(
+      key: key,
+      padding: EdgeInsets.only(right: isLast ? 0 : 4),
+      child: Center(child: child),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Observer(
@@ -163,24 +173,22 @@ class ChatTabs extends StatelessWidget {
                                       1;
                               if (index < tabs.length) {
                                 final tabInfo = chatTabsStore.tabs[index];
-                                return Padding(
+                                return _wrapItem(
                                   key: ValueKey(tabInfo.channelId),
-                                  padding: EdgeInsets.only(right: isLast ? 0 : 4),
-                                  child: Center(child: _buildTab(context, index)),
+                                  isLast: isLast,
+                                  child: _buildTab(context, index),
                                 );
                               }
 
                               final participant =
                                   sharedChatParticipants[index - tabs.length];
-                              return Padding(
+                              return _wrapItem(
                                 key: ValueKey('shared_${participant.key}'),
-                                padding: EdgeInsets.only(right: isLast ? 0 : 4),
-                                child: Center(
-                                  child: _buildSharedChatBubble(
-                                    context,
-                                    participant.key,
-                                    participant.value,
-                                  ),
+                                isLast: isLast,
+                                child: _buildSharedChatBubble(
+                                  context,
+                                  participant.key,
+                                  participant.value,
                                 ),
                               );
                             },

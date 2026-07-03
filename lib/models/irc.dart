@@ -56,6 +56,11 @@ class IRCMessage {
     this.actionLabel,
   });
 
+  /// The channel this message actually originated from. In Twitch shared
+  /// chat, `source-room-id` names the participant channel a message was
+  /// sent in; otherwise it's just this connection's own room.
+  String? get sourceChannelId => tags['source-room-id'] ?? tags['room-id'];
+
   /// Applies the given CLEARCHAT message to the provided messages and buffer.
   static void clearChat({
     required List<IRCMessage> messages,
@@ -186,7 +191,6 @@ class IRCMessage {
       span.add(const TextSpan(text: ' '));
     }
 
-    final sourceChannelId = tags['source-room-id'] ?? tags['room-id'];
     final sourceChannelUser = channelIdToUserTwitch?[sourceChannelId];
     if (sourceChannelUser != null) {
       final isCurrentChannel = sourceChannelId == currentChannelId;

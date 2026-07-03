@@ -626,27 +626,10 @@ class ChatMessage extends StatelessWidget {
                 child: dividedMessage,
               );
 
-        final sourceChannelId =
-            ircMessage.tags['source-room-id'] ?? ircMessage.tags['room-id'];
-        final currentChannelId =
-            overrideCurrentChannelId ?? chatStore.channelId;
-
-        // overrideCurrentChannelId is only set in manual "merged mode"
-        // (multiple manually-added tabs interleaved); that keeps its
-        // existing always-fade-non-active-tab behavior, gated by the
-        // focusCurrentChannel setting. Native Twitch shared chat instead
-        // defaults to unfaded and only fades once the user spotlights a
-        // participant channel via a chat bubble — an explicit action that
-        // isn't gated by that setting.
-        final isMerged = overrideCurrentChannelId != null;
-        final hasSpotlight =
-            !isMerged && chatStore.sharedChatBubbles.focusedChannelIds.isNotEmpty;
-        final shouldFade =
-            sourceChannelId != null &&
-            sourceChannelId != currentChannelId &&
-            ((isMerged && chatStore.settings.focusCurrentChannel) ||
-                (hasSpotlight &&
-                    !chatStore.sharedChatBubbles.isFocused(sourceChannelId)));
+        final shouldFade = chatStore.shouldFadeMessage(
+          sourceChannelId: ircMessage.sourceChannelId,
+          overrideCurrentChannelId: overrideCurrentChannelId,
+        );
 
         final fadedMessage = shouldFade
             ? Opacity(opacity: 0.55, child: coloredMessage)

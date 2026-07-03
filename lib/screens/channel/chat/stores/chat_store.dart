@@ -211,6 +211,31 @@ abstract class ChatStoreBase with Store {
     revealedMessageIds.add(id);
   }
 
+  /// Whether a message from [sourceChannelId] should render faded.
+  ///
+  /// [overrideCurrentChannelId] is set only when rendering the manual
+  /// "merged mode" view (multiple manually-added tabs interleaved), which
+  /// always fades non-active-tab messages, gated by [focusCurrentChannel].
+  /// Otherwise this is the normal single-connection view, where native
+  /// Twitch shared chat defaults to unfaded and only fades once the user
+  /// spotlights a participant channel via a chat bubble — an explicit
+  /// action that isn't gated by that setting.
+  bool shouldFadeMessage({
+    required String? sourceChannelId,
+    required String? overrideCurrentChannelId,
+  }) {
+    if (sourceChannelId == null) return false;
+
+    final currentChannelId = overrideCurrentChannelId ?? channelId;
+    if (sourceChannelId == currentChannelId) return false;
+
+    final isMerged = overrideCurrentChannelId != null;
+    if (isMerged) return settings.focusCurrentChannel;
+
+    return sharedChatBubbles.focusedChannelIds.isNotEmpty &&
+        !sharedChatBubbles.isFocused(sourceChannelId);
+  }
+
   /// Timer used for dismissing the notification.
   Timer? _notificationTimer;
 
@@ -255,8 +280,7 @@ abstract class ChatStoreBase with Store {
     // has hidden. Short-circuit when nothing is hidden (the common case).
     if (sharedChatBubbles.hiddenChannelIds.isEmpty) return base;
     return base.where((message) {
-      final sourceChannelId =
-          message.tags['source-room-id'] ?? message.tags['room-id'];
+      final sourceChannelId = message.sourceChannelId;
       return sourceChannelId == null ||
           !sharedChatBubbles.hiddenChannelIds.contains(sourceChannelId);
     }).toList();
