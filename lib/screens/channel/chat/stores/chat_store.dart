@@ -696,41 +696,49 @@ abstract class ChatStoreBase with Store {
               }
             }
 
-            // Update shared chat mode based on source-room-id tag presence
-            final wasShared = _isInSharedChatMode;
-            _isInSharedChatMode = parsedIRCMessage.tags.containsKey(
-              'source-room-id',
-            );
-            // On transition into shared chat mode, fetch assets for participants.
-            if (!wasShared && _isInSharedChatMode) {
-              assetsStore.fetchSharedChatAssets(
-                channelId: channelId,
-                headers: auth.headersTwitch,
-                onEmoteError: (error) {
-                  debugPrint(error.toString());
-                  return <Emote>[];
-                },
-                onBadgeError: (error) {
-                  debugPrint(error.toString());
-                  return <String, ChatBadge>{};
-                },
-                showTwitchEmotes: settings.showTwitchEmotes,
-                showTwitchBadges: settings.showTwitchBadges,
-                show7TVEmotes: settings.show7TVEmotes,
-                showBTTVEmotes: settings.showBTTVEmotes,
-                showFFZEmotes: settings.showFFZEmotes,
-                showFFZBadges: settings.showFFZBadges,
+            // Update shared chat mode based on source-room-id tag presence.
+            // Only PRIVMSG reliably carries this tag for the session's
+            // duration — NOTICE/USERNOTICE (subs, raids, announcements)
+            // don't always, so gating on those too would flap this flag off
+            // and on within a single live session (now visibly, since the
+            // shared chat bubble bar reads it — previously this only risked
+            // a redundant asset refetch, guarded below).
+            if (parsedIRCMessage.command == Command.privateMessage) {
+              final wasShared = _isInSharedChatMode;
+              _isInSharedChatMode = parsedIRCMessage.tags.containsKey(
+                'source-room-id',
               );
-            } else if (wasShared &&
-                !_isInSharedChatMode &&
-                assetsStore.hasLoadedSharedChatAssets) {
-              // On leaving shared chat, drop the participants' merged emotes and
-              // badges and restore just this channel's assets — otherwise the
-              // other streamer's emote set and badges linger (#522). Guarded on
-              // having actually loaded shared assets so a flapping tag can't
-              // trigger redundant refetches.
-              assetsStore.resetSharedChatAssets();
-              getAssets();
+              // On transition into shared chat mode, fetch assets for participants.
+              if (!wasShared && _isInSharedChatMode) {
+                assetsStore.fetchSharedChatAssets(
+                  channelId: channelId,
+                  headers: auth.headersTwitch,
+                  onEmoteError: (error) {
+                    debugPrint(error.toString());
+                    return <Emote>[];
+                  },
+                  onBadgeError: (error) {
+                    debugPrint(error.toString());
+                    return <String, ChatBadge>{};
+                  },
+                  showTwitchEmotes: settings.showTwitchEmotes,
+                  showTwitchBadges: settings.showTwitchBadges,
+                  show7TVEmotes: settings.show7TVEmotes,
+                  showBTTVEmotes: settings.showBTTVEmotes,
+                  showFFZEmotes: settings.showFFZEmotes,
+                  showFFZBadges: settings.showFFZBadges,
+                );
+              } else if (wasShared &&
+                  !_isInSharedChatMode &&
+                  assetsStore.hasLoadedSharedChatAssets) {
+                // On leaving shared chat, drop the participants' merged emotes and
+                // badges and restore just this channel's assets — otherwise the
+                // other streamer's emote set and badges linger (#522). Guarded on
+                // having actually loaded shared assets so a flapping tag can't
+                // trigger redundant refetches.
+                assetsStore.resetSharedChatAssets();
+                getAssets();
+              }
             }
             messageBuffer.add(parsedIRCMessage);
             break;
