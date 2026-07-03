@@ -34,8 +34,6 @@ dart run build_runner build                                         # Regenerate
 dart run build_runner build --delete-conflicting-outputs             # Same, but clears stale outputs
 ```
 
-Before pushing: `flutter analyze && flutter test`.
-
 ## Source Structure
 
 - `lib/apis/` — API services (all extend `BaseApiClient`)
