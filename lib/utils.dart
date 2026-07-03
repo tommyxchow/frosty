@@ -24,6 +24,12 @@ double _contrastRatio(Color a, Color b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
+/// Memoized results for [adjustChatNameColor]. Chat renders the same handful
+/// of Twitch palette colors thousands of times per session, and every call
+/// costs luminance math (plus a 16-step search for low-contrast colors) — the
+/// answer only depends on this key, so compute it once per combination.
+final _adjustedNameColorCache = <(int, int, double), Color>{};
+
 /// Adjusts [color] just enough to reach [targetContrast] on the app's background.
 /// Defaults to Theme.of(context).scaffoldBackgroundColor; if transparent, falls
 /// back to theme.colorScheme.surface.
@@ -44,6 +50,18 @@ Color adjustChatNameColor(
     bg = theme.colorScheme.surface;
   }
 
+  final cacheKey = (color.toARGB32(), bg.toARGB32(), targetContrast);
+  final cached = _adjustedNameColorCache[cacheKey];
+  if (cached != null) return cached;
+
+  final adjusted = _adjustNameColorUncached(color, bg, targetContrast);
+  // Custom hex name colors are unbounded in theory; keep the cache small.
+  if (_adjustedNameColorCache.length >= 1024) _adjustedNameColorCache.clear();
+  _adjustedNameColorCache[cacheKey] = adjusted;
+  return adjusted;
+}
+
+Color _adjustNameColorUncached(Color color, Color bg, double targetContrast) {
   if (_contrastRatio(color, bg) >= targetContrast) return color;
 
   final hsl0 = HSLColor.fromColor(color);

@@ -23,7 +23,10 @@ class CustomCacheManager {
       return;
     }
 
-    final allFiles = cacheDir.listSync(recursive: true).toList();
+    // Async listing — the cache can hold up to maxNrOfCacheObjects (10k)
+    // files, and a synchronous recursive listing that large would block the
+    // UI isolate during startup.
+    final allFiles = await cacheDir.list(recursive: true).toList();
 
     await _repo.open();
     final cachedObjects = await _repo.getAllObjects();

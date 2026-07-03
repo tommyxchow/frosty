@@ -198,6 +198,45 @@ void main() {
       expect(adjustedColor, isNot(const Color(0xFF00FF00)));
     });
 
+    testWidgets('memoized results are stable and keyed by background',
+        (tester) async {
+      late Color first;
+      late Color second;
+      late Color onLightBackground;
+      const darkBackground = Color(0xFF121212);
+      const lowContrastColor = Color(0xFF1F1F1F); // Near-black on dark bg
+
+      await tester.pumpWidget(
+        buildTestWidget(
+          scaffoldBackground: darkBackground,
+          child: Builder(
+            builder: (context) {
+              // Repeated calls with identical inputs must return the same
+              // adjusted color (second call is served from the memo cache).
+              first = adjustChatNameColor(context, lowContrastColor);
+              second = adjustChatNameColor(context, lowContrastColor);
+              // A different background must not be served the dark-background
+              // cache entry: near-black already passes on white, so it should
+              // come back unchanged.
+              onLightBackground = adjustChatNameColor(
+                context,
+                lowContrastColor,
+                background: const Color(0xFFFFFFFF),
+              );
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+
+      expect(second, first);
+      expect(
+        first.computeLuminance(),
+        greaterThan(lowContrastColor.computeLuminance()),
+      );
+      expect(onLightBackground, lowContrastColor);
+    });
+
     testWidgets('handles transparent scaffold background', (tester) async {
       late Color adjustedColor;
       const darkColor = Color(0xFF000000);
