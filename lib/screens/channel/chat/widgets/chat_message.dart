@@ -626,14 +626,10 @@ class ChatMessage extends StatelessWidget {
                 child: dividedMessage,
               );
 
-        final sourceChannelId =
-            ircMessage.tags['source-room-id'] ?? ircMessage.tags['room-id'];
-        final currentChannelId =
-            overrideCurrentChannelId ?? chatStore.channelId;
-        final shouldFade =
-            chatStore.settings.focusCurrentChannel &&
-            sourceChannelId != null &&
-            sourceChannelId != currentChannelId;
+        final shouldFade = chatStore.shouldFadeMessage(
+          sourceChannelId: ircMessage.sourceChannelId,
+          overrideCurrentChannelId: overrideCurrentChannelId,
+        );
 
         final fadedMessage = shouldFade
             ? Opacity(opacity: 0.55, child: coloredMessage)

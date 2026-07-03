@@ -13,6 +13,7 @@ import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/banned_user_tracker.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_interaction_pause.dart';
+import 'package:frosty/screens/channel/chat/stores/shared_chat_bubble_state.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
@@ -201,9 +202,38 @@ abstract class ChatStoreBase with Store {
   /// The set of message IDs that have been revealed by the user (for deleted messages).
   final revealedMessageIds = ObservableSet<String>();
 
+  /// User-driven spotlight/hide selections for shared chat participant
+  /// channels. See [SharedChatBubbleState].
+  final sharedChatBubbles = SharedChatBubbleState();
+
   @action
   void revealMessage(String id) {
     revealedMessageIds.add(id);
+  }
+
+  /// Whether a message from [sourceChannelId] should render faded.
+  ///
+  /// [overrideCurrentChannelId] is set only when rendering the manual
+  /// "merged mode" view (multiple manually-added tabs interleaved), which
+  /// always fades non-active-tab messages, gated by [focusCurrentChannel].
+  /// Otherwise this is the normal single-connection view, where native
+  /// Twitch shared chat defaults to unfaded and only fades once the user
+  /// spotlights a participant channel via a chat bubble — an explicit
+  /// action that isn't gated by that setting.
+  bool shouldFadeMessage({
+    required String? sourceChannelId,
+    required String? overrideCurrentChannelId,
+  }) {
+    if (sourceChannelId == null) return false;
+
+    final currentChannelId = overrideCurrentChannelId ?? channelId;
+    if (sourceChannelId == currentChannelId) return false;
+
+    final isMerged = overrideCurrentChannelId != null;
+    if (isMerged) return settings.focusCurrentChannel;
+
+    return sharedChatBubbles.focusedChannelIds.isNotEmpty &&
+        !sharedChatBubbles.isFocused(sourceChannelId);
   }
 
   /// Timer used for dismissing the notification.
@@ -242,14 +272,18 @@ abstract class ChatStoreBase with Store {
   List<IRCMessage> get renderMessages {
     // If autoscroll is disabled, render ALL messages in chat.
     // The second condition is to prevent an out of index error with sublist.
-    if (!_autoScroll || _messages.length < _renderMessageLimit) {
-      return _messages;
-    }
+    final base = (!_autoScroll || _messages.length < _renderMessageLimit)
+        ? _messages
+        : _messages.sublist(_messages.length - _renderMessageLimit);
 
-    // When autoscroll is enabled, only show the first [_renderMessageLimit] messages.
-    // This will improve performance by only rendering a limited amount of messages
-    // instead of the entire history at all times.
-    return _messages.sublist(_messages.length - _renderMessageLimit);
+    // Filter out messages from shared chat participant channels the user
+    // has hidden. Short-circuit when nothing is hidden (the common case).
+    if (sharedChatBubbles.hiddenChannelIds.isEmpty) return base;
+    return base.where((message) {
+      final sourceChannelId = message.sourceChannelId;
+      return sourceChannelId == null ||
+          !sharedChatBubbles.hiddenChannelIds.contains(sourceChannelId);
+    }).toList();
   }
 
   /// If the chat should automatically scroll/jump to the latest message.
@@ -662,41 +696,49 @@ abstract class ChatStoreBase with Store {
               }
             }
 
-            // Update shared chat mode based on source-room-id tag presence
-            final wasShared = _isInSharedChatMode;
-            _isInSharedChatMode = parsedIRCMessage.tags.containsKey(
-              'source-room-id',
-            );
-            // On transition into shared chat mode, fetch assets for participants.
-            if (!wasShared && _isInSharedChatMode) {
-              assetsStore.fetchSharedChatAssets(
-                channelId: channelId,
-                headers: auth.headersTwitch,
-                onEmoteError: (error) {
-                  debugPrint(error.toString());
-                  return <Emote>[];
-                },
-                onBadgeError: (error) {
-                  debugPrint(error.toString());
-                  return <String, ChatBadge>{};
-                },
-                showTwitchEmotes: settings.showTwitchEmotes,
-                showTwitchBadges: settings.showTwitchBadges,
-                show7TVEmotes: settings.show7TVEmotes,
-                showBTTVEmotes: settings.showBTTVEmotes,
-                showFFZEmotes: settings.showFFZEmotes,
-                showFFZBadges: settings.showFFZBadges,
+            // Update shared chat mode based on source-room-id tag presence.
+            // Only PRIVMSG reliably carries this tag for the session's
+            // duration — NOTICE/USERNOTICE (subs, raids, announcements)
+            // don't always, so gating on those too would flap this flag off
+            // and on within a single live session (now visibly, since the
+            // shared chat bubble bar reads it — previously this only risked
+            // a redundant asset refetch, guarded below).
+            if (parsedIRCMessage.command == Command.privateMessage) {
+              final wasShared = _isInSharedChatMode;
+              _isInSharedChatMode = parsedIRCMessage.tags.containsKey(
+                'source-room-id',
               );
-            } else if (wasShared &&
-                !_isInSharedChatMode &&
-                assetsStore.hasLoadedSharedChatAssets) {
-              // On leaving shared chat, drop the participants' merged emotes and
-              // badges and restore just this channel's assets — otherwise the
-              // other streamer's emote set and badges linger (#522). Guarded on
-              // having actually loaded shared assets so a flapping tag can't
-              // trigger redundant refetches.
-              assetsStore.resetSharedChatAssets();
-              getAssets();
+              // On transition into shared chat mode, fetch assets for participants.
+              if (!wasShared && _isInSharedChatMode) {
+                assetsStore.fetchSharedChatAssets(
+                  channelId: channelId,
+                  headers: auth.headersTwitch,
+                  onEmoteError: (error) {
+                    debugPrint(error.toString());
+                    return <Emote>[];
+                  },
+                  onBadgeError: (error) {
+                    debugPrint(error.toString());
+                    return <String, ChatBadge>{};
+                  },
+                  showTwitchEmotes: settings.showTwitchEmotes,
+                  showTwitchBadges: settings.showTwitchBadges,
+                  show7TVEmotes: settings.show7TVEmotes,
+                  showBTTVEmotes: settings.showBTTVEmotes,
+                  showFFZEmotes: settings.showFFZEmotes,
+                  showFFZBadges: settings.showFFZBadges,
+                );
+              } else if (wasShared &&
+                  !_isInSharedChatMode &&
+                  assetsStore.hasLoadedSharedChatAssets) {
+                // On leaving shared chat, drop the participants' merged emotes and
+                // badges and restore just this channel's assets — otherwise the
+                // other streamer's emote set and badges linger (#522). Guarded on
+                // having actually loaded shared assets so a flapping tag can't
+                // trigger redundant refetches.
+                assetsStore.resetSharedChatAssets();
+                getAssets();
+              }
             }
             messageBuffer.add(parsedIRCMessage);
             break;
