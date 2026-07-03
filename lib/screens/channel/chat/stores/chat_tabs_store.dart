@@ -407,6 +407,32 @@ abstract class ChatTabsStoreBase with Store {
     }
   }
 
+  /// Forwards app-pause to every activated tab and stops the merged render
+  /// timer — no frames are produced while the app is backgrounded, so the
+  /// periodic flush/recompute work would be pure battery cost.
+  void onAppPaused() {
+    _mergedRenderTimer?.cancel();
+    _mergedRenderTimer = null;
+    for (final tab in _tabs) {
+      tab.chatStore?.onAppPaused();
+    }
+  }
+
+  /// Resumes tab flush timers and (if merged mode is active) the merged
+  /// render timer after [onAppPaused].
+  void onAppResumed() {
+    for (final tab in _tabs) {
+      tab.chatStore?.onAppResumed();
+    }
+    if (mergedMode && _mergedRenderTimer == null) {
+      _refreshMergedMessages();
+      _mergedRenderTimer = Timer.periodic(
+        const Duration(milliseconds: 200),
+        (_) => _refreshMergedMessages(),
+      );
+    }
+  }
+
   /// Re-enables auto-scroll and jumps to the latest message in merged view.
   @action
   void resumeMergedScroll() {

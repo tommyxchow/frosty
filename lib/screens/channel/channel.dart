@@ -128,6 +128,12 @@ class _VideoChatState extends State<VideoChat>
 
     if (state == AppLifecycleState.resumed) {
       _videoStore.handleAppResume();
+      _chatTabsStore.onAppResumed();
+    } else if (state == AppLifecycleState.paused) {
+      // No frames are produced while backgrounded, but Dart timers keep
+      // firing — stop the chat flush timers until resume. (Messages keep
+      // buffering; PiP hides chat anyway, so pausing during PiP is safe.)
+      _chatTabsStore.onAppPaused();
     }
   }
 

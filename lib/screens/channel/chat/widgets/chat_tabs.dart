@@ -112,17 +112,26 @@ class ChatTabs extends StatelessWidget {
                       )
                     : IndexedStack(
                         index: activeIndex,
-                        children: tabs.map((tabInfo) {
-                          if (tabInfo.chatStore == null) {
-                            return const SizedBox.shrink();
-                          }
-                          return Chat(
-                            key: ValueKey(tabInfo.channelId),
-                            chatStore: tabInfo.chatStore!,
-                            listPadding: adjustedPadding,
-                            onAddChat: () => _handleAddChat(context),
-                          );
-                        }).toList(),
+                        children: [
+                          for (var i = 0; i < tabs.length; i++)
+                            if (tabs[i].chatStore == null)
+                              const SizedBox.shrink()
+                            else
+                              // IndexedStack children stay mounted (and keep
+                              // animating) when hidden. Disabling TickerMode
+                              // pauses inactive tabs' animated emotes — the
+                              // Image widget stops its frame-decode loop while
+                              // the ticker mode is off and resumes on switch.
+                              TickerMode(
+                                key: ValueKey(tabs[i].channelId),
+                                enabled: i == activeIndex,
+                                child: Chat(
+                                  chatStore: tabs[i].chatStore!,
+                                  listPadding: adjustedPadding,
+                                  onAddChat: () => _handleAddChat(context),
+                                ),
+                              ),
+                        ],
                       ),
               ),
               if (showTabBar)

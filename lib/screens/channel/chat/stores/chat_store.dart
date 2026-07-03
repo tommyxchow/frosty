@@ -189,6 +189,12 @@ abstract class ChatStoreBase with Store {
   /// The periodic timer used for batching chat message re-renders.
   Timer? _messageBufferTimer;
 
+  /// Whether the app is backgrounded. Gates the message flush timer — no
+  /// frames are produced while paused, so the 5x/s wakeups would be pure
+  /// battery cost. Messages keep parsing into [messageBuffer] and are flushed
+  /// on resume (with the overflow drain in [_handleIRCData] bounding growth).
+  var _isAppPaused = false;
+
   /// The list of chat messages to add once autoscroll is resumed.
   /// This is used as an optimization to prevent the list from being updated/shifted while the user is scrolling.
   final messageBuffer = ObservableList<IRCMessage>();
@@ -817,8 +823,10 @@ abstract class ChatStoreBase with Store {
             continue;
         }
 
-        if (!_autoScroll) {
-          // While autoscroll is disabled, occasionally move messages from the buffer to the messages to prevent a memory leak.
+        if (!_autoScroll || _isAppPaused) {
+          // While the flush is held (scrolled up, or app backgrounded),
+          // occasionally move messages from the buffer to the messages to
+          // prevent unbounded buffer growth.
           if (messageBuffer.length >= _messagesToRemove) {
             _messages.addAll(messageBuffer);
             messageBuffer.clear();
@@ -841,13 +849,7 @@ abstract class ChatStoreBase with Store {
         );
 
         // Activate the message buffer.
-        // Cancel any existing timer before creating a new one to prevent duplicates on reconnect.
-        _messageBufferTimer?.cancel();
-        // Create a timer that will add messages from the buffer every 200 milliseconds.
-        _messageBufferTimer = Timer.periodic(
-          const Duration(milliseconds: 200),
-          (timer) => addMessages(),
-        );
+        _startMessageBufferTimer();
 
         // Set up 7TV real-time listener (assets already fetched in connectToChat)
         if (settings.show7TVEmotes) {
@@ -1248,6 +1250,38 @@ abstract class ChatStoreBase with Store {
     // Send each command in order.
     for (final command in commands) {
       _channel?.sink.add(command);
+    }
+  }
+
+  /// (Re)starts the periodic buffer flush. Cancels any existing timer first
+  /// to prevent duplicates on reconnect; no-ops while the app is backgrounded
+  /// ([onAppResumed] restarts it).
+  void _startMessageBufferTimer() {
+    _messageBufferTimer?.cancel();
+    _messageBufferTimer = null;
+    if (_isAppPaused) return;
+    // Create a timer that will add messages from the buffer every 200 milliseconds.
+    _messageBufferTimer = Timer.periodic(
+      const Duration(milliseconds: 200),
+      (timer) => addMessages(),
+    );
+  }
+
+  /// Stops the flush timer while the app is backgrounded.
+  void onAppPaused() {
+    _isAppPaused = true;
+    _messageBufferTimer?.cancel();
+    _messageBufferTimer = null;
+  }
+
+  /// Restarts the flush timer after [onAppPaused] and flushes the backlog
+  /// immediately so chat is current on the first visible frame.
+  void onAppResumed() {
+    if (!_isAppPaused) return;
+    _isAppPaused = false;
+    if (_hasConnected) {
+      _startMessageBufferTimer();
+      addMessages();
     }
   }
 
