@@ -13,6 +13,7 @@ import 'package:frosty/screens/channel/chat/details/chat_details_store.dart';
 import 'package:frosty/screens/channel/chat/stores/banned_user_tracker.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_assets_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_interaction_pause.dart';
+import 'package:frosty/screens/channel/chat/stores/shared_chat_bubble_state.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/screens/settings/stores/settings_store.dart';
 import 'package:frosty/utils.dart';
@@ -201,6 +202,10 @@ abstract class ChatStoreBase with Store {
   /// The set of message IDs that have been revealed by the user (for deleted messages).
   final revealedMessageIds = ObservableSet<String>();
 
+  /// User-driven spotlight/hide selections for shared chat participant
+  /// channels. See [SharedChatBubbleState].
+  final sharedChatBubbles = SharedChatBubbleState();
+
   @action
   void revealMessage(String id) {
     revealedMessageIds.add(id);
@@ -242,14 +247,19 @@ abstract class ChatStoreBase with Store {
   List<IRCMessage> get renderMessages {
     // If autoscroll is disabled, render ALL messages in chat.
     // The second condition is to prevent an out of index error with sublist.
-    if (!_autoScroll || _messages.length < _renderMessageLimit) {
-      return _messages;
-    }
+    final base = (!_autoScroll || _messages.length < _renderMessageLimit)
+        ? _messages
+        : _messages.sublist(_messages.length - _renderMessageLimit);
 
-    // When autoscroll is enabled, only show the first [_renderMessageLimit] messages.
-    // This will improve performance by only rendering a limited amount of messages
-    // instead of the entire history at all times.
-    return _messages.sublist(_messages.length - _renderMessageLimit);
+    // Filter out messages from shared chat participant channels the user
+    // has hidden. Short-circuit when nothing is hidden (the common case).
+    if (sharedChatBubbles.hiddenChannelIds.isEmpty) return base;
+    return base.where((message) {
+      final sourceChannelId =
+          message.tags['source-room-id'] ?? message.tags['room-id'];
+      return sourceChannelId == null ||
+          !sharedChatBubbles.hiddenChannelIds.contains(sourceChannelId);
+    }).toList();
   }
 
   /// If the chat should automatically scroll/jump to the latest message.

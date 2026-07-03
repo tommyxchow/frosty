@@ -224,8 +224,8 @@ class ChatSettings extends StatelessWidget {
           SettingsListSwitch(
             title: 'Focus current channel',
             subtitle: const Text(
-              'Fades messages from other channels in shared chat and '
-              'merged views, so the current channel stands out.',
+              'Fades messages from other channels in merged chat, '
+              'so the current channel stands out.',
             ),
             value: settingsStore.focusCurrentChannel,
             onChanged: (newValue) =>

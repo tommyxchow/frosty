@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/chat.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/add_chat_dialog.dart';
@@ -54,7 +55,16 @@ class ChatTabs extends StatelessWidget {
       builder: (context) {
         final tabs = chatTabsStore.tabs;
         final activeIndex = chatTabsStore.activeTabIndex;
-        final showTabBar = chatTabsStore.showTabBar;
+        final activeStore = chatTabsStore.activeChatStore;
+        // Twitch native shared chat participants (excluding the active
+        // channel itself, which is already shown as its own tab chip).
+        final sharedChatParticipants = activeStore.isInSharedChatMode
+            ? activeStore.assetsStore.channelIdToUserTwitch.entries
+                .where((entry) => entry.key != activeStore.channelId)
+                .toList()
+            : const <MapEntry<String, UserTwitch>>[];
+        final showTabBar =
+            chatTabsStore.showTabBar || sharedChatParticipants.isNotEmpty;
         final showMerge = tabs.where((t) => t.isActivated).length >= 2;
 
         final tabBarHeight = showTabBar ? 48.0 : 0.0;
@@ -123,12 +133,19 @@ class ChatTabs extends StatelessWidget {
                           right: showMerge ? 33 : 0,
                           child: ReorderableListView.builder(
                             scrollDirection: Axis.horizontal,
-                            itemCount: tabs.length,
+                            itemCount: tabs.length + sharedChatParticipants.length,
                             padding: EdgeInsets.only(
                               left: 12,
                               right: showMerge ? 32 : 12,
                             ),
                             onReorderItem: (oldIndex, newIndex) {
+                              // Shared chat bubbles are trailing, fixed-order
+                              // items (not real tabs) — ignore any reorder
+                              // that touches them.
+                              if (oldIndex >= tabs.length ||
+                                  newIndex >= tabs.length) {
+                                return;
+                              }
                               HapticFeedback.lightImpact();
                               chatTabsStore.reorderTab(oldIndex, newIndex);
                             },
@@ -139,13 +156,32 @@ class ChatTabs extends StatelessWidget {
                               );
                             },
                             itemBuilder: (context, index) {
-                              final tabInfo = chatTabsStore.tabs[index];
+                              final isLast =
+                                  index ==
+                                  tabs.length +
+                                      sharedChatParticipants.length -
+                                      1;
+                              if (index < tabs.length) {
+                                final tabInfo = chatTabsStore.tabs[index];
+                                return Padding(
+                                  key: ValueKey(tabInfo.channelId),
+                                  padding: EdgeInsets.only(right: isLast ? 0 : 4),
+                                  child: Center(child: _buildTab(context, index)),
+                                );
+                              }
+
+                              final participant =
+                                  sharedChatParticipants[index - tabs.length];
                               return Padding(
-                                key: ValueKey(tabInfo.channelId),
-                                padding: EdgeInsets.only(
-                                  right: index < tabs.length - 1 ? 4 : 0,
+                                key: ValueKey('shared_${participant.key}'),
+                                padding: EdgeInsets.only(right: isLast ? 0 : 4),
+                                child: Center(
+                                  child: _buildSharedChatBubble(
+                                    context,
+                                    participant.key,
+                                    participant.value,
+                                  ),
                                 ),
-                                child: Center(child: _buildTab(context, index)),
                               );
                             },
                           ),
@@ -300,6 +336,79 @@ class ChatTabs extends StatelessWidget {
           ],
           anchorBuilder: (context, toggle) =>
               buildChip(onDeleted: toggle),
+        );
+      },
+    );
+  }
+
+  /// Builds a bubble for a Twitch native shared chat participant channel.
+  /// Unlike manual tabs, these don't own a connection: tapping spotlights
+  /// the channel (unfades it, fading the rest — see [chat_message.dart]),
+  /// and the trailing menu hides/shows the channel's messages instead of
+  /// disconnecting/removing a tab.
+  Widget _buildSharedChatBubble(
+    BuildContext context,
+    String channelId,
+    UserTwitch user,
+  ) {
+    final activeStore = chatTabsStore.activeChatStore;
+    final displayName = getReadableName(user.displayName, user.login);
+
+    return Observer(
+      builder: (context) {
+        final theme = Theme.of(context);
+        final isFocused = activeStore.sharedChatBubbles.isFocused(channelId);
+        final isHidden = activeStore.sharedChatBubbles.isHidden(channelId);
+
+        InputChip buildChip({VoidCallback? onDeleted}) => InputChip(
+              avatar: Opacity(
+                opacity: isHidden ? 0.5 : 1.0,
+                child: ProfilePicture(userLogin: user.login, radius: 12),
+              ),
+              label: Text(
+                displayName,
+                style: isHidden
+                    ? TextStyle(
+                        color: theme.textTheme.bodyMedium?.color
+                            ?.withValues(alpha: 0.5),
+                      )
+                    : null,
+              ),
+              selected: isFocused,
+              showCheckmark: false,
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              onPressed: () {
+                HapticFeedback.selectionClick();
+                activeStore.sharedChatBubbles.toggleFocus(channelId);
+              },
+              onDeleted: onDeleted,
+              deleteButtonTooltipMessage:
+                  onDeleted != null ? 'Channel options' : null,
+            );
+
+        return _AnchoredPopupMenu(
+          itemsBuilder: (close) => [
+            MenuItemButton(
+              leadingIcon: Icon(
+                isHidden
+                    ? Icons.visibility_rounded
+                    : Icons.visibility_off_rounded,
+                size: 18,
+              ),
+              child: Text(isHidden ? 'Show channel' : 'Hide channel'),
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                close();
+                if (isHidden) {
+                  activeStore.sharedChatBubbles.show(channelId);
+                } else {
+                  activeStore.sharedChatBubbles.hide(channelId);
+                }
+              },
+            ),
+          ],
+          anchorBuilder: (context, toggle) => buildChip(onDeleted: toggle),
         );
       },
     );
