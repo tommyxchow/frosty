@@ -8,6 +8,16 @@ class FrostyCachedNetworkImage extends StatelessWidget {
   final String? cacheKey;
   final double? width;
   final double? height;
+
+  /// Decode size caps (physical pixels) for the in-memory image. Without
+  /// these, images decode and stay resident at their intrinsic size — emote
+  /// CDNs serve 3x-4x assets (~112-128 px) that render in ~28 lp boxes, so
+  /// capping the decode cuts memory and raster cost several-fold. Applies to
+  /// animated codecs too (all frames decode at the target size; animation is
+  /// preserved). Providing only one axis keeps the aspect ratio.
+  final int? memCacheWidth;
+  final int? memCacheHeight;
+
   final Color? color;
   final BlendMode? colorBlendMode;
   final Widget Function(BuildContext, String)? placeholder;
@@ -21,6 +31,8 @@ class FrostyCachedNetworkImage extends StatelessWidget {
     this.cacheKey,
     this.width,
     this.height,
+    this.memCacheWidth,
+    this.memCacheHeight,
     this.color,
     this.colorBlendMode,
     this.placeholder,
@@ -36,6 +48,8 @@ class FrostyCachedNetworkImage extends StatelessWidget {
       cacheKey: cacheKey,
       width: width,
       height: height,
+      memCacheWidth: memCacheWidth,
+      memCacheHeight: memCacheHeight,
       color: color,
       colorBlendMode: colorBlendMode,
       placeholder: placeholder,

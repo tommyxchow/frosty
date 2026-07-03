@@ -42,6 +42,12 @@ class IRCMessage {
   final VoidCallback? actionCallback;
   final String? actionLabel;
 
+  /// Bumped whenever the message is mutated in place after creation (the
+  /// moderation marking in [clearChat]/[clearMessage]), so render output
+  /// cached against this message's identity knows to invalidate. Purely a
+  /// render-cache signal — not part of the IRC model.
+  int renderRevision = 0;
+
   IRCMessage({
     required this.raw,
     required this.command,
@@ -85,6 +91,7 @@ class IRCMessage {
       if (message.user == bannedUser) {
         // Mark the message for removal.
         messages[i].command = Command.clearChat;
+        messages[i].renderRevision++;
 
         // If timed-out, indicate the duration.
         if (banDuration != null) {
@@ -98,6 +105,7 @@ class IRCMessage {
       if (bufferedMessage.user == bannedUser) {
         // Mark the message for removal.
         bufferedMessages[i].command = Command.clearChat;
+        bufferedMessages[i].renderRevision++;
 
         // If timed-out, indicate the duration.
         if (banDuration != null) {
@@ -119,6 +127,7 @@ class IRCMessage {
     for (var i = 0; i < messages.length; i++) {
       if (messages[i].tags['id'] == targetId) {
         messages[i].command = Command.clearMessage;
+        messages[i].renderRevision++;
         break;
       }
     }
@@ -127,6 +136,7 @@ class IRCMessage {
     for (var i = 0; i < bufferedMessages.length; i++) {
       if (bufferedMessages[i].tags['id'] == targetId) {
         bufferedMessages[i].command = Command.clearMessage;
+        bufferedMessages[i].renderRevision++;
         break;
       }
     }
@@ -591,6 +601,10 @@ class IRCMessage {
           imageUrl: emote.url,
           height: emote.height != null ? emote.height! * emoteScale : emoteSize,
           width: emote.width != null ? emote.width! * emoteScale : emoteSize,
+          memCacheHeight: _memCacheDimension(
+            context,
+            emote.height != null ? emote.height! * emoteScale : emoteSize,
+          ),
           useFade: false,
         ),
       ),
@@ -748,6 +762,7 @@ class IRCMessage {
     double? size,
     Color? backgroundColor,
     bool? isSvg,
+    int? memCacheHeight,
   }) {
     if (backgroundColor != null) {
       return ColoredBox(
@@ -756,6 +771,7 @@ class IRCMessage {
           imageUrl: badge.url,
           height: size,
           width: size,
+          memCacheHeight: memCacheHeight,
           useFade: false,
         ),
       );
@@ -766,6 +782,7 @@ class IRCMessage {
         imageUrl: badge.url,
         height: size,
         width: size,
+        memCacheHeight: memCacheHeight,
         useFade: false,
       );
     }
@@ -801,6 +818,7 @@ class IRCMessage {
           size: size,
           backgroundColor: backgroundColor,
           isSvg: isSvg,
+          memCacheHeight: _memCacheDimension(context, size),
         ),
       ),
     );
@@ -825,12 +843,20 @@ class IRCMessage {
           imageUrl: emote.url,
           height: height,
           width: width,
+          // Decode at the rendered size instead of the CDN's 3x-4x intrinsic
+          // size. Height-only preserves the aspect ratio.
+          memCacheHeight: _memCacheDimension(context, height),
           useFade: false,
           placeholder: (context, url) => const SizedBox(),
         ),
       ),
     );
   }
+
+  /// Converts a layout dimension to a physical-pixel decode cap for the
+  /// in-memory image cache.
+  static int _memCacheDimension(BuildContext context, double logicalSize) =>
+      (logicalSize * MediaQuery.devicePixelRatioOf(context)).round();
 
   static TextSpan _createTextSpan({
     required String text,

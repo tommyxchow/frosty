@@ -339,6 +339,35 @@ void main() {
       expect(affectedMessage.tags['ban-duration'], '300');
     });
 
+    test('bumps renderRevision only on affected messages', () {
+      final clearChatMsg = IRCMessage(
+        raw: '',
+        command: Command.clearChat,
+        tags: {'ban-duration': '600'},
+        message: 'testuser',
+      );
+      bufferedMessages = [
+        IRCMessage.fromString(basicPrivmsg), // from testuser
+      ];
+
+      IRCMessage.clearChat(
+        messages: messages,
+        bufferedMessages: bufferedMessages,
+        ircMessage: clearChatMsg,
+      );
+
+      // Mutated-in-place messages must signal render caches to invalidate.
+      expect(
+        messages.where((m) => m.user == 'testuser').first.renderRevision,
+        1,
+      );
+      expect(bufferedMessages.first.renderRevision, 1);
+      expect(
+        messages.where((m) => m.user == 'moduser').first.renderRevision,
+        0,
+      );
+    });
+
     test('clears entire chat when no target user', () {
       final clearAllMsg = IRCMessage(
         raw: '',
@@ -407,6 +436,15 @@ void main() {
       expect(
         messages.firstWhere((m) => m.tags['id'] == 'msg-2').command,
         Command.clearMessage,
+      );
+      // Mutated-in-place message must signal render caches to invalidate.
+      expect(
+        messages.firstWhere((m) => m.tags['id'] == 'msg-2').renderRevision,
+        1,
+      );
+      expect(
+        messages.firstWhere((m) => m.tags['id'] == 'msg-1').renderRevision,
+        0,
       );
       // Other messages unchanged
       expect(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:frosty/models/irc.dart';
+import 'package:frosty/models/user.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/emote_menu_panel.dart';
 import 'package:frosty/screens/channel/chat/emote_menu/recent_emotes_panel.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
@@ -15,6 +17,27 @@ import 'package:frosty/widgets/frosty_scrollbar.dart';
 /// ~2x default to keep richer message widgets (emotes, badges, replies) built
 /// ahead of fast scroll-back without holding the entire history.
 const _chatCacheExtent = ScrollCacheExtent.pixels(500.0);
+
+/// Cached [ChatMessage] instances keyed by message identity. Returning the
+/// identical widget instance across list rebuilds lets the framework skip the
+/// row's build entirely (`Element.updateChild` short-circuits on identical
+/// widgets), so a batch flush only builds the genuinely new messages instead
+/// of regenerating every visible row's spans. Entries are GC'd together with
+/// their messages; [IRCMessage.renderRevision] invalidates rows the moderation
+/// handlers mutate in place. MobX reactivity is unaffected — each row's
+/// Observer subscription lives on its element, not its widget instance.
+final _messageWidgetCache = Expando<_CachedMessageWidget>();
+
+/// Merged-mode cache, kept separate because merged rows carry per-active-tab
+/// parameters that must invalidate the cached widget when they change.
+final _mergedMessageWidgetCache = Expando<_CachedMessageWidget>();
+
+class _CachedMessageWidget {
+  const _CachedMessageWidget(this.widget, this.revision);
+
+  final ChatMessage widget;
+  final int revision;
+}
 
 class Chat extends StatelessWidget {
   final ChatStore chatStore;
@@ -176,6 +199,10 @@ class Chat extends StatelessWidget {
     ScrollController scrollController,
     double bottomPadding,
   ) {
+    final messages = chatStore.renderMessages;
+    // Built lazily on the first keyed-child lookup of a rebuild.
+    Map<IRCMessage, int>? sliverIndexByMessage;
+
     return ListView.builder(
       reverse: true,
       padding: (listPadding ?? EdgeInsets.zero).add(
@@ -184,21 +211,49 @@ class Chat extends StatelessWidget {
       addAutomaticKeepAlives: false,
       scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
-      itemCount: chatStore.renderMessages.length,
+      itemCount: messages.length,
+      // Every appended batch shifts all sliver indices (the list is reversed,
+      // so new messages land at index 0). Mapping a row's key back to its new
+      // index here lets the framework *move* the existing element — without
+      // it, the key mismatch at each shifted index would deactivate and
+      // re-inflate every built row on every flush.
+      findChildIndexCallback: (key) {
+        final lookup = sliverIndexByMessage ??= {
+          for (var i = 0; i < messages.length; i++)
+            messages[messages.length - 1 - i]: i,
+        };
+        return lookup[(key as ObjectKey).value];
+      },
       itemBuilder: (context, index) {
-        final ircMessage = chatStore
-            .renderMessages[chatStore.renderMessages.length - 1 - index];
-        // Key by message identity so the list reconciles by message rather
-        // than by slot. This keeps each message's element (and its gesture
-        // recognizers) bound to the same message when new messages arrive
-        // mid-interaction, fixing long-press landing on the wrong message.
-        return ChatMessage(
-          key: ObjectKey(ircMessage),
-          ircMessage: ircMessage,
-          chatStore: chatStore,
-        );
+        final ircMessage = messages[messages.length - 1 - index];
+        return _cachedChatMessage(ircMessage);
       },
     );
+  }
+
+  /// Returns the (cached) widget for [ircMessage], building it on first
+  /// render. Keyed by message identity so the list reconciles by message
+  /// rather than by slot — this keeps each message's element (and its gesture
+  /// recognizers) bound to the same message when new messages arrive
+  /// mid-interaction, fixing long-press landing on the wrong message.
+  Widget _cachedChatMessage(IRCMessage ircMessage) {
+    final cached = _messageWidgetCache[ircMessage];
+    if (cached != null &&
+        cached.revision == ircMessage.renderRevision &&
+        identical(cached.widget.chatStore, chatStore)) {
+      return cached.widget;
+    }
+
+    final widget = ChatMessage(
+      key: ObjectKey(ircMessage),
+      ircMessage: ircMessage,
+      chatStore: chatStore,
+    );
+    _messageWidgetCache[ircMessage] = _CachedMessageWidget(
+      widget,
+      ircMessage.renderRevision,
+    );
+    return widget;
   }
 
   Widget _buildMergedList(
@@ -208,6 +263,8 @@ class Chat extends StatelessWidget {
     final mergedMessages = chatTabsStore!.mergedMessages;
     final channelIdToUserTwitch = chatTabsStore!.mergedChannelIdToUserTwitch;
     final currentChannelId = chatTabsStore!.activeTab.channelId;
+    // Built lazily on the first keyed-child lookup of a rebuild.
+    Map<IRCMessage, int>? sliverIndexByMessage;
 
     return ListView.builder(
       reverse: true,
@@ -218,27 +275,71 @@ class Chat extends StatelessWidget {
       scrollCacheExtent: _chatCacheExtent,
       controller: scrollController,
       itemCount: mergedMessages.length,
+      // See _buildNormalList — moves existing elements across index shifts.
+      findChildIndexCallback: (key) {
+        final lookup = sliverIndexByMessage ??= {
+          for (var i = 0; i < mergedMessages.length; i++)
+            mergedMessages[mergedMessages.length - 1 - i].ircMessage: i,
+        };
+        return lookup[(key as ObjectKey).value];
+      },
       itemBuilder: (context, index) {
         final merged = mergedMessages[mergedMessages.length - 1 - index];
-        return ChatMessage(
-          key: ObjectKey(merged.ircMessage),
-          ircMessage: merged.ircMessage,
-          chatStore: merged.chatStore,
-          inputChatStore: chatStore,
-          onActivateSourceTab: () {
-            final tabs = chatTabsStore!.tabs;
-            final idx = tabs.indexWhere(
-              (t) => t.channelId == merged.chatStore.channelId,
-            );
-            if (idx != -1 && idx != chatTabsStore!.activeTabIndex) {
-              chatTabsStore!.setActiveTab(idx, silent: true);
-            }
-          },
-          overrideChannelIdToUserTwitch: channelIdToUserTwitch,
-          overrideCurrentChannelId: currentChannelId,
+        return _cachedMergedChatMessage(
+          merged,
+          channelIdToUserTwitch,
+          currentChannelId,
         );
       },
     );
+  }
+
+  /// Merged-mode variant of [_cachedChatMessage]. The extra identity checks
+  /// invalidate the cached widget when the active tab (send target) or the
+  /// combined channel-profile map changes.
+  Widget _cachedMergedChatMessage(
+    MergedMessage merged,
+    Map<String, UserTwitch> channelIdToUserTwitch,
+    String currentChannelId,
+  ) {
+    final ircMessage = merged.ircMessage;
+    final cached = _mergedMessageWidgetCache[ircMessage];
+    final cachedWidget = cached?.widget;
+    if (cached != null &&
+        cachedWidget != null &&
+        cached.revision == ircMessage.renderRevision &&
+        identical(cachedWidget.chatStore, merged.chatStore) &&
+        identical(cachedWidget.inputChatStore, chatStore) &&
+        identical(
+          cachedWidget.overrideChannelIdToUserTwitch,
+          channelIdToUserTwitch,
+        ) &&
+        cachedWidget.overrideCurrentChannelId == currentChannelId) {
+      return cachedWidget;
+    }
+
+    final widget = ChatMessage(
+      key: ObjectKey(ircMessage),
+      ircMessage: ircMessage,
+      chatStore: merged.chatStore,
+      inputChatStore: chatStore,
+      onActivateSourceTab: () {
+        final tabs = chatTabsStore!.tabs;
+        final idx = tabs.indexWhere(
+          (t) => t.channelId == merged.chatStore.channelId,
+        );
+        if (idx != -1 && idx != chatTabsStore!.activeTabIndex) {
+          chatTabsStore!.setActiveTab(idx, silent: true);
+        }
+      },
+      overrideChannelIdToUserTwitch: channelIdToUserTwitch,
+      overrideCurrentChannelId: currentChannelId,
+    );
+    _mergedMessageWidgetCache[ircMessage] = _CachedMessageWidget(
+      widget,
+      ircMessage.renderRevision,
+    );
+    return widget;
   }
 
   Widget _buildResumeScrollButton() {
