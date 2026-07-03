@@ -35,6 +35,12 @@ void main() {
     expect(state.isFocused('1'), isFalse);
   });
 
+  test('toggleFocus is a no-op for a hidden channel', () {
+    state.hide('1');
+    state.toggleFocus('1');
+    expect(state.isFocused('1'), isFalse);
+  });
+
   test('show lifts a hide', () {
     state.hide('1');
     state.show('1');

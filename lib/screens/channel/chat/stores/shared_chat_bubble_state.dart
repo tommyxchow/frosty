@@ -14,8 +14,11 @@ class SharedChatBubbleState {
   /// Channel ids whose messages are filtered out of the feed entirely.
   final hiddenChannelIds = ObservableSet<String>();
 
-  /// Adds/removes [channelId] from the spotlight set.
+  /// Adds/removes [channelId] from the spotlight set. No-ops for a hidden
+  /// channel — its messages are filtered out, so spotlighting it would fade
+  /// every other channel to showcase nothing.
   void toggleFocus(String channelId) {
+    if (hiddenChannelIds.contains(channelId)) return;
     if (!focusedChannelIds.remove(channelId)) {
       focusedChannelIds.add(channelId);
     }
