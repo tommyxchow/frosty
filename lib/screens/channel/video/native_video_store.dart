@@ -886,7 +886,7 @@ abstract class NativeVideoStoreBase
     }
     _highLatencyCount = 0;
 
-    final newLatency = '${rounded}s';
+    final newLatency = '${seconds.toStringAsFixed(2)}s';
     if (newLatency != _latency) {
       runInAction(() {
         _latency = newLatency;
