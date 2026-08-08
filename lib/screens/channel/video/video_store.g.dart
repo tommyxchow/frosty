@@ -279,6 +279,30 @@ mixin _$VideoStore on VideoStoreBase, Store {
   }
 
   @override
+  void handleAndroidPipChanged(bool isInPip) {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+      name: 'VideoStoreBase.handleAndroidPipChanged',
+    );
+    try {
+      return super.handleAndroidPipChanged(isInPip);
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _setPipActive(bool isInPip) {
+    final _$actionInfo = _$VideoStoreBaseActionController.startAction(
+      name: 'VideoStoreBase._setPipActive',
+    );
+    try {
+      return super._setPipActive(isInPip);
+    } finally {
+      _$VideoStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void handleAppResume() {
     final _$actionInfo = _$VideoStoreBaseActionController.startAction(
       name: 'VideoStoreBase.handleAppResume',
