@@ -7,7 +7,6 @@ import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_tabs_store.dart';
 import 'package:frosty/screens/channel/chat/widgets/chat_tabs.dart';
 import 'package:frosty/screens/channel/video/native_video.dart';
-import 'package:frosty/screens/channel/video/native_video_player_interface.dart';
 import 'package:frosty/screens/channel/video/native_video_store.dart';
 import 'package:frosty/screens/channel/video/stream_info_bar.dart';
 import 'package:frosty/screens/channel/video/video.dart';
@@ -772,12 +771,10 @@ class _VideoChatState extends State<VideoChat>
 
     // If on Android, use PiPSwitcher to enable PiP functionality.
     if (Platform.isAndroid) {
-      void notifyPip(bool isInPip) {
-        final store = _videoStore;
-        if (store is NativeVideoPlayerInterface) {
-          store.handleAndroidPipChanged(isInPip);
-        }
-      }
+      // Both players need this — the WebView store used to be skipped by a
+      // NativeVideoPlayerInterface type check, so it never learned it was in
+      // PiP on Android.
+      void notifyPip(bool isInPip) => _videoStore.handleAndroidPipChanged(isInPip);
 
       return PipWidget(
         pipLayout: PipActionsLayout.mediaOnlyPause,

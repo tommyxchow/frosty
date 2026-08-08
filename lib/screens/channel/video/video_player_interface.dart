@@ -39,5 +39,10 @@ abstract class VideoPlayerInterface {
   Future<void> setStreamQuality(String quality);
   Future<void> updateStreamInfo({bool forceUpdate});
   void handleAppResume();
+
+  /// Called from the platform PiP callbacks on Android so the store can sync
+  /// its overlay state, and its playback, with the OS PiP window.
+  void handleAndroidPipChanged(bool isInPip);
+
   void dispose();
 }

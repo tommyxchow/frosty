@@ -499,9 +499,19 @@ abstract class NativeVideoStoreBase
     });
   }
 
+  /// Keeps the Android PiP window's play/pause remote action in sync with
+  /// actual playback. Without this the button is stuck on whatever glyph the
+  /// `mediaOnlyPause` layout started with, and `onPipAction` — which toggles
+  /// blind — then does the opposite of what the button shows.
+  void _syncPipPlaybackState({required bool isPlaying}) {
+    if (!Platform.isAndroid) return;
+    _pip.setIsPlaying(isPlaying);
+  }
+
   void _onPlaying() {
     _loading = false;
     _paused = false;
+    _syncPipPlaybackState(isPlaying: true);
     _isStalled = false;
     _hasPlayedOnce = true;
     _initializing = false;
@@ -543,6 +553,7 @@ abstract class NativeVideoStoreBase
   void _onPlayerError(Map<String, dynamic>? eventData) {
     _loading = false;
     _paused = true;
+    _syncPipPlaybackState(isPlaying: false);
     _isStalled = false;
     _initializing = false;
     _isQualitySwitching = false;
@@ -667,6 +678,7 @@ abstract class NativeVideoStoreBase
   void _onPaused() {
     _healthyPlaybackTimer?.cancel();
     _paused = true;
+    _syncPipPlaybackState(isPlaying: false);
     _isStalled = false;
     _isQualitySwitching = false;
     _stallRecoveryTimer?.cancel();
