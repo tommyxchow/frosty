@@ -69,8 +69,16 @@ jobs:
           echo storeFile=$GITHUB_WORKSPACE/android/upload-keystore.jks >> $KEY_FILE_PATH
 
       # Build the Android app bundle (AAB) and pass the environment variables.
+      #
+      # The version code is overridden because Play rejects one it has already
+      # seen, and pubspec's code is by definition already published between
+      # releases — so the dry-run would fail on every scheduled run and never
+      # reach the validation it exists to perform. Epoch seconds is always
+      # unused, always increasing, and well under Play's 2100000000 cap. The
+      # bundle is only ever validated, never published, so the value is thrown
+      # away. versionName still comes from pubspec.
       - name: Build the Android AAB
-        run: flutter build appbundle --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
+        run: flutter build appbundle --build-number=$(date +%s) --dart-define CLIENT_ID=$CLIENT_ID --dart-define SECRET=$SECRET
 
       # Validate the AAB and credentials against Google Play without publishing.
       - name: Validate release with fastlane (no publish)
