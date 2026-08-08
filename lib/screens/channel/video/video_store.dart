@@ -55,9 +55,23 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
 
   /// Whether [initVideo] should run on the next [onPageFinished].
   ///
-  /// Dart-controlled instead of JS-side (`window._injected`) to avoid race
-  /// conditions when `loadRequest` fires before the previous page fully loads.
+  /// Dart-controlled rather than JS-side (`window._injected`) to avoid race
+  /// conditions when `loadRequest` fires before the previous page fully
+  /// loads — but re-armed by `onPageStarted` on *every* navigation so it
+  /// keeps the page-scoped lifetime the JS flag had for free. This controller
+  /// outlives the [Video] widget, which reloads [videoUrl] on each mount, and
+  /// a flag only [handleRefresh] reset left those reloads permanently
+  /// uninitialized: no play/pause listeners, no `_videoEl`, no autoplay, no
+  /// overlay CSS, and no recovery short of restarting the app.
   var _needsInit = true;
+
+  /// Whether the *user* paused, as opposed to the page pausing itself.
+  ///
+  /// Backgrounding can suspend playback with no way for the page to resume on
+  /// its own — the native store recovers via `play()` on resume, the webview
+  /// store had no equivalent. This distinguishes "resume it for them" from
+  /// "they meant it".
+  var _userPaused = false;
 
   /// The video web view params used for enabling auto play.
   late final PlatformWebViewControllerCreationParams _videoWebViewParams;
@@ -158,28 +172,18 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
         )
         ..addJavaScriptChannel(
           'PipEntered',
-          onMessageReceived: (message) {
-            _overlayWasVisibleBeforePip = _overlayVisible;
-            _isInPipMode = true;
-            _overlayTimer?.cancel();
-            _overlayVisible = true;
-          },
+          onMessageReceived: (message) => _setPipActive(true),
         )
         ..addJavaScriptChannel(
           'PipExited',
-          onMessageReceived: (message) {
-            _isInPipMode = false;
-            if (_overlayWasVisibleBeforePip) {
-              _updateLatencyTrackerVisibility(true);
-              _scheduleOverlayHide();
-            } else {
-              _overlayVisible = false;
-              _updateLatencyTrackerVisibility(false);
-            }
-          },
+          onMessageReceived: (message) => _setPipActive(false),
         )
         ..setNavigationDelegate(
           NavigationDelegate(
+            // Every real navigation invalidates the injected JS context, so
+            // every one must re-arm init. Unconditional is safe: the
+            // onPageFinished handler below still filters on videoUrl.
+            onPageStarted: (url) => _needsInit = true,
             onPageFinished: (url) async {
               if (url != videoUrl) return;
               if (!_needsInit) return;
@@ -711,14 +715,71 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     });
   }
 
-  /// Handles app resume event for immediate stream info refresh in chat-only mode.
+  @override
+  @action
+  void handleAndroidPipChanged(bool isInPip) => _setPipActive(isInPip);
+
+  /// Shared PiP enter/exit state machine.
+  ///
+  /// Driven by the Android activity callback and, on iOS, by the web PiP API
+  /// events posted from the page. Android previously reached neither — the
+  /// callback was routed only to the native store — so `_isInPipMode` stayed
+  /// false for the whole PiP session and the overlay kept auto-hiding.
+  @action
+  void _setPipActive(bool isInPip) {
+    if (isInPip == _isInPipMode) return;
+
+    if (isInPip) {
+      _overlayWasVisibleBeforePip = _overlayVisible;
+      _isInPipMode = true;
+      _overlayTimer?.cancel();
+      _overlayVisible = true;
+    } else {
+      _isInPipMode = false;
+      if (_overlayWasVisibleBeforePip) {
+        _updateLatencyTrackerVisibility(true);
+        _scheduleOverlayHide();
+      } else {
+        _overlayVisible = false;
+        _updateLatencyTrackerVisibility(false);
+      }
+    }
+  }
+
+  /// Resumes playback when the page paused itself rather than the user doing
+  /// it. Safe to call spuriously — `play()` on an already-playing element is
+  /// a no-op.
+  ///
+  /// Deliberately not called on PiP transitions: Twitch's embed refuses to
+  /// play below 400x300 CSS pixels, and an Android PiP window is far under
+  /// that, so a resume there is rejected no matter what we do.
+  void _resumeIfSuspended() {
+    if (!settingsStore.showVideo || !_paused || _userPaused) return;
+    try {
+      videoWebViewController.runJavaScript(
+        '(window._videoEl || document.getElementsByTagName("video")[0])?.play();',
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// Handles the app returning to the foreground.
+  ///
+  /// In chat-only mode this just refreshes the stream info. In video mode it
+  /// also resumes playback if the page paused itself while backgrounded —
+  /// the webview can be suspended when detached from the window and has no
+  /// way to restart on its own, which previously left the player dead until
+  /// a manual refresh. A pause the user asked for is left alone.
   @override
   @action
   void handleAppResume() {
-    // Only refresh immediately in chat-only mode
     if (!settingsStore.showVideo) {
       updateStreamInfo(forceUpdate: true);
+      return;
     }
+
+    _resumeIfSuspended();
   }
 
   /// Updates the stream info from the Twitch API.
@@ -775,6 +836,7 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     HapticFeedback.lightImpact();
     _loading = true;
     _paused = true;
+    _userPaused = false;
     _firstTimeSettingQuality = true;
     _highLatencyCount = 0;
     _isInPipMode = false;
@@ -784,7 +846,8 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
     _overlayTimer?.cancel();
     _scheduleOverlayHide();
 
-    // Signal that initVideo() should run on the next onPageFinished
+    // Belt-and-braces: onPageStarted re-arms this for the loadRequest below
+    // too, but don't depend on the delegate firing for an explicit refresh.
     _needsInit = true;
 
     _stopLatencyTracker();
@@ -797,6 +860,9 @@ abstract class VideoStoreBase with Store implements VideoPlayerInterface {
   /// Play or pause the video depending on the current state of [_paused].
   @override
   void handlePausePlay() {
+    // Remember the user's intent so handleAppResume knows whether a pause is
+    // theirs or something the page did to itself.
+    _userPaused = !_paused;
     try {
       if (_paused) {
         videoWebViewController.runJavaScript(
