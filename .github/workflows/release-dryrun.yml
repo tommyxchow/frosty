@@ -39,7 +39,7 @@ jobs:
       - name: Set up Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.2
+          ruby-version: 3.3
           bundler-cache: true
 
       # Setup Java so that we can build the appbundle.
@@ -106,7 +106,7 @@ jobs:
       - name: Set up Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.2
+          ruby-version: 3.3
           bundler-cache: true
 
       # Setup and cache Flutter to install packages and build.
@@ -124,3 +124,50 @@ jobs:
       # fully signed archive without uploading to the App Store.
       - name: Sign and build with fastlane (no publish)
         run: cd ios && bundle exec fastlane release dry_run:true
+
+  # A heartbeat nobody reads is worse than none: it reads as green by default.
+  # This one broke on the release after 5.1.0 and stayed broken for weeks
+  # without surfacing, so scheduled failures now open a tracking issue and
+  # comment on it each week it stays red. Only on `schedule` — a failed
+  # workflow_dispatch is already in front of whoever pressed the button.
+  notify:
+    name: Report scheduled failure
+    needs: [android, ios]
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Open or update the tracking issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          LABEL: release-dryrun
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          # Idempotent: `gh issue create --label` fails outright if the label
+          # is missing, and it won't exist on the first failure.
+          gh label create "$LABEL" \
+            --color B60205 \
+            --description "Automated: the weekly release dry-run is failing" \
+            2>/dev/null || true
+
+          existing=$(gh issue list --state open --label "$LABEL" --limit 1 \
+            --json number --jq '.[0].number // empty')
+
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body \
+              "Still failing as of $(date -u +%Y-%m-%d). $RUN_URL"
+          else
+            gh issue create \
+              --title "Release dry-run is failing" \
+              --label "$LABEL" \
+              --body "$(printf '%s\n' \
+                "The weekly release dry-run failed: $RUN_URL" \
+                "" \
+                "This checks the release pipeline between releases — Play and App Store credentials, signing certs and provisioning profiles, and that a release build still validates against both stores. A failure here means the next release is likely to fail too, so it's worth fixing before cutting one." \
+                "" \
+                "Closing this issue is fine once the run is green; a later failure opens a new one.")"
+          fi
