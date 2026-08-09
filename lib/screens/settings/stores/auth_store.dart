@@ -10,6 +10,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
 import 'package:frosty/services/cookie_extractor.dart';
+import 'package:frosty/utils/twitch_oauth_scopes.dart';
 import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -34,9 +35,6 @@ abstract class AuthBase with Store {
   /// The Twitch API service for making requests.
   final TwitchApi twitchApi;
 
-  /// Whether the token is valid or not.
-  var _tokenIsValid = false;
-
   /// Timer used to retry authentication when offline or on transient failures.
   Timer? _reconnectTimer;
 
@@ -60,6 +58,13 @@ abstract class AuthBase with Store {
   /// Whether the user is logged in or not.
   @readonly
   var _isLoggedIn = false;
+
+  /// OAuth scopes granted to the current user token.
+  ///
+  /// Used to explain missing-permission 401s without another network round-trip.
+  var _grantedScopes = const <String>[];
+
+  List<String> get grantedScopes => _grantedScopes;
 
   /// Authentication headers for Twitch API requests.
   @computed
@@ -170,8 +175,7 @@ abstract class AuthBase with Store {
             'client_id': clientId,
             'redirect_uri': 'https://twitch.tv/login',
             'response_type': 'token',
-            'scope':
-                'chat:read chat:edit user:read:follows user:read:blocked_users user:manage:blocked_users user:manage:chat_color user:read:moderated_channels moderator:manage:chat_messages moderator:manage:banned_users',
+            'scope': twitchUserScopeQuery,
             'force_verify': 'true',
           },
         ),
@@ -257,23 +261,27 @@ abstract class AuthBase with Store {
         // Retrieve the currently stored default token if it exists.
         _token = await _storage.read(key: _defaultTokenKey);
         // If the token does not exist or is invalid, get a new token and store it.
-        if (_token == null || !await twitchApi.validateToken(token: _token!)) {
+        if (_token == null ||
+            await twitchApi.validateToken(token: _token!) == null) {
           _token = await twitchApi.getDefaultToken();
           await _storage.write(key: _defaultTokenKey, value: _token);
         }
       } else {
         // Validate the existing token. If it fails, start reconnect loop.
+        final List<String> scopes;
         try {
-          _tokenIsValid = await twitchApi.validateToken(token: _token!);
+          final validated = await twitchApi.validateToken(token: _token!);
+          if (validated == null) return await logout();
+          scopes = validated;
         } on ApiException catch (e) {
           debugPrint('Token validation failed: $e');
           _isLoggedIn = false;
+          _grantedScopes = const [];
           _startReconnectLoop();
           return;
         }
 
-        // If the token is invalid, logout.
-        if (!_tokenIsValid) return await logout();
+        _grantedScopes = scopes;
 
         // Initialize the user store.
         await user.init();
@@ -301,8 +309,9 @@ abstract class AuthBase with Store {
   Future<void> login({required String token}) async {
     try {
       // Validate the custom token.
-      _tokenIsValid = await twitchApi.validateToken(token: token);
-      if (!_tokenIsValid) return;
+      final scopes = await twitchApi.validateToken(token: token);
+      if (scopes == null) return;
+      _grantedScopes = scopes;
 
       // Replace the current default token with the new custom token.
       _token = token;
@@ -335,6 +344,7 @@ abstract class AuthBase with Store {
       await _storage.delete(key: _gqlTokenKey);
       _token = null;
       _gqlToken = null;
+      _grantedScopes = const [];
 
       // Clear the user info.
       user.dispose();
@@ -343,7 +353,8 @@ abstract class AuthBase with Store {
       _token = await _storage.read(key: _defaultTokenKey);
 
       // If the default token does not already exist or it's invalid, get the new default token and store it.
-      if (_token == null || !await twitchApi.validateToken(token: _token!)) {
+      if (_token == null ||
+          await twitchApi.validateToken(token: _token!) == null) {
         _token = await twitchApi.getDefaultToken();
         await _storage.write(key: _defaultTokenKey, value: _token);
       }
@@ -379,14 +390,15 @@ abstract class AuthBase with Store {
           return;
         }
 
-        final isValid = await twitchApi.validateToken(token: stored);
-        if (!isValid) {
+        final scopes = await twitchApi.validateToken(token: stored);
+        if (scopes == null) {
           await logout();
           return;
         }
 
         // Token valid again — restore session.
         _token = stored;
+        _grantedScopes = scopes;
         await user.init();
         if (user.details != null) {
           _isLoggedIn = true;

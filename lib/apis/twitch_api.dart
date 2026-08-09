@@ -145,17 +145,24 @@ class TwitchApi extends BaseApiClient {
     return data['access_token'] as String;
   }
 
-  /// Returns a bool indicating the validity of the given token.
-  Future<bool> validateToken({required String token}) async {
+  /// Validates [token] with Twitch.
+  ///
+  /// Returns the granted OAuth scopes when the token is valid, or `null` when
+  /// it is invalid/expired. App-access tokens may return an empty list.
+  Future<List<String>?> validateToken({required String token}) async {
     try {
-      await get<JsonMap>(
+      final data = await get<JsonMap>(
         '$_oauthBaseUrl/validate',
         headers: {'Authorization': 'Bearer $token'},
       );
-      return true;
+      final scopes = data['scopes'];
+      if (scopes is List) {
+        return scopes.map((scope) => scope.toString()).toList();
+      }
+      return const [];
     } on UnauthorizedException {
       // 401 -> token is invalid/expired (propagated from interceptor for validate requests)
-      return false;
+      return null;
     } on ApiException catch (e) {
       // Network/timeout/server errors -> treat as indeterminate, not invalid
       debugPrint('Token validation indeterminate: $e');

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/onboarding/login_webview.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/utils/twitch_oauth_scopes.dart';
 import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -45,9 +46,10 @@ class UnauthorizedInterceptor extends Interceptor {
     // Determine if user is logged in but missing scopes vs completely logged out
     final isLoggedIn = _authStore.isLoggedIn;
     final title = isLoggedIn ? 'Missing permissions' : 'Session expired';
-    final message = isLoggedIn
-        ? 'Your session is missing permissions. Please log in again to continue.'
-        : 'Your session has expired. Please log in again to continue.';
+    final message = unauthorizedDialogMessage(
+      isLoggedIn: isLoggedIn,
+      grantedScopes: _authStore.grantedScopes,
+    );
 
     showDialog(
       context: context,
