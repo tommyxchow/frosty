@@ -10,7 +10,7 @@ import 'package:frosty/constants.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/user_store.dart';
 import 'package:frosty/services/cookie_extractor.dart';
-import 'package:frosty/utils/twitch_oauth_scopes.dart';
+import 'package:frosty/utils/twitch_oauth_scopes.dart' as twitch_scopes;
 import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:mobx/mobx.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -32,6 +32,12 @@ abstract class AuthBase with Store {
   /// The secure storage key for the GQL web cookie token.
   static const _gqlTokenKey = 'gql_token';
 
+  /// Twitch user id that opted into moderator scopes on this device.
+  static const _moderatorOptInUserIdKey = 'moderator_scopes_opt_in_user_id';
+
+  /// Last logged-in Twitch user id (kept across logout for re-login scope choice).
+  static const _lastUserIdKey = 'last_user_id';
+
   /// The Twitch API service for making requests.
   final TwitchApi twitchApi;
 
@@ -45,7 +51,7 @@ abstract class AuthBase with Store {
   static const _maxReconnectAttempts = 5;
 
   /// The MobX store containing information relevant to the current user.
-  final UserStore user;
+  late final UserStore user;
 
   /// The user token used to authenticate with the Twitch API.
   @readonly
@@ -60,11 +66,19 @@ abstract class AuthBase with Store {
   var _isLoggedIn = false;
 
   /// OAuth scopes granted to the current user token.
-  ///
-  /// Used to explain missing-permission 401s without another network round-trip.
-  var _grantedScopes = const <String>[];
+  @readonly
+  var _grantedScopes = ObservableList<String>();
 
-  List<String> get grantedScopes => _grantedScopes;
+  /// Twitch user id that previously enabled moderator tools on this device.
+  String? _moderatorOptInUserId;
+
+  /// Last known Twitch user id, retained after logout for scope selection.
+  String? _lastUserId;
+
+  /// Whether the current token includes every moderator scope Frosty needs.
+  @computed
+  bool get hasModeratorScopes =>
+      twitch_scopes.hasModeratorScopes(_grantedScopes);
 
   /// Authentication headers for Twitch API requests.
   @computed
@@ -81,6 +95,7 @@ abstract class AuthBase with Store {
   FutureOr<NavigationDecision> handleNavigation({
     required NavigationRequest request,
     Widget? routeAfter,
+    bool upgradeModeratorScopes = false,
   }) {
     // Check if the URL is the redirect URI.
     if (request.url.startsWith('https://twitch.tv/login')) {
@@ -88,8 +103,13 @@ abstract class AuthBase with Store {
       final uri = Uri.parse(request.url.replaceFirst('#', '?'));
       final token = uri.queryParameters['access_token'];
 
-      // Login with the provided token.
-      if (token != null) login(token: token);
+      if (token != null) {
+        if (upgradeModeratorScopes) {
+          unawaited(completeModeratorUpgrade(token: token));
+        } else {
+          unawaited(login(token: token));
+        }
+      }
     }
 
     // Check if the the URL has been redirected to "https://www.twitch.tv/?no-reload=true".
@@ -97,6 +117,13 @@ abstract class AuthBase with Store {
     // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
     if (request.url == 'https://www.twitch.tv/?no-reload=true') {
       _extractGqlToken();
+
+      // Upgrade WebViews pop themselves after an atomic commit so we never
+      // dismiss into a half-applied session.
+      if (upgradeModeratorScopes) {
+        return NavigationDecision.navigate;
+      }
+
       if (routeAfter != null) {
         navigatorKey.currentState?.pop();
         navigatorKey.currentState?.push(
@@ -112,7 +139,10 @@ abstract class AuthBase with Store {
     return NavigationDecision.navigate;
   }
 
-  WebViewController createAuthWebViewController({Widget? routeAfter}) {
+  WebViewController createAuthWebViewController({
+    Widget? routeAfter,
+    bool upgradeModeratorScopes = false,
+  }) {
     final webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       // Use platform-specific user agents to allow Google OAuth sign-in.
@@ -124,11 +154,18 @@ abstract class AuthBase with Store {
             : 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Mobile Safari/537.36',
       );
 
+    final scopeQuery = upgradeModeratorScopes || _shouldIncludeModeratorScopes
+        ? twitch_scopes.twitchAllUserScopeQuery
+        : twitch_scopes.twitchUserScopeQuery;
+
     return webViewController
       ..setNavigationDelegate(
         NavigationDelegate(
-          onNavigationRequest: (request) =>
-              handleNavigation(request: request, routeAfter: routeAfter),
+          onNavigationRequest: (request) => handleNavigation(
+            request: request,
+            routeAfter: routeAfter,
+            upgradeModeratorScopes: upgradeModeratorScopes,
+          ),
           onWebResourceError: (error) {
             debugPrint('Auth WebView error: ${error.description}');
           },
@@ -175,7 +212,7 @@ abstract class AuthBase with Store {
             'client_id': clientId,
             'redirect_uri': 'https://twitch.tv/login',
             'response_type': 'token',
-            'scope': twitchUserScopeQuery,
+            'scope': scopeQuery,
             'force_verify': 'true',
           },
         ),
@@ -222,7 +259,26 @@ abstract class AuthBase with Store {
     );
   }
 
-  AuthBase({required this.twitchApi}) : user = UserStore(twitchApi: twitchApi);
+  AuthBase({required this.twitchApi}) {
+    user = UserStore(
+      twitchApi: twitchApi,
+      hasModeratorScopes: () => hasModeratorScopes,
+    );
+  }
+
+  bool get _shouldIncludeModeratorScopes {
+    final currentId = user.details?.id;
+    if (currentId != null && currentId == _moderatorOptInUserId) {
+      return true;
+    }
+    // After logout, still request mod scopes for the same opted-in account.
+    if (currentId == null &&
+        _lastUserId != null &&
+        _lastUserId == _moderatorOptInUserId) {
+      return true;
+    }
+    return false;
+  }
 
   Future<void> _extractGqlToken() async {
     try {
@@ -247,13 +303,40 @@ abstract class AuthBase with Store {
     await _storage.delete(key: _gqlTokenKey);
   }
 
+  void _setGrantedScopes(List<String> scopes) {
+    _grantedScopes = ObservableList.of(scopes);
+  }
+
+  Future<void> _persistModeratorOptIn(String userId) async {
+    if (_moderatorOptInUserId == userId) return;
+    _moderatorOptInUserId = userId;
+    await _storage.write(key: _moderatorOptInUserIdKey, value: userId);
+  }
+
+  Future<void> _persistLastUserId(String? userId) async {
+    if (_lastUserId == userId) return;
+    _lastUserId = userId;
+    if (userId == null) {
+      await _storage.delete(key: _lastUserIdKey);
+    } else {
+      await _storage.write(key: _lastUserIdKey, value: userId);
+    }
+  }
+
   /// Initialize by retrieving a token if it does not already exist.
   @action
   Future<void> init() async {
     try {
-      // Read and set the currently stored user token, if any.
-      _token = await _storage.read(key: _userTokenKey);
-      _gqlToken = await _storage.read(key: _gqlTokenKey);
+      final stored = await Future.wait([
+        _storage.read(key: _moderatorOptInUserIdKey),
+        _storage.read(key: _lastUserIdKey),
+        _storage.read(key: _userTokenKey),
+        _storage.read(key: _gqlTokenKey),
+      ]);
+      _moderatorOptInUserId = stored[0];
+      _lastUserId = stored[1];
+      _token = stored[2];
+      _gqlToken = stored[3];
 
       // If the token does not exist, get the default token.
       // Otherwise, log in.
@@ -266,28 +349,30 @@ abstract class AuthBase with Store {
           _token = await twitchApi.getDefaultToken();
           await _storage.write(key: _defaultTokenKey, value: _token);
         }
+        _setGrantedScopes(const []);
       } else {
         // Validate the existing token. If it fails, start reconnect loop.
-        final List<String> scopes;
+        final TwitchTokenInfo info;
         try {
           final validated = await twitchApi.validateToken(token: _token!);
           if (validated == null) return await logout();
-          scopes = validated;
+          info = validated;
         } on ApiException catch (e) {
           debugPrint('Token validation failed: $e');
           _isLoggedIn = false;
-          _grantedScopes = const [];
+          _setGrantedScopes(const []);
           _startReconnectLoop();
           return;
         }
 
-        _grantedScopes = scopes;
+        _setGrantedScopes(info.scopes);
 
         // Initialize the user store.
         await user.init();
 
         if (user.details != null) {
           _isLoggedIn = true;
+          await _persistLastUserId(user.details!.id);
           _stopReconnectLoop();
 
           // Recover a missed web session link — the WebView cookie store may
@@ -309,9 +394,9 @@ abstract class AuthBase with Store {
   Future<void> login({required String token}) async {
     try {
       // Validate the custom token.
-      final scopes = await twitchApi.validateToken(token: token);
-      if (scopes == null) return;
-      _grantedScopes = scopes;
+      final info = await twitchApi.validateToken(token: token);
+      if (info == null) return;
+      _setGrantedScopes(info.scopes);
 
       // Replace the current default token with the new custom token.
       _token = token;
@@ -325,6 +410,12 @@ abstract class AuthBase with Store {
       // Set the login status to logged in.
       if (user.details != null) {
         _isLoggedIn = true;
+        await _persistLastUserId(user.details!.id);
+        // A fresh login that already includes mod scopes (re-auth after opt-in)
+        // should keep the opt-in flag for this account.
+        if (hasModeratorScopes) {
+          await _persistModeratorOptIn(user.details!.id);
+        }
         FirebaseCrashlytics.instance.setCustomKey('is_logged_in', true);
         FirebaseCrashlytics.instance.setUserIdentifier(user.details!.id);
         _stopReconnectLoop();
@@ -334,17 +425,96 @@ abstract class AuthBase with Store {
     }
   }
 
+  /// Atomically upgrades the current session with moderator OAuth scopes.
+  ///
+  /// Keeps the existing token until validation proves the new token is for the
+  /// same user and includes every moderator scope. On any failure, the old
+  /// session is left untouched.
+  @action
+  Future<bool> completeModeratorUpgrade({required String token}) async {
+    final currentUserId = user.details?.id;
+    if (currentUserId == null || !_isLoggedIn) {
+      _showModeratorUpgradeFailed(
+        'Log in first, then enable moderator tools from a channel you moderate.',
+      );
+      return false;
+    }
+
+    try {
+      final info = await twitchApi.validateToken(token: token);
+      if (info == null) {
+        _showModeratorUpgradeFailed(
+          'Could not validate the new Twitch permissions. Your current session was kept.',
+        );
+        return false;
+      }
+
+      if (info.userId != currentUserId) {
+        _showModeratorUpgradeFailed(
+          'Log in with the same Twitch account to enable moderator tools. Your current session was kept.',
+        );
+        return false;
+      }
+
+      if (!twitch_scopes.hasModeratorScopes(info.scopes)) {
+        _showModeratorUpgradeFailed(
+          'Moderator permissions were not granted. Your current session was kept.',
+        );
+        return false;
+      }
+
+      // Commit only after all gates pass.
+      _token = token;
+      _setGrantedScopes(info.scopes);
+      await Future.wait([
+        _storage.write(key: _userTokenKey, value: token),
+        _persistModeratorOptIn(currentUserId),
+      ]);
+      await user.refreshModeratedChannels();
+
+      navigatorKey.currentState?.pop();
+      return true;
+    } catch (e) {
+      debugPrint('Moderator upgrade failed due to $e');
+      _showModeratorUpgradeFailed(
+        'Could not enable moderator tools. Your current session was kept.',
+      );
+      return false;
+    }
+  }
+
+  void _showModeratorUpgradeFailed(String message) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+    showDialog(
+      context: context,
+      builder: (dialogContext) => FrostyDialog(
+        title: 'Moderator tools not enabled',
+        message: message,
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(dialogContext).pop,
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Logs out the current user and updates fields accordingly.
   @action
   Future<void> logout() async {
     try {
       _stopReconnectLoop();
+      final previousUserId = user.details?.id ?? _lastUserId;
+      await _persistLastUserId(previousUserId);
+
       // Delete the existing user token and GQL token.
       await _storage.delete(key: _userTokenKey);
       await _storage.delete(key: _gqlTokenKey);
       _token = null;
       _gqlToken = null;
-      _grantedScopes = const [];
+      _setGrantedScopes(const []);
 
       // Clear the user info.
       user.dispose();
@@ -390,18 +560,19 @@ abstract class AuthBase with Store {
           return;
         }
 
-        final scopes = await twitchApi.validateToken(token: stored);
-        if (scopes == null) {
+        final info = await twitchApi.validateToken(token: stored);
+        if (info == null) {
           await logout();
           return;
         }
 
         // Token valid again — restore session.
         _token = stored;
-        _grantedScopes = scopes;
+        _setGrantedScopes(info.scopes);
         await user.init();
         if (user.details != null) {
           _isLoggedIn = true;
+          await _persistLastUserId(user.details!.id);
           _error = null;
           _stopReconnectLoop();
         }

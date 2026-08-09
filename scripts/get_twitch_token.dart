@@ -31,6 +31,8 @@ void main() async {
       'client_id': clientId,
       'redirect_uri': redirectUri,
       'response_type': 'token',
+      // Core scopes only — matches normal app login. Use the in-app
+      // "Enable moderator tools" flow when moderator scopes are needed.
       'scope': twitchUserScopeQuery,
     },
   ).toString();

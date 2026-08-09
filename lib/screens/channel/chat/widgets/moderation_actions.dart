@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:frosty/apis/base_api_client.dart';
 import 'package:frosty/screens/channel/chat/stores/chat_store.dart';
+import 'package:frosty/screens/onboarding/login_webview.dart';
+import 'package:frosty/screens/settings/stores/auth_store.dart';
 
 /// Moderator actions (delete / timeout / ban, plus unban) for [targetUserId],
 /// reused by the message long-press menu and the user panel.
 ///
-/// Renders nothing unless the viewer can moderate the channel. [messageId]
-/// enables the per-message Delete action; omit it (e.g. the user panel, which
-/// isn't tied to one message) to hide Delete. The unban action only appears
-/// when the user is currently banned/timed-out (seen via CLEARCHAT).
+/// Renders nothing unless the viewer can moderate the channel, or should see
+/// an opt-in row when IRC/broadcaster hints mod capability without OAuth scopes.
+/// [messageId] enables the per-message Delete action; omit it (e.g. the user
+/// panel, which isn't tied to one message) to hide Delete. The unban action
+/// only appears when the user is currently banned/timed-out (seen via CLEARCHAT).
 class ModerationActions extends StatelessWidget {
   final ChatStore chatStore;
   final String targetUserId;
@@ -29,10 +33,54 @@ class ModerationActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!chatStore.auth.user.canModerate(chatStore.channelId)) {
-      return const SizedBox.shrink();
-    }
+    return Observer(
+      builder: (context) {
+        final auth = chatStore.auth;
+        final hasModScopes = auth.hasModeratorScopes;
 
+        if (hasModScopes) {
+          if (auth.user.canPerformModeratorActions(chatStore.channelId)) {
+            return _actionsColumn(context);
+          }
+          return const SizedBox.shrink();
+        }
+
+        // IRC/broadcaster is a CTA hint only — not authority to call Helix.
+        // Read userState.mod only on the no-scopes path so USERSTATE acks do
+        // not rebuild this sheet while real actions are already available.
+        final isBroadcaster = auth.user.details?.id == chatStore.channelId;
+        final ircModHint = chatStore.userState.mod;
+        if (isBroadcaster || ircModHint) {
+          return _enableModeratorToolsRow(context, auth);
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget _enableModeratorToolsRow(BuildContext context, AuthStore auth) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Divider(),
+        ListTile(
+          onTap: () {
+            Navigator.pop(context);
+            // Use the root navigator after closing the sheet.
+            openEnableModeratorTools(auth);
+          },
+          leading: const Icon(Icons.shield_outlined),
+          title: const Text('Enable moderator tools…'),
+          subtitle: const Text(
+            'Authorize Twitch permissions to delete, timeout, and ban.',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _actionsColumn(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -133,7 +181,9 @@ class ModerationActions extends StatelessWidget {
       duration: 600, // 10 minutes
     );
     chatStore.updateNotification(
-      success ? '$targetName timed out for 10 minutes.' : 'Failed to timeout user',
+      success
+          ? '$targetName timed out for 10 minutes.'
+          : 'Failed to timeout user',
     );
   }
 

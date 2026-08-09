@@ -1304,8 +1304,9 @@ class USERSTATE {
     raw: ircMessage.raw,
     color: ircMessage.tags['color'] ?? color,
     displayName: ircMessage.tags['display-name'] ?? displayName,
-    mod: ircMessage.tags['mod'] == '0' ? false : true,
-    subscriber: ircMessage.tags['subscriber'] == '0' ? false : true,
+    // Missing tags must be false — the old `!= '0'` default treated absence as mod.
+    mod: ircMessage.tags['mod'] == '1',
+    subscriber: ircMessage.tags['subscriber'] == '1',
   );
 }
 

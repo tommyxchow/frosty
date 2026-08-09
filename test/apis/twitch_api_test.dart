@@ -215,15 +215,16 @@ void main() {
   });
 
   group('validateToken', () {
-    test('returns granted scopes for valid token', () async {
+    test('returns scopes and user id for valid token', () async {
       dioAdapter.onGet(
         'https://id.twitch.tv/oauth2/validate',
         (server) => server.reply(200, twitchValidateTokenResponse),
       );
 
-      final scopes = await api.validateToken(token: 'valid_token');
+      final info = await api.validateToken(token: 'valid_token');
 
-      expect(scopes, ['chat:read', 'chat:edit']);
+      expect(info?.scopes, ['chat:read', 'chat:edit']);
+      expect(info?.userId, '12345');
     });
 
     test('returns null for expired token (401)', () async {
@@ -232,9 +233,9 @@ void main() {
         (server) => server.reply(401, {'message': 'invalid access token'}),
       );
 
-      final scopes = await api.validateToken(token: 'expired_token');
+      final info = await api.validateToken(token: 'expired_token');
 
-      expect(scopes, isNull);
+      expect(info, isNull);
     });
 
     test('rethrows on server error', () {

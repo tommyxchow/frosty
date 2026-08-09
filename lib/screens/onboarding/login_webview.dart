@@ -1,16 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:frosty/main.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
 import 'package:frosty/widgets/frosty_app_bar.dart';
 import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+/// Pushes the atomic moderator-scopes upgrade WebView.
+void openEnableModeratorTools(AuthStore authStore, {BuildContext? context}) {
+  final navContext = context ?? navigatorKey.currentContext;
+  if (navContext == null) return;
+  Navigator.of(navContext).push(
+    MaterialPageRoute(
+      builder: (context) => Provider<AuthStore>.value(
+        value: authStore,
+        child: const LoginWebView(upgradeModeratorScopes: true),
+      ),
+    ),
+  );
+}
+
 /// Reusable WebView widget for Twitch OAuth login flow
 class LoginWebView extends StatelessWidget {
   /// Optional widget to navigate to after successful login
   final Widget? routeAfter;
 
-  const LoginWebView({super.key, this.routeAfter});
+  /// When true, requests core + moderator scopes and runs the atomic upgrade
+  /// commit instead of a full [AuthStore.login].
+  final bool upgradeModeratorScopes;
+
+  const LoginWebView({
+    super.key,
+    this.routeAfter,
+    this.upgradeModeratorScopes = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +41,11 @@ class LoginWebView extends StatelessWidget {
 
     return Scaffold(
       appBar: FrostyAppBar(
-        title: const Text('Connect with Twitch'),
+        title: Text(
+          upgradeModeratorScopes
+              ? 'Enable moderator tools'
+              : 'Connect with Twitch',
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_rounded),
@@ -44,6 +71,7 @@ class LoginWebView extends StatelessWidget {
       body: WebViewWidget(
         controller: authStore.createAuthWebViewController(
           routeAfter: routeAfter,
+          upgradeModeratorScopes: upgradeModeratorScopes,
         ),
       ),
     );
