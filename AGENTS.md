@@ -10,8 +10,9 @@ flutter run --dart-define=CLIENT_ID=ID --dart-define=SECRET=SECRET  # Run with T
 flutter analyze                                                     # Static analysis
 flutter test                                                        # Run tests
 dart run build_runner build                                         # Regenerate .g.dart files (MobX/JSON models)
-dart run build_runner build --delete-conflicting-outputs             # Same, but clears stale outputs
 ```
+
+`--delete-conflicting-outputs` was removed in build_runner 2.15 and is now ignored — conflicting outputs are handled automatically.
 
 ## Source Structure
 
