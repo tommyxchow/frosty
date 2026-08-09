@@ -331,6 +331,41 @@ void main() {
         ),
       );
     });
+
+    const timeoutCases = {
+      DioExceptionType.connectionTimeout: 'Connection timeout',
+      DioExceptionType.sendTimeout: 'Upload timeout',
+      DioExceptionType.receiveTimeout: 'Server response timeout',
+      DioExceptionType.transformTimeout: 'Response processing timeout',
+    };
+
+    timeoutCases.forEach((type, expectedMessage) {
+      test('${type.name} throws TimeoutException', () async {
+        final path = '/${type.name}';
+
+        dioAdapter.onGet(
+          'https://api.test.com$path',
+          (server) => server.throws(
+            0,
+            DioException(
+              requestOptions: RequestOptions(path: path),
+              type: type,
+            ),
+          ),
+        );
+
+        expect(
+          () => client.testGet(path),
+          throwsA(
+            isA<TimeoutException>().having(
+              (e) => e.message,
+              'message',
+              contains(expectedMessage),
+            ),
+          ),
+        );
+      });
+    });
   });
 
   group('successful get()', () {

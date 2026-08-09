@@ -161,7 +161,8 @@ abstract class BaseApiClient {
     final exception = switch (error.type) {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout =>
+      DioExceptionType.receiveTimeout ||
+      DioExceptionType.transformTimeout =>
         TimeoutException(_getTimeoutMessage(error.type)),
       DioExceptionType.connectionError => NetworkException(
         'No internet connection. Please check your network.',
@@ -202,6 +203,8 @@ abstract class BaseApiClient {
         return 'Upload timeout. Please try again.';
       case DioExceptionType.receiveTimeout:
         return 'Server response timeout. Please try again.';
+      case DioExceptionType.transformTimeout:
+        return 'Response processing timeout. Please try again.';
       default:
         return 'Request timeout. Please try again.';
     }

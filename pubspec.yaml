@@ -23,7 +23,7 @@ environment:
   sdk: ^3.9.0
   # Exact Flutter pin, enforced by `flutter pub get` locally and read by CI via
   # `flutter-version-file: pubspec.yaml`. Single source of truth: bump here.
-  flutter: 3.44.5
+  flutter: 3.44.9
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -34,12 +34,18 @@ environment:
 dependencies:
     flutter:
         sdk: flutter
-    json_annotation: ^4.6.0
+    json_annotation: ^4.12.0
 
     # The following adds the Cupertino Icons font to your application.
     # Use with the CupertinoIcons class for iOS style icons.
     cupertino_icons: ^1.0.2
     web_socket_channel: ^3.0.0
+    # Pinned to v9 deliberately. v10.0.0 was shipped in 5.0.0 and reverted in
+    # 5.0.1 (ba28e09) while chasing the #484 startup freeze on low-end Android
+    # 14; that commit also made deleteAll() non-blocking, so which change fixed
+    # it was never established. v10 rewrote the Android ciphers, and v11 drops
+    # the legacy ones entirely, so a 9 -> 11 jump would also strand existing
+    # tokens. Move to v10 on its own, with low-end Android testing.
     flutter_secure_storage: ^9.2.2
     intl: ^0.20.1
     cached_network_image: ^3.1.0
@@ -50,6 +56,8 @@ dependencies:
     shared_preferences: ^2.0.8
     flutter_svg: ^2.0.5
     url_launcher: ^6.0.17
+    # Held at v9/v12: the v10/v13 majors are just a win32 6.0.0 bump (Windows
+    # only), which conflicts with flutter_secure_storage v9's win32 ^5.
     package_info_plus: ^9.0.0
     collection: ^1.16.0
     flutter_cache_manager: ^3.3.0
