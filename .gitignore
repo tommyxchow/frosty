@@ -44,6 +44,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# AGP 9 writes a problems report here even when the Gradle build dir is redirected
+/android/build/
 
 # Folder containing random testing files
 random/
