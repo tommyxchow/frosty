@@ -1,3 +1,5 @@
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
+
 allprojects {
     repositories {
         google()
@@ -17,6 +19,17 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+// AGP 9 requires each library to compile against at least the compileSdk of
+// its dependencies. Several Flutter plugins still pin compileSdk 33/34.
+// finalizeDsl runs after the plugin's android {} block. Does not change minSdk.
+subprojects {
+    pluginManager.withPlugin("com.android.library") {
+        extensions.configure<LibraryAndroidComponentsExtension>("androidComponents") {
+            finalizeDsl { it.compileSdk = 36 }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
