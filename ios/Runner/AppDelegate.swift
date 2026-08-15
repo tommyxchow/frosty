@@ -2,19 +2,23 @@ import Flutter
 import UIKit
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    GeneratedPluginRegistrant.register(with: self)
-    guard let cookieExtractorRegistrar = self.registrar(
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+  }
+
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    guard let cookieExtractorRegistrar = engineBridge.pluginRegistry.registrar(
       forPlugin: "CookieExtractorPlugin"
     ) else {
       assertionFailure("Failed to create CookieExtractorPlugin registrar")
-      return false
+      return
     }
     CookieExtractorPlugin.register(with: cookieExtractorRegistrar)
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
+
