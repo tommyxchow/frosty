@@ -684,5 +684,18 @@ void main() {
       final updated = original.fromIRCMessage(ircMsg);
       expect(updated.mod, isFalse);
     });
+
+    test('missing mod and subscriber tags are false', () {
+      const original = USERSTATE();
+      final ircMsg = IRCMessage(
+        raw: '',
+        command: Command.userState,
+        tags: {'display-name': 'TestUser'},
+      );
+
+      final updated = original.fromIRCMessage(ircMsg);
+      expect(updated.mod, isFalse);
+      expect(updated.subscriber, isFalse);
+    });
   });
 }

@@ -9,6 +9,9 @@ class UserStore = UserStoreBase with _$UserStore;
 abstract class UserStoreBase with Store {
   final TwitchApi twitchApi;
 
+  /// Whether the active auth token includes Frosty's moderator OAuth scopes.
+  final bool Function() hasModeratorScopes;
+
   /// The current user's info.
   @readonly
   UserTwitch? _details;
@@ -23,7 +26,10 @@ abstract class UserStoreBase with Store {
 
   ReactionDisposer? _disposeReaction;
 
-  UserStoreBase({required this.twitchApi});
+  UserStoreBase({
+    required this.twitchApi,
+    required this.hasModeratorScopes,
+  });
 
   @action
   Future<void> init() async {
@@ -36,11 +42,20 @@ abstract class UserStoreBase with Store {
       twitchApi
           .getUserBlockedList(id: _details!.id)
           .then((blockedUsers) => _blockedUsers = blockedUsers.asObservable());
-      twitchApi
-          .getModeratedChannels(id: _details!.id)
-          .then((channels) => _moderatedChannels = channels.asObservable());
+      // Never hit moderated-channels Helix without moderator scopes — that 401
+      // is what nags non-mod users after an app upgrade.
+      if (hasModeratorScopes()) {
+        twitchApi
+            .getModeratedChannels(id: _details!.id)
+            .then(
+              (channels) => _moderatedChannels = channels.asObservable(),
+            );
+      } else {
+        _moderatedChannels = ObservableList<String>();
+      }
     }
 
+    _disposeReaction?.call();
     _disposeReaction = autorun(
       (_) => _blockedUsers.sort((a, b) => a.userLogin.compareTo(b.userLogin)),
     );
@@ -73,7 +88,7 @@ abstract class UserStoreBase with Store {
   /// status granted or revoked since then.
   @action
   Future<void> refreshModeratedChannels() async {
-    if (_details?.id == null) return;
+    if (_details?.id == null || !hasModeratorScopes()) return;
     _moderatedChannels =
         (await twitchApi.getModeratedChannels(id: _details!.id)).asObservable();
   }
@@ -85,18 +100,24 @@ abstract class UserStoreBase with Store {
   /// Whether the logged-in user can moderate [channelId] — either a moderator
   /// of that channel or its broadcaster (the broadcaster isn't in their own
   /// moderator list but can still use the moderation endpoints).
+  ///
+  /// Role only — does not require moderator OAuth scopes. Use
+  /// [canPerformModeratorActions] before calling Helix.
   bool canModerate(String channelId) =>
       _details?.id == channelId || isModerator(channelId);
+
+  /// Role + moderator OAuth scopes — safe to call Helix mod endpoints.
+  bool canPerformModeratorActions(String channelId) =>
+      _details?.id != null &&
+      hasModeratorScopes() &&
+      canModerate(channelId);
 
   @action
   Future<bool> deleteMessage({
     required String broadcasterId,
     required String messageId,
   }) async {
-    // Need the moderator ID and confirmed mod status for this channel.
-    if (_details?.id == null || !canModerate(broadcasterId)) {
-      return false;
-    }
+    if (!canPerformModeratorActions(broadcasterId)) return false;
     return twitchApi.deleteChatMessage(
       broadcasterId: broadcasterId,
       moderatorId: _details!.id,
@@ -111,10 +132,7 @@ abstract class UserStoreBase with Store {
     int? duration,
     String? reason,
   }) async {
-    // Need the moderator ID and confirmed mod status for this channel.
-    if (_details?.id == null || !canModerate(broadcasterId)) {
-      return false;
-    }
+    if (!canPerformModeratorActions(broadcasterId)) return false;
     return twitchApi.banUser(
       broadcasterId: broadcasterId,
       moderatorId: _details!.id,
@@ -130,9 +148,7 @@ abstract class UserStoreBase with Store {
     required String broadcasterId,
     required String userIdToUnban,
   }) async {
-    if (_details?.id == null || !canModerate(broadcasterId)) {
-      return false;
-    }
+    if (!canPerformModeratorActions(broadcasterId)) return false;
     return twitchApi.unbanUser(
       broadcasterId: broadcasterId,
       moderatorId: _details!.id,
@@ -145,6 +161,7 @@ abstract class UserStoreBase with Store {
     _details = null;
     _blockedUsers.clear();
     _moderatedChannels.clear();
-    if (_disposeReaction != null) _disposeReaction!();
+    _disposeReaction?.call();
+    _disposeReaction = null;
   }
 }

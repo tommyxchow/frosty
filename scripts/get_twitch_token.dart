@@ -8,9 +8,8 @@
 // Then long-press the Anonymous account tile in the app to log in.
 import 'dart:io';
 
-const scopes =
-    'chat:read+chat:edit+user:read:follows+user:read:blocked_users+'
-    'user:manage:blocked_users+user:manage:chat_color';
+import 'package:frosty/utils/twitch_oauth_scopes.dart';
+
 const redirectUri = 'https://twitch.tv/login';
 
 void main() async {
@@ -24,11 +23,19 @@ void main() async {
     exit(1);
   }
 
-  final authorizeUrl = 'https://id.twitch.tv/oauth2/authorize'
-      '?client_id=$clientId'
-      '&redirect_uri=$redirectUri'
-      '&response_type=token'
-      '&scope=$scopes';
+  final authorizeUrl = Uri(
+    scheme: 'https',
+    host: 'id.twitch.tv',
+    path: '/oauth2/authorize',
+    queryParameters: {
+      'client_id': clientId,
+      'redirect_uri': redirectUri,
+      'response_type': 'token',
+      // Core scopes only — matches normal app login. Use the in-app
+      // "Enable moderator tools" flow when moderator scopes are needed.
+      'scope': twitchUserScopeQuery,
+    },
+  ).toString();
 
   stdout.writeln('Opening Twitch authorization in your browser...');
   await _openUrl(authorizeUrl);

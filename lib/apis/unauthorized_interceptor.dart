@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frosty/main.dart';
 import 'package:frosty/screens/onboarding/login_webview.dart';
 import 'package:frosty/screens/settings/stores/auth_store.dart';
+import 'package:frosty/utils/twitch_oauth_scopes.dart';
 import 'package:frosty/widgets/frosty_dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -23,8 +24,57 @@ class UnauthorizedInterceptor extends Interceptor {
         return;
       }
 
-      // For other requests, show login dialog and reject so the Future completes
-      _showLoginDialog();
+      final path = err.requestOptions.uri.path;
+
+      // Background moderated-channels fetches must never nag — especially for
+      // core-only tokens after an app upgrade.
+      if (isTwitchModeratedChannelsPath(path)) {
+        handler.reject(err);
+        return;
+      }
+
+      // Moderator actions without scopes → opt-in Enable flow, not a generic
+      // "missing permissions" re-login for core scopes.
+      if (isTwitchModeratorActionPath(path) &&
+          !_authStore.hasModeratorScopes) {
+        _showAuthDialog(
+          title: 'Enable moderator tools',
+          message: enableModeratorToolsDialogMessage(),
+          primaryLabel: 'Enable',
+          onPrimary: () => openEnableModeratorTools(_authStore),
+        );
+        handler.reject(err);
+        return;
+      }
+
+      // Core-only messaging: if core scopes are present, prefer "Session expired"
+      // over "Missing permissions" (401 ≠ always missing scope).
+      final isLoggedIn = _authStore.isLoggedIn;
+      final missingCore = missingTwitchScopes(
+        granted: _authStore.grantedScopes,
+      );
+      _showAuthDialog(
+        title: isLoggedIn && missingCore.isNotEmpty
+            ? 'Missing permissions'
+            : 'Session expired',
+        message: unauthorizedDialogMessage(
+          isLoggedIn: isLoggedIn,
+          grantedScopes: _authStore.grantedScopes,
+        ),
+        primaryLabel: 'Log in',
+        onPrimary: () {
+          final context = navigatorKey.currentContext;
+          if (context == null) return;
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => Provider<AuthStore>.value(
+                value: _authStore,
+                child: const LoginWebView(),
+              ),
+            ),
+          );
+        },
+      );
       handler.reject(err);
       return;
     }
@@ -33,25 +83,20 @@ class UnauthorizedInterceptor extends Interceptor {
     handler.next(err);
   }
 
-  void _showLoginDialog() {
-    // Use the global navigator key to show dialog without needing BuildContext
+  void _showAuthDialog({
+    required String title,
+    required String message,
+    required String primaryLabel,
+    required VoidCallback onPrimary,
+  }) {
     final context = navigatorKey.currentContext;
     if (context == null) return;
-
-    // Use a flag to prevent multiple dialogs
     if (_isDialogShowing) return;
     _isDialogShowing = true;
 
-    // Determine if user is logged in but missing scopes vs completely logged out
-    final isLoggedIn = _authStore.isLoggedIn;
-    final title = isLoggedIn ? 'Missing permissions' : 'Session expired';
-    final message = isLoggedIn
-        ? 'Your session is missing permissions. Please log in again to continue.'
-        : 'Your session has expired. Please log in again to continue.';
-
     showDialog(
       context: context,
-      barrierDismissible: false, // User must choose an action
+      barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return FrostyDialog(
           title: title,
@@ -60,31 +105,22 @@ class UnauthorizedInterceptor extends Interceptor {
             TextButton(
               onPressed: () {
                 _isDialogShowing = false;
-                Navigator.of(dialogContext).pop(); // Close dialog
+                Navigator.of(dialogContext).pop();
               },
               child: const Text('Cancel'),
             ),
             FilledButton(
               onPressed: () {
                 _isDialogShowing = false;
-                Navigator.of(dialogContext).pop(); // Close dialog
-                // Navigate to login WebView
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Provider<AuthStore>.value(
-                      value: _authStore,
-                      child: const LoginWebView(),
-                    ),
-                  ),
-                );
+                Navigator.of(dialogContext).pop();
+                onPrimary();
               },
-              child: Text('Log in'),
+              child: Text(primaryLabel),
             ),
           ],
         );
       },
     ).then((_) {
-      // Reset flag when dialog is dismissed
       _isDialogShowing = false;
     });
   }
@@ -97,3 +133,11 @@ class UnauthorizedInterceptor extends Interceptor {
         url.startsWith('https://id.twitch.tv/oauth2');
   }
 }
+
+/// Helix path for listing channels the user moderates.
+bool isTwitchModeratedChannelsPath(String path) =>
+    path.contains('/moderation/channels');
+
+/// Helix paths for delete / ban / timeout / unban.
+bool isTwitchModeratorActionPath(String path) =>
+    path.contains('/moderation/chat') || path.contains('/moderation/bans');

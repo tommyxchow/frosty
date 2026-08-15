@@ -9,6 +9,14 @@ part of 'auth_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$AuthStore on AuthBase, Store {
+  Computed<bool>? _$hasModeratorScopesComputed;
+
+  @override
+  bool get hasModeratorScopes =>
+      (_$hasModeratorScopesComputed ??= Computed<bool>(
+        () => super.hasModeratorScopes,
+        name: 'AuthBase.hasModeratorScopes',
+      )).value;
   Computed<Map<String, String>>? _$headersTwitchComputed;
 
   @override
@@ -75,6 +83,26 @@ mixin _$AuthStore on AuthBase, Store {
     });
   }
 
+  late final _$_grantedScopesAtom = Atom(
+    name: 'AuthBase._grantedScopes',
+    context: context,
+  );
+
+  ObservableList<String> get grantedScopes {
+    _$_grantedScopesAtom.reportRead();
+    return super._grantedScopes;
+  }
+
+  @override
+  ObservableList<String> get _grantedScopes => grantedScopes;
+
+  @override
+  set _grantedScopes(ObservableList<String> value) {
+    _$_grantedScopesAtom.reportWrite(value, super._grantedScopes, () {
+      super._grantedScopes = value;
+    });
+  }
+
   late final _$_errorAtom = Atom(name: 'AuthBase._error', context: context);
 
   String? get error {
@@ -121,6 +149,18 @@ mixin _$AuthStore on AuthBase, Store {
     return _$loginAsyncAction.run(() => super.login(token: token));
   }
 
+  late final _$completeModeratorUpgradeAsyncAction = AsyncAction(
+    'AuthBase.completeModeratorUpgrade',
+    context: context,
+  );
+
+  @override
+  Future<bool> completeModeratorUpgrade({required String token}) {
+    return _$completeModeratorUpgradeAsyncAction.run(
+      () => super.completeModeratorUpgrade(token: token),
+    );
+  }
+
   late final _$logoutAsyncAction = AsyncAction(
     'AuthBase.logout',
     context: context,
@@ -134,6 +174,7 @@ mixin _$AuthStore on AuthBase, Store {
   @override
   String toString() {
     return '''
+hasModeratorScopes: ${hasModeratorScopes},
 headersTwitch: ${headersTwitch}
     ''';
   }

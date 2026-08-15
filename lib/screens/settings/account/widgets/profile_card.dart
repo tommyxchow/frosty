@@ -46,62 +46,71 @@ class ProfileCard extends StatelessWidget {
               userLogin: authStore.user.details!.login,
               radius: 12,
             ),
-            title: GestureDetector(
-              onTap: () {
-                final navigator = Navigator.of(context);
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) => FrostyDialog(
-                    title: 'Web session',
-                    message: hasToken
-                        ? 'Your Twitch web session is linked. When using the native player, ads will be avoided on channels where you have a subscription or Twitch Turbo.'
-                        : 'Your Twitch web session is not linked. Log in again to avoid ads when using the native player on channels where you have a subscription or Twitch Turbo.',
-                    actions: hasToken
-                        ? [
-                            TextButton(
-                              onPressed: Navigator.of(dialogContext).pop,
-                              child: const Text('OK'),
-                            ),
-                          ]
-                        : [
-                            TextButton(
-                              onPressed: Navigator.of(dialogContext).pop,
-                              child: const Text('Cancel'),
-                            ),
-                            FilledButton(
-                              onPressed: () {
-                                Navigator.of(dialogContext).pop();
-                                navigator.push(
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginWebView(),
-                                  ),
-                                );
-                              },
-                              child: const Text('Log in'),
-                            ),
-                          ],
-                  ),
-                );
-              },
-              child: Text.rich(
-                TextSpan(
-                  text: authStore.user.details!.displayName,
-                  children: [
-                    const WidgetSpan(child: SizedBox(width: 6)),
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Icon(
-                        hasToken
-                            ? Icons.check_circle_outline_rounded
-                            : Icons.info_outline_rounded,
-                        size: 16,
-                        color: hasToken ? Colors.green : Colors.amber,
+            title: Text.rich(
+              TextSpan(
+                text: authStore.user.details!.displayName,
+                children: [
+                  const WidgetSpan(child: SizedBox(width: 6)),
+                  WidgetSpan(
+                    alignment: PlaceholderAlignment.middle,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        final navigator = Navigator.of(context);
+                        showDialog(
+                          context: context,
+                          builder: (dialogContext) => FrostyDialog(
+                            title: 'Web session',
+                            message: hasToken
+                                ? 'Your Twitch web session is linked. When using the native player, ads will be avoided on channels where you have a subscription or Twitch Turbo.'
+                                : 'Your Twitch web session is not linked. Log in again to avoid ads when using the native player on channels where you have a subscription or Twitch Turbo.',
+                            actions: hasToken
+                                ? [
+                                    TextButton(
+                                      onPressed:
+                                          Navigator.of(dialogContext).pop,
+                                      child: const Text('OK'),
+                                    ),
+                                  ]
+                                : [
+                                    TextButton(
+                                      onPressed:
+                                          Navigator.of(dialogContext).pop,
+                                      child: const Text('Cancel'),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () {
+                                        Navigator.of(dialogContext).pop();
+                                        navigator.push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                LoginWebView(),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('Log in'),
+                                    ),
+                                  ],
+                          ),
+                        );
+                      },
+                      // Padding enlarges the hit target without stealing taps
+                      // on the display name / surrounding ListTile.
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: Icon(
+                          hasToken
+                              ? Icons.check_circle_outline_rounded
+                              : Icons.info_outline_rounded,
+                          size: 16,
+                          color: hasToken ? Colors.green : Colors.amber,
+                        ),
                       ),
                     ),
-                  ],
-                ),
-                overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
+              overflow: TextOverflow.ellipsis,
             ),
             trailing: const Icon(Icons.chevron_right_rounded),
             onTap: () => _showAccountOptionsModalBottomSheet(context),

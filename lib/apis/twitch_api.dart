@@ -145,17 +145,29 @@ class TwitchApi extends BaseApiClient {
     return data['access_token'] as String;
   }
 
-  /// Returns a bool indicating the validity of the given token.
-  Future<bool> validateToken({required String token}) async {
+  /// Validates [token] with Twitch.
+  ///
+  /// Returns token info (scopes + optional `user_id`) when valid, or `null`
+  /// when invalid/expired. App-access tokens may omit `user_id` and return an
+  /// empty scope list.
+  Future<TwitchTokenInfo?> validateToken({required String token}) async {
     try {
-      await get<JsonMap>(
+      final data = await get<JsonMap>(
         '$_oauthBaseUrl/validate',
         headers: {'Authorization': 'Bearer $token'},
       );
-      return true;
+      final scopes = data['scopes'];
+      final scopeList = scopes is List
+          ? scopes.map((scope) => scope.toString()).toList()
+          : const <String>[];
+      final userId = data['user_id']?.toString();
+      return TwitchTokenInfo(
+        scopes: scopeList,
+        userId: userId == null || userId.isEmpty ? null : userId,
+      );
     } on UnauthorizedException {
       // 401 -> token is invalid/expired (propagated from interceptor for validate requests)
-      return false;
+      return null;
     } on ApiException catch (e) {
       // Network/timeout/server errors -> treat as indeterminate, not invalid
       debugPrint('Token validation indeterminate: $e');
@@ -501,8 +513,8 @@ class TwitchApi extends BaseApiClient {
 
       return result;
     } on ApiException catch (e) {
-      // Existing users may not have re-authenticated with the new scope yet.
-      // Treat this as non-fatal and hide moderation actions.
+      // Backstop: callers should skip this without moderator scopes, but a
+      // stale/partial token must not take down chat.
       debugPrint('Failed to get moderated channels: $e');
       return [];
     }
@@ -582,4 +594,14 @@ class TwitchApi extends BaseApiClient {
     );
     return true;
   }
+}
+
+/// Result of a successful Twitch `/oauth2/validate` call.
+class TwitchTokenInfo {
+  final List<String> scopes;
+
+  /// Present for user access tokens; omitted for app access tokens.
+  final String? userId;
+
+  const TwitchTokenInfo({required this.scopes, this.userId});
 }
