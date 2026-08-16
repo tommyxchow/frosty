@@ -14,6 +14,7 @@ void main() {
       expect(store.showVideo, isTrue);
       expect(store.defaultToHighestQuality, isFalse);
       expect(store.useTextureRendering, isTrue);
+      expect(store.useNativePlayer, isTrue);
       expect(store.showOverlay, isTrue);
       expect(store.toggleableOverlay, isFalse);
       expect(store.showLatency, isFalse);
@@ -102,6 +103,34 @@ void main() {
     });
   });
 
+  group('native player default migration', () {
+    test('5.1.0 WebView default is flipped on once', () {
+      final store = SettingsStore.fromJson({'useNativePlayer': false});
+
+      expect(store.useNativePlayer, isTrue);
+      expect(store.nativePlayerV52Migrated, isTrue);
+    });
+
+    test('opt-out is kept after the one-shot migration', () {
+      final store = SettingsStore.fromJson({
+        'useNativePlayer': false,
+        'nativePlayerV52Migrated': true,
+      });
+
+      expect(store.useNativePlayer, isFalse);
+    });
+
+    test('roundtrip after opt-out stays on WebView', () {
+      final store = SettingsStore.fromJson({});
+      store.useNativePlayer = false;
+
+      final restored = SettingsStore.fromJson(store.toJson());
+
+      expect(restored.useNativePlayer, isFalse);
+      expect(restored.nativePlayerV52Migrated, isTrue);
+    });
+  });
+
   group('SettingsStore reset actions', () {
     test('resetGeneralSettings restores general defaults', () {
       final store = SettingsStore.fromJson({});
@@ -127,6 +156,7 @@ void main() {
       store.showVideo = false;
       store.defaultToHighestQuality = true;
       store.useTextureRendering = false;
+      store.useNativePlayer = false;
       store.showOverlay = false;
       store.toggleableOverlay = true;
       store.showLatency = true;
@@ -136,6 +166,7 @@ void main() {
       expect(store.showVideo, isTrue);
       expect(store.defaultToHighestQuality, isFalse);
       expect(store.useTextureRendering, isTrue);
+      expect(store.useNativePlayer, isTrue);
       expect(store.showOverlay, isTrue);
       expect(store.toggleableOverlay, isFalse);
       expect(store.showLatency, isFalse);

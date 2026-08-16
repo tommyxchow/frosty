@@ -30,6 +30,8 @@ abstract class NativeVideoStoreBase
     with Store
     implements NativeVideoPlayerInterface {
   static int _nextId = 0;
+  static const _legacyWebViewInSettings =
+      'the legacy WebView player in Settings';
 
   @override
   final String userLogin;
@@ -465,7 +467,7 @@ abstract class NativeVideoStoreBase
       // channel is expected to fail here and the overlay handles it.
       if (_streamInfo != null) {
         _showErrorOverlay(
-          'Native player failed to load. Try the standard player in Settings.',
+          'Native player failed to load. Try $_legacyWebViewInSettings.',
         );
       }
     });
@@ -560,7 +562,7 @@ abstract class NativeVideoStoreBase
     _stallRecoveryTimer?.cancel();
     final errorMessage =
         eventData?['message'] as String? ??
-        'Playback error. Try refreshing or switch to the standard player in Settings.';
+        'Playback error. Try refreshing or switch to $_legacyWebViewInSettings.';
     final errorCode = eventData?['code'] as String?;
     final statusCode = eventData?['statusCode'] as int?;
 
@@ -751,8 +753,8 @@ abstract class NativeVideoStoreBase
       _loading = false;
       _showErrorOverlay(
         bouncing
-            ? 'Twitch is having trouble with this channel right now. Try again in a moment, or switch to the standard player in Settings.'
-            : 'Stream stalled. Try refreshing or switch to the standard player in Settings.',
+            ? 'Twitch is having trouble with this channel right now. Try again in a moment, or switch to $_legacyWebViewInSettings.'
+            : 'Stream stalled. Try refreshing or switch to $_legacyWebViewInSettings.',
       );
     });
   }

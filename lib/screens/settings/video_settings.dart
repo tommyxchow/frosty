@@ -26,9 +26,9 @@ class VideoSettings extends StatelessWidget {
           ),
           if (settingsStore.showVideo)
             SettingsListSwitch(
-              title: 'Native player (experimental)',
+              title: 'Native player',
               subtitle: const Text(
-                'More performant video player with auto picture-in-picture and quality selection.',
+                'Picture-in-Picture, quality selection, and lower latency. Turn off to use the legacy WebView player.',
               ),
               value: settingsStore.useNativePlayer,
               onChanged: (newValue) =>

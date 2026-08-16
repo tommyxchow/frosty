@@ -23,7 +23,8 @@ SettingsStore _$SettingsStoreFromJson(
   ..showVideo = json['showVideo'] as bool? ?? true
   ..defaultToHighestQuality = json['defaultToHighestQuality'] as bool? ?? false
   ..useTextureRendering = json['useTextureRendering'] as bool? ?? true
-  ..useNativePlayer = json['useNativePlayer'] as bool? ?? false
+  ..useNativePlayer = json['useNativePlayer'] as bool? ?? true
+  ..nativePlayerV52Migrated = json['nativePlayerV52Migrated'] as bool? ?? false
   ..showOverlay = json['showOverlay'] as bool? ?? true
   ..toggleableOverlay = json['toggleableOverlay'] as bool? ?? false
   ..showLatency = json['showLatency'] as bool? ?? false
@@ -106,6 +107,7 @@ Map<String, dynamic> _$SettingsStoreToJson(
   'defaultToHighestQuality': instance.defaultToHighestQuality,
   'useTextureRendering': instance.useTextureRendering,
   'useNativePlayer': instance.useNativePlayer,
+  'nativePlayerV52Migrated': instance.nativePlayerV52Migrated,
   'showOverlay': instance.showOverlay,
   'toggleableOverlay': instance.toggleableOverlay,
   'showLatency': instance.showLatency,
@@ -1154,6 +1156,18 @@ mixin _$SettingsStore on _SettingsStoreBase, Store {
     );
     try {
       return super.resetGeneralSettings();
+    } finally {
+      _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _migrateNativePlayerDefault() {
+    final _$actionInfo = _$_SettingsStoreBaseActionController.startAction(
+      name: '_SettingsStoreBase._migrateNativePlayerDefault',
+    );
+    try {
+      return super._migrateNativePlayerDefault();
     } finally {
       _$_SettingsStoreBaseActionController.endAction(_$actionInfo);
     }

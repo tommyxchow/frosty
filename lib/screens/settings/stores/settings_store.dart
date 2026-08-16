@@ -8,8 +8,11 @@ part 'settings_store.g.dart';
 class SettingsStore extends _SettingsStoreBase with _$SettingsStore {
   SettingsStore();
 
-  factory SettingsStore.fromJson(Map<String, dynamic> json) =>
-      _$SettingsStoreFromJson(json);
+  factory SettingsStore.fromJson(Map<String, dynamic> json) {
+    final store = _$SettingsStoreFromJson(json);
+    store._migrateNativePlayerDefault();
+    return store;
+  }
   Map<String, dynamic> toJson() => _$SettingsStoreToJson(this);
 }
 
@@ -65,7 +68,7 @@ abstract class _SettingsStoreBase with Store {
   static const defaultShowVideo = true;
   static const defaultDefaultToHighestQuality = false;
   static const defaultUseTextureRendering = true;
-  static const defaultUseNativePlayer = false;
+  static const defaultUseNativePlayer = true;
 
   static const defaultShowOverlay = true;
   static const defaultToggleableOverlay = false;
@@ -87,6 +90,19 @@ abstract class _SettingsStoreBase with Store {
   @JsonKey(defaultValue: defaultUseNativePlayer)
   @observable
   var useNativePlayer = defaultUseNativePlayer;
+
+  /// 5.2.0 made native the default. 5.1.0 already wrote
+  /// `useNativePlayer: false` into saved settings, so a Dart default
+  /// change alone would leave existing installs on WebView.
+  @JsonKey(defaultValue: false)
+  var nativePlayerV52Migrated = false;
+
+  @action
+  void _migrateNativePlayerDefault() {
+    if (nativePlayerV52Migrated) return;
+    useNativePlayer = true;
+    nativePlayerV52Migrated = true;
+  }
 
   // Overlay options
   @JsonKey(defaultValue: defaultShowOverlay)
