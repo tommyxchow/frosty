@@ -26,6 +26,8 @@ Do not put `AGENTS.md` or other docs in that commit.
 
 Write for someone opening the app, not the commit log. Match the latest shipped version's voice (`Added` / `Improved` / `Fixed`). Skip CI, Flutter upgrades, codegen, and anything a user wouldn't notice; the GitHub compare link is the rest.
 
+Keep about three most recent versions, consecutive. Drop from the oldest end. Never skip a version in the middle. GitHub releases keep the full history.
+
 - Features that didn't exist last release. Improvements only for behavior that already shipped — gating a new feature (opt-in permissions, an Enable flow) is not an improvement.
 - If you can't remember the user-facing symptom, it doesn't belong.
 - `[Android]` / `[iOS]` on platform-only lines. Cluster them: one tagged line at the end of its section, two or more adjacent.

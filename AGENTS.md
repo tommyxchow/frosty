@@ -43,4 +43,4 @@ New or changed logic (stores, API clients, parsing, utils) ships with tests; ext
 
 ## Releases
 
-When cutting a store or GitHub release, read `docs/release.md` and follow it. That playbook is repo-local, not a global skill.
+When cutting a store or GitHub release, read `docs/release.md` and follow it. That playbook is repo-local, not a global skill. `assets/release-notes.md` keeps about three consecutive versions; drop from the oldest end, never skip.
