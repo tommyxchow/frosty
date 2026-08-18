@@ -617,7 +617,8 @@ class IRCMessage {
                 ),
               ],
             ),
-            url: emoteStack.last.url,
+            imageUrl: emoteStack.last.url,
+            browserUrl: _getEmoteBrowserUrl(emoteStack.last), // split url source to image and browser urls
             title: nextWordIsEmoji
                 ? emoji
                 : '${emoteStack.last.name} (${emoteStack.last.type})',
@@ -790,7 +791,8 @@ class IRCMessage {
             isSvg: isSvg,
             size: 56,
           ),
-          url: badge.url,
+          imageUrl: badge.url,
+          browserUrl: badge.url,
           title: badge.name,
           subtitle: Text(badge.type.toString()),
           launchExternal: launchExternal,
@@ -879,7 +881,8 @@ class IRCMessage {
     _showAssetDetailsBottomSheet(
       context,
       leading: FrostyCachedNetworkImage(imageUrl: emote.url, width: 56),
-      url: emote.url,
+      imageUrl: emote.url,
+      browserUrl: _getEmoteBrowserUrl(emote),
       title: emote.realName != null
           ? '${emote.name} (${emote.realName})'
           : emote.name,
@@ -900,7 +903,8 @@ class IRCMessage {
   static void _showAssetDetailsBottomSheet(
     BuildContext context, {
     required Widget leading,
-    required String url,
+    required String imageUrl,
+    required String browserUrl,
     required String title,
     required Widget subtitle,
     required bool launchExternal,
@@ -916,7 +920,7 @@ class IRCMessage {
             leading: InkWell(
               onTap: () => showDialog(
                 context: context,
-                builder: (context) => FrostyPhotoViewDialog(imageUrl: url),
+                builder: (context) => FrostyPhotoViewDialog(imageUrl: imageUrl),
               ),
               child: leading,
             ),
@@ -933,7 +937,6 @@ class IRCMessage {
               title: const Text('Copy name'),
               onTap: () {
                 Clipboard.setData(ClipboardData(text: title.split(' (')[0]));
-
                 Navigator.pop(context);
               },
             ),
@@ -941,8 +944,7 @@ class IRCMessage {
             leading: const Icon(Icons.copy_rounded),
             title: const Text('Copy image URL'),
             onTap: () {
-              Clipboard.setData(ClipboardData(text: url));
-
+              Clipboard.setData(ClipboardData(text: imageUrl));
               Navigator.pop(context);
             },
           ),
@@ -951,7 +953,7 @@ class IRCMessage {
             title: const Text('Open in browser'),
             onTap: () {
               launchUrl(
-                Uri.parse(url),
+                Uri.parse(browserUrl),
                 mode: launchExternal
                     ? LaunchMode.externalApplication
                     : LaunchMode.inAppBrowserView,
@@ -964,6 +966,46 @@ class IRCMessage {
       ),
     );
   }
+
+  // a helper function for extracting the emote id and return the emote url from the third party
+  static String _getEmoteBrowserUrl(Emote emote) {
+  final uri = Uri.tryParse(emote.url);
+  final segments = uri?.pathSegments ?? [];
+
+  switch (emote.type) {
+    case EmoteType.sevenTVGlobal:
+    case EmoteType.sevenTVChannel:
+      if (segments.length >= 2 && segments[0] == 'emote') {
+        return 'https://7tv.app/emotes/${segments[1]}';
+      }
+      return emote.url;
+
+    case EmoteType.bttvGlobal:
+    case EmoteType.bttvChannel:
+    case EmoteType.bttvShared:
+      if (segments.length >= 2 && segments[0] == 'emote') {
+        return 'https://betterttv.com/emotes/${segments[1]}';
+      }
+      return emote.url;
+
+    case EmoteType.ffzGlobal:
+    case EmoteType.ffzChannel:
+      final emoticonIndex = segments.indexOf('emoticon');
+      if (emoticonIndex != -1 && segments.length > emoticonIndex + 1) {
+        return 'https://www.frankerfacez.com/emoticon/${segments[emoticonIndex + 1]}';
+      }
+
+      final emoteIndex = segments.indexOf('emote');
+      if (emoteIndex != -1 && segments.length > emoteIndex + 1) {
+        return 'https://www.frankerfacez.com/emoticon/${segments[emoteIndex + 1]}';
+      }
+
+      return emote.url;
+
+    default:
+      return emote.url;
+  }
+}
 
   /// Parses an IRC string and returns its corresponding [IRCMessage] object.
   factory IRCMessage.fromString(String whole, {String? userLogin}) {
