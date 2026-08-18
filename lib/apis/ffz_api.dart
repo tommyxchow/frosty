@@ -42,7 +42,7 @@ class FFZApi extends BaseApiClient {
     );
   }
 
-  /// Returns a map of badges user IDs to a list of their FFZ badges.
+  /// Returns a map of user IDs to a list of their FFZ badges.
   Future<Map<String, List<ChatBadge>>> getBadges() async {
     final data = await get<JsonMap>('/badges/ids');
 

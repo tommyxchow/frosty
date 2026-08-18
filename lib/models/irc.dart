@@ -1025,7 +1025,7 @@ class IRCMessage {
     }
 
     // If the username exists, set it.
-    // tmi.twitch.tv means the message was sent by Twitch rather than a user, so will be irrelevant.
+    // tmi.twitch.tv means the message was sent by Twitch rather than a user, so it is irrelevant.
     final prefix = splitMessage[0];
     final String? user;
     if (prefix == _twitchIrcServer) {
@@ -1069,9 +1069,9 @@ class IRCMessage {
           indexBetweenIdAndPositions,
         );
 
-        // Parse the range in order to extract the associated word.
-        // If there are more than one indices, use the first one.
-        // Else, use the one provided indices.
+        // Parse the range to extract the associated word.
+        // If there is more than one index, use the first.
+        // Otherwise, use the provided index.
         final String range;
         if (emoteIdAndPosition.contains(',')) {
           range = emoteIdAndPosition.substring(

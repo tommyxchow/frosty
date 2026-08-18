@@ -46,7 +46,7 @@ abstract class SearchStoreBase with Store {
 
   @action
   Future<void> init() async {
-    // Retrieve the instance that will allow us to retrieve local search history.
+    // Load SharedPreferences for local search history.
     final prefs = await SharedPreferences.getInstance();
 
     // Retrieve the search history from local storage. If it doesn't exist, use an empty list.

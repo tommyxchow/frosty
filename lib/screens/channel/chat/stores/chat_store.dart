@@ -30,7 +30,7 @@ abstract class ChatStoreBase with Store {
   /// The total maximum amount of messages in chat.
   static const _messageLimit = 5000;
 
-  /// The maximum ammount of messages to render when autoscroll is enabled.
+  /// The maximum amount of messages to render when autoscroll is enabled.
   static const _renderMessageLimit = 100;
 
   /// IRC commands that should bypass chat delay.
@@ -271,7 +271,7 @@ abstract class ChatStoreBase with Store {
   @computed
   List<IRCMessage> get renderMessages {
     // If autoscroll is disabled, render ALL messages in chat.
-    // The second condition is to prevent an out of index error with sublist.
+    // The second condition is to prevent an out-of-range index error with sublist.
     final base = (!_autoScroll || _messages.length < _renderMessageLimit)
         ? _messages
         : _messages.sublist(_messages.length - _renderMessageLimit);

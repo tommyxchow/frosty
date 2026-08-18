@@ -13,7 +13,7 @@ import 'package:frosty/widgets/frosty_scrollbar.dart';
 import 'package:frosty/widgets/section_header.dart';
 import 'package:provider/provider.dart';
 
-/// The search section that contians search history and search results for channels and categories.
+/// The search section that contains search history and search results for channels and categories.
 class Search extends StatefulWidget {
   // The scroll controller for handling scroll to top functionality.
   final ScrollController scrollController;

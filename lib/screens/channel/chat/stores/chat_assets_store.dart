@@ -130,7 +130,7 @@ abstract class ChatAssetsStoreBase with Store {
 
   @action
   Future<void> init() async {
-    // Retrieve the instance that will allow us to retrieve local search history.
+    // Load SharedPreferences for recent emotes.
     final prefs = await SharedPreferences.getInstance();
 
     _recentEmotes =

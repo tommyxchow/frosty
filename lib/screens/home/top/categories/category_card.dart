@@ -18,7 +18,7 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate the dimmensions of the box art based on the current dimmensions of the screen.
+    // Calculate the dimensions of the box art based on the current dimensions of the screen.
     final size = MediaQuery.of(context).size;
     final pixelRatio = MediaQuery.of(context).devicePixelRatio;
     final artWidth = (size.width * pixelRatio) ~/ 5;

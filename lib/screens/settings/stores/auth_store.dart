@@ -112,7 +112,7 @@ abstract class AuthBase with Store {
       }
     }
 
-    // Check if the the URL has been redirected to "https://www.twitch.tv/?no-reload=true".
+    // Check if the URL has been redirected to "https://www.twitch.tv/?no-reload=true".
     // When redirected to the redirect_uri, there will be another redirect to "https://www.twitch.tv/?no-reload=true".
     // Checking for this will ensure that the user has automatically logged in to Twitch on the WebView itself.
     if (request.url == 'https://www.twitch.tv/?no-reload=true') {

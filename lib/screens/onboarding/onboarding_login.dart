@@ -12,7 +12,7 @@ class OnboardingLogin extends StatelessWidget {
     return OnboardingScaffold(
       header: 'Log in',
       subtitle:
-          'Frosty needs your permission in order to enable the ability to chat, view followed streams, and more.',
+          'Frosty needs permission to chat, view followed streams, and more.',
       disclaimer:
           'Frosty only asks for the necessary permissions through the official Twitch API. You\'ll be able to review them before authorizing.',
       buttonText: 'Connect with Twitch',
