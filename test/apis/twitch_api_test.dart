@@ -54,7 +54,6 @@ void main() {
         queryParameters: {
           'user_id': '12345',
           'broadcaster_id': '67890',
-          'first': 100,
         },
       );
       dioAdapter.onGet(
@@ -74,7 +73,6 @@ void main() {
         queryParameters: {
           'user_id': '12345',
           'broadcaster_id': '67890',
-          'first': 100,
           'after': 'next-page',
         },
       );
