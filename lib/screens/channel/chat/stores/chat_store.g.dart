@@ -59,6 +59,24 @@ mixin _$ChatStore on ChatStoreBase, Store {
     });
   }
 
+  late final _$isFollowingAtom = Atom(
+    name: 'ChatStoreBase.isFollowing',
+    context: context,
+  );
+
+  @override
+  bool get isFollowing {
+    _$isFollowingAtom.reportRead();
+    return super.isFollowing;
+  }
+
+  @override
+  set isFollowing(bool value) {
+    _$isFollowingAtom.reportWrite(value, super.isFollowing, () {
+      super.isFollowing = value;
+    });
+  }
+
   late final _$_notificationAtom = Atom(
     name: 'ChatStoreBase._notification',
     context: context,
@@ -375,6 +393,16 @@ mixin _$ChatStore on ChatStoreBase, Store {
     return _$getRecentMessageAsyncAction.run(() => super.getRecentMessage());
   }
 
+  late final _$checkFollowStatusAsyncAction = AsyncAction(
+    'ChatStoreBase.checkFollowStatus',
+    context: context,
+  );
+
+  @override
+  Future<void> checkFollowStatus() {
+    return _$checkFollowStatusAsyncAction.run(() => super.checkFollowStatus());
+  }
+
   late final _$ChatStoreBaseActionController = ActionController(
     name: 'ChatStoreBase',
     context: context,
@@ -570,6 +598,7 @@ mixin _$ChatStore on ChatStoreBase, Store {
   String toString() {
     return '''
 timeRemaining: ${timeRemaining},
+isFollowing: ${isFollowing},
 expandChat: ${expandChat},
 replyingToMessage: ${replyingToMessage},
 renderMessages: ${renderMessages},

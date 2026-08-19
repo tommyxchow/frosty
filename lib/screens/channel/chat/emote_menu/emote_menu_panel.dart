@@ -59,11 +59,38 @@ class EmoteMenuPanel extends StatelessWidget {
             .toList(),
         children: twitchEmotes!.entries
             .map(
-              (e) => EmoteMenuSection(
-                chatStore: chatStore,
-                emotes: e.value,
-                disabled: e.key.contains('Channel') && !isSubbed,
-              ),
+              (e) {
+                final isChannelSection = e.key.contains('Channel');
+                bool sectionDisabled = false;
+                
+                if (isChannelSection && !isSubbed) {
+                  final hasAccessibleEmotes = e.value.any((emote) => 
+                      emote.type == EmoteType.twitchFollower || 
+                      emote.type == EmoteType.twitchBits || 
+                      emote.type == EmoteType.twitchUnlocked);
+                      
+                  sectionDisabled = !hasAccessibleEmotes;
+                }
+
+                // We sort the emotes: first the follower, then subscriber emotes
+                final sortedEmotes = List<Emote>.from(e.value);
+                sortedEmotes.sort((a, b) {
+                  int getWeight(EmoteType type) {
+                    if (type == EmoteType.twitchFollower) return 0;
+                    if (type == EmoteType.twitchUnlocked) return 1;
+                    if (type == EmoteType.twitchBits) return 2;
+                    if (type == EmoteType.twitchSub) return 3;
+                    return 4; // fallback
+                  }
+                  return getWeight(a.type).compareTo(getWeight(b.type));
+                });
+
+                return EmoteMenuSection(
+                  chatStore: chatStore,
+                  emotes: sortedEmotes,
+                  disabled: sectionDisabled,
+                );
+              },
             )
             .toList(),
       );
