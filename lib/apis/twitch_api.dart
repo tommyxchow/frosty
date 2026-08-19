@@ -56,27 +56,44 @@ class TwitchApi extends BaseApiClient {
     }).toList();
   }
 
-  /// Returns a list of Twitch emotes under the provided [setId].
-  Future<List<Emote>> getEmotesSets({required String setId}) async {
-    final data = await get<JsonMap>(
-      '/chat/emotes/set',
-      queryParameters: {'emote_set_id': setId},
-    );
+  /// Returns every Twitch emote the user may use in the broadcaster's chat.
+  Future<List<Emote>> getUserEmotes({
+    required String userId,
+    required String broadcasterId,
+  }) async {
+    final result = <Emote>[];
+    String? cursor;
 
-    final decoded = data['data'] as JsonList;
-    final emotes = decoded.map((emote) => EmoteTwitch.fromJson(emote)).toList();
+    do {
+      final data = await get<JsonMap>(
+        '/chat/emotes/user',
+        queryParameters: {
+          'user_id': userId,
+          'broadcaster_id': broadcasterId,
+          'after': ?cursor,
+        },
+      );
 
-    return emotes.map((emote) {
-      switch (emote.emoteType) {
-        case 'globals':
-        case 'smilies':
-          return Emote.fromTwitch(emote, EmoteType.twitchGlobal);
-        case 'subscriptions':
-          return Emote.fromTwitch(emote, EmoteType.twitchSub);
-        default:
-          return Emote.fromTwitch(emote, EmoteType.twitchUnlocked);
-      }
-    }).toList();
+      final decoded = data['data'] as JsonList;
+      result.addAll(
+        decoded.map((json) {
+          final emote = EmoteTwitch.fromJson(json);
+          switch (emote.emoteType) {
+            case 'globals':
+            case 'smilies':
+              return Emote.fromTwitch(emote, EmoteType.twitchGlobal);
+            case 'subscriptions':
+              return Emote.fromTwitch(emote, EmoteType.twitchSub);
+            default:
+              return Emote.fromTwitch(emote, EmoteType.twitchUnlocked);
+          }
+        }),
+      );
+
+      cursor = (data['pagination'] as JsonMap?)?['cursor'] as String?;
+    } while (cursor != null && cursor.isNotEmpty);
+
+    return result;
   }
 
   /// Returns a map of global Twitch badges to their [Emote] object.
