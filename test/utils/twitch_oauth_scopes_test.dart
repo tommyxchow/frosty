@@ -9,6 +9,7 @@ void main() {
       }
       expect(twitchAllUserScopes, containsAll(twitchUserScopes));
       expect(twitchAllUserScopes, containsAll(twitchModeratorScopes));
+      expect(twitchUserScopes, contains('user:read:emotes'));
     });
   });
 

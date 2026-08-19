@@ -35,6 +35,63 @@ void main() {
     });
   });
 
+  group('getUserEmotes', () {
+    test('returns every page including Hype Train emotes', () async {
+      dioAdapter.onGet(
+        'https://api.twitch.tv/helix/chat/emotes/user',
+        (server) => server.reply(200, {
+          'data': [
+            {
+              'id': '304420818',
+              'name': 'HypeLol',
+              'emote_type': 'hypetrain',
+              'emote_set_id': '',
+              'owner_id': '477339272',
+            },
+          ],
+          'pagination': {'cursor': 'next-page'},
+        }),
+        queryParameters: {
+          'user_id': '12345',
+          'broadcaster_id': '67890',
+          'first': 100,
+        },
+      );
+      dioAdapter.onGet(
+        'https://api.twitch.tv/helix/chat/emotes/user',
+        (server) => server.reply(200, {
+          'data': [
+            {
+              'id': 'subscriber-1',
+              'name': 'ChannelLove',
+              'emote_type': 'subscriptions',
+              'emote_set_id': 'set-1',
+              'owner_id': '67890',
+            },
+          ],
+          'pagination': <String, dynamic>{},
+        }),
+        queryParameters: {
+          'user_id': '12345',
+          'broadcaster_id': '67890',
+          'first': 100,
+          'after': 'next-page',
+        },
+      );
+
+      final emotes = await api.getUserEmotes(
+        userId: '12345',
+        broadcasterId: '67890',
+      );
+
+      expect(emotes, hasLength(2));
+      expect(emotes[0].name, 'HypeLol');
+      expect(emotes[0].type, EmoteType.twitchUnlocked);
+      expect(emotes[1].name, 'ChannelLove');
+      expect(emotes[1].type, EmoteType.twitchSub);
+    });
+  });
+
   group('getBadgesGlobal', () {
     test('returns map of badge set/version to ChatBadge', () async {
       dioAdapter.onGet(
