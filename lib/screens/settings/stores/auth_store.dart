@@ -154,9 +154,7 @@ abstract class AuthBase with Store {
             : 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Mobile Safari/537.36',
       );
 
-    final scopeQuery = upgradeModeratorScopes || _shouldIncludeModeratorScopes
-        ? twitch_scopes.twitchAllUserScopeQuery
-        : twitch_scopes.twitchUserScopeQuery;
+    final scopeQuery = twitch_scopes.twitchAllUserScopeQuery;
 
     return webViewController
       ..setNavigationDelegate(
