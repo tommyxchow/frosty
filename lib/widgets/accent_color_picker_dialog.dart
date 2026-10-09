@@ -22,6 +22,7 @@ class AccentColorPickerDialog extends StatefulWidget {
 
 class _AccentColorPickerDialogState extends State<AccentColorPickerDialog> {
   late Color currentColor;
+  static const Color defaultColor = Color(0xFF9246FE);
 
   @override
   void initState() {
@@ -40,6 +41,11 @@ class _AccentColorPickerDialogState extends State<AccentColorPickerDialog> {
     );
     setState(() => currentColor = newColor);
     widget.onColorChanged(newColor);
+  }
+  void _resetToDefaultColor() {
+    HapticFeedback.lightImpact();
+    setState(() => currentColor = defaultColor);
+    widget.onColorChanged(defaultColor);
   }
 
   @override
@@ -62,13 +68,24 @@ class _AccentColorPickerDialogState extends State<AccentColorPickerDialog> {
               ),
               labelTypes: const [],
             ),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton.tonalIcon(
-                icon: const Icon(Icons.casino_rounded),
-                onPressed: _generateRandomColor,
-                label: const Text('Random'),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    icon: const Icon(Icons.casino_rounded),
+                    onPressed: _generateRandomColor,
+                    label: const Text('Random'),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    icon: const Icon(Icons.refresh_rounded),
+                    onPressed: _resetToDefaultColor,
+                    label: const Text('Reset'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
