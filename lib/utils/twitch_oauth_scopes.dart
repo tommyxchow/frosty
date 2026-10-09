@@ -9,6 +9,7 @@ const twitchUserScopes = <String>[
   'user:read:blocked_users',
   'user:manage:blocked_users',
   'user:manage:chat_color',
+  'user:read:emotes',
 ];
 
 /// Moderator-only scopes requested via an explicit opt-in upgrade.
@@ -38,6 +39,7 @@ const twitchScopeLabels = <String, String>{
   'user:read:blocked_users': 'View blocked users',
   'user:manage:blocked_users': 'Block and unblock users',
   'user:manage:chat_color': 'Change chat name color',
+  'user:read:emotes': 'View emotes you can use',
   'user:read:moderated_channels': 'View channels you moderate',
   'moderator:manage:chat_messages': 'Delete chat messages as a moderator',
   'moderator:manage:banned_users': 'Timeout and ban users as a moderator',

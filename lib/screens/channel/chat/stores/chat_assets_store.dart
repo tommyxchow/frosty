@@ -404,54 +404,47 @@ abstract class ChatAssetsStoreBase with Store {
 
   @action
   Future<void> userEmotesFuture({
-    required List<String> emoteSets,
-    required Map<String, String> headers,
+    required String userId,
+    required String broadcasterId,
     required Function onError,
   }) async {
-    final userEmotes = await Future.wait(
-      emoteSets.map(
-        (setId) => twitchApi.getEmotesSets(setId: setId).catchError(onError),
-      ),
-    );
+    try {
+      final emotes = await twitchApi.getUserEmotes(
+        userId: userId,
+        broadcasterId: broadcasterId,
+      );
+      final ownerIds = emotes
+          .where((emote) => emote.type == EmoteType.twitchSub)
+          .map((emote) => emote.ownerId)
+          .whereType<String>()
+          .where((ownerId) => ownerId != 'twitch')
+          .toSet();
+      final owners = await Future.wait(
+        ownerIds.map((ownerId) => twitchApi.getUser(id: ownerId)),
+      );
+      final ownerNames = {
+        for (final owner in owners) owner.id: owner.displayName,
+      };
+      final sections = <String, List<Emote>>{};
 
-    for (final emoteSet in userEmotes) {
-      if (emoteSet.isNotEmpty) {
-        if (emoteSet.first.type == EmoteType.twitchSub) {
-          final ownerId = emoteSet.first.ownerId;
-
-          // Check for tuurbo emote sets (e.g., monkey set).
-          if (ownerId == 'twitch') {
-            _userEmoteSectionToEmotes.update(
-              'Global Emotes',
-              (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
-              ifAbsent: () => emoteSet,
-            );
-          } else {
-            final owner = await twitchApi.getUser(id: ownerId);
-            _userEmoteSectionToEmotes.update(
-              owner.displayName,
-              (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
-              ifAbsent: () => emoteSet,
-            );
-          }
-        } else if (emoteSet.first.type == EmoteType.twitchGlobal) {
-          _userEmoteSectionToEmotes.update(
-            'Global Emotes',
-            (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
-            ifAbsent: () => emoteSet,
-          );
-        } else if (emoteSet.first.type == EmoteType.twitchUnlocked) {
-          _userEmoteSectionToEmotes.update(
-            'Unlocked Emotes',
-            (existingEmoteSet) => [...existingEmoteSet, ...emoteSet],
-            ifAbsent: () => emoteSet,
-          );
-        }
-
-        for (final emote in emoteSet) {
-          _userEmoteToObject[emote.name] = emote;
-        }
+      for (final emote in emotes) {
+        final section = switch (emote.type) {
+          EmoteType.twitchGlobal => 'Global Emotes',
+          EmoteType.twitchSub when emote.ownerId == 'twitch' => 'Global Emotes',
+          EmoteType.twitchSub => ownerNames[emote.ownerId] ?? 'Unlocked Emotes',
+          _ => 'Unlocked Emotes',
+        };
+        sections.update(
+          section,
+          (existing) => [...existing, emote],
+          ifAbsent: () => [emote],
+        );
       }
+
+      _userEmoteToObject = {for (final emote in emotes) emote.name: emote};
+      _userEmoteSectionToEmotes = sections;
+    } catch (error) {
+      onError(error);
     }
   }
 

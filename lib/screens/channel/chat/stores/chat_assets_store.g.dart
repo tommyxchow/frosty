@@ -307,14 +307,14 @@ mixin _$ChatAssetsStore on ChatAssetsStoreBase, Store {
 
   @override
   Future<void> userEmotesFuture({
-    required List<String> emoteSets,
-    required Map<String, String> headers,
+    required String userId,
+    required String broadcasterId,
     required Function onError,
   }) {
     return _$userEmotesFutureAsyncAction.run(
       () => super.userEmotesFuture(
-        emoteSets: emoteSets,
-        headers: headers,
+        userId: userId,
+        broadcasterId: broadcasterId,
         onError: onError,
       ),
     );

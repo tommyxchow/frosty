@@ -800,14 +800,13 @@ abstract class ChatStoreBase with Store {
             }
             break;
           case Command.globalUserState:
-            final setIds = parsedIRCMessage.tags['emote-sets']?.split(',');
-            if (setIds != null) {
+            final userId = auth.user.details?.id;
+            if (auth.isLoggedIn && userId != null) {
               assetsStore.userEmotesFuture(
-                emoteSets: setIds,
-                headers: auth.headersTwitch,
+                userId: userId,
+                broadcasterId: channelId,
                 onError: (error) {
                   debugPrint(error.toString());
-                  return <Emote>[];
                 },
               );
             }
